@@ -1,5 +1,5 @@
 {
-  "name": "GibsonOs/Core",
+  "name": "gibson-os/core",
   "require": {
     "mdo/mdo": "dev-master",
     "ext-mbstring": "*",
