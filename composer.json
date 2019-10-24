@@ -1,0 +1,26 @@
+{
+  "name": "GibsonOs/Core",
+  "require": {
+    "mdo/mdo": "dev-master",
+    "ext-mbstring": "*",
+    "ext-gd": "*",
+    "ext-fileinfo": "*",
+    "ext-json": "*",
+    "ext-sqlite3": "*",
+    "ext-sockets": "*"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^8.4"
+  },
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "git@wolli.dyndns.tv:/home/git/mdo.git"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "GibsonOS\\Core\\": "src/"
+    }
+  }
+}
