@@ -1,26 +1,32 @@
 <?php
+declare(strict_types=1);
+
 namespace GibsonOS\Core\Service;
 
 abstract class AbstractSingletonService extends AbstractService
 {
     /**
-     * @var AbstractSingletonService
+     * @var AbstractSingletonService[]
      */
     private static $instances = [];
 
     /**
-     * Konstruktor
+     * Konstruktor.
      *
      * Keine Instanzen erlauben.
      */
-    private function __construct() {}
+    private function __construct()
+    {
+    }
 
     /**
-     * Klonen
+     * Klonen.
      *
      * Keine Klonen erlauben.
      */
-    private function __clone() {}
+    private function __clone()
+    {
+    }
 
     /**
      * @return AbstractSingletonService

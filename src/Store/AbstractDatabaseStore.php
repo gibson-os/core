@@ -1,8 +1,10 @@
 <?php
+declare(strict_types=1);
+
 namespace GibsonOS\Core\Store;
 
-use GibsonOS\Core\Service\Registry;
 use mysqlDatabase;
+use mysqlRegistry;
 use mysqlTable;
 
 abstract class AbstractDatabaseStore extends AbstractStore
@@ -11,42 +13,46 @@ abstract class AbstractDatabaseStore extends AbstractStore
      * @var mysqlDatabase
      */
     protected $database;
+
     /**
      * @var mysqlTable
      */
     protected $table;
+
     /**
      * @var array
      */
     protected $where = [];
+
     /**
-     * @var string
+     * @var string|null
      */
     private $orderBy;
 
     /**
      * @return string
      */
-    abstract protected function getTableName();
+    abstract protected function getTableName(): string;
 
     /**
      * @return string
      */
-    abstract protected function getCountField();
+    abstract protected function getCountField(): string;
 
     /**
      * @return string[]
      */
-    abstract protected function getOrderMapping();
+    abstract protected function getOrderMapping(): array;
 
     /**
      * Core_Abstract_Store constructor.
+     *
      * @param mysqlDatabase|null $database
      */
     public function __construct(mysqlDatabase $database = null)
     {
-        if (is_null($database)) {
-            $this->database = Registry::getInstance()->get('database');
+        if (null === $database) {
+            $this->database = mysqlRegistry::getInstance()->get('database');
         } else {
             $this->database = $database;
         }
@@ -58,7 +64,7 @@ abstract class AbstractDatabaseStore extends AbstractStore
      * @param int $rows
      * @param int $from
      */
-    public function setLimit($rows, $from)
+    public function setLimit(int $rows, int $from): void
     {
         parent::setLimit($rows, $from);
 
@@ -68,26 +74,26 @@ abstract class AbstractDatabaseStore extends AbstractStore
     /**
      * @return int
      */
-    public function getCount()
+    public function getCount(): int
     {
         $this->table->clearJoin();
-        $this->table->setOrderBy(false);
+        $this->table->setOrderBy();
         $this->table->setWhere($this->getWhere());
-        $this->table->setLimit(false, false);
+        $this->table->setLimit();
 
         $count = $this->table->selectAggregate('COUNT(' . $this->getCountField() . ')');
         $this->table->setLimit(
-            $this->getRows() === 0 ? false : $this->getRows(),
-            $this->getFrom() === 0 ? false : $this->getFrom()
+            $this->getRows() === 0 ? null : $this->getRows(),
+            $this->getFrom() === 0 ? null : $this->getFrom()
         );
 
-        return $count[0];
+        return (int) $count[0];
     }
 
     /**
      * @return string|null
      */
-    protected function getWhere()
+    protected function getWhere(): ?string
     {
         if (!count($this->where)) {
             return null;
@@ -99,7 +105,7 @@ abstract class AbstractDatabaseStore extends AbstractStore
     /**
      * @param array $sort
      */
-    public function setSortByExt($sort)
+    public function setSortByExt(array $sort): void
     {
         $mapping = $this->getOrderMapping();
 
@@ -123,10 +129,10 @@ abstract class AbstractDatabaseStore extends AbstractStore
                 continue;
             }
 
-            $order = '`' . $this->database->escape($sortItem['property'], false) . '`';
+            $order = '`' . $this->database->escapeWithoutQuotes($sortItem['property']) . '`';
 
             if (array_key_exists('direction', $sortItem)) {
-                $order .= ' ' . $this->database->escape($sortItem['direction'], false);
+                $order .= ' ' . $this->database->escapeWithoutQuotes($sortItem['direction']);
             }
 
             $orderBy[] = $order;
@@ -136,9 +142,9 @@ abstract class AbstractDatabaseStore extends AbstractStore
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    protected function getOrderBy()
+    protected function getOrderBy(): ?string
     {
         return $this->orderBy;
     }

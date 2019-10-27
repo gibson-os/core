@@ -1,8 +1,12 @@
 <?php
+declare(strict_types=1);
+
 namespace GibsonOS\Core\Factory\Image;
 
 use GibsonOS\Core\Exception\FileNotFound;
-use GibsonOS\Core\Service\Image;
+use GibsonOS\Core\Exception\SetError;
+use GibsonOS\Core\Factory\Image;
+use GibsonOS\Core\Service\Image as ImageService;
 use GibsonOS\Core\Service\Image\Manipulate as ManipulateService;
 
 class Manipulate
@@ -10,36 +14,42 @@ class Manipulate
     /**
      * @param int $width
      * @param int $height
-     * @param bool $trueColor
-     * @param bool $fillTransparent
+     *
+     * @throws SetError
+     *
      * @return ManipulateService
      */
-    static function create($width, $height, $trueColor = true, $fillTransparent = true)
+    public static function create(int $width, int $height): ManipulateService
     {
-        $image = new Image();
-        $image->create($width, $height, $trueColor, $fillTransparent);
+        $image = Image::create();
+        $image->create($width, $height);
+        $image->fillTransparent();
 
         return self::createByImage($image);
     }
 
     /**
      * @param string $filename
-     * @return ManipulateService
+     *
      * @throws FileNotFound
+     * @throws SetError
+     *
+     * @return ManipulateService
      */
-    static function createByFilename($filename)
+    public static function createByFilename(string $filename): ManipulateService
     {
-        $image = new Image();
+        $image = Image::create();
         $image->load($filename);
 
         return self::createByImage($image);
     }
 
     /**
-     * @param Image $image
+     * @param ImageService $image
+     *
      * @return ManipulateService
      */
-    static function createByImage(Image $image)
+    public static function createByImage(ImageService $image): ManipulateService
     {
         return new ManipulateService($image);
     }

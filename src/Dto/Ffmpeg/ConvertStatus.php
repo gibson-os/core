@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace GibsonOS\Core\Dto\Ffmpeg;
 
 use DateTime;
@@ -9,26 +11,32 @@ class ConvertStatus
      * @var int
      */
     private $frame;
+
     /**
      * @var int
      */
     private $frames = 0;
+
     /**
      * @var int
      */
     private $fps;
+
     /**
      * @var float
      */
     private $quality;
+
     /**
      * @var int;
      */
     private $size;
+
     /**
      * @var DateTime
      */
     private $time;
+
     /**
      * @var float
      */
@@ -44,11 +52,13 @@ class ConvertStatus
 
     /**
      * @param int $frame
+     *
      * @return ConvertStatus
      */
     public function setFrame($frame)
     {
         $this->frame = $frame;
+
         return $this;
     }
 
@@ -62,11 +72,13 @@ class ConvertStatus
 
     /**
      * @param int $frames
+     *
      * @return ConvertStatus
      */
     public function setFrames($frames)
     {
         $this->frames = $frames;
+
         return $this;
     }
 
@@ -80,11 +92,13 @@ class ConvertStatus
 
     /**
      * @param int $fps
+     *
      * @return ConvertStatus
      */
     public function setFps($fps)
     {
         $this->fps = $fps;
+
         return $this;
     }
 
@@ -98,11 +112,13 @@ class ConvertStatus
 
     /**
      * @param float $quality
+     *
      * @return ConvertStatus
      */
     public function setQuality($quality)
     {
         $this->quality = $quality;
+
         return $this;
     }
 
@@ -116,11 +132,13 @@ class ConvertStatus
 
     /**
      * @param int $size
+     *
      * @return ConvertStatus
      */
     public function setSize($size)
     {
         $this->size = $size;
+
         return $this;
     }
 
@@ -134,11 +152,13 @@ class ConvertStatus
 
     /**
      * @param DateTime $time
+     *
      * @return ConvertStatus
      */
     public function setTime(DateTime $time)
     {
         $this->time = $time;
+
         return $this;
     }
 
@@ -152,11 +172,13 @@ class ConvertStatus
 
     /**
      * @param float $bitrate
+     *
      * @return ConvertStatus
      */
     public function setBitrate($bitrate)
     {
         $this->bitrate = $bitrate;
+
         return $this;
     }
 
@@ -169,7 +191,7 @@ class ConvertStatus
             return 0;
         }
 
-        $percent = intval((100/$this->getFrames()) * $this->getFrame());
+        $percent = intval((100 / $this->getFrames()) * $this->getFrame());
 
         return $percent = $percent > 100 ? 100 : $percent;
     }
@@ -179,7 +201,6 @@ class ConvertStatus
         if ($this->getFrames() === 0) {
             return 0;
         }
-
 
         return new DateTime('@' . round(($this->getFrames() - $this->getFrame()) / $this->getFps()));
     }

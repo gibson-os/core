@@ -1,7 +1,9 @@
 <?php
+declare(strict_types=1);
+
 namespace GibsonOS\Core\Model;
 
-
+use GibsonOS\Core\Exception\DateTimeError;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use mysqlDatabase;
 
@@ -11,14 +13,17 @@ class Action extends AbstractModel
      * @var int
      */
     private $id;
+
     /**
      * @var string
      */
     private $name;
+
     /**
      * @var int
      */
     private $moduleId;
+
     /**
      * @var int
      */
@@ -28,6 +33,7 @@ class Action extends AbstractModel
      * @var Module
      */
     private $module;
+
     /**
      * @var Task
      */
@@ -59,11 +65,13 @@ class Action extends AbstractModel
 
     /**
      * @param int $id
+     *
      * @return Action
      */
     public function setId(int $id): Action
     {
         $this->id = $id;
+
         return $this;
     }
 
@@ -77,11 +85,13 @@ class Action extends AbstractModel
 
     /**
      * @param string $name
+     *
      * @return Action
      */
     public function setName(string $name): Action
     {
         $this->name = $name;
+
         return $this;
     }
 
@@ -95,11 +105,13 @@ class Action extends AbstractModel
 
     /**
      * @param int $moduleId
+     *
      * @return Action
      */
     public function setModuleId(int $moduleId): Action
     {
         $this->moduleId = $moduleId;
+
         return $this;
     }
 
@@ -113,11 +125,13 @@ class Action extends AbstractModel
 
     /**
      * @param int $taskId
+     *
      * @return Action
      */
     public function setTaskId(int $taskId): Action
     {
         $this->taskId = $taskId;
+
         return $this;
     }
 
@@ -131,11 +145,13 @@ class Action extends AbstractModel
 
     /**
      * @param Module $module
+     *
      * @return Action
      */
     public function setModule(Module $module): Action
     {
         $this->module = $module;
+
         return $this;
     }
 
@@ -149,31 +165,39 @@ class Action extends AbstractModel
 
     /**
      * @param Task $task
+     *
      * @return Action
      */
     public function setTask(Task $task): Action
     {
         $this->task = $task;
+
         return $this;
     }
 
     /**
-     * @return Action
      * @throws SelectError
+     * @throws DateTimeError
+     *
+     * @return Action
      */
     public function loadModule(): Action
     {
         $this->loadForeignRecord($this->getModule(), $this->getModuleId());
+
         return $this;
     }
 
     /**
-     * @return Action
+     * @throws DateTimeError
      * @throws SelectError
+     *
+     * @return Action
      */
     public function loadTask(): Action
     {
         $this->loadForeignRecord($this->getTask(), $this->getTaskId());
+
         return $this;
     }
 }

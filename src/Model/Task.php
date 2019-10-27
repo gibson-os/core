@@ -1,6 +1,9 @@
 <?php
+declare(strict_types=1);
+
 namespace GibsonOS\Core\Model;
 
+use GibsonOS\Core\Exception\DateTimeError;
 use GibsonOS\Core\Exception\Repository\SelectError;
 
 class Task extends AbstractModel
@@ -9,14 +12,17 @@ class Task extends AbstractModel
      * @var int
      */
     private $id;
+
     /**
      * @var string
      */
     private $name;
+
     /**
      * @var int
      */
     private $moduleId;
+
     /**
      * @var Module
      */
@@ -40,11 +46,13 @@ class Task extends AbstractModel
 
     /**
      * @param int $id
+     *
      * @return Task
      */
     public function setId(int $id): Task
     {
         $this->id = $id;
+
         return $this;
     }
 
@@ -58,11 +66,13 @@ class Task extends AbstractModel
 
     /**
      * @param string $name
+     *
      * @return Task
      */
     public function setName(string $name): Task
     {
         $this->name = $name;
+
         return $this;
     }
 
@@ -76,11 +86,13 @@ class Task extends AbstractModel
 
     /**
      * @param int $moduleId
+     *
      * @return Task
      */
     public function setModuleId(int $moduleId): Task
     {
         $this->moduleId = $moduleId;
+
         return $this;
     }
 
@@ -94,21 +106,26 @@ class Task extends AbstractModel
 
     /**
      * @param Module $module
+     *
      * @return Task
      */
     public function setModule(Module $module): Task
     {
         $this->module = $module;
+
         return $this;
     }
 
     /**
-     * @return Task
      * @throws SelectError
+     * @throws DateTimeError
+     *
+     * @return Task
      */
     public function loadModule(): Task
     {
         $this->loadForeignRecord($this->getModule(), $this->getModuleId());
+
         return $this;
     }
 }

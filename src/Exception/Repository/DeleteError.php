@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace GibsonOS\Core\Exception\Repository;
 
 use GibsonOS\Core\Exception\AbstractException;
@@ -27,11 +29,13 @@ class DeleteError extends AbstractException
 
     /**
      * @param mysqlTable $table
+     *
      * @return DeleteError
      */
     public function setTable($table)
     {
         $this->table = $table;
+
         return $this;
     }
 }

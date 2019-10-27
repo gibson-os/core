@@ -1,46 +1,58 @@
 <?php
+declare(strict_types=1);
+
 namespace GibsonOS\Core\Exception;
 
 use Exception;
 
 /**
- * Gibson OS
+ * Gibson OS.
  *
  * @author Benjamin Wollenweber
+ *
  * @package GibsonOS\System
+ *
  * @copyright 2014
  */
 abstract class AbstractException extends Exception
 {
     const INFO = 0;
+
     const WARNING = 1;
+
     const ERROR = 2;
+
     const QUESTION = 3;
+
     const PROMPT = 4;
 
     /**
-     * @var null|string
+     * @var string|null
      */
-    private $title = null;
+    private $title;
+
     /**
      * @var int
      */
     private $type = self::ERROR;
+
     /**
      * @var array
      */
     private $extraParameters = [];
+
     /**
      * @var array
      */
     private $buttons = [];
-    /**
-     * @var null|string
-     */
-    private $promptParameter = null;
 
     /**
-     * @return null|string
+     * @var string|null
+     */
+    private $promptParameter;
+
+    /**
+     * @return string|null
      */
     public function getTitle(): ?string
     {
@@ -48,12 +60,14 @@ abstract class AbstractException extends Exception
     }
 
     /**
-     * @param null|string $title
+     * @param string|null $title
+     *
      * @return AbstractException
      */
     public function setTitle($title): AbstractException
     {
         $this->title = $title;
+
         return $this;
     }
 
@@ -67,11 +81,13 @@ abstract class AbstractException extends Exception
 
     /**
      * @param int $type
+     *
      * @return AbstractException
      */
     public function setType($type): AbstractException
     {
         $this->type = $type;
+
         return $this;
     }
 
@@ -85,27 +101,31 @@ abstract class AbstractException extends Exception
 
     /**
      * @param array $extraParameters
+     *
      * @return AbstractException
      */
     public function setExtraParameters($extraParameters): AbstractException
     {
         $this->extraParameters = $extraParameters;
+
         return $this;
     }
 
     /**
      * @param string $key
-     * @param $value
+     * @param mixed  $value
+     *
      * @return AbstractException
      */
     public function setExtraParameter(string $key, $value): AbstractException
     {
         $this->extraParameters[$key] = $value;
+
         return $this;
     }
 
     /**
-     * @return null|string
+     * @return string|null
      */
     public function getPromptParameter(): ?string
     {
@@ -113,12 +133,14 @@ abstract class AbstractException extends Exception
     }
 
     /**
-     * @param null|string $promptParameter
+     * @param string|null $promptParameter
+     *
      * @return AbstractException
      */
     public function setPromptParameter($promptParameter): AbstractException
     {
         $this->promptParameter = $promptParameter;
+
         return $this;
     }
 
@@ -143,9 +165,9 @@ abstract class AbstractException extends Exception
     }
 
     /**
-     * @param string $text
+     * @param string      $text
      * @param string|null $parameter
-     * @param mixed|null $value
+     * @param mixed|null  $value
      */
     public function addButton(string $text, string $parameter = null, $value = null)
     {
@@ -153,7 +175,7 @@ abstract class AbstractException extends Exception
             'text' => $text,
             'parameter' => $parameter,
             'value' => $value,
-            'sendRequest' => $parameter ? true : false
+            'sendRequest' => $parameter ? true : false,
         ];
     }
 }

@@ -1,13 +1,18 @@
 <?php
+declare(strict_types=1);
+
 namespace GibsonOS\Core\Model;
 
-use DateTime;
+use GibsonOS\Core\Exception\DateTimeError;
+use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\Model\DeleteError;
 use GibsonOS\Core\Exception\Model\SaveError;
 use GibsonOS\Core\Exception\Repository\SelectError;
-use GibsonOS\Core\Service\Registry;
+use GibsonOS\Core\Factory\DateTime as DateTimeFactory;
+use GibsonOS\Core\Service\DateTime;
 use mysqlDatabase;
 use mysqlField;
+use mysqlRegistry;
 use mysqlTable;
 
 abstract class AbstractModel implements ModelInterface
@@ -18,9 +23,13 @@ abstract class AbstractModel implements ModelInterface
     private $database;
 
     private const TYPE_INT = 'int';
+
     private const TYPE_FLOAT = 'int';
+
     private const TYPE_STRING = 'string';
+
     private const TYPE_DATE_TIME = 'dateTime';
+
     private const COLUMN_TYPES = [
         'tinyint' => self::TYPE_INT,
         'smallint' => self::TYPE_INT,
@@ -37,19 +46,32 @@ abstract class AbstractModel implements ModelInterface
     ];
 
     /**
+     * @var DateTime
+     */
+    private $dateTime;
+
+    /**
      * AbstractModel constructor.
+     *
      * @param mysqlDatabase|null $database
+     *
+     * @throws GetError
      */
     public function __construct(mysqlDatabase $database = null)
     {
-        if (is_null($database)) {
-            $this->database = Registry::getInstance()->get('database');
+        // @todo uncooles konstrukt
+        $this->dateTime = DateTimeFactory::create();
+
+        if ($database === null) {
+            $this->database = mysqlRegistry::getInstance()->get('database');
         } else {
             $this->database = $database;
         }
     }
 
     /**
+     * @throws DateTimeError
+     *
      * @return mysqlTable
      */
     public function getMysqlTable(): mysqlTable
@@ -62,6 +84,8 @@ abstract class AbstractModel implements ModelInterface
 
     /**
      * @param mysqlTable $mysqlTable
+     *
+     * @throws DateTimeError
      */
     public function loadFromMysqlTable(mysqlTable $mysqlTable)
     {
@@ -80,18 +104,22 @@ abstract class AbstractModel implements ModelInterface
             } else {
                 switch ($this->getColumnType($fieldObject->getType())) {
                     case self::TYPE_INT:
-                        $this->{'set' . $fieldName}((int)$fieldObject->getValue());
+                        $this->{'set' . $fieldName}((int) $fieldObject->getValue());
+
                         break;
                     case self::TYPE_FLOAT:
-                        $this->{'set' . $fieldName}((float)$fieldObject->getValue());
+                        $this->{'set' . $fieldName}((float) $fieldObject->getValue());
+
                         break;
                     case self::TYPE_DATE_TIME:
-                        $this->{'set' . $fieldName}(new DateTime(
-                            $fieldObject->getValue() === 'CURRENT_TIMESTAMP' ? 'now' : $fieldObject->getValue()
+                        $this->{'set' . $fieldName}($this->dateTime->get(
+                            $fieldObject->getValue() === 'CURRENT_TIMESTAMP' ? 'now' : (string) $fieldObject->getValue()
                         ));
+
                         break;
                     default:
                         $this->{'set' . $fieldName}($fieldObject->getValue());
+
                         break;
                 }
             }
@@ -100,6 +128,8 @@ abstract class AbstractModel implements ModelInterface
 
     /**
      * @param mysqlTable $mysqlTable
+     *
+     * @throws DateTimeError
      */
     public function setToMysqlTable(mysqlTable $mysqlTable)
     {
@@ -110,7 +140,7 @@ abstract class AbstractModel implements ModelInterface
                 continue;
             }
 
-            if (is_null($this->{'get' . $fieldName}())) {
+            if (null === $this->{'get' . $fieldName}()) {
                 continue;
             }
 
@@ -119,21 +149,22 @@ abstract class AbstractModel implements ModelInterface
 
             if ($this->getColumnType($fieldObject->getType()) === self::TYPE_DATE_TIME) {
                 $fieldObject->setValue($this->{'get' . $fieldName}()->format('Y-m-d H:i:s'));
-                $this->{'set' . $fieldName}(new DateTime($fieldObject->getValue()));
+                $this->{'set' . $fieldName}($this->dateTime->get((string) $fieldObject->getValue()));
             } else {
                 $fieldObject->setValue($this->{'get' . $fieldName}());
             }
-
         }
     }
 
     /**
      * @param mysqlTable|null $mysqlTable
+     *
      * @throws SaveError
+     * @throws DateTimeError
      */
     public function save(mysqlTable $mysqlTable = null)
     {
-        if (is_null($mysqlTable)) {
+        if (null === $mysqlTable) {
             $mysqlTable = new mysqlTable($this->database, $this->getTableName());
         }
 
@@ -151,12 +182,14 @@ abstract class AbstractModel implements ModelInterface
     }
 
     /**
-     * @param null|mysqlTable $mysqlTable
+     * @param mysqlTable|null $mysqlTable
+     *
      * @throws DeleteError
+     * @throws DateTimeError
      */
     public function delete(mysqlTable $mysqlTable = null)
     {
-        if (is_null($mysqlTable)) {
+        if (null === $mysqlTable) {
             $mysqlTable = new mysqlTable($this->database, $this->getTableName());
         }
 
@@ -165,12 +198,14 @@ abstract class AbstractModel implements ModelInterface
         if (!$mysqlTable->delete()) {
             $exception = new DeleteError();
             $exception->setModel($this);
+
             throw $exception;
         }
     }
 
     /**
      * @param string $fieldName
+     *
      * @return string
      */
     private function transformFieldName(string $fieldName): string
@@ -180,8 +215,10 @@ abstract class AbstractModel implements ModelInterface
 
     /**
      * @param AbstractModel $model
-     * @param mixed $value
-     * @param string $foreignField
+     * @param mixed         $value
+     * @param string        $foreignField
+     *
+     * @throws DateTimeError
      * @throws SelectError
      */
     protected function loadForeignRecord(AbstractModel $model, $value, string $foreignField = 'id')
@@ -208,9 +245,12 @@ abstract class AbstractModel implements ModelInterface
 
     /**
      * @param string $modelClassName
-     * @param mixed $value
+     * @param mixed  $value
      * @param string $foreignTable
      * @param string $foreignField
+     *
+     * @throws DateTimeError
+     *
      * @return AbstractModel[]
      */
     protected function loadForeignRecords(string $modelClassName, $value, string $foreignTable, string $foreignField): array
@@ -225,9 +265,7 @@ abstract class AbstractModel implements ModelInterface
         }
 
         do {
-            /**
-             * @var AbstractModel $model
-             */
+            /** @var AbstractModel $model */
             $model = new $modelClassName();
             $model->loadFromMysqlTable($mysqlTable);
             $models[] = $model;
@@ -238,6 +276,7 @@ abstract class AbstractModel implements ModelInterface
 
     /**
      * @param string $type
+     *
      * @return string
      */
     private function getColumnType(string $type): string

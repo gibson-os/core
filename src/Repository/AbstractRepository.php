@@ -1,15 +1,16 @@
 <?php
+declare(strict_types=1);
+
 namespace GibsonOS\Core\Repository;
 
-
-use GibsonOS\Core\Service\Registry;
 use mysqlDatabase;
+use mysqlRegistry;
 use mysqlTable;
 
 class AbstractRepository
 {
     /**
-     * @param null|mysqlDatabase $database
+     * @param mysqlDatabase|null $database
      */
     public static function startTransaction(mysqlDatabase $database = null)
     {
@@ -18,7 +19,7 @@ class AbstractRepository
     }
 
     /**
-     * @param null|mysqlDatabase $database
+     * @param mysqlDatabase|null $database
      */
     public static function commit(mysqlDatabase $database = null)
     {
@@ -27,7 +28,7 @@ class AbstractRepository
     }
 
     /**
-     * @param null|mysqlDatabase $database
+     * @param mysqlDatabase|null $database
      */
     public static function rollback(mysqlDatabase $database = null)
     {
@@ -36,11 +37,12 @@ class AbstractRepository
     }
 
     /**
-     * @param string $tableName
-     * @param null|mysqlDatabase $database
+     * @param string             $tableName
+     * @param mysqlDatabase|null $database
+     *
      * @return mysqlTable
      */
-    static protected function getTable(string $tableName, mysqlDatabase $database = null): mysqlTable
+    protected static function getTable(string $tableName, mysqlDatabase $database = null): mysqlTable
     {
         $database = self::getDatabase($database);
 
@@ -48,32 +50,38 @@ class AbstractRepository
     }
 
     /**
-     * Maskiert und quotet
+     * @param string             $value
+     * @param mysqlDatabase|null $database
      *
-     * Maskiert und qoutet einen Wert.
-     *
-     * @param string $value Wert
-     * @param bool $withQuotes
-     * @param null|mysqlDatabase $database
      * @return string
      */
-    static protected function escape(string $value, bool $withQuotes = true, mysqlDatabase $database = null): string
+    protected static function escape(string $value, mysqlDatabase $database = null): string
     {
         $database = self::getDatabase($database);
 
-        return $database->escape($value, $withQuotes);
+        return $database->escape($value);
     }
 
     /**
-     * Gibt MySQL RexEx String zurück
-     *
-     * Gibt einen MySQL RexEx String zurück.
-     *
-     * @param string $search Suchstring
+     * @param string             $value
      * @param mysqlDatabase|null $database
-     * @return string MySQL RexEx String
+     *
+     * @return string
      */
-    static protected function getRegexString(string $search, mysqlDatabase $database = null): string
+    protected static function escapeWithoutQuotes(string $value, mysqlDatabase $database = null): string
+    {
+        $database = self::getDatabase($database);
+
+        return $database->escapeWithoutQuotes($value);
+    }
+
+    /**
+     * @param string             $search
+     * @param mysqlDatabase|null $database
+     *
+     * @return string
+     */
+    protected static function getRegexString(string $search, mysqlDatabase $database = null): string
     {
         $database = self::getDatabase($database);
 
@@ -81,16 +89,13 @@ class AbstractRepository
     }
 
     /**
-     * Maskiert und quotet
+     * @param array              $pieces
+     * @param string             $glue
+     * @param mysqlDatabase|null $database
      *
-     * Maskiert und qoutet ein Array mit Werten.
-     *
-     * @param array $pieces Werte
-     * @param string $glue Trennzeichen
-     * @param null|mysqlDatabase $database
      * @return string
      */
-    static protected function implode(array $pieces, $glue = ',', mysqlDatabase $database = null): string
+    protected static function implode(array $pieces, $glue = ',', mysqlDatabase $database = null): string
     {
         $database = self::getDatabase($database);
 
@@ -99,14 +104,15 @@ class AbstractRepository
 
     /**
      * @param mysqlDatabase|null $database
+     *
      * @return mysqlDatabase
      */
     private static function getDatabase(mysqlDatabase $database = null): mysqlDatabase
     {
         if ($database instanceof mysqlDatabase) {
             return $database;
-        } else {
-            return Registry::getInstance()->get('database');
         }
+
+        return mysqlRegistry::getInstance()->get('database');
     }
 }

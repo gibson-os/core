@@ -1,13 +1,18 @@
 <?php
+declare(strict_types=1);
+
 namespace GibsonOS\Core\Service;
 
-use DateTime;
 use GibsonOS\Core\Dto\Ffmpeg\ConvertStatus;
+use GibsonOS\Core\Exception\CreateError;
+use GibsonOS\Core\Exception\DateTimeError;
 use GibsonOS\Core\Exception\DeleteError;
 use GibsonOS\Core\Exception\Ffmpeg\ConvertStatusError;
 use GibsonOS\Core\Exception\FileNotFound;
+use GibsonOS\Core\Exception\GetError;
+use GibsonOS\Core\Exception\SetError;
+use GibsonOS\Core\Factory\Image as ImageFactory;
 use GibsonOS\Core\Service\Ffmpeg\Media;
-use GibsonOS\Core\Utility\File;
 
 class Ffmpeg extends AbstractService
 {
@@ -17,18 +22,36 @@ class Ffmpeg extends AbstractService
     public $ffpmegPath;
 
     /**
-     * Ffmpeg constructor.
-     * @param string $ffpmegPath
+     * @var DateTime
      */
-    public function __construct(string $ffpmegPath)
+    private $dateTime;
+
+    /**
+     * @var File
+     */
+    private $file;
+
+    /**
+     * Ffmpeg constructor.
+     *
+     * @param string   $ffpmegPath
+     * @param DateTime $dateTime
+     * @param File     $file
+     */
+    public function __construct(string $ffpmegPath, DateTime $dateTime, File $file)
     {
         $this->ffpmegPath = $ffpmegPath;
+        $this->dateTime = $dateTime;
+        $this->file = $file;
     }
 
     /**
      * @param string $filename
-     * @return string
+     *
+     * @throws CreateError
      * @throws FileNotFound
+     *
+     * @return string
      */
     public function getFileMetaDataString(string $filename): string
     {
@@ -40,6 +63,11 @@ class Ffmpeg extends AbstractService
         }
 
         $ffMpeg = popen($this->ffpmegPath . ' -i ' . escapeshellarg($filename) . ' 2>&1', 'r');
+
+        if (!is_resource($ffMpeg)) {
+            throw new CreateError(sprintf('Ffmpeg konnte für %s nicht ausgeführt werden!', $filename));
+        }
+
         $output = '';
 
         while ($out = fgets($ffMpeg)) {
@@ -60,13 +88,15 @@ class Ffmpeg extends AbstractService
     }
 
     /**
-     * @param Media $media
-     * @param string $outputFilename
-     * @param null|string $videoCodec
-     * @param null|string $audioCodec
-     * @param array $options
+     * @param Media       $media
+     * @param string      $outputFilename
+     * @param string|null $videoCodec
+     * @param string|null $audioCodec
+     * @param array       $options
+     *
      * @throws DeleteError
      * @throws FileNotFound
+     * @throws GetError
      */
     public function convert(
         Media $media,
@@ -83,7 +113,7 @@ class Ffmpeg extends AbstractService
         ) {
             $optionString .=
                 '-map ' . $media->getSelectedAudioStreamId() . ' ' .
-                '-c:v ' . escapeshellarg($videoCodec) . ' ';
+                '-c:v ' . escapeshellarg((string) $videoCodec) . ' ';
         }
 
         if (
@@ -92,7 +122,7 @@ class Ffmpeg extends AbstractService
         ) {
             $optionString .=
                 '-map ' . $media->getSelectedVideoStreamId() . ' ' .
-                '-c:a ' . escapeshellarg($audioCodec) . ' ';
+                '-c:a ' . escapeshellarg((string) $audioCodec) . ' ';
 
             if ($media->getSelectedSubtitleStreamId() !== null) {
                 $substitleStreamIds = array_keys($media->getSubtitleStreams());
@@ -106,7 +136,7 @@ class Ffmpeg extends AbstractService
             $optionString .= '-' . $key . ' ' . escapeshellarg($option) . ' ';
         }
 
-        $filename = 'ffmpeg' . File::getFilename($outputFilename);
+        $filename = 'ffmpeg' . $this->file->getFilename($outputFilename);
         $logPath = sys_get_temp_dir() . '/' . $filename;
         $this->execute(
             $optionString .
@@ -119,14 +149,17 @@ class Ffmpeg extends AbstractService
             throw new FileNotFound('Konvertieren war nicht erfolgreich!');
         }
 
-        File::delete(sys_get_temp_dir(), $filename);
+        $this->file->delete(sys_get_temp_dir(), $filename);
     }
 
     /**
      * @param string $filename
-     * @return ConvertStatus
+     *
      * @throws ConvertStatusError
      * @throws FileNotFound
+     * @throws DateTimeError
+     *
+     * @return ConvertStatus
      */
     public function getConvertStatus(string $filename): ConvertStatus
     {
@@ -137,6 +170,11 @@ class Ffmpeg extends AbstractService
         }
 
         $content = file_get_contents($path);
+
+        if (empty($content)) {
+            throw new ConvertStatusError();
+        }
+
         preg_match_all('/frame=\s*(\d*)\s*fps=\s*(\d*)\s*q=\s*(\d*\.\d*)\s*size=\s*(\d*)kB\s*time=\s*(\d{2}\:\d{2}\:\d{2}\.\d{2})\s*bitrate=\s*(\d*\.\d*)/', $content, $hits);
 
         $count = count($hits[0]) - 1;
@@ -144,22 +182,26 @@ class Ffmpeg extends AbstractService
         if ($count == -1) {
             throw new ConvertStatusError();
         }
-        
+
         return (new ConvertStatus())
-            ->setFrame((int)$hits[1][$count])
-            ->setFps((int)$hits[2][$count])
-            ->setQuality((float)$hits[3][$count])
+            ->setFrame((int) $hits[1][$count])
+            ->setFps((int) $hits[2][$count])
+            ->setQuality((float) $hits[3][$count])
             ->setSize($hits[4][$count])
-            ->setTime(new DateTime($hits[5][$count]))
+            ->setTime($this->dateTime->get($hits[5][$count]))
             ->setBitrate($hits[6][$count]);
     }
 
     /**
      * @param string $filename
      * @param string $frameNumber
-     * @return Image
-     * @throws FileNotFound
+     *
      * @throws DeleteError
+     * @throws FileNotFound
+     * @throws SetError
+     * @throws GetError
+     *
+     * @return Image
      */
     public function getImageByFrame(string $filename, string $frameNumber): Image
     {
@@ -170,9 +212,9 @@ class Ffmpeg extends AbstractService
             ' -an -r 1 -vframes 1 -f image2 ' . $path . ' >/dev/null 2>/dev/null'
         );
 
-        $image = new Image();
+        $image = ImageFactory::create();
         $image->load($path);
-        File::delete(sys_get_temp_dir(), $tmpFilename);
+        $this->file->delete(sys_get_temp_dir(), $tmpFilename);
 
         return $image;
     }

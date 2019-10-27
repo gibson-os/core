@@ -1,6 +1,9 @@
 <?php
+declare(strict_types=1);
+
 namespace GibsonOS\Core\Model\User;
 
+use GibsonOS\Core\Exception\DateTimeError;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Model\User;
@@ -12,18 +15,22 @@ class Permission extends AbstractModel
      * @var string
      */
     private $module;
+
     /**
      * @var string
      */
     private $task;
+
     /**
      * @var string
      */
     private $action;
+
     /**
      * @var int
      */
     private $userId;
+
     /**
      * @var int
      */
@@ -59,11 +66,13 @@ class Permission extends AbstractModel
 
     /**
      * @param string $module
+     *
      * @return Permission
      */
     public function setModule(string $module): Permission
     {
         $this->module = $module;
+
         return $this;
     }
 
@@ -77,11 +86,13 @@ class Permission extends AbstractModel
 
     /**
      * @param string $task
+     *
      * @return Permission
      */
     public function setTask(string $task): Permission
     {
         $this->task = $task;
+
         return $this;
     }
 
@@ -95,11 +106,13 @@ class Permission extends AbstractModel
 
     /**
      * @param string $action
+     *
      * @return Permission
      */
     public function setAction(string $action): Permission
     {
         $this->action = $action;
+
         return $this;
     }
 
@@ -113,11 +126,13 @@ class Permission extends AbstractModel
 
     /**
      * @param int $userId
+     *
      * @return Permission
      */
     public function setUserId(int $userId): Permission
     {
         $this->userId = $userId;
+
         return $this;
     }
 
@@ -131,11 +146,13 @@ class Permission extends AbstractModel
 
     /**
      * @param int $permission
+     *
      * @return Permission
      */
     public function setPermission(int $permission): Permission
     {
         $this->permission = $permission;
+
         return $this;
     }
 
@@ -149,6 +166,7 @@ class Permission extends AbstractModel
 
     /**
      * @param User $user
+     *
      * @return Permission
      */
     public function setUser(User $user): Permission
@@ -160,12 +178,15 @@ class Permission extends AbstractModel
     }
 
     /**
-     * @return Permission
      * @throws SelectError
+     * @throws DateTimeError
+     *
+     * @return Permission
      */
     public function loadUser(): Permission
     {
         $this->loadForeignRecord($this->getUser(), $this->getUserId());
+
         return $this;
     }
 }

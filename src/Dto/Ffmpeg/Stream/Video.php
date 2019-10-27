@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace GibsonOS\Core\Dto\Ffmpeg\Stream;
 
 class Video
@@ -6,34 +8,40 @@ class Video
     /**
      * @var string|null
      */
-    private $language = null;
+    private $language;
+
     /**
      * @var string|null
      */
     private $codec;
+
     /**
      * @var string|null
      */
     private $colorSpace;
+
     /**
      * @var int
      */
     private $width = 0;
+
     /**
      * @var int
      */
     private $height = 0;
+
     /**
      * @var int
      */
     private $fps = 0;
+
     /**
      * @var bool
      */
     private $default = false;
 
     /**
-     * @return null|string
+     * @return string|null
      */
     public function getLanguage(): ?string
     {
@@ -41,17 +49,19 @@ class Video
     }
 
     /**
-     * @param null|string $language
+     * @param string|null $language
+     *
      * @return Video
      */
     public function setLanguage(?string $language): Video
     {
         $this->language = $language;
+
         return $this;
     }
 
     /**
-     * @return null|string
+     * @return string|null
      */
     public function getCodec(): ?String
     {
@@ -59,17 +69,19 @@ class Video
     }
 
     /**
-     * @param null|string $codec
+     * @param string|null $codec
+     *
      * @return Video
      */
     public function setCodec(?string $codec): Video
     {
         $this->codec = $codec;
+
         return $this;
     }
 
     /**
-     * @return null|string
+     * @return string|null
      */
     public function getColorSpace(): ?string
     {
@@ -77,12 +89,14 @@ class Video
     }
 
     /**
-     * @param null|string $colorSpace
+     * @param string|null $colorSpace
+     *
      * @return Video
      */
     public function setColorSpace(?string $colorSpace): Video
     {
         $this->colorSpace = $colorSpace;
+
         return $this;
     }
 
@@ -96,11 +110,13 @@ class Video
 
     /**
      * @param int $width
+     *
      * @return Video
      */
     public function setWidth(int $width): Video
     {
         $this->width = $width;
+
         return $this;
     }
 
@@ -114,11 +130,13 @@ class Video
 
     /**
      * @param int $height
+     *
      * @return Video
      */
     public function setHeight(int $height): Video
     {
         $this->height = $height;
+
         return $this;
     }
 
@@ -132,11 +150,13 @@ class Video
 
     /**
      * @param int $fps
+     *
      * @return Video
      */
     public function setFps(int $fps): Video
     {
         $this->fps = $fps;
+
         return $this;
     }
 
@@ -150,11 +170,13 @@ class Video
 
     /**
      * @param bool $default
+     *
      * @return Video
      */
     public function setDefault(bool $default): Video
     {
         $this->default = $default;
+
         return $this;
     }
 }

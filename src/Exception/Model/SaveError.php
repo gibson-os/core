@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace GibsonOS\Core\Exception\Model;
 
 use GibsonOS\Core\Exception\AbstractException;
@@ -27,11 +29,13 @@ class SaveError extends AbstractException
 
     /**
      * @param AbstractModel $model
+     *
      * @return SaveError
      */
     public function setModel($model)
     {
         $this->model = $model;
+
         return $this;
     }
 }

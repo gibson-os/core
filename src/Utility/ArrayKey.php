@@ -1,18 +1,17 @@
 <?php
+declare(strict_types=1);
+
 namespace GibsonOS\Core\Utility;
 
 class ArrayKey
 {
     /**
-     * Durchsucht Mehrdimensionale Arrays
+     * @param string|int|array $key
+     * @param array            $search
      *
-     * Durchsucht Mehrdimensionale Arrays nach einem Schlüssel.
-     *
-     * @param string|int|array $key Schlüssel
-     * @param array $search Zu durchsuchendes Array
      * @return bool
      */
-    public static function exists($key, $search)
+    public static function exists($key, array $search): bool
     {
         if (is_array($key)) {
             foreach ($key as $keyValue) {
@@ -20,7 +19,7 @@ class ArrayKey
                     return true;
                 }
             }
-        } else if (!is_array($search)) {
+
             return false;
         }
 

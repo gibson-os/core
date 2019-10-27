@@ -1,7 +1,10 @@
 <?php
+declare(strict_types=1);
+
 namespace GibsonOS\Core\Model\User;
 
 use DateTime;
+use GibsonOS\Core\Exception\DateTimeError;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Model\User;
@@ -13,22 +16,27 @@ class Device extends AbstractModel
      * @var string
      */
     private $id;
+
     /**
      * @var int
      */
     private $userId;
+
     /**
      * @var string
      */
     private $model;
+
     /**
      * @var string
      */
     private $registrationId;
+
     /**
      * @var DateTime
      */
     private $lastLogin;
+
     /**
      * @var DateTime
      */
@@ -64,11 +72,13 @@ class Device extends AbstractModel
 
     /**
      * @param string $id
+     *
      * @return Device
      */
     public function setId(string $id): Device
     {
         $this->id = $id;
+
         return $this;
     }
 
@@ -82,11 +92,13 @@ class Device extends AbstractModel
 
     /**
      * @param int $userId
+     *
      * @return Device
      */
     public function setUserId(int $userId): Device
     {
         $this->userId = $userId;
+
         return $this;
     }
 
@@ -100,11 +112,13 @@ class Device extends AbstractModel
 
     /**
      * @param string $model
+     *
      * @return Device
      */
     public function setModel(string $model): Device
     {
         $this->model = $model;
+
         return $this;
     }
 
@@ -118,11 +132,13 @@ class Device extends AbstractModel
 
     /**
      * @param string $registrationId
+     *
      * @return Device
      */
     public function setRegistrationId(string $registrationId): Device
     {
         $this->registrationId = $registrationId;
+
         return $this;
     }
 
@@ -136,11 +152,13 @@ class Device extends AbstractModel
 
     /**
      * @param DateTime $lastLogin
+     *
      * @return Device
      */
     public function setLastLogin(DateTime $lastLogin): Device
     {
         $this->lastLogin = $lastLogin;
+
         return $this;
     }
 
@@ -154,11 +172,13 @@ class Device extends AbstractModel
 
     /**
      * @param DateTime $added
+     *
      * @return Device
      */
     public function setAdded(DateTime $added): Device
     {
         $this->added = $added;
+
         return $this;
     }
 
@@ -172,6 +192,7 @@ class Device extends AbstractModel
 
     /**
      * @param User $user
+     *
      * @return Device
      */
     public function setUser(User $user)
@@ -183,12 +204,15 @@ class Device extends AbstractModel
     }
 
     /**
-     * @return Device
      * @throws SelectError
+     * @throws DateTimeError
+     *
+     * @return Device
      */
     public function loadUser()
     {
         $this->loadForeignRecord($this->getUser(), $this->getUserId());
+
         return $this;
     }
 }

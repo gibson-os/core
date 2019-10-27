@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace GibsonOS\Core\Dto\Ffmpeg\Stream;
 
 class Subtitle
@@ -7,17 +9,19 @@ class Subtitle
      * @var string|null
      */
     private $language;
+
     /**
      * @var bool
      */
     private $default = false;
+
     /**
      * @var bool
      */
     private $forced = false;
 
     /**
-     * @return null|string
+     * @return string|null
      */
     public function getLanguage(): ?string
     {
@@ -25,12 +29,14 @@ class Subtitle
     }
 
     /**
-     * @param null|string $language
+     * @param string|null $language
+     *
      * @return Subtitle
      */
     public function setLanguage(?string $language): Subtitle
     {
         $this->language = $language;
+
         return $this;
     }
 
@@ -44,11 +50,13 @@ class Subtitle
 
     /**
      * @param bool $default
+     *
      * @return Subtitle
      */
     public function setDefault(bool $default): Subtitle
     {
         $this->default = $default;
+
         return $this;
     }
 
@@ -62,11 +70,13 @@ class Subtitle
 
     /**
      * @param bool $forced
+     *
      * @return Subtitle
      */
     public function setForced(bool $forced): Subtitle
     {
         $this->forced = $forced;
+
         return $this;
     }
 }

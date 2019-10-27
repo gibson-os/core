@@ -1,19 +1,24 @@
 <?php
+declare(strict_types=1);
+
 namespace GibsonOS\Core\Service\Image;
+
+use GibsonOS\Core\Exception\SetError;
 
 /**
  * @deprecated
+ *
  * @package GibsonOS\Core\Service\Image
  */
 class Thumbnail
 {
-    CONST POSITIONS = [
+    const POSITIONS = [
         16 => 144,
         32 => 112,
         48 => 64,
         64 => 0,
         128 => 160,
-        256 => 288
+        256 => 288,
     ];
 
     /**
@@ -32,11 +37,14 @@ class Thumbnail
     /**
      * @return Manipulate
      */
-    public function getManipulate()
+    public function getManipulate(): Manipulate
     {
         return $this->manipulate;
     }
 
+    /**
+     * @throws SetError
+     */
     public function create()
     {
         /** @var Manipulate[] $images */

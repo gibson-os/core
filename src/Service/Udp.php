@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace GibsonOS\Core\Service;
 
 use GibsonOS\Core\Exception\CreateError;
@@ -9,40 +11,47 @@ use GibsonOS\Core\Exception\SetError;
 class Udp extends AbstractService
 {
     /**
-     * @var resource Socket
+     * @var resource
      */
     private $socket;
+
     /**
-     * @var string IP
+     * @var string
      */
     private $ip;
+
     /**
-     * @var int Port
+     * @var int
      */
     private $port = 0;
+
     /**
-     * @var string Sender IP
+     * @var string
      */
     private $sendIp;
+
     /**
-     * @var int Sender Port
+     * @var int
      */
     private $sendPort = 0;
 
     /**
      * @param string $ip
-     * @param int $port
+     * @param int    $port
+     *
      * @throws CreateError
      * @throws SetError
      */
-    public function __construct($ip, $port)
+    public function __construct(string $ip, int $port)
     {
-        $this->socket = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP);
-        $this->setTimeout();
+        $socket = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP);
 
-        if (!is_resource($this->socket)) {
+        if (!is_resource($socket)) {
             throw new CreateError('Socket konnte nicht angelegt werden!');
         }
+
+        $this->socket = $socket;
+        $this->setTimeout();
 
         $this->ip = $ip;
         $this->port = $port;
@@ -53,14 +62,11 @@ class Udp extends AbstractService
     }
 
     /**
-     * Setzt Timeout
+     * @param int $timeout
      *
-     * Setzt das Timeout für Übertragungen.
-     *
-     * @param int $timeout Timeout
      * @throws SetError
      */
-    public function setTimeout($timeout = 10)
+    public function setTimeout(int $timeout = 10)
     {
         if (!socket_set_option($this->socket, SOL_SOCKET, SO_RCVTIMEO, ['sec' => $timeout, 'usec' => null])) {
             throw new SetError('Receive timeout konnte nicht gesetzt werden!');
@@ -72,16 +78,13 @@ class Udp extends AbstractService
     }
 
     /**
-     * Sendet Nachricht
+     * @param string $msg
+     * @param string $ip
+     * @param int    $port
      *
-     * Sendet eine Nachricht.
-     *
-     * @param string $msg Nachricht
-     * @param string $ip IP
-     * @param int $port Port
      * @throws SendError
      */
-    public function send($msg, $ip, $port = 0)
+    public function send(string $msg, string $ip, int $port = 0)
     {
         $this->sendIp = $ip;
         $this->sendPort = $port;
@@ -92,40 +95,32 @@ class Udp extends AbstractService
     }
 
     /**
-     * Empfängt Nachricht
+     * @param int         $length
+     * @param string|null $ip
+     * @param int|null    $port
+     * @param int         $flags
      *
-     * Wird IP nicht übergeben nimmt er die aus der Initalisierung.<br>
-     * Wird Port nicht übergeben nimmt er die aus der Initalisierung.
-     *
-     * @param int $len Länge
-     * @param string|null $ip IP
-     * @param int|null $port Port
-     * @param int $flags Einstellungen
-     * @return string
      * @throws ReceiveError
+     *
+     * @return string
      */
-    public function receive($len, $ip = null, $port = null, $flags = 0)
+    public function receive(int $length, string $ip = null, int $port = null, int $flags = 0): string
     {
-        if (is_null($ip)) {
+        if (null === $ip) {
             $ip = $this->sendIp;
         }
 
-        if (is_null($port)) {
+        if (null === $port) {
             $port = $this->sendPort;
         }
 
-        if (socket_recvfrom($this->socket, $buf, $len, $flags, $ip, $port) === false) {
+        if (socket_recvfrom($this->socket, $buf, $length, $flags, $ip, $port) === false) {
             throw new ReceiveError();
         }
 
         return $buf;
     }
 
-    /**
-     * Schließt Socket
-     *
-     * Schließt eine Socket Verbindung.
-     */
     public function close()
     {
         socket_close($this->socket);

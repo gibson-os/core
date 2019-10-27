@@ -1,6 +1,10 @@
 <?php
+declare(strict_types=1);
+
 namespace GibsonOS\Core\Service\Image;
 
+use GibsonOS\Core\Exception\SetError;
+use GibsonOS\Core\Factory\Image as ImageFactory;
 use GibsonOS\Core\Factory\Image\Draw as DrawFactory;
 use GibsonOS\Core\Factory\Image\Manipulate as ManipulateFactory;
 use GibsonOS\Core\Service\AbstractService;
@@ -22,10 +26,11 @@ class Manipulate extends AbstractService
     }
 
     /**
-     * Verkleinert oder Vergrößter ein Bild und behäld dabei die Proportionen.
+     * @param int $width
+     * @param int $height
      *
-     * @param int $width Breite
-     * @param int $height Höhe
+     * @throws SetError
+     *
      * @return bool
      */
     public function resize(int $width, int $height): bool
@@ -57,10 +62,10 @@ class Manipulate extends AbstractService
             }
         }
 
-        $width = $newWidth;
-        $height = $newHeight;
+        $width = (int) $newWidth;
+        $height = (int) $newHeight;
 
-        $Image = new Image();
+        $Image = ImageFactory::create();
         $Image->create($width, $height);
         $image = $Image->getResource();
 
@@ -88,14 +93,14 @@ class Manipulate extends AbstractService
     }
 
     /**
-     * Setzt das Bild zentriert auf die angegebene Breite und Höhe.
-     * Gegenstück zu cropResized.
+     * @param int $width
+     * @param int $height
      *
-     * @param int $width Breite
-     * @param int $height Höhe
+     * @throws SetError
+     *
      * @return bool
      */
-    public function resizeCentered($width, $height)
+    public function resizeCentered(int $width, int $height): bool
     {
         if (!$this->resize($width, $height)) {
             return false;
@@ -103,7 +108,7 @@ class Manipulate extends AbstractService
 
         if ($this->getImage()->getWidth() < $width) {
             $this->horizontalCentered($width, $height);
-        } else if ($this->getImage()->getHeight() < $height) {
+        } elseif ($this->getImage()->getHeight() < $height) {
             $this->verticalCentered($width, $height);
         }
 
@@ -111,12 +116,12 @@ class Manipulate extends AbstractService
     }
 
     /**
-     * Setzt das Bild vertikal zentriert auf die angegebene Breite und Höhe
+     * @param int $width
+     * @param int $height
      *
-     * @param int $width Breite
-     * @param int $height Höhe
+     * @throws SetError
      */
-    public function verticalCentered($width, $height)
+    public function verticalCentered(int $width, int $height): void
     {
         $manipulate = ManipulateFactory::create($width, $height);
         $manipulate->copy(
@@ -128,12 +133,12 @@ class Manipulate extends AbstractService
     }
 
     /**
-     * Setzt das Bild horizontal zentriert auf die angegebene Breite und Höhe.
+     * @param int $width
+     * @param int $height
      *
-     * @param int $width Breite
-     * @param int $height Höhe
+     * @throws SetError
      */
-    public function horizontalCentered($width, $height)
+    public function horizontalCentered(int $width, int $height): void
     {
         $manipulate = ManipulateFactory::create($width, $height);
         $manipulate->copy(
@@ -144,27 +149,28 @@ class Manipulate extends AbstractService
     }
 
     /**
-     * Schneidet das Bild zu.
+     * @param int      $width
+     * @param int      $height
+     * @param int|null $startX
+     * @param int|null $startY
+     * @param int|null $color
      *
-     * @param int $width Breite
-     * @param int $height Höhe
-     * @param int|bool $startX
-     * @param int|bool $startY
-     * @param int|bool $color
+     * @throws SetError
+     *
      * @return bool
      */
-    public function crop($width, $height, $startX = false, $startY = false, $color = false)
+    public function crop(int $width, int $height, int $startX = null, int $startY = null, int $color = null): bool
     {
-        if ($startX === false) {
+        if ($startX === null) {
             $startX = ($this->getImage()->getWidth() - $width) / 2;
         }
-        if ($startY === false) {
+        if ($startY === null) {
             $startY = ($this->getImage()->getHeight() - $height) / 2;
         }
 
         $draw = DrawFactory::create($width, $height);
 
-        if ($color) {
+        if (!empty($color)) {
             $draw->filledRectangle($color);
         }
 
@@ -189,16 +195,16 @@ class Manipulate extends AbstractService
     }
 
     /**
-     * Bild vergrößern oder verkleinern und alles was übersteht abschneiden.
-     * Gegenstück zu resizeCentered.
+     * @param int      $width
+     * @param int      $height
+     * @param int|null $startX
+     * @param int|null $startY
      *
-     * @param int $width Breite
-     * @param int $height Höhe
-     * @param int|bool $startX
-     * @param int|bool $startY
+     * @throws SetError
+     *
      * @return bool
      */
-    public function cropResized($width, $height, $startX = false, $startY = false)
+    public function cropResized(int $width, int $height, int $startX = null, int $startY = null): bool
     {
         if ($this->getImage()->getWidth() > $this->getImage()->getHeight()) {
             $newWidth = ($this->getImage()->getWidth() / $this->getImage()->getHeight()) * $height;
@@ -218,7 +224,7 @@ class Manipulate extends AbstractService
             }
         }
 
-        if ($this->resize($newWidth, $newHeight)) {
+        if ($this->resize((int) $newWidth, (int) $newHeight)) {
             if ($this->crop($width, $height, $startX, $startY)) {
                 return true;
             }
@@ -228,43 +234,42 @@ class Manipulate extends AbstractService
     }
 
     /**
-     * Kopiert ein Bild in das aktuelle Bild. Kann dabei auch nur einen Tiel kopieren.
+     * @param Image $image
+     * @param int   $destX
+     * @param int   $destY
+     * @param int   $srcX
+     * @param int   $srcY
+     * @param int   $srcWidth
+     * @param int   $srcHeight
+     * @param int   $dstWidth
+     * @param int   $dstHeight
      *
-     * @param Image $image Bild
-     * @param int $destX Horizontale Position in die das Bild kopiert wird
-     * @param int $destY Vertikale Position in die das Bild kopiert wird
-     * @param int $srcX Horizontale Startposition des zu kopierenden Bildes
-     * @param int $srcY Vertikale Startosition des zu kopierenden Bildes
-     * @param int $srcWidth Breite des zu kopierenden Bildes
-     * @param int $srcHeight Höhe des zu kopierenden Bildes
-     * @param int $dstWidth Breite des Bildes in das kopiert wird
-     * @param int $dstHeight Höhe des Bildes in das kopiert wird
      * @return bool
      */
     public function copy(
-        $image,
-        $destX = 0,
-        $destY = 0,
-        $srcX = 0,
-        $srcY = 0,
-        $srcWidth = -1,
-        $srcHeight = -1,
-        $dstWidth = -1,
-        $dstHeight = -1
-    ) {
-        if ($srcWidth == -1) {
+        Image $image,
+        int $destX = 0,
+        int $destY = 0,
+        int $srcX = 0,
+        int $srcY = 0,
+        int $srcWidth = -1,
+        int $srcHeight = -1,
+        int $dstWidth = -1,
+        int $dstHeight = -1
+    ): bool {
+        if ($srcWidth === -1) {
             $srcWidth = $image->getWidth();
         }
 
-        if ($srcHeight == -1) {
+        if ($srcHeight === -1) {
             $srcHeight = $image->getHeight();
         }
 
-        if ($dstWidth == -1) {
+        if ($dstWidth === -1) {
             $dstWidth = $image->getWidth();
         }
 
-        if ($dstHeight == -1) {
+        if ($dstHeight === -1) {
             $dstHeight = $image->getHeight();
         }
 
@@ -285,7 +290,7 @@ class Manipulate extends AbstractService
     /**
      * @return Image
      */
-    public function getImage()
+    public function getImage(): Image
     {
         return $this->image;
     }

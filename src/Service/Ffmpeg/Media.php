@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace GibsonOS\Core\Service\Ffmpeg;
 
 use DateInterval;
@@ -8,10 +10,14 @@ use GibsonOS\Core\Dto\Ffmpeg\ConvertStatus;
 use GibsonOS\Core\Dto\Ffmpeg\Stream\Audio;
 use GibsonOS\Core\Dto\Ffmpeg\Stream\Subtitle;
 use GibsonOS\Core\Dto\Ffmpeg\Stream\Video;
+use GibsonOS\Core\Exception\CreateError;
+use GibsonOS\Core\Exception\DateTimeError;
 use GibsonOS\Core\Exception\DeleteError;
 use GibsonOS\Core\Exception\Ffmpeg\ConvertStatusError;
 use GibsonOS\Core\Exception\Ffmpeg\NoVideoError;
 use GibsonOS\Core\Exception\FileNotFound;
+use GibsonOS\Core\Exception\GetError;
+use GibsonOS\Core\Exception\SetError;
 use GibsonOS\Core\Service\Ffmpeg;
 use GibsonOS\Core\Service\Image as ImageService;
 use InvalidArgumentException;
@@ -23,42 +29,52 @@ class Media
      * @var Ffmpeg
      */
     private $ffmpeg;
+
     /**
      * @var string
      */
     private $filename;
+
     /**
      * @var Video[]
      */
     private $videoStreams = [];
+
     /**
      * @var Audio[]
      */
     private $audioStreams = [];
+
     /**
      * @var Subtitle[]
      */
     private $subtitleStreams = [];
+
     /**
-     * @var null|string
+     * @var string|null
      */
-    private $selectedAudioStreamId = null;
+    private $selectedAudioStreamId;
+
     /**
-     * @var null|string
+     * @var string|null
      */
-    private $selectedVideoStreamId = null;
+    private $selectedVideoStreamId;
+
     /**
-     * @var null|string
+     * @var string|null
      */
-    private $selectedSubtitleStreamId = null;
+    private $selectedSubtitleStreamId;
+
     /**
      * @var float
      */
     private $duration = 0;
+
     /**
      * @var int
      */
     private $frames = 0;
+
     /**
      * @var int
      */
@@ -66,8 +82,11 @@ class Media
 
     /**
      * Video constructor.
+     *
      * @param Ffmpeg $ffmpeg
      * @param string $filename
+     *
+     * @throws CreateError
      * @throws FileNotFound
      */
     public function __construct(Ffmpeg $ffmpeg, string $filename)
@@ -80,6 +99,7 @@ class Media
 
     /**
      * @throws FileNotFound
+     * @throws CreateError
      */
     private function load()
     {
@@ -90,42 +110,45 @@ class Media
         }
 
         $this->calculateDuration($hits);
-        $this->bitRate = (int)trim($hits[5]);
+        $this->bitRate = (int) trim($hits[5]);
 
         if (!preg_match_all('/Stream[^#]#(\d+:\d+)([^:]*):([^:]*):(.*)/', $loadString, $hits)) {
             return;
         }
 
-        for ($i = 0; $i < count($hits[0]); $i++) {
-            $options = preg_replace('/(\([^\)]*),/', '$1', $hits[4][$i]);
-            $options = preg_replace('/(\[[^\]]*),/', '$1', $options);
+        for ($i = 0; $i < count($hits[0]); ++$i) {
+            $options = (string) preg_replace('/(\([^\)]*),/', '$1', $hits[4][$i]);
+            $options = (string) preg_replace('/(\[[^\]]*),/', '$1', $options);
             $properties = $this->getPropertiesFromString($hits[4][$i]);
             $language = $this->getLanguageFromString($hits[2][$i]);
 
             switch (strtolower(trim($hits[3][$i]))) {
                 case 'video':
                     $this->addVideoStream($properties, $hits[1][$i], $language, $options);
+
                     break;
                 case 'audio':
                     $this->addAudioStream($properties, $hits[1][$i], $language, $options);
+
                     break;
                 case 'subtitle':
                     $this->addSubtitleStream($hits[1][$i], $language, $options);
+
                     break;
             }
         }
 
         if ($this->hasVideo()) {
-            if (is_null($this->selectedVideoStreamId)) {
+            if (null === $this->selectedVideoStreamId) {
                 $streamIds = array_keys($this->videoStreams);
                 $this->selectVideoStream($streamIds[0]);
             }
 
-            $this->frames = round($this->duration * $this->getSelectedVideoStream()->getFps());
+            $this->frames = (int) ceil($this->duration * $this->getSelectedVideoStream()->getFps());
         }
 
         if (
-            is_null($this->selectedAudioStreamId) &&
+            null === $this->selectedAudioStreamId &&
             $this->hasAudio()
         ) {
             $streamIds = array_keys($this->audioStreams);
@@ -134,12 +157,14 @@ class Media
     }
 
     /**
-     * @param string $outputFilename
-     * @param null|string $videoCodec
-     * @param null|string $audioCodec
-     * @param array $options
+     * @param string      $outputFilename
+     * @param string|null $videoCodec
+     * @param string|null $audioCodec
+     * @param array       $options
+     *
      * @throws DeleteError
      * @throws FileNotFound
+     * @throws GetError
      */
     public function convert(
         string $outputFilename,
@@ -152,9 +177,12 @@ class Media
 
     /**
      * @param string $outputFilename
-     * @return ConvertStatus
-     * @throws FileNotFound
+     *
      * @throws ConvertStatusError
+     * @throws FileNotFound
+     * @throws DateTimeError
+     *
+     * @return ConvertStatus
      */
     public function getConvertStatus(string $outputFilename): ConvertStatus
     {
@@ -165,12 +193,16 @@ class Media
     }
 
     /**
-     * @param int $second
-     * @param null|int $frame
-     * @return ImageService
+     * @param int      $second
+     * @param int|null $frame
+     *
      * @throws DeleteError
      * @throws FileNotFound
+     * @throws GetError
      * @throws NoVideoError
+     * @throws SetError
+     *
+     * @return ImageService
      */
     public function getImageBySecond(int $second, int $frame = null): ImageService
     {
@@ -180,15 +212,19 @@ class Media
             );
         }
 
-        return $this->getImageByFrame((int)(($second * $this->getSelectedVideoStream()->getFps()) + $frame));
+        return $this->getImageByFrame((int) (($second * $this->getSelectedVideoStream()->getFps()) + $frame));
     }
 
     /**
      * @param int $frameNumber
-     * @return ImageService
+     *
      * @throws DeleteError
      * @throws FileNotFound
+     * @throws GetError
      * @throws NoVideoError
+     * @throws SetError
+     *
+     * @return ImageService
      */
     public function getImageByFrame(int $frameNumber): ImageService
     {
@@ -204,7 +240,7 @@ class Media
 
         try {
             $date = (new DateTime('01.01.2000 00:00:00'))->add(
-                new DateInterval('PT' . (int)($frameNumber / $this->getSelectedVideoStream()->getFps()) . 'S')
+                new DateInterval('PT' . (int) ($frameNumber / $this->getSelectedVideoStream()->getFps()) . 'S')
             );
         } catch (Exception $e) {
             throw new OutOfRangeException('Frame Nummer ' . $frameNumber . ' kann nicht addiert werden!');
@@ -285,7 +321,7 @@ class Media
     }
 
     /**
-     * @return null|string
+     * @return string|null
      */
     public function getSelectedAudioStreamId(): ?string
     {
@@ -293,7 +329,7 @@ class Media
     }
 
     /**
-     * @return null|string
+     * @return string|null
      */
     public function getSelectedVideoStreamId(): ?string
     {
@@ -301,7 +337,7 @@ class Media
     }
 
     /**
-     * @return null|string
+     * @return string|null
      */
     public function getSelectedSubtitleStreamId(): ?string
     {
@@ -309,25 +345,25 @@ class Media
     }
 
     /**
-     * @return Audio|null
+     * @return Audio
      */
-    public function getSelectedAudioStream(): ?Audio
+    public function getSelectedAudioStream(): Audio
     {
         return $this->audioStreams[$this->selectedAudioStreamId];
     }
 
     /**
-     * @return Video|null
+     * @return Video
      */
-    public function getSelectedVideoStream(): ?Video
+    public function getSelectedVideoStream(): Video
     {
         return $this->videoStreams[$this->selectedVideoStreamId];
     }
 
     /**
-     * @return Subtitle|null
+     * @return Subtitle
      */
-    public function getSelectedSubtitleStream(): ?Subtitle
+    public function getSelectedSubtitleStream(): Subtitle
     {
         return $this->subtitleStreams[$this->selectedSubtitleStreamId];
     }
@@ -337,7 +373,7 @@ class Media
      */
     public function hasAudio(): bool
     {
-        return (bool)count($this->getAudioStreams());
+        return (bool) count($this->getAudioStreams());
     }
 
     /**
@@ -345,7 +381,7 @@ class Media
      */
     public function hasVideo(): bool
     {
-        return (bool)count($this->getVideoStreams());
+        return (bool) count($this->getVideoStreams());
     }
 
     /**
@@ -353,7 +389,7 @@ class Media
      */
     public function hasSubtitle(): bool
     {
-        return (bool)count($this->getSubtitleStreams());
+        return (bool) count($this->getSubtitleStreams());
     }
 
     /**
@@ -390,10 +426,10 @@ class Media
             1 => 3600,
             2 => 60,
             3 => 1,
-            4 => .01
+            4 => .01,
         ];
 
-        for ($i = 1; $i < count($rawValues)-1; $i++) {
+        for ($i = 1; $i < count($rawValues) - 1; ++$i) {
             $duration += $rawValues[$i] * $durationMultiplier[$i];
         }
 
@@ -401,10 +437,10 @@ class Media
     }
 
     /**
-     * @param array $properties
-     * @param string $streamId
+     * @param array       $properties
+     * @param string      $streamId
      * @param string|null $language
-     * @param string $options
+     * @param string      $options
      */
     private function addVideoStream(array $properties, string $streamId, ?string $language, string $options)
     {
@@ -414,14 +450,14 @@ class Media
             ->setColorSpace(isset($properties[1]) ? trim($properties[1]) : null);
 
         if (preg_match('/(,|^)\s*(\d+(\.\d+)?)\s*fps(,|$)/', $options, $fps)) {
-            $stream->setFps((int)$fps[2]);
-        } else if (preg_match('/(,|^)\s*(\d+(\.\d+)?)\s*tbr(,|$)/', $options, $fps)) {
-            $stream->setFps((int)$fps[2]);
+            $stream->setFps((int) $fps[2]);
+        } elseif (preg_match('/(,|^)\s*(\d+(\.\d+)?)\s*tbr(,|$)/', $options, $fps)) {
+            $stream->setFps((int) $fps[2]);
         }
 
         if (preg_match('/(\d+)x(\d+)/', $properties[2], $size)) {
-            $stream->setWidth((int)$size[1]);
-            $stream->setHeight((int)$size[2]);
+            $stream->setWidth((int) $size[1]);
+            $stream->setHeight((int) $size[2]);
         }
 
         $this->videoStreams[$streamId] = $stream;
@@ -433,10 +469,10 @@ class Media
     }
 
     /**
-     * @param array $properties
-     * @param string $streamId
+     * @param array       $properties
+     * @param string      $streamId
      * @param string|null $language
-     * @param string $options
+     * @param string      $options
      */
     private function addAudioStream(array $properties, string $streamId, ?string $language, string $options)
     {
@@ -455,9 +491,9 @@ class Media
     }
 
     /**
-     * @param string $streamId
+     * @param string      $streamId
      * @param string|null $language
-     * @param string $options
+     * @param string      $options
      */
     private function addSubtitleStream(string $streamId, ?string $language, string $options)
     {
@@ -477,16 +513,17 @@ class Media
 
     /**
      * @param string $propertiesString
+     *
      * @return array
      */
     private function getPropertiesFromString(string $propertiesString): array
     {
-        $propertiesString = preg_replace('/(\([^\(].),(.+?\))/', '$1{%%KOMMA%%}$2', $propertiesString);
+        $propertiesString = (string) preg_replace('/(\([^\(].),(.+?\))/', '$1{%%KOMMA%%}$2', $propertiesString);
         $properties = explode(',', $propertiesString);
-        $properties[count($properties)-1] = preg_replace('/\(.*?$/', '', $properties[count($properties)-1]);
+        $properties[count($properties) - 1] = preg_replace('/\(.*?$/', '', $properties[count($properties) - 1]);
 
         $properties = array_map(
-            function($str) {
+            function ($str) {
                 return str_replace('{%%KOMMA%%}', ',', $str);
             },
             $properties
@@ -497,11 +534,12 @@ class Media
 
     /**
      * @param string $string
-     * @return null|string
+     *
+     * @return string|null
      */
     private function getLanguageFromString(string $string): ?string
     {
-        $language = preg_replace('/\(([a-zA-Z]{3})\)/', '$1', $string);
+        $language = (string) preg_replace('/\(([a-zA-Z]{3})\)/', '$1', $string);
 
         if (mb_strlen($language) != 3) {
             return null;

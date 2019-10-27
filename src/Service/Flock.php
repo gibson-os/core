@@ -1,8 +1,10 @@
 <?php
+declare(strict_types=1);
+
 namespace GibsonOS\Core\Service;
 
-use GibsonOS\Core\Exception\Flock\UnFlockError;
 use GibsonOS\Core\Exception\Flock\FlockError;
+use GibsonOS\Core\Exception\Flock\UnFlockError;
 
 class Flock extends AbstractSingletonService
 {
@@ -12,7 +14,8 @@ class Flock extends AbstractSingletonService
     private $flocks;
 
     /**
-     * @param null|string $name
+     * @param string|null $name
+     *
      * @throws FlockError
      */
     public function flock($name = null)
@@ -45,7 +48,8 @@ class Flock extends AbstractSingletonService
     }
 
     /**
-     * @param null|string $name
+     * @param string|null $name
+     *
      * @throws UnFlockError
      */
     public function unFlock($name = null)
@@ -69,7 +73,7 @@ class Flock extends AbstractSingletonService
     }
 
     /**
-     * @param null|string $name
+     * @param string|null $name
      */
     public function waitUnFlockToFlock($name = null)
     {
@@ -83,20 +87,12 @@ class Flock extends AbstractSingletonService
 
     private function getName($name = null)
     {
-        if (!is_null($name)) {
+        if (null !== $name) {
             return $name;
         }
 
         $caller = debug_backtrace();
 
         return str_replace(DIRECTORY_SEPARATOR, '', $caller[1]['file']);
-    }
-
-    /**
-     * @return AbstractSingletonService|Flock
-     */
-    public static function getInstance()
-    {
-        return parent::getInstance();
     }
 }

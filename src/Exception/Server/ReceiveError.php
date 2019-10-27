@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace GibsonOS\Core\Exception\Server;
 
 use GibsonOS\Core\Exception\AbstractException;

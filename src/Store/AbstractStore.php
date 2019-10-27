@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace GibsonOS\Core\Store;
 
 abstract class AbstractStore
@@ -7,6 +9,7 @@ abstract class AbstractStore
      * @var int
      */
     private $rows = 0;
+
     /**
      * @var int
      */
@@ -20,13 +23,13 @@ abstract class AbstractStore
     /**
      * @return int
      */
-    abstract public function getCount();
+    abstract public function getCount(): int;
 
     /**
      * @param int $rows
      * @param int $from
      */
-    public function setLimit($rows, $from)
+    public function setLimit(int $rows, int $from): void
     {
         $this->rows = $rows;
         $this->from = $from;

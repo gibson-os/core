@@ -1,12 +1,30 @@
 <?php
+declare(strict_types=1);
+
 namespace GibsonOS\Core\Service;
 
 use GibsonOS\Core\Exception\DeleteError;
 use GibsonOS\Core\Exception\FileNotFound;
-use GibsonOS\Core\Utility\File;
+use GibsonOS\Core\Exception\GetError;
+use GibsonOS\Core\Exception\SetError;
 
 class Image extends AbstractService
 {
+    /**
+     * @var File
+     */
+    private $file;
+
+    /**
+     * Image constructor.
+     *
+     * @param File $file
+     */
+    public function __construct(File $file)
+    {
+        $this->file = $file;
+    }
+
     /**
      * @var resource Bild
      */
@@ -23,87 +41,78 @@ class Image extends AbstractService
     }
 
     /**
-     * Setzt das Bild.
+     * @param resource|bool $resource
      *
-     * @param resource $resource
+     * @throws SetError
      */
-    public function setResource($resource)
+    public function setResource($resource): void
     {
+        if (!is_resource($resource)) {
+            throw new SetError('Bild ist keine Ressource!');
+        }
+
         $this->resource = $resource;
     }
 
     /**
-     * Gibt die Breite des Bildes zurück.
-     *
-     * @return int Breite
+     * @return int
      */
-    public function getWidth()
+    public function getWidth(): int
     {
-        return imagesx($this->getResource());
+        return (int) imagesx($this->getResource());
     }
 
     /**
-     * Gibt die Höhe des Bildes zurück.
-     *
-     * @return int Höhe
+     * @return int
      */
-    public function getHeight()
+    public function getHeight(): int
     {
-        return imagesy($this->getResource());
+        return (int) imagesy($this->getResource());
     }
 
     /**
-     * Erstellt ein neues Bild.
+     * @param int $width
+     * @param int $height
      *
-     * @param int $width Breite
-     * @param int $height Höhe
-     * @param bool $trueColor
-     * @param bool $fillTransparent
+     * @throws SetError
      */
-    public function create($width, $height, $trueColor = true, $fillTransparent = true)
+    public function create(int $width, int $height): void
     {
-        if ($trueColor) {
-            $this->setResource(imagecreatetruecolor($width, $height));
-        } else {
-            $this->setResource(imagecreate($width, $height));
-        }
-
+        $this->setResource(imagecreatetruecolor($width, $height));
         $this->alphaBlending(true);
+    }
 
-        if ($fillTransparent) {
-            $this->fill($this->getTransparentColor());
-            $this->saveAlpha(true);
-        }
+    public function fillTransparent(): void
+    {
+        $this->fill($this->getTransparentColor());
+        $this->saveAlpha(true);
     }
 
     /**
-     * Erstellt eine Farbe aus einem RGB Code.
-     *
-     * @param int $red Rot
-     * @param int $green Grün
-     * @param int $blue Blau
+     * @param int $red
+     * @param int $green
+     * @param int $blue
      * @param int $alpha
-     * @return int
-     */
-    public function getColor($red, $green, $blue, $alpha = 0)
-    {
-        return imagecolorallocatealpha($this->getResource(), $red, $green, $blue, $alpha);
-    }
-
-    /**
-     * Erstellt die Transparente Farbe.
      *
      * @return int
      */
-    public function getTransparentColor()
+    public function getColor(int $red, int $green, int $blue, int $alpha = 0): int
     {
-        return imagecolortransparent($this->getResource());
+        return (int) imagecolorallocatealpha($this->getResource(), $red, $green, $blue, $alpha);
+    }
+
+    /**
+     * @return int
+     */
+    public function getTransparentColor(): int
+    {
+        return (int) imagecolortransparent($this->getResource());
     }
 
     /**
      * @param int $color
      */
-    public function setTransparentColor($color)
+    public function setTransparentColor(int $color): void
     {
         imagecolortransparent($this->getResource(), $color);
     }
@@ -113,87 +122,85 @@ class Image extends AbstractService
      *
      * @return bool
      */
-    public function destroy()
+    public function destroy(): bool
     {
         return imagedestroy($this->getResource());
     }
 
     /**
-     * @param string $filename Dateiname
-     * @param string|null $type Dateityp
+     * @param string      $filename
+     * @param string|null $type
+     *
      * @throws FileNotFound
+     * @throws SetError
      */
-    public function load($filename, $type = null)
+    public function load(string $filename, string $type = null): void
     {
-        if (is_null($type)) {
+        if ($type === null) {
             $type = $this->getImageTypeByFilename($filename);
         }
 
-        if(
+        if (
             $type != 'string' &&
             !file_exists($filename)
         ) {
-            throw new FileNotFound('Bild ' . $filename . ' existiert nicht!');
+            throw new FileNotFound(sprintf('Bild %s existiert nicht!', $filename));
         }
 
         switch ($type) {
             case 'bmp':
                 // @todo BMPs gehen nicht!
                 $this->setResource(imagecreatefromgd($filename));
+
                 break;
             case 'jpg':
             case 'jpeg':
                 $this->setResource(imagecreatefromjpeg($filename));
+
                 break;
             case 'gif':
                 $this->setResource(imagecreatefromgif($filename));
+
                 break;
             case 'png':
                 $this->setResource(imagecreatefrompng($filename));
                 $this->alphaBlending(true);
                 $this->saveAlpha(true);
+
                 break;
             case 'string':
                 $this->setResource(imagecreatefromstring($filename));
+
                 break;
         }
     }
 
     /**
-     * Gibt Dateityp zurück
+     * @param string $filename
      *
-     * Holt sich den Dateityp über den Dateinamen.
-     *
-     * @param string $filename Dateiname
-     * @return string Dateityp
+     * @return string
      */
-    static function getImageTypeByFilename($filename)
+    public static function getImageTypeByFilename(string $filename): string
     {
-        return strtolower(substr(strrchr($filename, '.'), 1));
+        return strtolower((string) substr((string) strrchr($filename, '.'), 1));
     }
 
     /**
-     * Gibt Dateityp zurück
-     *
-     * Holt sich den Dateityp über den Mime Type.
-     *
      * @param string $mimeType
-     * @return string Dateityp
+     *
+     * @return string
      */
-    static function getImageTypeByMimeType($mimeType)
+    public static function getImageTypeByMimeType(string $mimeType): string
     {
-        return strtolower(substr(strrchr($mimeType, '/'), 1));
+        return strtolower((string) substr((string) strrchr($mimeType, '/'), 1));
     }
 
     /**
-     * Gibt Mime Type zurück
+     * @param string $filename
      *
-     * Holt sich den Mime Type über den Dateinamen.
-     *
-     * @param string $filename Dateiname
-     * @return string Mime Type
+     * @return string
      */
-    static function getMimeTypeByFilename($filename)
+    public static function getMimeTypeByFilename(string $filename): string
     {
         return image_type_to_mime_type(
             constant('IMG_' . strtoupper(self::getImageTypeByFilename($filename)))
@@ -201,12 +208,11 @@ class Image extends AbstractService
     }
 
     /**
-     * Erzeugt die Ausgabe des aktuellen Bildes.
-     *
      * @param string $type
+     *
      * @return bool
      */
-    public function output($type = 'jpg')
+    public function output(string $type = 'jpg'): bool
     {
         switch ($type) {
             case 'bmp':
@@ -224,26 +230,29 @@ class Image extends AbstractService
     }
 
     /**
-     * Erzeugt eine HTTP Ausgabe des aktuellen Bildes.
-     *
      * @param string $type
+     *
      * @return bool
      */
-    public function show($type = 'jpg')
+    public function show(string $type = 'jpg'): bool
     {
         switch ($type) {
             case 'bmp':
-                header("Content-type: image/x-ms-bmp");
+                header('Content-type: image/x-ms-bmp');
+
                 break;
             case 'jpg':
             case 'jpeg':
-                header("Content-type: image/jpeg");
+                header('Content-type: image/jpeg');
+
                 break;
             case 'gif':
-                header("Content-type: image/gif");
+                header('Content-type: image/gif');
+
                 break;
             case 'png':
-                header("Content-type: image/png");
+                header('Content-type: image/png');
+
                 break;
         }
 
@@ -251,35 +260,37 @@ class Image extends AbstractService
     }
 
     /**
-     * Gibt das Bild als String zurück
+     * @param string $type
      *
-     * @param string $type Dateityp
      * @return string
      */
-    public function getString($type = 'jpg')
+    public function getString(string $type = 'jpg'): string
     {
         ob_start();
         $this->output($type);
-        $string = ob_get_contents();
+        $string = (string) ob_get_contents();
         ob_end_clean();
 
         return $string;
     }
 
     /**
-     * @param string $filename Dateiname
-     * @param string|null $type Dateityp
-     * @return bool
+     * @param string      $filename
+     * @param string|null $type
+     *
      * @throws DeleteError
+     * @throws GetError
+     *
+     * @return bool
      */
-    public function save($filename, $type = null)
+    public function save(string $filename, string $type = null): bool
     {
-        if (is_null($type)) {
+        if ($type === null) {
             $type = $this->getImageTypeByFilename($filename);
         }
 
         try {
-            File::delete(File::getDir($filename), File::getFilename($filename));
+            $this->file->delete($this->file->getDir($filename), $this->file->getFilename($filename));
         } catch (FileNotFound $exception) {
         }
 
@@ -299,40 +310,40 @@ class Image extends AbstractService
     }
 
     /**
-     * De-/Aktiviert die Transparenz.
-     *
      * @param bool $blendMode
+     *
      * @return bool
      */
-    public function alphaBlending($blendMode)
+    public function alphaBlending(bool $blendMode): bool
     {
         return imagealphablending($this->getResource(), $blendMode);
     }
 
     /**
-     * De-/Aktiviert das die Transparenz mitgespeichert wird (PNG).
-     *
      * @param bool $saveFlag
+     *
      * @return bool
      */
-    public function saveAlpha($saveFlag)
+    public function saveAlpha(bool $saveFlag): bool
     {
         return imagesavealpha($this->getResource(), $saveFlag);
     }
 
     /**
-     * Füllt Bild in einer Farbe.
-     *
      * @param int $color
      * @param int $x
      * @param int $y
+     *
      * @return bool
      */
-    public function fill($color, $x = 0, $y = 0)
+    public function fill(int $color, int $x = 0, int $y = 0): bool
     {
         return imagefill($this->getResource(), $x, $y, $color);
     }
 
+    /**
+     * @throws SetError
+     */
     public function __clone()
     {
         $w = $this->getWidth();

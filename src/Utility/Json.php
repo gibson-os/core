@@ -1,32 +1,41 @@
 <?php
+declare(strict_types=1);
+
 namespace GibsonOS\Core\Utility;
 
 class Json
 {
     /**
-     * Wandelt in JSON um
+     * Wandelt in JSON um.
      *
      * Wandelt Wert in JSON um.
      *
      * @param mixed $value Wert
+     *
      * @return string
      */
-    public static function encode($value)
+    public static function encode($value): string
     {
-        return json_encode($value, JSON_UNESCAPED_UNICODE);
+        return (string) json_encode($value, JSON_UNESCAPED_UNICODE);
     }
 
     /**
-     * Wandelt von JSON um.
+     * @param string $json
      *
-     * Wandelt einen JSON String um.
-     *
-     * @param string $json JSON
-     * @param bool $assoc Als Assoziatives Array
      * @return mixed
      */
-    public static function decode($json, $assoc = true)
+    public static function decode(string $json)
     {
-        return json_decode($json, $assoc);
+        return json_decode($json, true);
+    }
+
+    /**
+     * @param string $json
+     *
+     * @return mixed
+     */
+    public static function decodeNotAssoc(string $json)
+    {
+        return json_decode($json, false);
     }
 }

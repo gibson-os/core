@@ -1,8 +1,10 @@
 <?php
+/** @noinspection SqlNoDataSourceInspection */
+declare(strict_types=1);
+
 namespace GibsonOS\Core\Service;
 
 use GibsonOS\Core\Exception\Sqlite\ExecuteError;
-use GibsonOS\Core\Utility\File;
 use SQLite3;
 use SQLite3Result;
 use SQLite3Stmt;
@@ -13,22 +15,31 @@ class SqLite extends AbstractService
      * @var string
      */
     private $filename;
+
     /**
      * @var SQLite3
      */
     private $database;
 
     /**
-     * @param string $filename
+     * @var File
      */
-    public function __construct(string $filename)
+    private $file;
+
+    /**
+     * @param string $filename
+     * @param File   $file
+     */
+    public function __construct(string $filename, File $file)
     {
         $this->filename = $filename;
+        $this->file = $file;
         $this->database = new SQLite3($this->filename);
     }
 
     /**
      * @param string $query
+     *
      * @throws ExecuteError
      */
     public function execute(string $query)
@@ -40,15 +51,25 @@ class SqLite extends AbstractService
 
     /**
      * @param string $query
+     *
+     * @throws ExecuteError
+     *
      * @return SQLite3Stmt
      */
     public function prepare(string $query): SQLite3Stmt
     {
-        return $this->database->prepare($query);
+        $statement = $this->database->prepare($query);
+
+        if ($statement instanceof SQLite3Stmt) {
+            return $statement;
+        }
+
+        throw new ExecuteError('Query konnte nicht ausgeführt werden!');
     }
 
     /**
      * @param int $milliSeconds
+     *
      * @throws ExecuteError
      */
     public function busyTimeout(int $milliSeconds)
@@ -70,8 +91,10 @@ class SqLite extends AbstractService
 
     /**
      * @param string $query
-     * @return SQLite3Result
+     *
      * @throws ExecuteError
+     *
+     * @return SQLite3Result
      */
     public function query(string $query): SQLite3Result
     {
@@ -86,8 +109,10 @@ class SqLite extends AbstractService
 
     /**
      * @param string $query
-     * @return mixed
+     *
      * @throws ExecuteError
+     *
+     * @return mixed
      */
     public function querySingle(string $query)
     {
@@ -103,6 +128,7 @@ class SqLite extends AbstractService
     /**
      * @param string $name
      * @param string $createQuery
+     *
      * @throws ExecuteError
      */
     public function addTableIfNotExists(string $name, string $createQuery)
@@ -116,6 +142,7 @@ class SqLite extends AbstractService
 
     /**
      * @param string $name
+     *
      * @return bool
      */
     public function hasTable(string $name): bool
@@ -140,7 +167,7 @@ class SqLite extends AbstractService
      */
     public function isWritable(): bool
     {
-        if (!is_writable(File::getDir($this->filename))) {
+        if (!is_writable($this->file->getDir($this->filename))) {
             return false;
         }
 

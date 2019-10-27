@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace GibsonOS\Core\Service\Image;
 
 use GibsonOS\Core\Service\AbstractService;
@@ -20,17 +22,21 @@ class Draw extends AbstractService
     }
 
     /**
-     * Zeichnet ein gefülltes Rechteck.
-     *
      * @param int $color
      * @param int $startX
      * @param int $startY
      * @param int $stopX
      * @param int $stopY
+     *
      * @return bool
      */
-    public function filledRectangle($color, $startX = 0, $startY = 0, $stopX = -1, $stopY = -1)
-    {
+    public function filledRectangle(
+        int $color,
+        int $startX = 0,
+        int $startY = 0,
+        int $stopX = -1,
+        int $stopY = -1
+    ): bool {
         if ($stopX === -1) {
             $stopX = $this->getImage()->getWidth();
         }
@@ -46,12 +52,13 @@ class Draw extends AbstractService
      * Schreibt einen Text in das Bild.
      *
      * @param string $text
-     * @param int $color
+     * @param int    $color
      * @param string $fontfile
-     * @param int $size
-     * @param int $startX
-     * @param int $startY
-     * @param int $angle
+     * @param int    $size
+     * @param int    $startX
+     * @param int    $startY
+     * @param int    $angle
+     *
      * @return array
      */
     public function setTtfText($text, $color, $fontfile, $size, $startX = 0, $startY = 0, $angle = 0)
@@ -68,8 +75,9 @@ class Draw extends AbstractService
      *
      * @param string $text
      * @param string $fontfile
-     * @param int $size
-     * @param int $angle
+     * @param int    $size
+     * @param int    $angle
+     *
      * @return array
      */
     public function setTfbBox($text, $fontfile, $size, $angle = 0)

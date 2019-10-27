@@ -1,6 +1,10 @@
 <?php
+declare(strict_types=1);
+
 namespace GibsonOS\Core\Model;
 
+use GibsonOS\Core\Exception\DateTimeError;
+use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use mysqlDatabase;
 
@@ -10,14 +14,17 @@ class Setting extends AbstractModel
      * @var int
      */
     private $userId;
+
     /**
      * @var int
      */
     private $moduleId;
+
     /**
      * @var string
      */
     private $key;
+
     /**
      * @var string
      */
@@ -30,6 +37,8 @@ class Setting extends AbstractModel
 
     /**
      * @param mysqlDatabase|null $database
+     *
+     * @throws GetError
      */
     public function __construct(mysqlDatabase $database = null)
     {
@@ -56,11 +65,13 @@ class Setting extends AbstractModel
 
     /**
      * @param int $userId
+     *
      * @return Setting
      */
     public function setUserId(int $userId): Setting
     {
         $this->userId = $userId;
+
         return $this;
     }
 
@@ -74,11 +85,13 @@ class Setting extends AbstractModel
 
     /**
      * @param int $moduleId
+     *
      * @return Setting
      */
     public function setModuleId(int $moduleId): Setting
     {
         $this->moduleId = $moduleId;
+
         return $this;
     }
 
@@ -92,11 +105,13 @@ class Setting extends AbstractModel
 
     /**
      * @param string $key
+     *
      * @return Setting
      */
     public function setKey(string $key): Setting
     {
         $this->key = $key;
+
         return $this;
     }
 
@@ -110,11 +125,13 @@ class Setting extends AbstractModel
 
     /**
      * @param string $value
+     *
      * @return Setting
      */
     public function setValue(string $value): Setting
     {
         $this->value = $value;
+
         return $this;
     }
 
@@ -128,6 +145,7 @@ class Setting extends AbstractModel
 
     /**
      * @param User $user
+     *
      * @return Setting
      */
     public function setUser(User $user): Setting
@@ -140,11 +158,14 @@ class Setting extends AbstractModel
 
     /**
      * @throws SelectError
+     * @throws DateTimeError
+     *
      * @return Setting
      */
     public function loadUser(): Setting
     {
         $this->loadForeignRecord($this->getUser(), $this->getUserId());
+
         return $this;
     }
 }

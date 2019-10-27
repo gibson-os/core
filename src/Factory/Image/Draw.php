@@ -1,8 +1,12 @@
 <?php
+declare(strict_types=1);
+
 namespace GibsonOS\Core\Factory\Image;
 
 use GibsonOS\Core\Exception\FileNotFound;
-use GibsonOS\Core\Service\Image;
+use GibsonOS\Core\Exception\SetError;
+use GibsonOS\Core\Factory\Image;
+use GibsonOS\Core\Service\Image as ImageService;
 use GibsonOS\Core\Service\Image\Draw as DrawService;
 
 class Draw
@@ -10,36 +14,42 @@ class Draw
     /**
      * @param int $width
      * @param int $height
-     * @param bool $trueColor
-     * @param bool $fillTransparent
+     *
+     * @throws SetError
+     *
      * @return DrawService
      */
-    static function create($width, $height, $trueColor = true, $fillTransparent = true)
+    public static function create(int $width, int $height): DrawService
     {
-        $image = new Image();
-        $image->create($width, $height, $trueColor, $fillTransparent);
+        $image = Image::create();
+        $image->create($width, $height);
+        $image->fillTransparent();
 
         return self::createByImage($image);
     }
 
     /**
      * @param string $filename
-     * @return DrawService
+     *
      * @throws FileNotFound
+     * @throws SetError
+     *
+     * @return DrawService
      */
-    static function createByFilename($filename)
+    public static function createByFilename(string $filename): DrawService
     {
-        $image = new Image();
+        $image = Image::create();
         $image->load($filename);
 
         return self::createByImage($image);
     }
 
     /**
-     * @param Image $image
+     * @param ImageService $image
+     *
      * @return DrawService
      */
-    static function createByImage(Image $image)
+    public static function createByImage(ImageService $image): DrawService
     {
         return new DrawService($image);
     }
