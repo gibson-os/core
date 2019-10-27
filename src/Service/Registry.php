@@ -1,69 +1,36 @@
 <?php
 namespace GibsonOS\Core\Service;
 
-class Registry
+use GibsonOS\Core\Exception\GetError;
+
+class Registry extends AbstractSingletonService
 {
-    /** @var null Instanz */
+    /**
+     * @var null
+     */
     private static $instance = null;
-    /** @var array Registry */
-    private $_registry = array();
-
     /**
-     * Konstruktor
-     *
-     * Keine Instanzen erlauben.
+     * @var array
      */
-    private function __construct() {}
-
-    /**
-     * Klonen
-     *
-     * Keine Klonen erlauben.
-     */
-    private function __clone() {}
+    private $registry = array();
     
     /**
-     * Gibt Registry Instanz zurück
-     *
-     * Gibt die Registry Instanz zurück.
-     *
-     * @return Registry
-     */
-    public static function getInstance(): Registry
-    {
-        if (self::$instance === NULL) {
-            self::$instance = new self;
-        }
-
-        return self::$instance;
-    }
-    
-    /**
-     * Prüft ob Schlüssel existiert.
-     *
-     * Prüft ob ein Schlüssel existiert.
-     *
-     * @param string $key Schlüssel
+     * @param string $key
      * @return boolean
      */
-    public function exists($key)
+    public function exists(string $key): bool
     {
-        return array_key_exists($key, $this->_registry);
+        return array_key_exists($key, $this->registry);
     }
    
     /**
-     * Lädt Registry aus Session
-     *
-     * Lädt die Registry aus der Session.<br>
-     * Wenn der Schlüssel $name nicht existiert, wird false zurückgegeben.
-     *
-     * @param string $name Name
+     * @param string $name
      * @return boolean
      */
-    public function loadFromSession($name = 'REGISTRY')
+    public function loadFromSession(string $name = 'REGISTRY'): bool
     {
         if (array_key_exists($name, $_SESSION)) {
-            $this->_registry = $_SESSION[$name];
+            $this->registry = $_SESSION[$name];
             return true;
         }
 
@@ -71,45 +38,33 @@ class Registry
     }
     
     /**
-     * Speichert Registry in Session
-     *
-     * Speichert Registry in der Session zwischen.<br>
-     * Der Schlüssel kann optional mit übergeben werden.
-     *
      * @param string $name Name
      */    
-    public function saveToSession($name = 'REGISTRY')
+    public function saveToSession(string $name = 'REGISTRY'): void
     {
-        $_SESSION[$name] = $this->_registry;
+        $_SESSION[$name] = $this->registry;
     }
 
     /**
-     * Gibt Wert zurück
-     *
-     * Gibt einen Wert anhand des Schlüssel zurück.
-     *
-     * @param string $key Schlüssel
+     * @param string $key
      * @return mixed
+     * @throws GetError
      */
-    public function get($key)
+    public function get(string $key)
     {
-        if (array_key_exists($key, $this->_registry)) {
-            return $this->_registry[$key];
+        if (array_key_exists($key, $this->registry)) {
+            return $this->registry[$key];
         }
 
-        return false;
+        throw new GetError(sprintf('Schlüssel "%s" nicht in der Registry gefunden', $key));
     }
     
     /**
-     * Setzt Wert
-     *
-     * Setzt einen Wert anhand des Schlüssels.
-     *
      * @param string $key
      * @param mixed $value
      */
-    public function set($key, $value)
+    public function set(string $key, $value)
     {
-        $this->_registry[$key] = $value;
+        $this->registry[$key] = $value;
     }
 }

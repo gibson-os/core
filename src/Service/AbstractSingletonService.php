@@ -25,7 +25,7 @@ abstract class AbstractSingletonService extends AbstractService
     /**
      * @return AbstractSingletonService
      */
-    public static function getInstance()
+    public static function getInstance(): AbstractSingletonService
     {
         $class = get_called_class();
 

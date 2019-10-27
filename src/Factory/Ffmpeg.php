@@ -6,11 +6,10 @@ use GibsonOS\Core\Service\Ffmpeg as FfmpegService;
 class Ffmpeg
 {
     /**
-     * @param string $ffmpegPath
      * @return FfmpegService
      */
-    public static function create(string $ffmpegPath): FfmpegService
+    public static function create(): FfmpegService
     {
-        return new FfmpegService($ffmpegPath);
+        return new FfmpegService(getenv('FFMPEG_PATH'));
     }
 }

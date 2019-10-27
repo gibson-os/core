@@ -16,6 +16,10 @@ class Ffmpeg extends AbstractService
      */
     public $ffpmegPath;
 
+    /**
+     * Ffmpeg constructor.
+     * @param string $ffpmegPath
+     */
     public function __construct(string $ffpmegPath)
     {
         $this->ffpmegPath = $ffpmegPath;
