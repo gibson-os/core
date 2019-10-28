@@ -65,9 +65,9 @@ class Manipulate extends AbstractService
         $width = (int) $newWidth;
         $height = (int) $newHeight;
 
-        $Image = ImageFactory::create();
-        $Image->create($width, $height);
-        $image = $Image->getResource();
+        $image = ImageFactory::create();
+        $image->create($width, $height);
+        $image = $image->getResource();
 
         if (
             !imagecopyresampled(

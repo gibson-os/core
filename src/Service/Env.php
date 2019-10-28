@@ -51,7 +51,7 @@ class Env extends AbstractService
      *
      * @return bool
      */
-    public function getBool(string $name): bool
+    public function getBoolValue(string $name): bool
     {
         return mb_strtolower($this->get($name)) === 'true' ? true : false;
     }
