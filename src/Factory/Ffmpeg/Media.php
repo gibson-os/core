@@ -13,7 +13,6 @@ use GibsonOS\Core\Service\Ffmpeg\Media as MediaService;
 class Media
 {
     /**
-     * @param string      $filename
      * @param Ffmpeg|null $ffmpeg
      *
      * @throws CreateError
@@ -22,12 +21,12 @@ class Media
      *
      * @return MediaService
      */
-    public static function create(string $filename, Ffmpeg $ffmpeg = null): MediaService
+    public static function create(Ffmpeg $ffmpeg = null): MediaService
     {
         if (!$ffmpeg instanceof Ffmpeg) {
             $ffmpeg = FfmpegFactory::create();
         }
 
-        return new MediaService($ffmpeg, $filename);
+        return new MediaService($ffmpeg);
     }
 }

@@ -118,8 +118,9 @@ class ModuleSetting extends AbstractSingletonService
      * @param string   $value
      * @param int|null $userId
      *
-     * @throws SaveError
      * @throws DateTimeError
+     * @throws GetError
+     * @throws SaveError
      */
     public function setById(int $moduleId, string $key, string $value, int $userId = null)
     {

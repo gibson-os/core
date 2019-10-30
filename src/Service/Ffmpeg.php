@@ -4,15 +4,15 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Service;
 
 use GibsonOS\Core\Dto\Ffmpeg\ConvertStatus;
-use GibsonOS\Core\Exception\CreateError;
+use GibsonOS\Core\Dto\Ffmpeg\Media;
 use GibsonOS\Core\Exception\DateTimeError;
 use GibsonOS\Core\Exception\DeleteError;
 use GibsonOS\Core\Exception\Ffmpeg\ConvertStatusError;
 use GibsonOS\Core\Exception\FileNotFound;
 use GibsonOS\Core\Exception\GetError;
+use GibsonOS\Core\Exception\ProcessError;
 use GibsonOS\Core\Exception\SetError;
 use GibsonOS\Core\Factory\Image as ImageFactory;
-use GibsonOS\Core\Service\Ffmpeg\Media;
 
 class Ffmpeg extends AbstractService
 {
@@ -32,42 +32,44 @@ class Ffmpeg extends AbstractService
     private $file;
 
     /**
+     * @var Process
+     */
+    private $process;
+
+    /**
      * Ffmpeg constructor.
      *
      * @param string   $ffpmegPath
      * @param DateTime $dateTime
      * @param File     $file
+     * @param Process  $process
      */
-    public function __construct(string $ffpmegPath, DateTime $dateTime, File $file)
+    public function __construct(string $ffpmegPath, DateTime $dateTime, File $file, Process $process)
     {
         $this->ffpmegPath = $ffpmegPath;
         $this->dateTime = $dateTime;
         $this->file = $file;
+        $this->process = $process;
     }
 
     /**
      * @param string $filename
      *
-     * @throws CreateError
      * @throws FileNotFound
+     * @throws ProcessError
      *
      * @return string
      */
     public function getFileMetaDataString(string $filename): string
     {
         if (
-            !file_exists($filename) ||
-            !is_readable($filename)
+            !$this->file->exists($filename) ||
+            !$this->file->isReadable($filename)
         ) {
-            throw new FileNotFound('Datei ' . $filename . ' existiert nicht!');
+            throw new FileNotFound(sprintf('Datei %s existiert nicht!', $filename));
         }
 
-        $ffMpeg = popen($this->ffpmegPath . ' -i ' . escapeshellarg($filename) . ' 2>&1', 'r');
-
-        if (!is_resource($ffMpeg)) {
-            throw new CreateError(sprintf('Ffmpeg konnte für %s nicht ausgeführt werden!', $filename));
-        }
-
+        $ffMpeg = $this->process->open($this->ffpmegPath . ' -i ' . escapeshellarg($filename), 'r');
         $output = '';
 
         while ($out = fgets($ffMpeg)) {
@@ -82,7 +84,7 @@ class Ffmpeg extends AbstractService
             }
         }
 
-        pclose($ffMpeg);
+        $this->process->close($ffMpeg);
 
         return $output;
     }
@@ -125,10 +127,10 @@ class Ffmpeg extends AbstractService
                 '-c:a ' . escapeshellarg((string) $audioCodec) . ' ';
 
             if ($media->getSelectedSubtitleStreamId() !== null) {
-                $substitleStreamIds = array_keys($media->getSubtitleStreams());
+                $subtitleStreamIds = array_keys($media->getSubtitleStreams());
                 $optionString .=
                     '-vf subtitles=' . escapeshellarg($media->getFilename()) .
-                    ':si=' . array_search($media->getSelectedSubtitleStreamId(), $substitleStreamIds) . ' ';
+                    ':si=' . array_search($media->getSelectedSubtitleStreamId(), $subtitleStreamIds) . ' ';
             }
         }
 
@@ -165,7 +167,7 @@ class Ffmpeg extends AbstractService
     {
         $path = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'ffmpeg' . $filename;
 
-        if (!file_exists($path)) {
+        if (!$this->file->exists($path)) {
             throw new FileNotFound('Konvertstatus nicht gefunden!');
         }
 
@@ -224,6 +226,6 @@ class Ffmpeg extends AbstractService
      */
     private function execute(string $parameters)
     {
-        exec($this->ffpmegPath . ' ' . $parameters);
+        $this->process->execute($this->ffpmegPath . ' ' . $parameters);
     }
 }

@@ -28,6 +28,26 @@ class File extends AbstractService
     }
 
     /**
+     * @param string $filename
+     *
+     * @return bool
+     */
+    public function exists(string $filename): bool
+    {
+        return file_exists($filename);
+    }
+
+    /**
+     * @param string $filename
+     *
+     * @return bool
+     */
+    public function isReadable(string $filename): bool
+    {
+        return is_readable($filename);
+    }
+
+    /**
      * @param string $from
      * @param string $to
      *
