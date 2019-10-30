@@ -1,0 +1,50 @@
+ffmpeg version 3.3.9 Copyright (c) 2000-2018 the FFmpeg developers
+  built with gcc 6.3.0 (Debian 6.3.0-18+deb9u1) 20170516
+  configuration: --disable-decoder=amrnb --disable-decoder=libopenjpeg --disable-mips32r2 --disable-mips32r6 --disable-mips64r6 --disable-mipsdsp --disable-mipsdspr2 --disable-mipsfpu --disable-msa --disable-libopencv --disable-podpages --disable-stripping --enable-avfilter --enable-avresample --enable-gcrypt --enable-gnutls --enable-gpl --enable-libass --enable-libbluray --enable-libbs2b --enable-libcaca --enable-libcdio --enable-libfdk-aac --enable-libfontconfig --enable-libfreetype --enable-libfribidi --enable-libgme --enable-libgsm --enable-libilbc --enable-libkvazaar --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libopenh264 --enable-libopenjpeg --enable-libopenmpt --enable-libopus --enable-libpulse --enable-librubberband --enable-libshine --enable-libsnappy --enable-libsoxr --enable-libspeex --enable-libtesseract --enable-libtheora --enable-libvidstab --enable-libvo-amrwbenc --enable-libvorbis --enable-libvpx --enable-libx265 --enable-libxvid --enable-libzvbi --enable-nonfree --enable-opengl --enable-openssl --enable-postproc --enable-pthreads --enable-shared --enable-version3 --incdir=/usr/include/x86_64-linux-gnu --libdir=/usr/lib/x86_64-linux-gnu --prefix=/usr --toolchain=hardened --enable-frei0r --enable-chromaprint --enable-libx264 --enable-libiec61883 --enable-libdc1394 --enable-vaapi --disable-opencl --enable-libmfx --disable-altivec --shlibdir=/usr/lib/x86_64-linux-gnu
+  libavutil      55. 58.100 / 55. 58.100
+  libavcodec     57. 89.100 / 57. 89.100
+  libavformat    57. 71.100 / 57. 71.100
+  libavdevice    57.  6.100 / 57.  6.100
+  libavfilter     6. 82.100 /  6. 82.100
+  libavresample   3.  5.  0 /  3.  5.  0
+  libswscale      4.  6.100 /  4.  6.100
+  libswresample   2.  7.100 /  2.  7.100
+  libpostproc    54.  5.100 / 54.  5.100
+Input #0, matroska,webm, from 'Fresh.Off.the.Boat.S01.GERMAN.720p.HDTV.X264-WiSHTV - serienjunkies.org/Fresh.Off.the.Boat.S01E01.GERMAN.720p.HDTV.X264-WiSHTV/wtv-freshofftheboat-s01e01-720p.mkv':
+  Metadata:
+    encoder         : libebml v1.3.3 + libmatroska v1.4.4
+    creation_time   : 2016-06-01T20:34:21.000000Z
+  Duration: 00:20:33.98, start: 0.000000, bitrate: 2816 kb/s
+    Stream #0:0: Video: h264 (High), yuv420p(tv, bt709, progressive), 1280x720 [SAR 1:1 DAR 16:9], 25 fps, 25 tbr, 1k tbn, 50 tbc (default)
+    Metadata:
+      BPS             : 2430971
+      BPS-eng         : 2430971
+      DURATION        : 00:20:33.960000000
+      DURATION-eng    : 00:20:33.960000000
+      NUMBER_OF_FRAMES: 30849
+      NUMBER_OF_FRAMES-eng: 30849
+      NUMBER_OF_BYTES : 374965215
+      NUMBER_OF_BYTES-eng: 374965215
+      _STATISTICS_WRITING_APP: mkvmerge v9.0.0 ('Power to progress') 64bit
+      _STATISTICS_WRITING_APP-eng: mkvmerge v9.0.0 ('Power to progress') 64bit
+      _STATISTICS_WRITING_DATE_UTC: 2016-06-01 20:34:21
+      _STATISTICS_WRITING_DATE_UTC-eng: 2016-06-01 20:34:21
+      _STATISTICS_TAGS: BPS DURATION NUMBER_OF_FRAMES NUMBER_OF_BYTES
+      _STATISTICS_TAGS-eng: BPS DURATION NUMBER_OF_FRAMES NUMBER_OF_BYTES
+    Stream #0:1(ger): Audio: ac3, 48000 Hz, stereo, fltp, 384 kb/s (default)
+    Metadata:
+      BPS             : 384000
+      BPS-eng         : 384000
+      DURATION        : 00:20:33.984000000
+      DURATION-eng    : 00:20:33.984000000
+      NUMBER_OF_FRAMES: 38562
+      NUMBER_OF_FRAMES-eng: 38562
+      NUMBER_OF_BYTES : 59231232
+      NUMBER_OF_BYTES-eng: 59231232
+      _STATISTICS_WRITING_APP: mkvmerge v9.0.0 ('Power to progress') 64bit
+      _STATISTICS_WRITING_APP-eng: mkvmerge v9.0.0 ('Power to progress') 64bit
+      _STATISTICS_WRITING_DATE_UTC: 2016-06-01 20:34:21
+      _STATISTICS_WRITING_DATE_UTC-eng: 2016-06-01 20:34:21
+      _STATISTICS_TAGS: BPS DURATION NUMBER_OF_FRAMES NUMBER_OF_BYTES
+      _STATISTICS_TAGS-eng: BPS DURATION NUMBER_OF_FRAMES NUMBER_OF_BYTES
+At least one output file must be specified

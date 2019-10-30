@@ -1,0 +1,151 @@
+ffmpeg version 3.3.9 Copyright (c) 2000-2018 the FFmpeg developers
+  built with gcc 6.3.0 (Debian 6.3.0-18+deb9u1) 20170516
+  configuration: --disable-decoder=amrnb --disable-decoder=libopenjpeg --disable-mips32r2 --disable-mips32r6 --disable-mips64r6 --disable-mipsdsp --disable-mipsdspr2 --disable-mipsfpu --disable-msa --disable-libopencv --disable-podpages --disable-stripping --enable-avfilter --enable-avresample --enable-gcrypt --enable-gnutls --enable-gpl --enable-libass --enable-libbluray --enable-libbs2b --enable-libcaca --enable-libcdio --enable-libfdk-aac --enable-libfontconfig --enable-libfreetype --enable-libfribidi --enable-libgme --enable-libgsm --enable-libilbc --enable-libkvazaar --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libopenh264 --enable-libopenjpeg --enable-libopenmpt --enable-libopus --enable-libpulse --enable-librubberband --enable-libshine --enable-libsnappy --enable-libsoxr --enable-libspeex --enable-libtesseract --enable-libtheora --enable-libvidstab --enable-libvo-amrwbenc --enable-libvorbis --enable-libvpx --enable-libx265 --enable-libxvid --enable-libzvbi --enable-nonfree --enable-opengl --enable-openssl --enable-postproc --enable-pthreads --enable-shared --enable-version3 --incdir=/usr/include/x86_64-linux-gnu --libdir=/usr/lib/x86_64-linux-gnu --prefix=/usr --toolchain=hardened --enable-frei0r --enable-chromaprint --enable-libx264 --enable-libiec61883 --enable-libdc1394 --enable-vaapi --disable-opencl --enable-libmfx --disable-altivec --shlibdir=/usr/lib/x86_64-linux-gnu
+  libavutil      55. 58.100 / 55. 58.100
+  libavcodec     57. 89.100 / 57. 89.100
+  libavformat    57. 71.100 / 57. 71.100
+  libavdevice    57.  6.100 / 57.  6.100
+  libavfilter     6. 82.100 /  6. 82.100
+  libavresample   3.  5.  0 /  3.  5.  0
+  libswscale      4.  6.100 /  4.  6.100
+  libswresample   2.  7.100 /  2.  7.100
+  libpostproc    54.  5.100 / 54.  5.100
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x563007bc7860] stream 0, timescale not set
+Input #0, mov,mp4,m4a,3gp,3g2,mj2, from 'ModernFamily.07.SO - filecrypt.cc/S07E01.Im Sommer der leidenden Liebenden.mp4':
+  Metadata:
+    major_brand     : mp42
+    minor_version   : 512
+    compatible_brands: isomiso2avc1mp41
+    creation_time   : 2018-06-30T11:41:31.000000Z
+    title           : Im Sommer der leidenden Liebenden
+    artist          : Modern Family
+    album_artist    : Modern Family
+    album           : Modern Family, Season 7
+    comment         : tagged by my own Software
+    genre           : Comedy
+    date            : 2015-09-23T10:00:00Z
+    track           : 1/22
+    show            : Modern Family
+    network         : ABC (US)
+    episode_id      : S07E01
+    season_number   : 7
+    episode_sort    : 1
+    sort_show       : Modern Family
+    description     : Haley erfährt, dass Andy Beth einen Antrag machen will. Sie versucht ihn aufzuhalten, kommt jedoch zu spät. Cam ist mit seinem arbeitslosen Mann, Mitchell, überfordert. Er bittet Mitchells Ex-Chef darum, ihn wieder einzustellen.
+    synopsis        : Haley erfährt, dass Andy Beth einen Antrag machen will. Sie versucht ihn aufzuhalten, kommt jedoch zu spät. Cam ist mit seinem arbeitslosen Mann, Mitchell, überfordert. Er bittet Mitchells Ex-Chef darum, ihn wieder einzustellen.
+    encoder         : by Kristallprinz
+    hd_video        : 1
+    media_type      : 10
+    rating          : 0
+    gapless_playback: 0
+    account_id      : 
+    iTunEXTC        : de-tv|Ab 16 Jahren|500|
+    iTunMOVI        : <?xml version="1.0" encoding="UTF-8"?>
+                    : <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+                    : <plist version="1.0">
+                    : <dict>
+                    : 	<key>cast</key>
+                    : 	<array>
+                    : 		<dict>
+                    : 			<key>name</key>
+                    : 			<string>Julie Bowen</string>
+                    : 		</dict>
+                    : 		<dict>
+                    : 			<key>name</key>
+                    : 			<string>Ty Burrell</string>
+                    : 		</dict>
+                    : 		<dict>
+                    : 			<key>name</key>
+                    : 			<string>Sofía Vergara</string>
+                    : 		</dict>
+                    : 		<dict>
+                    : 			<key>name</key>
+                    : 			<string>Sarah Hyland</string>
+                    : 		</dict>
+                    : 		<dict>
+                    : 			<key>name</key>
+                    : 			<string>Ariel Winter</string>
+                    : 		</dict>
+                    : 		<dict>
+                    : 			<key>name</key>
+                    : 			<string>Jesse Tyler Ferguson</string>
+                    : 		</dict>
+                    : 		<dict>
+                    : 			<key>name</key>
+                    : 			<string>Eric Stonestreet</string>
+                    : 		</dict>
+                    : 		<dict>
+                    : 			<key>name</key>
+                    : 			<string>Ed O'Neill</string>
+                    : 		</dict>
+                    : 		<dict>
+                    : 			<key>name</key>
+                    : 			<string>Aubrey Anderson-Emmons</string>
+                    : 		</dict>
+                    : 		<dict>
+                    : 			<key>name</key>
+                    : 			<string>Rico Rodriguez</string>
+                    : 		</dict>
+                    : 		<dict>
+                    : 			<key>name</key>
+                    : 			<string>Nolan Gould</string>
+                    : 		</dict>
+                    : 		<dict>
+                    : 			<key>name</key>
+                    : 			<string>Jeremy Maguire</string>
+                    : 		</dict>
+                    : 		<dict>
+                    : 			<key>name</key>
+                    : 			<string>Adam DeVine</string>
+                    : 		</dict>
+                    : 		<dict>
+                    : 			<key>name</key>
+                    : 			<string>Reid Ewing</string>
+                    : 		</dict>
+                    : 		<dict>
+                    : 			<key>name</key>
+                    : 			<string>Justin Kirk</string>
+                    : 		</dict>
+                    : 	</array>
+                    : 	<key>directors</key>
+                    : 	<array>
+                    : 		<dict>
+                    : 			<key>name</key>
+                    : 			<string>Jim Hensz</string>
+                    : 		</dict>
+                    : 	</array>
+                    : 	<key>screenwriters</key>
+                    : 	<array>
+                    : 		<dict>
+                    : 			<key>name</key>
+                    : 			<string>Abraham Higginbotham</string>
+                    : 		</dict>
+                    : 	</array>
+                    : 	<key>studio</key>
+                    : 	<string>Kristallprinz</string>
+                    : </dict>
+                    : </plist>
+                    : 
+  Duration: 00:20:52.10, start: -0.001333, bitrate: 3565 kb/s
+    Stream #0:0(eng): Video: h264 (Main) (avc1 / 0x31637661), yuv420p(tv, bt709), 1280x720 [SAR 1:1 DAR 16:9], 2799 kb/s, 25 fps, 25 tbr, 90k tbn, 50 tbc (default)
+    Metadata:
+      creation_time   : 2018-06-30T11:41:31.000000Z
+      handler_name    : VideoHandler
+    Stream #0:1(deu): Audio: aac (LC) (mp4a / 0x6134706D), 48000 Hz, 5.1, fltp, 392 kb/s (default)
+    Metadata:
+      creation_time   : 2018-06-30T11:41:31.000000Z
+      handler_name    : Surround
+    Stream #0:2(eng): Audio: aac (LC) (mp4a / 0x6134706D), 48000 Hz, 5.1, fltp, 378 kb/s
+    Metadata:
+      creation_time   : 2018-06-30T11:41:31.000000Z
+      handler_name    : Surround
+    Stream #0:3(deu): Subtitle: mov_text (tx3g / 0x67337874), 1280x108, 0 kb/s (default)
+    Metadata:
+      creation_time   : 2018-06-30T11:41:31.000000Z
+      handler_name    : SubtitleHandler
+    Stream #0:4(eng): Subtitle: mov_text (tx3g / 0x67337874), 1280x108, 0 kb/s
+    Metadata:
+      creation_time   : 2018-06-30T11:41:31.000000Z
+      handler_name    : SubtitleHandler
+    Stream #0:5: Video: png, rgba(pc), 960x1320 [SAR 5669:5669 DAR 8:11], 90k tbr, 90k tbn, 90k tbc
+At least one output file must be specified

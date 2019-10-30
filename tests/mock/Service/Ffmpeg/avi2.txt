@@ -1,0 +1,19 @@
+ffmpeg version 3.3.9 Copyright (c) 2000-2018 the FFmpeg developers
+  built with gcc 6.3.0 (Debian 6.3.0-18+deb9u1) 20170516
+  configuration: --disable-decoder=amrnb --disable-decoder=libopenjpeg --disable-mips32r2 --disable-mips32r6 --disable-mips64r6 --disable-mipsdsp --disable-mipsdspr2 --disable-mipsfpu --disable-msa --disable-libopencv --disable-podpages --disable-stripping --enable-avfilter --enable-avresample --enable-gcrypt --enable-gnutls --enable-gpl --enable-libass --enable-libbluray --enable-libbs2b --enable-libcaca --enable-libcdio --enable-libfdk-aac --enable-libfontconfig --enable-libfreetype --enable-libfribidi --enable-libgme --enable-libgsm --enable-libilbc --enable-libkvazaar --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libopenh264 --enable-libopenjpeg --enable-libopenmpt --enable-libopus --enable-libpulse --enable-librubberband --enable-libshine --enable-libsnappy --enable-libsoxr --enable-libspeex --enable-libtesseract --enable-libtheora --enable-libvidstab --enable-libvo-amrwbenc --enable-libvorbis --enable-libvpx --enable-libx265 --enable-libxvid --enable-libzvbi --enable-nonfree --enable-opengl --enable-openssl --enable-postproc --enable-pthreads --enable-shared --enable-version3 --incdir=/usr/include/x86_64-linux-gnu --libdir=/usr/lib/x86_64-linux-gnu --prefix=/usr --toolchain=hardened --enable-frei0r --enable-chromaprint --enable-libx264 --enable-libiec61883 --enable-libdc1394 --enable-vaapi --disable-opencl --enable-libmfx --disable-altivec --shlibdir=/usr/lib/x86_64-linux-gnu
+  libavutil      55. 58.100 / 55. 58.100
+  libavcodec     57. 89.100 / 57. 89.100
+  libavformat    57. 71.100 / 57. 71.100
+  libavdevice    57.  6.100 / 57.  6.100
+  libavfilter     6. 82.100 /  6. 82.100
+  libavresample   3.  5.  0 /  3.  5.  0
+  libswscale      4.  6.100 /  4.  6.100
+  libswresample   2.  7.100 /  2.  7.100
+  libpostproc    54.  5.100 / 54.  5.100
+Input #0, avi, from 'dfsdf.öad22x3.avi':
+  Metadata:
+    encoder         : VirtualDubMod 1.5.4.1 (build 2178/release)
+  Duration: 00:10:40.00, start: 0.000000, bitrate: 1664 kb/s
+    Stream #0:0: Video: mpeg4 (Advanced Simple Profile) (XVID / 0x44495658), yuv420p, 640x480 [SAR 1:1 DAR 4:3], 1526 kb/s, 25 fps, 25 tbr, 25 tbn, 25 tbc
+    Stream #0:1: Audio: mp3 (U[0][0][0] / 0x0055), 48000 Hz, stereo, s16p, 128 kb/s
+At least one output file must be specified
