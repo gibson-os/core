@@ -7,10 +7,6 @@ use GibsonOS\Core\Exception\CreateError;
 
 class DirService extends AbstractService
 {
-    public function __construct()
-    {
-    }
-
     /**
      * @param string $dir
      * @param int    $mode
@@ -19,8 +15,11 @@ class DirService extends AbstractService
      */
     public function create(string $dir, int $mode = 0770): void
     {
-        if (!mkdir($dir, $mode, true)) {
-            throw new CreateError(sprintf('Ordner %s konnte nicht angelegt werden!', $dir));
+        if (
+            file_exists($dir) ||
+            !mkdir($dir, $mode, true)
+        ) {
+            throw new CreateError(sprintf('Ordner "%s" konnte nicht angelegt werden!', $dir));
         }
     }
 
@@ -32,11 +31,11 @@ class DirService extends AbstractService
      */
     public function addEndSlash(string $dir, string $slash = DIRECTORY_SEPARATOR): string
     {
-        if (mb_strlen($dir) == 0) {
-            return '';
+        if (mb_strlen($dir) === 0) {
+            return $slash;
         }
 
-        if (mb_strrpos($dir, $slash) === mb_strlen($dir) - 1) {
+        if (mb_strrpos($dir, $slash) === mb_strlen($dir) - mb_strlen($slash)) {
             return $dir;
         }
 
@@ -51,8 +50,14 @@ class DirService extends AbstractService
      */
     public function removeEndSlash(string $dir, string $slash = DIRECTORY_SEPARATOR): string
     {
-        if (mb_strrpos($dir, $slash) == mb_strlen($dir) - 1) {
-            return mb_substr($dir, 0, -1);
+        $slashLength = mb_strlen($slash);
+        $lastSlashPosition = mb_strrpos($dir, $slash);
+
+        if (
+            $lastSlashPosition !== 0 &&
+            $lastSlashPosition === mb_strlen($dir) - $slashLength
+        ) {
+            return mb_substr($dir, 0, 0 - $slashLength);
         }
 
         return $dir;
@@ -68,7 +73,7 @@ class DirService extends AbstractService
     {
         $dirs = explode(DIRECTORY_SEPARATOR, $this->removeEndSlash($path));
 
-        while (!file_exists(implode(DIRECTORY_SEPARATOR, $dirs))) {
+        while (!$file->exists($this->addEndSlash(implode(DIRECTORY_SEPARATOR, $dirs)))) {
             array_pop($dirs);
         }
 
@@ -80,8 +85,8 @@ class DirService extends AbstractService
      *
      * @return string
      */
-    public function escapeForGlob(string $path): ?string
+    public function escapeForGlob(string $path): string
     {
-        return preg_replace('/(\*|\?|\[)/', '[$1]', $path);
+        return (string) preg_replace('/(\*|\?|\[)/', '[$1]', $path);
     }
 }
