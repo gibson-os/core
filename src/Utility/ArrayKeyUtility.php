@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Utility;
 
-class ArrayKey
+class ArrayKeyUtility
 {
     /**
      * @param string|int|array $key
