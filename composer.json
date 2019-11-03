@@ -34,6 +34,7 @@
     "phpcs": "php ./vendor/friendsofphp/php-cs-fixer/php-cs-fixer fix src --verbose",
     "phpstan": "php ./vendor/phpstan/phpstan/bin/phpstan analyse -l 7 src",
     "phpmd": "php ./vendor/phpmd/phpmd/src/bin/phpmd src text ruleset.xml",
-    "phpunit": "php ./vendor/codeception/codeception/codecept run unit --ext DotReporter"
+    "phpunit": "php ./vendor/codeception/codeception/codecept run unit --ext DotReporter",
+    "phpaddunit": "php ./vendor/codeception/codeception/codecept generate:test unit"
   }
 }
