@@ -8,7 +8,7 @@ use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\Module as ModuleModel;
 
-class Module extends AbstractRepository
+class ModuleRepository extends AbstractRepository
 {
     /**
      * @param string $name

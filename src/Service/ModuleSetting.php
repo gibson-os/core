@@ -8,8 +8,8 @@ use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\Model\SaveError;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\Setting;
-use GibsonOS\Core\Repository\Module;
-use GibsonOS\Core\Repository\Setting as SettingRepository;
+use GibsonOS\Core\Repository\ModuleRepository;
+use GibsonOS\Core\Repository\SettingRepository;
 
 class ModuleSetting extends AbstractSingletonService
 {
@@ -156,7 +156,7 @@ class ModuleSetting extends AbstractSingletonService
      */
     private function getModuleIdByName(string $name): int
     {
-        $moduleModel = Module::getByName($name);
+        $moduleModel = ModuleRepository::getByName($name);
 
         return $moduleModel->getId();
     }
