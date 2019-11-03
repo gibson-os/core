@@ -11,7 +11,7 @@ use GibsonOS\Core\Exception\Image\CreateError;
  *
  * @package GibsonOS\Core\Service\Image
  */
-class Thumbnail extends Manipulate
+class ThumbnailService extends ManipulateService
 {
     const POSITIONS = [
         16 => 144,

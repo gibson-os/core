@@ -5,7 +5,7 @@ namespace GibsonOS\Core\Service;
 
 use GibsonOS\Core\Exception\ProcessError;
 
-class Process extends AbstractService
+class ProcessService extends AbstractService
 {
     /**
      * @param string $command

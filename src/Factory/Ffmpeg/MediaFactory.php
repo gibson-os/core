@@ -5,24 +5,24 @@ namespace GibsonOS\Core\Factory\Ffmpeg;
 
 use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Factory\FfmpegFactory;
-use GibsonOS\Core\Service\Ffmpeg;
-use GibsonOS\Core\Service\Ffmpeg\Media;
+use GibsonOS\Core\Service\Ffmpeg\MediaService;
+use GibsonOS\Core\Service\FfmpegService;
 
 class MediaFactory
 {
     /**
-     * @param Ffmpeg|null $ffmpeg
+     * @param FfmpegService|null $ffmpeg
      *
      * @throws GetError
      *
-     * @return Media
+     * @return MediaService
      */
-    public static function create(Ffmpeg $ffmpeg = null): Media
+    public static function create(FfmpegService $ffmpeg = null): MediaService
     {
-        if (!$ffmpeg instanceof Ffmpeg) {
+        if (!$ffmpeg instanceof FfmpegService) {
             $ffmpeg = FfmpegFactory::create();
         }
 
-        return new Media($ffmpeg);
+        return new MediaService($ffmpeg);
     }
 }

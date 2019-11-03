@@ -5,7 +5,7 @@ namespace Service;
 
 use Codeception\Test\Unit;
 use GibsonOS\Core\Service\AbstractSingletonService;
-use GibsonOS\Core\Service\Flock;
+use GibsonOS\Core\Service\FlockService;
 
 class AbstractSingletonTest extends Unit
 {
@@ -25,8 +25,8 @@ class AbstractSingletonTest extends Unit
     // tests
     public function testNewInstance(): void
     {
-        $instance = Flock::getInstance();
-        $newInstance = Flock::getInstance();
+        $instance = FlockService::getInstance();
+        $newInstance = FlockService::getInstance();
 
         $this->assertTrue($instance instanceof AbstractSingletonService);
         $this->assertSame($instance, $newInstance);

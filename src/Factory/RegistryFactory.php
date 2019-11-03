@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Factory;
 
-use GibsonOS\Core\Service\Registry;
+use GibsonOS\Core\Service\RegistryService;
 
 /**
  * @deprecated
@@ -11,12 +11,12 @@ use GibsonOS\Core\Service\Registry;
 class RegistryFactory
 {
     /**
-     * @return Registry
+     * @return RegistryService
      */
-    public static function create(): Registry
+    public static function create(): RegistryService
     {
-        /** @var Registry $registry */
-        $registry = Registry::getInstance();
+        /** @var RegistryService $registry */
+        $registry = RegistryService::getInstance();
 
         return $registry;
     }

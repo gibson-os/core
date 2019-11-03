@@ -1,8 +1,11 @@
-<?php namespace Service;
+<?php
+declare(strict_types=1);
+
+namespace Service;
 
 use Codeception\Test\Unit;
 use GibsonOS\Core\Exception\GetError;
-use GibsonOS\Core\Service\Registry;
+use GibsonOS\Core\Service\RegistryService;
 use stdClass;
 use UnitTester;
 
@@ -12,14 +15,15 @@ class RegistryTest extends Unit
      * @var UnitTester
      */
     protected $tester;
+
     /**
-     * @var Registry
+     * @var RegistryService
      */
     private $registry;
 
     protected function _before()
     {
-        $this->registry = Registry::getInstance();
+        $this->registry = RegistryService::getInstance();
         $this->registry->set('arthur', 'dent');
     }
 
@@ -30,12 +34,12 @@ class RegistryTest extends Unit
     // tests
     public function testInstance(): void
     {
-        $this->assertEquals(Registry::class, get_class($this->registry));
+        $this->assertEquals(RegistryService::class, get_class($this->registry));
     }
 
     public function testNewInstance(): void
     {
-        $newInstance = Registry::getInstance();
+        $newInstance = RegistryService::getInstance();
 
         $this->assertSame('dent', $newInstance->get('arthur'));
     }
@@ -60,7 +64,7 @@ class RegistryTest extends Unit
     {
         $array = [
             'antwort' => 'auf alles',
-            42 => true
+            42 => true,
         ];
         $this->registry->set('array', $array);
 

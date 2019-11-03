@@ -15,7 +15,7 @@ use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\Image\LoadError;
 use GibsonOS\Core\Exception\ProcessError;
 
-class Ffmpeg extends AbstractService
+class FfmpegService extends AbstractService
 {
     /**
      * @var string
@@ -23,35 +23,35 @@ class Ffmpeg extends AbstractService
     public $ffpmegPath;
 
     /**
-     * @var DateTime
+     * @var DateTimeService
      */
     private $dateTime;
 
     /**
-     * @var File
+     * @var FileService
      */
     private $file;
 
     /**
-     * @var Process
+     * @var ProcessService
      */
     private $process;
 
     /**
-     * @var Image
+     * @var ImageService
      */
     private $image;
 
     /**
      * Ffmpeg constructor.
      *
-     * @param string   $ffpmegPath
-     * @param DateTime $dateTime
-     * @param File     $file
-     * @param Process  $process
-     * @param Image    $image
+     * @param string          $ffpmegPath
+     * @param DateTimeService $dateTime
+     * @param FileService     $file
+     * @param ProcessService  $process
+     * @param ImageService    $image
      */
-    public function __construct(string $ffpmegPath, DateTime $dateTime, File $file, Process $process, Image $image)
+    public function __construct(string $ffpmegPath, DateTimeService $dateTime, FileService $file, ProcessService $process, ImageService $image)
     {
         $this->ffpmegPath = $ffpmegPath;
         $this->dateTime = $dateTime;

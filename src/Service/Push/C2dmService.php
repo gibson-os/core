@@ -11,7 +11,7 @@ namespace GibsonOS\Core\Service\Push;
 
 use GibsonOS\Core\Model\User;
 
-class C2dm implements PushInterface
+class C2DmService implements PushInterface
 {
     /**
      * @param User[] $users

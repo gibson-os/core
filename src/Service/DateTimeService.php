@@ -8,7 +8,7 @@ use DateTimeZone;
 use Exception;
 use GibsonOS\Core\Exception\DateTimeError;
 
-class DateTime extends AbstractService
+class DateTimeService extends AbstractService
 {
     /**
      * @var DateTimeZone
@@ -58,9 +58,9 @@ class DateTime extends AbstractService
     /**
      * @param DateTimeZone $timezone
      *
-     * @return DateTime
+     * @return DateTimeService
      */
-    public function setTimezone(DateTimeZone $timezone): DateTime
+    public function setTimezone(DateTimeZone $timezone): DateTimeService
     {
         $this->timezone = $timezone;
 

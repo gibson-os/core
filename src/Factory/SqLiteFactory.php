@@ -3,18 +3,18 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Factory;
 
-use GibsonOS\Core\Service\SqLite;
+use GibsonOS\Core\Service\SqLiteService;
 
 class SqLiteFactory
 {
     /**
      * @param string $filename
      *
-     * @return SqLite
+     * @return SqLiteService
      */
-    public static function create(string $filename): SqLite
+    public static function create(string $filename): SqLiteService
     {
-        $sqLite = new SqLite($filename, FileFactory::create());
+        $sqLite = new SqLiteService($filename, FileFactory::create());
 
         return $sqLite;
     }

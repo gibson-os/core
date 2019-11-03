@@ -4,15 +4,15 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Factory\Image;
 
 use GibsonOS\Core\Factory\FileFactory;
-use GibsonOS\Core\Service\Image\Manipulate;
+use GibsonOS\Core\Service\Image\ManipulateService;
 
 class ManipulateFactory
 {
     /**
-     * @return Manipulate
+     * @return ManipulateService
      */
-    public static function create(): Manipulate
+    public static function create(): ManipulateService
     {
-        return new Manipulate(FileFactory::create());
+        return new ManipulateService(FileFactory::create());
     }
 }

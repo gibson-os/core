@@ -5,7 +5,7 @@ namespace GibsonOS\Core\Service\File;
 
 use GibsonOS\Core\Exception\GetError;
 
-class Type
+class TypeService
 {
     public const TYPE_JPG = 'jpg';
 

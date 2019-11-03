@@ -11,7 +11,7 @@ use GibsonOS\Core\Model\Setting;
 use GibsonOS\Core\Repository\ModuleRepository;
 use GibsonOS\Core\Repository\SettingRepository;
 
-class ModuleSetting extends AbstractSingletonService
+class ModuleSettingService extends AbstractSingletonService
 {
     /**
      * @var Setting[][]
@@ -139,8 +139,8 @@ class ModuleSetting extends AbstractSingletonService
      */
     private function getModuleNameByRegistry(): string
     {
-        /** @var Registry $registry */
-        $registry = Registry::getInstance();
+        /** @var RegistryService $registry */
+        $registry = RegistryService::getInstance();
 
         return (string) $registry->get('module');
     }
@@ -174,8 +174,8 @@ class ModuleSetting extends AbstractSingletonService
      */
     private function loadSettings(int $moduleId, int $userId = null, string $key = null)
     {
-        /** @var Registry $registry */
-        $registry = Registry::getInstance();
+        /** @var RegistryService $registry */
+        $registry = RegistryService::getInstance();
 
         // User ID holen
         if (null === $userId) {

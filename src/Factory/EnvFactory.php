@@ -3,12 +3,12 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Factory;
 
-use GibsonOS\Core\Service\Env;
+use GibsonOS\Core\Service\EnvService;
 
 class EnvFactory
 {
-    public static function create(): Env
+    public static function create(): EnvService
     {
-        return new Env();
+        return new EnvService();
     }
 }

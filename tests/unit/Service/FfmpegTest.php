@@ -8,11 +8,11 @@ use GibsonOS\Core\Dto\Image as ImageDto;
 use GibsonOS\Core\Exception\Ffmpeg\ConvertStatusError;
 use GibsonOS\Core\Exception\FileNotFound;
 use GibsonOS\Core\Exception\ProcessError;
-use GibsonOS\Core\Service\DateTime;
-use GibsonOS\Core\Service\Ffmpeg;
-use GibsonOS\Core\Service\File;
-use GibsonOS\Core\Service\Image;
-use GibsonOS\Core\Service\Process;
+use GibsonOS\Core\Service\DateTimeService;
+use GibsonOS\Core\Service\FfmpegService;
+use GibsonOS\Core\Service\FileService;
+use GibsonOS\Core\Service\ImageService;
+use GibsonOS\Core\Service\ProcessService;
 use GibsonOS\Mock\Dto\Ffmpeg\Media as MediaMock;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
@@ -31,27 +31,27 @@ class FfmpegTest extends Unit
     private $ffmpegPath;
 
     /**
-     * @var Ffmpeg
+     * @var FfmpegService
      */
     private $ffmpeg;
 
     /**
-     * @var ObjectProphecy|DateTime
+     * @var ObjectProphecy|DateTimeService
      */
     private $dateTime;
 
     /**
-     * @var ObjectProphecy|File
+     * @var ObjectProphecy|FileService
      */
     private $file;
 
     /**
-     * @var ObjectProphecy|Process
+     * @var ObjectProphecy|ProcessService
      */
     private $process;
 
     /**
-     * @var ObjectProphecy|Image
+     * @var ObjectProphecy|ImageService
      */
     private $image;
 
@@ -83,10 +83,10 @@ class FfmpegTest extends Unit
     protected function _before()
     {
         $this->ffmpegPath = 'path/to/ffmpeg';
-        $this->dateTime = $this->prophesize(DateTime::class);
-        $this->file = $this->prophesize(File::class);
-        $this->process = $this->prophesize(Process::class);
-        $this->image = $this->prophesize(Image::class);
+        $this->dateTime = $this->prophesize(DateTimeService::class);
+        $this->file = $this->prophesize(FileService::class);
+        $this->process = $this->prophesize(ProcessService::class);
+        $this->image = $this->prophesize(ImageService::class);
         $this->inputVideoFilename = '/name/from/file.vid';
         $this->outputVideoFilename = '/name/to/file.vid';
         $this->logFilename = 'ffmpegfile.vid';
@@ -100,7 +100,7 @@ class FfmpegTest extends Unit
             escapeshellarg($this->logPath)
         );
 
-        $this->ffmpeg = new Ffmpeg(
+        $this->ffmpeg = new FfmpegService(
             $this->ffmpegPath,
             $this->dateTime->reveal(),
             $this->file->reveal(),

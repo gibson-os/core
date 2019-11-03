@@ -11,19 +11,19 @@ use GibsonOS\Core\Exception\FileNotFound;
 use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\SetError;
 
-class File extends AbstractService
+class FileService extends AbstractService
 {
     /**
-     * @var Dir
+     * @var DirService
      */
     private $dir;
 
     /**
      * File constructor.
      *
-     * @param Dir $dir
+     * @param DirService $dir
      */
-    public function __construct(Dir $dir)
+    public function __construct(DirService $dir)
     {
         $this->dir = $dir;
     }
@@ -446,6 +446,6 @@ class File extends AbstractService
 
         $this->close($file);
 
-        echo $line;
+        return $line;
     }
 }

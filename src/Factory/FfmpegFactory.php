@@ -4,20 +4,20 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Factory;
 
 use GibsonOS\Core\Exception\GetError;
-use GibsonOS\Core\Service\Ffmpeg;
+use GibsonOS\Core\Service\FfmpegService;
 
 class FfmpegFactory
 {
     /**
      * @throws GetError
      *
-     * @return Ffmpeg
+     * @return FfmpegService
      */
-    public static function create(): Ffmpeg
+    public static function create(): FfmpegService
     {
         $env = EnvFactory::create();
 
-        return new Ffmpeg(
+        return new FfmpegService(
             $env->getString('FFMPEG_PATH'),
             DateTimeFactory::create(),
             FileFactory::create(),

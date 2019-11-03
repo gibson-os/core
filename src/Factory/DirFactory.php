@@ -3,12 +3,12 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Factory;
 
-use GibsonOS\Core\Service\Dir;
+use GibsonOS\Core\Service\DirService;
 
 class DirFactory
 {
-    public static function create(): Dir
+    public static function create(): DirService
     {
-        return new Dir();
+        return new DirService();
     }
 }

@@ -3,46 +3,46 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Service;
 
-use GibsonOS\Core\Dto\Image as ImageDto;
+use GibsonOS\Core\Dto\Image;
 use GibsonOS\Core\Exception\DeleteError;
 use GibsonOS\Core\Exception\FileNotFound;
 use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\Image\CreateError;
 use GibsonOS\Core\Exception\Image\LoadError;
 
-class Image extends AbstractService
+class ImageService extends AbstractService
 {
     /**
-     * @var File
+     * @var FileService
      */
     private $file;
 
     /**
      * Image constructor.
      *
-     * @param File $file
+     * @param FileService $file
      */
-    public function __construct(File $file)
+    public function __construct(FileService $file)
     {
         $this->file = $file;
     }
 
     /**
-     * @param ImageDto $image
+     * @param Image $image
      *
      * @return int
      */
-    public function getWidth(ImageDto $image): int
+    public function getWidth(Image $image): int
     {
         return (int) imagesx($image->getResource());
     }
 
     /**
-     * @param ImageDto $image
+     * @param Image $image
      *
      * @return int
      */
-    public function getHeight(ImageDto $image): int
+    public function getHeight(Image $image): int
     {
         return (int) imagesy($image->getResource());
     }
@@ -53,9 +53,9 @@ class Image extends AbstractService
      *
      * @throws CreateError
      *
-     * @return ImageDto
+     * @return Image
      */
-    public function create(int $width, int $height): ImageDto
+    public function create(int $width, int $height): Image
     {
         $image = imagecreatetruecolor($width, $height);
 
@@ -63,50 +63,50 @@ class Image extends AbstractService
             throw new CreateError('Bild jonnte nicht erstellt werden!');
         }
 
-        $image = new ImageDto($image);
+        $image = new Image($image);
         $this->enableAlphaBlending($image);
 
         return $image;
     }
 
     /**
-     * @param ImageDto $image
+     * @param Image $image
      */
-    public function fillTransparent(ImageDto $image): void
+    public function fillTransparent(Image $image): void
     {
         $this->fill($image, $this->getTransparentColor($image));
         $this->enableAlpha($image);
     }
 
     /**
-     * @param ImageDto $image
-     * @param int      $red
-     * @param int      $green
-     * @param int      $blue
-     * @param int      $alpha
+     * @param Image $image
+     * @param int   $red
+     * @param int   $green
+     * @param int   $blue
+     * @param int   $alpha
      *
      * @return int
      */
-    public function getColor(ImageDto $image, int $red, int $green, int $blue, int $alpha = 0): int
+    public function getColor(Image $image, int $red, int $green, int $blue, int $alpha = 0): int
     {
         return (int) imagecolorallocatealpha($image->getResource(), $red, $green, $blue, $alpha);
     }
 
     /**
-     * @param ImageDto $image
+     * @param Image $image
      *
      * @return int
      */
-    public function getTransparentColor(ImageDto $image): int
+    public function getTransparentColor(Image $image): int
     {
         return (int) imagecolortransparent($image->getResource());
     }
 
     /**
-     * @param ImageDto $image
-     * @param int      $color
+     * @param Image $image
+     * @param int   $color
      */
-    public function setTransparentColor(ImageDto $image, int $color): void
+    public function setTransparentColor(Image $image, int $color): void
     {
         imagecolortransparent($image->getResource(), $color);
     }
@@ -114,11 +114,11 @@ class Image extends AbstractService
     /**
      * Zerstört das Bild.
      *
-     * @param ImageDto $image
+     * @param Image $image
      *
      * @return bool
      */
-    public function destroy(ImageDto $image): bool
+    public function destroy(Image $image): bool
     {
         return imagedestroy($image->getResource());
     }
@@ -130,9 +130,9 @@ class Image extends AbstractService
      * @throws FileNotFound
      * @throws LoadError
      *
-     * @return ImageDto
+     * @return Image
      */
-    public function load(string $filename, string $type = null): ImageDto
+    public function load(string $filename, string $type = null): Image
     {
         if ($type === null) {
             $type = $this->getImageTypeByFilename($filename);
@@ -176,16 +176,16 @@ class Image extends AbstractService
             throw new LoadError(sprintf('Bild "%s" konnte nciht geladen werden!', $filename));
         }
 
-        $imageDto = (new ImageDto($image))
+        $Image = (new Image($image))
             ->setFilename($filename)
         ;
 
         if ($type === 'png') {
-            $this->enableAlphaBlending($imageDto);
-            $this->enableAlpha($imageDto);
+            $this->enableAlphaBlending($Image);
+            $this->enableAlpha($Image);
         }
 
-        return $imageDto;
+        return $Image;
     }
 
     /**
@@ -221,12 +221,12 @@ class Image extends AbstractService
     }
 
     /**
-     * @param ImageDto $image
-     * @param string   $type
+     * @param Image  $image
+     * @param string $type
      *
      * @return bool
      */
-    public function output(ImageDto $image, string $type = 'jpg'): bool
+    public function output(Image $image, string $type = 'jpg'): bool
     {
         switch ($type) {
             case 'bmp':
@@ -244,12 +244,12 @@ class Image extends AbstractService
     }
 
     /**
-     * @param ImageDto $image
-     * @param string   $type
+     * @param Image  $image
+     * @param string $type
      *
      * @return bool
      */
-    public function show(ImageDto $image, string $type = 'jpg'): bool
+    public function show(Image $image, string $type = 'jpg'): bool
     {
         switch ($type) {
             case 'bmp':
@@ -275,12 +275,12 @@ class Image extends AbstractService
     }
 
     /**
-     * @param ImageDto $image
-     * @param string   $type
+     * @param Image  $image
+     * @param string $type
      *
      * @return string
      */
-    public function getString(ImageDto $image, string $type = 'jpg'): string
+    public function getString(Image $image, string $type = 'jpg'): string
     {
         ob_start();
         $this->output($image, $type);
@@ -291,7 +291,7 @@ class Image extends AbstractService
     }
 
     /**
-     * @param ImageDto    $image
+     * @param Image       $image
      * @param string|null $type
      *
      * @throws DeleteError
@@ -299,7 +299,7 @@ class Image extends AbstractService
      *
      * @return bool
      */
-    public function save(ImageDto $image, string $type = null): bool
+    public function save(Image $image, string $type = null): bool
     {
         if ($type === null) {
             $type = $this->getImageTypeByFilename($image->getFilename());
@@ -329,54 +329,54 @@ class Image extends AbstractService
     }
 
     /**
-     * @param ImageDto $image
+     * @param Image $image
      *
      * @return bool
      */
-    public function enableAlphaBlending(ImageDto $image): bool
+    public function enableAlphaBlending(Image $image): bool
     {
         return imagealphablending($image->getResource(), true);
     }
 
     /**
-     * @param ImageDto $image
+     * @param Image $image
      *
      * @return bool
      */
-    public function disableAlphaBlending(ImageDto $image): bool
+    public function disableAlphaBlending(Image $image): bool
     {
         return imagealphablending($image->getResource(), false);
     }
 
     /**
-     * @param ImageDto $image
+     * @param Image $image
      *
      * @return bool
      */
-    public function enableAlpha(ImageDto $image): bool
+    public function enableAlpha(Image $image): bool
     {
         return imagesavealpha($image->getResource(), true);
     }
 
     /**
-     * @param ImageDto $image
+     * @param Image $image
      *
      * @return bool
      */
-    public function disableAlpha(ImageDto $image): bool
+    public function disableAlpha(Image $image): bool
     {
         return imagesavealpha($image->getResource(), false);
     }
 
     /**
-     * @param ImageDto $image
-     * @param int      $color
-     * @param int      $x
-     * @param int      $y
+     * @param Image $image
+     * @param int   $color
+     * @param int   $x
+     * @param int   $y
      *
      * @return bool
      */
-    public function fill(ImageDto $image, int $color, int $x = 0, int $y = 0): bool
+    public function fill(Image $image, int $color, int $x = 0, int $y = 0): bool
     {
         return imagefill($image->getResource(), $x, $y, $color);
     }

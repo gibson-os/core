@@ -3,17 +3,17 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Factory;
 
-use GibsonOS\Core\Service\ModuleSetting;
+use GibsonOS\Core\Service\ModuleSettingService;
 
 class ModuleSettingFactory
 {
     /**
-     * @return ModuleSetting
+     * @return ModuleSettingService
      */
-    public static function create(): ModuleSetting
+    public static function create(): ModuleSettingService
     {
-        /** @var ModuleSetting $moduleSetting */
-        $moduleSetting = ModuleSetting::getInstance();
+        /** @var ModuleSettingService $moduleSetting */
+        $moduleSetting = ModuleSettingService::getInstance();
 
         return $moduleSetting;
     }

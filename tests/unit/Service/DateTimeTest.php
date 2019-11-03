@@ -3,10 +3,10 @@
 namespace Service;
 
 use Codeception\Test\Unit;
-use DateTime as PhpDateTime;
+use DateTime;
 use DateTimeZone;
 use GibsonOS\Core\Exception\DateTimeError;
-use GibsonOS\Core\Service\DateTime;
+use GibsonOS\Core\Service\DateTimeService;
 use UnitTester;
 
 class DateTimeTest extends Unit
@@ -17,7 +17,7 @@ class DateTimeTest extends Unit
     protected $tester;
 
     /**
-     * @var DateTime
+     * @var DateTimeService
      */
     private $dateTime;
 
@@ -29,7 +29,7 @@ class DateTimeTest extends Unit
     protected function _before()
     {
         $this->timeZone = new DateTimeZone('Europe/Berlin');
-        $this->dateTime = new DateTime($this->timeZone);
+        $this->dateTime = new DateTimeService($this->timeZone);
     }
 
     protected function _after()
@@ -38,7 +38,7 @@ class DateTimeTest extends Unit
 
     public function testNew()
     {
-        $testDateTime = new PhpDateTime('now', $this->timeZone);
+        $testDateTime = new DateTime('now', $this->timeZone);
         $dateTime = $this->dateTime->new();
 
         $this->assertGreaterThanOrEqual($testDateTime->getTimestamp(), $dateTime->getTimestamp());
@@ -46,7 +46,7 @@ class DateTimeTest extends Unit
 
     public function testGet()
     {
-        $testDateTime = new PhpDateTime('28.04.2005 00:00:00', $this->timeZone);
+        $testDateTime = new DateTime('28.04.2005 00:00:00', $this->timeZone);
         $dateTime = $this->dateTime->get('2005-04-28 00:00:00');
 
         $this->assertEquals($testDateTime->getTimestamp(), $dateTime->getTimestamp());

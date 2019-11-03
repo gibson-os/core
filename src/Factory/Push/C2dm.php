@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Factory\Push;
 
-use GibsonOS\Core\Service\Push\C2dm as C2dmService;
+use GibsonOS\Core\Service\Push\C2DmService;
 
 class C2dm
 {

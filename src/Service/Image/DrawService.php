@@ -4,9 +4,9 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Service\Image;
 
 use GibsonOS\Core\Dto\Image as ImageDto;
-use GibsonOS\Core\Service\Image;
+use GibsonOS\Core\Service\ImageService;
 
-class Draw extends Image
+class DrawService extends ImageService
 {
     /**
      * @param ImageDto $image

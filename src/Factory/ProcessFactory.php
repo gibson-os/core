@@ -3,15 +3,15 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Factory;
 
-use GibsonOS\Core\Service\Process;
+use GibsonOS\Core\Service\ProcessService;
 
 class ProcessFactory
 {
     /**
-     * @return Process
+     * @return ProcessService
      */
-    public static function create(): Process
+    public static function create(): ProcessService
     {
-        return new Process();
+        return new ProcessService();
     }
 }

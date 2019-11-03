@@ -5,19 +5,19 @@ namespace GibsonOS\Core\Factory;
 
 use DateTimeZone;
 use GibsonOS\Core\Exception\GetError;
-use GibsonOS\Core\Service\DateTime;
+use GibsonOS\Core\Service\DateTimeService;
 
 class DateTimeFactory
 {
     /**
      * @throws GetError
      *
-     * @return DateTime
+     * @return DateTimeService
      */
-    public static function create(): DateTime
+    public static function create(): DateTimeService
     {
         $env = EnvFactory::create();
 
-        return new DateTime(new DateTimeZone($env->getString('timezone')));
+        return new DateTimeService(new DateTimeZone($env->getString('timezone')));
     }
 }

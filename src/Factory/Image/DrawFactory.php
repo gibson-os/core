@@ -4,15 +4,15 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Factory\Image;
 
 use GibsonOS\Core\Factory\FileFactory;
-use GibsonOS\Core\Service\Image\Draw;
+use GibsonOS\Core\Service\Image\DrawService;
 
 class DrawFactory
 {
     /**
-     * @return Draw
+     * @return DrawService
      */
-    public static function create(): Draw
+    public static function create(): DrawService
     {
-        return new Draw(FileFactory::create());
+        return new DrawService(FileFactory::create());
     }
 }

@@ -3,15 +3,15 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Factory\File;
 
-use GibsonOS\Core\Service\File\Type;
+use GibsonOS\Core\Service\File\TypeService;
 
 class TypeFactory
 {
     /**
-     * @return Type
+     * @return TypeService
      */
-    public static function create(): Type
+    public static function create(): TypeService
     {
-        return new Type();
+        return new TypeService();
     }
 }

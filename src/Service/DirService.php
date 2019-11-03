@@ -5,7 +5,7 @@ namespace GibsonOS\Core\Service;
 
 use GibsonOS\Core\Exception\CreateError;
 
-class Dir extends AbstractService
+class DirService extends AbstractService
 {
     public function __construct()
     {
@@ -59,12 +59,12 @@ class Dir extends AbstractService
     }
 
     /**
-     * @param string $path
-     * @param File   $file
+     * @param string      $path
+     * @param FileService $file
      *
      * @return bool
      */
-    public function isWritable(string $path, File $file): bool
+    public function isWritable(string $path, FileService $file): bool
     {
         $dirs = explode(DIRECTORY_SEPARATOR, $this->removeEndSlash($path));
 

@@ -3,17 +3,17 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Factory;
 
-use GibsonOS\Core\Service\Flock;
+use GibsonOS\Core\Service\FlockService;
 
 class FlockFactory
 {
     /**
-     * @return Flock
+     * @return FlockService
      */
-    public static function create(): Flock
+    public static function create(): FlockService
     {
-        /** @var Flock $flock */
-        $flock = Flock::getInstance();
+        /** @var FlockService $flock */
+        $flock = FlockService::getInstance();
 
         return $flock;
     }

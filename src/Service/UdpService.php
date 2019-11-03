@@ -8,7 +8,7 @@ use GibsonOS\Core\Exception\Server\ReceiveError;
 use GibsonOS\Core\Exception\Server\SendError;
 use GibsonOS\Core\Exception\SetError;
 
-class Udp extends AbstractService
+class UdpService extends AbstractService
 {
     /**
      * @var resource

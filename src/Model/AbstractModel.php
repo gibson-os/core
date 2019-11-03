@@ -9,7 +9,7 @@ use GibsonOS\Core\Exception\Model\DeleteError;
 use GibsonOS\Core\Exception\Model\SaveError;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Factory\DateTimeFactory;
-use GibsonOS\Core\Service\DateTime;
+use GibsonOS\Core\Service\DateTimeService;
 use mysqlDatabase;
 use mysqlField;
 use mysqlRegistry;
@@ -46,7 +46,7 @@ abstract class AbstractModel implements ModelInterface
     ];
 
     /**
-     * @var DateTime
+     * @var DateTimeService
      */
     private $dateTime;
 

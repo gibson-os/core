@@ -3,15 +3,15 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Factory;
 
-use GibsonOS\Core\Service\Image;
+use GibsonOS\Core\Service\ImageService;
 
 class ImageFactory
 {
     /**
-     * @return Image
+     * @return ImageService
      */
-    public static function create(): Image
+    public static function create(): ImageService
     {
-        return new Image(FileFactory::create());
+        return new ImageService(FileFactory::create());
     }
 }

@@ -3,15 +3,15 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Factory;
 
-use GibsonOS\Core\Service\File;
+use GibsonOS\Core\Service\FileService;
 
 class FileFactory
 {
     /**
-     * @return File
+     * @return FileService
      */
-    public static function create(): File
+    public static function create(): FileService
     {
-        return new File(DirFactory::create());
+        return new FileService(DirFactory::create());
     }
 }

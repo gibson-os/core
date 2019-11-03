@@ -3,21 +3,21 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Service\Image;
 
-use GibsonOS\Core\Dto\Image as ImageDto;
+use GibsonOS\Core\Dto\Image;
 use GibsonOS\Core\Exception\Image\CreateError;
 
-class Manipulate extends Draw
+class ManipulateService extends DrawService
 {
     /**
-     * @param ImageDto $image
-     * @param int      $width
-     * @param int      $height
+     * @param Image $image
+     * @param int   $width
+     * @param int   $height
      *
      * @throws CreateError
      *
      * @return bool
      */
-    public function resize(ImageDto $image, int $width, int $height): bool
+    public function resize(Image $image, int $width, int $height): bool
     {
         // Wenn das bild breiter als hoch ist
         if ($this->getWidth($image) > $this->getHeight($image)) {
@@ -75,13 +75,15 @@ class Manipulate extends Draw
     }
 
     /**
-     * @param ImageDto $image
-     * @param int      $width
-     * @param int      $height
+     * @param Image $image
+     * @param int   $width
+     * @param int   $height
+     *
+     * @throws CreateError
      *
      * @return bool
      */
-    public function resizeCentered(ImageDto $image, int $width, int $height): bool
+    public function resizeCentered(Image $image, int $width, int $height): bool
     {
         if (!$this->resize($image, $width, $height)) {
             return false;
@@ -97,15 +99,15 @@ class Manipulate extends Draw
     }
 
     /**
-     * @param ImageDto $image
-     * @param int      $width
-     * @param int      $height
+     * @param Image $image
+     * @param int   $width
+     * @param int   $height
      *
      * @throws CreateError
      *
-     * @return ImageDto
+     * @return Image
      */
-    public function verticalCentered(ImageDto $image, int $width, int $height): ImageDto
+    public function verticalCentered(Image $image, int $width, int $height): Image
     {
         $manipulate = $this->create($width, $height);
         $this->copy(
@@ -119,15 +121,15 @@ class Manipulate extends Draw
     }
 
     /**
-     * @param ImageDto $image
-     * @param int      $width
-     * @param int      $height
+     * @param Image $image
+     * @param int   $width
+     * @param int   $height
      *
      * @throws CreateError
      *
      * @return bool
      */
-    public function horizontalCentered(ImageDto $image, int $width, int $height): bool
+    public function horizontalCentered(Image $image, int $width, int $height): bool
     {
         $manipulate = $this->create($width, $height);
 
@@ -145,17 +147,19 @@ class Manipulate extends Draw
     }
 
     /**
-     * @param ImageDto $image
+     * @param Image    $image
      * @param int      $width
      * @param int      $height
      * @param int|null $startX
      * @param int|null $startY
      * @param int|null $color
      *
+     * @throws CreateError
+     *
      * @return bool
      */
     public function crop(
-        ImageDto $image,
+        Image $image,
         int $width,
         int $height,
         int $startX = null,
@@ -196,15 +200,17 @@ class Manipulate extends Draw
     }
 
     /**
-     * @param ImageDto $image
+     * @param Image    $image
      * @param int      $width
      * @param int      $height
      * @param int|null $startX
      * @param int|null $startY
      *
+     * @throws CreateError
+     *
      * @return bool
      */
-    public function cropResized(ImageDto $image, int $width, int $height, int $startX = null, int $startY = null): bool
+    public function cropResized(Image $image, int $width, int $height, int $startX = null, int $startY = null): bool
     {
         if ($this->getWidth($image) > $this->getHeight($image)) {
             $newWidth = ($this->getWidth($image) / $this->getHeight($image)) * $height;
@@ -234,22 +240,22 @@ class Manipulate extends Draw
     }
 
     /**
-     * @param ImageDto $sourceImage
-     * @param ImageDto $destinationImage
-     * @param int      $destX
-     * @param int      $destY
-     * @param int      $srcX
-     * @param int      $srcY
-     * @param int      $srcWidth
-     * @param int      $srcHeight
-     * @param int      $dstWidth
-     * @param int      $dstHeight
+     * @param Image $sourceImage
+     * @param Image $destinationImage
+     * @param int   $destX
+     * @param int   $destY
+     * @param int   $srcX
+     * @param int   $srcY
+     * @param int   $srcWidth
+     * @param int   $srcHeight
+     * @param int   $dstWidth
+     * @param int   $dstHeight
      *
      * @return bool
      */
     public function copy(
-        ImageDto $sourceImage,
-        ImageDto $destinationImage,
+        Image $sourceImage,
+        Image $destinationImage,
         int $destX = 0,
         int $destY = 0,
         int $srcX = 0,

@@ -22,23 +22,23 @@ use GibsonOS\Core\Exception\FileNotFound;
 use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\Image\LoadError;
 use GibsonOS\Core\Exception\ProcessError;
-use GibsonOS\Core\Service\Ffmpeg;
+use GibsonOS\Core\Service\FfmpegService;
 use InvalidArgumentException;
 use OutOfRangeException;
 
-class Media
+class MediaService
 {
     /**
-     * @var Ffmpeg
+     * @var FfmpegService
      */
     private $ffmpeg;
 
     /**
      * Video constructor.
      *
-     * @param Ffmpeg $ffmpeg
+     * @param FfmpegService $ffmpeg
      */
-    public function __construct(Ffmpeg $ffmpeg)
+    public function __construct(FfmpegService $ffmpeg)
     {
         $this->ffmpeg = $ffmpeg;
     }

@@ -9,7 +9,7 @@ use SQLite3;
 use SQLite3Result;
 use SQLite3Stmt;
 
-class SqLite extends AbstractService
+class SqLiteService extends AbstractService
 {
     /**
      * @var string
@@ -22,15 +22,15 @@ class SqLite extends AbstractService
     private $database;
 
     /**
-     * @var File
+     * @var FileService
      */
     private $file;
 
     /**
-     * @param string $filename
-     * @param File   $file
+     * @param string      $filename
+     * @param FileService $file
      */
-    public function __construct(string $filename, File $file)
+    public function __construct(string $filename, FileService $file)
     {
         $this->filename = $filename;
         $this->file = $file;

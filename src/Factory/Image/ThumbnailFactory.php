@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Factory\Image;
 
 use GibsonOS\Core\Factory\FileFactory;
-use GibsonOS\Core\Service\Image\Thumbnail;
+use GibsonOS\Core\Service\Image\ThumbnailService;
 
 /**
  * @deprecated
@@ -14,10 +14,10 @@ use GibsonOS\Core\Service\Image\Thumbnail;
 class ThumbnailFactory
 {
     /**
-     * @return Thumbnail
+     * @return ThumbnailService
      */
-    public static function create(): Thumbnail
+    public static function create(): ThumbnailService
     {
-        return new Thumbnail(FileFactory::create());
+        return new ThumbnailService(FileFactory::create());
     }
 }
