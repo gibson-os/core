@@ -5,9 +5,9 @@ namespace GibsonOS\Core\Factory;
 
 use GibsonOS\Core\Exception\CreateError;
 use GibsonOS\Core\Exception\SetError;
-use GibsonOS\Core\Service\Udp as UdpService;
+use GibsonOS\Core\Service\Udp;
 
-class Udp
+class UdpFactoy
 {
     /**
      * @param string $ip
@@ -16,10 +16,10 @@ class Udp
      * @throws CreateError
      * @throws SetError
      *
-     * @return UdpService
+     * @return Udp
      */
-    public static function create(string $ip, int $port): UdpService
+    public static function create(string $ip, int $port): Udp
     {
-        return new UdpService($ip, $port);
+        return new Udp($ip, $port);
     }
 }

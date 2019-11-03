@@ -8,7 +8,7 @@ use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\Model\DeleteError;
 use GibsonOS\Core\Exception\Model\SaveError;
 use GibsonOS\Core\Exception\Repository\SelectError;
-use GibsonOS\Core\Factory\DateTime as DateTimeFactory;
+use GibsonOS\Core\Factory\DateTimeFactory;
 use GibsonOS\Core\Service\DateTime;
 use mysqlDatabase;
 use mysqlField;
