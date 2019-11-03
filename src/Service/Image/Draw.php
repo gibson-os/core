@@ -3,34 +3,23 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Service\Image;
 
-use GibsonOS\Core\Service\AbstractService;
+use GibsonOS\Core\Dto\Image as ImageDto;
 use GibsonOS\Core\Service\Image;
 
-class Draw extends AbstractService
+class Draw extends Image
 {
     /**
-     * @var Image
-     */
-    private $image;
-
-    /**
-     * @param Image $image
-     */
-    public function __construct(Image $image)
-    {
-        $this->image = $image;
-    }
-
-    /**
-     * @param int $color
-     * @param int $startX
-     * @param int $startY
-     * @param int $stopX
-     * @param int $stopY
+     * @param ImageDto $image
+     * @param int      $color
+     * @param int      $startX
+     * @param int      $startY
+     * @param int      $stopX
+     * @param int      $stopY
      *
      * @return bool
      */
     public function filledRectangle(
+        ImageDto $image,
         int $color,
         int $startX = 0,
         int $startY = 0,
@@ -38,63 +27,59 @@ class Draw extends AbstractService
         int $stopY = -1
     ): bool {
         if ($stopX === -1) {
-            $stopX = $this->getImage()->getWidth();
+            $stopX = $this->getWidth($image);
         }
 
         if ($stopY === -1) {
-            $stopY = $this->getImage()->getHeight();
+            $stopY = $this->getHeight($image);
         }
 
-        return imagefilledrectangle($this->getImage()->getResource(), $startX, $startY, $stopX, $stopY, $color);
+        return imagefilledrectangle($image->getResource(), $startX, $startY, $stopX, $stopY, $color);
     }
 
     /**
      * Schreibt einen Text in das Bild.
      *
-     * @param string $text
-     * @param int    $color
-     * @param string $fontfile
-     * @param int    $size
-     * @param int    $startX
-     * @param int    $startY
-     * @param int    $angle
+     * @param ImageDto $image
+     * @param string   $text
+     * @param int      $color
+     * @param string   $fontFile
+     * @param int      $size
+     * @param int      $startX
+     * @param int      $startY
+     * @param int      $angle
      *
      * @return array
      */
-    public function setTtfText($text, $color, $fontfile, $size, $startX = 0, $startY = 0, $angle = 0)
-    {
+    public function setTtfText(
+        ImageDto $image,
+        string $text,
+        int $color,
+        string $fontFile,
+        int $size,
+        int $startX = 0,
+        int $startY = 0,
+        int $angle = 0
+    ): array {
         if ($startY == 0) {
             $startY = $size;
         }
 
-        return imagettftext($this->getImage()->getResource(), $size, $angle, $startX, $startY, $color, $fontfile, $text);
+        return imagettftext($image->getResource(), $size, $angle, $startX, $startY, $color, $fontFile, $text);
     }
 
     /**
      * Schreibt einen Text in das Bild.
      *
      * @param string $text
-     * @param string $fontfile
+     * @param string $fontFile
      * @param int    $size
      * @param int    $angle
      *
      * @return array
      */
-    public function setTfbBox($text, $fontfile, $size, $angle = 0)
+    public function setTfbBox(string $text, string $fontFile, int $size, int $angle = 0): array
     {
-        return imagettfbbox($size, $angle, $fontfile, $text);
-    }
-
-    /**
-     * @return Image
-     */
-    public function getImage()
-    {
-        return $this->image;
-    }
-
-    public function __clone()
-    {
-        $this->image = clone $this->image;
+        return imagettfbbox($size, $angle, $fontFile, $text);
     }
 }

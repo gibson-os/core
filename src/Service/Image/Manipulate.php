@@ -3,41 +3,25 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Service\Image;
 
-use GibsonOS\Core\Exception\SetError;
-use GibsonOS\Core\Factory\Image as ImageFactory;
-use GibsonOS\Core\Factory\Image\Draw as DrawFactory;
-use GibsonOS\Core\Factory\Image\Manipulate as ManipulateFactory;
-use GibsonOS\Core\Service\AbstractService;
-use GibsonOS\Core\Service\Image;
+use GibsonOS\Core\Dto\Image as ImageDto;
+use GibsonOS\Core\Exception\Image\CreateError;
 
-class Manipulate extends AbstractService
+class Manipulate extends Draw
 {
     /**
-     * @var Image
-     */
-    private $image;
-
-    /**
-     * @param Image $image
-     */
-    public function __construct(Image $image)
-    {
-        $this->image = $image;
-    }
-
-    /**
-     * @param int $width
-     * @param int $height
+     * @param ImageDto $image
+     * @param int      $width
+     * @param int      $height
      *
-     * @throws SetError
+     * @throws CreateError
      *
      * @return bool
      */
-    public function resize(int $width, int $height): bool
+    public function resize(ImageDto $image, int $width, int $height): bool
     {
         // Wenn das bild breiter als hoch ist
-        if ($this->getImage()->getWidth() > $this->getImage()->getHeight()) {
-            $newHeight = ($this->getImage()->getHeight() / $this->getImage()->getWidth()) * $width;
+        if ($this->getWidth($image) > $this->getHeight($image)) {
+            $newHeight = ($this->getHeight($image) / $this->getWidth($image)) * $width;
             $newWidth = $width;
 
             /* Höhe passt nicht in die übergebenen maße
@@ -53,7 +37,7 @@ class Manipulate extends AbstractService
             }
         } else {
             // Wenn das Bild höher als breit ist
-            $newWidth = ($this->getImage()->getWidth() / $this->getImage()->getHeight()) * $height;
+            $newWidth = ($this->getWidth($image) / $this->getHeight($image)) * $height;
             $newHeight = $height;
 
             if ($newWidth > $width) {
@@ -65,119 +49,135 @@ class Manipulate extends AbstractService
         $width = (int) $newWidth;
         $height = (int) $newHeight;
 
-        $image = ImageFactory::create();
-        $image->create($width, $height);
-        $image = $image->getResource();
+        $newImage = $this->create($width, $height);
 
         if (
             !imagecopyresampled(
-                $image,
-                $this->getImage()->getResource(),
+                $newImage->getResource(),
+                $image->getResource(),
                 0,
                 0,
                 0,
                 0,
                 $width,
                 $height,
-                $this->getImage()->getWidth(),
-                $this->getImage()->getHeight()
+                $this->getWidth($image),
+                $this->getHeight($image)
             )
         ) {
             return false;
         }
 
-        $this->getImage()->destroy();
-        $this->getImage()->setResource($image);
+        $this->destroy($image);
+        $image->setResource($newImage->getResource());
 
         return true;
     }
 
     /**
-     * @param int $width
-     * @param int $height
-     *
-     * @throws SetError
+     * @param ImageDto $image
+     * @param int      $width
+     * @param int      $height
      *
      * @return bool
      */
-    public function resizeCentered(int $width, int $height): bool
+    public function resizeCentered(ImageDto $image, int $width, int $height): bool
     {
-        if (!$this->resize($width, $height)) {
+        if (!$this->resize($image, $width, $height)) {
             return false;
         }
 
-        if ($this->getImage()->getWidth() < $width) {
-            $this->horizontalCentered($width, $height);
-        } elseif ($this->getImage()->getHeight() < $height) {
-            $this->verticalCentered($width, $height);
+        if ($this->getWidth($image) < $width) {
+            $this->horizontalCentered($image, $width, $height);
+        } elseif ($this->getHeight($image) < $height) {
+            $this->verticalCentered($image, $width, $height);
         }
 
         return true;
     }
 
     /**
-     * @param int $width
-     * @param int $height
+     * @param ImageDto $image
+     * @param int      $width
+     * @param int      $height
      *
-     * @throws SetError
+     * @throws CreateError
+     *
+     * @return ImageDto
      */
-    public function verticalCentered(int $width, int $height): void
+    public function verticalCentered(ImageDto $image, int $width, int $height): ImageDto
     {
-        $manipulate = ManipulateFactory::create($width, $height);
-        $manipulate->copy(
-            $this->getImage(),
+        $manipulate = $this->create($width, $height);
+        $this->copy(
+            $image,
+            $manipulate,
             0,
-            ($height - $this->getImage()->getHeight()) / 2
+            ($height - $this->getHeight($image)) / 2
         );
-        $this->getImage()->setResource($manipulate->getImage()->getResource());
+
+        return $manipulate;
     }
 
     /**
-     * @param int $width
-     * @param int $height
+     * @param ImageDto $image
+     * @param int      $width
+     * @param int      $height
      *
-     * @throws SetError
+     * @throws CreateError
+     *
+     * @return bool
      */
-    public function horizontalCentered(int $width, int $height): void
+    public function horizontalCentered(ImageDto $image, int $width, int $height): bool
     {
-        $manipulate = ManipulateFactory::create($width, $height);
-        $manipulate->copy(
-            $this->getImage(),
-            ($width - $this->getImage()->getWidth()) / 2
-        );
-        $this->getImage()->setResource($manipulate->getImage()->getResource());
+        $manipulate = $this->create($width, $height);
+
+        if ($this->copy(
+            $image,
+            $manipulate,
+            ($width - $this->getWidth($image)) / 2
+        ) === false) {
+            return false;
+        }
+
+        $image->setResource($manipulate->getResource());
+
+        return true;
     }
 
     /**
+     * @param ImageDto $image
      * @param int      $width
      * @param int      $height
      * @param int|null $startX
      * @param int|null $startY
      * @param int|null $color
      *
-     * @throws SetError
-     *
      * @return bool
      */
-    public function crop(int $width, int $height, int $startX = null, int $startY = null, int $color = null): bool
-    {
+    public function crop(
+        ImageDto $image,
+        int $width,
+        int $height,
+        int $startX = null,
+        int $startY = null,
+        int $color = null
+    ): bool {
         if ($startX === null) {
-            $startX = ($this->getImage()->getWidth() - $width) / 2;
+            $startX = ($this->getWidth($image) - $width) / 2;
         }
         if ($startY === null) {
-            $startY = ($this->getImage()->getHeight() - $height) / 2;
+            $startY = ($this->getHeight($image) - $height) / 2;
         }
 
-        $draw = DrawFactory::create($width, $height);
+        $draw = $this->create($width, $height);
 
         if (!empty($color)) {
-            $draw->filledRectangle($color);
+            $this->filledRectangle($draw, $color);
         }
 
-        $image = $draw->getImage()->getResource();
-        $return = imagecopyresampled(
-            $image,
-            $this->getImage()->getResource(),
+        if (imagecopyresampled(
+            $draw->getResource(),
+            $image->getResource(),
             0,
             0,
             $startX,
@@ -186,28 +186,28 @@ class Manipulate extends AbstractService
             $height,
             $width,
             $height
-        );
+        ) === false) {
+            return false;
+        }
 
-        $this->getImage()->destroy();
-        $this->getImage()->setResource($image);
+        $image->setResource($draw->getResource());
 
-        return $return;
+        return true;
     }
 
     /**
+     * @param ImageDto $image
      * @param int      $width
      * @param int      $height
      * @param int|null $startX
      * @param int|null $startY
      *
-     * @throws SetError
-     *
      * @return bool
      */
-    public function cropResized(int $width, int $height, int $startX = null, int $startY = null): bool
+    public function cropResized(ImageDto $image, int $width, int $height, int $startX = null, int $startY = null): bool
     {
-        if ($this->getImage()->getWidth() > $this->getImage()->getHeight()) {
-            $newWidth = ($this->getImage()->getWidth() / $this->getImage()->getHeight()) * $height;
+        if ($this->getWidth($image) > $this->getHeight($image)) {
+            $newWidth = ($this->getWidth($image) / $this->getHeight($image)) * $height;
             $newHeight = $height;
 
             if ($newWidth < $width) {
@@ -215,7 +215,7 @@ class Manipulate extends AbstractService
                 $newWidth = $width;
             }
         } else {
-            $newHeight = ($this->getImage()->getHeight() / $this->getImage()->getWidth()) * $width;
+            $newHeight = ($this->getHeight($image) / $this->getWidth($image)) * $width;
             $newWidth = $width;
 
             if ($newHeight < $height) {
@@ -224,8 +224,8 @@ class Manipulate extends AbstractService
             }
         }
 
-        if ($this->resize((int) $newWidth, (int) $newHeight)) {
-            if ($this->crop($width, $height, $startX, $startY)) {
+        if ($this->resize($image, (int) $newWidth, (int) $newHeight)) {
+            if ($this->crop($image, $width, $height, $startX, $startY)) {
                 return true;
             }
         }
@@ -234,20 +234,22 @@ class Manipulate extends AbstractService
     }
 
     /**
-     * @param Image $image
-     * @param int   $destX
-     * @param int   $destY
-     * @param int   $srcX
-     * @param int   $srcY
-     * @param int   $srcWidth
-     * @param int   $srcHeight
-     * @param int   $dstWidth
-     * @param int   $dstHeight
+     * @param ImageDto $sourceImage
+     * @param ImageDto $destinationImage
+     * @param int      $destX
+     * @param int      $destY
+     * @param int      $srcX
+     * @param int      $srcY
+     * @param int      $srcWidth
+     * @param int      $srcHeight
+     * @param int      $dstWidth
+     * @param int      $dstHeight
      *
      * @return bool
      */
     public function copy(
-        Image $image,
+        ImageDto $sourceImage,
+        ImageDto $destinationImage,
         int $destX = 0,
         int $destY = 0,
         int $srcX = 0,
@@ -258,24 +260,24 @@ class Manipulate extends AbstractService
         int $dstHeight = -1
     ): bool {
         if ($srcWidth === -1) {
-            $srcWidth = $image->getWidth();
+            $srcWidth = $this->getWidth($sourceImage);
         }
 
         if ($srcHeight === -1) {
-            $srcHeight = $image->getHeight();
+            $srcHeight = $this->getHeight($sourceImage);
         }
 
         if ($dstWidth === -1) {
-            $dstWidth = $image->getWidth();
+            $dstWidth = $this->getWidth($sourceImage);
         }
 
         if ($dstHeight === -1) {
-            $dstHeight = $image->getHeight();
+            $dstHeight = $this->getHeight($sourceImage);
         }
 
         return imagecopyresampled(
-            $this->getImage()->getResource(),
-            $image->getResource(),
+            $destinationImage->getResource(),
+            $sourceImage->getResource(),
             $destX,
             $destY,
             $srcX,
@@ -285,18 +287,5 @@ class Manipulate extends AbstractService
             $srcWidth,
             $srcHeight
         );
-    }
-
-    /**
-     * @return Image
-     */
-    public function getImage(): Image
-    {
-        return $this->image;
-    }
-
-    public function __clone()
-    {
-        $this->image = clone $this->image;
     }
 }

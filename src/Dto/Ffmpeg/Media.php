@@ -61,6 +61,16 @@ class Media
     private $bitRate = 0;
 
     /**
+     * Media constructor.
+     *
+     * @param string $filename
+     */
+    public function __construct(string $filename)
+    {
+        $this->filename = $filename;
+    }
+
+    /**
      * @return string
      */
     public function getFilename(): string
@@ -188,18 +198,6 @@ class Media
     }
 
     /**
-     * @param string|null $selectedAudioStreamId
-     *
-     * @return Media
-     */
-    public function setSelectedAudioStreamId(?string $selectedAudioStreamId): Media
-    {
-        $this->selectedAudioStreamId = $selectedAudioStreamId;
-
-        return $this;
-    }
-
-    /**
      * @return string|null
      */
     public function getSelectedVideoStreamId(): ?string
@@ -208,35 +206,11 @@ class Media
     }
 
     /**
-     * @param string|null $selectedVideoStreamId
-     *
-     * @return Media
-     */
-    public function setSelectedVideoStreamId(?string $selectedVideoStreamId): Media
-    {
-        $this->selectedVideoStreamId = $selectedVideoStreamId;
-
-        return $this;
-    }
-
-    /**
      * @return string|null
      */
     public function getSelectedSubtitleStreamId(): ?string
     {
         return $this->selectedSubtitleStreamId;
-    }
-
-    /**
-     * @param string|null $selectedSubtitleStreamId
-     *
-     * @return Media
-     */
-    public function setSelectedSubtitleStreamId(?string $selectedSubtitleStreamId): Media
-    {
-        $this->selectedSubtitleStreamId = $selectedSubtitleStreamId;
-
-        return $this;
     }
 
     /**

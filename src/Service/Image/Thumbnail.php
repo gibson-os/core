@@ -3,14 +3,15 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Service\Image;
 
-use GibsonOS\Core\Exception\SetError;
+use GibsonOS\Core\Dto\Image;
+use GibsonOS\Core\Exception\Image\CreateError;
 
 /**
  * @deprecated
  *
  * @package GibsonOS\Core\Service\Image
  */
-class Thumbnail
+class Thumbnail extends Manipulate
 {
     const POSITIONS = [
         16 => 144,
@@ -22,49 +23,29 @@ class Thumbnail
     ];
 
     /**
-     * @var Manipulate
+     * @param int $width
+     * @param int $height
+     *
+     * @throws CreateError
+     *
+     * @return Image
      */
-    private $manipulate;
-
-    /**
-     * @param Manipulate $manipulate
-     */
-    public function __construct(Manipulate $manipulate)
+    public function create(int $width = 544, int $height = 256): Image
     {
-        $this->manipulate = $manipulate;
-    }
-
-    /**
-     * @return Manipulate
-     */
-    public function getManipulate(): Manipulate
-    {
-        return $this->manipulate;
-    }
-
-    /**
-     * @throws SetError
-     */
-    public function create()
-    {
-        /** @var Manipulate[] $images */
+        /** @var Image[] $images */
         $images = [];
 
         foreach (self::POSITIONS as $size => $position) {
-            $image = clone $this->getManipulate();
-            $image->resizeCentered($size, $size);
+            $image = parent::create($size, $size);
             $images[$size] = $image;
         }
 
-        $this->manipulate->getImage()->create(544, 256);
+        $image = parent::create($width, $height);
 
         foreach (self::POSITIONS as $size => $position) {
-            $this->manipulate->copy($images[$size]->getImage(), $position);
+            $this->copy($images[$size], $image, $position);
         }
-    }
 
-    public function __clone()
-    {
-        $this->manipulate = clone $this->manipulate;
+        return $image;
     }
 }

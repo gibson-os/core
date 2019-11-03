@@ -3,10 +3,18 @@
 namespace Service;
 
 use Codeception\Test\Unit;
+use GibsonOS\Core\Dto\Ffmpeg\Media;
+use GibsonOS\Core\Dto\Image as ImageDto;
+use GibsonOS\Core\Exception\Ffmpeg\ConvertStatusError;
+use GibsonOS\Core\Exception\FileNotFound;
+use GibsonOS\Core\Exception\ProcessError;
 use GibsonOS\Core\Service\DateTime;
 use GibsonOS\Core\Service\Ffmpeg;
 use GibsonOS\Core\Service\File;
+use GibsonOS\Core\Service\Image;
 use GibsonOS\Core\Service\Process;
+use GibsonOS\Mock\Dto\Ffmpeg\Media as MediaMock;
+use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 use UnitTester;
 
@@ -38,14 +46,39 @@ class FfmpegTest extends Unit
     private $file;
 
     /**
-     * @var string
-     */
-    private $videoFilename;
-
-    /**
-     * @var ObjectProphecy
+     * @var ObjectProphecy|Process
      */
     private $process;
+
+    /**
+     * @var ObjectProphecy|Image
+     */
+    private $image;
+
+    /**
+     * @var string
+     */
+    private $inputVideoFilename;
+
+    /**
+     * @var string
+     */
+    private $outputVideoFilename;
+
+    /**
+     * @var string
+     */
+    private $logFilename;
+
+    /**
+     * @var string
+     */
+    private $logPath;
+
+    /**
+     * @var string
+     */
+    private $defaultCommand;
 
     protected function _before()
     {
@@ -53,13 +86,26 @@ class FfmpegTest extends Unit
         $this->dateTime = $this->prophesize(DateTime::class);
         $this->file = $this->prophesize(File::class);
         $this->process = $this->prophesize(Process::class);
-        $this->videoFilename = '/name/from/file.vid';
+        $this->image = $this->prophesize(Image::class);
+        $this->inputVideoFilename = '/name/from/file.vid';
+        $this->outputVideoFilename = '/name/to/file.vid';
+        $this->logFilename = 'ffmpegfile.vid';
+        $this->logPath = sys_get_temp_dir() . DIRECTORY_SEPARATOR . $this->logFilename;
+        $this->defaultCommand = sprintf(
+            '%s -i %s %s > %s 2> %s',
+            $this->ffmpegPath,
+            escapeshellarg($this->inputVideoFilename),
+            escapeshellarg($this->outputVideoFilename),
+            escapeshellarg($this->logPath),
+            escapeshellarg($this->logPath)
+        );
 
         $this->ffmpeg = new Ffmpeg(
             $this->ffmpegPath,
             $this->dateTime->reveal(),
             $this->file->reveal(),
-            $this->process->reveal()
+            $this->process->reveal(),
+            $this->image->reveal()
         );
     }
 
@@ -69,33 +115,303 @@ class FfmpegTest extends Unit
 
     /**
      * @dataProvider getMetaDataStrings
+     *
+     * @param string $filename
+     * @param string $return
+     *
+     * @throws FileNotFound
+     * @throws ProcessError
      */
     public function testGetFileMetaDataString(string $filename, string $return): void
     {
-        $this->file->exists($this->videoFilename)
-            ->willReturn(true)
-            ->shouldBeCalledOnce()
-        ;
-        $this->file->isReadable($this->videoFilename)
-            ->willReturn(true)
-            ->shouldBeCalledOnce()
-        ;
+        $file = $this->initTestGetFileMetaDataString($filename);
 
-        $file = fopen($filename, 'r');
-        $this->process->open($this->ffmpegPath . ' -i ' . escapeshellarg($this->videoFilename), 'r')
-            ->willReturn($file)
-            ->shouldBeCalledOnce()
+        $this->assertEquals($return, $this->ffmpeg->getFileMetaDataString($this->inputVideoFilename));
+        fclose($file);
+    }
+
+    /**
+     * @dataProvider getMetaDataStrings
+     *
+     * @param string $filename
+     *
+     * @throws FileNotFound
+     * @throws ProcessError
+     */
+    public function testGetFileMetaDataStringFileDoesntExists(string $filename): void
+    {
+        $this->expectException(FileNotFound::class);
+
+        $file = $this->initTestGetFileMetaDataString($filename);
+        $this->file->exists($this->inputVideoFilename)
+            ->willReturn(false)
+        ;
+        $this->file->isReadable($this->inputVideoFilename)
+            ->shouldNotBeCalled()
+        ;
+        $this->process->open($this->ffmpegPath . ' -i ' . escapeshellarg($this->inputVideoFilename), 'r')
+            ->shouldNotBeCalled()
         ;
         $this->process->close($file)
-            ->shouldBeCalledOnce()
+            ->shouldNotBeCalled()
         ;
-
-        $this->assertEquals($return, $this->ffmpeg->getFileMetaDataString($this->videoFilename));
         fclose($file);
+
+        $this->ffmpeg->getFileMetaDataString($this->inputVideoFilename);
+    }
+
+    /**
+     * @dataProvider getMetaDataStrings
+     *
+     * @param string $filename
+     *
+     * @throws FileNotFound
+     * @throws ProcessError
+     */
+    public function testGetFileMetaDataStringFileIsNotReadable(string $filename): void
+    {
+        $this->expectException(FileNotFound::class);
+
+        $file = $this->initTestGetFileMetaDataString($filename);
+        $this->file->isReadable($this->inputVideoFilename)
+            ->willReturn(false)
+        ;
+        $this->process->open($this->ffmpegPath . ' -i ' . escapeshellarg($this->inputVideoFilename), 'r')
+            ->shouldNotBeCalled()
+        ;
+        $this->process->close($file)
+            ->shouldNotBeCalled()
+        ;
+        fclose($file);
+
+        $this->ffmpeg->getFileMetaDataString($this->inputVideoFilename);
     }
 
     public function testConvert(): void
     {
+        $media = $this->initTestConvert();
+
+        $this->ffmpeg->convert($media, $this->outputVideoFilename);
+    }
+
+    public function testConvertFileDoesntExists(): void
+    {
+        $this->expectException(FileNotFound::class);
+
+        $media = $this->initTestConvert();
+        $this->file->exists($this->outputVideoFilename)
+            ->willReturn(false)
+        ;
+
+        $this->ffmpeg->convert($media, $this->outputVideoFilename);
+    }
+
+    public function testConvertVideoCodecWithSelectedVideoStreamId(): void
+    {
+        $media = $this->initTestConvert();
+        $media->selectVideoStream('v1');
+
+        $this->process->execute($this->defaultCommand)
+            ->shouldNotBeCalled()
+        ;
+        $this->process->execute(sprintf(
+            '%s -i %s -map v1 -c:v "codec" %s > %s 2> %s',
+            $this->ffmpegPath,
+            escapeshellarg($this->inputVideoFilename),
+            escapeshellarg($this->outputVideoFilename),
+            escapeshellarg($this->logPath),
+            escapeshellarg($this->logPath)
+        ))
+            ->shouldBeCalledOnce()
+        ;
+
+        $this->ffmpeg->convert($media, $this->outputVideoFilename, 'codec');
+    }
+
+    public function testConvertVideoCodecWithoutSelectedVideoStreamId(): void
+    {
+        $media = $this->initTestConvert();
+
+        $this->ffmpeg->convert($media, $this->outputVideoFilename, 'codec');
+    }
+
+    public function testConvertAudioCodecWithSelectedAudioStreamId(): void
+    {
+        $media = $this->initTestConvert();
+        $media->selectAudioStream('a3');
+
+        $this->process->execute($this->defaultCommand)
+            ->shouldNotBeCalled()
+        ;
+        $this->process->execute(sprintf(
+            '%s -i %s -map a3 -c:a "codec" %s > %s 2> %s',
+            $this->ffmpegPath,
+            escapeshellarg($this->inputVideoFilename),
+            escapeshellarg($this->outputVideoFilename),
+            escapeshellarg($this->logPath),
+            escapeshellarg($this->logPath)
+        ))
+            ->shouldBeCalledOnce()
+        ;
+
+        $this->ffmpeg->convert($media, $this->outputVideoFilename, null, 'codec');
+    }
+
+    public function testConvertAudioCodecWithoutSelectedAudioStreamId(): void
+    {
+        $media = $this->initTestConvert();
+
+        $this->ffmpeg->convert($media, $this->outputVideoFilename, null, 'codec');
+    }
+
+    public function testConvertWithSelectedSubtitleStreamId(): void
+    {
+        $media = $this->initTestConvert();
+        $media->selectSubtitleStream('s4');
+
+        $this->ffmpeg->convert($media, $this->outputVideoFilename);
+    }
+
+    public function testConvertWithSelectedVideoStreamIdAndSubtitleStreamId(): void
+    {
+        $media = $this->initTestConvert();
+        $media->selectVideoStream('v2');
+        $media->selectSubtitleStream('s4');
+
+        $this->process->execute($this->defaultCommand)
+            ->shouldNotBeCalled()
+        ;
+        $this->process->execute(sprintf(
+            '%s -i %s -map v2 -c:v "codec" -vf subtitles=%s:si=3 %s > %s 2> %s',
+            $this->ffmpegPath,
+            escapeshellarg($this->inputVideoFilename),
+            escapeshellarg($this->inputVideoFilename),
+            escapeshellarg($this->outputVideoFilename),
+            escapeshellarg($this->logPath),
+            escapeshellarg($this->logPath)
+        ))
+            ->shouldBeCalledOnce()
+        ;
+
+        $this->ffmpeg->convert($media, $this->outputVideoFilename, 'codec');
+    }
+
+    public function testConvertWithOptions(): void
+    {
+        $media = $this->initTestConvert();
+
+        $this->process->execute($this->defaultCommand)
+            ->shouldNotBeCalled()
+        ;
+        $this->process->execute(sprintf(
+            '%s -i %s -arthur "dent" -mouse "answer" %s > %s 2> %s',
+            $this->ffmpegPath,
+            escapeshellarg($this->inputVideoFilename),
+            escapeshellarg($this->outputVideoFilename),
+            escapeshellarg($this->logPath),
+            escapeshellarg($this->logPath)
+        ))
+            ->shouldBeCalledOnce()
+        ;
+
+        $this->ffmpeg->convert($media, $this->outputVideoFilename, null, null, [
+            'arthur' => 'dent',
+            'mouse' => 'answer',
+        ]);
+    }
+
+    /**
+     * @dataProvider getConvertStatusStrings
+     */
+    public function testGetConvertStatus(
+        string $lastLine,
+        int $frame,
+        float $fps,
+        float $quality,
+        int $size,
+        string $time,
+        float $bitrate,
+        int $hours,
+        int $minutes,
+        int $seconds,
+        int $microseconds
+    ): void {
+        $this->file->exists(sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'ffmpeg' . $this->logFilename)
+            ->willReturn(true)
+            ->shouldBeCalledOnce()
+        ;
+        $this->file->readLastLine(sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'ffmpeg' . $this->logFilename)
+            ->willReturn($lastLine)
+            ->shouldBeCalledOnce()
+        ;
+
+        $this->dateTime->get($time)
+            ->willReturn(new \DateTime($time))
+            ->shouldBeCalledOnce()
+        ;
+
+        $convertStatus = $this->ffmpeg->getConvertStatus($this->logFilename);
+
+        $this->assertEquals($frame, $convertStatus->getFrame(), 'Frame');
+        $this->assertEquals($fps, $convertStatus->getFps(), 'FPS');
+        $this->assertEquals($quality, $convertStatus->getQuality(), 'Quality');
+        $this->assertEquals($size, $convertStatus->getSize(), 'Size');
+        $this->assertEquals($bitrate, $convertStatus->getBitrate(), 'Bitrate');
+        $this->assertEquals($hours, (int) $convertStatus->getTime()->format('G'), 'Hours');
+        $this->assertEquals($minutes, (int) $convertStatus->getTime()->format('i'), 'Minutes');
+        $this->assertEquals($seconds, (int) $convertStatus->getTime()->format('s'), 'Seconds');
+        $this->assertEquals($microseconds, (int) $convertStatus->getTime()->format('v'), 'Seconds');
+    }
+
+    public function testGetConvertStatusFileDoesntExists(): void
+    {
+        $this->expectException(FileNotFound::class);
+
+        $this->file->exists(sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'ffmpeg' . $this->logFilename)
+            ->willReturn(false)
+            ->shouldBeCalledOnce()
+        ;
+
+        $this->ffmpeg->getConvertStatus($this->logFilename);
+    }
+
+    public function testGetConvertStatusReadLastLineError(): void
+    {
+        $this->expectException(ConvertStatusError::class);
+
+        $this->file->exists(sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'ffmpeg' . $this->logFilename)
+            ->willReturn(true)
+            ->shouldBeCalledOnce()
+        ;
+        $this->file->readLastLine(sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'ffmpeg' . $this->logFilename)
+            ->willReturn('Unwarscheinlichkeits Drive')
+            ->shouldBeCalledOnce()
+        ;
+
+        $this->ffmpeg->getConvertStatus($this->logFilename);
+    }
+
+    public function testGetImageByFrame(): void
+    {
+        $frameNumber = '00:17:03.23';
+
+        $this->process->execute(Argument::containingString(sprintf(
+            '%s -ss %s -i %s -an -r 1 -vframes 1 -f image2 %s',
+            $this->ffmpegPath,
+            $frameNumber,
+            escapeshellarg($this->inputVideoFilename),
+            sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'tmpFrame'
+        )))
+            ->shouldBeCalledOnce()
+        ;
+
+        $image = new ImageDto(imagecreate(1, 1));
+        $this->image->load(Argument::containingString(sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'tmpFrame'))
+            ->willReturn($image)
+            ->shouldBeCalledOnce()
+        ;
+
+        $this->assertSame($image, $this->ffmpeg->getImageByFrame($this->inputVideoFilename, $frameNumber));
     }
 
     public function getMetaDataStrings(): array
@@ -1009,5 +1325,110 @@ At least one output file must be specified
 ',
             ],
         ];
+    }
+
+    private function initTestGetFileMetaDataString(string $filename)
+    {
+        $this->file->exists($this->inputVideoFilename)
+            ->willReturn(true)
+            ->shouldBeCalledOnce()
+        ;
+        $this->file->isReadable($this->inputVideoFilename)
+            ->willReturn(true)
+            ->shouldBeCalledOnce()
+        ;
+
+        $file = fopen($filename, 'r');
+        $this->process->open($this->ffmpegPath . ' -i ' . escapeshellarg($this->inputVideoFilename), 'r')
+            ->willReturn($file)
+            ->shouldBeCalledOnce()
+        ;
+        $this->process->close($file)
+            ->shouldBeCalledOnce()
+        ;
+
+        return $file;
+    }
+
+    /**
+     * @return array
+     */
+    public function getConvertStatusStrings(): array
+    {
+        return [
+            [
+                'frame=19858 fps= 67 q=29.0 size=   82377kB time=00:11:02.91 bitrate=1018.0kbits/s speed=2.23x    ',
+                19858,
+                67.0,
+                29.0,
+                82377,
+                '00:11:02.91',
+                1018.0,
+                0,
+                11,
+                2,
+                910,
+            ],
+            [
+                'frame=   78 fps=7.1 q=29.0 size=     218kB time=00:00:02.98 bitrate= 597.9kbits/s speed=0.272x   ',
+                78,
+                7,
+                29.0,
+                218,
+                '00:00:02.98',
+                597.9,
+                0,
+                0,
+                2,
+                980,
+            ],
+            [
+                'frame=32195 fps= 65 q=29.0 size=  137564kB time=01:17:54.51 bitrate=1048.8kbits/s speed=2.16x    ',
+                32195,
+                65,
+                29.0,
+                137564,
+                '01:17:54.51',
+                1048.8,
+                1,
+                17,
+                54,
+                510,
+            ],
+            [
+                'frame=38515 fps= 65 q=29.0 size=  160858kB time=00:21:25.02 bitrate=1025.2kbits/s speed=2.18x    ',
+                38515,
+                65,
+                29.0,
+                160858,
+                '00:21:25.02',
+                1025.2,
+                0,
+                21,
+                25,
+                20,
+            ],
+        ];
+    }
+
+    private function initTestConvert($command = null): Media
+    {
+        $this->file->getFilename($this->outputVideoFilename)
+            ->willReturn('file.vid')
+            ->shouldBeCalledOnce()
+        ;
+        $this->file->exists($this->outputVideoFilename)
+            ->willReturn(true)
+            ->shouldBeCalledOnce()
+        ;
+        $this->file->delete(sys_get_temp_dir(), $this->logFilename)
+            ->shouldBeCalledOnce()
+        ;
+
+        $this->process->execute($this->defaultCommand)
+            ->shouldBeCalledOnce()
+        ;
+
+        return MediaMock::create($this->inputVideoFilename);
     }
 }

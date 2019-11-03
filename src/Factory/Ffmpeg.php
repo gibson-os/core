@@ -21,7 +21,8 @@ class Ffmpeg
             $env->getString('FFMPEG_PATH'),
             DateTime::create(),
             File::create(),
-            Process::create()
+            Process::create(),
+            Image::create()
         );
     }
 }

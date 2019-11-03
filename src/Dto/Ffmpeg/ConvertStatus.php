@@ -45,7 +45,7 @@ class ConvertStatus
     /**
      * @return int
      */
-    public function getFrame()
+    public function getFrame(): int
     {
         return $this->frame;
     }
@@ -55,7 +55,7 @@ class ConvertStatus
      *
      * @return ConvertStatus
      */
-    public function setFrame($frame)
+    public function setFrame(int $frame): ConvertStatus
     {
         $this->frame = $frame;
 
@@ -65,7 +65,7 @@ class ConvertStatus
     /**
      * @return int
      */
-    public function getFrames()
+    public function getFrames(): int
     {
         return $this->frames;
     }
@@ -75,7 +75,7 @@ class ConvertStatus
      *
      * @return ConvertStatus
      */
-    public function setFrames($frames)
+    public function setFrames(int $frames): ConvertStatus
     {
         $this->frames = $frames;
 
@@ -85,7 +85,7 @@ class ConvertStatus
     /**
      * @return int
      */
-    public function getFps()
+    public function getFps(): int
     {
         return $this->fps;
     }
@@ -95,7 +95,7 @@ class ConvertStatus
      *
      * @return ConvertStatus
      */
-    public function setFps($fps)
+    public function setFps(int $fps): ConvertStatus
     {
         $this->fps = $fps;
 
@@ -105,7 +105,7 @@ class ConvertStatus
     /**
      * @return float
      */
-    public function getQuality()
+    public function getQuality(): float
     {
         return $this->quality;
     }
@@ -115,7 +115,7 @@ class ConvertStatus
      *
      * @return ConvertStatus
      */
-    public function setQuality($quality)
+    public function setQuality(float $quality): ConvertStatus
     {
         $this->quality = $quality;
 
@@ -125,7 +125,7 @@ class ConvertStatus
     /**
      * @return int
      */
-    public function getSize()
+    public function getSize(): int
     {
         return $this->size;
     }
@@ -135,7 +135,7 @@ class ConvertStatus
      *
      * @return ConvertStatus
      */
-    public function setSize($size)
+    public function setSize(int $size): ConvertStatus
     {
         $this->size = $size;
 
@@ -145,7 +145,7 @@ class ConvertStatus
     /**
      * @return DateTime
      */
-    public function getTime()
+    public function getTime(): DateTime
     {
         return $this->time;
     }
@@ -155,7 +155,7 @@ class ConvertStatus
      *
      * @return ConvertStatus
      */
-    public function setTime(DateTime $time)
+    public function setTime(DateTime $time): ConvertStatus
     {
         $this->time = $time;
 
@@ -165,7 +165,7 @@ class ConvertStatus
     /**
      * @return float
      */
-    public function getBitrate()
+    public function getBitrate(): float
     {
         return $this->bitrate;
     }
@@ -175,7 +175,7 @@ class ConvertStatus
      *
      * @return ConvertStatus
      */
-    public function setBitrate($bitrate)
+    public function setBitrate(float $bitrate): ConvertStatus
     {
         $this->bitrate = $bitrate;
 
@@ -185,7 +185,7 @@ class ConvertStatus
     /**
      * @return int
      */
-    public function getPercent()
+    public function getPercent(): int
     {
         if ($this->getFrames() === 0) {
             return 0;
@@ -193,7 +193,7 @@ class ConvertStatus
 
         $percent = intval((100 / $this->getFrames()) * $this->getFrame());
 
-        return $percent = $percent > 100 ? 100 : $percent;
+        return (int) ($percent > 100 ? 100 : $percent);
     }
 
     public function getTimeRemaining()

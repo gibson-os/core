@@ -3,10 +3,12 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Service;
 
+use GibsonOS\Core\Dto\Image as ImageDto;
 use GibsonOS\Core\Exception\DeleteError;
 use GibsonOS\Core\Exception\FileNotFound;
 use GibsonOS\Core\Exception\GetError;
-use GibsonOS\Core\Exception\SetError;
+use GibsonOS\Core\Exception\Image\CreateError;
+use GibsonOS\Core\Exception\Image\LoadError;
 
 class Image extends AbstractService
 {
@@ -26,105 +28,99 @@ class Image extends AbstractService
     }
 
     /**
-     * @var resource Bild
-     */
-    private $resource;
-
-    /**
-     * Gibt das Bild zurück.
+     * @param ImageDto $image
      *
-     * @return resource
-     */
-    public function getResource()
-    {
-        return $this->resource;
-    }
-
-    /**
-     * @param resource|bool $resource
-     *
-     * @throws SetError
-     */
-    public function setResource($resource): void
-    {
-        if (!is_resource($resource)) {
-            throw new SetError('Bild ist keine Ressource!');
-        }
-
-        $this->resource = $resource;
-    }
-
-    /**
      * @return int
      */
-    public function getWidth(): int
+    public function getWidth(ImageDto $image): int
     {
-        return (int) imagesx($this->getResource());
+        return (int) imagesx($image->getResource());
     }
 
     /**
+     * @param ImageDto $image
+     *
      * @return int
      */
-    public function getHeight(): int
+    public function getHeight(ImageDto $image): int
     {
-        return (int) imagesy($this->getResource());
+        return (int) imagesy($image->getResource());
     }
 
     /**
      * @param int $width
      * @param int $height
      *
-     * @throws SetError
+     * @throws CreateError
+     *
+     * @return ImageDto
      */
-    public function create(int $width, int $height): void
+    public function create(int $width, int $height): ImageDto
     {
-        $this->setResource(imagecreatetruecolor($width, $height));
-        $this->alphaBlending(true);
-    }
+        $image = imagecreatetruecolor($width, $height);
 
-    public function fillTransparent(): void
-    {
-        $this->fill($this->getTransparentColor());
-        $this->saveAlpha(true);
+        if (is_bool($image)) {
+            throw new CreateError('Bild jonnte nicht erstellt werden!');
+        }
+
+        $image = new ImageDto($image);
+        $this->enableAlphaBlending($image);
+
+        return $image;
     }
 
     /**
-     * @param int $red
-     * @param int $green
-     * @param int $blue
-     * @param int $alpha
+     * @param ImageDto $image
+     */
+    public function fillTransparent(ImageDto $image): void
+    {
+        $this->fill($image, $this->getTransparentColor($image));
+        $this->enableAlpha($image);
+    }
+
+    /**
+     * @param ImageDto $image
+     * @param int      $red
+     * @param int      $green
+     * @param int      $blue
+     * @param int      $alpha
      *
      * @return int
      */
-    public function getColor(int $red, int $green, int $blue, int $alpha = 0): int
+    public function getColor(ImageDto $image, int $red, int $green, int $blue, int $alpha = 0): int
     {
-        return (int) imagecolorallocatealpha($this->getResource(), $red, $green, $blue, $alpha);
+        return (int) imagecolorallocatealpha($image->getResource(), $red, $green, $blue, $alpha);
     }
 
     /**
+     * @param ImageDto $image
+     *
      * @return int
      */
-    public function getTransparentColor(): int
+    public function getTransparentColor(ImageDto $image): int
     {
-        return (int) imagecolortransparent($this->getResource());
+        return (int) imagecolortransparent($image->getResource());
     }
 
     /**
-     * @param int $color
+     * @param ImageDto $image
+     * @param int      $color
      */
-    public function setTransparentColor(int $color): void
+    public function setTransparentColor(ImageDto $image, int $color): void
     {
-        imagecolortransparent($this->getResource(), $color);
+        imagecolortransparent($image->getResource(), $color);
     }
 
     /**
      * Zerstört das Bild.
      *
+     * @param ImageDto $image
+     *
      * @return bool
      */
-    public function destroy(): bool
+    public function destroy(ImageDto $image): bool
     {
-        return imagedestroy($this->getResource());
+        return imagedestroy($image->getResource());
     }
 
     /**
@@ -132,9 +128,11 @@ class Image extends AbstractService
      * @param string|null $type
      *
      * @throws FileNotFound
-     * @throws SetError
+     * @throws LoadError
+     *
+     * @return ImageDto
      */
-    public function load(string $filename, string $type = null): void
+    public function load(string $filename, string $type = null): ImageDto
     {
         if ($type === null) {
             $type = $this->getImageTypeByFilename($filename);
@@ -142,37 +140,52 @@ class Image extends AbstractService
 
         if (
             $type != 'string' &&
-            !file_exists($filename)
+            !$this->file->exists($filename)
         ) {
             throw new FileNotFound(sprintf('Bild %s existiert nicht!', $filename));
         }
 
+        $image = false;
+
         switch ($type) {
             case 'bmp':
                 // @todo BMPs gehen nicht!
-                $this->setResource(imagecreatefromgd($filename));
+                $image = imagecreatefromgd($filename);
 
                 break;
             case 'jpg':
             case 'jpeg':
-                $this->setResource(imagecreatefromjpeg($filename));
+                $image = imagecreatefromjpeg($filename);
 
                 break;
             case 'gif':
-                $this->setResource(imagecreatefromgif($filename));
+                $image = imagecreatefromgif($filename);
 
                 break;
             case 'png':
-                $this->setResource(imagecreatefrompng($filename));
-                $this->alphaBlending(true);
-                $this->saveAlpha(true);
+                $image = imagecreatefrompng($filename);
 
                 break;
             case 'string':
-                $this->setResource(imagecreatefromstring($filename));
+                $image = imagecreatefromstring($filename);
 
                 break;
         }
+
+        if (!is_resource($image)) {
+            throw new LoadError(sprintf('Bild "%s" konnte nciht geladen werden!', $filename));
+        }
+
+        $imageDto = (new ImageDto($image))
+            ->setFilename($filename)
+        ;
+
+        if ($type === 'png') {
+            $this->enableAlphaBlending($imageDto);
+            $this->enableAlpha($imageDto);
+        }
+
+        return $imageDto;
     }
 
     /**
@@ -208,33 +221,35 @@ class Image extends AbstractService
     }
 
     /**
-     * @param string $type
+     * @param ImageDto $image
+     * @param string   $type
      *
      * @return bool
      */
-    public function output(string $type = 'jpg'): bool
+    public function output(ImageDto $image, string $type = 'jpg'): bool
     {
         switch ($type) {
             case 'bmp':
-                return imagewbmp($this->getResource(), null, 80);
+                return imagewbmp($image->getResource(), null, 80);
             case 'jpg':
             case 'jpeg':
-                return imagejpeg($this->getResource(), null, 80);
+                return imagejpeg($image->getResource(), null, 80);
             case 'gif':
-                return imagegif($this->getResource());
+                return imagegif($image->getResource());
             case 'png':
-                return imagepng($this->getResource());
+                return imagepng($image->getResource());
         }
 
         return false;
     }
 
     /**
-     * @param string $type
+     * @param ImageDto $image
+     * @param string   $type
      *
      * @return bool
      */
-    public function show(string $type = 'jpg'): bool
+    public function show(ImageDto $image, string $type = 'jpg'): bool
     {
         switch ($type) {
             case 'bmp':
@@ -256,18 +271,19 @@ class Image extends AbstractService
                 break;
         }
 
-        return $this->output($type);
+        return $this->output($image, $type);
     }
 
     /**
-     * @param string $type
+     * @param ImageDto $image
+     * @param string   $type
      *
      * @return string
      */
-    public function getString(string $type = 'jpg'): string
+    public function getString(ImageDto $image, string $type = 'jpg'): string
     {
         ob_start();
-        $this->output($type);
+        $this->output($image, $type);
         $string = (string) ob_get_contents();
         ob_end_clean();
 
@@ -275,7 +291,7 @@ class Image extends AbstractService
     }
 
     /**
-     * @param string      $filename
+     * @param ImageDto    $image
      * @param string|null $type
      *
      * @throws DeleteError
@@ -283,90 +299,85 @@ class Image extends AbstractService
      *
      * @return bool
      */
-    public function save(string $filename, string $type = null): bool
+    public function save(ImageDto $image, string $type = null): bool
     {
         if ($type === null) {
-            $type = $this->getImageTypeByFilename($filename);
+            $type = $this->getImageTypeByFilename($image->getFilename());
         }
 
         try {
-            $this->file->delete($this->file->getDir($filename), $this->file->getFilename($filename));
+            $this->file->delete(
+                $this->file->getDir($image->getFilename()),
+                $this->file->getFilename($image->getFilename())
+            );
         } catch (FileNotFound $exception) {
         }
 
         switch ($type) {
             case 'bmp':
-                return imagewbmp($this->getResource(), $filename);
+                return imagewbmp($image->getResource(), $image->getFilename());
             case 'jpg':
             case 'jpeg':
-                return imagejpeg($this->getResource(), $filename, 80);
+                return imagejpeg($image->getResource(), $image->getFilename(), $image->getQuality());
             case 'gif':
-                return imagegif($this->getResource(), $filename);
+                return imagegif($image->getResource(), $image->getFilename());
             case 'png':
-                return imagepng($this->getResource(), $filename);
+                return imagepng($image->getResource(), $image->getFilename());
         }
 
         return false;
     }
 
     /**
-     * @param bool $blendMode
+     * @param ImageDto $image
      *
      * @return bool
      */
-    public function alphaBlending(bool $blendMode): bool
+    public function enableAlphaBlending(ImageDto $image): bool
     {
-        return imagealphablending($this->getResource(), $blendMode);
+        return imagealphablending($image->getResource(), true);
     }
 
     /**
-     * @param bool $saveFlag
+     * @param ImageDto $image
      *
      * @return bool
      */
-    public function saveAlpha(bool $saveFlag): bool
+    public function disableAlphaBlending(ImageDto $image): bool
     {
-        return imagesavealpha($this->getResource(), $saveFlag);
+        return imagealphablending($image->getResource(), false);
     }
 
     /**
-     * @param int $color
-     * @param int $x
-     * @param int $y
+     * @param ImageDto $image
      *
      * @return bool
      */
-    public function fill(int $color, int $x = 0, int $y = 0): bool
+    public function enableAlpha(ImageDto $image): bool
     {
-        return imagefill($this->getResource(), $x, $y, $color);
+        return imagesavealpha($image->getResource(), true);
     }
 
     /**
-     * @throws SetError
+     * @param ImageDto $image
+     *
+     * @return bool
      */
-    public function __clone()
+    public function disableAlpha(ImageDto $image): bool
     {
-        $w = $this->getWidth();
-        $h = $this->getHeight();
-        $trans = $this->getTransparentColor();
-        $oldImage = $this->getResource();
+        return imagesavealpha($image->getResource(), false);
+    }
 
-        if (imageistruecolor($this->getResource())) {
-            $this->setResource(imagecreatetruecolor($w, $h));
-            $this->alphaBlending(false);
-            $this->saveAlpha(true);
-        } else {
-            $this->setResource(imagecreate($w, $h));
-
-            if ($trans >= 0) {
-                $rgb = imagecolorsforindex($this->getResource(), $trans);
-
-                $this->saveAlpha(true);
-                $transIndex = $this->getColor($rgb['red'], $rgb['green'], $rgb['blue'], $rgb['alpha']);
-                $this->fill($transIndex, 0, 0);
-            }
-        }
-
-        imagecopy($this->getResource(), $oldImage, 0, 0, 0, 0, $w, $h);
+    /**
+     * @param ImageDto $image
+     * @param int      $color
+     * @param int      $x
+     * @param int      $y
+     *
+     * @return bool
+     */
+    public function fill(ImageDto $image, int $color, int $x = 0, int $y = 0): bool
+    {
+        return imagefill($image->getResource(), $x, $y, $color);
     }
 }

@@ -5,6 +5,7 @@ namespace GibsonOS\Core\Service;
 
 use GibsonOS\Core\Exception\CreateError;
 use GibsonOS\Core\Exception\DeleteError;
+use GibsonOS\Core\Exception\File\OpenError;
 use GibsonOS\Core\Exception\FileExistsError;
 use GibsonOS\Core\Exception\FileNotFound;
 use GibsonOS\Core\Exception\GetError;
@@ -381,5 +382,70 @@ class File extends AbstractService
     public function getFileEnding(string $path): string
     {
         return mb_substr($path, mb_strrpos($path, '.') + 1);
+    }
+
+    /**
+     * @param string $filename
+     * @param string $mode
+     *
+     * @throws OpenError
+     *
+     * @return resource
+     */
+    public function open(string $filename, string $mode)
+    {
+        $file = fopen($filename, $mode);
+
+        if (is_bool($file)) {
+            throw new OpenError(sprintf('Datei "%s" konnte nicht geöffnet werden!', $filename));
+        }
+
+        return $file;
+    }
+
+    /**
+     * @param resource $fileHandle
+     *
+     * @return bool
+     */
+    public function close($fileHandle): bool
+    {
+        return fclose($fileHandle);
+    }
+
+    /**
+     * @param string $filename
+     *
+     * @throws OpenError
+     *
+     * @return string
+     */
+    public function readLastLine(string $filename): string
+    {
+        $file = $this->open($filename, 'r');
+        $line = '';
+        $cursor = -1;
+
+        fseek($file, $cursor, SEEK_END);
+        $char = fgetc($file);
+
+        while ($char === "\n" || $char === "\r") {
+            fseek($file, $cursor--, SEEK_END);
+            $char = fgetc($file);
+        }
+
+        while (
+            $char !== false &&
+            $char !== "\n" &&
+            $char !== "\r"
+        ) {
+            $line = $char . $line;
+            fseek($file, $cursor--, SEEK_END);
+            $char = fgetc($file);
+        }
+
+        $this->close($file);
+
+        echo $line;
     }
 }

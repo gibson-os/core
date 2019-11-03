@@ -26,7 +26,8 @@
   ],
   "autoload": {
     "psr-4": {
-      "GibsonOS\\Core\\": "src/"
+      "GibsonOS\\Core\\": "src/",
+      "GibsonOS\\Mock\\": "tests/mock/"
     }
   },
   "scripts": {

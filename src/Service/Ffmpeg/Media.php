@@ -12,16 +12,17 @@ use GibsonOS\Core\Dto\Ffmpeg\Media as MediaDto;
 use GibsonOS\Core\Dto\Ffmpeg\Stream\Audio;
 use GibsonOS\Core\Dto\Ffmpeg\Stream\Subtitle;
 use GibsonOS\Core\Dto\Ffmpeg\Stream\Video;
+use GibsonOS\Core\Dto\Image;
 use GibsonOS\Core\Exception\DateTimeError;
 use GibsonOS\Core\Exception\DeleteError;
 use GibsonOS\Core\Exception\Ffmpeg\ConvertStatusError;
 use GibsonOS\Core\Exception\Ffmpeg\NoVideoError;
+use GibsonOS\Core\Exception\File\OpenError;
 use GibsonOS\Core\Exception\FileNotFound;
 use GibsonOS\Core\Exception\GetError;
+use GibsonOS\Core\Exception\Image\LoadError;
 use GibsonOS\Core\Exception\ProcessError;
-use GibsonOS\Core\Exception\SetError;
 use GibsonOS\Core\Service\Ffmpeg;
-use GibsonOS\Core\Service\Image as ImageService;
 use InvalidArgumentException;
 use OutOfRangeException;
 
@@ -52,9 +53,7 @@ class Media
      */
     public function getMedia(string $filename): MediaDto
     {
-        $media = (new MediaDto())
-            ->setFilename($filename)
-        ;
+        $media = new MediaDto($filename);
         $loadString = $this->ffmpeg->getFileMetaDataString($media->getFilename());
 
         if (!preg_match('/Duration:\s*(\d{2}):(\d{2}):(\d{2}).(\d{2}),.*bitrate:\s*(.*)\s*kb/', $loadString, $hits)) {
@@ -138,6 +137,7 @@ class Media
      * @throws ConvertStatusError
      * @throws DateTimeError
      * @throws FileNotFound
+     * @throws OpenError
      *
      * @return ConvertStatus
      */
@@ -157,12 +157,12 @@ class Media
      * @throws DeleteError
      * @throws FileNotFound
      * @throws GetError
+     * @throws LoadError
      * @throws NoVideoError
-     * @throws SetError
      *
-     * @return ImageService
+     * @return Image
      */
-    public function getImageBySecond(MediaDto $media, int $second, int $frame = null): ImageService
+    public function getImageBySecond(MediaDto $media, int $second, int $frame = null): Image
     {
         if ($second > $media->getDuration()) {
             throw new OutOfRangeException(
@@ -181,11 +181,11 @@ class Media
      * @throws FileNotFound
      * @throws GetError
      * @throws NoVideoError
-     * @throws SetError
+     * @throws LoadError
      *
-     * @return ImageService
+     * @return Image
      */
-    public function getImageByFrame(MediaDto $media, int $frameNumber): ImageService
+    public function getImageByFrame(MediaDto $media, int $frameNumber): Image
     {
         if (!$media->hasVideo()) {
             throw new NoVideoError();
