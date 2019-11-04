@@ -9,11 +9,7 @@ use GibsonOS\Core\Exception\SetError;
 class EnvService extends AbstractService
 {
     /**
-     * @param string $name
-     *
      * @throws GetError
-     *
-     * @return int
      */
     public function getInt(string $name): int
     {
@@ -21,11 +17,7 @@ class EnvService extends AbstractService
     }
 
     /**
-     * @param string $name
-     *
      * @throws GetError
-     *
-     * @return string
      */
     public function getString(string $name): string
     {
@@ -33,11 +25,7 @@ class EnvService extends AbstractService
     }
 
     /**
-     * @param string $name
-     *
      * @throws GetError
-     *
-     * @return float
      */
     public function getFloat(string $name): float
     {
@@ -45,32 +33,22 @@ class EnvService extends AbstractService
     }
 
     /**
-     * @param string $name
-     *
      * @throws GetError
-     *
-     * @return bool
      */
-    public function getBoolValue(string $name): bool
+    public function getBool(string $name): bool
     {
         return mb_strtolower($this->get($name)) === 'true' ? true : false;
     }
 
     /**
-     * @param string $name
-     * @param int    $value
-     *
      * @throws SetError
      */
     public function setInt(string $name, int $value): void
     {
-        $this->set($name, $value);
+        $this->set($name, (string) $value);
     }
 
     /**
-     * @param string $name
-     * @param string $value
-     *
      * @throws SetError
      */
     public function setString(string $name, string $value): void
@@ -79,40 +57,38 @@ class EnvService extends AbstractService
     }
 
     /**
-     * @param string $name
-     * @param float  $value
-     *
      * @throws SetError
      */
     public function setFloat(string $name, float $value): void
     {
-        $this->set($name, $value);
+        $this->set($name, (string) $value);
     }
 
     /**
-     * @param string $name
-     * @param bool   $value
-     *
      * @throws SetError
      */
     public function setBool(string $name, bool $value): void
     {
-        $this->set($name, $value);
+        $this->set($name, $value === true ? 'true' : 'false');
     }
 
     /**
-     * @param string $name
-     *
+     * @throws SetError
+     */
+    public function setEmpty(string $name): void
+    {
+        $this->set($name, '');
+    }
+
+    /**
      * @throws GetError
-     *
-     * @return string
      */
     private function get(string $name): string
     {
         $name = mb_strtoupper($name);
         $value = getenv($name);
 
-        if (!is_string($value)) {
+        if (is_bool($value)) {
             throw new GetError(sprintf('Umgebungsvariable "%s" ist nicht gesetzt!', $name));
         }
 
@@ -120,26 +96,19 @@ class EnvService extends AbstractService
     }
 
     /**
-     * @param string $name
-     * @param mixed  $value
-     *
      * @throws SetError
      */
-    private function set(string $name, $value): void
+    private function set(string $name, string $value): void
     {
         $name = mb_strtoupper($name);
         $putString = $name;
 
-        if ($value !== null) {
+        if ($value !== '') {
             $putString .= '=' . $value;
         }
 
         if (!putenv($putString)) {
-            throw new SetError(sprintf(
-                'Umgebungsvariable "%s" konnte nicht mit dem Wert "%s" gesetzt werden!',
-                $name,
-                $value
-            ));
+            throw new SetError(sprintf('Umgebungsvariable "%s" konnte nicht mit dem Wert "%s" gesetzt werden!', $name, $value));
         }
     }
 }

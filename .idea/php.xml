@@ -112,6 +112,9 @@
       <path value="$PROJECT_DIR$/vendor/symfony/config" />
       <path value="$PROJECT_DIR$/vendor/symfony/dependency-injection" />
       <path value="$PROJECT_DIR$/vendor/captainhook/plugin-composer" />
+      <path value="$PROJECT_DIR$/vendor/php-mock/php-mock-integration" />
+      <path value="$PROJECT_DIR$/vendor/php-mock/php-mock-phpunit" />
+      <path value="$PROJECT_DIR$/vendor/php-mock/php-mock" />
     </include_path>
   </component>
   <component name="PhpProjectSharedConfiguration" php_language_level="7.2" />

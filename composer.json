@@ -16,7 +16,8 @@
     "phpstan/phpstan": "^0.11.19",
     "phpmd/phpmd": "^2.7",
     "captainhook/captainhook": "^4.5",
-    "captainhook/plugin-composer": "^4.0"
+    "captainhook/plugin-composer": "^4.0",
+    "php-mock/php-mock-phpunit": "^2.5"
   },
   "repositories": [
     {
