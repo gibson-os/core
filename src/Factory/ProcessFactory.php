@@ -5,13 +5,21 @@ namespace GibsonOS\Core\Factory;
 
 use GibsonOS\Core\Service\ProcessService;
 
-class ProcessFactory
+class ProcessFactory extends AbstractSingletonFactory
 {
     /**
      * @return ProcessService
      */
-    public static function create(): ProcessService
+    protected static function createInstance(): ProcessService
     {
         return new ProcessService();
+    }
+
+    public static function create(): ProcessService
+    {
+        /** @var ProcessService $service */
+        $service = parent::create();
+
+        return $service;
     }
 }

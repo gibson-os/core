@@ -5,16 +5,21 @@ namespace GibsonOS\Core\Factory;
 
 use GibsonOS\Core\Service\FlockService;
 
-class FlockFactory
+class FlockFactory extends AbstractSingletonFactory
 {
     /**
      * @return FlockService
      */
+    protected static function createInstance(): FlockService
+    {
+        return new FlockService();
+    }
+
     public static function create(): FlockService
     {
-        /** @var FlockService $flock */
-        $flock = FlockService::getInstance();
+        /** @var FlockService $service */
+        $service = parent::create();
 
-        return $flock;
+        return $service;
     }
 }

@@ -5,10 +5,18 @@ namespace GibsonOS\Core\Factory;
 
 use GibsonOS\Core\Service\EnvService;
 
-class EnvFactory
+class EnvFactory extends AbstractSingletonFactory
 {
-    public static function create(): EnvService
+    protected static function createInstance(): EnvService
     {
         return new EnvService();
+    }
+
+    public static function create(): EnvService
+    {
+        /** @var EnvService $service */
+        $service = parent::create();
+
+        return $service;
     }
 }

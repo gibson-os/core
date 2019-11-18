@@ -8,7 +8,7 @@ use GibsonOS\Core\Exception\GetError;
 /**
  * @deprecated
  */
-class RegistryService extends AbstractSingletonService
+class RegistryService extends AbstractService
 {
     /**
      * @var array

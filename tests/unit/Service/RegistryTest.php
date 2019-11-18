@@ -23,25 +23,12 @@ class RegistryTest extends Unit
 
     protected function _before()
     {
-        $this->registry = RegistryService::getInstance();
+        $this->registry = new RegistryService();
         $this->registry->set('arthur', 'dent');
     }
 
     protected function _after()
     {
-    }
-
-    // tests
-    public function testInstance(): void
-    {
-        $this->assertEquals(RegistryService::class, get_class($this->registry));
-    }
-
-    public function testNewInstance(): void
-    {
-        $newInstance = RegistryService::getInstance();
-
-        $this->assertSame('dent', $newInstance->get('arthur'));
     }
 
     /**

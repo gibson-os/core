@@ -11,12 +11,27 @@ use GibsonOS\Core\Model\Setting;
 use GibsonOS\Core\Repository\ModuleRepository;
 use GibsonOS\Core\Repository\SettingRepository;
 
-class ModuleSettingService extends AbstractSingletonService
+class ModuleSettingService extends AbstractService
 {
     /**
      * @var Setting[][]
      */
     private $moduleSettings = [];
+
+    /**
+     * @var RegistryService
+     */
+    private $registry;
+
+    /**
+     * ModuleSettingService constructor.
+     *
+     * @param RegistryService $registry
+     */
+    public function __construct(RegistryService $registry)
+    {
+        $this->registry = $registry;
+    }
 
     /**
      * @param string|null $key
@@ -139,10 +154,7 @@ class ModuleSettingService extends AbstractSingletonService
      */
     private function getModuleNameByRegistry(): string
     {
-        /** @var RegistryService $registry */
-        $registry = RegistryService::getInstance();
-
-        return (string) $registry->get('module');
+        return (string) $this->registry->get('module');
     }
 
     /**
@@ -174,13 +186,10 @@ class ModuleSettingService extends AbstractSingletonService
      */
     private function loadSettings(int $moduleId, int $userId = null, string $key = null)
     {
-        /** @var RegistryService $registry */
-        $registry = RegistryService::getInstance();
-
         // User ID holen
         if (null === $userId) {
-            if ($registry->exists('session')) {
-                $userId = $registry->get('session')->getValueInt('user_id', 0, false);
+            if ($this->registry->exists('session')) {
+                $userId = $this->registry->get('session')->getValueInt('user_id', 0, false);
             } else {
                 $userId = 0;
             }

@@ -5,16 +5,21 @@ namespace GibsonOS\Core\Factory;
 
 use GibsonOS\Core\Service\ModuleSettingService;
 
-class ModuleSettingFactory
+class ModuleSettingFactory extends AbstractSingletonFactory
 {
     /**
      * @return ModuleSettingService
      */
+    protected static function createInstance(): ModuleSettingService
+    {
+        return new ModuleSettingService(RegistryFactory::create());
+    }
+
     public static function create(): ModuleSettingService
     {
-        /** @var ModuleSettingService $moduleSetting */
-        $moduleSetting = ModuleSettingService::getInstance();
+        /** @var ModuleSettingService $service */
+        $service = parent::create();
 
-        return $moduleSetting;
+        return $service;
     }
 }

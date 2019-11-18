@@ -6,7 +6,7 @@ namespace GibsonOS\Core\Service;
 use GibsonOS\Core\Exception\Flock\FlockError;
 use GibsonOS\Core\Exception\Flock\UnFlockError;
 
-class FlockService extends AbstractSingletonService
+class FlockService extends AbstractService
 {
     /**
      * @var resource[]

@@ -5,10 +5,18 @@ namespace GibsonOS\Core\Factory;
 
 use GibsonOS\Core\Service\DirService;
 
-class DirFactory
+class DirFactory extends AbstractSingletonFactory
 {
-    public static function create(): DirService
+    protected static function createInstance(): DirService
     {
         return new DirService();
+    }
+
+    public static function create(): DirService
+    {
+        /** @var DirService $service */
+        $service = parent::create();
+
+        return $service;
     }
 }

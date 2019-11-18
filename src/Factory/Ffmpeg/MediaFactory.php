@@ -3,26 +3,25 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Factory\Ffmpeg;
 
-use GibsonOS\Core\Exception\GetError;
+use GibsonOS\Core\Factory\AbstractSingletonFactory;
 use GibsonOS\Core\Factory\FfmpegFactory;
 use GibsonOS\Core\Service\Ffmpeg\MediaService;
-use GibsonOS\Core\Service\FfmpegService;
 
-class MediaFactory
+class MediaFactory extends AbstractSingletonFactory
 {
     /**
-     * @param FfmpegService|null $ffmpeg
-     *
-     * @throws GetError
-     *
      * @return MediaService
      */
-    public static function create(FfmpegService $ffmpeg = null): MediaService
+    protected static function createInstance(): MediaService
     {
-        if (!$ffmpeg instanceof FfmpegService) {
-            $ffmpeg = FfmpegFactory::create();
-        }
+        return new MediaService(FfmpegFactory::create());
+    }
 
-        return new MediaService($ffmpeg);
+    public static function create(): MediaService
+    {
+        /** @var MediaService $service */
+        $service = parent::create();
+
+        return $service;
     }
 }

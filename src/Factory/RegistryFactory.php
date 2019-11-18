@@ -8,16 +8,21 @@ use GibsonOS\Core\Service\RegistryService;
 /**
  * @deprecated
  */
-class RegistryFactory
+class RegistryFactory extends AbstractSingletonFactory
 {
     /**
      * @return RegistryService
      */
+    protected static function createInstance(): RegistryService
+    {
+        return new RegistryService();
+    }
+
     public static function create(): RegistryService
     {
-        /** @var RegistryService $registry */
-        $registry = RegistryService::getInstance();
+        /** @var RegistryService $service */
+        $service = parent::create();
 
-        return $registry;
+        return $service;
     }
 }

@@ -6,14 +6,14 @@ namespace GibsonOS\Core\Factory;
 use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Service\FfmpegService;
 
-class FfmpegFactory
+class FfmpegFactory extends AbstractSingletonFactory
 {
     /**
      * @throws GetError
      *
      * @return FfmpegService
      */
-    public static function create(): FfmpegService
+    protected static function createInstance(): FfmpegService
     {
         $env = EnvFactory::create();
 
@@ -24,5 +24,13 @@ class FfmpegFactory
             ProcessFactory::create(),
             ImageFactory::create()
         );
+    }
+
+    public static function create(): FfmpegService
+    {
+        /** @var FfmpegService $service */
+        $service = parent::create();
+
+        return $service;
     }
 }
