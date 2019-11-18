@@ -4,9 +4,31 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Dto\Ffmpeg;
 
 use DateTime;
+use GibsonOS\Core\Exception\SetError;
+use JsonSerializable;
 
-class ConvertStatus
+class ConvertStatus implements JsonSerializable
 {
+    public const STATUS_ERROR = 'error';
+
+    public const STATUS_WAIT = 'wait';
+
+    public const STATUS_GENERATE = 'generate';
+
+    public const STATUS_GENERATED = 'generated';
+
+    private const STATUS = [
+        self::STATUS_ERROR,
+        self::STATUS_WAIT,
+        self::STATUS_GENERATE,
+        self::STATUS_GENERATED,
+    ];
+
+    /**
+     * @var string
+     */
+    private $status;
+
     /**
      * @var int
      */
@@ -41,6 +63,18 @@ class ConvertStatus
      * @var float
      */
     private $bitrate;
+
+    /**
+     * ConvertStatus constructor.
+     *
+     * @param string $status
+     *
+     * @throws SetError
+     */
+    public function __construct(string $status)
+    {
+        $this->setStatus($status);
+    }
 
     /**
      * @return int
@@ -203,5 +237,57 @@ class ConvertStatus
         }
 
         return new DateTime('@' . round(($this->getFrames() - $this->getFrame()) / $this->getFps()));
+    }
+
+    /**
+     * @return string
+     */
+    public function getStatus(): string
+    {
+        return $this->status;
+    }
+
+    /**
+     * @param string $status
+     *
+     * @throws SetError
+     *
+     * @return ConvertStatus
+     */
+    public function setStatus(string $status): ConvertStatus
+    {
+        if (!in_array($status, self::STATUS)) {
+            throw new SetError(sprintf(
+                'Status "%s" nicht erlaubt! Erlaubt: %s',
+                $status,
+                implode(', ', self::STATUS)
+            ));
+        }
+
+        $this->status = $status;
+
+        return $this;
+    }
+
+    /**
+     * @return array|mixed
+     */
+    public function jsonSerialize()
+    {
+        if ($this->status === self::STATUS_GENERATE) {
+            return [
+                'status' => $this->getStatus(),
+                'bitrate' => $this->getBitrate(),
+                'fps' => $this->getFps(),
+                'frame' => $this->getFrame(),
+                'frames' => $this->getFrames(),
+                'quality' => $this->getQuality(),
+                'size' => $this->getSize(),
+                'time' => $this->getTime(),
+                'timeRemaining' => $this->getTimeRemaining(),
+            ];
+        }
+
+        return ['status' => $this->getStatus()];
     }
 }

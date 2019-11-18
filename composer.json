@@ -32,10 +32,12 @@
     }
   },
   "scripts": {
-    "phpcs": "php ./vendor/friendsofphp/php-cs-fixer/php-cs-fixer fix src --verbose",
-    "phpstan": "php ./vendor/phpstan/phpstan/bin/phpstan analyse -l 7 src",
-    "phpmd": "php ./vendor/phpmd/phpmd/src/bin/phpmd src text ruleset.xml",
-    "phpunit": "php ./vendor/codeception/codeception/codecept run unit --ext DotReporter",
-    "phpaddunit": "php ./vendor/codeception/codeception/codecept generate:test unit"
+    "php-cs": "php ./vendor/friendsofphp/php-cs-fixer/php-cs-fixer fix src --verbose",
+    "php-cs-dry": "php ./vendor/friendsofphp/php-cs-fixer/php-cs-fixer fix src --verbose --dry-run",
+    "php-stan": "php ./vendor/phpstan/phpstan/bin/phpstan analyse -l 7 src",
+    "php-md": "php ./vendor/phpmd/phpmd/src/bin/phpmd src text ruleset.xml",
+    "php-unit": "php ./vendor/codeception/codeception/codecept run unit --ext DotReporter",
+    "php-unit-push": "php ./vendor/codeception/codeception/codecept run unit --ext DotReporter --no-ansi --no-colors",
+    "php-unit-add": "php ./vendor/codeception/codeception/codecept generate:test unit"
   }
 }

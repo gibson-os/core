@@ -196,7 +196,7 @@ class FfmpegService extends AbstractService
             throw new ConvertStatusError();
         }
 
-        return (new ConvertStatus())
+        return (new ConvertStatus(ConvertStatus::STATUS_GENERATE))
             ->setFrame((int) $hits[1])
             ->setFps((int) round($hits[2]))
             ->setQuality((float) $hits[3])
