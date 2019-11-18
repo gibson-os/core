@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Service;
 
 use GibsonOS\Core\Exception\CreateError;
+use GibsonOS\Core\Exception\GetError;
 
 class DirService extends AbstractService
 {
@@ -88,5 +89,23 @@ class DirService extends AbstractService
     public function escapeForGlob(string $path): string
     {
         return (string) preg_replace('/(\*|\?|\[)/', '[$1]', $path);
+    }
+
+    /**
+     * @param string $path
+     *
+     * @throws GetError
+     *
+     * @return array
+     */
+    public function getFiles(string $path): array
+    {
+        $files = glob($this->escapeForGlob($path) . '*');
+
+        if (!is_array($files)) {
+            throw new GetError(sprintf('Verzeichnis "%s" kann nicht gelesen werden!', $path));
+        }
+
+        return $files;
     }
 }

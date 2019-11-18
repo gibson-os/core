@@ -75,13 +75,7 @@ class FileService extends AbstractService
             $group = $this->getGroup($from);
             $this->setGroup($to, $group);
 
-            $files = glob($this->dir->escapeForGlob($from) . '*');
-
-            if (is_bool($files)) {
-                throw new GetError(sprintf('Verzeichnis %s kann nicht gelesen werden!', $from));
-            }
-
-            foreach ($files as $path) {
+            foreach ($this->dir->getFiles($from) as $path) {
                 $filename = $this->getFilename($path);
                 $this->copy($path, $to . $filename);
             }
@@ -121,13 +115,7 @@ class FileService extends AbstractService
             $group = $this->getGroup($from);
             $this->setGroup($to, $group);
 
-            $files = glob($this->dir->escapeForGlob($from) . '*');
-
-            if (is_bool($files)) {
-                throw new GetError(sprintf('Verzeichnis %s kann nicht gelesen werden!', $from));
-            }
-
-            foreach ($files as $path) {
+            foreach ($this->dir->getFiles($from) as $path) {
                 $filename = $this->getFilename($path);
                 $this->move($path, $to . $filename, $overwrite, $ignore);
             }
@@ -303,12 +291,8 @@ class FileService extends AbstractService
             $deleteDir = false;
 
             if ($files === null) {
-                $files = glob($this->dir->escapeForGlob($dir) . '*');
+                $files = $this->dir->getFiles($dir);
                 $deleteDir = true;
-
-                if (is_bool($files)) {
-                    throw new GetError(sprintf('Verzeichnis %s kann nicht gelesen werden!', $dir));
-                }
             }
 
             foreach ($files as $file) {
