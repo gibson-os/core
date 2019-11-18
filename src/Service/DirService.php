@@ -93,14 +93,15 @@ class DirService extends AbstractService
 
     /**
      * @param string $path
+     * @param string $pattern
      *
      * @throws GetError
      *
-     * @return array
+     * @return string[]
      */
-    public function getFiles(string $path): array
+    public function getFiles(string $path, string $pattern = '*'): array
     {
-        $files = glob($this->escapeForGlob($path) . '*');
+        $files = glob($this->escapeForGlob($this->addEndSlash($path)) . $pattern);
 
         if (!is_array($files)) {
             throw new GetError(sprintf('Verzeichnis "%s" kann nicht gelesen werden!', $path));
