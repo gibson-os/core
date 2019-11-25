@@ -8,9 +8,6 @@ use GibsonOS\Core\Exception\ProcessError;
 class ProcessService extends AbstractService
 {
     /**
-     * @param string $command
-     * @param string $mode
-     *
      * @throws ProcessError
      *
      * @return resource
@@ -34,11 +31,6 @@ class ProcessService extends AbstractService
         pclose($process);
     }
 
-    /**
-     * @param string $command
-     *
-     * @return string
-     */
     public function execute(string $command): string
     {
         return exec($command);

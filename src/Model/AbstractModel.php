@@ -53,8 +53,6 @@ abstract class AbstractModel implements ModelInterface
     /**
      * AbstractModel constructor.
      *
-     * @param mysqlDatabase|null $database
-     *
      * @throws GetError
      */
     public function __construct(mysqlDatabase $database = null)
@@ -71,8 +69,6 @@ abstract class AbstractModel implements ModelInterface
 
     /**
      * @throws DateTimeError
-     *
-     * @return mysqlTable
      */
     public function getMysqlTable(): mysqlTable
     {
@@ -83,8 +79,6 @@ abstract class AbstractModel implements ModelInterface
     }
 
     /**
-     * @param mysqlTable $mysqlTable
-     *
      * @throws DateTimeError
      */
     public function loadFromMysqlTable(mysqlTable $mysqlTable)
@@ -127,8 +121,6 @@ abstract class AbstractModel implements ModelInterface
     }
 
     /**
-     * @param mysqlTable $mysqlTable
-     *
      * @throws DateTimeError
      */
     public function setToMysqlTable(mysqlTable $mysqlTable)
@@ -157,8 +149,6 @@ abstract class AbstractModel implements ModelInterface
     }
 
     /**
-     * @param mysqlTable|null $mysqlTable
-     *
      * @throws SaveError
      * @throws DateTimeError
      */
@@ -182,8 +172,6 @@ abstract class AbstractModel implements ModelInterface
     }
 
     /**
-     * @param mysqlTable|null $mysqlTable
-     *
      * @throws DeleteError
      * @throws DateTimeError
      */
@@ -203,20 +191,13 @@ abstract class AbstractModel implements ModelInterface
         }
     }
 
-    /**
-     * @param string $fieldName
-     *
-     * @return string
-     */
     private function transformFieldName(string $fieldName): string
     {
         return str_replace(' ', '', ucwords(str_replace('_', ' ', $fieldName)));
     }
 
     /**
-     * @param AbstractModel $model
-     * @param mixed         $value
-     * @param string        $foreignField
+     * @param mixed $value
      *
      * @throws DateTimeError
      * @throws SelectError
@@ -241,10 +222,7 @@ abstract class AbstractModel implements ModelInterface
     }
 
     /**
-     * @param string $modelClassName
-     * @param mixed  $value
-     * @param string $foreignTable
-     * @param string $foreignField
+     * @param mixed $value
      *
      * @throws DateTimeError
      *
@@ -271,11 +249,6 @@ abstract class AbstractModel implements ModelInterface
         return $models;
     }
 
-    /**
-     * @param string $type
-     *
-     * @return string
-     */
     private function getColumnType(string $type): string
     {
         return self::COLUMN_TYPES[preg_replace('/^(\\w*).*$/', '$1', $type)];

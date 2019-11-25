@@ -35,9 +35,6 @@ class Audio
      */
     private $default = false;
 
-    /**
-     * @return string|null
-     */
     public function getLanguage(): ?string
     {
         return $this->language;
@@ -45,8 +42,6 @@ class Audio
 
     /**
      * @param string|null $language
-     *
-     * @return Audio
      */
     public function setLanguage($language): Audio
     {
@@ -55,19 +50,11 @@ class Audio
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
     public function getFormat(): ?string
     {
         return $this->format;
     }
 
-    /**
-     * @param string|null $format
-     *
-     * @return Audio
-     */
     public function setFormat(?string $format): Audio
     {
         $this->format = $format;
@@ -75,19 +62,11 @@ class Audio
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
     public function getFrequency(): ?string
     {
         return $this->frequency;
     }
 
-    /**
-     * @param string|null $frequency
-     *
-     * @return Audio
-     */
     public function setFrequency(?string $frequency): Audio
     {
         $this->frequency = $frequency;
@@ -95,19 +74,11 @@ class Audio
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
     public function getChannels(): ?string
     {
         return $this->channels;
     }
 
-    /**
-     * @param string|null $channels
-     *
-     * @return Audio
-     */
     public function setChannels(?string $channels): Audio
     {
         $this->channels = $channels;
@@ -115,19 +86,11 @@ class Audio
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
     public function getBitrate(): ?string
     {
         return $this->bitrate;
     }
 
-    /**
-     * @param string|null $bitrate
-     *
-     * @return Audio
-     */
     public function setBitrate(?string $bitrate): Audio
     {
         $this->bitrate = $bitrate;
@@ -135,19 +98,11 @@ class Audio
         return $this;
     }
 
-    /**
-     * @return bool
-     */
     public function isDefault(): bool
     {
         return $this->default;
     }
 
-    /**
-     * @param bool $default
-     *
-     * @return Audio
-     */
     public function setDefault(bool $default): Audio
     {
         $this->default = $default;

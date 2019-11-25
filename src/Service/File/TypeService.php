@@ -177,11 +177,6 @@ class TypeService
         self::TYPE_CATEGORY_OFFICE,
     ];
 
-    /**
-     * @param string $path
-     *
-     * @return string|null
-     */
     public function getFileType(string $path): ?string
     {
         if (mb_strrpos($path, '.') === false) {
@@ -192,11 +187,7 @@ class TypeService
     }
 
     /**
-     * @param string $filename
-     *
      * @throws GetError
-     *
-     * @return string
      */
     public function getContentType(string $filename): string
     {
@@ -209,11 +200,6 @@ class TypeService
         return (string) finfo_file($fileInfo, $filename);
     }
 
-    /**
-     * @param string $path
-     *
-     * @return int|null
-     */
     public function getCategory(string $path): ?int
     {
         $type = $this->getFileType(strtolower($path));
@@ -229,10 +215,6 @@ class TypeService
     }
 
     /**
-     * @param string $path
-     *
-     * @return int|null
-     *
      * @deprecated
      */
     public function getThumbType(string $path): ?int

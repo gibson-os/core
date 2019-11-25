@@ -9,13 +9,7 @@ use GibsonOS\Core\Exception\Image\CreateError;
 class ManipulateService extends DrawService
 {
     /**
-     * @param Image $image
-     * @param int   $width
-     * @param int   $height
-     *
      * @throws CreateError
-     *
-     * @return bool
      */
     public function resize(Image $image, int $width, int $height): bool
     {
@@ -75,13 +69,7 @@ class ManipulateService extends DrawService
     }
 
     /**
-     * @param Image $image
-     * @param int   $width
-     * @param int   $height
-     *
      * @throws CreateError
-     *
-     * @return bool
      */
     public function resizeCentered(Image $image, int $width, int $height): bool
     {
@@ -99,13 +87,7 @@ class ManipulateService extends DrawService
     }
 
     /**
-     * @param Image $image
-     * @param int   $width
-     * @param int   $height
-     *
      * @throws CreateError
-     *
-     * @return Image
      */
     public function verticalCentered(Image $image, int $width, int $height): Image
     {
@@ -121,13 +103,7 @@ class ManipulateService extends DrawService
     }
 
     /**
-     * @param Image $image
-     * @param int   $width
-     * @param int   $height
-     *
      * @throws CreateError
-     *
-     * @return bool
      */
     public function horizontalCentered(Image $image, int $width, int $height): bool
     {
@@ -147,16 +123,7 @@ class ManipulateService extends DrawService
     }
 
     /**
-     * @param Image    $image
-     * @param int      $width
-     * @param int      $height
-     * @param int|null $startX
-     * @param int|null $startY
-     * @param int|null $color
-     *
      * @throws CreateError
-     *
-     * @return bool
      */
     public function crop(
         Image $image,
@@ -200,15 +167,7 @@ class ManipulateService extends DrawService
     }
 
     /**
-     * @param Image    $image
-     * @param int      $width
-     * @param int      $height
-     * @param int|null $startX
-     * @param int|null $startY
-     *
      * @throws CreateError
-     *
-     * @return bool
      */
     public function cropResized(Image $image, int $width, int $height, int $startX = null, int $startY = null): bool
     {
@@ -239,20 +198,6 @@ class ManipulateService extends DrawService
         return false;
     }
 
-    /**
-     * @param Image $sourceImage
-     * @param Image $destinationImage
-     * @param int   $destX
-     * @param int   $destY
-     * @param int   $srcX
-     * @param int   $srcY
-     * @param int   $srcWidth
-     * @param int   $srcHeight
-     * @param int   $dstWidth
-     * @param int   $dstHeight
-     *
-     * @return bool
-     */
     public function copy(
         Image $sourceImage,
         Image $destinationImage,

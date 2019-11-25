@@ -36,8 +36,6 @@ class Setting extends AbstractModel
     private $user;
 
     /**
-     * @param mysqlDatabase|null $database
-     *
      * @throws GetError
      */
     public function __construct(mysqlDatabase $database = null)
@@ -47,27 +45,16 @@ class Setting extends AbstractModel
         $this->user = new User();
     }
 
-    /**
-     * @return string
-     */
     public static function getTableName(): string
     {
         return 'setting';
     }
 
-    /**
-     * @return int
-     */
     public function getUserId(): int
     {
         return $this->userId;
     }
 
-    /**
-     * @param int $userId
-     *
-     * @return Setting
-     */
     public function setUserId(int $userId): Setting
     {
         $this->userId = $userId;
@@ -75,19 +62,11 @@ class Setting extends AbstractModel
         return $this;
     }
 
-    /**
-     * @return int
-     */
     public function getModuleId(): int
     {
         return $this->moduleId;
     }
 
-    /**
-     * @param int $moduleId
-     *
-     * @return Setting
-     */
     public function setModuleId(int $moduleId): Setting
     {
         $this->moduleId = $moduleId;
@@ -95,19 +74,11 @@ class Setting extends AbstractModel
         return $this;
     }
 
-    /**
-     * @return string
-     */
     public function getKey(): string
     {
         return $this->key;
     }
 
-    /**
-     * @param string $key
-     *
-     * @return Setting
-     */
     public function setKey(string $key): Setting
     {
         $this->key = $key;
@@ -115,19 +86,11 @@ class Setting extends AbstractModel
         return $this;
     }
 
-    /**
-     * @return string
-     */
     public function getValue(): string
     {
         return $this->value;
     }
 
-    /**
-     * @param string $value
-     *
-     * @return Setting
-     */
     public function setValue(string $value): Setting
     {
         $this->value = $value;
@@ -138,8 +101,6 @@ class Setting extends AbstractModel
     /**
      * @throws DateTimeError
      * @throws SelectError
-     *
-     * @return User
      */
     public function getUser(): User
     {
@@ -148,11 +109,6 @@ class Setting extends AbstractModel
         return $this->user;
     }
 
-    /**
-     * @param User $user
-     *
-     * @return Setting
-     */
     public function setUser(User $user): Setting
     {
         $this->user = $user;

@@ -40,8 +40,6 @@ class Image
 
     /**
      * @param resource $resource
-     *
-     * @return Image
      */
     public function setResource($resource): Image
     {
@@ -50,19 +48,11 @@ class Image
         return $this;
     }
 
-    /**
-     * @return string
-     */
     public function getFilename(): string
     {
         return $this->filename;
     }
 
-    /**
-     * @param string $filename
-     *
-     * @return Image
-     */
     public function setFilename(string $filename): Image
     {
         $this->filename = $filename;
@@ -70,19 +60,11 @@ class Image
         return $this;
     }
 
-    /**
-     * @return int
-     */
     public function getQuality(): int
     {
         return $this->quality;
     }
 
-    /**
-     * @param int $quality
-     *
-     * @return Image
-     */
     public function setQuality(int $quality): Image
     {
         $this->quality = $quality;

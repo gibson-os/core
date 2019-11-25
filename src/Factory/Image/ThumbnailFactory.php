@@ -14,9 +14,6 @@ use GibsonOS\Core\Service\Image\ThumbnailService;
  */
 class ThumbnailFactory extends AbstractSingletonFactory
 {
-    /**
-     * @return ThumbnailService
-     */
     protected static function createInstance(): ThumbnailService
     {
         return new ThumbnailService(FileFactory::create());

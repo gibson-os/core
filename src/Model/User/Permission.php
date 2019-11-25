@@ -48,27 +48,16 @@ class Permission extends AbstractModel
         $this->user = new User();
     }
 
-    /**
-     * @return string
-     */
     public static function getTableName(): string
     {
         return 'user_permission';
     }
 
-    /**
-     * @return string
-     */
     public function getModule(): string
     {
         return $this->module;
     }
 
-    /**
-     * @param string $module
-     *
-     * @return Permission
-     */
     public function setModule(string $module): Permission
     {
         $this->module = $module;
@@ -76,19 +65,11 @@ class Permission extends AbstractModel
         return $this;
     }
 
-    /**
-     * @return string
-     */
     public function getTask(): string
     {
         return $this->task;
     }
 
-    /**
-     * @param string $task
-     *
-     * @return Permission
-     */
     public function setTask(string $task): Permission
     {
         $this->task = $task;
@@ -96,19 +77,11 @@ class Permission extends AbstractModel
         return $this;
     }
 
-    /**
-     * @return string
-     */
     public function getAction(): string
     {
         return $this->action;
     }
 
-    /**
-     * @param string $action
-     *
-     * @return Permission
-     */
     public function setAction(string $action): Permission
     {
         $this->action = $action;
@@ -116,19 +89,11 @@ class Permission extends AbstractModel
         return $this;
     }
 
-    /**
-     * @return int
-     */
     public function getUserId(): int
     {
         return $this->userId;
     }
 
-    /**
-     * @param int $userId
-     *
-     * @return Permission
-     */
     public function setUserId(int $userId): Permission
     {
         $this->userId = $userId;
@@ -136,19 +101,11 @@ class Permission extends AbstractModel
         return $this;
     }
 
-    /**
-     * @return int
-     */
     public function getPermission(): int
     {
         return $this->permission;
     }
 
-    /**
-     * @param int $permission
-     *
-     * @return Permission
-     */
     public function setPermission(int $permission): Permission
     {
         $this->permission = $permission;
@@ -159,8 +116,6 @@ class Permission extends AbstractModel
     /**
      * @throws DateTimeError
      * @throws SelectError
-     *
-     * @return User
      */
     public function getUser(): User
     {
@@ -169,11 +124,6 @@ class Permission extends AbstractModel
         return $this->user;
     }
 
-    /**
-     * @param User $user
-     *
-     * @return Permission
-     */
     public function setUser(User $user): Permission
     {
         $this->user = $user;

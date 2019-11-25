@@ -35,8 +35,6 @@ class MediaService
 
     /**
      * Video constructor.
-     *
-     * @param FfmpegService $ffmpeg
      */
     public function __construct(FfmpegService $ffmpeg)
     {
@@ -44,12 +42,8 @@ class MediaService
     }
 
     /**
-     * @param string $filename
-     *
      * @throws FileNotFound
      * @throws ProcessError
-     *
-     * @return MediaDto
      */
     public function getMedia(string $filename): MediaDto
     {
@@ -110,12 +104,6 @@ class MediaService
     }
 
     /**
-     * @param MediaDto    $media
-     * @param string      $outputFilename
-     * @param string|null $videoCodec
-     * @param string|null $audioCodec
-     * @param array       $options
-     *
      * @throws DeleteError
      * @throws FileNotFound
      * @throws GetError
@@ -131,15 +119,10 @@ class MediaService
     }
 
     /**
-     * @param MediaDto $media
-     * @param string   $outputFilename
-     *
      * @throws ConvertStatusError
      * @throws DateTimeError
      * @throws FileNotFound
      * @throws OpenError
-     *
-     * @return ConvertStatus
      */
     public function getConvertStatus(MediaDto $media, string $outputFilename): ConvertStatus
     {
@@ -150,17 +133,11 @@ class MediaService
     }
 
     /**
-     * @param MediaDto $media
-     * @param int      $second
-     * @param int|null $frame
-     *
      * @throws DeleteError
      * @throws FileNotFound
      * @throws GetError
      * @throws LoadError
      * @throws NoVideoError
-     *
-     * @return Image
      */
     public function getImageBySecond(MediaDto $media, int $second, int $frame = null): Image
     {
@@ -174,16 +151,11 @@ class MediaService
     }
 
     /**
-     * @param MediaDto $media
-     * @param int      $frameNumber
-     *
      * @throws DeleteError
      * @throws FileNotFound
      * @throws GetError
      * @throws NoVideoError
      * @throws LoadError
-     *
-     * @return Image
      */
     public function getImageByFrame(MediaDto $media, int $frameNumber): Image
     {
@@ -211,10 +183,6 @@ class MediaService
         );
     }
 
-    /**
-     * @param MediaDto $media
-     * @param array    $rawValues
-     */
     private function calculateDuration(MediaDto $media, array $rawValues)
     {
         $duration = 0;
@@ -232,13 +200,6 @@ class MediaService
         $media->setDuration($duration);
     }
 
-    /**
-     * @param MediaDto    $media
-     * @param array       $properties
-     * @param string      $streamId
-     * @param string|null $language
-     * @param string      $options
-     */
     private function addVideoStream(MediaDto $media, array $properties, string $streamId, ?string $language, string $options)
     {
         $stream = (new Video())
@@ -265,13 +226,6 @@ class MediaService
         }
     }
 
-    /**
-     * @param MediaDto    $media
-     * @param array       $properties
-     * @param string      $streamId
-     * @param string|null $language
-     * @param string      $options
-     */
     private function addAudioStream(MediaDto $media, array $properties, string $streamId, ?string $language, string $options)
     {
         $stream = (new Audio())
@@ -288,12 +242,6 @@ class MediaService
         }
     }
 
-    /**
-     * @param MediaDto    $media
-     * @param string      $streamId
-     * @param string|null $language
-     * @param string      $options
-     */
     private function addSubtitleStream(MediaDto $media, string $streamId, ?string $language, string $options)
     {
         $stream = (new Subtitle())->setLanguage($language);
@@ -310,11 +258,6 @@ class MediaService
         }
     }
 
-    /**
-     * @param string $propertiesString
-     *
-     * @return array
-     */
     private function getPropertiesFromString(string $propertiesString): array
     {
         $propertiesString = (string) preg_replace('/(\([^\(].),(.+?\))/', '$1{%%KOMMA%%}$2', $propertiesString);
@@ -331,11 +274,6 @@ class MediaService
         return $properties;
     }
 
-    /**
-     * @param string $string
-     *
-     * @return string|null
-     */
     private function getLanguageFromString(string $string): ?string
     {
         $language = (string) preg_replace('/\(([a-zA-Z]{3})\)/', '$1', $string);

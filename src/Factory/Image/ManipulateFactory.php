@@ -9,9 +9,6 @@ use GibsonOS\Core\Service\Image\ManipulateService;
 
 class ManipulateFactory extends AbstractSingletonFactory
 {
-    /**
-     * @return ManipulateService
-     */
     protected static function createInstance(): ManipulateService
     {
         return new ManipulateService(FileFactory::create());

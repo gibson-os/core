@@ -7,9 +7,6 @@ use GibsonOS\Core\Service\ModuleSettingService;
 
 class ModuleSettingFactory extends AbstractSingletonFactory
 {
-    /**
-     * @return ModuleSettingService
-     */
     protected static function createInstance(): ModuleSettingService
     {
         return new ModuleSettingService(RegistryFactory::create());

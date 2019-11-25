@@ -20,15 +20,8 @@ abstract class AbstractStore
      */
     abstract public function getList();
 
-    /**
-     * @return int
-     */
     abstract public function getCount(): int;
 
-    /**
-     * @param int $rows
-     * @param int $from
-     */
     public function setLimit(int $rows, int $from): void
     {
         $this->rows = $rows;

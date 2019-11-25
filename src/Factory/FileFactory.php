@@ -7,9 +7,6 @@ use GibsonOS\Core\Service\FileService;
 
 class FileFactory extends AbstractSingletonFactory
 {
-    /**
-     * @return FileService
-     */
     protected static function createInstance(): FileService
     {
         return new FileService(DirFactory::create());

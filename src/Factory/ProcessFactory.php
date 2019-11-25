@@ -7,9 +7,6 @@ use GibsonOS\Core\Service\ProcessService;
 
 class ProcessFactory extends AbstractSingletonFactory
 {
-    /**
-     * @return ProcessService
-     */
     protected static function createInstance(): ProcessService
     {
         return new ProcessService();

@@ -25,8 +25,6 @@ class ModuleSettingService extends AbstractService
 
     /**
      * ModuleSettingService constructor.
-     *
-     * @param RegistryService $registry
      */
     public function __construct(RegistryService $registry)
     {
@@ -34,9 +32,6 @@ class ModuleSettingService extends AbstractService
     }
 
     /**
-     * @param string|null $key
-     * @param int|null    $userId
-     *
      * @throws DateTimeError
      * @throws GetError
      * @throws SelectError
@@ -49,10 +44,6 @@ class ModuleSettingService extends AbstractService
     }
 
     /**
-     * @param string      $moduleName
-     * @param string|null $key
-     * @param int|null    $userId
-     *
      * @throws DateTimeError
      * @throws GetError
      * @throws SelectError
@@ -65,10 +56,6 @@ class ModuleSettingService extends AbstractService
     }
 
     /**
-     * @param int         $moduleId
-     * @param string|null $key
-     * @param int|null    $userId
-     *
      * @throws DateTimeError
      * @throws GetError
      * @throws SelectError
@@ -97,10 +84,6 @@ class ModuleSettingService extends AbstractService
     }
 
     /**
-     * @param string   $key
-     * @param string   $value
-     * @param int|null $userId
-     *
      * @throws DateTimeError
      * @throws GetError
      * @throws SaveError
@@ -112,11 +95,6 @@ class ModuleSettingService extends AbstractService
     }
 
     /**
-     * @param string   $moduleName
-     * @param string   $key
-     * @param string   $value
-     * @param int|null $userId
-     *
      * @throws DateTimeError
      * @throws GetError
      * @throws SaveError
@@ -128,11 +106,6 @@ class ModuleSettingService extends AbstractService
     }
 
     /**
-     * @param int      $moduleId
-     * @param string   $key
-     * @param string   $value
-     * @param int|null $userId
-     *
      * @throws DateTimeError
      * @throws GetError
      * @throws SaveError
@@ -149,8 +122,6 @@ class ModuleSettingService extends AbstractService
 
     /**
      * @throws GetError
-     *
-     * @return string
      */
     private function getModuleNameByRegistry(): string
     {
@@ -158,13 +129,9 @@ class ModuleSettingService extends AbstractService
     }
 
     /**
-     * @param string $name
-     *
      * @throws DateTimeError
      * @throws GetError
      * @throws SelectError
-     *
-     * @return int
      */
     private function getModuleIdByName(string $name): int
     {
@@ -174,10 +141,6 @@ class ModuleSettingService extends AbstractService
     }
 
     /**
-     * @param int         $moduleId
-     * @param int|null    $userId
-     * @param string|null $key
-     *
      * @throws DateTimeError
      * @throws GetError
      * @throws SelectError

@@ -7,9 +7,6 @@ class ArrayKeyUtility
 {
     /**
      * @param string|int|array $key
-     * @param array            $search
-     *
-     * @return bool
      */
     public static function exists($key, array $search): bool
     {

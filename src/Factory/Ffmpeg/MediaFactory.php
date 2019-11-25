@@ -9,9 +9,6 @@ use GibsonOS\Core\Service\Ffmpeg\MediaService;
 
 class MediaFactory extends AbstractSingletonFactory
 {
-    /**
-     * @return MediaService
-     */
     protected static function createInstance(): MediaService
     {
         return new MediaService(FfmpegFactory::create());

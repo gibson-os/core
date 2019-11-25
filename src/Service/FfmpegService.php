@@ -44,12 +44,6 @@ class FfmpegService extends AbstractService
 
     /**
      * Ffmpeg constructor.
-     *
-     * @param string          $ffpmegPath
-     * @param DateTimeService $dateTime
-     * @param FileService     $file
-     * @param ProcessService  $process
-     * @param ImageService    $image
      */
     public function __construct(string $ffpmegPath, DateTimeService $dateTime, FileService $file, ProcessService $process, ImageService $image)
     {
@@ -61,12 +55,8 @@ class FfmpegService extends AbstractService
     }
 
     /**
-     * @param string $filename
-     *
      * @throws FileNotFound
      * @throws ProcessError
-     *
-     * @return string
      */
     public function getFileMetaDataString(string $filename): string
     {
@@ -98,11 +88,7 @@ class FfmpegService extends AbstractService
     }
 
     /**
-     * @param Media       $media
-     * @param string      $outputFilename
-     * @param string|null $videoCodec
-     * @param string|null $audioCodec
-     * @param string[]    $options
+     * @param string[] $options
      *
      * @throws DeleteError
      * @throws FileNotFound
@@ -164,14 +150,10 @@ class FfmpegService extends AbstractService
     }
 
     /**
-     * @param string $filename
-     *
      * @throws ConvertStatusError
      * @throws DateTimeError
      * @throws FileNotFound
      * @throws OpenError
-     *
-     * @return ConvertStatus
      */
     public function getConvertStatus(string $filename): ConvertStatus
     {
@@ -207,15 +189,10 @@ class FfmpegService extends AbstractService
     }
 
     /**
-     * @param string $filename
-     * @param string $frameNumber
-     *
      * @throws DeleteError
      * @throws FileNotFound
      * @throws GetError
      * @throws LoadError
-     *
-     * @return ImageDto
      */
     public function getImageByFrame(string $filename, string $frameNumber): ImageDto
     {
@@ -234,9 +211,6 @@ class FfmpegService extends AbstractService
         return $image;
     }
 
-    /**
-     * @param string $parameters
-     */
     private function execute(string $parameters)
     {
         $this->process->execute($this->ffpmegPath . ' ' . $parameters);

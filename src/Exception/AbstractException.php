@@ -51,9 +51,6 @@ abstract class AbstractException extends Exception
      */
     private $promptParameter;
 
-    /**
-     * @return string|null
-     */
     public function getTitle(): ?string
     {
         return $this->title;
@@ -61,8 +58,6 @@ abstract class AbstractException extends Exception
 
     /**
      * @param string|null $title
-     *
-     * @return AbstractException
      */
     public function setTitle($title): AbstractException
     {
@@ -71,9 +66,6 @@ abstract class AbstractException extends Exception
         return $this;
     }
 
-    /**
-     * @return int
-     */
     public function getType(): int
     {
         return $this->type;
@@ -81,8 +73,6 @@ abstract class AbstractException extends Exception
 
     /**
      * @param int $type
-     *
-     * @return AbstractException
      */
     public function setType($type): AbstractException
     {
@@ -91,9 +81,6 @@ abstract class AbstractException extends Exception
         return $this;
     }
 
-    /**
-     * @return array
-     */
     public function getExtraParameters(): array
     {
         return $this->extraParameters;
@@ -101,8 +88,6 @@ abstract class AbstractException extends Exception
 
     /**
      * @param array $extraParameters
-     *
-     * @return AbstractException
      */
     public function setExtraParameters($extraParameters): AbstractException
     {
@@ -112,10 +97,7 @@ abstract class AbstractException extends Exception
     }
 
     /**
-     * @param string $key
-     * @param mixed  $value
-     *
-     * @return AbstractException
+     * @param mixed $value
      */
     public function setExtraParameter(string $key, $value): AbstractException
     {
@@ -124,9 +106,6 @@ abstract class AbstractException extends Exception
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
     public function getPromptParameter(): ?string
     {
         return $this->promptParameter;
@@ -134,8 +113,6 @@ abstract class AbstractException extends Exception
 
     /**
      * @param string|null $promptParameter
-     *
-     * @return AbstractException
      */
     public function setPromptParameter($promptParameter): AbstractException
     {
@@ -144,9 +121,6 @@ abstract class AbstractException extends Exception
         return $this;
     }
 
-    /**
-     * @return array
-     */
     public function getButtons(): array
     {
         if (!count($this->buttons)) {
@@ -156,18 +130,13 @@ abstract class AbstractException extends Exception
         return $this->buttons;
     }
 
-    /**
-     * @param array $buttons
-     */
     public function setButtons(array $buttons)
     {
         $this->buttons = $buttons;
     }
 
     /**
-     * @param string      $text
-     * @param string|null $parameter
-     * @param mixed|null  $value
+     * @param mixed|null $value
      */
     public function addButton(string $text, string $parameter = null, $value = null)
     {

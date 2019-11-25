@@ -15,21 +15,11 @@ class RegistryService extends AbstractService
      */
     private $registry = [];
 
-    /**
-     * @param string $key
-     *
-     * @return bool
-     */
     public function exists(string $key): bool
     {
         return array_key_exists($key, $this->registry);
     }
 
-    /**
-     * @param string $name
-     *
-     * @return bool
-     */
     public function loadFromSession(string $name = 'REGISTRY'): bool
     {
         if (array_key_exists($name, $_SESSION)) {
@@ -50,8 +40,6 @@ class RegistryService extends AbstractService
     }
 
     /**
-     * @param string $key
-     *
      * @throws GetError
      *
      * @return mixed
@@ -66,8 +54,7 @@ class RegistryService extends AbstractService
     }
 
     /**
-     * @param string $key
-     * @param mixed  $value
+     * @param mixed $value
      */
     public function set(string $key, $value)
     {

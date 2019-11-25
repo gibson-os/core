@@ -10,8 +10,6 @@ class FfmpegFactory extends AbstractSingletonFactory
 {
     /**
      * @throws GetError
-     *
-     * @return FfmpegService
      */
     protected static function createInstance(): FfmpegService
     {

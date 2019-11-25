@@ -26,10 +26,6 @@ class SqLiteService extends AbstractService
      */
     private $file;
 
-    /**
-     * @param string      $filename
-     * @param FileService $file
-     */
     public function __construct(string $filename, FileService $file)
     {
         $this->filename = $filename;
@@ -38,8 +34,6 @@ class SqLiteService extends AbstractService
     }
 
     /**
-     * @param string $query
-     *
      * @throws ExecuteError
      */
     public function execute(string $query)
@@ -50,11 +44,7 @@ class SqLiteService extends AbstractService
     }
 
     /**
-     * @param string $query
-     *
      * @throws ExecuteError
-     *
-     * @return SQLite3Stmt
      */
     public function prepare(string $query): SQLite3Stmt
     {
@@ -68,8 +58,6 @@ class SqLiteService extends AbstractService
     }
 
     /**
-     * @param int $milliSeconds
-     *
      * @throws ExecuteError
      */
     public function busyTimeout(int $milliSeconds)
@@ -90,11 +78,7 @@ class SqLiteService extends AbstractService
     }
 
     /**
-     * @param string $query
-     *
      * @throws ExecuteError
-     *
-     * @return SQLite3Result
      */
     public function query(string $query): SQLite3Result
     {
@@ -108,8 +92,6 @@ class SqLiteService extends AbstractService
     }
 
     /**
-     * @param string $query
-     *
      * @throws ExecuteError
      *
      * @return mixed
@@ -126,9 +108,6 @@ class SqLiteService extends AbstractService
     }
 
     /**
-     * @param string $name
-     * @param string $createQuery
-     *
      * @throws ExecuteError
      */
     public function addTableIfNotExists(string $name, string $createQuery)
@@ -140,11 +119,6 @@ class SqLiteService extends AbstractService
         $this->execute($createQuery);
     }
 
-    /**
-     * @param string $name
-     *
-     * @return bool
-     */
     public function hasTable(string $name): bool
     {
         if ($this->database->querySingle("SELECT * FROM sqlite_master WHERE type='table' AND tbl_name='" . SQLite3::escapeString($name) . "'")) {
@@ -154,17 +128,11 @@ class SqLiteService extends AbstractService
         return false;
     }
 
-    /**
-     * @return SQLite3
-     */
     public function getDatabase(): SQLite3
     {
         return $this->database;
     }
 
-    /**
-     * @return bool
-     */
     public function isWritable(): bool
     {
         if (!is_writable($this->file->getDir($this->filename))) {
@@ -181,9 +149,6 @@ class SqLiteService extends AbstractService
         return true;
     }
 
-    /**
-     * @return bool
-     */
     public function isReadable(): bool
     {
         if (

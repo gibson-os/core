@@ -20,38 +20,23 @@ class FileService extends AbstractService
 
     /**
      * File constructor.
-     *
-     * @param DirService $dir
      */
     public function __construct(DirService $dir)
     {
         $this->dir = $dir;
     }
 
-    /**
-     * @param string $filename
-     *
-     * @return bool
-     */
     public function exists(string $filename): bool
     {
         return file_exists($filename);
     }
 
-    /**
-     * @param string $filename
-     *
-     * @return bool
-     */
     public function isReadable(string $filename): bool
     {
         return is_readable($filename);
     }
 
     /**
-     * @param string $from
-     * @param string $to
-     *
      * @throws CreateError
      * @throws GetError
      * @throws SetError
@@ -85,11 +70,6 @@ class FileService extends AbstractService
     }
 
     /**
-     * @param string $from
-     * @param string $to
-     * @param bool   $overwrite
-     * @param bool   $ignore
-     *
      * @throws CreateError
      * @throws DeleteError
      * @throws FileNotFound
@@ -129,11 +109,7 @@ class FileService extends AbstractService
     }
 
     /**
-     * @param string $path
-     *
      * @throws GetError
-     *
-     * @return int
      */
     public function getPerms(string $path): int
     {
@@ -147,9 +123,6 @@ class FileService extends AbstractService
     }
 
     /**
-     * @param string $path
-     * @param int    $chmod
-     *
      * @throws SetError
      */
     public function setPerms(string $path, int $chmod): void
@@ -160,11 +133,7 @@ class FileService extends AbstractService
     }
 
     /**
-     * @param string $path
-     *
      * @throws GetError
-     *
-     * @return int
      */
     public function getOwner(string $path): int
     {
@@ -178,9 +147,6 @@ class FileService extends AbstractService
     }
 
     /**
-     * @param string $path
-     * @param int    $owner
-     *
      * @throws SetError
      */
     public function setOwner(string $path, int $owner): void
@@ -191,11 +157,7 @@ class FileService extends AbstractService
     }
 
     /**
-     * @param string $path
-     *
      * @throws GetError
-     *
-     * @return int
      */
     public function getGroup(string $path): int
     {
@@ -209,9 +171,6 @@ class FileService extends AbstractService
     }
 
     /**
-     * @param string $path
-     * @param int    $group
-     *
      * @throws SetError
      */
     public function setGroup(string $path, int $group): void
@@ -222,10 +181,6 @@ class FileService extends AbstractService
     }
 
     /**
-     * @param string $path
-     * @param string $data
-     * @param bool   $overwrite
-     *
      * @throws CreateError
      * @throws FileExistsError
      */
@@ -247,12 +202,6 @@ class FileService extends AbstractService
         }
     }
 
-    /**
-     * @param string $path
-     * @param bool   $overwrite
-     *
-     * @return bool
-     */
     public function isWritable(string $path, bool $overwrite = false): bool
     {
         if (file_exists($path)) {
@@ -271,7 +220,6 @@ class FileService extends AbstractService
     }
 
     /**
-     * @param string            $dir
      * @param string|array|null $files
      *
      * @throws DeleteError
@@ -328,12 +276,6 @@ class FileService extends AbstractService
         }
     }
 
-    /**
-     * @param string $path
-     * @param string $directorySeparator
-     *
-     * @return string
-     */
     public function getDir(string $path, string $directorySeparator = DIRECTORY_SEPARATOR): string
     {
         if (mb_strrpos($path, $directorySeparator) === false) {
@@ -343,12 +285,6 @@ class FileService extends AbstractService
         return mb_substr($path, 0, mb_strrpos($path, $directorySeparator) + 1);
     }
 
-    /**
-     * @param string $path
-     * @param string $directorySeparator
-     *
-     * @return string
-     */
     public function getFilename(string $path, string $directorySeparator = DIRECTORY_SEPARATOR): string
     {
         if (mb_strrpos($path, $directorySeparator) === false) {
@@ -358,20 +294,12 @@ class FileService extends AbstractService
         return mb_substr($path, mb_strrpos($path, $directorySeparator) + 1);
     }
 
-    /**
-     * @param string $path
-     *
-     * @return string
-     */
     public function getFileEnding(string $path): string
     {
         return mb_substr($path, mb_strrpos($path, '.') + 1);
     }
 
     /**
-     * @param string $filename
-     * @param string $mode
-     *
      * @throws OpenError
      *
      * @return resource
@@ -389,8 +317,6 @@ class FileService extends AbstractService
 
     /**
      * @param resource $fileHandle
-     *
-     * @return bool
      */
     public function close($fileHandle): bool
     {
@@ -398,11 +324,7 @@ class FileService extends AbstractService
     }
 
     /**
-     * @param string $filename
-     *
      * @throws OpenError
-     *
-     * @return string
      */
     public function readLastLine(string $filename): string
     {

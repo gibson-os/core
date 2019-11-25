@@ -19,41 +19,24 @@ class ImageService extends AbstractService
 
     /**
      * Image constructor.
-     *
-     * @param FileService $file
      */
     public function __construct(FileService $file)
     {
         $this->file = $file;
     }
 
-    /**
-     * @param Image $image
-     *
-     * @return int
-     */
     public function getWidth(Image $image): int
     {
         return (int) imagesx($image->getResource());
     }
 
-    /**
-     * @param Image $image
-     *
-     * @return int
-     */
     public function getHeight(Image $image): int
     {
         return (int) imagesy($image->getResource());
     }
 
     /**
-     * @param int $width
-     * @param int $height
-     *
      * @throws CreateError
-     *
-     * @return Image
      */
     public function create(int $width, int $height): Image
     {
@@ -69,43 +52,22 @@ class ImageService extends AbstractService
         return $image;
     }
 
-    /**
-     * @param Image $image
-     */
     public function fillTransparent(Image $image): void
     {
         $this->fill($image, $this->getTransparentColor($image));
         $this->enableAlpha($image);
     }
 
-    /**
-     * @param Image $image
-     * @param int   $red
-     * @param int   $green
-     * @param int   $blue
-     * @param int   $alpha
-     *
-     * @return int
-     */
     public function getColor(Image $image, int $red, int $green, int $blue, int $alpha = 0): int
     {
         return (int) imagecolorallocatealpha($image->getResource(), $red, $green, $blue, $alpha);
     }
 
-    /**
-     * @param Image $image
-     *
-     * @return int
-     */
     public function getTransparentColor(Image $image): int
     {
         return (int) imagecolortransparent($image->getResource());
     }
 
-    /**
-     * @param Image $image
-     * @param int   $color
-     */
     public function setTransparentColor(Image $image, int $color): void
     {
         imagecolortransparent($image->getResource(), $color);
@@ -113,10 +75,6 @@ class ImageService extends AbstractService
 
     /**
      * Zerstört das Bild.
-     *
-     * @param Image $image
-     *
-     * @return bool
      */
     public function destroy(Image $image): bool
     {
@@ -124,13 +82,8 @@ class ImageService extends AbstractService
     }
 
     /**
-     * @param string      $filename
-     * @param string|null $type
-     *
      * @throws FileNotFound
      * @throws LoadError
-     *
-     * @return Image
      */
     public function load(string $filename, string $type = null): Image
     {
@@ -188,31 +141,16 @@ class ImageService extends AbstractService
         return $Image;
     }
 
-    /**
-     * @param string $filename
-     *
-     * @return string
-     */
     public static function getImageTypeByFilename(string $filename): string
     {
         return strtolower((string) substr((string) strrchr($filename, '.'), 1));
     }
 
-    /**
-     * @param string $mimeType
-     *
-     * @return string
-     */
     public static function getImageTypeByMimeType(string $mimeType): string
     {
         return strtolower((string) substr((string) strrchr($mimeType, '/'), 1));
     }
 
-    /**
-     * @param string $filename
-     *
-     * @return string
-     */
     public static function getMimeTypeByFilename(string $filename): string
     {
         return image_type_to_mime_type(
@@ -220,12 +158,6 @@ class ImageService extends AbstractService
         );
     }
 
-    /**
-     * @param Image  $image
-     * @param string $type
-     *
-     * @return bool
-     */
     public function output(Image $image, string $type = 'jpg'): bool
     {
         switch ($type) {
@@ -243,12 +175,6 @@ class ImageService extends AbstractService
         return false;
     }
 
-    /**
-     * @param Image  $image
-     * @param string $type
-     *
-     * @return bool
-     */
     public function show(Image $image, string $type = 'jpg'): bool
     {
         switch ($type) {
@@ -274,12 +200,6 @@ class ImageService extends AbstractService
         return $this->output($image, $type);
     }
 
-    /**
-     * @param Image  $image
-     * @param string $type
-     *
-     * @return string
-     */
     public function getString(Image $image, string $type = 'jpg'): string
     {
         ob_start();
@@ -291,13 +211,8 @@ class ImageService extends AbstractService
     }
 
     /**
-     * @param Image       $image
-     * @param string|null $type
-     *
      * @throws DeleteError
      * @throws GetError
-     *
-     * @return bool
      */
     public function save(Image $image, string $type = null): bool
     {
@@ -328,54 +243,26 @@ class ImageService extends AbstractService
         return false;
     }
 
-    /**
-     * @param Image $image
-     *
-     * @return bool
-     */
     public function enableAlphaBlending(Image $image): bool
     {
         return imagealphablending($image->getResource(), true);
     }
 
-    /**
-     * @param Image $image
-     *
-     * @return bool
-     */
     public function disableAlphaBlending(Image $image): bool
     {
         return imagealphablending($image->getResource(), false);
     }
 
-    /**
-     * @param Image $image
-     *
-     * @return bool
-     */
     public function enableAlpha(Image $image): bool
     {
         return imagesavealpha($image->getResource(), true);
     }
 
-    /**
-     * @param Image $image
-     *
-     * @return bool
-     */
     public function disableAlpha(Image $image): bool
     {
         return imagesavealpha($image->getResource(), false);
     }
 
-    /**
-     * @param Image $image
-     * @param int   $color
-     * @param int   $x
-     * @param int   $y
-     *
-     * @return bool
-     */
     public function fill(Image $image, int $color, int $x = 0, int $y = 0): bool
     {
         return imagefill($image->getResource(), $x, $y, $color);

@@ -29,14 +29,8 @@ abstract class AbstractDatabaseStore extends AbstractStore
      */
     private $orderBy;
 
-    /**
-     * @return string
-     */
     abstract protected function getTableName(): string;
 
-    /**
-     * @return string
-     */
     abstract protected function getCountField(): string;
 
     /**
@@ -46,8 +40,6 @@ abstract class AbstractDatabaseStore extends AbstractStore
 
     /**
      * Core_Abstract_Store constructor.
-     *
-     * @param mysqlDatabase|null $database
      */
     public function __construct(mysqlDatabase $database = null)
     {
@@ -60,10 +52,6 @@ abstract class AbstractDatabaseStore extends AbstractStore
         $this->table = new mysqlTable($this->database, $this->getTableName());
     }
 
-    /**
-     * @param int $rows
-     * @param int $from
-     */
     public function setLimit(int $rows, int $from): void
     {
         parent::setLimit($rows, $from);
@@ -71,9 +59,6 @@ abstract class AbstractDatabaseStore extends AbstractStore
         $this->table->setLimit($rows, $from);
     }
 
-    /**
-     * @return int
-     */
     public function getCount(): int
     {
         $this->table->clearJoin();
@@ -90,9 +75,6 @@ abstract class AbstractDatabaseStore extends AbstractStore
         return (int) $count[0];
     }
 
-    /**
-     * @return string|null
-     */
     protected function getWhere(): ?string
     {
         if (!count($this->where)) {
@@ -102,9 +84,6 @@ abstract class AbstractDatabaseStore extends AbstractStore
         return '(' . implode(') AND (', $this->where) . ')';
     }
 
-    /**
-     * @param array $sort
-     */
     public function setSortByExt(array $sort): void
     {
         $mapping = $this->getOrderMapping();
@@ -141,9 +120,6 @@ abstract class AbstractDatabaseStore extends AbstractStore
         $this->orderBy = implode(', ', $orderBy);
     }
 
-    /**
-     * @return string|null
-     */
     protected function getOrderBy(): ?string
     {
         return $this->orderBy;

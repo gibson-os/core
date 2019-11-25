@@ -9,9 +9,6 @@ use GibsonOS\Core\Exception\GetError;
 class DirService extends AbstractService
 {
     /**
-     * @param string $dir
-     * @param int    $mode
-     *
      * @throws CreateError
      */
     public function create(string $dir, int $mode = 0770): void
@@ -24,12 +21,6 @@ class DirService extends AbstractService
         }
     }
 
-    /**
-     * @param string $dir
-     * @param string $slash
-     *
-     * @return string
-     */
     public function addEndSlash(string $dir, string $slash = DIRECTORY_SEPARATOR): string
     {
         if (mb_strlen($dir) === 0) {
@@ -43,12 +34,6 @@ class DirService extends AbstractService
         return $dir . $slash;
     }
 
-    /**
-     * @param string $dir
-     * @param string $slash
-     *
-     * @return string
-     */
     public function removeEndSlash(string $dir, string $slash = DIRECTORY_SEPARATOR): string
     {
         $slashLength = mb_strlen($slash);
@@ -64,12 +49,6 @@ class DirService extends AbstractService
         return $dir;
     }
 
-    /**
-     * @param string      $path
-     * @param FileService $file
-     *
-     * @return bool
-     */
     public function isWritable(string $path, FileService $file): bool
     {
         $dirs = explode(DIRECTORY_SEPARATOR, $this->removeEndSlash($path));
@@ -81,20 +60,12 @@ class DirService extends AbstractService
         return $file->isWritable($this->addEndSlash(implode(DIRECTORY_SEPARATOR, $dirs)), true);
     }
 
-    /**
-     * @param string $path
-     *
-     * @return string
-     */
     public function escapeForGlob(string $path): string
     {
         return (string) preg_replace('/(\*|\?|\[)/', '[$1]', $path);
     }
 
     /**
-     * @param string $path
-     * @param string $pattern
-     *
      * @throws GetError
      *
      * @return string[]

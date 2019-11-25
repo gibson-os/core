@@ -17,8 +17,6 @@ class DateTimeService extends AbstractService
 
     /**
      * DateTime constructor.
-     *
-     * @param DateTimeZone $timezone
      */
     public function __construct(DateTimeZone $timezone)
     {
@@ -27,8 +25,6 @@ class DateTimeService extends AbstractService
 
     /**
      * @throws DateTimeError
-     *
-     * @return PhpDateTime
      */
     public function new(): PhpDateTime
     {
@@ -36,11 +32,7 @@ class DateTimeService extends AbstractService
     }
 
     /**
-     * @param string $time
-     *
      * @throws DateTimeError
-     *
-     * @return PhpDateTime
      */
     public function get(string $time): PhpDateTime
     {
@@ -55,11 +47,6 @@ class DateTimeService extends AbstractService
         }
     }
 
-    /**
-     * @param DateTimeZone $timezone
-     *
-     * @return DateTimeService
-     */
     public function setTimezone(DateTimeZone $timezone): DateTimeService
     {
         $this->timezone = $timezone;

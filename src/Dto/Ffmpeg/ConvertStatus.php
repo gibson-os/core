@@ -67,8 +67,6 @@ class ConvertStatus implements JsonSerializable
     /**
      * ConvertStatus constructor.
      *
-     * @param string $status
-     *
      * @throws SetError
      */
     public function __construct(string $status)
@@ -76,19 +74,11 @@ class ConvertStatus implements JsonSerializable
         $this->setStatus($status);
     }
 
-    /**
-     * @return int
-     */
     public function getFrame(): int
     {
         return $this->frame;
     }
 
-    /**
-     * @param int $frame
-     *
-     * @return ConvertStatus
-     */
     public function setFrame(int $frame): ConvertStatus
     {
         $this->frame = $frame;
@@ -96,19 +86,11 @@ class ConvertStatus implements JsonSerializable
         return $this;
     }
 
-    /**
-     * @return int
-     */
     public function getFrames(): int
     {
         return $this->frames;
     }
 
-    /**
-     * @param int $frames
-     *
-     * @return ConvertStatus
-     */
     public function setFrames(int $frames): ConvertStatus
     {
         $this->frames = $frames;
@@ -116,19 +98,11 @@ class ConvertStatus implements JsonSerializable
         return $this;
     }
 
-    /**
-     * @return int
-     */
     public function getFps(): int
     {
         return $this->fps;
     }
 
-    /**
-     * @param int $fps
-     *
-     * @return ConvertStatus
-     */
     public function setFps(int $fps): ConvertStatus
     {
         $this->fps = $fps;
@@ -136,19 +110,11 @@ class ConvertStatus implements JsonSerializable
         return $this;
     }
 
-    /**
-     * @return float
-     */
     public function getQuality(): float
     {
         return $this->quality;
     }
 
-    /**
-     * @param float $quality
-     *
-     * @return ConvertStatus
-     */
     public function setQuality(float $quality): ConvertStatus
     {
         $this->quality = $quality;
@@ -156,19 +122,11 @@ class ConvertStatus implements JsonSerializable
         return $this;
     }
 
-    /**
-     * @return int
-     */
     public function getSize(): int
     {
         return $this->size;
     }
 
-    /**
-     * @param int $size
-     *
-     * @return ConvertStatus
-     */
     public function setSize(int $size): ConvertStatus
     {
         $this->size = $size;
@@ -176,19 +134,11 @@ class ConvertStatus implements JsonSerializable
         return $this;
     }
 
-    /**
-     * @return DateTime
-     */
     public function getTime(): DateTime
     {
         return $this->time;
     }
 
-    /**
-     * @param DateTime $time
-     *
-     * @return ConvertStatus
-     */
     public function setTime(DateTime $time): ConvertStatus
     {
         $this->time = $time;
@@ -196,19 +146,11 @@ class ConvertStatus implements JsonSerializable
         return $this;
     }
 
-    /**
-     * @return float
-     */
     public function getBitrate(): float
     {
         return $this->bitrate;
     }
 
-    /**
-     * @param float $bitrate
-     *
-     * @return ConvertStatus
-     */
     public function setBitrate(float $bitrate): ConvertStatus
     {
         $this->bitrate = $bitrate;
@@ -216,9 +158,6 @@ class ConvertStatus implements JsonSerializable
         return $this;
     }
 
-    /**
-     * @return int
-     */
     public function getPercent(): int
     {
         if ($this->getFrames() === 0) {
@@ -239,20 +178,13 @@ class ConvertStatus implements JsonSerializable
         return new DateTime('@' . round(($this->getFrames() - $this->getFrame()) / $this->getFps()));
     }
 
-    /**
-     * @return string
-     */
     public function getStatus(): string
     {
         return $this->status;
     }
 
     /**
-     * @param string $status
-     *
      * @throws SetError
-     *
-     * @return ConvertStatus
      */
     public function setStatus(string $status): ConvertStatus
     {

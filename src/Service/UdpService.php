@@ -36,9 +36,6 @@ class UdpService extends AbstractService
     private $sendPort = 0;
 
     /**
-     * @param string $ip
-     * @param int    $port
-     *
      * @throws CreateError
      * @throws SetError
      */
@@ -62,8 +59,6 @@ class UdpService extends AbstractService
     }
 
     /**
-     * @param int $timeout
-     *
      * @throws SetError
      */
     public function setTimeout(int $timeout = 10)
@@ -78,10 +73,6 @@ class UdpService extends AbstractService
     }
 
     /**
-     * @param string $msg
-     * @param string $ip
-     * @param int    $port
-     *
      * @throws SendError
      */
     public function send(string $msg, string $ip, int $port = 0)
@@ -95,14 +86,7 @@ class UdpService extends AbstractService
     }
 
     /**
-     * @param int         $length
-     * @param string|null $ip
-     * @param int|null    $port
-     * @param int         $flags
-     *
      * @throws ReceiveError
-     *
-     * @return string
      */
     public function receive(int $length, string $ip = null, int $port = null, int $flags = 0): string
     {

@@ -11,9 +11,6 @@ use GibsonOS\Core\Model\Setting as SettingModel;
 class SettingRepository extends AbstractRepository
 {
     /**
-     * @param int $moduleId
-     * @param int $userId
-     *
      * @throws DateTimeError
      * @throws SelectError
      * @throws GetError
@@ -47,15 +44,9 @@ class SettingRepository extends AbstractRepository
     }
 
     /**
-     * @param int    $moduleId
-     * @param int    $userId
-     * @param string $key
-     *
      * @throws DateTimeError
      * @throws GetError
      * @throws SelectError
-     *
-     * @return SettingModel
      */
     public static function getByKey(int $moduleId, int $userId, string $key): SettingModel
     {

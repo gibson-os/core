@@ -7,9 +7,6 @@ use GibsonOS\Core\Service\FlockService;
 
 class FlockFactory extends AbstractSingletonFactory
 {
-    /**
-     * @return FlockService
-     */
     protected static function createInstance(): FlockService
     {
         return new FlockService();

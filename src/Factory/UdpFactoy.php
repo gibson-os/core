@@ -10,13 +10,8 @@ use GibsonOS\Core\Service\UdpService;
 class UdpFactoy
 {
     /**
-     * @param string $ip
-     * @param int    $port
-     *
      * @throws SetError
      * @throws CreateError
-     *
-     * @return UdpService
      */
     public static function create(string $ip, int $port): UdpService
     {

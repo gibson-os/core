@@ -11,8 +11,6 @@ class JsonUtility
      * Wandelt Wert in JSON um.
      *
      * @param mixed $value Wert
-     *
-     * @return string
      */
     public static function encode($value): string
     {
@@ -20,8 +18,6 @@ class JsonUtility
     }
 
     /**
-     * @param string $json
-     *
      * @return mixed
      */
     public static function decode(string $json)
@@ -30,8 +26,6 @@ class JsonUtility
     }
 
     /**
-     * @param string $json
-     *
      * @return mixed
      */
     public static function decodeNotAssoc(string $json)

@@ -23,12 +23,7 @@ class ThumbnailService extends ManipulateService
     ];
 
     /**
-     * @param int $width
-     * @param int $height
-     *
      * @throws CreateError
-     *
-     * @return Image
      */
     public function create(int $width = 544, int $height = 256): Image
     {

@@ -11,8 +11,6 @@ class DateTimeFactory extends AbstractSingletonFactory
 {
     /**
      * @throws GetError
-     *
-     * @return DateTimeService
      */
     protected static function createInstance(): DateTimeService
     {

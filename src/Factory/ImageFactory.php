@@ -7,9 +7,6 @@ use GibsonOS\Core\Service\ImageService;
 
 class ImageFactory extends AbstractSingletonFactory
 {
-    /**
-     * @return ImageService
-     */
     protected static function createInstance(): ImageService
     {
         return new ImageService(FileFactory::create());

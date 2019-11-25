@@ -28,27 +28,16 @@ class Task extends AbstractModel
      */
     private $module;
 
-    /**
-     * @return string
-     */
     public static function getTableName(): string
     {
         return 'task';
     }
 
-    /**
-     * @return int
-     */
     public function getId(): int
     {
         return $this->id;
     }
 
-    /**
-     * @param int $id
-     *
-     * @return Task
-     */
     public function setId(int $id): Task
     {
         $this->id = $id;
@@ -56,19 +45,11 @@ class Task extends AbstractModel
         return $this;
     }
 
-    /**
-     * @return string
-     */
     public function getName(): string
     {
         return $this->name;
     }
 
-    /**
-     * @param string $name
-     *
-     * @return Task
-     */
     public function setName(string $name): Task
     {
         $this->name = $name;
@@ -76,19 +57,11 @@ class Task extends AbstractModel
         return $this;
     }
 
-    /**
-     * @return int
-     */
     public function getModuleId(): int
     {
         return $this->moduleId;
     }
 
-    /**
-     * @param int $moduleId
-     *
-     * @return Task
-     */
     public function setModuleId(int $moduleId): Task
     {
         $this->moduleId = $moduleId;
@@ -99,8 +72,6 @@ class Task extends AbstractModel
     /**
      * @throws DateTimeError
      * @throws SelectError
-     *
-     * @return Module
      */
     public function getModule(): Module
     {
@@ -109,11 +80,6 @@ class Task extends AbstractModel
         return $this->module;
     }
 
-    /**
-     * @param Module $module
-     *
-     * @return Task
-     */
     public function setModule(Module $module): Task
     {
         $this->module = $module;

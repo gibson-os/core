@@ -62,27 +62,17 @@ class Media
 
     /**
      * Media constructor.
-     *
-     * @param string $filename
      */
     public function __construct(string $filename)
     {
         $this->filename = $filename;
     }
 
-    /**
-     * @return string
-     */
     public function getFilename(): string
     {
         return $this->filename;
     }
 
-    /**
-     * @param string $filename
-     *
-     * @return Media
-     */
     public function setFilename(string $filename): Media
     {
         $this->filename = $filename;
@@ -100,8 +90,6 @@ class Media
 
     /**
      * @param Video[] $videoStreams
-     *
-     * @return Media
      */
     public function setVideoStreams(array $videoStreams): Media
     {
@@ -110,12 +98,6 @@ class Media
         return $this;
     }
 
-    /**
-     * @param string $id
-     * @param Video  $videoStream
-     *
-     * @return Media
-     */
     public function setVideoStream(string $id, Video $videoStream): Media
     {
         $this->videoStreams[$id] = $videoStream;
@@ -133,8 +115,6 @@ class Media
 
     /**
      * @param Audio[] $audioStreams
-     *
-     * @return Media
      */
     public function setAudioStreams(array $audioStreams): Media
     {
@@ -143,12 +123,6 @@ class Media
         return $this;
     }
 
-    /**
-     * @param string $id
-     * @param Audio  $audioStream
-     *
-     * @return Media
-     */
     public function setAudioStream(string $id, Audio $audioStream): Media
     {
         $this->audioStreams[$id] = $audioStream;
@@ -166,8 +140,6 @@ class Media
 
     /**
      * @param Subtitle[] $subtitleStreams
-     *
-     * @return Media
      */
     public function setSubtitleStreams(array $subtitleStreams): Media
     {
@@ -176,12 +148,6 @@ class Media
         return $this;
     }
 
-    /**
-     * @param string   $id
-     * @param Subtitle $subtitleStream
-     *
-     * @return Media
-     */
     public function setSubtitleStream(string $id, Subtitle $subtitleStream): Media
     {
         $this->subtitleStreams[$id] = $subtitleStream;
@@ -189,43 +155,26 @@ class Media
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
     public function getSelectedAudioStreamId(): ?string
     {
         return $this->selectedAudioStreamId;
     }
 
-    /**
-     * @return string|null
-     */
     public function getSelectedVideoStreamId(): ?string
     {
         return $this->selectedVideoStreamId;
     }
 
-    /**
-     * @return string|null
-     */
     public function getSelectedSubtitleStreamId(): ?string
     {
         return $this->selectedSubtitleStreamId;
     }
 
-    /**
-     * @return float
-     */
     public function getDuration(): float
     {
         return $this->duration;
     }
 
-    /**
-     * @param float $duration
-     *
-     * @return Media
-     */
     public function setDuration(float $duration): Media
     {
         $this->duration = $duration;
@@ -233,19 +182,11 @@ class Media
         return $this;
     }
 
-    /**
-     * @return int
-     */
     public function getFrames(): int
     {
         return $this->frames;
     }
 
-    /**
-     * @param int $frames
-     *
-     * @return Media
-     */
     public function setFrames(int $frames): Media
     {
         $this->frames = $frames;
@@ -253,19 +194,11 @@ class Media
         return $this;
     }
 
-    /**
-     * @return int
-     */
     public function getBitRate(): int
     {
         return $this->bitRate;
     }
 
-    /**
-     * @param int $bitRate
-     *
-     * @return Media
-     */
     public function setBitRate(int $bitRate): Media
     {
         $this->bitRate = $bitRate;
@@ -273,57 +206,36 @@ class Media
         return $this;
     }
 
-    /**
-     * @return Audio
-     */
     public function getSelectedAudioStream(): Audio
     {
         return $this->audioStreams[$this->selectedAudioStreamId];
     }
 
-    /**
-     * @return Video
-     */
     public function getSelectedVideoStream(): Video
     {
         return $this->videoStreams[$this->selectedVideoStreamId];
     }
 
-    /**
-     * @return Subtitle
-     */
     public function getSelectedSubtitleStream(): Subtitle
     {
         return $this->subtitleStreams[$this->selectedSubtitleStreamId];
     }
 
-    /**
-     * @return bool
-     */
     public function hasAudio(): bool
     {
         return (bool) count($this->getAudioStreams());
     }
 
-    /**
-     * @return bool
-     */
     public function hasVideo(): bool
     {
         return (bool) count($this->getVideoStreams());
     }
 
-    /**
-     * @return bool
-     */
     public function hasSubtitle(): bool
     {
         return (bool) count($this->getSubtitleStreams());
     }
 
-    /**
-     * @param string $streamId
-     */
     public function selectAudioStream(string $streamId)
     {
         if (!isset($this->audioStreams[$streamId])) {
@@ -333,9 +245,6 @@ class Media
         $this->selectedAudioStreamId = $streamId;
     }
 
-    /**
-     * @param string $streamId
-     */
     public function selectSubtitleStream(string $streamId)
     {
         if (!isset($this->subtitleStreams[$streamId])) {
@@ -345,9 +254,6 @@ class Media
         $this->selectedSubtitleStreamId = $streamId;
     }
 
-    /**
-     * @param string $streamId
-     */
     public function selectVideoStream(string $streamId)
     {
         if (!isset($this->videoStreams[$streamId])) {

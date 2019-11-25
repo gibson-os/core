@@ -8,16 +8,6 @@ use GibsonOS\Core\Service\ImageService;
 
 class DrawService extends ImageService
 {
-    /**
-     * @param ImageDto $image
-     * @param int      $color
-     * @param int      $startX
-     * @param int      $startY
-     * @param int      $stopX
-     * @param int      $stopY
-     *
-     * @return bool
-     */
     public function filledRectangle(
         ImageDto $image,
         int $color,
@@ -39,17 +29,6 @@ class DrawService extends ImageService
 
     /**
      * Schreibt einen Text in das Bild.
-     *
-     * @param ImageDto $image
-     * @param string   $text
-     * @param int      $color
-     * @param string   $fontFile
-     * @param int      $size
-     * @param int      $startX
-     * @param int      $startY
-     * @param int      $angle
-     *
-     * @return array
      */
     public function setTtfText(
         ImageDto $image,
@@ -70,13 +49,6 @@ class DrawService extends ImageService
 
     /**
      * Schreibt einen Text in das Bild.
-     *
-     * @param string $text
-     * @param string $fontFile
-     * @param int    $size
-     * @param int    $angle
-     *
-     * @return array
      */
     public function setTfbBox(string $text, string $fontFile, int $size, int $angle = 0): array
     {

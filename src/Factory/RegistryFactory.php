@@ -10,9 +10,6 @@ use GibsonOS\Core\Service\RegistryService;
  */
 class RegistryFactory extends AbstractSingletonFactory
 {
-    /**
-     * @return RegistryService
-     */
     protected static function createInstance(): RegistryService
     {
         return new RegistryService();

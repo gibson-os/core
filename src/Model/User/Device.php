@@ -54,27 +54,16 @@ class Device extends AbstractModel
         $this->user = new User();
     }
 
-    /**
-     * @return string
-     */
     public static function getTableName(): string
     {
         return 'user_device';
     }
 
-    /**
-     * @return string
-     */
     public function getId(): string
     {
         return $this->id;
     }
 
-    /**
-     * @param string $id
-     *
-     * @return Device
-     */
     public function setId(string $id): Device
     {
         $this->id = $id;
@@ -82,19 +71,11 @@ class Device extends AbstractModel
         return $this;
     }
 
-    /**
-     * @return int
-     */
     public function getUserId(): int
     {
         return $this->userId;
     }
 
-    /**
-     * @param int $userId
-     *
-     * @return Device
-     */
     public function setUserId(int $userId): Device
     {
         $this->userId = $userId;
@@ -102,19 +83,11 @@ class Device extends AbstractModel
         return $this;
     }
 
-    /**
-     * @return string
-     */
     public function getModel(): string
     {
         return $this->model;
     }
 
-    /**
-     * @param string $model
-     *
-     * @return Device
-     */
     public function setModel(string $model): Device
     {
         $this->model = $model;
@@ -122,19 +95,11 @@ class Device extends AbstractModel
         return $this;
     }
 
-    /**
-     * @return string
-     */
     public function getRegistrationId(): string
     {
         return $this->registrationId;
     }
 
-    /**
-     * @param string $registrationId
-     *
-     * @return Device
-     */
     public function setRegistrationId(string $registrationId): Device
     {
         $this->registrationId = $registrationId;
@@ -142,19 +107,11 @@ class Device extends AbstractModel
         return $this;
     }
 
-    /**
-     * @return DateTime
-     */
     public function getLastLogin(): DateTime
     {
         return $this->lastLogin;
     }
 
-    /**
-     * @param DateTime $lastLogin
-     *
-     * @return Device
-     */
     public function setLastLogin(DateTime $lastLogin): Device
     {
         $this->lastLogin = $lastLogin;
@@ -162,19 +119,11 @@ class Device extends AbstractModel
         return $this;
     }
 
-    /**
-     * @return DateTime
-     */
     public function getAdded(): DateTime
     {
         return $this->added;
     }
 
-    /**
-     * @param DateTime $added
-     *
-     * @return Device
-     */
     public function setAdded(DateTime $added): Device
     {
         $this->added = $added;
@@ -196,8 +145,6 @@ class Device extends AbstractModel
     }
 
     /**
-     * @param User $user
-     *
      * @return Device
      */
     public function setUser(User $user)

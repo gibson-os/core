@@ -11,13 +11,9 @@ use GibsonOS\Core\Model\Module as ModuleModel;
 class ModuleRepository extends AbstractRepository
 {
     /**
-     * @param string $name
-     *
      * @throws SelectError
      * @throws DateTimeError
      * @throws GetError
-     *
-     * @return ModuleModel
      */
     public static function getByName(string $name): ModuleModel
     {

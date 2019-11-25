@@ -8,9 +8,6 @@ use GibsonOS\Core\Service\File\TypeService;
 
 class TypeFactory extends AbstractSingletonFactory
 {
-    /**
-     * @return TypeService
-     */
     protected static function createInstance(): TypeService
     {
         return new TypeService();

@@ -9,9 +9,6 @@ use GibsonOS\Core\Service\Image\DrawService;
 
 class DrawFactory extends AbstractSingletonFactory
 {
-    /**
-     * @return DrawService
-     */
     protected static function createInstance(): DrawService
     {
         return new DrawService(FileFactory::create());

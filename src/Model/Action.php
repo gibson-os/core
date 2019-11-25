@@ -47,27 +47,16 @@ class Action extends AbstractModel
         $this->task = new Task();
     }
 
-    /**
-     * @return string
-     */
     public static function getTableName(): string
     {
         return 'action';
     }
 
-    /**
-     * @return int
-     */
     public function getId(): int
     {
         return $this->id;
     }
 
-    /**
-     * @param int $id
-     *
-     * @return Action
-     */
     public function setId(int $id): Action
     {
         $this->id = $id;
@@ -75,19 +64,11 @@ class Action extends AbstractModel
         return $this;
     }
 
-    /**
-     * @return string
-     */
     public function getName(): string
     {
         return $this->name;
     }
 
-    /**
-     * @param string $name
-     *
-     * @return Action
-     */
     public function setName(string $name): Action
     {
         $this->name = $name;
@@ -95,19 +76,11 @@ class Action extends AbstractModel
         return $this;
     }
 
-    /**
-     * @return int
-     */
     public function getModuleId(): int
     {
         return $this->moduleId;
     }
 
-    /**
-     * @param int $moduleId
-     *
-     * @return Action
-     */
     public function setModuleId(int $moduleId): Action
     {
         $this->moduleId = $moduleId;
@@ -115,19 +88,11 @@ class Action extends AbstractModel
         return $this;
     }
 
-    /**
-     * @return int
-     */
     public function getTaskId(): int
     {
         return $this->taskId;
     }
 
-    /**
-     * @param int $taskId
-     *
-     * @return Action
-     */
     public function setTaskId(int $taskId): Action
     {
         $this->taskId = $taskId;
@@ -138,8 +103,6 @@ class Action extends AbstractModel
     /**
      * @throws DateTimeError
      * @throws SelectError
-     *
-     * @return Module
      */
     public function getModule(): Module
     {
@@ -148,11 +111,6 @@ class Action extends AbstractModel
         return $this->module;
     }
 
-    /**
-     * @param Module $module
-     *
-     * @return Action
-     */
     public function setModule(Module $module): Action
     {
         $this->module = $module;
@@ -163,8 +121,6 @@ class Action extends AbstractModel
     /**
      * @throws DateTimeError
      * @throws SelectError
-     *
-     * @return Task
      */
     public function getTask(): Task
     {
@@ -173,11 +129,6 @@ class Action extends AbstractModel
         return $this->task;
     }
 
-    /**
-     * @param Task $task
-     *
-     * @return Action
-     */
     public function setTask(Task $task): Action
     {
         $this->task = $task;
