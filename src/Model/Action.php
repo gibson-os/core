@@ -136,10 +136,15 @@ class Action extends AbstractModel
     }
 
     /**
+     * @throws DateTimeError
+     * @throws SelectError
+     *
      * @return Module
      */
     public function getModule(): Module
     {
+        $this->loadForeignRecord($this->module, $this->getModuleId());
+
         return $this->module;
     }
 
@@ -156,10 +161,15 @@ class Action extends AbstractModel
     }
 
     /**
+     * @throws DateTimeError
+     * @throws SelectError
+     *
      * @return Task
      */
     public function getTask(): Task
     {
+        $this->loadForeignRecord($this->task, $this->getTaskId());
+
         return $this->task;
     }
 
@@ -171,32 +181,6 @@ class Action extends AbstractModel
     public function setTask(Task $task): Action
     {
         $this->task = $task;
-
-        return $this;
-    }
-
-    /**
-     * @throws SelectError
-     * @throws DateTimeError
-     *
-     * @return Action
-     */
-    public function loadModule(): Action
-    {
-        $this->loadForeignRecord($this->getModule(), $this->getModuleId());
-
-        return $this;
-    }
-
-    /**
-     * @throws DateTimeError
-     * @throws SelectError
-     *
-     * @return Action
-     */
-    public function loadTask(): Action
-    {
-        $this->loadForeignRecord($this->getTask(), $this->getTaskId());
 
         return $this;
     }

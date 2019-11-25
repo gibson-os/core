@@ -136,10 +136,15 @@ class Setting extends AbstractModel
     }
 
     /**
+     * @throws DateTimeError
+     * @throws SelectError
+     *
      * @return User
      */
     public function getUser(): User
     {
+        $this->loadForeignRecord($this->user, $this->getUserId());
+
         return $this->user;
     }
 
@@ -152,19 +157,6 @@ class Setting extends AbstractModel
     {
         $this->user = $user;
         $this->setUserId($user->getId());
-
-        return $this;
-    }
-
-    /**
-     * @throws SelectError
-     * @throws DateTimeError
-     *
-     * @return Setting
-     */
-    public function loadUser(): Setting
-    {
-        $this->loadForeignRecord($this->getUser(), $this->getUserId());
 
         return $this;
     }

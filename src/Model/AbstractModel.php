@@ -221,7 +221,7 @@ abstract class AbstractModel implements ModelInterface
      * @throws DateTimeError
      * @throws SelectError
      */
-    protected function loadForeignRecord(AbstractModel $model, $value, string $foreignField = 'id')
+    protected function loadForeignRecord(AbstractModel $model, $value, string $foreignField = 'id'): void
     {
         $fieldName = $this->transformFieldName($foreignField);
 
@@ -234,10 +234,7 @@ abstract class AbstractModel implements ModelInterface
         $mysqlTable->setLimit(1);
 
         if (!$mysqlTable->select()) {
-            $exception = new SelectError('Fremd Eintrag `' . $model->getTableName() . '`.`' . $foreignField . '`=' . $value . ' konnte nicht geladen werden!');
-            $exception->setTable($mysqlTable);
-
-            throw $exception;
+            return;
         }
 
         $model->loadFromMysqlTable($mysqlTable);
