@@ -115,6 +115,7 @@
       <path value="$PROJECT_DIR$/vendor/php-mock/php-mock-integration" />
       <path value="$PROJECT_DIR$/vendor/php-mock/php-mock-phpunit" />
       <path value="$PROJECT_DIR$/vendor/php-mock/php-mock" />
+      <path value="$PROJECT_DIR$/vendor/sebastianfeldmann/camino" />
     </include_path>
   </component>
   <component name="PhpProjectSharedConfiguration" php_language_level="7.2" />
