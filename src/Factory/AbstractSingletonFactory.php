@@ -17,7 +17,7 @@ abstract class AbstractSingletonFactory implements FactoryInterface
         $class = get_called_class();
 
         if (!isset(self::$instances[$class])) {
-            self::$instances[$class] = self::createInstance();
+            self::$instances[$class] = static::createInstance();
         }
 
         return self::$instances[$class];
