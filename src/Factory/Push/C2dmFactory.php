@@ -6,7 +6,7 @@ namespace GibsonOS\Core\Factory\Push;
 use GibsonOS\Core\Factory\AbstractSingletonFactory;
 use GibsonOS\Core\Service\Push\C2DmService;
 
-class C2dm extends AbstractSingletonFactory
+class C2DmFactory extends AbstractSingletonFactory
 {
     protected static function createInstance(): C2dmService
     {
