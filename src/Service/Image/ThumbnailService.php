@@ -33,7 +33,7 @@ class ThumbnailService extends ManipulateService
         foreach (self::POSITIONS as $size => $position) {
             $imageClone = clone $image;
             $this->resizeCentered($imageClone, $size, $size);
-            $images[$size] = $image;
+            $images[$size] = $imageClone;
         }
 
         $thumbnail = $this->create($width, $height);
