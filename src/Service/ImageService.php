@@ -126,7 +126,7 @@ class ImageService extends AbstractService
         }
 
         if (!is_resource($image)) {
-            throw new LoadError(sprintf('Bild "%s" konnte nciht geladen werden!', $filename));
+            throw new LoadError(sprintf('Bild "%s" konnte nicht geladen werden!', $filename));
         }
 
         $Image = (new Image($image))
@@ -266,5 +266,22 @@ class ImageService extends AbstractService
     public function fill(Image $image, int $color, int $x = 0, int $y = 0): bool
     {
         return imagefill($image->getResource(), $x, $y, $color);
+    }
+
+    /**
+     * @throws CreateError
+     */
+    public function cloneImage(Image $image): Image
+    {
+        $width = $this->getWidth($image);
+        $height = $this->getHeight($image);
+
+        $newImage = $this->create($width, $height);
+        imagecopy($newImage->getResource(), $image->getResource(), 0, 0, 0, 0, $width, $height);
+
+        $newImage->setFilename($image->getFilename());
+        $newImage->setQuality($image->getQuality());
+
+        return $newImage;
     }
 }

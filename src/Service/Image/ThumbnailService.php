@@ -31,12 +31,13 @@ class ThumbnailService extends ManipulateService
         $images = [];
 
         foreach (self::POSITIONS as $size => $position) {
-            $imageClone = clone $image;
+            $imageClone = $this->cloneImage($image);
             $this->resizeCentered($imageClone, $size, $size);
             $images[$size] = $imageClone;
         }
 
         $thumbnail = $this->create($width, $height);
+        $this->fillTransparent($thumbnail);
 
         foreach (self::POSITIONS as $size => $position) {
             $this->copy($images[$size], $thumbnail, $position);

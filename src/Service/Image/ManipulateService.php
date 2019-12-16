@@ -89,17 +89,23 @@ class ManipulateService extends DrawService
     /**
      * @throws CreateError
      */
-    public function verticalCentered(Image $image, int $width, int $height): Image
+    public function verticalCentered(Image $image, int $width, int $height): bool
     {
         $manipulate = $this->create($width, $height);
-        $this->copy(
+        $this->fillTransparent($manipulate);
+
+        if ($this->copy(
             $image,
             $manipulate,
             0,
-            ($height - $this->getHeight($image)) / 2
-        );
+            (int) (($height - $this->getHeight($image)) / 2)
+        ) === false) {
+            return false;
+        }
 
-        return $manipulate;
+        $image->setResource($manipulate->getResource());
+
+        return true;
     }
 
     /**
@@ -108,11 +114,12 @@ class ManipulateService extends DrawService
     public function horizontalCentered(Image $image, int $width, int $height): bool
     {
         $manipulate = $this->create($width, $height);
+        $this->fillTransparent($manipulate);
 
         if ($this->copy(
             $image,
             $manipulate,
-            ($width - $this->getWidth($image)) / 2
+            (int) (($width - $this->getWidth($image)) / 2)
         ) === false) {
             return false;
         }
