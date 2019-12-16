@@ -264,9 +264,6 @@ class Media implements JsonSerializable
         $this->selectedVideoStreamId = $streamId;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function jsonSerialize(): array
     {
         return [

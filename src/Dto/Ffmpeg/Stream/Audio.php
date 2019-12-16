@@ -112,9 +112,6 @@ class Audio implements JsonSerializable
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function jsonSerialize(): array
     {
         return [

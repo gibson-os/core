@@ -201,10 +201,7 @@ class ConvertStatus implements JsonSerializable
         return $this;
     }
 
-    /**
-     * @return array|mixed
-     */
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         if ($this->status === self::STATUS_GENERATE) {
             return [
