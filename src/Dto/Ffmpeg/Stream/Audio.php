@@ -3,7 +3,9 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Dto\Ffmpeg\Stream;
 
-class Audio
+use JsonSerializable;
+
+class Audio implements JsonSerializable
 {
     /**
      * @var string|null
@@ -28,7 +30,7 @@ class Audio
     /**
      * @var string|null
      */
-    private $bitrate;
+    private $bitRate;
 
     /**
      * @var bool
@@ -86,14 +88,14 @@ class Audio
         return $this;
     }
 
-    public function getBitrate(): ?string
+    public function getBitRate(): ?string
     {
-        return $this->bitrate;
+        return $this->bitRate;
     }
 
-    public function setBitrate(?string $bitrate): Audio
+    public function setBitRate(?string $bitRate): Audio
     {
-        $this->bitrate = $bitrate;
+        $this->bitRate = $bitRate;
 
         return $this;
     }
@@ -108,5 +110,20 @@ class Audio
         $this->default = $default;
 
         return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function jsonSerialize(): array
+    {
+        return [
+            'language' => $this->getLanguage(),
+            'format' => $this->getFormat(),
+            'frequency' => $this->getFrequency(),
+            'channels' => $this->getChannels(),
+            'bitRate' => $this->getBitRate(),
+            'default' => $this->isDefault(),
+        ];
     }
 }

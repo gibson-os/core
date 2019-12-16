@@ -233,7 +233,7 @@ class MediaService
             ->setFormat(isset($properties[0]) ? trim($properties[0]) : null)
             ->setFrequency(isset($properties[1]) ? trim($properties[1]) : null)
             ->setChannels(isset($properties[2]) ? trim($properties[2]) : null)
-            ->setBitrate(isset($properties[4]) ? trim($properties[4]) : null);
+            ->setBitRate(isset($properties[4]) ? trim($properties[4]) : null);
         $media->setAudioStream($streamId, $stream);
 
         if (mb_stripos($options, '(default)')) {

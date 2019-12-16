@@ -7,8 +7,9 @@ use GibsonOS\Core\Dto\Ffmpeg\Stream\Audio;
 use GibsonOS\Core\Dto\Ffmpeg\Stream\Subtitle;
 use GibsonOS\Core\Dto\Ffmpeg\Stream\Video;
 use InvalidArgumentException;
+use JsonSerializable;
 
-class Media
+class Media implements JsonSerializable
 {
     /**
      * @var string
@@ -261,5 +262,24 @@ class Media
         }
 
         $this->selectedVideoStreamId = $streamId;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function jsonSerialize(): array
+    {
+        return [
+            'filename' => $this->getFilename(),
+            'videoStreams' => $this->getVideoStreams(),
+            'audioStreams' => $this->getAudioStreams(),
+            'subtitleStreams' => $this->getSubtitleStreams(),
+            'selectedAudioStreamId' => $this->getSelectedAudioStreamId(),
+            'selectedVideoStreamId' => $this->getSelectedVideoStreamId(),
+            'selectedSubtitleStreamId' => $this->getSelectedSubtitleStreamId(),
+            'duration' => $this->getDuration(),
+            'frames' => $this->getFrames(),
+            'bitRate' => $this->getBitRate(),
+        ];
     }
 }

@@ -10,7 +10,7 @@ class Audio
     public static function create(): AudioDto
     {
         return (new AudioDto())
-            ->setBitrate('bitrate')
+            ->setBitRate('bitrate')
             ->setChannels('channels')
             ->setDefault(false)
             ->setFormat('format')
