@@ -3,7 +3,9 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Dto\Ffmpeg\Stream;
 
-class Subtitle
+use JsonSerializable;
+
+class Subtitle implements JsonSerializable
 {
     /**
      * @var string|null
@@ -54,5 +56,14 @@ class Subtitle
         $this->forced = $forced;
 
         return $this;
+    }
+
+    public function jsonSerialize(): array
+    {
+        return [
+            'language' => $this->getLanguage(),
+            'default' => $this->isDefault(),
+            'forced' => $this->isForced(),
+        ];
     }
 }

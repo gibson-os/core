@@ -3,7 +3,9 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Dto\Ffmpeg\Stream;
 
-class Video
+use JsonSerializable;
+
+class Video implements JsonSerializable
 {
     /**
      * @var string|null
@@ -122,5 +124,18 @@ class Video
         $this->default = $default;
 
         return $this;
+    }
+
+    public function jsonSerialize(): array
+    {
+        return [
+            'language' => $this->getLanguage(),
+            'codec' => $this->getCodec(),
+            'colorSpace' => $this->getColorSpace(),
+            'width' => $this->getWidth(),
+            'height' => $this->getHeight(),
+            'fps' => $this->getFps(),
+            'default' => $this->isDefault(),
+        ];
     }
 }
