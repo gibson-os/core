@@ -237,31 +237,37 @@ class Media implements JsonSerializable
         return (bool) count($this->getSubtitleStreams());
     }
 
-    public function selectAudioStream(string $streamId)
+    public function selectAudioStream(string $streamId): Media
     {
         if (!isset($this->audioStreams[$streamId])) {
             throw new InvalidArgumentException('Audio Stream (' . $streamId . ') existiert nicht!');
         }
 
         $this->selectedAudioStreamId = $streamId;
+
+        return $this;
     }
 
-    public function selectSubtitleStream(string $streamId)
+    public function selectSubtitleStream(string $streamId): Media
     {
         if (!isset($this->subtitleStreams[$streamId])) {
             throw new InvalidArgumentException('Subtitle Stream (' . $streamId . ') existiert nicht!');
         }
 
         $this->selectedSubtitleStreamId = $streamId;
+
+        return $this;
     }
 
-    public function selectVideoStream(string $streamId)
+    public function selectVideoStream(string $streamId): Media
     {
         if (!isset($this->videoStreams[$streamId])) {
             throw new InvalidArgumentException('Video Stream (' . $streamId . ') existiert nciht!');
         }
 
         $this->selectedVideoStreamId = $streamId;
+
+        return $this;
     }
 
     public function jsonSerialize(): array

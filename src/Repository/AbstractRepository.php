@@ -55,10 +55,7 @@ class AbstractRepository
         return $database->getRegexString($search);
     }
 
-    /**
-     * @param string $glue
-     */
-    protected static function implode(array $pieces, $glue = ',', mysqlDatabase $database = null): string
+    protected static function implode(array $pieces, string $glue = ',', mysqlDatabase $database = null): string
     {
         $database = self::getDatabase($database);
 
