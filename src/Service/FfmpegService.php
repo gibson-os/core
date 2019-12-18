@@ -109,7 +109,7 @@ class FfmpegService extends AbstractService
         ) {
             $optionString .=
                 '-map ' . $media->getSelectedAudioStreamId() . ' ' .
-                '-c:a ' . escapeshellarg((string) $audioCodec) . ' ';
+                '-c:a ' . escapeshellarg($audioCodec) . ' ';
         }
 
         if (
@@ -118,7 +118,7 @@ class FfmpegService extends AbstractService
         ) {
             $optionString .=
                 '-map ' . $media->getSelectedVideoStreamId() . ' ' .
-                '-c:v ' . escapeshellarg((string) $videoCodec) . ' ';
+                '-c:v ' . escapeshellarg($videoCodec) . ' ';
 
             if ($media->getSelectedSubtitleStreamId() !== null) {
                 $subtitleStreamIds = array_keys($media->getSubtitleStreams());
@@ -129,7 +129,7 @@ class FfmpegService extends AbstractService
         }
 
         foreach ($options as $key => $option) {
-            $optionString .= '-' . $key . ' ' . escapeshellarg($option) . ' ';
+            $optionString .= '-' . $key . ' ' . escapeshellarg((string) $option) . ' ';
         }
 
         $filename = 'ffmpeg' . $this->file->getFilename($outputFilename);
