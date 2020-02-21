@@ -145,7 +145,9 @@ class FfmpegService extends AbstractService
         $this->file->delete(sys_get_temp_dir(), $filename);
 
         if (!$this->file->exists($outputFilename)) {
-            throw new FileNotFound('Konvertieren war nicht erfolgreich!');
+            throw new FileNotFound(
+                sprintf('Konvertieren war nicht erfolgreich! Datei %s existiert nicht!', $outputFilename)
+            );
         }
     }
 
