@@ -13,22 +13,22 @@ class Setting extends AbstractModel
     /**
      * @var int
      */
-    private $userId;
+    private $userId = 0;
 
     /**
      * @var int
      */
-    private $moduleId;
+    private $moduleId = 0;
 
     /**
      * @var string
      */
-    private $key;
+    private $key = '';
 
     /**
      * @var string
      */
-    private $value;
+    private $value = '';
 
     /**
      * @var User
@@ -112,7 +112,7 @@ class Setting extends AbstractModel
     public function setUser(User $user): Setting
     {
         $this->user = $user;
-        $this->setUserId($user->getId());
+        $this->setUserId($user->getId() ?? 0);
 
         return $this;
     }

@@ -56,7 +56,7 @@ class RegistryService extends AbstractService
     /**
      * @param mixed $value
      */
-    public function set(string $key, $value)
+    public function set(string $key, $value): void
     {
         $this->registry[$key] = $value;
     }

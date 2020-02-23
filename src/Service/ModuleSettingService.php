@@ -14,7 +14,7 @@ use GibsonOS\Core\Repository\SettingRepository;
 class ModuleSettingService extends AbstractService
 {
     /**
-     * @var Setting[][]
+     * @var Setting[][]|Setting[][][]
      */
     private $moduleSettings = [];
 
@@ -76,8 +76,8 @@ class ModuleSettingService extends AbstractService
 
         $settings = $this->loadSettings($moduleId, $userId, $key);
 
-        if (null === $key) {
-            $this->moduleSettings[$moduleId][$userId] = $settings;
+        if ($key === null) {
+            $this->moduleSettings[$moduleId][$userId ?? 0] = $settings;
         }
 
         return $settings;
@@ -89,7 +89,7 @@ class ModuleSettingService extends AbstractService
      * @throws SaveError
      * @throws SelectError
      */
-    public function setByRegistry(string $key, string $value, int $userId = null)
+    public function setByRegistry(string $key, string $value, int $userId = null): void
     {
         $this->setByName($this->getModuleNameByRegistry(), $key, $value, $userId);
     }
@@ -100,7 +100,7 @@ class ModuleSettingService extends AbstractService
      * @throws SaveError
      * @throws SelectError
      */
-    public function setByName(string $moduleName, string $key, string $value, int $userId = null)
+    public function setByName(string $moduleName, string $key, string $value, int $userId = null): void
     {
         $this->setById($this->getModuleIdByName($moduleName), $key, $value, $userId);
     }
@@ -110,7 +110,7 @@ class ModuleSettingService extends AbstractService
      * @throws GetError
      * @throws SaveError
      */
-    public function setById(int $moduleId, string $key, string $value, int $userId = null)
+    public function setById(int $moduleId, string $key, string $value, int $userId = null): void
     {
         $settingModel = new Setting();
         $settingModel->setModuleId($moduleId);
@@ -137,7 +137,7 @@ class ModuleSettingService extends AbstractService
     {
         $moduleModel = ModuleRepository::getByName($name);
 
-        return $moduleModel->getId();
+        return $moduleModel->getId() ?? 0;
     }
 
     /**
@@ -150,7 +150,7 @@ class ModuleSettingService extends AbstractService
     private function loadSettings(int $moduleId, int $userId = null, string $key = null)
     {
         // User ID holen
-        if (null === $userId) {
+        if ($userId === null) {
             if ($this->registry->exists('session')) {
                 $userId = $this->registry->get('session')->getValueInt('user_id', 0, false);
             } else {
@@ -158,7 +158,7 @@ class ModuleSettingService extends AbstractService
             }
         }
 
-        if (null === $key) {
+        if ($key === null) {
             return SettingRepository::getAll($moduleId, $userId);
         }
 

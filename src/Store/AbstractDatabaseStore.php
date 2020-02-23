@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Store;
 
+use GibsonOS\Core\Exception\CreateError;
+use GibsonOS\Core\Exception\GetError;
 use mysqlDatabase;
 use mysqlRegistry;
 use mysqlTable;
@@ -39,14 +41,18 @@ abstract class AbstractDatabaseStore extends AbstractStore
     abstract protected function getOrderMapping(): array;
 
     /**
-     * Core_Abstract_Store constructor.
+     * @throws CreateError
      */
     public function __construct(mysqlDatabase $database = null)
     {
-        if (null === $database) {
+        if ($database === null) {
             $this->database = mysqlRegistry::getInstance()->get('database');
         } else {
             $this->database = $database;
+        }
+
+        if (!$this->database instanceof mysqlDatabase) {
+            throw new CreateError('Kein Datenbank Objekt vorhanden!');
         }
 
         $this->table = new mysqlTable($this->database, $this->getTableName());
@@ -59,6 +65,9 @@ abstract class AbstractDatabaseStore extends AbstractStore
         $this->table->setLimit($rows, $from);
     }
 
+    /**
+     * @throws GetError
+     */
     public function getCount(): int
     {
         $this->table->clearJoin();
@@ -71,6 +80,13 @@ abstract class AbstractDatabaseStore extends AbstractStore
             $this->getRows() === 0 ? null : $this->getRows(),
             $this->getFrom() === 0 ? null : $this->getFrom()
         );
+
+        if (
+            empty($count) ||
+            !isset($count[0])
+        ) {
+            throw new GetError('Anzahl konnte nicht ermittelt werden!');
+        }
 
         return (int) $count[0];
     }
@@ -88,10 +104,7 @@ abstract class AbstractDatabaseStore extends AbstractStore
     {
         $mapping = $this->getOrderMapping();
 
-        if (
-            !is_array($sort) ||
-            count($mapping) === 0
-        ) {
+        if (count($mapping) === 0) {
             $this->orderBy = null;
 
             return;
@@ -117,7 +130,7 @@ abstract class AbstractDatabaseStore extends AbstractStore
             $orderBy[] = $order;
         }
 
-        $this->orderBy = implode(', ', $orderBy);
+        $this->orderBy = empty($orderBy) ? null : implode(', ', $orderBy);
     }
 
     protected function getOrderBy(): ?string

@@ -6,21 +6,21 @@ namespace GibsonOS\Core\Model;
 class Module extends AbstractModel
 {
     /**
-     * @var int
+     * @var int|null
      */
     private $id;
 
     /**
      * @var string
      */
-    private $name;
+    private $name = '';
 
     public static function getTableName(): string
     {
         return 'module';
     }
 
-    public function getId(): int
+    public function getId(): ?int
     {
         return $this->id;
     }

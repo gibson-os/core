@@ -81,7 +81,7 @@ abstract class AbstractModel implements ModelInterface
     /**
      * @throws DateTimeError
      */
-    public function loadFromMysqlTable(mysqlTable $mysqlTable)
+    public function loadFromMysqlTable(mysqlTable $mysqlTable): void
     {
         foreach ($mysqlTable->fields as $field) {
             $fieldName = $this->transformFieldName($field);
@@ -123,7 +123,7 @@ abstract class AbstractModel implements ModelInterface
     /**
      * @throws DateTimeError
      */
-    public function setToMysqlTable(mysqlTable $mysqlTable)
+    public function setToMysqlTable(mysqlTable $mysqlTable): void
     {
         foreach ($mysqlTable->fields as $field) {
             $fieldName = $this->transformFieldName($field);
@@ -152,7 +152,7 @@ abstract class AbstractModel implements ModelInterface
      * @throws SaveError
      * @throws DateTimeError
      */
-    public function save(mysqlTable $mysqlTable = null)
+    public function save(mysqlTable $mysqlTable = null): void
     {
         if (null === $mysqlTable) {
             $mysqlTable = new mysqlTable($this->database, $this->getTableName());
@@ -175,7 +175,7 @@ abstract class AbstractModel implements ModelInterface
      * @throws DeleteError
      * @throws DateTimeError
      */
-    public function delete(mysqlTable $mysqlTable = null)
+    public function delete(mysqlTable $mysqlTable = null): void
     {
         if (null === $mysqlTable) {
             $mysqlTable = new mysqlTable($this->database, $this->getTableName());
@@ -241,6 +241,7 @@ abstract class AbstractModel implements ModelInterface
 
         do {
             /** @var AbstractModel $model */
+            /** @psalm-suppress InvalidStringClass */
             $model = new $modelClassName();
             $model->loadFromMysqlTable($mysqlTable);
             $models[] = $model;

@@ -16,7 +16,7 @@ class C2DmService implements PushInterface
     /**
      * @param User[] $users
      */
-    public function send($users)
+    public function send(array $users): void
     {
         // TODO: Implement send() method.
     }

@@ -11,14 +11,14 @@ class FlockService extends AbstractService
     /**
      * @var resource[]
      */
-    private $flocks;
+    private $flocks = [];
 
     /**
      * @param string|null $name
      *
      * @throws FlockError
      */
-    public function flock($name = null)
+    public function flock($name = null): void
     {
         $name = $this->getName($name);
 
@@ -52,7 +52,7 @@ class FlockService extends AbstractService
      *
      * @throws UnFlockError
      */
-    public function unFlock($name = null)
+    public function unFlock($name = null): void
     {
         $name = $this->getName($name);
 
@@ -75,7 +75,7 @@ class FlockService extends AbstractService
     /**
      * @param string|null $name
      */
-    public function waitUnFlockToFlock($name = null)
+    public function waitUnFlockToFlock($name = null): void
     {
         try {
             $this->flock($name);
@@ -85,7 +85,7 @@ class FlockService extends AbstractService
         }
     }
 
-    private function getName($name = null)
+    private function getName(?string $name = null): string
     {
         if (null !== $name) {
             return $name;

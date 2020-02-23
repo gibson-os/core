@@ -51,7 +51,9 @@ class UdpService extends AbstractService
         $this->setTimeout();
 
         $this->ip = $ip;
+        $this->sendIp = $ip;
         $this->port = $port;
+        $this->sendPort = $port;
 
         if (!socket_bind($this->socket, $ip, $port)) {
             throw new CreateError('Socket konnte nicht an ' . $ip . ':' . $port . ' gebunden werden!');
@@ -61,7 +63,7 @@ class UdpService extends AbstractService
     /**
      * @throws SetError
      */
-    public function setTimeout(int $timeout = 10)
+    public function setTimeout(int $timeout = 10): void
     {
         if (!socket_set_option($this->socket, SOL_SOCKET, SO_RCVTIMEO, ['sec' => $timeout, 'usec' => null])) {
             throw new SetError('Receive timeout konnte nicht gesetzt werden!');
@@ -75,7 +77,7 @@ class UdpService extends AbstractService
     /**
      * @throws SendError
      */
-    public function send(string $msg, string $ip, int $port = 0)
+    public function send(string $msg, string $ip, int $port = 0): void
     {
         $this->sendIp = $ip;
         $this->sendPort = $port;
@@ -90,11 +92,11 @@ class UdpService extends AbstractService
      */
     public function receive(int $length, string $ip = null, int $port = null, int $flags = 0): string
     {
-        if (null === $ip) {
+        if ($ip === null) {
             $ip = $this->sendIp;
         }
 
-        if (null === $port) {
+        if ($port === null) {
             $port = $this->sendPort;
         }
 
@@ -105,7 +107,7 @@ class UdpService extends AbstractService
         return $buf;
     }
 
-    public function close()
+    public function close(): void
     {
         socket_close($this->socket);
     }

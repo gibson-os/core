@@ -36,7 +36,7 @@ class SqLiteService extends AbstractService
     /**
      * @throws ExecuteError
      */
-    public function execute(string $query)
+    public function execute(string $query): void
     {
         if (!$this->database->exec($query)) {
             throw new ExecuteError();
@@ -60,7 +60,7 @@ class SqLiteService extends AbstractService
     /**
      * @throws ExecuteError
      */
-    public function busyTimeout(int $milliSeconds)
+    public function busyTimeout(int $milliSeconds): void
     {
         if (!$this->database->busyTimeout($milliSeconds)) {
             throw new ExecuteError();
@@ -70,7 +70,7 @@ class SqLiteService extends AbstractService
     /**
      * @throws ExecuteError
      */
-    public function close()
+    public function close(): void
     {
         if (!$this->database->close()) {
             throw new ExecuteError();
@@ -110,7 +110,7 @@ class SqLiteService extends AbstractService
     /**
      * @throws ExecuteError
      */
-    public function addTableIfNotExists(string $name, string $createQuery)
+    public function addTableIfNotExists(string $name, string $createQuery): void
     {
         if ($this->hasTable($name)) {
             return;

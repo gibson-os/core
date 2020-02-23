@@ -14,27 +14,27 @@ class Permission extends AbstractModel
     /**
      * @var string
      */
-    private $module;
+    private $module = '';
 
     /**
      * @var string
      */
-    private $task;
+    private $task = '';
 
     /**
      * @var string
      */
-    private $action;
+    private $action = '';
 
     /**
      * @var int
      */
-    private $userId;
+    private $userId = 0;
 
     /**
      * @var int
      */
-    private $permission;
+    private $permission = 1;
 
     /**
      * @var User
@@ -127,7 +127,7 @@ class Permission extends AbstractModel
     public function setUser(User $user): Permission
     {
         $this->user = $user;
-        $this->setUserId($user->getId());
+        $this->setUserId($user->getId() ?? 0);
 
         return $this;
     }

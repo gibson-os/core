@@ -282,21 +282,17 @@ class FileService extends AbstractService
             return '';
         }
 
-        return mb_substr($path, 0, mb_strrpos($path, $directorySeparator) + 1);
+        return mb_substr($path, 0, (mb_strrpos($path, $directorySeparator) ?: -1) + 1);
     }
 
     public function getFilename(string $path, string $directorySeparator = DIRECTORY_SEPARATOR): string
     {
-        if (mb_strrpos($path, $directorySeparator) === false) {
-            return $path;
-        }
-
-        return mb_substr($path, mb_strrpos($path, $directorySeparator) + 1);
+        return mb_substr($path, (mb_strrpos($path, $directorySeparator) ?: -1) + 1);
     }
 
     public function getFileEnding(string $path): string
     {
-        return mb_substr($path, mb_strrpos($path, '.') + 1);
+        return mb_substr($path, (mb_strrpos($path, '.') ?: -1) + 1);
     }
 
     /**

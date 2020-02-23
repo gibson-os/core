@@ -10,24 +10,24 @@ use mysqlDatabase;
 class Action extends AbstractModel
 {
     /**
-     * @var int
+     * @var int|null
      */
     private $id;
 
     /**
      * @var string
      */
-    private $name;
+    private $name = '';
 
     /**
      * @var int
      */
-    private $moduleId;
+    private $moduleId = 0;
 
     /**
      * @var int
      */
-    private $taskId;
+    private $taskId = 0;
 
     /**
      * @var Module
@@ -52,7 +52,7 @@ class Action extends AbstractModel
         return 'action';
     }
 
-    public function getId(): int
+    public function getId(): ?int
     {
         return $this->id;
     }

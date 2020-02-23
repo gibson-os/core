@@ -10,5 +10,5 @@ interface PushInterface
     /**
      * @param User[] $users
      */
-    public function send($users);
+    public function send(array $users): void;
 }

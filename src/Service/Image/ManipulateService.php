@@ -141,10 +141,10 @@ class ManipulateService extends DrawService
         int $color = null
     ): bool {
         if ($startX === null) {
-            $startX = ($this->getWidth($image) - $width) / 2;
+            $startX = (int) (($this->getWidth($image) - $width) / 2);
         }
         if ($startY === null) {
-            $startY = ($this->getHeight($image) - $height) / 2;
+            $startY = (int) (($this->getHeight($image) - $height) / 2);
         }
 
         $draw = $this->create($width, $height);

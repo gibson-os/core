@@ -114,7 +114,7 @@ class MediaService
         string $videoCodec = null,
         string $audioCodec = null,
         array $options = []
-    ) {
+    ): void {
         $this->ffmpeg->convert($media, $outputFilename, $videoCodec, $audioCodec, $options);
     }
 
@@ -183,7 +183,7 @@ class MediaService
         );
     }
 
-    private function calculateDuration(MediaDto $media, array $rawValues)
+    private function calculateDuration(MediaDto $media, array $rawValues): void
     {
         $duration = 0;
         $durationMultiplier = [
@@ -200,7 +200,7 @@ class MediaService
         $media->setDuration($duration);
     }
 
-    private function addVideoStream(MediaDto $media, array $properties, string $streamId, ?string $language, string $options)
+    private function addVideoStream(MediaDto $media, array $properties, string $streamId, ?string $language, string $options): void
     {
         $stream = (new Video())
             ->setLanguage($language)
@@ -226,7 +226,7 @@ class MediaService
         }
     }
 
-    private function addAudioStream(MediaDto $media, array $properties, string $streamId, ?string $language, string $options)
+    private function addAudioStream(MediaDto $media, array $properties, string $streamId, ?string $language, string $options): void
     {
         $stream = (new Audio())
             ->setLanguage($language)
@@ -242,7 +242,7 @@ class MediaService
         }
     }
 
-    private function addSubtitleStream(MediaDto $media, string $streamId, ?string $language, string $options)
+    private function addSubtitleStream(MediaDto $media, string $streamId, ?string $language, string $options): void
     {
         $stream = (new Subtitle())->setLanguage($language);
         $media->setSubtitleStream($streamId, $stream);
@@ -265,7 +265,7 @@ class MediaService
         $properties[count($properties) - 1] = preg_replace('/\(.*?$/', '', $properties[count($properties) - 1]);
 
         $properties = array_map(
-            function ($str) {
+            function (string $str) {
                 return str_replace('{%%KOMMA%%}', ',', $str);
             },
             $properties

@@ -169,10 +169,10 @@ class ConvertStatus implements JsonSerializable
         return (int) ($percent > 100 ? 100 : $percent);
     }
 
-    public function getTimeRemaining()
+    public function getTimeRemaining(): ?DateTime
     {
         if ($this->getFrames() === 0) {
-            return 0;
+            return null;
         }
 
         return new DateTime('@' . round(($this->getFrames() - $this->getFrame()) / $this->getFps()));

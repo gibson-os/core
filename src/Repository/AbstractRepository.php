@@ -9,19 +9,19 @@ use mysqlTable;
 
 class AbstractRepository
 {
-    public static function startTransaction(mysqlDatabase $database = null)
+    public static function startTransaction(mysqlDatabase $database = null): void
     {
         $database = self::getDatabase($database);
         $database->startTransaction();
     }
 
-    public static function commit(mysqlDatabase $database = null)
+    public static function commit(mysqlDatabase $database = null): void
     {
         $database = self::getDatabase($database);
         $database->commit();
     }
 
-    public static function rollback(mysqlDatabase $database = null)
+    public static function rollback(mysqlDatabase $database = null): void
     {
         $database = self::getDatabase($database);
         $database->rollback();

@@ -3,7 +3,8 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Model\User;
 
-use DateTime;
+use DateTimeImmutable;
+use DateTimeInterface;
 use GibsonOS\Core\Exception\DateTimeError;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\AbstractModel;
@@ -15,30 +16,30 @@ class Device extends AbstractModel
     /**
      * @var string
      */
-    private $id;
+    private $id = '';
 
     /**
      * @var int
      */
-    private $userId;
+    private $userId = 0;
 
     /**
      * @var string
      */
-    private $model;
+    private $model = '';
 
     /**
-     * @var string
+     * @var string|null
      */
     private $registrationId;
 
     /**
-     * @var DateTime
+     * @var DateTimeInterface|null
      */
     private $lastLogin;
 
     /**
-     * @var DateTime
+     * @var DateTimeInterface
      */
     private $added;
 
@@ -52,6 +53,7 @@ class Device extends AbstractModel
         parent::__construct($database);
 
         $this->user = new User();
+        $this->added = new DateTimeImmutable();
     }
 
     public static function getTableName(): string
@@ -95,36 +97,36 @@ class Device extends AbstractModel
         return $this;
     }
 
-    public function getRegistrationId(): string
+    public function getRegistrationId(): ?string
     {
         return $this->registrationId;
     }
 
-    public function setRegistrationId(string $registrationId): Device
+    public function setRegistrationId(?string $registrationId): Device
     {
         $this->registrationId = $registrationId;
 
         return $this;
     }
 
-    public function getLastLogin(): DateTime
+    public function getLastLogin(): ?DateTimeInterface
     {
         return $this->lastLogin;
     }
 
-    public function setLastLogin(DateTime $lastLogin): Device
+    public function setLastLogin(?DateTimeInterface $lastLogin): Device
     {
         $this->lastLogin = $lastLogin;
 
         return $this;
     }
 
-    public function getAdded(): DateTime
+    public function getAdded(): DateTimeInterface
     {
         return $this->added;
     }
 
-    public function setAdded(DateTime $added): Device
+    public function setAdded(DateTimeInterface $added): Device
     {
         $this->added = $added;
 
@@ -150,7 +152,7 @@ class Device extends AbstractModel
     public function setUser(User $user)
     {
         $this->user = $user;
-        $this->setUserId($user->getId());
+        $this->setUserId($user->getId() ?? 0);
 
         return $this;
     }

@@ -130,7 +130,7 @@ abstract class AbstractException extends Exception
         return $this->buttons;
     }
 
-    public function setButtons(array $buttons)
+    public function setButtons(array $buttons): void
     {
         $this->buttons = $buttons;
     }
@@ -138,7 +138,7 @@ abstract class AbstractException extends Exception
     /**
      * @param mixed|null $value
      */
-    public function addButton(string $text, string $parameter = null, $value = null)
+    public function addButton(string $text, string $parameter = null, $value = null): void
     {
         $this->buttons[] = [
             'text' => $text,

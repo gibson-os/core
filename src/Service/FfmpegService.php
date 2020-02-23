@@ -100,7 +100,7 @@ class FfmpegService extends AbstractService
         string $videoCodec = null,
         string $audioCodec = null,
         array $options = []
-    ) {
+    ): void {
         $optionString = '-i ' . escapeshellarg($media->getFilename()) . ' ';
 
         if (
@@ -124,7 +124,7 @@ class FfmpegService extends AbstractService
                 $subtitleStreamIds = array_keys($media->getSubtitleStreams());
                 $optionString .=
                     '-vf subtitles=' . escapeshellarg($media->getFilename()) .
-                    ':si=' . array_search($media->getSelectedSubtitleStreamId(), $subtitleStreamIds) . ' ';
+                    ':si=' . (array_search($media->getSelectedSubtitleStreamId(), $subtitleStreamIds) ?: 0) . ' ';
             }
         }
 
@@ -182,7 +182,7 @@ class FfmpegService extends AbstractService
 
         return (new ConvertStatus(ConvertStatus::STATUS_GENERATE))
             ->setFrame((int) $hits[1])
-            ->setFps((int) round($hits[2]))
+            ->setFps((int) round((float) $hits[2]))
             ->setQuality((float) $hits[3])
             ->setSize((int) $hits[4])
             ->setTime($this->dateTime->get($hits[5]))
@@ -213,7 +213,7 @@ class FfmpegService extends AbstractService
         return $image;
     }
 
-    private function execute(string $parameters)
+    private function execute(string $parameters): void
     {
         $this->process->execute($this->ffpmegPath . ' ' . $parameters);
     }

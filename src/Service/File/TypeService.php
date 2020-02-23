@@ -183,7 +183,7 @@ class TypeService
             return null;
         }
 
-        return mb_substr($path, mb_strrpos($path, '.') + 1);
+        return mb_substr($path, (mb_strrpos($path, '.') ?: -1) + 1);
     }
 
     /**
