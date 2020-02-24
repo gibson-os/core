@@ -216,7 +216,7 @@ abstract class AbstractModel implements ModelInterface
         }
 
         $mysqlTable = new mysqlTable($this->database, $model->getTableName());
-        $mysqlTable->setWhere('`' . $foreignField . '`=' . $this->database->escape($value));
+        $mysqlTable->setWhere('`' . $foreignField . '`=' . (is_int($value) ? $value : $this->database->escape($value)));
         $mysqlTable->setLimit(1);
 
         if (!$mysqlTable->select()) {
