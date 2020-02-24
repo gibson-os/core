@@ -14,6 +14,7 @@ use mysqlDatabase;
 use mysqlField;
 use mysqlRegistry;
 use mysqlTable;
+use Throwable;
 
 abstract class AbstractModel implements ModelInterface
 {
@@ -98,7 +99,11 @@ abstract class AbstractModel implements ModelInterface
             } else {
                 switch ($this->getColumnType($fieldObject->getType())) {
                     case self::TYPE_INT:
-                        $this->{'set' . $fieldName}((int) $fieldObject->getValue());
+                        try {
+                            $this->{'set' . $fieldName}((int) $fieldObject->getValue());
+                        } catch (Throwable $exception) {
+                            $this->{'set' . $fieldName}((bool) $fieldObject->getValue());
+                        }
 
                         break;
                     case self::TYPE_FLOAT:
