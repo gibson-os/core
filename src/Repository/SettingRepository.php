@@ -17,7 +17,7 @@ class SettingRepository extends AbstractRepository
      *
      * @return SettingModel[]
      */
-    public static function getAll(int $moduleId, int $userId): array
+    public function getAll(int $moduleId, int $userId): array
     {
         $table = self::getTable(SettingModel::getTableName());
         $table->setWhere(
@@ -48,7 +48,7 @@ class SettingRepository extends AbstractRepository
      * @throws GetError
      * @throws SelectError
      */
-    public static function getByKey(int $moduleId, int $userId, string $key): SettingModel
+    public function getByKey(int $moduleId, int $userId, string $key): SettingModel
     {
         $table = self::getTable(SettingModel::getTableName());
         $table->setWhere(

@@ -24,11 +24,26 @@ class ModuleSettingService extends AbstractService
     private $registry;
 
     /**
+     * @var ModuleRepository
+     */
+    private $moduleRepository;
+
+    /**
+     * @var SettingRepository
+     */
+    private $settingRepository;
+
+    /**
      * ModuleSettingService constructor.
      */
-    public function __construct(RegistryService $registry)
-    {
+    public function __construct(
+        RegistryService $registry,
+        ModuleRepository $moduleRepository,
+        SettingRepository $settingRepository
+    ) {
         $this->registry = $registry;
+        $this->moduleRepository = $moduleRepository;
+        $this->settingRepository = $settingRepository;
     }
 
     /**
@@ -135,7 +150,7 @@ class ModuleSettingService extends AbstractService
      */
     private function getModuleIdByName(string $name): int
     {
-        $moduleModel = ModuleRepository::getByName($name);
+        $moduleModel = $this->moduleRepository->getByName($name);
 
         return $moduleModel->getId() ?? 0;
     }
@@ -159,9 +174,9 @@ class ModuleSettingService extends AbstractService
         }
 
         if ($key === null) {
-            return SettingRepository::getAll($moduleId, $userId);
+            return $this->settingRepository->getAll($moduleId, $userId);
         }
 
-        return SettingRepository::getByKey($moduleId, $userId, $key);
+        return $this->settingRepository->getByKey($moduleId, $userId, $key);
     }
 }

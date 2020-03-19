@@ -15,7 +15,7 @@ class ModuleRepository extends AbstractRepository
      * @throws DateTimeError
      * @throws GetError
      */
-    public static function getByName(string $name): ModuleModel
+    public function getByName(string $name): ModuleModel
     {
         $table = self::getTable(ModuleModel::getTableName());
         $table->setWhere('`name`=' . self::escape($name));

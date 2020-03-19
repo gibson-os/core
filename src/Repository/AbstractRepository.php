@@ -9,60 +9,60 @@ use mysqlTable;
 
 class AbstractRepository
 {
-    public static function startTransaction(mysqlDatabase $database = null): void
+    public function startTransaction(mysqlDatabase $database = null): void
     {
-        $database = self::getDatabase($database);
+        $database = $this->getDatabase($database);
         $database->startTransaction();
     }
 
-    public static function commit(mysqlDatabase $database = null): void
+    public function commit(mysqlDatabase $database = null): void
     {
-        $database = self::getDatabase($database);
+        $database = $this->getDatabase($database);
         $database->commit();
     }
 
-    public static function rollback(mysqlDatabase $database = null): void
+    public function rollback(mysqlDatabase $database = null): void
     {
-        $database = self::getDatabase($database);
+        $database = $this->getDatabase($database);
         $database->rollback();
     }
 
-    protected static function getTable(string $tableName, mysqlDatabase $database = null): mysqlTable
+    protected function getTable(string $tableName, mysqlDatabase $database = null): mysqlTable
     {
-        $database = self::getDatabase($database);
+        $database = $this->getDatabase($database);
 
         return new mysqlTable($database, $tableName);
     }
 
-    protected static function escape(string $value, mysqlDatabase $database = null): string
+    protected function escape(string $value, mysqlDatabase $database = null): string
     {
-        $database = self::getDatabase($database);
+        $database = $this->getDatabase($database);
 
         return $database->escape($value);
     }
 
-    protected static function escapeWithoutQuotes(string $value, mysqlDatabase $database = null): string
+    protected function escapeWithoutQuotes(string $value, mysqlDatabase $database = null): string
     {
-        $database = self::getDatabase($database);
+        $database = $this->getDatabase($database);
 
         return $database->escapeWithoutQuotes($value);
     }
 
-    protected static function getRegexString(string $search, mysqlDatabase $database = null): string
+    protected function getRegexString(string $search, mysqlDatabase $database = null): string
     {
-        $database = self::getDatabase($database);
+        $database = $this->getDatabase($database);
 
         return $database->getRegexString($search);
     }
 
-    protected static function implode(array $pieces, string $glue = ',', mysqlDatabase $database = null): string
+    protected function implode(array $pieces, string $glue = ',', mysqlDatabase $database = null): string
     {
-        $database = self::getDatabase($database);
+        $database = $this->getDatabase($database);
 
         return $database->implode($pieces, $glue);
     }
 
-    private static function getDatabase(mysqlDatabase $database = null): mysqlDatabase
+    private function getDatabase(mysqlDatabase $database = null): mysqlDatabase
     {
         if ($database instanceof mysqlDatabase) {
             return $database;
