@@ -212,8 +212,8 @@ class ConvertStatus implements JsonSerializable
                 'frames' => $this->getFrames(),
                 'quality' => $this->getQuality(),
                 'size' => $this->getSize(),
-                'time' => $this->getTime(),
-                'timeRemaining' => $this->getTimeRemaining(),
+                'time' => $this->getTime()->format('H:i:s'),
+                'timeRemaining' => $this->getTimeRemaining()->format('H:i:s'),
             ];
         }
 
