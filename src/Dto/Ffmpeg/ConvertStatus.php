@@ -213,7 +213,7 @@ class ConvertStatus implements JsonSerializable
                 'quality' => $this->getQuality(),
                 'size' => $this->getSize(),
                 'time' => $this->getTime()->format('H:i:s'),
-                'timeRemaining' => $this->getTimeRemaining()->format('H:i:s'),
+                'timeRemaining' => $this->getTimeRemaining() === null ? 0 : $this->getTimeRemaining()->format('H:i:s'),
                 'percent' => $this->getPercent(),
             ];
         }
