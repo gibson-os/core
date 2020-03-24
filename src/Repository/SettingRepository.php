@@ -19,10 +19,10 @@ class SettingRepository extends AbstractRepository
      */
     public function getAll(int $moduleId, int $userId): array
     {
-        $table = self::getTable(SettingModel::getTableName());
+        $table = $this->getTable(SettingModel::getTableName());
         $table->setWhere(
-            '`module_id`=' . self::escape((string) $moduleId) . ' AND ' .
-            '(`user_id`=' . self::escape((string) $userId) . ' OR `user_id`=0)'
+            '`module_id`=' . $this->escape((string) $moduleId) . ' AND ' .
+            '(`user_id`=' . $this->escape((string) $userId) . ' OR `user_id`=0)'
         );
 
         if (!$table->select()) {
@@ -50,11 +50,11 @@ class SettingRepository extends AbstractRepository
      */
     public function getByKey(int $moduleId, int $userId, string $key): SettingModel
     {
-        $table = self::getTable(SettingModel::getTableName());
+        $table = $this->getTable(SettingModel::getTableName());
         $table->setWhere(
-            '`module_id`=' . self::escape((string) $moduleId) . ' AND ' .
-            '(`user_id`=' . self::escape((string) $userId) . ' OR `user_id`=0) AND ' .
-            '`key`=' . self::escape($key)
+            '`module_id`=' . $this->escape((string) $moduleId) . ' AND ' .
+            '(`user_id`=' . $this->escape((string) $userId) . ' OR `user_id`=0) AND ' .
+            '`key`=' . $this->escape($key)
         );
         $table->setOrderBy('`user_id`');
         $table->setLimit(1);
