@@ -49,7 +49,16 @@ class PermissionService
         string $action = null,
         int $userId = null
     ): bool {
-        return ($this->getPermission($module, $task, $action, $userId) & $permission) === $permission;
+        $permissionValue = $this->getPermission($module, $task, $action, $userId);
+
+        if (
+            $permission !== self::DENIED &&
+            ($permissionValue & self::DENIED)
+        ) {
+            return false;
+        }
+
+        return ($permissionValue & $permission) === $permission;
     }
 
     public function isDenied(string $module, string $task = null, string $action = null, int $userId = null): bool
@@ -57,22 +66,22 @@ class PermissionService
         return $this->hasPermission(self::DENIED, $module, $task, $action, $userId);
     }
 
-    public function isRead(string $module, string $task = null, string $action = null, int $userId = null): bool
+    public function hasReadPermission(string $module, string $task = null, string $action = null, int $userId = null): bool
     {
         return $this->hasPermission(self::READ, $module, $task, $action, $userId);
     }
 
-    public function isWrite(string $module, string $task = null, string $action = null, int $userId = null): bool
+    public function hasWritePermission(string $module, string $task = null, string $action = null, int $userId = null): bool
     {
         return $this->hasPermission(self::WRITE, $module, $task, $action, $userId);
     }
 
-    public function isDelete(string $module, string $task = null, string $action = null, int $userId = null): bool
+    public function hasDeletePermission(string $module, string $task = null, string $action = null, int $userId = null): bool
     {
         return $this->hasPermission(self::DELETE, $module, $task, $action, $userId);
     }
 
-    public function isManage(string $module, string $task = null, string $action = null, int $userId = null): bool
+    public function hasManagePermission(string $module, string $task = null, string $action = null, int $userId = null): bool
     {
         return $this->hasPermission(self::MANAGE, $module, $task, $action, $userId);
     }
