@@ -89,17 +89,6 @@
       <path value="$PROJECT_DIR$/vendor/psr/log" />
       <path value="$PROJECT_DIR$/vendor/php-cs-fixer/diff" />
       <path value="$PROJECT_DIR$/vendor/nikic/php-parser" />
-      <path value="$PROJECT_DIR$/vendor/phpstan/phpdoc-parser" />
-      <path value="$PROJECT_DIR$/vendor/nette/utils" />
-      <path value="$PROJECT_DIR$/vendor/nette/robot-loader" />
-      <path value="$PROJECT_DIR$/vendor/nette/schema" />
-      <path value="$PROJECT_DIR$/vendor/nette/finder" />
-      <path value="$PROJECT_DIR$/vendor/jean85/pretty-package-versions" />
-      <path value="$PROJECT_DIR$/vendor/phpstan/phpstan" />
-      <path value="$PROJECT_DIR$/vendor/nette/php-generator" />
-      <path value="$PROJECT_DIR$/vendor/nette/bootstrap" />
-      <path value="$PROJECT_DIR$/vendor/nette/di" />
-      <path value="$PROJECT_DIR$/vendor/nette/neon" />
       <path value="$PROJECT_DIR$/vendor/sebastianfeldmann/cli" />
       <path value="$PROJECT_DIR$/vendor/sebastianfeldmann/git" />
       <path value="$PROJECT_DIR$/vendor/pdepend/pdepend" />
