@@ -22,6 +22,7 @@ use GibsonOS\Core\Exception\FileNotFound;
 use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\Image\LoadError;
 use GibsonOS\Core\Exception\ProcessError;
+use GibsonOS\Core\Exception\SetError;
 use GibsonOS\Core\Service\FfmpegService;
 use InvalidArgumentException;
 use OutOfRangeException;
@@ -123,6 +124,7 @@ class MediaService
      * @throws DateTimeError
      * @throws FileNotFound
      * @throws OpenError
+     * @throws SetError
      */
     public function getConvertStatus(MediaDto $media, string $outputFilename): ConvertStatus
     {

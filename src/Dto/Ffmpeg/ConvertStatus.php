@@ -50,7 +50,7 @@ class ConvertStatus implements JsonSerializable
     private $quality;
 
     /**
-     * @var int;
+     * @var int
      */
     private $size;
 
@@ -204,6 +204,8 @@ class ConvertStatus implements JsonSerializable
     public function jsonSerialize(): array
     {
         if ($this->status === self::STATUS_GENERATE) {
+            $timeRemaining = $this->getTimeRemaining();
+
             return [
                 'status' => $this->getStatus(),
                 'bitrate' => $this->getBitrate(),
@@ -213,7 +215,7 @@ class ConvertStatus implements JsonSerializable
                 'quality' => $this->getQuality(),
                 'size' => $this->getSize(),
                 'time' => $this->getTime()->format('H:i:s'),
-                'timeRemaining' => $this->getTimeRemaining() === null ? 0 : $this->getTimeRemaining()->format('H:i:s'),
+                'timeRemaining' => $timeRemaining instanceof DateTime ? $timeRemaining->format('H:i:s') : 0,
                 'percent' => $this->getPercent(),
             ];
         }

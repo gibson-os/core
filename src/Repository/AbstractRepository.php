@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Repository;
 
+use InvalidArgumentException;
 use mysqlDatabase;
 use mysqlRegistry;
 use mysqlTable;
@@ -68,6 +69,12 @@ class AbstractRepository
             return $database;
         }
 
-        return mysqlRegistry::getInstance()->get('database');
+        $database = mysqlRegistry::getInstance()->get('database');
+
+        if (!$database instanceof mysqlDatabase) {
+            throw new InvalidArgumentException('Datenbank nicht in der Registry gefunden!');
+        }
+
+        return $database;
     }
 }

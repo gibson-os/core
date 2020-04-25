@@ -6,6 +6,8 @@ namespace GibsonOS\Core\Dto\Ffmpeg;
 use GibsonOS\Core\Dto\Ffmpeg\Stream\Audio;
 use GibsonOS\Core\Dto\Ffmpeg\Stream\Subtitle;
 use GibsonOS\Core\Dto\Ffmpeg\Stream\Video;
+use GibsonOS\Core\Exception\Ffmpeg\NoAudioError;
+use GibsonOS\Core\Exception\Ffmpeg\NoSubtitleError;
 use InvalidArgumentException;
 use JsonSerializable;
 
@@ -207,18 +209,39 @@ class Media implements JsonSerializable
         return $this;
     }
 
+    /**
+     * @throws NoAudioError
+     */
     public function getSelectedAudioStream(): Audio
     {
+        if (!isset($this->audioStreams[$this->selectedAudioStreamId])) {
+            throw new NoAudioError('Selektierter Audio Stream existiert nicht!');
+        }
+
         return $this->audioStreams[$this->selectedAudioStreamId];
     }
 
+    /**
+     * @throws NoAudioError
+     */
     public function getSelectedVideoStream(): Video
     {
+        if (!isset($this->videoStreams[$this->selectedVideoStreamId])) {
+            throw new NoAudioError('Selektierter Video Stream existiert nicht!');
+        }
+
         return $this->videoStreams[$this->selectedVideoStreamId];
     }
 
+    /**
+     * @throws NoSubtitleError
+     */
     public function getSelectedSubtitleStream(): Subtitle
     {
+        if (!isset($this->subtitleStreams[$this->selectedSubtitleStreamId])) {
+            throw new NoSubtitleError('Selektierter Untertitel Stream existiert nicht!');
+        }
+
         return $this->subtitleStreams[$this->selectedSubtitleStreamId];
     }
 

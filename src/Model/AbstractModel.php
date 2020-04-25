@@ -246,7 +246,6 @@ abstract class AbstractModel implements ModelInterface
 
         do {
             /** @var AbstractModel $model */
-            /** @psalm-suppress InvalidStringClass */
             $model = new $modelClassName();
             $model->loadFromMysqlTable($mysqlTable);
             $models[] = $model;
