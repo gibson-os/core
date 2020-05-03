@@ -27,7 +27,7 @@ class ServiceManagerService
     public function get(string $classname): object
     {
         if (!class_exists($classname)) {
-            throw new FactoryError(sprintf('Class does not %s exists', $classname));
+            throw new FactoryError(sprintf('Class %s does not exists', $classname));
         }
 
         $class = $this->getByFactory($classname);
@@ -57,13 +57,12 @@ class ServiceManagerService
     private function getByFactory(string $classname): ?object
     {
         $factoryName = str_replace('Service.php', 'Factory.php', $classname);
-        $factoryName = str_replace(
-            DIRECTORY_SEPARATOR . 'Service' . DIRECTORY_SEPARATOR,
-            DIRECTORY_SEPARATOR . 'Factory' . DIRECTORY_SEPARATOR,
-            $factoryName
-        );
+        $factoryName = str_replace('\\Service\\', '\\Factory\\', $factoryName);
 
-        if (!class_exists($factoryName)) {
+        if (
+            !class_exists($factoryName) ||
+            $factoryName === $classname
+        ) {
             return null;
         }
 
@@ -104,6 +103,6 @@ class ServiceManagerService
             }
         }
 
-        return eval('return new ' . $classname . '(' . implode(', ', $parameters) . ')');
+        return eval('return new ' . $classname . '(' . implode(', ', $parameters) . ');');
     }
 }

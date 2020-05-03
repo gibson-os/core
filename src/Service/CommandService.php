@@ -49,8 +49,8 @@ class CommandService
             $classname = $commandName[0];
 
             if (count($commandName) > 1) {
-                $module = 'Module\\' . $commandName[0];
-                $classname = $commandName[1];
+                $module = 'Module\\' . array_shift($commandName);
+                $classname = implode('\\', $commandName);
             }
 
             return 'GibsonOS\\' . $module . '\\Command\\' . $classname;
