@@ -105,4 +105,9 @@ class ServiceManagerService
 
         return new $classname(...$parameters);
     }
+
+    public function setService(string $name, object $class): void
+    {
+        $this->services[$name] = $class;
+    }
 }

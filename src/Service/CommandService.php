@@ -6,6 +6,7 @@ namespace GibsonOS\Core\Service;
 use GibsonOS\Core\Command\CommandInterface;
 use GibsonOS\Core\Exception\CommandError;
 use GibsonOS\Core\Exception\FactoryError;
+use mysqlDatabase;
 
 class CommandService
 {
@@ -17,6 +18,15 @@ class CommandService
     public function __construct()
     {
         $this->serviceManager = new ServiceManagerService();
+        //@ todo Workaround bis die DB Connection mal umgebaut wird
+        /** @var EnvService $envService */
+        $envService = $this->serviceManager->get(EnvService::class);
+        $mysqlDatabase = new mysqlDatabase(
+            $envService->getString('MYSQL_HOST'),
+            $envService->getString('MYSQL_USER'),
+            $envService->getString('MYSQL_PASS')
+        );
+        $this->serviceManager->setService('mysqlDatabase', $mysqlDatabase);
     }
 
     /**
