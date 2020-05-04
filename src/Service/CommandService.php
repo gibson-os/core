@@ -26,6 +26,7 @@ class CommandService
             $envService->getString('MYSQL_USER'),
             $envService->getString('MYSQL_PASS')
         );
+        $mysqlDatabase->openDB($envService->getString('MYSQL_DATABASE'));
         $this->serviceManager->setService('mysqlDatabase', $mysqlDatabase);
     }
 
