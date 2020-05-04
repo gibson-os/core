@@ -103,6 +103,6 @@ class ServiceManagerService
             }
         }
 
-        return eval('return new ' . $classname . '(' . implode(', ', $parameters) . ');');
+        return new $classname(...$parameters);
     }
 }
