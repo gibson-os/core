@@ -4,16 +4,14 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Repository;
 
 use GibsonOS\Core\Exception\DateTimeError;
-use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\Module as ModuleModel;
 
 class ModuleRepository extends AbstractRepository
 {
     /**
-     * @throws SelectError
      * @throws DateTimeError
-     * @throws GetError
+     * @throws SelectError
      */
     public function getByName(string $name): ModuleModel
     {

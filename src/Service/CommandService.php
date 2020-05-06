@@ -6,7 +6,6 @@ namespace GibsonOS\Core\Service;
 use GibsonOS\Core\Command\CommandInterface;
 use GibsonOS\Core\Exception\CommandError;
 use GibsonOS\Core\Exception\FactoryError;
-use mysqlDatabase;
 
 class CommandService
 {
@@ -15,40 +14,51 @@ class CommandService
      */
     private $serviceManager;
 
-    public function __construct()
+    /**
+     * @var ProcessService
+     */
+    private $processService;
+
+    public function __construct(ServiceManagerService $serviceManagerService, ProcessService $processService)
     {
-        $this->serviceManager = new ServiceManagerService();
-        //@ todo Workaround bis die DB Connection mal umgebaut wird
-        /** @var EnvService $envService */
-        $envService = $this->serviceManager->get(EnvService::class);
-        $mysqlDatabase = new mysqlDatabase(
-            $envService->getString('MYSQL_HOST'),
-            $envService->getString('MYSQL_USER'),
-            $envService->getString('MYSQL_PASS')
-        );
-        $mysqlDatabase->openDB($envService->getString('MYSQL_DATABASE'));
-        $this->serviceManager->setService('mysqlDatabase', $mysqlDatabase);
+        $this->serviceManager = $serviceManagerService;
+        $this->processService = $processService;
     }
 
     /**
-     * @throws CommandError
      * @throws FactoryError
      */
-    public function execute(array $arguments): int
+    public function execute(string $commandClassname, array $arguments, array $options): int
     {
         /** @var CommandInterface $command */
-        $command = $this->serviceManager->get($this->getCommandClassname($arguments))
-            ->setArguments($this->getArgument($arguments))
-            ->setOptions($this->getOptions($arguments))
+        $command = $this->serviceManager->get($commandClassname);
+        $command
+            ->setArguments($arguments)
+            ->setOptions($options)
         ;
 
         return $command->execute();
     }
 
+    public function executeAsync(string $commandClassname, array $arguments, array $options): void
+    {
+        $commandName = mb_substr(str_replace('\\Command\\', '', $commandClassname), 9);
+
+        $this->processService->executeAsync(
+            'php bin/command ' . escapeshellarg($commandName) .
+            implode(' ', array_map(function ($item) {
+                return escapeshellarg('--' . $item);
+            }, $arguments)) . ' ' .
+            implode(' ', array_map(function ($item) {
+                return escapeshellarg('-' . $item);
+            }, $options))
+        );
+    }
+
     /**
      * @throws CommandError
      */
-    private function getCommandClassname(array $arguments): string
+    public function getCommandClassname(array $arguments): string
     {
         foreach ($arguments as $index => $argument) {
             if ($index === 0 || mb_strpos($argument, '-') === 0) {
@@ -70,7 +80,7 @@ class CommandService
         throw new CommandError('No Command found!');
     }
 
-    private function getArgument(array $arguments): array
+    public function getArguments(array $arguments): array
     {
         $argumentList = [];
 
@@ -86,7 +96,7 @@ class CommandService
         return $argumentList;
     }
 
-    private function getOptions(array $arguments): array
+    public function getOptions(array $arguments): array
     {
         $options = [];
 

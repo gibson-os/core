@@ -35,4 +35,9 @@ class ProcessService extends AbstractService
     {
         return exec($command);
     }
+
+    public function executeAsync(string $command): void
+    {
+        system($command . ' &');
+    }
 }
