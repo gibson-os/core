@@ -24,17 +24,33 @@ class CronjobRepository extends AbstractRepository
         $table->setWhere(
             '`' . $tableName . '`.`user`=' . $this->escape($user) . ' AND ' .
             '`' . $tableName . '`.`active`=1 AND ' .
+            'UNIX_TIMESTAMP(`' . $tableName . '`.`last_run`) != UNIX_TIMESTAMP(\'' .
+            ((int) $dateTime->format('Y')) . '-' . ((int) $dateTime->format('n')) . '-' . ((int) $dateTime->format('j')) . ' ' .
+            ((int) $dateTime->format('H')) . ':' . ((int) $dateTime->format('i')) . ':' . ((int) $dateTime->format('s')) . '\'' .
+            ') AND ' .
             'UNIX_TIMESTAMP(CONCAT(' .
-                $this->getTimePartWhere('year', (int) $dateTime->format('Y'), 9999) . ', \'-\', ' .
-                $this->getTimePartWhere('month', (int) $dateTime->format('n'), 12) . ', \'-\', ' .
-                $this->getTimePartWhere('day_of_month', (int) $dateTime->format('j'), 31) . ', \' \', ' .
-                $this->getTimePartWhere('hour', (int) $dateTime->format('H'), 23) . ', \':\', ' .
-                $this->getTimePartWhere('minute', (int) $dateTime->format('i'), 59) . ', \':\', ' .
-                $this->getTimePartWhere('second', (int) $dateTime->format('s'), 59) .
+                $this->getTimePartWhere('year', (int) $dateTime->format('Y')) . ', \'-\', ' .
+                $this->getTimePartWhere('month', (int) $dateTime->format('n')) . ', \'-\', ' .
+                $this->getTimePartWhere('day_of_month', (int) $dateTime->format('j')) . ', \' \', ' .
+                $this->getTimePartWhere('hour', (int) $dateTime->format('H')) . ', \':\', ' .
+                $this->getTimePartWhere('minute', (int) $dateTime->format('i')) . ', \':\', ' .
+                $this->getTimePartWhere('second', (int) $dateTime->format('s')) .
             ')) BETWEEN UNIX_TIMESTAMP(COALESCE(`' . $tableName . '`.`last_run`, `' . $tableName . '`.`added`)) AND UNIX_TIMESTAMP(\'' .
                 ((int) $dateTime->format('Y')) . '-' . ((int) $dateTime->format('n')) . '-' . ((int) $dateTime->format('j')) . ' ' .
                 ((int) $dateTime->format('H')) . ':' . ((int) $dateTime->format('i')) . ':' . ((int) $dateTime->format('s')) . '\'' .
-            ')'
+            ') AND ' .
+            $this->getTimePartWhere('day_of_week', (int) $dateTime->format('w')) .
+            ' BETWEEN ' .
+                'IF(' .
+                    'DATE_FORMAT(COALESCE(`' . $tableName . '`.`last_run`, `' . $tableName . '`.`added`), \'%w\') < ' . (int) $dateTime->format('w') . ', ' .
+                    'DATE_FORMAT(COALESCE(`' . $tableName . '`.`last_run`, `' . $tableName . '`.`added`), \'%w\'), ' .
+                    (int) $dateTime->format('w') .
+                ') AND ' .
+                'IF(' .
+                    'DATE_FORMAT(COALESCE(`' . $tableName . '`.`last_run`, `' . $tableName . '`.`added`), \'%w\') > ' . (int) $dateTime->format('w') . ', ' .
+                    'DATE_FORMAT(COALESCE(`' . $tableName . '`.`last_run`, `' . $tableName . '`.`added`), \'%w\'), ' .
+                    (int) $dateTime->format('w') .
+                ')'
         );
 
         if (!$table->select()) {
@@ -52,7 +68,7 @@ class CronjobRepository extends AbstractRepository
         return $models;
     }
 
-    private function getTimePartWhere(string $field, int $value, int $maxValue): string
+    private function getTimePartWhere(string $field, int $value): string
     {
         $tableName = Cronjob\Time::getTableName();
 
