@@ -66,12 +66,11 @@ class CommandService
             }
 
             $commandName = explode('\\', $argument);
-            $module = 'Core';
-            $classname = $commandName[0];
+            $module = array_shift($commandName);
+            $classname = implode('\\', $commandName);
 
-            if (count($commandName) > 1) {
-                $module = 'Module\\' . array_shift($commandName);
-                $classname = implode('\\', $commandName);
+            if ($module === 'Core') {
+                return 'GibsonOS\\Core\\Command\\' . $classname;
             }
 
             return 'GibsonOS\\' . $module . '\\Command\\' . $classname;
