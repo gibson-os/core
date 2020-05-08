@@ -25,6 +25,20 @@ class CronjobService
         $this->commandService = $commandService;
     }
 
+    public function add(
+        string $command,
+        string $user,
+        array $years,
+        array $days_of_months,
+        array $days_of_week,
+        array $hours,
+        array $minutes,
+        array $seconds,
+        array $arguments = null,
+        array $options = null
+    ): void {
+    }
+
     public function run(string $user): void
     {
         $dateTime = new DateTime();

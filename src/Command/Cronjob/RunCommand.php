@@ -8,7 +8,7 @@ use GibsonOS\Core\Command\AbstractCommand;
 use GibsonOS\Core\Exception\ArgumentError;
 use GibsonOS\Core\Service\CronjobService;
 
-class Run extends AbstractCommand
+class RunCommand extends AbstractCommand
 {
     /**
      * @var CronjobService

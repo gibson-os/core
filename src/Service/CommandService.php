@@ -70,10 +70,10 @@ class CommandService
             $classname = implode('\\', $commandName);
 
             if ($module === 'Core') {
-                return 'GibsonOS\\Core\\Command\\' . $classname;
+                return 'GibsonOS\\Core\\Command\\' . $classname . 'Command';
             }
 
-            return 'GibsonOS\\' . $module . '\\Command\\' . $classname;
+            return 'GibsonOS\\' . $module . '\\Command\\' . $classname . 'Command';
         }
 
         throw new CommandError('No Command found!');
