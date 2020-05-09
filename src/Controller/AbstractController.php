@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Controller;
 
 use GibsonOS\Core\Service\PermissionService;
+use GibsonOS\Core\Service\RequestService;
 
 abstract class AbstractController
 {
@@ -12,12 +13,18 @@ abstract class AbstractController
      */
     private $permissionService;
 
-    public function __construct(PermissionService $permissionService)
+    /**
+     * @var RequestService
+     */
+    private $requestService;
+
+    public function __construct(PermissionService $permissionService, RequestService $requestService)
     {
         $this->permissionService = $permissionService;
+        $this->requestService = $requestService;
     }
 
-    public function checkPermission(int $permission): void
+    protected function checkPermission(int $permission): void
     {
         //$this->permissionService->hasPermission($permission)
     }

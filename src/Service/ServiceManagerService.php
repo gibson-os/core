@@ -81,13 +81,7 @@ class ServiceManagerService
      */
     private function getByCreate(string $classname): object
     {
-        try {
-            /** @psalm-suppress ArgumentTypeCoercion */
-            $reflection = new ReflectionClass($classname);
-        } catch (ReflectionException $e) {
-            throw new FactoryError(sprintf('Reflection class for %s could not be created', $classname), 0, $e);
-        }
-
+        $reflection = $this->getReflectionsClass($classname);
         $constructor = $reflection->getConstructor();
         $parameters = [];
 
@@ -104,6 +98,19 @@ class ServiceManagerService
         }
 
         return new $classname(...$parameters);
+    }
+
+    /**
+     * @throws FactoryError
+     */
+    private function getReflectionsClass(string $classname): ReflectionClass
+    {
+        try {
+            /** @psalm-suppress ArgumentTypeCoercion */
+            return new ReflectionClass($classname);
+        } catch (ReflectionException $e) {
+            throw new FactoryError(sprintf('Reflection class for %s could not be created', $classname), 0, $e);
+        }
     }
 
     public function setService(string $name, object $class): void
