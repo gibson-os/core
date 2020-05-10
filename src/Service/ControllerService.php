@@ -32,9 +32,14 @@ class ControllerService
     /**
      * @throws ControllerError
      */
-    public function runAction(string $module, string $task, string $action): void
+    public function runAction(): void
     {
-        $controllerName = '\\GibsonOS\\' . ucfirst($module) . '\\' . ucfirst($task) . 'Controller';
+        $controllerName =
+            '\\GibsonOS\\' .
+            ucfirst($this->requestService->getModuleName()) . '\\' .
+            ucfirst($this->requestService->getTaskName()) . 'Controller'
+        ;
+        $action = $this->requestService->getActionName();
 
         try {
             $controller = $this->serviceManagerService->get($controllerName);
@@ -54,6 +59,48 @@ class ControllerService
             throw new ControllerError(sprintf('Action %s::%s is not public!', $controllerName, $action));
         }
 
+        $parameters = $this->getParameters($reflectionMethod);
+
+        /** @var ResponseInterface $response */
+        $response = $controller->$action(...$parameters);
+
+        $this->checkRequiredHeaders($response);
+
+        foreach ($response->getHeaders() as $headerName => $headerValue) {
+            header($headerName . ': ' . $headerValue);
+        }
+
+        echo $response->getBody();
+    }
+
+    /**
+     * @throws ControllerError
+     */
+    private function checkRequiredHeaders(ResponseInterface $response): void
+    {
+        foreach ($response->getRequiredHeaders() as $requiredHeader => $requiredValue) {
+            try {
+                $headerValue = $this->requestService->getHeader($requiredHeader);
+            } catch (RequestError $e) {
+                throw new ControllerError(sprintf('Required header %s not exists!', $requiredHeader), 0, $e);
+            }
+
+            if ($requiredValue !== $headerValue) {
+                throw new ControllerError(sprintf(
+                    'Required header %s has value %s. Required value is %s!',
+                    $requiredHeader,
+                    $headerValue,
+                    $requiredValue
+                ));
+            }
+        }
+    }
+
+    /**
+     * @throws ControllerError
+     */
+    private function getParameters(\ReflectionMethod $reflectionMethod): array
+    {
         $parameters = [];
 
         foreach ($reflectionMethod->getParameters() as $parameter) {
@@ -76,16 +123,7 @@ class ControllerService
             $parameters[] = $this->getParameterFromRequest($parameter);
         }
 
-        /** @var ResponseInterface $response */
-        $response = $controller->$action(...$parameters);
-
-        $this->checkRequiredHeaders($response);
-
-        foreach ($response->getHeaders() as $headerName => $headerValue) {
-            header($headerName . ': ' . $headerValue);
-        }
-
-        echo $response->getBody();
+        return $parameters;
     }
 
     /**
@@ -121,29 +159,6 @@ class ControllerService
                     (string) $parameter->getType(),
                     $parameter->getName()
                 ));
-        }
-    }
-
-    /**
-     * @throws ControllerError
-     */
-    private function checkRequiredHeaders(ResponseInterface $response): void
-    {
-        foreach ($response->getRequiredHeaders() as $requiredHeader => $requiredValue) {
-            try {
-                $headerValue = $this->requestService->getHeader($requiredHeader);
-            } catch (RequestError $e) {
-                throw new ControllerError(sprintf('Required header %s not exists!', $requiredHeader), 0, $e);
-            }
-
-            if ($requiredValue !== $headerValue) {
-                throw new ControllerError(sprintf(
-                    'Required header %s has value %s. Required value is %s!',
-                    $requiredHeader,
-                    $headerValue,
-                    $requiredValue
-                ));
-            }
         }
     }
 }
