@@ -8,7 +8,7 @@ use mysqlDatabase;
 use mysqlRegistry;
 use mysqlTable;
 
-class AbstractRepository
+abstract class AbstractRepository
 {
     public function startTransaction(mysqlDatabase $database = null): void
     {

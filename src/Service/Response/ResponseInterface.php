@@ -5,6 +5,8 @@ namespace GibsonOS\Core\Service\Response;
 
 interface ResponseInterface
 {
+    public function getCode(): int;
+
     public function getHeaders(): array;
 
     public function getBody(): string;

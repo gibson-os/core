@@ -1,0 +1,70 @@
+<html lang="de">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <title>Gibson OS</title>
+        <script type="text/javascript">
+            /* <![CDATA[ */
+            let domain = '{{ domain }}';
+            let baseDir = '{{ baseDir }}';
+            let serverDate = {{ serverDate|json_encode }};
+
+            let post = {{ app.request.post }};
+            let get = {{ app.request.get }};
+            let request = {{ app.request.request }};
+            /* ]]> */
+        </script>
+        <link rel="icon" type="image/vnd.microsoft.icon" href="/favicon.ico">
+        <link rel="stylesheet" type="text/css" href="js/ext/resources/css/ext-all.css" />
+        <link rel="stylesheet" type="text/css" href="css/style.css" />
+        <link rel="stylesheet" type="text/css" href="css/icons.css" />
+        <link rel="stylesheet" type="text/css" href="fontawesome/css/brands.css" />
+        <link rel="stylesheet" type="text/css" href="fontawesome/css/solid.css" />
+        <script type="text/javascript" src="js/ext/ext-all-debug.js"></script>
+        <script type="text/javascript" src="js/functions.js"></script>
+        <script type="text/javascript" src="js/elements.js"></script>
+        {% if session.get('login') %}
+            <script type="text/javascript" src="js/desktop.js"></script>
+            <script type="text/javascript" src="js/module/all/all.js"></script>
+            <script type="text/javascript" src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js"></script>
+            <script type="text/javascript" src="js/jsplumb.min.js"></script>
+            <script type="text/javascript" src="js/jsplumb.min.js"></script>>
+            <link rel="stylesheet" type="text/css" href="css/custom_icons.css" />
+        {% else %}
+            <script type="text/javascript" src="js/module/system/user.js"></script>
+        {% endfor %}
+    </head>
+    
+    <body scroll="no" id="body">
+    <div id="extBody"></div>
+    <script type="text/javascript">
+        /* <![CDATA[ */
+        Ext.onReady(function()
+        {
+            if (
+                GibsonOS.module.{{ request.getModuleName() }} &&
+                GibsonOS.module.{{ request.getModuleName() }}.{{ request.getTaskName() }}
+            ) {
+                {% set jsModule = 'GibsonOS.module.' ~ request.getModuleName() ~ '.' ~ request.getTaskName() ~ '.' ~ request.getActionName() %}
+                {% set jsTask = 'GibsonOS.module.' ~ request.getModuleName() ~ '.' ~ request.getTaskName() %}
+
+                if ({{ jsModule }}) {
+                    if (typeof({{ jsModule }}.App) === "function")  {
+                        new {{ jsModule }}.App();
+                    } else if (typeof({{ jsModule }}.Window) === "function")  {
+                        new {{ jsModule }}.Window();
+                    }
+                {% if request.getActionName() %}
+                } else if (typeof({{ jsTask }}.App) === "function") {
+                    new {{ jsTask }}.App();
+                {% endif %}
+                }
+            } else if (typeof({{ request.getModuleName()|lower }}{{ request.getTaskName()|capitalize }}{{ request.getActionName()|capitalize }}) == "function") {
+                // Old way
+                {{ request.getModuleName()|lower }}{{ request.getTaskName()|capitalize }}{{ request.getActionName()|capitalize }}();
+            }
+        });
+        /* ]]> */
+    </script>
+    <div id="taskbar"></div>
+    </body>
+</html>

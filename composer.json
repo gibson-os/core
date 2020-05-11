@@ -8,7 +8,8 @@
     "ext-fileinfo": "*",
     "ext-json": "*",
     "ext-sqlite3": "*",
-    "ext-sockets": "*"
+    "ext-sockets": "*",
+    "twig/twig": "^2.12"
   },
   "require-dev": {
     "codeception/codeception": "^3.1",

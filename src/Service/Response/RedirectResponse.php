@@ -3,26 +3,23 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Service\Response;
 
-use GibsonOS\Core\Utility\JsonUtility;
+use GibsonOS\Core\Utility\StatusCode;
 
-class AjaxResponse implements ResponseInterface
+class RedirectResponse implements ResponseInterface
 {
     /**
-     * @var mixed
+     * @var string
      */
-    private $body;
+    private $url;
 
     /**
      * @var int
      */
     private $code;
 
-    /**
-     * @param mixed $body
-     */
-    public function __construct($body, int $code = 200)
+    public function __construct(string $url, int $code = StatusCode::MOVED_PERMANENTLY)
     {
-        $this->body = $body;
+        $this->url = $url;
         $this->code = $code;
     }
 
@@ -33,16 +30,16 @@ class AjaxResponse implements ResponseInterface
 
     public function getHeaders(): array
     {
-        return ['Content-Type' => 'text/json; charset=UTF-8'];
+        return ['Location' => $this->url];
     }
 
     public function getBody(): string
     {
-        return JsonUtility::encode($this->body);
+        return '';
     }
 
     public function getRequiredHeaders(): array
     {
-        return ['HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest'];
+        return [];
     }
 }

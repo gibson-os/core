@@ -6,10 +6,14 @@ namespace GibsonOS\Core\Service;
 use GibsonOS\Core\Exception\ControllerError;
 use GibsonOS\Core\Exception\FactoryError;
 use GibsonOS\Core\Exception\RequestError;
+use GibsonOS\Core\Service\Response\ExceptionResponse;
 use GibsonOS\Core\Service\Response\ResponseInterface;
+use GibsonOS\Core\Utility\StatusCode;
 use ReflectionClass;
 use ReflectionException;
+use ReflectionMethod;
 use ReflectionParameter;
+use Throwable;
 
 class ControllerService
 {
@@ -23,10 +27,19 @@ class ControllerService
      */
     private $requestService;
 
-    public function __construct(ServiceManagerService $serviceManagerService, RequestService $requestService)
-    {
+    /**
+     * @var StatusCode
+     */
+    private $statusCode;
+
+    public function __construct(
+        ServiceManagerService $serviceManagerService,
+        RequestService $requestService,
+        StatusCode $statusCode
+    ) {
         $this->serviceManagerService = $serviceManagerService;
         $this->requestService = $requestService;
+        $this->statusCode = $statusCode;
     }
 
     /**
@@ -46,25 +59,50 @@ class ControllerService
             /** @psalm-suppress ArgumentTypeCoercion */
             $reflectionClass = new ReflectionClass($controllerName);
         } catch (ReflectionException | FactoryError $e) {
-            throw new ControllerError(sprintf('Controller %s not found!', $controllerName), 0, $e);
+            $this->outputResponse(new ExceptionResponse(
+                new ControllerError(sprintf('Controller %s not found!', $controllerName), 404, $e),
+                $this->requestService
+            ));
+
+            return;
         }
 
         try {
             $reflectionMethod = $reflectionClass->getMethod($action);
         } catch (ReflectionException $e) {
-            throw new ControllerError(sprintf('Action %s::%s is not exists!', $controllerName, $action), 0, $e);
+            $this->outputResponse(new ExceptionResponse(
+                new ControllerError(sprintf('Action %s::%s not exists!', $controllerName, $action), 404, $e),
+                $this->requestService
+            ));
+
+            return;
         }
 
         if (!$reflectionMethod->isPublic()) {
-            throw new ControllerError(sprintf('Action %s::%s is not public!', $controllerName, $action));
+            $this->outputResponse(new ExceptionResponse(
+                new ControllerError(sprintf('Action %s::%s is not public!', $controllerName, $action), 405),
+                $this->requestService
+            ));
+
+            return;
         }
 
         $parameters = $this->getParameters($reflectionMethod);
 
-        /** @var ResponseInterface $response */
-        $response = $controller->$action(...$parameters);
+        try {
+            /** @var ResponseInterface $response */
+            $response = $controller->$action(...$parameters);
+            $this->checkRequiredHeaders($response);
+        } catch (Throwable $e) {
+            $response = new ExceptionResponse($e, $this->requestService);
+        }
 
-        $this->checkRequiredHeaders($response);
+        $this->outputResponse($response);
+    }
+
+    private function outputResponse(ResponseInterface $response): void
+    {
+        header($this->statusCode->getStatusHeader($response->getCode()));
 
         foreach ($response->getHeaders() as $headerName => $headerValue) {
             header($headerName . ': ' . $headerValue);
@@ -99,7 +137,7 @@ class ControllerService
     /**
      * @throws ControllerError
      */
-    private function getParameters(\ReflectionMethod $reflectionMethod): array
+    private function getParameters(ReflectionMethod $reflectionMethod): array
     {
         $parameters = [];
 
@@ -129,13 +167,25 @@ class ControllerService
     /**
      * @throws ControllerError
      *
-     * @return array|bool|float|int|string
+     * @return array|bool|float|int|string|null
      */
     private function getParameterFromRequest(ReflectionParameter $parameter)
     {
         try {
             $value = $this->requestService->getRequestValue($parameter->getName());
         } catch (RequestError $e) {
+            if ($parameter->isOptional()) {
+                try {
+                    return $parameter->getDefaultValue();
+                } catch (ReflectionException $e) {
+                    throw new ControllerError($e->getMessage(), 0, $e);
+                }
+            }
+
+            if ($parameter->allowsNull()) {
+                return null;
+            }
+
             throw new ControllerError(sprintf(
                 'Parameter %s is not in request!',
                 $parameter->getName()

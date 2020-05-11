@@ -24,17 +24,20 @@ class RequestService
      */
     private $actionName;
 
-    /**
-     * @throws RequestError
-     */
     public function __construct()
     {
         $queryString = (string) preg_replace('/\?.*/', '', $_SERVER['REQUEST_URI']);
-        $params = explode('/', $queryString);
+        $queryParams = explode('/', $queryString);
 
-        $this->moduleName = (string) (array_shift($params) ?: 'system');
-        $this->taskName = (string) (array_shift($params) ?: 'index');
-        $this->actionName = (string) (array_shift($params) ?: 'index');
+        $this->moduleName = (string) (array_shift($queryParams) ?: 'system');
+        $this->taskName = (string) (array_shift($queryParams) ?: 'index');
+        $this->actionName = (string) (array_shift($queryParams) ?: 'index');
+
+        $params = [];
+
+        while (count($queryParams) > 1) {
+            $params[(string) array_shift($queryParams)] = (string) array_shift($queryParams);
+        }
 
         $this->requestValues = array_merge(
             $_GET,
@@ -57,6 +60,11 @@ class RequestService
     public function getActionName(): string
     {
         return $this->actionName;
+    }
+
+    public function getBaseDir(): string
+    {
+        return preg_replace('|^(.*/).+?$|', '$1', $_SERVER['SCRIPT_NAME']);
     }
 
     /**
@@ -101,5 +109,13 @@ class RequestService
         }
 
         return $this->requestValues[$key];
+    }
+
+    /**
+     * @throws RequestError
+     */
+    public function isAjax(): bool
+    {
+        return $this->getHeader('HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest';
     }
 }
