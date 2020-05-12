@@ -47,9 +47,11 @@ class ControllerService
      */
     public function runAction(): void
     {
+        $moduleName = $this->requestService->getModuleName();
         $controllerName =
-            '\\GibsonOS\\' .
-            ucfirst($this->requestService->getModuleName()) . '\\' .
+            'GibsonOS\\' .
+            ($moduleName === 'core' ? '' : 'Module\\') .
+            ucfirst($moduleName) . '\\Controller\\' .
             ucfirst($this->requestService->getTaskName()) . 'Controller'
         ;
         $action = $this->requestService->getActionName();

@@ -29,7 +29,7 @@ class RequestService
         $queryString = (string) preg_replace('/\?.*/', '', $_SERVER['REQUEST_URI']);
         $queryParams = explode('/', $queryString);
 
-        $this->moduleName = (string) (array_shift($queryParams) ?: 'system');
+        $this->moduleName = (string) (array_shift($queryParams) ?: 'core');
         $this->taskName = (string) (array_shift($queryParams) ?: 'index');
         $this->actionName = (string) (array_shift($queryParams) ?: 'index');
 
