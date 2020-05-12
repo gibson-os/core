@@ -46,4 +46,18 @@ class SessionService
 
         $this->unset($this->data[$key]);
     }
+
+    /**
+     * @param mixed|null $default
+     *
+     * @return mixed
+     */
+    public function getWithDefault(string $key, $default = null)
+    {
+        try {
+            return $this->get($key);
+        } catch (OutOfBoundsException $e) {
+            return $default;
+        }
+    }
 }

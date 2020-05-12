@@ -4,13 +4,13 @@
         <title>Gibson OS</title>
         <script type="text/javascript">
             /* <![CDATA[ */
-            let domain = '{{ domain }}';
-            let baseDir = '{{ baseDir }}';
-            let serverDate = {{ serverDate|json_encode }};
+            const domain = '{{ domain }}';
+            const baseDir = '{{ baseDir }}';
+            const serverDate = {{ serverDate|json_encode|raw }};
 
-            let post = {{ app.request.post }};
-            let get = {{ app.request.get }};
-            let request = {{ app.request.request }};
+            const post = {{ app.request.post|json_encode|raw }};
+            const get = {{ app.request.get|json_encode|raw }};
+            const request = {{ app.request.request|json_encode|raw }};
             /* ]]> */
         </script>
         <link rel="icon" type="image/vnd.microsoft.icon" href="/favicon.ico">
@@ -22,7 +22,7 @@
         <script type="text/javascript" src="js/ext/ext-all-debug.js"></script>
         <script type="text/javascript" src="js/functions.js"></script>
         <script type="text/javascript" src="js/elements.js"></script>
-        {% if session.get('login') %}
+        {% if session.getWithDefault('login', false) %}
             <script type="text/javascript" src="js/desktop.js"></script>
             <script type="text/javascript" src="js/module/all/all.js"></script>
             <script type="text/javascript" src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js"></script>
@@ -31,7 +31,7 @@
             <link rel="stylesheet" type="text/css" href="css/custom_icons.css" />
         {% else %}
             <script type="text/javascript" src="js/module/system/user.js"></script>
-        {% endfor %}
+        {% endif %}
     </head>
     
     <body scroll="no" id="body">
@@ -40,12 +40,19 @@
         /* <![CDATA[ */
         Ext.onReady(function()
         {
+            {% set moduleName = request.getModuleName() == 'core' ? 'system' : request.getTaskName() %}
+            {% set taskName = request.getTaskName() %}
+            {% set actionName = request.getActionName() %}
+            {% if session.getWithDefault('login', false) != true %}
+                {% set taskName = 'user' %}
+                {% set actionName = 'login' %}
+            {% endif %}
+
             if (
-                GibsonOS.module.{{ request.getModuleName() }} &&
-                GibsonOS.module.{{ request.getModuleName() }}.{{ request.getTaskName() }}
+                GibsonOS.module.{{ moduleName }} &&
+                GibsonOS.module.{{ moduleName }}.{{ taskName }}
             ) {
-                {% set jsModule = 'GibsonOS.module.' ~ request.getModuleName() ~ '.' ~ request.getTaskName() ~ '.' ~ request.getActionName() %}
-                {% set jsTask = 'GibsonOS.module.' ~ request.getModuleName() ~ '.' ~ request.getTaskName() %}
+                {% set jsModule = 'GibsonOS.module.' ~ moduleName ~ '.' ~ taskName ~ '.' ~ actionName %}
 
                 if ({{ jsModule }}) {
                     if (typeof({{ jsModule }}.App) === "function")  {
@@ -53,14 +60,10 @@
                     } else if (typeof({{ jsModule }}.Window) === "function")  {
                         new {{ jsModule }}.Window();
                     }
-                {% if request.getActionName() %}
-                } else if (typeof({{ jsTask }}.App) === "function") {
-                    new {{ jsTask }}.App();
-                {% endif %}
                 }
-            } else if (typeof({{ request.getModuleName()|lower }}{{ request.getTaskName()|capitalize }}{{ request.getActionName()|capitalize }}) == "function") {
+            } else if (typeof({{ moduleName|lower }}{{ taskName|capitalize }}{{ actionName|capitalize }}) == "function") {
                 // Old way
-                {{ request.getModuleName()|lower }}{{ request.getTaskName()|capitalize }}{{ request.getActionName()|capitalize }}();
+                {{ moduleName|lower }}{{ taskName|capitalize }}{{ actionName|capitalize }}();
             }
         });
         /* ]]> */

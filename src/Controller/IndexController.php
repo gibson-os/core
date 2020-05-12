@@ -13,6 +13,6 @@ class IndexController extends AbstractController
      */
     public function index(): Response
     {
-        return $this->renderTemplate('@core/index.html');
+        return $this->renderTemplate('@core/base.html.twig');
     }
 }
