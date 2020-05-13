@@ -42,18 +42,9 @@ class ControllerService
         $this->statusCode = $statusCode;
     }
 
-    /**
-     * @throws ControllerError
-     */
     public function runAction(): void
     {
-        $moduleName = $this->requestService->getModuleName();
-        $controllerName =
-            'GibsonOS\\' .
-            ($moduleName === 'core' ? '' : 'Module\\') .
-            ucfirst($moduleName) . '\\Controller\\' .
-            ucfirst($this->requestService->getTaskName()) . 'Controller'
-        ;
+        $controllerName = $this->getControllerClassname();
         $action = $this->requestService->getActionName();
 
         try {
@@ -89,9 +80,8 @@ class ControllerService
             return;
         }
 
-        $parameters = $this->getParameters($reflectionMethod);
-
         try {
+            $parameters = $this->getParameters($reflectionMethod);
             /** @var ResponseInterface $response */
             $response = $controller->$action(...$parameters);
             $this->checkRequiredHeaders($response);
@@ -212,5 +202,17 @@ class ControllerService
                     $parameter->getName()
                 ));
         }
+    }
+
+    public function getControllerClassname(): string
+    {
+        $moduleName = $this->requestService->getModuleName();
+
+        return
+            'GibsonOS\\' .
+            ($moduleName === 'core' ? '' : 'Module\\') .
+            ucfirst($moduleName) . '\\Controller\\' .
+            ucfirst($this->requestService->getTaskName()) . 'Controller'
+        ;
     }
 }

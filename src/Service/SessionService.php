@@ -31,7 +31,7 @@ class SessionService
      */
     public function get(string $key)
     {
-        if (isset($this->data[$key])) {
+        if (!isset($this->data[$key])) {
             throw new OutOfBoundsException(sprintf('Session key $%s not exists!', $key));
         }
 
@@ -40,11 +40,14 @@ class SessionService
 
     public function unset(string $key): void
     {
-        if (isset($this->data[$key])) {
+        if (!isset($this->data[$key])) {
             throw new OutOfBoundsException(sprintf('Session key $%s not exists!', $key));
         }
 
-        $this->unset($this->data[$key]);
+        unset($this->data[$key]);
+        session_start();
+        unset($_SESSION[$key]);
+        session_write_close();
     }
 
     /**
