@@ -27,7 +27,7 @@ class RequestService
     public function __construct()
     {
         $queryString = (string) preg_replace('/\?.*/', '', $_SERVER['REQUEST_URI']);
-        $queryParams = explode('/', $queryString);
+        $queryParams = explode('/', mb_substr($queryString, 1));
 
         $this->moduleName = (string) (array_shift($queryParams) ?: 'core');
         $this->taskName = (string) (array_shift($queryParams) ?: 'index');
@@ -111,11 +111,12 @@ class RequestService
         return $this->requestValues[$key];
     }
 
-    /**
-     * @throws RequestError
-     */
     public function isAjax(): bool
     {
-        return $this->getHeader('HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest';
+        try {
+            return $this->getHeader('HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest';
+        } catch (RequestError $e) {
+            return false;
+        }
     }
 }
