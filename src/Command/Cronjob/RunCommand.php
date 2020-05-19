@@ -31,6 +31,6 @@ class RunCommand extends AbstractCommand
             $this->cronjobService->run($this->getArgument('user') ?? '');
         }
 
-        return 255;
+        return 0;
     }
 }

@@ -113,6 +113,6 @@ class DriveStatCommand extends AbstractCommand
             }
         }
 
-        return 255;
+        return 0;
     }
 }
