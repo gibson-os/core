@@ -8,6 +8,7 @@ use GibsonOS\Core\Exception\FactoryError;
 use GibsonOS\Core\Exception\RequestError;
 use GibsonOS\Core\Service\Response\ExceptionResponse;
 use GibsonOS\Core\Service\Response\ResponseInterface;
+use GibsonOS\Core\Utility\JsonUtility;
 use GibsonOS\Core\Utility\StatusCode;
 use ReflectionClass;
 use ReflectionException;
@@ -194,7 +195,11 @@ class ControllerService
             case 'string':
                 return (string) $value;
             case 'array':
-                return (array) $value;
+                if (!is_array($value)) {
+                    return (array) JsonUtility::decode($value);
+                }
+
+                return $value;
             default:
                 throw new ControllerError(sprintf(
                     'Type %s of parameter %s is not allowed!',
