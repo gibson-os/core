@@ -82,13 +82,19 @@ abstract class AbstractController
         }
     }
 
-    protected function returnSuccess($data): AjaxResponse
+    protected function returnSuccess($data, int $total = null): AjaxResponse
     {
-        return new AjaxResponse([
+        $return = [
             'success' => true,
             'failure' => false,
             'data' => $data,
-        ]);
+        ];
+
+        if ($total !== null) {
+            $return['total'] = $total;
+        }
+
+        return new AjaxResponse($return);
     }
 
     protected function returnFailure($message, int $code = 400): AjaxResponse
