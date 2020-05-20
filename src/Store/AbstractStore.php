@@ -15,10 +15,7 @@ abstract class AbstractStore
      */
     private $from = 0;
 
-    /**
-     * @return array[]
-     */
-    abstract public function getList();
+    abstract public function getList(): array;
 
     abstract public function getCount(): int;
 
