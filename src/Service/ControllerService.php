@@ -142,9 +142,11 @@ class ControllerService
                     $parameters[] = $this->serviceManagerService->get($parameterClass->getName());
                 } catch (FactoryError $e) {
                     throw new ControllerError(sprintf(
-                        'Class %s of parameter $%s not found!',
+                        'Class %s of parameter $%s for %s::%s not found!',
                         $parameterClass->getName(),
-                        $parameter->getName()
+                        $parameter->getName(),
+                        $reflectionMethod->getName(),
+                        $reflectionMethod->getDeclaringClass()->getName()
                     ), 0, $e);
                 }
 
@@ -201,10 +203,14 @@ class ControllerService
 
                 return $value;
             default:
+                $declaringClass = $parameter->getDeclaringClass();
+
                 throw new ControllerError(sprintf(
-                    'Type %s of parameter %s is not allowed!',
+                    'Type %s of parameter %s for %s::%s is not allowed!',
                     (string) $parameter->getType(),
-                    $parameter->getName()
+                    $parameter->getName(),
+                    $declaringClass === null ? '' : $declaringClass->getName(),
+                    $parameter->getDeclaringFunction()->getName()
                 ));
         }
     }
