@@ -260,9 +260,9 @@ class Media implements JsonSerializable
         return (bool) count($this->getSubtitleStreams());
     }
 
-    public function selectAudioStream(string $streamId): Media
+    public function selectAudioStream(?string $streamId): Media
     {
-        if (!isset($this->audioStreams[$streamId])) {
+        if ($streamId !== null && !isset($this->audioStreams[$streamId])) {
             throw new InvalidArgumentException('Audio Stream (' . $streamId . ') existiert nicht!');
         }
 
@@ -271,9 +271,9 @@ class Media implements JsonSerializable
         return $this;
     }
 
-    public function selectSubtitleStream(string $streamId): Media
+    public function selectSubtitleStream(?string $streamId): Media
     {
-        if (!isset($this->subtitleStreams[$streamId])) {
+        if ($streamId !== null && !isset($this->subtitleStreams[$streamId])) {
             throw new InvalidArgumentException('Subtitle Stream (' . $streamId . ') existiert nicht!');
         }
 
@@ -282,9 +282,9 @@ class Media implements JsonSerializable
         return $this;
     }
 
-    public function selectVideoStream(string $streamId): Media
+    public function selectVideoStream(?string $streamId): Media
     {
-        if (!isset($this->videoStreams[$streamId])) {
+        if ($streamId !== null && !isset($this->videoStreams[$streamId])) {
             throw new InvalidArgumentException('Video Stream (' . $streamId . ') existiert nciht!');
         }
 
