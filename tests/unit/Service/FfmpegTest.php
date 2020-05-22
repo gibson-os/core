@@ -116,9 +116,6 @@ class FfmpegTest extends Unit
     /**
      * @dataProvider getMetaDataStrings
      *
-     * @param string $filename
-     * @param string $return
-     *
      * @throws FileNotFound
      * @throws ProcessError
      */
@@ -132,8 +129,6 @@ class FfmpegTest extends Unit
 
     /**
      * @dataProvider getMetaDataStrings
-     *
-     * @param string $filename
      *
      * @throws FileNotFound
      * @throws ProcessError
@@ -162,8 +157,6 @@ class FfmpegTest extends Unit
 
     /**
      * @dataProvider getMetaDataStrings
-     *
-     * @param string $filename
      *
      * @throws FileNotFound
      * @throws ProcessError
@@ -215,7 +208,7 @@ class FfmpegTest extends Unit
             ->shouldNotBeCalled()
         ;
         $this->process->execute(sprintf(
-            '%s -i %s -map v1 -c:v "codec" %s > %s 2> %s',
+            '%s -i %s -map v1 -c:v "codec" -sn %s > %s 2> %s',
             $this->ffmpegPath,
             escapeshellarg($this->inputVideoFilename),
             escapeshellarg($this->outputVideoFilename),
@@ -1350,9 +1343,6 @@ At least one output file must be specified
         return $file;
     }
 
-    /**
-     * @return array
-     */
     public function getConvertStatusStrings(): array
     {
         return [
