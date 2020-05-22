@@ -90,7 +90,11 @@ class ServiceManagerService
                 $parameterClass = $parameter->getClass();
 
                 if (!$parameterClass instanceof ReflectionClass) {
-                    throw new FactoryError(sprintf('Parameter %s is no Class', $parameter->getName()));
+                    throw new FactoryError(sprintf(
+                        'Parameter %s of Class %s is no Class',
+                        $parameter->getName(),
+                        $classname
+                    ));
                 }
 
                 $parameters[] = $this->get($parameterClass->getName());

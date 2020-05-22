@@ -89,12 +89,15 @@ class RequestService
     public function getHeader(string $key): string
     {
         $headers = $this->getHeaders();
+        /** @psalm-suppress InvalidScalarArgument */
+        $headers = array_combine(array_map('mb_strtolower', array_keys($headers)), $headers) ?: [];
+        $key = mb_strtolower($key);
 
         if (!isset($headers[$key])) {
             throw new RequestError(sprintf('Header %s not exists!', $key));
         }
 
-        return $_SERVER[$key];
+        return $headers[$key];
     }
 
     /**
@@ -114,7 +117,7 @@ class RequestService
     public function isAjax(): bool
     {
         try {
-            return $this->getHeader('HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest';
+            return $this->getHeader('X-REQUESTED-WITH') === 'XMLHttpRequest';
         } catch (RequestError $e) {
             return false;
         }

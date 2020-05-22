@@ -43,6 +43,6 @@ class AjaxResponse implements ResponseInterface
 
     public function getRequiredHeaders(): array
     {
-        return ['HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest'];
+        return ['X-REQUESTED-WITH' => 'XMLHttpRequest'];
     }
 }

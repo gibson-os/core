@@ -33,14 +33,21 @@ class ControllerService
      */
     private $statusCode;
 
+    /**
+     * @var TwigService
+     */
+    private $twigService;
+
     public function __construct(
         ServiceManagerService $serviceManagerService,
         RequestService $requestService,
-        StatusCode $statusCode
+        StatusCode $statusCode,
+        TwigService $twigService
     ) {
         $this->serviceManagerService = $serviceManagerService;
         $this->requestService = $requestService;
         $this->statusCode = $statusCode;
+        $this->twigService = $twigService;
     }
 
     public function runAction(): void
@@ -55,7 +62,8 @@ class ControllerService
         } catch (ReflectionException | FactoryError $e) {
             $this->outputResponse(new ExceptionResponse(
                 new ControllerError(sprintf('Controller %s not found!', $controllerName), 404, $e),
-                $this->requestService
+                $this->requestService,
+                $this->twigService
             ));
 
             return;
@@ -66,7 +74,8 @@ class ControllerService
         } catch (ReflectionException $e) {
             $this->outputResponse(new ExceptionResponse(
                 new ControllerError(sprintf('Action %s::%s not exists!', $controllerName, $action), 404, $e),
-                $this->requestService
+                $this->requestService,
+                $this->twigService
             ));
 
             return;
@@ -75,7 +84,8 @@ class ControllerService
         if (!$reflectionMethod->isPublic()) {
             $this->outputResponse(new ExceptionResponse(
                 new ControllerError(sprintf('Action %s::%s is not public!', $controllerName, $action), 405),
-                $this->requestService
+                $this->requestService,
+                $this->twigService
             ));
 
             return;
@@ -87,7 +97,7 @@ class ControllerService
             $response = $controller->$action(...$parameters);
             $this->checkRequiredHeaders($response);
         } catch (Throwable $e) {
-            $response = new ExceptionResponse($e, $this->requestService);
+            $response = new ExceptionResponse($e, $this->requestService, $this->twigService);
         }
 
         $this->outputResponse($response);
@@ -145,8 +155,8 @@ class ControllerService
                         'Class %s of parameter $%s for %s::%s not found!',
                         $parameterClass->getName(),
                         $parameter->getName(),
-                        $reflectionMethod->getName(),
-                        $reflectionMethod->getDeclaringClass()->getName()
+                        $reflectionMethod->getDeclaringClass()->getName(),
+                        $reflectionMethod->getName()
                     ), 0, $e);
                 }
 
