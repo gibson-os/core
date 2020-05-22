@@ -7,6 +7,7 @@ use GibsonOS\Core\Exception\LoginRequired;
 use GibsonOS\Core\Exception\PermissionDenied;
 use GibsonOS\Core\Exception\UserError;
 use GibsonOS\Core\Service\PermissionService;
+use GibsonOS\Core\Service\Response\AjaxResponse;
 use GibsonOS\Core\Service\Response\RedirectResponse;
 use GibsonOS\Core\Service\Response\ResponseInterface;
 use GibsonOS\Core\Service\UserService;
@@ -41,5 +42,16 @@ class UserController extends AbstractController
         $userService->logout();
 
         return new RedirectResponse($this->requestService->getBaseDir());
+    }
+
+    /**
+     * @throws LoginRequired
+     * @throws PermissionDenied
+     */
+    public function sessionRefresh(): AjaxResponse
+    {
+        $this->checkPermission(PermissionService::READ);
+
+        return $this->returnSuccess(null);
     }
 }
