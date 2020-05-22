@@ -3,7 +3,10 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Controller;
 
+use GibsonOS\Core\Exception\LoginRequired;
+use GibsonOS\Core\Exception\PermissionDenied;
 use GibsonOS\Core\Exception\UserError;
+use GibsonOS\Core\Service\PermissionService;
 use GibsonOS\Core\Service\Response\RedirectResponse;
 use GibsonOS\Core\Service\Response\ResponseInterface;
 use GibsonOS\Core\Service\UserService;
@@ -27,8 +30,14 @@ class UserController extends AbstractController
         return new RedirectResponse($this->requestService->getBaseDir());
     }
 
+    /**
+     * @throws LoginRequired
+     * @throws PermissionDenied
+     */
     public function logout(UserService $userService): ResponseInterface
     {
+        $this->checkPermission(PermissionService::WRITE);
+
         $userService->logout();
 
         return new RedirectResponse($this->requestService->getBaseDir());

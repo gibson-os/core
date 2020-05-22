@@ -3,10 +3,15 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Service;
 
+use GibsonOS\Core\Model\User;
 use OutOfBoundsException;
 
 class SessionService
 {
+    const LOGIN = 'login';
+
+    const USER_ID = 'userId';
+
     private $data = [];
 
     public function __construct()
@@ -38,7 +43,7 @@ class SessionService
         return $this->data[$key];
     }
 
-    public function unset(string $key): void
+    public function unset(string $key): SessionService
     {
         if (!isset($this->data[$key])) {
             throw new OutOfBoundsException(sprintf('Session key $%s not exists!', $key));
@@ -48,6 +53,8 @@ class SessionService
         session_start();
         unset($_SESSION[$key]);
         session_write_close();
+
+        return $this;
     }
 
     /**
@@ -62,5 +69,39 @@ class SessionService
         } catch (OutOfBoundsException $e) {
             return $default;
         }
+    }
+
+    public function login(User $user): SessionService
+    {
+        return $this
+            ->set(self::LOGIN, true)
+            ->set(self::USER_ID, $user->getId())
+            // @todo old stuff. Entfernen wenn alles umgebaut ist
+            ->set('user_id', $user->getId())
+            ->set('user_name', $user->getUser())
+        ;
+    }
+
+    public function logout(): SessionService
+    {
+        return $this
+            ->unset(self::LOGIN)
+            ->unset(self::USER_ID)
+            // @todo old stuff. Entfernen wenn alles umgebaut ist
+            ->unset('user_id')
+            ->unset('user_name')
+        ;
+    }
+
+    public function isLogin(): bool
+    {
+        return (bool) $this->getWithDefault(self::LOGIN, false);
+    }
+
+    public function getUserId(): ?int
+    {
+        $userId = (int) $this->getWithDefault(self::USER_ID, 0);
+
+        return $userId === 0 ? null : $userId;
     }
 }

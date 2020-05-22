@@ -40,12 +40,7 @@ class UserService
     {
         try {
             $user = $this->userRepository->getByUsernameAndPassword($username, $this->hashPassword($password));
-            $this->sessionService->set('login', true);
-            $this->sessionService->set('userId', $user->getId());
-
-            // @todo old stuff. Entfernen wenn alles umgebaut ist
-            $this->sessionService->set('user_id', $user->getId());
-            $this->sessionService->set('user_name', $user->getUser());
+            $this->sessionService->login($user);
 
             return true;
         } catch (SelectError $e) {
@@ -57,12 +52,7 @@ class UserService
 
     public function logout(): void
     {
-        $this->sessionService->unset('login');
-        $this->sessionService->unset('userId');
-
-        // @todo old stuff. Entfernen wenn alles umgebaut ist
-        $this->sessionService->unset('user_id');
-        $this->sessionService->unset('user_name');
+        $this->sessionService->logout();
     }
 
     /**

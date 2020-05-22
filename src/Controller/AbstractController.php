@@ -4,6 +4,8 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Controller;
 
 use GibsonOS\Core\Exception\ControllerError;
+use GibsonOS\Core\Exception\LoginRequired;
+use GibsonOS\Core\Exception\PermissionDenied;
 use GibsonOS\Core\Service\PermissionService;
 use GibsonOS\Core\Service\RequestService;
 use GibsonOS\Core\Service\Response\AjaxResponse;
@@ -49,9 +51,29 @@ abstract class AbstractController
         $this->sessionService = $sessionService;
     }
 
+    /**
+     * @throws LoginRequired
+     * @throws PermissionDenied
+     */
     protected function checkPermission(int $permission): void
     {
-        //$this->permissionService->hasPermission($permission)
+        $hasPermission = $this->permissionService->hasPermission(
+            $permission,
+            $this->requestService->getModuleName(),
+            $this->requestService->getTaskName(),
+            $this->requestService->getActionName(),
+            $this->sessionService->getUserId()
+        );
+
+        if ($hasPermission) {
+            return;
+        }
+
+        if ($this->sessionService->isLogin()) {
+            throw new PermissionDenied();
+        }
+
+        throw new LoginRequired();
     }
 
     /**
