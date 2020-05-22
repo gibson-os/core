@@ -127,7 +127,7 @@ class ControllerService
         $context = [
             'baseDir' => preg_replace('|^(.*/).+?$|', '$1', $_SERVER['SCRIPT_NAME']),
             'domain' => strtolower($_SERVER['REQUEST_SCHEME']) . '://' . $_SERVER['HTTP_HOST'],
-            'derverDate' => [
+            'serverDate' => [
                 'now' => $now,
                 'sunrise' => date_sunrise($now, SUNFUNCS_RET_TIMESTAMP),
                 'sunset' => date_sunset($now, SUNFUNCS_RET_TIMESTAMP),
