@@ -6,7 +6,9 @@ namespace GibsonOS\Core\Service;
 use GibsonOS\Core\Exception\ControllerError;
 use GibsonOS\Core\Exception\FactoryError;
 use GibsonOS\Core\Exception\RequestError;
+use GibsonOS\Core\Service\Response\AjaxResponse;
 use GibsonOS\Core\Service\Response\ExceptionResponse;
+use GibsonOS\Core\Service\Response\Response;
 use GibsonOS\Core\Service\Response\ResponseInterface;
 use GibsonOS\Core\Utility\JsonUtility;
 use GibsonOS\Core\Utility\StatusCode;
@@ -15,6 +17,9 @@ use ReflectionException;
 use ReflectionMethod;
 use ReflectionParameter;
 use Throwable;
+use Twig\Error\LoaderError;
+use Twig\Error\RuntimeError;
+use Twig\Error\SyntaxError;
 
 class ControllerService
 {
@@ -95,12 +100,51 @@ class ControllerService
             $parameters = $this->getParameters($reflectionMethod);
             /** @var ResponseInterface $response */
             $response = $controller->$action(...$parameters);
-            $this->checkRequiredHeaders($response);
+
+            try {
+                $this->checkRequiredHeaders($response);
+            } catch (ControllerError $e) {
+                if (!$response instanceof AjaxResponse) {
+                    throw $e;
+                }
+
+                $response = $this->renderTemplate();
+            }
         } catch (Throwable $e) {
             $response = new ExceptionResponse($e, $this->requestService, $this->twigService);
         }
 
         $this->outputResponse($response);
+    }
+
+    /**
+     * @throws ControllerError
+     */
+    private function renderTemplate(): Response
+    {
+        $twig = $this->twigService->getTwig();
+        $now = time();
+        $context = [
+            'baseDir' => preg_replace('|^(.*/).+?$|', '$1', $_SERVER['SCRIPT_NAME']),
+            'domain' => strtolower($_SERVER['REQUEST_SCHEME']) . '://' . $_SERVER['HTTP_HOST'],
+            'derverDate' => [
+                'now' => $now,
+                'sunrise' => date_sunrise($now, SUNFUNCS_RET_TIMESTAMP),
+                'sunset' => date_sunset($now, SUNFUNCS_RET_TIMESTAMP),
+            ],
+            'request' => $this->requestService,
+            'session' => $this->serviceManagerService->get(SessionService::class),
+        ];
+
+        try {
+            return new Response(
+                $twig->render('@core/base.html.twig', $context),
+                StatusCode::OK,
+                ['Content-Type' => 'text/html; charset=UTF-8']
+            );
+        } catch (LoaderError | RuntimeError | SyntaxError $e) {
+            throw new ControllerError('Template render error!', 0, $e);
+        }
     }
 
     private function outputResponse(ResponseInterface $response): void

@@ -22,7 +22,7 @@
         <script type="text/javascript" src="js/ext/ext-all-debug.js"></script>
         <script type="text/javascript" src="js/functions.js"></script>
         <script type="text/javascript" src="js/elements.js"></script>
-        {% if session.getWithDefault('login', false) %}
+        {% if session.isLogin() %}
             <script type="text/javascript" src="js/desktop.js"></script>
             <script type="text/javascript" src="js/module/all/all.js"></script>
             <script type="text/javascript" src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js"></script>

@@ -36,6 +36,11 @@ class Setting extends AbstractModel
     private $user;
 
     /**
+     * @var Module
+     */
+    private $module;
+
+    /**
      * @throws GetError
      */
     public function __construct(mysqlDatabase $database = null)
@@ -113,6 +118,25 @@ class Setting extends AbstractModel
     {
         $this->user = $user;
         $this->setUserId($user->getId() ?? 0);
+
+        return $this;
+    }
+
+    /**
+     * @throws DateTimeError
+     * @throws SelectError
+     */
+    public function getModule(): Module
+    {
+        $this->loadForeignRecord($this->module, $this->getModuleId());
+
+        return $this->module;
+    }
+
+    public function setModule(Module $module): Setting
+    {
+        $this->module = $module;
+        $this->setModuleId($module->getId() ?? 0);
 
         return $this;
     }

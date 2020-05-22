@@ -81,21 +81,9 @@ abstract class AbstractController
      */
     protected function renderTemplate(string $templatePath, array $context = []): Response
     {
-        $twig = $this->twigService->getTwig();
-        $context['baseDir'] = preg_replace('|^(.*/).+?$|', '$1', $_SERVER['SCRIPT_NAME']);
-        $context['domain'] = strtolower($_SERVER['REQUEST_SCHEME']) . '://' . $_SERVER['HTTP_HOST'];
-        $now = time();
-        $context['serverDate'] = [
-            'now' => $now,
-            'sunrise' => date_sunrise($now, SUNFUNCS_RET_TIMESTAMP),
-            'sunset' => date_sunset($now, SUNFUNCS_RET_TIMESTAMP),
-        ];
-        $context['request'] = $this->requestService;
-        $context['session'] = $this->sessionService;
-
         try {
             return new Response(
-                $twig->render($templatePath, $context),
+                $this->twigService->getTwig()->render($templatePath, $context),
                 StatusCode::OK,
                 ['Content-Type' => 'text/html; charset=UTF-8']
             );
@@ -104,7 +92,7 @@ abstract class AbstractController
         }
     }
 
-    protected function returnSuccess($data, int $total = null): AjaxResponse
+    protected function returnSuccess($data = null, int $total = null): AjaxResponse
     {
         $return = [
             'success' => true,

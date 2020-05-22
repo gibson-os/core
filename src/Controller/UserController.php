@@ -52,6 +52,6 @@ class UserController extends AbstractController
     {
         $this->checkPermission(PermissionService::READ);
 
-        return $this->returnSuccess(null);
+        return $this->returnSuccess();
     }
 }

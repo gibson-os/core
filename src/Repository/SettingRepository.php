@@ -22,7 +22,7 @@ class SettingRepository extends AbstractRepository
         $table = $this->getTable(SettingModel::getTableName());
         $table->setWhere(
             '`module_id`=' . $this->escape((string) $moduleId) . ' AND ' .
-            '(`user_id`=' . $this->escape((string) $userId) . ' OR `user_id`=0)'
+            '(`user_id`=' . $userId . ' OR `user_id`=0)'
         );
 
         if (!$table->select()) {

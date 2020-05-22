@@ -120,7 +120,9 @@ class FfmpegService extends AbstractService
                 '-map ' . $media->getSelectedVideoStreamId() . ' ' .
                 '-c:v ' . escapeshellarg($videoCodec) . ' ';
 
-            if ($media->getSelectedSubtitleStreamId() !== null) {
+            if ($media->getSelectedSubtitleStreamId() === null) {
+                $optionString .= '-sn ';
+            } else {
                 $subtitleStreamIds = array_keys($media->getSubtitleStreams());
                 $optionString .=
                     '-vf subtitles=' . escapeshellarg($media->getFilename()) .
