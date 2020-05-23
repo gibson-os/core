@@ -56,7 +56,7 @@ class ServiceManagerService
      */
     private function getByFactory(string $classname): ?object
     {
-        $factoryName = str_replace('Service.php', 'Factory.php', $classname);
+        $factoryName = mb_substr($classname, 0, -7) . 'Factory';
         $factoryName = str_replace('\\Service\\', '\\Factory\\', $factoryName);
 
         if (

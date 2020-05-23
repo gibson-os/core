@@ -50,16 +50,19 @@ class ExceptionResponse implements ResponseInterface
 
     public function getBody(): string
     {
+        error_log($this->exception->getMessage());
+        $exception = $this->getExceptionJson($this->exception);
+
         if ($this->requestService->isAjax()) {
             return JsonUtility::encode([
                 'success' => false,
                 'failure' => true,
-                'exception' => $this->getExceptionJson($this->exception),
+                'exception' => $exception,
             ]);
         }
 
         $response = new TwigResponse($this->twigService, '@core/exception.html.twig');
-        $response->setVariable('exception', $this->exception);
+        $response->setVariable('exception', $exception);
 
         return $response->getBody();
     }
