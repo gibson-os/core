@@ -23,6 +23,10 @@ class IndexController extends AbstractController
      */
     public function index(DesktopController $desktopController, ModuleRepository $moduleRepository, SettingRepository $settingRepository): AjaxResponse
     {
+        if (!$this->sessionService->isLogin()) {
+            return $this->returnSuccess();
+        }
+
         return $desktopController->index($moduleRepository, $settingRepository);
     }
 }
