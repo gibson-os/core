@@ -32,7 +32,7 @@ class FileResponse implements ResponseInterface
     private $code = StatusCode::OK;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $disposition = 'attachment';
 
@@ -98,12 +98,17 @@ class FileResponse implements ResponseInterface
             'Accept-Ranges' => 'bytes',
             'Cache-Control' => ['must-revalidate, post-check=0, pre-check=0', 'private'],
             'Content-Type' => $this->type,
-            'Content-Disposition' => $this->disposition . '; ' .
-                'filename*=UTF-8\'\'' . rawurlencode($this->filename) . ' ' .
-                'filename="' . rawurlencode($this->filename) . '"',
             'Content-Length' => $this->hasRange ? $this->endSize - $this->startSize + 1 : $this->size,
             'Content-Transfer-Encoding' => 'binary',
         ];
+
+        if (!empty($this->disposition)) {
+            $headers['Content-Disposition'] =
+                $this->disposition . '; ' .
+                'filename*=UTF-8\'\'' . rawurlencode($this->filename) . ' ' .
+                'filename="' . rawurlencode($this->filename) . '"'
+            ;
+        }
 
         if ($this->hasRange) {
             $headers['Content-Range'] = sprintf('bytes %d-%d/%d', $this->startSize, $this->endSize, $this->size);
@@ -165,7 +170,7 @@ class FileResponse implements ResponseInterface
         return $this;
     }
 
-    public function setDisposition(string $disposition): FileResponse
+    public function setDisposition(?string $disposition): FileResponse
     {
         $this->disposition = $disposition;
 
