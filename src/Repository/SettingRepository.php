@@ -74,4 +74,38 @@ class SettingRepository extends AbstractRepository
 
         return $model;
     }
+
+    /**
+     * @throws DateTimeError
+     * @throws GetError
+     * @throws SelectError
+     */
+    public function getByKeyAndModuleName(string $moduleName, int $userId, string $key): SettingModel
+    {
+        $tableName = SettingModel::getTableName();
+        $table = $this->getTable($tableName);
+        $table->appendJoin('module', '`' . $tableName . '`.`module_id`=`module`.`id`');
+        $table->setWhere(
+            '`module`.`name`=' . $this->escape($moduleName) . ' AND ' .
+            '(`' . $tableName . '`.`user_id`=' . $userId . ' OR `' . $tableName . '`.`user_id`=0) AND ' .
+            '`' . $tableName . '`.`key`=' . $this->escape($key)
+        );
+        $table->setOrderBy('`user_id`');
+        $table->setLimit(1);
+
+        if (!$table->select()) {
+            $exception = new SelectError(sprintf(
+                'Einstellung mit dem Key "%s" konnte nicht geladen werden!',
+                $key
+            ));
+            $exception->setTable($table);
+
+            throw $exception;
+        }
+
+        $model = new SettingModel();
+        $model->loadFromMysqlTable($table);
+
+        return $model;
+    }
 }
