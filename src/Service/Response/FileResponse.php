@@ -1,12 +1,11 @@
 <?php
 declare(strict_types=1);
 
-namespace GibsonOS\Core\Repository;
+namespace GibsonOS\Core\Service\Response;
 
 use GibsonOS\Core\Exception\RequestError;
 use GibsonOS\Core\Exception\ResponseError;
 use GibsonOS\Core\Service\RequestService;
-use GibsonOS\Core\Service\Response\ResponseInterface;
 use GibsonOS\Core\Utility\StatusCode;
 
 class FileResponse implements ResponseInterface

@@ -114,9 +114,6 @@ class ControllerService
         $this->outputResponse($response);
     }
 
-    /**
-     * @throws ControllerError
-     */
     private function renderTemplate(): TwigResponse
     {
         $now = time();
