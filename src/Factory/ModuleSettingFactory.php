@@ -7,6 +7,9 @@ use GibsonOS\Core\Repository\ModuleRepository;
 use GibsonOS\Core\Repository\SettingRepository;
 use GibsonOS\Core\Service\ModuleSettingService;
 
+/**
+ * @deprecated
+ */
 class ModuleSettingFactory extends AbstractSingletonFactory
 {
     protected static function createInstance(): ModuleSettingService

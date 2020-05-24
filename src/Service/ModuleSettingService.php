@@ -11,6 +11,9 @@ use GibsonOS\Core\Model\Setting;
 use GibsonOS\Core\Repository\ModuleRepository;
 use GibsonOS\Core\Repository\SettingRepository;
 
+/**
+ * @deprecated
+ */
 class ModuleSettingService extends AbstractService
 {
     /**

@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Controller;
 
 use GibsonOS\Core\Exception\DateTimeError;
-use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\LoginRequired;
 use GibsonOS\Core\Exception\Model\SaveError;
 use GibsonOS\Core\Exception\PermissionDenied;
@@ -27,20 +26,19 @@ class DesktopController extends AbstractController
      * @throws LoginRequired
      * @throws PermissionDenied
      * @throws SelectError
-     * @throws GetError
      */
-    public function index(ModuleRepository $moduleRepository, SettingRepository $settingRepository): AjaxResponse
+    public function index(SettingRepository $settingRepository): AjaxResponse
     {
         $this->checkPermission(PermissionService::READ);
 
-        $module = $moduleRepository->getByName($this->requestService->getModuleName());
-        $desktop = $settingRepository->getByKey(
-            $module->getId() ?? 0,
+        $moduleName = $this->requestService->getModuleName();
+        $desktop = $settingRepository->getByKeyAndModuleName(
+            $moduleName,
             $this->sessionService->getUserId() ?? 0,
             self::DESKTOP_KEY
         );
-        $apps = $settingRepository->getByKey(
-            $module->getId() ?? 0,
+        $apps = $settingRepository->getByKeyAndModuleName(
+            $moduleName,
             $this->sessionService->getUserId() ?? 0,
             self::APPS_KEY
         );

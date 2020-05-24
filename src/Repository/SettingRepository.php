@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Repository;
 
 use GibsonOS\Core\Exception\DateTimeError;
-use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\Setting as SettingModel;
 
@@ -13,7 +12,6 @@ class SettingRepository extends AbstractRepository
     /**
      * @throws DateTimeError
      * @throws SelectError
-     * @throws GetError
      *
      * @return SettingModel[]
      */
@@ -45,7 +43,6 @@ class SettingRepository extends AbstractRepository
 
     /**
      * @throws DateTimeError
-     * @throws GetError
      * @throws SelectError
      */
     public function getByKey(int $moduleId, int $userId, string $key): SettingModel
@@ -77,7 +74,6 @@ class SettingRepository extends AbstractRepository
 
     /**
      * @throws DateTimeError
-     * @throws GetError
      * @throws SelectError
      */
     public function getByKeyAndModuleName(string $moduleName, int $userId, string $key): SettingModel
