@@ -151,8 +151,14 @@ class ControllerService
     {
         header($this->statusCode->getStatusHeader($response->getCode()));
 
-        foreach ($response->getHeaders() as $headerName => $headerValue) {
-            header($headerName . ': ' . $headerValue);
+        foreach ($response->getHeaders() as $headerName => $headerValues) {
+            if (!is_array($headerValues)) {
+                $headerValues = [$headerValues];
+            }
+
+            foreach ($headerValues as $headerValue) {
+                header($headerName . ': ' . $headerValue);
+            }
         }
 
         echo $response->getBody();
