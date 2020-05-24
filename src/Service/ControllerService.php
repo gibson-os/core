@@ -8,8 +8,8 @@ use GibsonOS\Core\Exception\FactoryError;
 use GibsonOS\Core\Exception\RequestError;
 use GibsonOS\Core\Service\Response\AjaxResponse;
 use GibsonOS\Core\Service\Response\ExceptionResponse;
-use GibsonOS\Core\Service\Response\Response;
 use GibsonOS\Core\Service\Response\ResponseInterface;
+use GibsonOS\Core\Service\Response\TwigResponse;
 use GibsonOS\Core\Utility\JsonUtility;
 use GibsonOS\Core\Utility\StatusCode;
 use ReflectionClass;
@@ -17,9 +17,6 @@ use ReflectionException;
 use ReflectionMethod;
 use ReflectionParameter;
 use Throwable;
-use Twig\Error\LoaderError;
-use Twig\Error\RuntimeError;
-use Twig\Error\SyntaxError;
 
 class ControllerService
 {
@@ -120,9 +117,8 @@ class ControllerService
     /**
      * @throws ControllerError
      */
-    private function renderTemplate(): Response
+    private function renderTemplate(): TwigResponse
     {
-        $twig = $this->twigService->getTwig();
         $now = time();
         $context = [
             'baseDir' => preg_replace('|^(.*/).+?$|', '$1', $_SERVER['SCRIPT_NAME']),
@@ -136,15 +132,9 @@ class ControllerService
             'session' => $this->serviceManagerService->get(SessionService::class),
         ];
 
-        try {
-            return new Response(
-                $twig->render('@core/base.html.twig', $context),
-                StatusCode::OK,
-                ['Content-Type' => 'text/html; charset=UTF-8']
-            );
-        } catch (LoaderError | RuntimeError | SyntaxError $e) {
-            throw new ControllerError('Template render error!', 0, $e);
-        }
+        return (new TwigResponse($this->twigService, '@core/base.html.twig'))
+            ->setVariables($context)
+        ;
     }
 
     private function outputResponse(ResponseInterface $response): void
