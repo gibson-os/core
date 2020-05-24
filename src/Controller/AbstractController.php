@@ -3,19 +3,14 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Controller;
 
-use GibsonOS\Core\Exception\ControllerError;
 use GibsonOS\Core\Exception\LoginRequired;
 use GibsonOS\Core\Exception\PermissionDenied;
 use GibsonOS\Core\Service\PermissionService;
 use GibsonOS\Core\Service\RequestService;
 use GibsonOS\Core\Service\Response\AjaxResponse;
-use GibsonOS\Core\Service\Response\Response;
+use GibsonOS\Core\Service\Response\TwigResponse;
 use GibsonOS\Core\Service\SessionService;
 use GibsonOS\Core\Service\TwigService;
-use GibsonOS\Core\Utility\StatusCode;
-use Twig\Error\LoaderError;
-use Twig\Error\RuntimeError;
-use Twig\Error\SyntaxError;
 
 abstract class AbstractController
 {
@@ -76,20 +71,11 @@ abstract class AbstractController
         throw new LoginRequired();
     }
 
-    /**
-     * @throws ControllerError
-     */
-    protected function renderTemplate(string $templatePath, array $context = []): Response
+    protected function renderTemplate(string $templatePath, array $context = []): TwigResponse
     {
-        try {
-            return new Response(
-                $this->twigService->getTwig()->render($templatePath, $context),
-                StatusCode::OK,
-                ['Content-Type' => 'text/html; charset=UTF-8']
-            );
-        } catch (LoaderError | RuntimeError | SyntaxError $e) {
-            throw new ControllerError('Template render error!', 0, $e);
-        }
+        return (new TwigResponse($this->twigService, $templatePath))
+            ->setVariables($context)
+        ;
     }
 
     protected function returnSuccess($data = null, int $total = null): AjaxResponse
