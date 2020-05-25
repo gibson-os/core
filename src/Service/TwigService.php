@@ -24,8 +24,8 @@ class TwigService
         $projectPath = realpath(
             dirname(__FILE__) . DIRECTORY_SEPARATOR .
             '..' . DIRECTORY_SEPARATOR .
-            '..' . DIRECTORY_SEPARATOR
-        );
+            '..'
+        ) . DIRECTORY_SEPARATOR;
         $loader = new FilesystemLoader();
         $loader->addPath($projectPath . 'template', 'core');
         $projectPath = realpath(
