@@ -25,27 +25,36 @@ class DesktopController extends AbstractController
      * @throws DateTimeError
      * @throws LoginRequired
      * @throws PermissionDenied
-     * @throws SelectError
      */
     public function index(SettingRepository $settingRepository): AjaxResponse
     {
         $this->checkPermission(PermissionService::READ);
 
         $moduleName = $this->requestService->getModuleName();
-        $desktop = $settingRepository->getByKeyAndModuleName(
-            $moduleName,
-            $this->sessionService->getUserId() ?? 0,
-            self::DESKTOP_KEY
-        );
-        $apps = $settingRepository->getByKeyAndModuleName(
-            $moduleName,
-            $this->sessionService->getUserId() ?? 0,
-            self::APPS_KEY
-        );
+
+        try {
+            $desktop = $settingRepository->getByKeyAndModuleName(
+                $moduleName,
+                $this->sessionService->getUserId() ?? 0,
+                self::DESKTOP_KEY
+            )->getValue();
+        } catch (SelectError $e) {
+            $desktop = '[]';
+        }
+
+        try {
+            $apps = $settingRepository->getByKeyAndModuleName(
+                $moduleName,
+                $this->sessionService->getUserId() ?? 0,
+                self::APPS_KEY
+            )->getValue();
+        } catch (SelectError $e) {
+            $apps = '[]';
+        }
 
         return $this->returnSuccess([
-            self::DESKTOP_KEY => JsonUtility::decode($desktop->getValue()),
-            self::APPS_KEY => JsonUtility::decode($apps->getValue()),
+            self::DESKTOP_KEY => JsonUtility::decode($desktop),
+            self::APPS_KEY => JsonUtility::decode($apps),
         ]);
     }
 
