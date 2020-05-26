@@ -27,9 +27,15 @@ class RunCommand extends AbstractCommand
      */
     protected function run(): int
     {
-        while ((int) (new DateTime())->format('s') < 59) {
+        do {
+            $startSecond = (int) (new DateTime())->format('s');
             $this->cronjobService->run($this->getArgument('user') ?? '');
-        }
+
+            do {
+                usleep(100000);
+                $endSecond = (int) (new DateTime())->format('s');
+            } while ($startSecond === $endSecond);
+        } while ($endSecond < 59);
 
         return 0;
     }
