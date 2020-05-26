@@ -86,7 +86,7 @@ class FileResponse implements ResponseInterface
 
     public function getCode(): int
     {
-        return $this->getCode();
+        return $this->code;
     }
 
     public function getHeaders(): array
@@ -128,24 +128,22 @@ class FileResponse implements ResponseInterface
             throw new ResponseError(sprintf('Can not open file %s!', $this->filename));
         }
 
-        if ($this->hasRange) {
-            fseek($file, $this->startSize);
+        fseek($file, $this->startSize);
 
-            while (true) {
-                $position = ftell($file);
+        while (true) {
+            $position = ftell($file);
 
-                if ($position >= $this->endSize) {
-                    break;
-                }
-
-                echo fread($file, $this->partLength);
-                ob_flush();
-                flush();
+            if ($position >= $this->endSize) {
+                break;
             }
 
-            fclose($file);
-            ob_end_flush();
+            echo fread($file, $this->partLength);
+            ob_flush();
+            flush();
         }
+
+        fclose($file);
+        ob_end_flush();
 
         return '';
     }
