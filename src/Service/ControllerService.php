@@ -143,8 +143,8 @@ class ControllerService
                 $headerValues = [$headerValues];
             }
 
-            foreach ($headerValues as $headerValue) {
-                header($headerName . ': ' . $headerValue);
+            foreach ($headerValues as $index => $headerValue) {
+                header($headerName . ': ' . $headerValue, $index === 0);
             }
         }
 
