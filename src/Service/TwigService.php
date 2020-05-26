@@ -21,35 +21,24 @@ class TwigService
      */
     public function __construct(DirService $dirService)
     {
-        $projectPath = realpath(
+        $vendorPath = realpath(
             dirname(__FILE__) . DIRECTORY_SEPARATOR .
             '..' . DIRECTORY_SEPARATOR .
-            '..'
+            '..' . DIRECTORY_SEPARATOR .
+            '..' . DIRECTORY_SEPARATOR .
+            '..' . DIRECTORY_SEPARATOR .
+            'gibson-os'
         ) . DIRECTORY_SEPARATOR;
         $loader = new FilesystemLoader();
-        $loader->addPath($projectPath . 'template', 'core');
-        $projectPath = realpath(
-            $projectPath .
-            '..' . DIRECTORY_SEPARATOR .
-            '..' . DIRECTORY_SEPARATOR .
-            '..' . DIRECTORY_SEPARATOR
-        );
 
-        foreach ($dirService->getFiles($projectPath . 'vendor' . DIRECTORY_SEPARATOR . 'gibson-os') as $path) {
-            $templatePath = $dirService->addEndSlash($path) . 'templates';
+        foreach ($dirService->getFiles($vendorPath) as $path) {
+            $templatePath = $dirService->addEndSlash($path) . 'template';
 
             if (!is_dir($templatePath)) {
                 continue;
             }
 
-            $loader->addPath(
-                $templatePath,
-                $dirService->removeEndSlash(str_replace(
-                    $projectPath . 'vendor' . DIRECTORY_SEPARATOR . 'gibson-os' . DIRECTORY_SEPARATOR,
-                    '',
-                    $path
-                ))
-            );
+            $loader->addPath($templatePath, $dirService->removeEndSlash(str_replace($vendorPath, '', $path)));
         }
 
         $this->twig = new Environment($loader);
