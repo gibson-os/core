@@ -73,7 +73,7 @@ class CommandService
                 return 'GibsonOS\\Core\\Command\\' . $classname . 'Command';
             }
 
-            return 'GibsonOS\\' . $module . '\\Command\\' . $classname . 'Command';
+            return 'GibsonOS\\Module\\' . $module . '\\Command\\' . $classname . 'Command';
         }
 
         throw new CommandError('No Command found!');
