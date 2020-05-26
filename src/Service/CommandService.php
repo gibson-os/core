@@ -42,7 +42,8 @@ class CommandService
 
     public function executeAsync(string $commandClassname, array $arguments, array $options): void
     {
-        $commandName = mb_substr(str_replace('\\Command\\', '', $commandClassname), 9);
+        $commandName = mb_substr(str_replace('Command\\', '', $commandClassname), 0, -7);
+        $commandName = preg_replace('/^GibsonOS\\\\(Module\\\\)?/', '', $commandName);
 
         $this->processService->executeAsync(
             'php bin/command ' . escapeshellarg($commandName) .

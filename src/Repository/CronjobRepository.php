@@ -24,7 +24,7 @@ class CronjobRepository extends AbstractRepository
         $table->setWhere(
             '`' . $tableName . '`.`user`=' . $this->escape($user) . ' AND ' .
             '`' . $tableName . '`.`active`=1 AND ' .
-            '`' . $tableName . '`.`last_run` != ' . $this->escape($dateTime->format('Y-m-d H:i:s')) . ' AND ' .
+            '(`' . $tableName . '`.`last_run` IS NULL OR `' . $tableName . '`.`last_run` < ' . $this->escape($dateTime->format('Y-m-d H:i:s')) . ') AND ' .
             'UNIX_TIMESTAMP(CONCAT(' .
                 $this->getTimePartWhere('year', (int) $dateTime->format('Y')) . ', \'-\', ' .
                 $this->getTimePartWhere('month', (int) $dateTime->format('n')) . ', \'-\', ' .
