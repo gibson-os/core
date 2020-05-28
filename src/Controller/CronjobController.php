@@ -17,7 +17,7 @@ class CronjobController extends AbstractController
      * @throws LoginRequired
      * @throws PermissionDenied
      */
-    public function index(CronjobStore $cronjobStore, int $limit = 0, int $start = 0, array $sort = []): AjaxResponse
+    public function index(CronjobStore $cronjobStore, int $limit = 100, int $start = 0, array $sort = []): AjaxResponse
     {
         $this->checkPermission(PermissionService::READ);
 
