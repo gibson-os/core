@@ -8,6 +8,7 @@ use GibsonOS\Core\Exception\LoginRequired;
 use GibsonOS\Core\Exception\PermissionDenied;
 use GibsonOS\Core\Service\PermissionService;
 use GibsonOS\Core\Service\Response\AjaxResponse;
+use GibsonOS\Core\Store\Cronjob\TimeStore;
 use GibsonOS\Core\Store\CronjobStore;
 
 class CronjobController extends AbstractController
@@ -25,5 +26,12 @@ class CronjobController extends AbstractController
         $cronjobStore->setSortByExt($sort);
 
         return $this->returnSuccess($cronjobStore->getList(), $cronjobStore->getCount());
+    }
+
+    public function times(TimeStore $timeStore): AjaxResponse
+    {
+        $this->checkPermission(PermissionService::READ);
+
+        return $this->returnSuccess($timeStore->getList());
     }
 }

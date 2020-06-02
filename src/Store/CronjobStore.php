@@ -29,15 +29,7 @@ class CronjobStore extends AbstractDatabaseStore
 
     public function getList(): array
     {
-        $this->table->select(
-            false,
-            '`command` ,' .
-            '`arguments`, ' .
-            '`options`, ' .
-            '`user`, ' .
-            '`last_run`, ' .
-            '`active`'
-        );
+        $this->table->select(false);
 
         return $this->table->connection->fetchAssocList();
     }
