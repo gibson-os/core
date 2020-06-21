@@ -136,20 +136,15 @@ class Device extends AbstractModel
     /**
      * @throws DateTimeError
      * @throws SelectError
-     *
-     * @return User
      */
-    public function getUser()
+    public function getUser(): User
     {
         $this->loadForeignRecord($this->user, $this->getUserId());
 
         return $this->user;
     }
 
-    /**
-     * @return Device
-     */
-    public function setUser(User $user)
+    public function setUser(User $user): Device
     {
         $this->user = $user;
         $this->setUserId($user->getId() ?? 0);
