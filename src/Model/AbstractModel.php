@@ -236,7 +236,7 @@ abstract class AbstractModel implements ModelInterface
     protected function loadForeignRecords(string $modelClassName, $value, string $foreignTable, string $foreignField): array
     {
         $mysqlTable = new mysqlTable($this->database, $foreignTable);
-        $mysqlTable->setWhere('`' . $foreignField . '`=' . $this->database->escape($value));
+        $mysqlTable->setWhere('`' . $foreignField . '`=' . (is_int($value) ? $value : $this->database->escape($value)));
 
         $models = [];
 
