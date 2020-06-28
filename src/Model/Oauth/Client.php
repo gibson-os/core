@@ -22,6 +22,11 @@ class Client extends AbstractModel
      */
     private $name;
 
+    /**
+     * @var string
+     */
+    private $redirectUrl;
+
     public static function getTableName(): string
     {
         return 'oauth_client';
@@ -59,6 +64,18 @@ class Client extends AbstractModel
     public function setName(string $name): Client
     {
         $this->name = $name;
+
+        return $this;
+    }
+
+    public function getRedirectUrl(): string
+    {
+        return $this->redirectUrl;
+    }
+
+    public function setRedirectUrl(string $redirectUrl): Client
+    {
+        $this->redirectUrl = $redirectUrl;
 
         return $this;
     }

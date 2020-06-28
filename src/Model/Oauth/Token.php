@@ -24,6 +24,11 @@ class Token extends AbstractModel
     /**
      * @var string
      */
+    private $identifier;
+
+    /**
+     * @var string
+     */
     private $accessToken;
 
     /**
@@ -71,6 +76,18 @@ class Token extends AbstractModel
     public function setUserId(int $userId): Token
     {
         $this->userId = $userId;
+
+        return $this;
+    }
+
+    public function getIdentifier(): string
+    {
+        return $this->identifier;
+    }
+
+    public function setIdentifier(string $identifier): Token
+    {
+        $this->identifier = $identifier;
 
         return $this;
     }
