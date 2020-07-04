@@ -34,6 +34,11 @@ class Device extends AbstractModel
     private $registrationId;
 
     /**
+     * @var string|null
+     */
+    private $token;
+
+    /**
      * @var DateTimeInterface|null
      */
     private $lastLogin;
@@ -105,6 +110,18 @@ class Device extends AbstractModel
     public function setRegistrationId(?string $registrationId): Device
     {
         $this->registrationId = $registrationId;
+
+        return $this;
+    }
+
+    public function getToken(): ?string
+    {
+        return $this->token;
+    }
+
+    public function setToken(?string $token): Device
+    {
+        $this->token = $token;
 
         return $this;
     }

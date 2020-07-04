@@ -11,6 +11,7 @@ use GibsonOS\Core\Service\Response\AjaxResponse;
 use GibsonOS\Core\Service\Response\RedirectResponse;
 use GibsonOS\Core\Service\Response\ResponseInterface;
 use GibsonOS\Core\Service\UserService;
+use GibsonOS\Core\Utility\StatusCode;
 
 class UserController extends AbstractController
 {
@@ -21,7 +22,7 @@ class UserController extends AbstractController
         UserService $userService,
         ?string $username,
         ?string $password
-    ): ResponseInterface {
+    ): RedirectResponse {
         if (empty($password) || empty($username)) {
             return new RedirectResponse($this->requestService->getBaseDir());
         }
@@ -29,6 +30,22 @@ class UserController extends AbstractController
         $userService->login($username, $password);
 
         return new RedirectResponse($this->requestService->getBaseDir());
+    }
+
+    public function appLogin(
+        UserService $userService,
+        string $model,
+        string $username,
+        string $password
+    ): AjaxResponse {
+        if (empty($password) || empty($username)) {
+            return $this->returnFailure('Login Error', StatusCode::UNAUTHORIZED);
+        }
+
+        $user = $userService->login($username, $password);
+        $device = $userService->addDevice($user, $model);
+
+        return $this->returnSuccess(['token' => $device->getToken()]);
     }
 
     /**

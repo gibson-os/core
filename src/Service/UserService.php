@@ -3,10 +3,14 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Service;
 
+use Exception;
 use GibsonOS\Core\Exception\DateTimeError;
 use GibsonOS\Core\Exception\GetError;
+use GibsonOS\Core\Exception\Model\SaveError;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Exception\UserError;
+use GibsonOS\Core\Model\User;
+use GibsonOS\Core\Repository\User\DeviceRepository;
 use GibsonOS\Core\Repository\UserRepository;
 
 class UserService
@@ -22,32 +26,84 @@ class UserService
     private $userRepository;
 
     /**
+     * @var DeviceRepository
+     */
+    private $deviceRepository;
+
+    /**
      * @var SessionService
      */
     private $sessionService;
 
-    public function __construct(EnvService $envService, UserRepository $userRepository, SessionService $sessionService)
-    {
+    public function __construct(
+        EnvService $envService,
+        UserRepository $userRepository,
+        DeviceRepository $deviceRepository,
+        SessionService $sessionService
+    ) {
         $this->envService = $envService;
         $this->userRepository = $userRepository;
+        $this->deviceRepository = $deviceRepository;
         $this->sessionService = $sessionService;
     }
 
     /**
      * @throws UserError
      */
-    public function login(string $username, string $password): bool
+    public function login(string $username, string $password): User
     {
         try {
             $user = $this->userRepository->getByUsernameAndPassword($username, $this->hashPassword($password));
             $this->sessionService->login($user);
 
-            return true;
-        } catch (SelectError $e) {
-            return false;
-        } catch (DateTimeError $e) {
+            return $user;
+        } catch (SelectError | DateTimeError $e) {
             throw new UserError($e->getMessage(), 0, $e);
         }
+    }
+
+    /**
+     * @throws UserError
+     */
+    public function deviceLogin(string $token): User\Device
+    {
+        try {
+            $device = $this->deviceRepository->getByToken($token);
+            $this->sessionService->login($device->getUser());
+
+            return $device;
+        } catch (SelectError | DateTimeError $e) {
+            throw new UserError($e->getMessage(), 0, $e);
+        }
+    }
+
+    /**
+     * @throws DateTimeError
+     * @throws SaveError
+     * @throws Exception
+     */
+    public function addDevice(User $user, string $model): User\Device
+    {
+        // @todo remove after app release
+        do {
+            $id = (string) random_int(1, 9999999999999999);
+
+            try {
+                $this->deviceRepository->getById($id);
+            } catch (SelectError $e) {
+                break;
+            }
+        } while (true);
+
+        $device = (new User\Device())
+            ->setId($id) // @todo change to int value
+            ->setUser($user)
+            ->setModel($model)
+            ->setToken(md5((string) mt_rand()) . md5((string) mt_rand()))
+        ;
+        $device->save();
+
+        return $device;
     }
 
     public function logout(): void

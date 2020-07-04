@@ -7,6 +7,10 @@ use GibsonOS\Core\Exception\RequestError;
 
 class RequestService
 {
+    public const METHOD_GET = 'GET';
+
+    public const METHOD_POST = 'POST';
+
     private $requestValues = [];
 
     /**
@@ -121,5 +125,10 @@ class RequestService
         } catch (RequestError $e) {
             return false;
         }
+    }
+
+    public function getMethod(): string
+    {
+        return (string) $_SERVER['REQUEST_METHOD'];
     }
 }
