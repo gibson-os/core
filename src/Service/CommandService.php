@@ -96,18 +96,19 @@ class CommandService
         return $argumentList;
     }
 
-    public function getOptions(array $arguments): array
+    public function getOptions(array $options): array
     {
-        $options = [];
+        $optionList = [];
 
-        foreach ($arguments as $argument) {
-            if (mb_strpos($argument, '--') === 0 || mb_strpos($argument, '-') !== 0) {
+        foreach ($options as $option) {
+            if (mb_strpos($option, '--') === 0 || mb_strpos($option, '-') !== 0) {
                 continue;
             }
 
-            $options[] = mb_substr($argument, 1);
+            $optionName = mb_substr($option, 1);
+            $optionList[$optionName] = $optionName;
         }
 
-        return $options;
+        return $optionList;
     }
 }
