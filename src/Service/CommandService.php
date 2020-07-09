@@ -44,9 +44,17 @@ class CommandService
     {
         $commandName = mb_substr(str_replace('Command\\', '', $commandClassname), 0, -7);
         $commandName = preg_replace('/^GibsonOS\\\\(Module\\\\)?/', '', $commandName);
+        $commandPath = realpath(
+            dirname(__FILE__) .
+                DIRECTORY_SEPARATOR . '..' .
+                DIRECTORY_SEPARATOR . '..' .
+                DIRECTORY_SEPARATOR . '..' .
+                DIRECTORY_SEPARATOR . '..' .
+                DIRECTORY_SEPARATOR . '..'
+        ) . DIRECTORY_SEPARATOR . 'bin' . DIRECTORY_SEPARATOR . 'command';
 
         $this->processService->executeAsync(
-            'php bin/command ' . escapeshellarg($commandName) .
+            $commandPath . ' ' . escapeshellarg($commandName) .
             implode(' ', array_map(function ($item) {
                 return escapeshellarg('--' . $item);
             }, $arguments)) . ' ' .
