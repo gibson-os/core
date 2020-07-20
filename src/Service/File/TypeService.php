@@ -177,6 +177,9 @@ class TypeService
         self::TYPE_CATEGORY_OFFICE,
     ];
 
+    /**
+     * @deprecated
+     */
     public function getFileType(string $path): ?string
     {
         if (mb_strrpos($path, '.') === false) {
@@ -188,6 +191,8 @@ class TypeService
 
     /**
      * @throws GetError
+     *
+     * @deprecated
      */
     public function getContentType(string $filename): string
     {
@@ -200,6 +205,9 @@ class TypeService
         return (string) finfo_file($fileInfo, $filename);
     }
 
+    /**
+     * @deprecated
+     */
     public function getCategory(string $path): ?int
     {
         $type = $this->getFileType(strtolower($path));

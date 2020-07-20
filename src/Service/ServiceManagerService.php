@@ -26,6 +26,10 @@ class ServiceManagerService
      */
     public function get(string $classname): object
     {
+        if (mb_strpos($classname, '\\') === 0) {
+            $classname = substr($classname, 1);
+        }
+
         if (!class_exists($classname)) {
             throw new FactoryError(sprintf('Class %s does not exists', $classname));
         }

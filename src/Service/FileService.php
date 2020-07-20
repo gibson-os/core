@@ -296,6 +296,20 @@ class FileService extends AbstractService
     }
 
     /**
+     * @throws GetError
+     */
+    public function getContentType(string $filename): string
+    {
+        $fileInfo = finfo_open(FILEINFO_MIME_TYPE);
+
+        if (!is_resource($fileInfo)) {
+            throw new GetError(sprintf('Content Type für %s konnte nicht ermittelt werden!', $filename));
+        }
+
+        return (string) finfo_file($fileInfo, $filename);
+    }
+
+    /**
      * @throws OpenError
      *
      * @return resource
