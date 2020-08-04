@@ -86,7 +86,7 @@ class SettingRepository extends AbstractRepository
             '(`user_id`=' . $this->escape((string) $userId) . ' OR `user_id`=0) AND ' .
             '`key`=' . $this->escape($key)
         );
-        $table->setOrderBy('`user_id`');
+        $table->setOrderBy('`user_id` DESC');
         $table->setLimit(1);
 
         if (!$table->select()) {
@@ -119,7 +119,7 @@ class SettingRepository extends AbstractRepository
             '(`' . $tableName . '`.`user_id`=' . $userId . ' OR `' . $tableName . '`.`user_id`=0) AND ' .
             '`' . $tableName . '`.`key`=' . $this->escape($key)
         );
-        $table->setOrderBy('`user_id`');
+        $table->setOrderBy('`user_id` DESC');
         $table->setLimit(1);
 
         if (!$table->select()) {
