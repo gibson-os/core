@@ -25,7 +25,7 @@ abstract class AbstractModel implements ModelInterface
 
     private const TYPE_INT = 'int';
 
-    private const TYPE_FLOAT = 'int';
+    private const TYPE_FLOAT = 'float';
 
     private const TYPE_STRING = 'string';
 
