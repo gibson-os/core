@@ -12,6 +12,8 @@ use GibsonOS\Core\Service\FlockService;
 
 class RunCommand extends AbstractCommand
 {
+    private const FLOCK_NAME = 'cronjob';
+
     /**
      * @var CronjobService
      */
@@ -41,7 +43,7 @@ class RunCommand extends AbstractCommand
         $pidFile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'gibsonOsCronjob.pid';
         $pid = getmypid();
         file_put_contents($pidFile, $pid);
-        $this->flockService->waitUnFlockToFlock();
+        $this->flockService->waitUnFlockToFlock(self::FLOCK_NAME);
 
         do {
             $startSecond = (int) (new DateTime())->format('s');
@@ -51,11 +53,9 @@ class RunCommand extends AbstractCommand
                 usleep(100000);
                 $endSecond = (int) (new DateTime())->format('s');
             } while ($startSecond === $endSecond);
+        } while ((int) file_get_contents($pidFile) === $pid);
 
-            $actualPid = (int) file_get_contents($pidFile);
-        } while ($actualPid === $pid);
-
-        $this->flockService->unFlock();
+        $this->flockService->unFlock(self::FLOCK_NAME);
 
         return 0;
     }
