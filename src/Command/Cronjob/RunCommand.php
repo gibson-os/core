@@ -45,7 +45,7 @@ class RunCommand extends AbstractCommand
         file_put_contents($pidFile, $pid);
         $this->flockService->waitUnFlockToFlock(self::FLOCK_NAME);
 
-        do {
+        while ((int) file_get_contents($pidFile) === $pid) {
             $startSecond = (int) (new DateTime())->format('s');
             $this->cronjobService->run($this->getArgument('user') ?? '');
 
@@ -53,7 +53,7 @@ class RunCommand extends AbstractCommand
                 usleep(100000);
                 $endSecond = (int) (new DateTime())->format('s');
             } while ($startSecond === $endSecond);
-        } while ((int) file_get_contents($pidFile) === $pid);
+        }
 
         $this->flockService->unFlock(self::FLOCK_NAME);
 
