@@ -40,14 +40,15 @@ class RunCommand extends AbstractCommand
      */
     protected function run(): int
     {
-        $pidFile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'gibsonOsCronjob.pid';
+        $user = $this->getArgument('user') ?? '';
+        $pidFile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'gibsonOsCronjob' . $user . '.pid';
         $pid = getmypid();
         file_put_contents($pidFile, $pid);
-        $this->flockService->waitUnFlockToFlock(self::FLOCK_NAME);
+        $this->flockService->waitUnFlockToFlock(self::FLOCK_NAME . $user);
 
         while ((int) file_get_contents($pidFile) === $pid) {
             $startSecond = (int) (new DateTime())->format('s');
-            $this->cronjobService->run($this->getArgument('user') ?? '');
+            $this->cronjobService->run($user);
 
             do {
                 usleep(100000);
@@ -55,7 +56,7 @@ class RunCommand extends AbstractCommand
             } while ($startSecond === $endSecond);
         }
 
-        $this->flockService->unFlock(self::FLOCK_NAME);
+        $this->flockService->unFlock(self::FLOCK_NAME . $user);
 
         return 0;
     }
