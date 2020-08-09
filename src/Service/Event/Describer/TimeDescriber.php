@@ -6,7 +6,7 @@ namespace GibsonOS\Core\Service\Event\Describer;
 use GibsonOS\Core\Dto\Event\Describer\Method;
 use GibsonOS\Core\Dto\Event\Describer\Parameter\IntParameter;
 
-class TimeService implements DescriberInterface
+class TimeDescriber implements DescriberInterface
 {
     public function getTitle(): string
     {

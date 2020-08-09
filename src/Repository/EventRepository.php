@@ -19,7 +19,7 @@ class EventRepository extends AbstractRepository
     public function getByMasterId(int $masterId): array
     {
         $table = $this->initializeTable();
-        $table->setWhere('`hc_event_trigger`.`master_id`=' . $masterId);
+        $table->setWhere('`event_trigger`.`master_id`=' . $masterId);
 
         if (!$table->select(false)) {
             return [];
@@ -34,7 +34,7 @@ class EventRepository extends AbstractRepository
     public function getByModuleId(int $masterId): array
     {
         $table = $this->initializeTable();
-        $table->setWhere('`hc_event_trigger`.`module_id`=' . $masterId);
+        $table->setWhere('`event_trigger`.`module_id`=' . $masterId);
 
         if (!$table->select(false)) {
             return [];
@@ -50,14 +50,14 @@ class EventRepository extends AbstractRepository
     {
         $table = $this->initializeTable();
         $table->setWhere(
-            '`hc_event_trigger`.`trigger`=' . $this->escape(Trigger::TRIGGER_CRON) . ' AND ' .
-            '(`hc_event_trigger`.`weekday` IS NULL OR `hc_event_trigger`.`weekday`=' . (int) $dateTime->format('w') . ') AND ' .
-            '(`hc_event_trigger`.`day` IS NULL OR `hc_event_trigger`.`day`=' . (int) $dateTime->format('j') . ') AND ' .
-            '(`hc_event_trigger`.`month` IS NULL OR `hc_event_trigger`.`month`=' . (int) $dateTime->format('n') . ') AND ' .
-            '(`hc_event_trigger`.`year` IS NULL OR `hc_event_trigger`.`year`=' . (int) $dateTime->format('Y') . ') AND ' .
-            '(`hc_event_trigger`.`hour` IS NULL OR `hc_event_trigger`.`hour`=' . (int) $dateTime->format('H') . ') AND ' .
-            '(`hc_event_trigger`.`minute` IS NULL OR `hc_event_trigger`.`minute`=' . (int) $dateTime->format('m') . ') AND ' .
-            '(`hc_event_trigger`.`second` IS NULL OR `hc_event_trigger`.`second`=' . (int) $dateTime->format('s') . ')'
+            '`event_trigger`.`trigger`=' . $this->escape(Trigger::TRIGGER_CRON) . ' AND ' .
+            '(`event_trigger`.`weekday` IS NULL OR `event_trigger`.`weekday`=' . (int) $dateTime->format('w') . ') AND ' .
+            '(`event_trigger`.`day` IS NULL OR `event_trigger`.`day`=' . (int) $dateTime->format('j') . ') AND ' .
+            '(`event_trigger`.`month` IS NULL OR `event_trigger`.`month`=' . (int) $dateTime->format('n') . ') AND ' .
+            '(`event_trigger`.`year` IS NULL OR `event_trigger`.`year`=' . (int) $dateTime->format('Y') . ') AND ' .
+            '(`event_trigger`.`hour` IS NULL OR `event_trigger`.`hour`=' . (int) $dateTime->format('H') . ') AND ' .
+            '(`event_trigger`.`minute` IS NULL OR `event_trigger`.`minute`=' . (int) $dateTime->format('m') . ') AND ' .
+            '(`event_trigger`.`second` IS NULL OR `event_trigger`.`second`=' . (int) $dateTime->format('s') . ')'
         );
 
         if (!$table->select(false)) {
@@ -73,38 +73,34 @@ class EventRepository extends AbstractRepository
     private function initializeTable()
     {
         $table = $this->getTable(Element::getTableName());
-        $table->appendJoin('`hc_event`', '`hc_event_element`.`event_id`=`hc_event`.`id`');
-        $table->appendJoin('`hc_event_trigger`', '`hc_event_element`.`event_id`=`hc_event_trigger`.`event_id`');
-        $table->setOrderBy('`hc_event_trigger`.`priority` DESC, `hc_event_element`.`left`');
+        $table->appendJoin('`event`', '`event_element`.`event_id`=`event`.`id`');
+        $table->appendJoin('`event_trigger`', '`event_element`.`event_id`=`event_trigger`.`event_id`');
+        $table->setOrderBy('`event_trigger`.`priority` DESC, `event_element`.`left`');
         $table->setSelectString(
-            '`hc_event`.`id`, ' .
-            '`hc_event`.`name`, ' .
-            '`hc_event`.`active`, ' .
-            '`hc_event`.`async`, ' .
-            '`hc_event`.`modified`, ' .
-            '`hc_event_element`.`id` AS `elementId`, ' .
-            '`hc_event_element`.`left` AS `elementLeft`, ' .
-            '`hc_event_element`.`right` AS `elementRight`, ' .
-            '`hc_event_element`.`parent_id` AS `elementParentId`, ' .
-            '`hc_event_element`.`master_id` AS `elementMasterId`, ' .
-            '`hc_event_element`.`module_id` AS `elementModuleId`, ' .
-            '`hc_event_element`.`class` AS `elementClass`, ' .
-            '`hc_event_element`.`method` AS `elementMethod`, ' .
-            '`hc_event_element`.`params` AS `elementParams`, ' .
-            '`hc_event_element`.`command` AS `elementCommand`, ' .
-            '`hc_event_element`.`operator` AS `elementOperator`, ' .
-            '`hc_event_element`.`value` AS `elementValue`, ' .
-            '`hc_event_trigger`.`id` AS `triggerId`, ' .
-            '`hc_event_trigger`.`trigger` AS `triggerTrigger`, ' .
-            '`hc_event_trigger`.`master_id` AS `triggerMasterId`, ' .
-            '`hc_event_trigger`.`module_id` AS `triggerModuleId`, ' .
-            '`hc_event_trigger`.`weekday` AS `triggerWeekday`, ' .
-            '`hc_event_trigger`.`day` AS `triggerDay`, ' .
-            '`hc_event_trigger`.`month` AS `triggerMonth`, ' .
-            '`hc_event_trigger`.`year` AS `triggerYear`, ' .
-            '`hc_event_trigger`.`hour` AS `triggerHour`, ' .
-            '`hc_event_trigger`.`minute` AS `triggerMinute`, ' .
-            '`hc_event_trigger`.`priority` AS `triggerPriority`'
+            '`event`.`id`, ' .
+            '`event`.`name`, ' .
+            '`event`.`active`, ' .
+            '`event`.`async`, ' .
+            '`event`.`modified`, ' .
+            '`event_element`.`id` AS `elementId`, ' .
+            '`event_element`.`left` AS `elementLeft`, ' .
+            '`event_element`.`right` AS `elementRight`, ' .
+            '`event_element`.`parent_id` AS `elementParentId`, ' .
+            '`event_element`.`class` AS `elementClass`, ' .
+            '`event_element`.`method` AS `elementMethod`, ' .
+            '`event_element`.`params` AS `elementParams`, ' .
+            '`event_element`.`command` AS `elementCommand`, ' .
+            '`event_element`.`operator` AS `elementOperator`, ' .
+            '`event_element`.`value` AS `elementValue`, ' .
+            '`event_trigger`.`id` AS `triggerId`, ' .
+            '`event_trigger`.`trigger` AS `triggerTrigger`, ' .
+            '`event_trigger`.`weekday` AS `triggerWeekday`, ' .
+            '`event_trigger`.`day` AS `triggerDay`, ' .
+            '`event_trigger`.`month` AS `triggerMonth`, ' .
+            '`event_trigger`.`year` AS `triggerYear`, ' .
+            '`event_trigger`.`hour` AS `triggerHour`, ' .
+            '`event_trigger`.`minute` AS `triggerMinute`, ' .
+            '`event_trigger`.`priority` AS `triggerPriority`'
         );
 
         return $table;

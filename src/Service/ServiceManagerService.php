@@ -101,6 +101,14 @@ class ServiceManagerService
                     ));
                 }
 
+                if ($parameterClass->isInterface()) {
+                    throw new FactoryError(sprintf(
+                        'Parameter %s of Class %s is an Interface. Please define implementation in constructor',
+                        $parameter->getName(),
+                        $classname
+                    ));
+                }
+
                 $parameters[] = $this->get($parameterClass->getName());
             }
         }

@@ -86,7 +86,7 @@ class Element extends AbstractModel implements Serializable
 
     public static function getTableName(): string
     {
-        return 'hc_event_element';
+        return 'event_element';
     }
 
     public function getId(): ?int
