@@ -12,21 +12,18 @@ class MethodStore extends AbstractStore
     /**
      * @var string
      */
-    private $className;
+    private $className = '';
 
     /**
      * @var array[]
      */
     private $list = [];
 
-    /**
-     * Method constructor.
-     *
-     * @param string $className
-     */
-    public function __construct($className)
+    public function setClassName(string $className): MethodStore
     {
         $this->className = $className;
+
+        return $this;
     }
 
     /**
@@ -50,6 +47,7 @@ class MethodStore extends AbstractStore
             return;
         }
 
+        // @ todo muss umgebaut werden
         $classNameWithNamespace = '\\GibsonOS\\Module\\Hc\\Service\\Event\\Describer\\' . $this->className;
         $class = new $classNameWithNamespace();
         $methods = [];
