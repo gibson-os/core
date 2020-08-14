@@ -22,9 +22,7 @@ class EventStore extends AbstractDatabaseStore
     {
         return [
             'name' => '`' . $this->getTableName() . '`.`name`',
-            'master' => '`hc_master`.`name`',
-            'module' => '`hc_module`.`name`',
-            'trigger' => '`hc_event_trigger`.`trigger`',
+            'event_trigger' => '`event_trigger`.`trigger`',
         ];
     }
 
@@ -34,18 +32,9 @@ class EventStore extends AbstractDatabaseStore
     public function getList(): array
     {
         $this->table->appendJoinLeft(
-            '`gibson_os`.`hc_event_trigger`',
-            '`hc_event_trigger`.`event_id`=`' . $this->getTableName() . '`.`id`'
+            '`gibson_os`.`event_trigger`',
+            '`event_trigger`.`event_id`=`' . $this->getTableName() . '`.`id`'
         );
-        $this->table->appendJoinLeft(
-            '`gibson_os`.`hc_master`',
-            '`hc_master`.`id`=`hc_event_trigger`.`master_id`'
-        );
-        $this->table->appendJoinLeft(
-            '`gibson_os`.`hc_module`',
-            '`hc_module`.`id`=`hc_event_trigger`.`module_id`'
-        );
-
         $this->table->setWhere($this->getWhere());
         $this->table->setOrderBy($this->getOrderBy());
         $this->table->select(
@@ -58,27 +47,5 @@ class EventStore extends AbstractDatabaseStore
         );
 
         return $this->table->connection->fetchAssocList();
-    }
-
-    public function setMasterId(?int $masterId): EventStore
-    {
-        if (empty($masterId)) {
-            unset($this->where['masterId']);
-        } else {
-            $this->where['masterId'] = '`hc_event_trigger`.`master_id`=' . $masterId;
-        }
-
-        return $this;
-    }
-
-    public function setSlaveId(?int $moduleId): EventStore
-    {
-        if (empty($moduleId)) {
-            unset($this->where['moduleId']);
-        } else {
-            $this->where['moduleId'] = '`hc_event_trigger`.`module_id`=' . $moduleId;
-        }
-
-        return $this;
     }
 }

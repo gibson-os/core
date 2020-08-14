@@ -22,18 +22,12 @@ class EventController extends AbstractController
      */
     public function index(
         EventStore $eventStore,
-        ?int $masterId,
-        ?int $slaveId,
         int $start = 0,
         int $limit = 0,
         array $sort = []
     ): ResponseInterface {
         $this->checkPermission(PermissionService::READ);
 
-        $eventStore
-            ->setMasterId($masterId)
-            ->setSlaveId($slaveId)
-        ;
         $eventStore->setLimit($limit, $start);
         $eventStore->setSortByExt($sort);
 
@@ -52,6 +46,10 @@ class EventController extends AbstractController
         return $this->returnSuccess($classNameStore->getList());
     }
 
+    /**
+     * @throws LoginRequired
+     * @throws PermissionDenied
+     */
     public function methods(MethodStore $methodStore, string $className): AjaxResponse
     {
         $this->checkPermission(PermissionService::READ);
