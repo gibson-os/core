@@ -5,6 +5,7 @@ namespace GibsonOS\Core\Repository;
 
 use DateTime;
 use DateTimeInterface;
+use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\Event;
 use GibsonOS\Core\Model\Event\Element;
 use GibsonOS\Core\Model\Event\Trigger;
@@ -14,33 +15,30 @@ use stdClass;
 class EventRepository extends AbstractRepository
 {
     /**
-     * @return Event[]
+     * @throws SelectError
      */
-    public function getByMasterId(int $masterId): array
+    public function getById(int $id): Event
     {
         $table = $this->initializeTable();
-        $table->setWhere('`event_trigger`.`master_id`=' . $masterId);
+        $table->setWhere('`' . Event::getTableName() . '`.`id`=' . $id);
 
         if (!$table->select(false)) {
-            return [];
+            $exception = new SelectError('Event not found!');
+            $exception->setTable($table);
+
+            throw $exception;
         }
 
-        return $this->matchModels($table->connection->fetchObjectList());
-    }
+        $models = $this->matchModels($table->connection->fetchObjectList());
 
-    /**
-     * @return Event[]
-     */
-    public function getByModuleId(int $masterId): array
-    {
-        $table = $this->initializeTable();
-        $table->setWhere('`event_trigger`.`module_id`=' . $masterId);
+        if (empty($models)) {
+            $exception = new SelectError('Event not found!');
+            $exception->setTable($table);
 
-        if (!$table->select(false)) {
-            return [];
+            throw $exception;
         }
 
-        return $this->matchModels($table->connection->fetchObjectList());
+        return reset($models);
     }
 
     /**

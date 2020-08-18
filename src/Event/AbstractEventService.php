@@ -1,10 +1,10 @@
 <?php
 declare(strict_types=1);
 
-namespace GibsonOS\Core\Service\Event;
+namespace GibsonOS\Core\Event;
 
+use GibsonOS\Core\Event\Describer\DescriberInterface;
 use GibsonOS\Core\Model\Event\Element;
-use GibsonOS\Core\Service\Event\Describer\DescriberInterface;
 
 abstract class AbstractEventService
 {

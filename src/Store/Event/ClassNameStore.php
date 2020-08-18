@@ -3,10 +3,12 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Store\Event;
 
+use GibsonOS\Core\Event\Describer\DescriberInterface;
+use GibsonOS\Core\Exception\FactoryError;
 use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Service\DirService;
-use GibsonOS\Core\Service\Event\Describer\DescriberInterface;
 use GibsonOS\Core\Service\FileService;
+use GibsonOS\Core\Service\ServiceManagerService;
 use GibsonOS\Core\Store\AbstractStore;
 
 class ClassNameStore extends AbstractStore
@@ -26,10 +28,16 @@ class ClassNameStore extends AbstractStore
      */
     private $file;
 
-    public function __construct(DirService $dir, FileService $file)
+    /**
+     * @var ServiceManagerService
+     */
+    private $serviceManagerService;
+
+    public function __construct(DirService $dir, FileService $file, ServiceManagerService $serviceManagerService)
     {
         $this->dir = $dir;
         $this->file = $file;
+        $this->serviceManagerService = $serviceManagerService;
     }
 
     /**
@@ -61,37 +69,53 @@ class ClassNameStore extends AbstractStore
             return;
         }
 
-        $namespace = 'GibsonOS\\Module\\Hc\\Service\\Event\\Describer\\';
-        $eventDescriberDir = realpath(dirname(__FILE__)) . DIRECTORY_SEPARATOR .
-            '..' . DIRECTORY_SEPARATOR .
-            '..' . DIRECTORY_SEPARATOR .
-            'Service' . DIRECTORY_SEPARATOR .
-            'Event' . DIRECTORY_SEPARATOR .
-            'Describer' . DIRECTORY_SEPARATOR;
         $classNames = [];
+        $vendorDir = realpath(
+            dirname(__FILE__) . DIRECTORY_SEPARATOR .
+            '..' . DIRECTORY_SEPARATOR .
+            '..' . DIRECTORY_SEPARATOR .
+            '..' . DIRECTORY_SEPARATOR .
+            '..' . DIRECTORY_SEPARATOR .
+            '..' . DIRECTORY_SEPARATOR .
+            'gibson-os'
+        ) . DIRECTORY_SEPARATOR;
 
-        foreach ($this->dir->getFiles($eventDescriberDir, '*.php') as $classPath) {
-            $className = str_replace('.php', '', $this->file->getFilename($classPath));
-
-            if (mb_strpos($className, 'Abstract') !== false) {
+        foreach ($this->dir->getFiles($vendorDir) as $moduleDir) {
+            if (!is_dir($moduleDir)) {
                 continue;
             }
 
-            if (mb_strpos($className, 'Interface') !== false) {
-                continue;
+            $eventDescriberDir = $moduleDir . DIRECTORY_SEPARATOR .
+                'src' . DIRECTORY_SEPARATOR .
+                'Event' . DIRECTORY_SEPARATOR .
+                'Describer' . DIRECTORY_SEPARATOR;
+            $moduleName = ucfirst(str_replace($vendorDir, '', $moduleDir));
+            $namespace =
+                'GibsonOS\\' .
+                ($moduleName === 'Core' ? '' : 'Module\\') . $moduleName .
+                '\\Event\\Describer\\'
+            ;
+
+            foreach ($this->dir->getFiles($eventDescriberDir, '*.php') as $classPath) {
+                $className = str_replace('.php', '', $this->file->getFilename($classPath));
+
+                $classNameWithNamespace = $namespace . $className;
+
+                try {
+                    $class = $this->serviceManagerService->get($classNameWithNamespace);
+                } catch (FactoryError $e) {
+                    continue;
+                }
+
+                if (!$class instanceof DescriberInterface) {
+                    continue;
+                }
+
+                $classNames[] = [
+                    'className' => $className,
+                    'title' => $class->getTitle(),
+                ];
             }
-
-            $classNameWithNamespace = $namespace . $className;
-            $class = new $classNameWithNamespace();
-
-            if (!$class instanceof DescriberInterface) {
-                continue;
-            }
-
-            $classNames[] = [
-                'className' => $className,
-                'title' => $class->getTitle(),
-            ];
         }
 
         $this->list = $classNames;

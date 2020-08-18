@@ -1,9 +1,9 @@
 <?php
 declare(strict_types=1);
 
-namespace GibsonOS\Core\Service\Event;
+namespace GibsonOS\Core\Event;
 
-use GibsonOS\Core\Service\Event\Describer\TimeDescriber;
+use GibsonOS\Core\Event\Describer\TimeDescriber;
 
 class TimeService extends AbstractEventService
 {
