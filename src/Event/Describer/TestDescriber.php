@@ -5,6 +5,7 @@ namespace GibsonOS\Core\Event\Describer;
 
 use GibsonOS\Core\Dto\Event\Describer\Method;
 use GibsonOS\Core\Dto\Event\Describer\Parameter\IntParameter;
+use GibsonOS\Core\Event\TestEvent;
 
 class TestDescriber implements DescriberInterface
 {
@@ -27,5 +28,10 @@ class TestDescriber implements DescriberInterface
             'echo' => (new Method('Ausgeben'))
                 ->setParameters([new IntParameter('Wert')]),
         ];
+    }
+
+    public function getEventClassName(): string
+    {
+        return TestEvent::class;
     }
 }

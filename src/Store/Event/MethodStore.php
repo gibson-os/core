@@ -5,6 +5,7 @@ namespace GibsonOS\Core\Store\Event;
 
 use GibsonOS\Core\Dto\Event\Describer\Parameter\AbstractParameter;
 use GibsonOS\Core\Event\Describer\DescriberInterface;
+use GibsonOS\Core\Service\ServiceManagerService;
 use GibsonOS\Core\Store\AbstractStore;
 
 class MethodStore extends AbstractStore
@@ -18,6 +19,16 @@ class MethodStore extends AbstractStore
      * @var array[]
      */
     private $list = [];
+
+    /**
+     * @var ServiceManagerService
+     */
+    private $serviceManagerService;
+
+    public function __construct(ServiceManagerService $serviceManagerService)
+    {
+        $this->serviceManagerService = $serviceManagerService;
+    }
 
     public function setClassName(string $className): MethodStore
     {
@@ -47,18 +58,16 @@ class MethodStore extends AbstractStore
             return;
         }
 
-        // @ todo muss umgebaut werden
-        $classNameWithNamespace = '\\GibsonOS\\Module\\Hc\\Service\\Event\\Describer\\' . $this->className;
-        $class = new $classNameWithNamespace();
+        $describer = $this->serviceManagerService->get($this->className);
         $methods = [];
 
-        if (!$class instanceof DescriberInterface) {
+        if (!$describer instanceof DescriberInterface) {
             $this->list = $methods;
 
             return;
         }
 
-        foreach ($class->getMethods() as $name => $method) {
+        foreach ($describer->getMethods() as $name => $method) {
             $methods[$method->getTitle()] = [
                 'method' => $name,
                 'title' => $method->getTitle(),

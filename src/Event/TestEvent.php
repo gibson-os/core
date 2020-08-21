@@ -5,7 +5,7 @@ namespace GibsonOS\Core\Event;
 
 use GibsonOS\Core\Event\Describer\TestDescriber;
 
-class TestService extends AbstractEventService
+class TestEvent extends AbstractEvent
 {
     public function __construct(TestDescriber $describer)
     {

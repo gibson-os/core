@@ -23,4 +23,6 @@ interface DescriberInterface
      * @return Method[]
      */
     public function getMethods(): array;
+
+    public function getEventClassName(): string;
 }

@@ -6,7 +6,7 @@ namespace GibsonOS\Core\Event;
 use GibsonOS\Core\Event\Describer\DescriberInterface;
 use GibsonOS\Core\Model\Event\Element;
 
-abstract class AbstractEventService
+abstract class AbstractEvent
 {
     /**
      * @var DescriberInterface

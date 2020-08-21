@@ -98,22 +98,22 @@ class ClassNameStore extends AbstractStore
 
             foreach ($this->dir->getFiles($eventDescriberDir, '*.php') as $classPath) {
                 $className = str_replace('.php', '', $this->file->getFilename($classPath));
-
                 $classNameWithNamespace = $namespace . $className;
 
                 try {
-                    $class = $this->serviceManagerService->get($classNameWithNamespace);
+                    $describer = $this->serviceManagerService->get($classNameWithNamespace);
                 } catch (FactoryError $e) {
                     continue;
                 }
 
-                if (!$class instanceof DescriberInterface) {
+                if (!$describer instanceof DescriberInterface) {
                     continue;
                 }
 
                 $classNames[] = [
-                    'className' => $className,
-                    'title' => $class->getTitle(),
+                    'describerClass' => $classNameWithNamespace,
+                    'eventClass' => $describer->getEventClassName(),
+                    'title' => $describer->getTitle(),
                 ];
             }
         }

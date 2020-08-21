@@ -5,6 +5,7 @@ namespace GibsonOS\Core\Event\Describer;
 
 use GibsonOS\Core\Dto\Event\Describer\Method;
 use GibsonOS\Core\Dto\Event\Describer\Parameter\IntParameter;
+use GibsonOS\Core\Event\TimeEvent;
 
 class TimeDescriber implements DescriberInterface
 {
@@ -40,5 +41,10 @@ class TimeDescriber implements DescriberInterface
                         ->setRange(1),
                 ]),
         ];
+    }
+
+    public function getEventClassName(): string
+    {
+        return TimeEvent::class;
     }
 }

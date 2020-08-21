@@ -5,7 +5,7 @@ namespace GibsonOS\Core\Event;
 
 use GibsonOS\Core\Event\Describer\TimeDescriber;
 
-class TimeService extends AbstractEventService
+class TimeEvent extends AbstractEvent
 {
     public function __construct(TimeDescriber $describer)
     {
