@@ -13,7 +13,7 @@ class MethodStore extends AbstractStore
     /**
      * @var string
      */
-    private $className = '';
+    private $describerClass = '';
 
     /**
      * @var array[]
@@ -30,9 +30,9 @@ class MethodStore extends AbstractStore
         $this->serviceManagerService = $serviceManagerService;
     }
 
-    public function setClassName(string $className): MethodStore
+    public function setDescriberClass(string $describerClass): MethodStore
     {
-        $this->className = $className;
+        $this->describerClass = $describerClass;
 
         return $this;
     }
@@ -58,7 +58,7 @@ class MethodStore extends AbstractStore
             return;
         }
 
-        $describer = $this->serviceManagerService->get($this->className);
+        $describer = $this->serviceManagerService->get($this->describerClass);
         $methods = [];
 
         if (!$describer instanceof DescriberInterface) {

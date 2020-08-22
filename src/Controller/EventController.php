@@ -58,11 +58,11 @@ class EventController extends AbstractController
      * @throws LoginRequired
      * @throws PermissionDenied
      */
-    public function methods(MethodStore $methodStore, string $className): AjaxResponse
+    public function methods(MethodStore $methodStore, string $describerClass): AjaxResponse
     {
         $this->checkPermission(PermissionService::READ);
 
-        $methodStore->setClassName($className);
+        $methodStore->setDescriberClass($describerClass);
 
         return $this->returnSuccess($methodStore->getList());
     }

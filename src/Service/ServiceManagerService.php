@@ -86,6 +86,21 @@ class ServiceManagerService
     private function getByCreate(string $classname): object
     {
         $reflection = $this->getReflectionsClass($classname);
+
+        if ($reflection->isInterface()) {
+            throw new FactoryError(sprintf(
+                'Class %s is an Interface',
+                $classname
+            ));
+        }
+
+        if ($reflection->isAbstract()) {
+            throw new FactoryError(sprintf(
+                'Class %s is an Abstract class',
+                $classname
+            ));
+        }
+
         $constructor = $reflection->getConstructor();
         $parameters = [];
 
