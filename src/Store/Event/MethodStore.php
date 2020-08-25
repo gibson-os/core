@@ -72,7 +72,7 @@ class MethodStore extends AbstractStore
                 'method' => $name,
                 'title' => $method->getTitle(),
                 'parameters' => $this->transformParameters($method->getParameters()),
-                'returnType' => $this->transformReturnTypes($method->getReturnTypes()),
+                'returns' => $this->transformParameters($method->getReturnTypes()),
             ];
         }
 
@@ -97,29 +97,5 @@ class MethodStore extends AbstractStore
         }
 
         return $parametersArray;
-    }
-
-    /**
-     * @param AbstractParameter[]|AbstractParameter[][] $returnTypes
-     */
-    private function transformReturnTypes(array $returnTypes): array
-    {
-        $returnTypesArray = [];
-
-        foreach ($returnTypes as $returnType) {
-            if (is_array($returnType)) {
-                $returnTypesArray[] = $this->transformReturnTypes($returnType);
-
-                continue;
-            }
-
-            $returnTypesArray[] = [
-                'title' => $returnType->getTitle(),
-                'type' => $returnType->getType(),
-                'config' => $returnType->getConfig(),
-            ];
-        }
-
-        return $returnTypesArray;
     }
 }

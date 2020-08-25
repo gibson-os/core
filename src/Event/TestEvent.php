@@ -12,12 +12,12 @@ class TestEvent extends AbstractEvent
         parent::__construct($describer);
     }
 
-    public function returnParameter($value)
+    public function returnParameter(int $value): int
     {
         return $value;
     }
 
-    public function echo($value): void
+    public function echo(string $value): void
     {
         echo $value . PHP_EOL;
     }
