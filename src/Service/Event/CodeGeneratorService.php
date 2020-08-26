@@ -141,9 +141,9 @@ class CodeGeneratorService extends AbstractService
         }
 
         if ($element->getOperator() === self::OPERATOR_SET) {
-            return '$' . $element->getValue() . ' = ' . $command;
+            return '$' . $element->getReturns() . ' = ' . $command;
         }
 
-        return $command . ' ' . $element->getOperator() . ' ' . $element->getValue();
+        return $command . ' ' . $element->getOperator() . ' ' . $element->getReturns();
     }
 }

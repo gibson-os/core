@@ -72,7 +72,7 @@ class MethodStore extends AbstractStore
                 'method' => $name,
                 'title' => $method->getTitle(),
                 'parameters' => $this->transformParameters($method->getParameters()),
-                'returns' => $this->transformParameters($method->getReturnTypes()),
+                'returns' => $this->transformParameters($method->getReturns()),
             ];
         }
 

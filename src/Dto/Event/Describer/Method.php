@@ -13,9 +13,9 @@ class Method
     private $parameters = [];
 
     /**
-     * @var AbstractParameter[]|AbstractParameter[][]
+     * @var AbstractParameter[]
      */
-    private $returnTypes = [];
+    private $returns = [];
 
     /**
      * @var string
@@ -49,19 +49,19 @@ class Method
     }
 
     /**
-     * @return AbstractParameter[]|AbstractParameter[][]
+     * @return AbstractParameter[]
      */
-    public function getReturnTypes(): array
+    public function getReturns(): array
     {
-        return $this->returnTypes;
+        return $this->returns;
     }
 
     /**
-     * @param AbstractParameter[]|AbstractParameter[][] $returnTypes
+     * @param AbstractParameter[] $returns
      */
-    public function setReturnTypes(array $returnTypes): Method
+    public function setReturns(array $returns): Method
     {
-        $this->returnTypes = $returnTypes;
+        $this->returns = $returns;
 
         return $this;
     }

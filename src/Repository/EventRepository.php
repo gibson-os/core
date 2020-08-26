@@ -86,10 +86,10 @@ class EventRepository extends AbstractRepository
             '`event_element`.`parent_id` AS `elementParentId`, ' .
             '`event_element`.`class` AS `elementClass`, ' .
             '`event_element`.`method` AS `elementMethod`, ' .
-            '`event_element`.`params` AS `elementParams`, ' .
+            '`event_element`.`parameters` AS `elementParameters`, ' .
             '`event_element`.`command` AS `elementCommand`, ' .
             '`event_element`.`operator` AS `elementOperator`, ' .
-            '`event_element`.`value` AS `elementValue`, ' .
+            '`event_element`.`returns` AS `elementReturns`, ' .
             '`event_trigger`.`id` AS `triggerId`, ' .
             '`event_trigger`.`trigger` AS `triggerTrigger`, ' .
             '`event_trigger`.`weekday` AS `triggerWeekday`, ' .
@@ -151,10 +151,10 @@ class EventRepository extends AbstractRepository
                 ->setParent($event->elementParentId === null ? null : $elementModels[$event->elementParentId])
                 ->setClass($event->elementClass)
                 ->setMethod($event->elementMethod)
-                ->setParams($event->elementParams)
+                ->setParameters($event->elementParameters)
                 ->setCommand($event->elementCommand)
                 ->setOperator($event->elementOperator)
-                ->setValue($event->elementValue);
+                ->setReturns($event->elementReturns);
             $models[$event->id]->addElement($elementModel);
             $elementModels[$event->elementId] = $elementModel;
         }

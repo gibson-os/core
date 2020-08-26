@@ -25,7 +25,7 @@ class TestDescriber implements DescriberInterface
         return [
             'returnParameter' => (new Method('Gibt aus was rein kommt'))
                 ->setParameters(['value' => new IntParameter('Wert')])
-                ->setReturnTypes(['value' => new IntParameter('Wert')]),
+                ->setReturns(['value' => new IntParameter('Wert')]),
             'echo' => (new Method('Ausgeben'))
                 ->setParameters(['value' => new StringParameter('Wert')]),
         ];

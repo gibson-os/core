@@ -6,11 +6,11 @@ namespace GibsonOS\Core\Controller;
 use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\LoginRequired;
 use GibsonOS\Core\Exception\PermissionDenied;
-use GibsonOS\Core\Repository\EventRepository;
 use GibsonOS\Core\Service\PermissionService;
 use GibsonOS\Core\Service\Response\AjaxResponse;
 use GibsonOS\Core\Service\Response\ResponseInterface;
 use GibsonOS\Core\Store\Event\ClassNameStore;
+use GibsonOS\Core\Store\Event\ElementStore;
 use GibsonOS\Core\Store\Event\MethodStore;
 use GibsonOS\Core\Store\EventStore;
 
@@ -35,11 +35,13 @@ class EventController extends AbstractController
         return $this->returnSuccess($eventStore->getList(), $eventStore->getCount());
     }
 
-    public function elements(EventRepository $eventRepository, int $eventId): AjaxResponse
+    public function elements(ElementStore $elementStore, int $eventId): AjaxResponse
     {
         $this->checkPermission(PermissionService::READ);
 
-        return $this->returnSuccess();
+        $elementStore->setEventId($eventId);
+
+        return $this->returnSuccess($elementStore->getList());
     }
 
     /**

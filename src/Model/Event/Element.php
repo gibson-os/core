@@ -50,7 +50,7 @@ class Element extends AbstractModel implements Serializable
     /**
      * @var string|null
      */
-    private $params;
+    private $parameters;
 
     /**
      * @var string|null
@@ -65,7 +65,7 @@ class Element extends AbstractModel implements Serializable
     /**
      * @var string|null
      */
-    private $value;
+    private $returns;
 
     /**
      * @var Event
@@ -173,14 +173,14 @@ class Element extends AbstractModel implements Serializable
         return $this;
     }
 
-    public function getParams(): ?string
+    public function getParameters(): ?string
     {
-        return $this->params;
+        return $this->parameters;
     }
 
-    public function setParams(?string $params): Element
+    public function setParameters(?string $parameters): Element
     {
-        $this->params = $params;
+        $this->parameters = $parameters;
 
         return $this;
     }
@@ -209,14 +209,14 @@ class Element extends AbstractModel implements Serializable
         return $this;
     }
 
-    public function getValue(): ?string
+    public function getReturns(): ?string
     {
-        return $this->value;
+        return $this->returns;
     }
 
-    public function setValue(?string $value): Element
+    public function setReturns(?string $returns): Element
     {
-        $this->value = $value;
+        $this->returns = $returns;
 
         return $this;
     }
@@ -273,8 +273,8 @@ class Element extends AbstractModel implements Serializable
             'class' => $this->getClass(),
             'method' => $this->getMethod(),
             'operator' => $this->getOperator(),
-            'params' => $this->getParams(),
-            'value' => $this->getValue(),
+            'params' => $this->getParameters(),
+            'value' => $this->getReturns(),
         ]);
     }
 
@@ -292,8 +292,8 @@ class Element extends AbstractModel implements Serializable
             ->setClass($unserialized['class'])
             ->setMethod($unserialized['method'])
             ->setOperator($unserialized['operator'])
-            ->setParams($unserialized['params'])
-            ->setValue($unserialized['value'])
+            ->setParameters($unserialized['params'])
+            ->setReturns($unserialized['value'])
         ;
     }
 }

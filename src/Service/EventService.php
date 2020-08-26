@@ -35,14 +35,14 @@ class EventService extends AbstractService
         $this->events[$trigger][] = $function;
     }
 
-    public function fire(string $trigger, array $params = null): void
+    public function fire(string $trigger, array $parameters = null): void
     {
         if (!isset($this->events[$trigger])) {
             return;
         }
 
         foreach ($this->events[$trigger] as $event) {
-            $event($params);
+            $event($parameters);
         }
     }
 

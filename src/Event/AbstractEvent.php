@@ -29,13 +29,13 @@ abstract class AbstractEvent
             // @todo throw exception
         }
 
-        return $this->{$method}(...$this->getParams($element));
+        return $this->{$method}(...$this->getParameters($element));
     }
 
-    protected function getParams(Element $element): array
+    protected function getParameters(Element $element): array
     {
-        $params = $element->getParams();
+        $parameters = $element->getParameters();
 
-        return empty($params) ? [] : unserialize($params);
+        return empty($parameters) ? [] : unserialize($parameters);
     }
 }

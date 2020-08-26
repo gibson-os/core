@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Store;
 
+use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\Cronjob;
 
 class CronjobStore extends AbstractDatabaseStore
@@ -29,7 +30,9 @@ class CronjobStore extends AbstractDatabaseStore
 
     public function getList(): array
     {
-        $this->table->select(false);
+        if ($this->table->select(false) !== false) {
+            throw (new SelectError())->setTable($this->table);
+        }
 
         return $this->table->connection->fetchAssocList();
     }
