@@ -21,12 +21,12 @@ class Event extends AbstractModel
     private $name;
 
     /**
-     * @var int
+     * @var bool
      */
     private $active;
 
     /**
-     * @var int
+     * @var bool
      */
     private $async;
 
@@ -74,24 +74,24 @@ class Event extends AbstractModel
         return $this;
     }
 
-    public function getActive(): int
+    public function isActive(): bool
     {
         return $this->active;
     }
 
-    public function setActive(int $active): Event
+    public function setActive(bool $active): Event
     {
         $this->active = $active;
 
         return $this;
     }
 
-    public function getAsync(): int
+    public function isAsync(): bool
     {
         return $this->async;
     }
 
-    public function setAsync(int $async): Event
+    public function setAsync(bool $async): Event
     {
         $this->async = $async;
 

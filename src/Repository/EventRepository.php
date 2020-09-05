@@ -123,8 +123,8 @@ class EventRepository extends AbstractRepository
                 $models[$event->id] = (new Event())
                     ->setId((int) $event->id)
                     ->setName($event->name)
-                    ->setActive((int) $event->active)
-                    ->setAsync((int) $event->async)
+                    ->setActive((bool) $event->active)
+                    ->setAsync((bool) $event->async)
                     ->setModified(new DateTime($event->modified));
             }
 
