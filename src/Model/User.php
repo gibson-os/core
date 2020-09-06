@@ -5,9 +5,10 @@ namespace GibsonOS\Core\Model;
 
 use DateTimeImmutable;
 use DateTimeInterface;
+use JsonSerializable;
 use mysqlDatabase;
 
-class User extends AbstractModel
+class User extends AbstractModel implements JsonSerializable
 {
     /**
      * @var int|null
@@ -138,5 +139,18 @@ class User extends AbstractModel
         $this->added = $added;
 
         return $this;
+    }
+
+    public function jsonSerialize()
+    {
+        return [
+            'id' => $this->getId(),
+            'user' => $this->getUser(),
+            'password' => $this->getPassword(),
+            'host' => $this->getHost(),
+            'ip' => $this->getIp(),
+            'lastLogin' => $this->getLastLogin(),
+            'added' => $this->getAdded(),
+        ];
     }
 }

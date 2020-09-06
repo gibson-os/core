@@ -9,6 +9,25 @@ use GibsonOS\Core\Model\User;
 
 class UserRepository extends AbstractRepository
 {
+    public function getById(int $id): User
+    {
+        $table = $this->getTable(User::getTableName());
+        $table->setWhere('`id`=' . $id);
+        $table->setLimit(1);
+
+        if (!$table->select()) {
+            $exception = new SelectError('User not found!');
+            $exception->setTable($table);
+
+            throw $exception;
+        }
+
+        $model = new User();
+        $model->loadFromMysqlTable($table);
+
+        return $model;
+    }
+
     /**
      * @throws SelectError
      * @throws DateTimeError

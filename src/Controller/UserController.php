@@ -5,7 +5,10 @@ namespace GibsonOS\Core\Controller;
 
 use GibsonOS\Core\Exception\LoginRequired;
 use GibsonOS\Core\Exception\PermissionDenied;
+use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Exception\UserError;
+use GibsonOS\Core\Model\User;
+use GibsonOS\Core\Repository\UserRepository;
 use GibsonOS\Core\Service\PermissionService;
 use GibsonOS\Core\Service\Response\AjaxResponse;
 use GibsonOS\Core\Service\Response\RedirectResponse;
@@ -70,5 +73,48 @@ class UserController extends AbstractController
         $this->checkPermission(PermissionService::READ);
 
         return $this->returnSuccess();
+    }
+
+    /**
+     * @throws SelectError
+     * @throws UserError
+     */
+    public function save(
+        UserService $userService,
+        UserRepository $userRepository,
+        string $username,
+        string $password,
+        string $passwordRepeat,
+        string $host = null,
+        string $ip = null,
+        int $id = null
+    ): AjaxResponse {
+        $this->checkUserPermission($id, PermissionService::WRITE);
+
+        $user = new User();
+
+        if ($id !== null) {
+            $user = $userRepository->getById($id);
+        }
+
+        return $this->returnSuccess($userService->save(
+            $user,
+            $username,
+            $password,
+            $passwordRepeat,
+            $host,
+            $ip
+        ));
+    }
+
+    private function checkUserPermission(?int $userId, $permission): void
+    {
+        if ($userId !== $this->sessionService->getUserId()) {
+            $this->checkPermission($permission & PermissionService::MANAGE);
+
+            return;
+        }
+
+        $this->checkPermission($permission);
     }
 }

@@ -15,6 +15,8 @@ use GibsonOS\Core\Repository\UserRepository;
 
 class UserService
 {
+    private const PASSWORD_MIN_LENGTH = 6;
+
     /**
      * @var EnvService
      */
@@ -109,6 +111,46 @@ class UserService
     public function logout(): void
     {
         $this->sessionService->logout();
+    }
+
+    /**
+     * @throws UserError
+     */
+    public function save(
+        User $user,
+        string $username,
+        string $password,
+        string $passwordRepeat,
+        ?string $host,
+        ?string $ip
+    ): User {
+        if (empty($username)) {
+            throw new UserError('Username is empty');
+        }
+
+        if (
+            !empty($password) ||
+            !empty($passwordRepeat)
+        ) {
+            if ($password != $passwordRepeat) {
+                throw new UserError('Password not equal');
+            }
+
+            if (mb_strlen($password) < self::PASSWORD_MIN_LENGTH) {
+                throw new UserError('Password to short');
+            }
+
+            $user->setPassword(md5($this->hashPassword($password)));
+        }
+
+        $user
+            ->setUser($username)
+            ->setHost($host)
+            ->setIp($ip)
+        ;
+        $user->save();
+
+        return $user;
     }
 
     /**
