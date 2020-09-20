@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Store\Event;
 
-use GibsonOS\Core\Dto\Event\Element as ElementDto;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\Event\Element;
 use GibsonOS\Core\Store\AbstractDatabaseStore;
@@ -36,42 +35,35 @@ class ElementStore extends AbstractDatabaseStore
     }
 
     /**
-     * @return ElementDto[]
+     * @throws \GibsonOS\Core\Exception\DateTimeError
+     *
+     * @return Element[]
      */
     public function getList(): array
     {
         $this->where[] = '`event_id`=' . ($this->eventId ?? 0);
         $this->table->setWhere($this->getWhere());
-        $this->table->setOrderBy('`left`');
+        $this->table->setOrderBy('`parent_id`, `order`');
 
         $data = [];
-        $elements = [];
+        $models = [];
 
-        if ($this->table->select(false) !== false) {
+        if (!$this->table->select()) {
             throw (new SelectError())->setTable($this->table);
         }
 
-        foreach ($this->table->connection->fetchAssocList() as $element) {
-            $elementDto = (new ElementDto(
-                (int) $element->id,
-                $element->class,
-                $element->method,
-                (int) $element->left,
-                (int) $element->right
-            ))
-                ->setReturns(unserialize($element->returns))
-                ->setParameters(unserialize($element->parameters))
-                ->setOperator($element->operator)
-                ->setCommand($element->command)
-            ;
-            $elements[$elementDto->getId()] = $elementDto;
+        do {
+            $model = new Element();
+            $model->loadFromMysqlTable($this->table);
+            $models[$model->getId() ?? 0] = $model;
+            $parentId = $model->getParentId();
 
-            if ($element->parent_id === null) {
-                $data[] = $elementDto;
+            if ($parentId === null) {
+                $data[] = $model;
             } else {
-                $elements[$element->parent_id]->addChildren($elementDto);
+                $models[$parentId]->addChildren($model);
             }
-        }
+        } while ($this->table->next());
 
         return $data;
     }

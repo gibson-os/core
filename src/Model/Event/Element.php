@@ -7,10 +7,11 @@ use GibsonOS\Core\Exception\DateTimeError;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Model\Event;
+use JsonSerializable;
 use mysqlDatabase;
 use Serializable;
 
-class Element extends AbstractModel implements Serializable
+class Element extends AbstractModel implements Serializable, JsonSerializable
 {
     /**
      * @var int|null
@@ -23,19 +24,14 @@ class Element extends AbstractModel implements Serializable
     private $eventId;
 
     /**
-     * @var int
-     */
-    private $left;
-
-    /**
-     * @var int
-     */
-    private $right;
-
-    /**
      * @var int|null
      */
     private $parentId;
+
+    /**
+     * @var int
+     */
+    private $order = 0;
 
     /**
      * @var string
@@ -77,6 +73,11 @@ class Element extends AbstractModel implements Serializable
      */
     private $parent;
 
+    /**
+     * @var Element[]
+     */
+    private $children;
+
     public function __construct(mysqlDatabase $database = null)
     {
         parent::__construct($database);
@@ -113,30 +114,6 @@ class Element extends AbstractModel implements Serializable
         return $this;
     }
 
-    public function getLeft(): int
-    {
-        return $this->left;
-    }
-
-    public function setLeft(int $left): Element
-    {
-        $this->left = $left;
-
-        return $this;
-    }
-
-    public function getRight(): int
-    {
-        return $this->right;
-    }
-
-    public function setRight(int $right): Element
-    {
-        $this->right = $right;
-
-        return $this;
-    }
-
     public function getParentId(): ?int
     {
         return $this->parentId;
@@ -145,6 +122,18 @@ class Element extends AbstractModel implements Serializable
     public function setParentId(?int $parentId): Element
     {
         $this->parentId = $parentId;
+
+        return $this;
+    }
+
+    public function getOrder(): int
+    {
+        return $this->order;
+    }
+
+    public function setOrder(int $order): Element
+    {
+        $this->order = $order;
 
         return $this;
     }
@@ -246,7 +235,11 @@ class Element extends AbstractModel implements Serializable
      */
     public function getParent(): ?Element
     {
-        if ($this->parent instanceof Element) {
+        if ($this->getParentId() != null) {
+            if ($this->parent === null) {
+                $this->parent = new Element();
+            }
+
             $this->loadForeignRecord($this->parent, $this->getParentId());
         }
 
@@ -261,14 +254,60 @@ class Element extends AbstractModel implements Serializable
         return $this;
     }
 
+    /**
+     * @throws DateTimeError
+     *
+     * @return Element[]
+     */
+    public function getChildren(): array
+    {
+        if ($this->children === null) {
+            $this->loadChildren();
+        }
+
+        return $this->children;
+    }
+
+    /**
+     * @throws DateTimeError
+     */
+    public function loadChildren(): void
+    {
+        /** @var Element[] $children */
+        $children = $this->loadForeignRecords(
+            Element::class,
+            $this->getId(),
+            Element::getTableName(),
+            'parent_id'
+        );
+
+        $this->setChildren($children);
+    }
+
+    /**
+     * @param Element[] $children
+     */
+    public function setChildren(array $children): Element
+    {
+        $this->children = $children;
+
+        return $this;
+    }
+
+    public function addChildren(Element $children): Element
+    {
+        $this->children[] = $children;
+
+        return $this;
+    }
+
     public function serialize(): string
     {
         return serialize([
             'id' => $this->getId(),
             'eventId' => $this->getEventId(),
             'parentId' => $this->getParentId(),
-            'left' => $this->getLeft(),
-            'right' => $this->getRight(),
+            'order' => $this->getOrder(),
             'command' => $this->getCommand(),
             'class' => $this->getClass(),
             'method' => $this->getMethod(),
@@ -286,8 +325,7 @@ class Element extends AbstractModel implements Serializable
             ->setId($unserialized['id'])
             ->setEventId($unserialized['eventId'])
             ->setParentId($unserialized['parentId'])
-            ->setLeft($unserialized['left'])
-            ->setRight($unserialized['right'])
+            ->setOrder($unserialized['order'])
             ->setCommand($unserialized['command'])
             ->setClass($unserialized['class'])
             ->setMethod($unserialized['method'])
@@ -295,5 +333,20 @@ class Element extends AbstractModel implements Serializable
             ->setParameters($unserialized['params'])
             ->setReturns($unserialized['value'])
         ;
+    }
+
+    public function jsonSerialize()
+    {
+        return [
+            'id' => $this->getId(),
+            'order' => $this->getOrder(),
+            'className' => $this->getClass(),
+            'method' => $this->getMethod(),
+            'command' => $this->getCommand(),
+            'operator' => $this->getOperator(),
+            'returns' => $this->getReturns(),
+            'parameters' => $this->getParameters(),
+            'data' => $this->getChildren(),
+        ];
     }
 }

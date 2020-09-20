@@ -4,10 +4,12 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Controller;
 
 use DateTime;
+use Exception;
 use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\LoginRequired;
 use GibsonOS\Core\Exception\PermissionDenied;
 use GibsonOS\Core\Model\Event;
+use GibsonOS\Core\Repository\EventRepository;
 use GibsonOS\Core\Service\PermissionService;
 use GibsonOS\Core\Service\Response\AjaxResponse;
 use GibsonOS\Core\Service\Response\ResponseInterface;
@@ -71,42 +73,45 @@ class EventController extends AbstractController
         return $this->returnSuccess($methodStore->getList());
     }
 
-    public function save(string $name, bool $active, bool $async, array $elements): AjaxResponse
-    {
+    /**
+     * @throws LoginRequired
+     * @throws PermissionDenied
+     */
+    public function save(
+        EventRepository $eventRepository,
+        string $name,
+        bool $active,
+        bool $async,
+        array $elements,
+        int $id = null
+    ): AjaxResponse {
         $this->checkPermission(PermissionService::WRITE);
 
-        $event = (new Event())
-            ->setName($name)
-            ->setActive($active)
-            ->setAsync($async)
-            ->setModified(new DateTime())
-        ;
-        $event->save();
-        $this->saveElements($event, $elements);
+        $eventRepository->startTransaction();
 
-        return $this->returnSuccess();
-    }
+        try {
+            $event = new Event();
 
-    private function saveElements(Event $event, array $elements, int $left = 0, int $parentId = null): int
-    {
-        foreach ($elements as $element) {
-            $elementModel = (new Event\Element())
-                ->setEvent($event)
-                ->setParentId($parentId)
-                ->setClass($element['className'])
-                ->setMethod($element['method'])
-                ->setCommand($element['command'] ?: null)
-                ->setOperator($element['operator'] ?: null)
-                ->setParameters(empty($element['parameters']) ? null : serialize($element['parameters']))
-                ->setReturns(empty($element['returns']) ? null : serialize($element['returns']))
-                ->setLeft($left)
-                ->setRight($left++)
+            if (!empty($id)) {
+                $event = $eventRepository->getById($id);
+            }
+
+            $event
+                ->setName($name)
+                ->setActive($active)
+                ->setAsync($async)
+                ->setModified(new DateTime())
             ;
-            $elementModel->save();
-            $elementModel->setRight($this->saveElements($event, $element['children'], $left, $elementModel->getId()));
-            $elementModel->save();
+            $event->save();
+            $eventRepository->saveElements($event, $elements);
+        } catch (Exception $e) {
+            $eventRepository->rollback();
+
+            return $this->returnFailure($e->getMessage());
         }
 
-        return $left;
+        $eventRepository->commit();
+
+        return $this->returnSuccess(['id' => $event->getId()]);
     }
 }

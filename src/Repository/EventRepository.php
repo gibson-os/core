@@ -5,15 +5,28 @@ namespace GibsonOS\Core\Repository;
 
 use DateTime;
 use DateTimeInterface;
+use GibsonOS\Core\Exception\DateTimeError;
+use GibsonOS\Core\Exception\Model\SaveError;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\Event;
 use GibsonOS\Core\Model\Event\Element;
 use GibsonOS\Core\Model\Event\Trigger;
+use GibsonOS\Core\Utility\JsonUtility;
 use mysqlTable;
 use stdClass;
 
 class EventRepository extends AbstractRepository
 {
+    /**
+     * @var JsonUtility
+     */
+    private $jsonUtility;
+
+    public function __construct(JsonUtility $jsonUtility)
+    {
+        $this->jsonUtility = $jsonUtility;
+    }
+
     /**
      * @throws SelectError
      */
@@ -105,6 +118,33 @@ class EventRepository extends AbstractRepository
     }
 
     /**
+     * @throws DateTimeError
+     * @throws SaveError
+     */
+    public function saveElements(Event $event, array $elements, int $parentId = null): void
+    {
+        $order = 0;
+
+        foreach ($elements as $element) {
+            $elementModel = (new Event\Element())
+                ->setEvent($event)
+                ->setParentId($parentId)
+                ->setClass($element['className'])
+                ->setMethod($element['method'])
+                ->setCommand($element['command'] ?: null)
+                ->setOperator($element['operator'] ?: null)
+                ->setParameters(
+                    empty($element['parameters']) ? null : $this->jsonUtility->encode($element['parameters'])
+                )
+                ->setReturns(empty($element['returns']) ? null : $this->jsonUtility->encode($element['returns']))
+                ->setOrder($order++)
+            ;
+            $elementModel->save();
+            $this->saveElements($event, $element['children'], $elementModel->getId());
+        }
+    }
+
+    /**
      * @param stdClass[] $events
      *
      * @return Event[]
@@ -125,7 +165,8 @@ class EventRepository extends AbstractRepository
                     ->setName($event->name)
                     ->setActive((bool) $event->active)
                     ->setAsync((bool) $event->async)
-                    ->setModified(new DateTime($event->modified));
+                    ->setModified(new DateTime($event->modified))
+                ;
             }
 
             if (!isset($triggerModels[$event->triggerId])) {
@@ -138,7 +179,8 @@ class EventRepository extends AbstractRepository
                     ->setYear((int) $event->triggerYear ?: null)
                     ->setHour((int) $event->triggerHour ?: null)
                     ->setMinute((int) $event->triggerMinute ?: null)
-                    ->setPriority((int) $event->triggerPriority ?: null);
+                    ->setPriority((int) $event->triggerPriority ?: null)
+                ;
                 $models[$event->id]->addTrigger($triggerModel);
                 $triggerModels[$event->triggerId] = $triggerModel;
             }
@@ -146,15 +188,15 @@ class EventRepository extends AbstractRepository
             $elementModel = (new Element())
                 ->setId((int) $event->elementId)
                 ->setEvent($models[$event->id])
-                ->setLeft((int) $event->elementLeft)
-                ->setRight((int) $event->elementRight)
                 ->setParent($event->elementParentId === null ? null : $elementModels[$event->elementParentId])
+                ->setOrder($event->elementOrder)
                 ->setClass($event->elementClass)
                 ->setMethod($event->elementMethod)
                 ->setParameters($event->elementParameters)
                 ->setCommand($event->elementCommand)
                 ->setOperator($event->elementOperator)
-                ->setReturns($event->elementReturns);
+                ->setReturns($event->elementReturns)
+            ;
             $models[$event->id]->addElement($elementModel);
             $elementModels[$event->elementId] = $elementModel;
         }
