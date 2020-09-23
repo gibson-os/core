@@ -3,9 +3,9 @@
 namespace GibsonOS\Core\Service;
 
 use Codeception\Test\Unit;
+use GibsonOS\Core\Event\AbstractEvent;
+use GibsonOS\Core\Event\Describer\DescriberInterface;
 use GibsonOS\Core\Model\Event\Element;
-use GibsonOS\Core\Service\Event\AbstractEventService;
-use GibsonOS\Core\Service\Event\Describer\DescriberInterface;
 
 class EventServiceTest extends Unit
 {
@@ -51,7 +51,7 @@ class EventServiceTest extends Unit
     }
 }
 
-class Marvin extends AbstractEventService
+class Marvin extends AbstractEvent
 {
     public function __construct(MarvinDescriber $describer)
     {
@@ -79,5 +79,10 @@ class MarvinDescriber implements DescriberInterface
     public function getMethods(): array
     {
         return [];
+    }
+
+    public function getEventClassName(): string
+    {
+        return Marvin::class;
     }
 }
