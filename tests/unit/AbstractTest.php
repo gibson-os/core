@@ -8,6 +8,11 @@ use GibsonOS\Core\Service\ServiceManagerService;
 
 class AbstractTest extends Unit
 {
+    /**
+     * @var ServiceManagerService
+     */
+    protected $serviceManagerService;
+
     public function __construct($name = null, array $data = [], $dataName = '')
     {
         parent::__construct($name, $data, $dataName);
