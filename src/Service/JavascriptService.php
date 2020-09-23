@@ -121,8 +121,7 @@ class JavascriptService extends AbstractService
             $content .= $this->loadFile($file->getNamespace(), $files);
         }
 
-        return $content . $this->mergeFileContent($dir)
-        ;
+        return $content . $this->mergeFileContent($dir);
     }
 
     /**
