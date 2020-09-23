@@ -27,6 +27,11 @@ class JavascriptService extends AbstractService
      */
     private $permissionService;
 
+    /**
+     * @var string
+     */
+    private $vendorPath;
+
     public function __construct(
         PermissionViewRepository $permissionViewRepository,
         DirService $dirService,
@@ -37,6 +42,13 @@ class JavascriptService extends AbstractService
         $this->dirService = $dirService;
         $this->fileService = $fileService;
         $this->permissionService = $permissionService;
+        $this->vendorPath = realpath(
+            dirname(__FILE__) . DIRECTORY_SEPARATOR .
+            '..' . DIRECTORY_SEPARATOR .
+            '..' . DIRECTORY_SEPARATOR .
+            '..' . DIRECTORY_SEPARATOR .
+            '..'
+        ) . DIRECTORY_SEPARATOR;
     }
 
     /**
@@ -56,8 +68,21 @@ class JavascriptService extends AbstractService
                 $task->module . DIRECTORY_SEPARATOR .
                 $task->task . DIRECTORY_SEPARATOR
             ;
-
             $classFiles = $this->mergeClassFileContent($dir, $files, $filesOrder, $filesExtends);
+
+            $dir =
+                $this->vendorPath .
+                'gibson-os' . DIRECTORY_SEPARATOR .
+                $task->module . DIRECTORY_SEPARATOR .
+                'assets' . DIRECTORY_SEPARATOR .
+                'js' . DIRECTORY_SEPARATOR
+            ;
+            $classFiles = $this->mergeClassFileContent(
+                $dir,
+                $classFiles['content'],
+                $classFiles['order'],
+                $classFiles['extends']
+            );
             $filesOrder = $classFiles['order'];
             $filesExtends = $classFiles['extends'];
             $files = $classFiles['content'];
@@ -80,8 +105,22 @@ class JavascriptService extends AbstractService
             $module . DIRECTORY_SEPARATOR .
             $task . DIRECTORY_SEPARATOR
         ;
-
         $classFiles = $this->mergeClassFileContent($dir);
+
+        $dir =
+            $this->vendorPath .
+            'gibson-os' . DIRECTORY_SEPARATOR .
+            $module . DIRECTORY_SEPARATOR .
+            'assets' . DIRECTORY_SEPARATOR .
+            'js' . DIRECTORY_SEPARATOR .
+            $task . DIRECTORY_SEPARATOR
+        ;
+        $classFiles = $this->mergeClassFileContent(
+            $dir,
+            $classFiles['content'],
+            $classFiles['order'],
+            $classFiles['extends']
+        );
 
         return
             $this->getClassFilesContent($classFiles['content'], $classFiles['order']) .
@@ -97,7 +136,7 @@ class JavascriptService extends AbstractService
         $filename = $this->dirService->removeEndSlash($dir) . '.js';
 
         if (file_exists($filename)) {
-            $return .= "\n/* " . str_replace('js' . DIRECTORY_SEPARATOR . 'module' . DIRECTORY_SEPARATOR, '', $filename) . " */\n";
+            $return .= "\n/* " . $filename . " */\n";
             $return .= file_get_contents($filename);
         }
 
