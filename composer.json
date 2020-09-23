@@ -30,7 +30,8 @@
   "autoload": {
     "psr-4": {
       "GibsonOS\\Core\\": "src/",
-      "GibsonOS\\Mock\\": "tests/mock/"
+      "GibsonOS\\Mock\\": "tests/mock/",
+      "GibsonOS\\UnitTest\\": "tests/unit/"
     }
   },
   "scripts": {
