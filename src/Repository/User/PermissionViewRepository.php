@@ -25,11 +25,11 @@ class PermissionViewRepository extends AbstractRepository
                 '`task_id` IS NOT NULL' .
                 ($module === null ? '' : ' AND `module`=?')
             )
-            ->setParameters([$userId ?? 0, PermissionService::DENIED])
+            ->setWhereParameters([$userId ?? 0, PermissionService::DENIED])
         ;
 
         if ($module !== null) {
-            $table->addParameter($module);
+            $table->addWhereParameter($module);
         }
 
         if (!$table->selectPrepared(false, 'DISTINCT `module`, `task_name` AS `task`')) {
