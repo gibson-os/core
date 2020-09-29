@@ -78,7 +78,6 @@ class JavascriptService extends AbstractService
                 'assets' . DIRECTORY_SEPARATOR .
                 'js' . DIRECTORY_SEPARATOR
             ));
-
             $oldData .= $this->mergeFileContent($dir);
         }
 
