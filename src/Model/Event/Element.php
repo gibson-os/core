@@ -7,6 +7,7 @@ use GibsonOS\Core\Exception\DateTimeError;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Model\Event;
+use GibsonOS\Core\Utility\JsonUtility;
 use JsonSerializable;
 use mysqlDatabase;
 use Serializable;
@@ -344,8 +345,8 @@ class Element extends AbstractModel implements Serializable, JsonSerializable
             'method' => $this->getMethod(),
             'command' => $this->getCommand(),
             'operator' => $this->getOperator(),
-            'returns' => $this->getReturns(),
-            'parameters' => $this->getParameters(),
+            'returns' => JsonUtility::decode($this->getReturns() ?? 'null'),
+            'parameters' => JsonUtility::decode($this->getParameters() ?? 'null'),
             'data' => $this->getChildren(),
         ];
     }
