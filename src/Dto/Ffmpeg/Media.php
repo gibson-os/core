@@ -285,7 +285,7 @@ class Media implements JsonSerializable
     public function selectVideoStream(?string $streamId): Media
     {
         if ($streamId !== null && !isset($this->videoStreams[$streamId])) {
-            throw new InvalidArgumentException('Video Stream (' . $streamId . ') existiert nciht!');
+            throw new InvalidArgumentException('Video Stream (' . $streamId . ') existiert nicht!');
         }
 
         $this->selectedVideoStreamId = $streamId;
