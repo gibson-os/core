@@ -338,7 +338,7 @@ class Element extends AbstractModel implements Serializable, JsonSerializable
 
     public function jsonSerialize()
     {
-        return [
+        $data = [
             'id' => $this->getId(),
             'order' => $this->getOrder(),
             'className' => $this->getClass(),
@@ -347,7 +347,12 @@ class Element extends AbstractModel implements Serializable, JsonSerializable
             'operator' => $this->getOperator(),
             'returns' => JsonUtility::decode($this->getReturns() ?? 'null'),
             'parameters' => JsonUtility::decode($this->getParameters() ?? 'null'),
-            'data' => $this->getChildren(),
         ];
+
+        if (count($this->getChildren())) {
+            $data['children'] = $this->getChildren();
+        }
+
+        return $data;
     }
 }
