@@ -347,10 +347,12 @@ class Element extends AbstractModel implements Serializable, JsonSerializable
             'operator' => $this->getOperator(),
             'returns' => JsonUtility::decode($this->getReturns() ?? 'null'),
             'parameters' => JsonUtility::decode($this->getParameters() ?? 'null'),
+            'leaf' => true,
         ];
 
         if (count($this->getChildren())) {
-            $data['children'] = $this->getChildren();
+            $data['data'] = $this->getChildren();
+            $data['leaf'] = false;
         }
 
         return $data;

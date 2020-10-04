@@ -1,6 +1,9 @@
 Ext.define('GibsonOS.module.core.event.element.model.TreeGrid', {
     extend: 'GibsonOS.data.Model',
     fields: [{
+        name: 'id',
+        type: 'int'
+    },{
         name: 'command',
         type: 'string'
     },{
