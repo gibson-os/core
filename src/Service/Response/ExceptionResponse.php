@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Service\Response;
 
+use GibsonOS\Core\Exception\AbstractException;
 use GibsonOS\Core\Service\RequestService;
 use GibsonOS\Core\Service\TwigService;
 use GibsonOS\Core\Utility\JsonUtility;
@@ -54,6 +55,27 @@ class ExceptionResponse implements ResponseInterface
         $exception = $this->getExceptionJson($this->exception);
 
         if ($this->requestService->isAjax()) {
+            if ($this->exception instanceof AbstractException) {
+                $data = [
+                    'msg' => nl2br($this->exception->getMessage()),
+                    'title' => $this->exception->getTitle(),
+                    'type' => $this->exception->getType(),
+                ];
+
+                $data['extraParameters'] = $this->exception->getExtraParameters();
+                $data['buttons'] = $this->exception->getButtons();
+
+                if ($this->exception->getType() == AbstractException::PROMPT) {
+                    $data['promptParameter'] = $this->exception->getPromptParameter();
+                }
+
+                return JsonUtility::encode([
+                    'success' => false,
+                    'failure' => true,
+                    'data' => $data,
+                ]);
+            }
+
             return JsonUtility::encode([
                 'success' => false,
                 'failure' => true,
