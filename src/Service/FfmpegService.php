@@ -164,7 +164,7 @@ class FfmpegService extends AbstractService
         $path = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'ffmpeg' . $filename;
 
         if (!$this->file->exists($path)) {
-            throw new FileNotFound(sprintf('Konvertstatus "%s" existiert nicht!', $path));
+            throw new FileNotFound(sprintf('Konvertstatus "%s" existiert nicht! Maybe PrivateTmp? /usr/lib/systemd/system/apache2.service', $path));
         }
 
         $content = $this->file->readLastLine($path);
