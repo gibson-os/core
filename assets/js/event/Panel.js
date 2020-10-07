@@ -9,22 +9,19 @@ Ext.define('GibsonOS.module.core.event.Panel', {
         me.items = [{
             xtype: 'gosModuleCoreEventForm',
             region: 'north',
-            flex: 0,
-            gos: me.gos
+            flex: 0
         },{
-            xtype: 'gosModuleCoreEventElementTreeGrid',
+            xtype: 'gosTabPanel',
             region: 'center',
-            gos: me.gos
-        /*},{
-            xtype: 'gosModuleCoreEventTriggerGrid',
-            region: 'east',
-            gos: {
-                data: {
-                    extraParams: {
-                        module: me.gos.data.module.id
-                    }
-                }
-            }*/
+            items: [{
+                xtype: 'gosModuleCoreEventElementTreeGrid',
+                title: 'Ereignis',
+                gos: me.gos
+            },{
+                xtype: 'gosModuleCoreEventTriggerGrid',
+                title: 'Auslöser',
+                gos: me.gos
+            }]
         }];
 
         let getAjaxData = function(element) {
@@ -71,7 +68,7 @@ Ext.define('GibsonOS.module.core.event.Panel', {
                 GibsonOS.Ajax.request({
                     url: baseDir + 'core/event/save',
                     params: {
-                        id: me.gos.data.eventId,
+                        eventId: me.gos.data.eventId,
                         name: form.findField('name').getValue(),
                         async: form.findField('async').getValue(),
                         active: form.findField('active').getValue(),

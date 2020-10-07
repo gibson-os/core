@@ -5,9 +5,11 @@ namespace GibsonOS\Core\Controller;
 
 use DateTime;
 use Exception;
+use GibsonOS\Core\Exception\DateTimeError;
 use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\LoginRequired;
 use GibsonOS\Core\Exception\PermissionDenied;
+use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\Event;
 use GibsonOS\Core\Repository\EventRepository;
 use GibsonOS\Core\Service\PermissionService;
@@ -16,6 +18,7 @@ use GibsonOS\Core\Service\Response\ResponseInterface;
 use GibsonOS\Core\Store\Event\ClassNameStore;
 use GibsonOS\Core\Store\Event\ElementStore;
 use GibsonOS\Core\Store\Event\MethodStore;
+use GibsonOS\Core\Store\Event\TriggerStore;
 use GibsonOS\Core\Store\EventStore;
 
 class EventController extends AbstractController
@@ -39,6 +42,11 @@ class EventController extends AbstractController
         return $this->returnSuccess($eventStore->getList(), $eventStore->getCount());
     }
 
+    /**
+     * @throws LoginRequired
+     * @throws PermissionDenied
+     * @throws DateTimeError
+     */
     public function elements(ElementStore $elementStore, int $eventId): AjaxResponse
     {
         $this->checkPermission(PermissionService::READ);
@@ -76,6 +84,20 @@ class EventController extends AbstractController
     /**
      * @throws LoginRequired
      * @throws PermissionDenied
+     * @throws SelectError
+     */
+    public function triggers(TriggerStore $triggerStore, int $eventId): AjaxResponse
+    {
+        $this->checkPermission(PermissionService::READ);
+
+        $triggerStore->setEventId($eventId);
+
+        return $this->returnSuccess($triggerStore->getList());
+    }
+
+    /**
+     * @throws LoginRequired
+     * @throws PermissionDenied
      */
     public function save(
         EventRepository $eventRepository,
@@ -83,7 +105,7 @@ class EventController extends AbstractController
         bool $active,
         bool $async,
         array $elements,
-        int $id = null
+        int $eventId = null
     ): AjaxResponse {
         $this->checkPermission(PermissionService::WRITE);
 
@@ -92,8 +114,8 @@ class EventController extends AbstractController
         try {
             $event = new Event();
 
-            if (!empty($id)) {
-                $event = $eventRepository->getById($id);
+            if (!empty($eventId)) {
+                $event = $eventRepository->getById($eventId);
             }
 
             $event

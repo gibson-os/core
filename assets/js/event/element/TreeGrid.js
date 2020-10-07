@@ -86,6 +86,7 @@ Ext.define('GibsonOS.module.core.event.element.TreeGrid', {
             xtype: 'treecolumn'
         },{
             xtype: 'gosGridColumnComboBoxEditor',
+            itemId: 'gosModuleCoreEventElementTreeGridColumnCommand',
             header: 'Kommando',
             dataIndex: 'command',
             width: 120,
@@ -103,9 +104,15 @@ Ext.define('GibsonOS.module.core.event.element.TreeGrid', {
                         }
                     }
                 }
+            },
+            renderer: function(value) {
+                let record = me.down('#gosModuleCoreEventElementTreeGridColumnCommand').getEditor().findRecordByValue(value);
+
+                return record === false ? null : record.get('name');
             }
         },{
             xtype: 'gosGridColumnComboBoxEditor',
+            itemId: 'gosModuleCoreEventElementTreeGridColumnClassName',
             header: 'Klasse',
             dataIndex: 'className',
             flex: 1,
@@ -124,6 +131,14 @@ Ext.define('GibsonOS.module.core.event.element.TreeGrid', {
                         methodColumnEditor.enable();
                     }
                 }
+            },
+            renderer: function(value, metaData, record) {
+                let column = me.down('#gosModuleCoreEventElementTreeGridColumnClassName');
+                let comboBox = column.getEditor();
+                let comboRecord = comboBox.findRecordByValue(value);
+
+                return comboBox.getStore().count() === 0 ? record.get('classNameTitle') :
+                    comboRecord === false ? null : comboRecord.get('title');
             }
         },{
             xtype: 'gosGridColumnComboBoxEditor',
@@ -162,6 +177,14 @@ Ext.define('GibsonOS.module.core.event.element.TreeGrid', {
                         }
                     }
                 }
+            },
+            renderer: function(value, metaData, record) {
+                let column = me.down('#gosModuleCoreEventElementTreeGridColumnMethod');
+                let comboBox = column.getEditor();
+                let comboRecord = comboBox.findRecordByValue(value);
+
+                return comboBox.getStore().count() === 0 ? record.get('methodTitle') :
+                    comboRecord === false ? null : comboRecord.get('title');
             }
         },{
             header: 'Parameter',
@@ -173,15 +196,17 @@ Ext.define('GibsonOS.module.core.event.element.TreeGrid', {
                 let methodComboBox = me.down('#gosModuleCoreEventElementTreeGridColumnMethod').getEditor();
                 let methodComboBoxRecord = methodComboBox.findRecordByValue(methodComboBox.getValue());
                 let returnValue = '';
+                let parameters = record.get('parameters');
 
-                if (
-                    !methodComboBoxRecord ||
-                    !methodComboBoxRecord.get('parameters')
-                ) {
+                if (methodComboBoxRecord) {
+                    parameters = methodComboBoxRecord.get('parameters');
+                }
+
+                if (!parameters) {
                     return returnValue;
                 }
 
-                Ext.iterate(methodComboBoxRecord.get('parameters'), function(name, parameter) {
+                Ext.iterate(parameters, function(name, parameter) {
                     returnValue += parameter.title + ': ';
 
                     if (values[name]) {
@@ -223,6 +248,11 @@ Ext.define('GibsonOS.module.core.event.element.TreeGrid', {
             width: 100,
             editor: {
                 xtype: 'gosModuleCoreEventElementOperatorComboBox'
+            },
+            renderer: function(value) {
+                let record = me.down('#gosModuleCoreEventElementTreeGridColumnOperator').getEditor().findRecordByValue(value);
+
+                return record === false ? null : record.get('name');
             }
         },{
             header: 'Wert',
@@ -234,16 +264,20 @@ Ext.define('GibsonOS.module.core.event.element.TreeGrid', {
                 let methodComboBox = me.down('#gosModuleCoreEventElementTreeGridColumnMethod').getEditor();
                 let methodComboBoxRecord = methodComboBox.findRecordByValue(methodComboBox.getValue());
                 let returnValue = '';
+                let returns = record.get('returns');
+
+                if (methodComboBoxRecord) {
+                    returns = methodComboBoxRecord.get('returns');
+                }
 
                 if (
                     !record.get('operator') ||
-                    !methodComboBoxRecord ||
-                    !methodComboBoxRecord.get('returns')
+                    !returns
                 ) {
                     return returnValue;
                 }
 
-                Ext.iterate(methodComboBoxRecord.get('returns'), function(name, parameter) {
+                Ext.iterate(returns, function(name, parameter) {
                     returnValue += parameter.title + ': ';
 
                     if (values[name]) {

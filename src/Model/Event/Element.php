@@ -45,6 +45,20 @@ class Element extends AbstractModel implements Serializable, JsonSerializable
     private $method;
 
     /**
+     * Required for store.
+     *
+     * @var string
+     */
+    private $classTitle;
+
+    /**
+     * Required for store.
+     *
+     * @var string
+     */
+    private $methodTitle;
+
+    /**
      * @var string|null
      */
     private $parameters;
@@ -302,6 +316,30 @@ class Element extends AbstractModel implements Serializable, JsonSerializable
         return $this;
     }
 
+    public function getClassTitle(): string
+    {
+        return $this->classTitle;
+    }
+
+    public function setClassTitle(string $classTitle): Element
+    {
+        $this->classTitle = $classTitle;
+
+        return $this;
+    }
+
+    public function getMethodTitle(): string
+    {
+        return $this->methodTitle;
+    }
+
+    public function setMethodTitle(string $methodTitle): Element
+    {
+        $this->methodTitle = $methodTitle;
+
+        return $this;
+    }
+
     public function serialize(): string
     {
         return serialize([
@@ -342,7 +380,9 @@ class Element extends AbstractModel implements Serializable, JsonSerializable
             'id' => $this->getId(),
             'order' => $this->getOrder(),
             'className' => $this->getClass(),
+            'classNameTitle' => $this->getClassTitle(),
             'method' => $this->getMethod(),
+            'methodTitle' => $this->getMethodTitle(),
             'command' => $this->getCommand(),
             'operator' => $this->getOperator(),
             'returns' => JsonUtility::decode($this->getReturns() ?? 'null'),

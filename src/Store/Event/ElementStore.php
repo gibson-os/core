@@ -3,12 +3,35 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Store\Event;
 
+use GibsonOS\Core\Exception\DateTimeError;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\Event\Element;
 use GibsonOS\Core\Store\AbstractDatabaseStore;
+use GibsonOS\Core\Utility\JsonUtility;
+use mysqlDatabase;
 
 class ElementStore extends AbstractDatabaseStore
 {
+    /**
+     * @var ClassNameStore
+     */
+    private $classNameStore;
+
+    /**
+     * @var MethodStore
+     */
+    private $methodStore;
+
+    public function __construct(
+        ClassNameStore $classNameStore,
+        MethodStore $methodStore,
+        mysqlDatabase $database = null
+    ) {
+        parent::__construct($database);
+        $this->classNameStore = $classNameStore;
+        $this->methodStore = $methodStore;
+    }
+
     /**
      * @var int|null
      */
@@ -35,7 +58,7 @@ class ElementStore extends AbstractDatabaseStore
     }
 
     /**
-     * @throws \GibsonOS\Core\Exception\DateTimeError
+     * @throws DateTimeError
      *
      * @return Element[]
      */
@@ -52,19 +75,58 @@ class ElementStore extends AbstractDatabaseStore
             throw (new SelectError())->setTable($this->table);
         }
 
+        $classNames = $this->classNameStore->getList();
+
         do {
-            $model = new Element();
-            $model->loadFromMysqlTable($this->table);
-            $models[$model->getId() ?? 0] = $model;
-            $parentId = $model->getParentId();
+            $element = new Element();
+            $element->loadFromMysqlTable($this->table);
+            $models[$element->getId() ?? 0] = $element;
+            $parentId = $element->getParentId();
+
+            foreach ($classNames as $className) {
+                if ($className['describerClass'] === $element->getClass()) {
+                    $element->setClassTitle($className['title']);
+
+                    break;
+                }
+            }
+
+            $this->methodStore->setDescriberClass($element->getClass());
+
+            foreach ($this->methodStore->getList() as $method) {
+                if ($method['method'] === $element->getMethod()) {
+                    $element
+                        ->setMethodTitle($method['title'])
+                        ->setParameters($this->completeParameters($method['parameters'], $element->getParameters()))
+                        ->setReturns($this->completeParameters($method['returns'], $element->getReturns()))
+                    ;
+
+                    break;
+                }
+            }
 
             if ($parentId === null) {
-                $data[] = $model;
+                $data[] = $element;
             } else {
-                $models[$parentId]->addChildren($model);
+                $models[$parentId]->addChildren($element);
             }
         } while ($this->table->next());
 
         return $data;
+    }
+
+    private function completeParameters(array $methodParameters, ?string $parameters): ?string
+    {
+        $parameters = $parameters === null ? [] : JsonUtility::decode($parameters);
+
+        foreach ($methodParameters as $parameterName => &$methodParameter) {
+            if (!isset($parameters[$parameterName])) {
+                continue;
+            }
+
+            $methodParameter['value'] = $parameters[$parameterName];
+        }
+
+        return JsonUtility::encode($methodParameters);
     }
 }

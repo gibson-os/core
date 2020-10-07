@@ -28,30 +28,29 @@ class EventRepository extends AbstractRepository
     }
 
     /**
+     * @throws DateTimeError
      * @throws SelectError
      */
     public function getById(int $id): Event
     {
-        $table = $this->initializeTable();
-        $table->setWhere('`' . Event::getTableName() . '`.`id`=' . $id);
+        $table = $this->getTable(Event::getTableName());
+        $table
+            ->setWhere('`id`=?')
+            ->addWhereParameter($id)
+            ->setLimit(1)
+        ;
 
-        if (!$table->select(false)) {
+        if (!$table->selectPrepared()) {
             $exception = new SelectError('Event not found!');
             $exception->setTable($table);
 
             throw $exception;
         }
 
-        $models = $this->matchModels($table->connection->fetchObjectList());
+        $model = new Event();
+        $model->loadFromMysqlTable($table);
 
-        if (empty($models)) {
-            $exception = new SelectError('Event not found!');
-            $exception->setTable($table);
-
-            throw $exception;
-        }
-
-        return reset($models);
+        return $model;
     }
 
     /**
@@ -84,9 +83,9 @@ class EventRepository extends AbstractRepository
     private function initializeTable()
     {
         $table = $this->getTable(Element::getTableName());
-        $table->appendJoin('`event`', '`event_element`.`event_id`=`event`.`id`');
-        $table->appendJoin('`event_trigger`', '`event_element`.`event_id`=`event_trigger`.`event_id`');
-        $table->setOrderBy('`event_trigger`.`priority` DESC, `event_element`.`left`');
+        $table->appendJoinLeft('`event`', '`event_element`.`event_id`=`event`.`id`');
+        $table->appendJoinLeft('`event_trigger`', '`event_element`.`event_id`=`event_trigger`.`event_id`');
+        $table->setOrderBy('`event_trigger`.`priority` DESC, `event_element`.`parent_id`, `event_element`.`order`');
         $table->setSelectString(
             '`event`.`id`, ' .
             '`event`.`name`, ' .
@@ -94,9 +93,8 @@ class EventRepository extends AbstractRepository
             '`event`.`async`, ' .
             '`event`.`modified`, ' .
             '`event_element`.`id` AS `elementId`, ' .
-            '`event_element`.`left` AS `elementLeft`, ' .
-            '`event_element`.`right` AS `elementRight`, ' .
             '`event_element`.`parent_id` AS `elementParentId`, ' .
+            '`event_element`.`order` AS `elementOrder`, ' .
             '`event_element`.`class` AS `elementClass`, ' .
             '`event_element`.`method` AS `elementMethod`, ' .
             '`event_element`.`parameters` AS `elementParameters`, ' .

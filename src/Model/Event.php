@@ -7,8 +7,9 @@ use DateTime;
 use GibsonOS\Core\Exception\DateTimeError;
 use GibsonOS\Core\Model\Event\Element;
 use GibsonOS\Core\Model\Event\Trigger;
+use JsonSerializable;
 
-class Event extends AbstractModel
+class Event extends AbstractModel implements JsonSerializable
 {
     /**
      * @var int|null
@@ -202,5 +203,15 @@ class Event extends AbstractModel
         );
 
         $this->setTriggers($triggers);
+    }
+
+    public function jsonSerialize()
+    {
+        return [
+            'id' => $this->getId(),
+            'name' => $this->getName(),
+            'active' => $this->isActive(),
+            'async' => $this->isAsync(),
+        ];
     }
 }

@@ -56,13 +56,15 @@ Ext.define('GibsonOS.module.core.event.Grid', {
         me.callParent();
 
         me.on('itemdblclick', function(view, record) {
-            new GibsonOS.module.core.event.Window({
+            let window = new GibsonOS.module.core.event.Window({
                 gos: {
                     data: {
                         eventId: record.get('id')
                     }
                 }
             });
+
+            window.down('gosModuleCoreEventForm').loadRecord(record);
         });
     }
 });

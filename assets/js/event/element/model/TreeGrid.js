@@ -10,7 +10,13 @@ Ext.define('GibsonOS.module.core.event.element.model.TreeGrid', {
         name: 'className',
         type: 'string'
     },{
+        name: 'classNameTitle',
+        type: 'string'
+    },{
         name: 'method',
+        type: 'string'
+    },{
+        name: 'methodTitle',
         type: 'string'
     },{
         name: 'parameters',
