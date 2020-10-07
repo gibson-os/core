@@ -28,7 +28,44 @@ Ext.define('GibsonOS.module.core.event.trigger.Grid', {
         },{
             header: 'Wochentag',
             dataIndex: 'weekday',
-            width: 70
+            width: 70,
+            editor: {
+                xtype: 'gosFormComboBox',
+                emptyText: 'Keiner',
+                hideLabel: true,
+                store: {
+                    xtype: 'gosDataStore',
+                    fields: ['id', 'name'],
+                    data: [{
+                        id: null,
+                        name: 'Keiner'
+                    },{
+                        id: 1,
+                        name: 'Montag'
+                    },{
+                        id: 2,
+                        name: 'Dienstag'
+                    },{
+                        id: 3,
+                        name: 'Mittwoch'
+                    },{
+                        id: 4,
+                        name: 'Donnerstag'
+                    },{
+                        id: 5,
+                        name: 'Freitag'
+                    },{
+                        id: 6,
+                        name: 'Samstag'
+                    },{
+                        id: 0,
+                        name: 'Sonntag'
+                    },{
+                        id: 1,
+                        name: 'Montag'
+                    }]
+                }
+            }
         },{
             header: 'Tag',
             dataIndex: 'day',
