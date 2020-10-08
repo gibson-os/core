@@ -26,7 +26,17 @@ class Trigger extends AbstractModel
     /**
      * @var string
      */
+    private $class;
+
+    /**
+     * @var string
+     */
     private $trigger;
+
+    /**
+     * @var string|null
+     */
+    private $parameters;
 
     /**
      * @var int|null
@@ -109,6 +119,18 @@ class Trigger extends AbstractModel
         return $this;
     }
 
+    public function getClass(): string
+    {
+        return $this->class;
+    }
+
+    public function setClass(string $class): Trigger
+    {
+        $this->class = $class;
+
+        return $this;
+    }
+
     public function getTrigger(): string
     {
         return $this->trigger;
@@ -117,6 +139,18 @@ class Trigger extends AbstractModel
     public function setTrigger(string $trigger): Trigger
     {
         $this->trigger = $trigger;
+
+        return $this;
+    }
+
+    public function getParameters(): ?string
+    {
+        return $this->parameters;
+    }
+
+    public function setParameters(?string $parameters): Trigger
+    {
+        $this->parameters = $parameters;
 
         return $this;
     }

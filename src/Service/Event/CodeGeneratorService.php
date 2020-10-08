@@ -5,6 +5,7 @@ namespace GibsonOS\Core\Service\Event;
 
 use GibsonOS\Core\Model\Event\Element;
 use GibsonOS\Core\Service\AbstractService;
+use GibsonOS\Core\Utility\JsonUtility;
 
 class CodeGeneratorService extends AbstractService
 {
@@ -140,10 +141,13 @@ class CodeGeneratorService extends AbstractService
             return $command;
         }
 
+        $returns = JsonUtility::decode($element->getReturns() ?? '[]');
+
         if ($element->getOperator() === self::OPERATOR_SET) {
-            return '$' . $element->getReturns() . ' = ' . $command;
+            return '$' . reset($returns) . ' = ' . $command;
         }
 
-        return $command . ' ' . $element->getOperator() . ' ' . $element->getReturns();
+        // @todo multiple returns. Vorstellung: Jedes ELement der Antwort wird durchlaufen und mit jedem gesetzten verglichen
+        return $command . ' ' . $element->getOperator() . ' ' . reset($returns);
     }
 }

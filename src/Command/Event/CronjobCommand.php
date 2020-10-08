@@ -3,11 +3,8 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Command\Event;
 
-use DateTime;
 use GibsonOS\Core\Command\AbstractCommand;
 use GibsonOS\Core\Exception\DateTimeError;
-use GibsonOS\Core\Exception\FileNotFound;
-use GibsonOS\Core\Model\Event\Element;
 use GibsonOS\Core\Model\Event\Trigger;
 use GibsonOS\Core\Repository\EventRepository;
 use GibsonOS\Core\Service\Event\CodeGeneratorService;
@@ -45,20 +42,8 @@ class CronjobCommand extends AbstractCommand
      */
     protected function run(): int
     {
-        $events = $this->eventRepository->getTimeControlled(Trigger::TRIGGER_CRON, new DateTime());
-
-        foreach ($events as $event) {
-            eval($this->codeGeneratorService->generateByElements($event->getElements()));
-        }
+        $this->eventService->fire(Trigger::TRIGGER_CRON);
 
         return 0;
-    }
-
-    /**
-     * @throws FileNotFound
-     */
-    public function runFunction(Element $element)
-    {
-        return $this->eventService->runFunction($element);
     }
 }

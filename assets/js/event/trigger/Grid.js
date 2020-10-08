@@ -30,12 +30,96 @@ Ext.define('GibsonOS.module.core.event.trigger.Grid', {
     },
     getColumns: function() {
         return [{
+            xtype: 'gosGridColumnComboBoxEditor',
+            itemId: 'gosModuleCoreEventTriggerGridColumnClassName',
+            header: 'Klasse',
+            dataIndex: 'className',
+            flex: 1,
+            editor: {
+                xtype: 'gosModuleCoreEventElementClassNameComboBox',
+                listeners: {
+                    change: function(comboBox, newValue) {
+                        let methodColumnEditor = me.down('#gosModuleCoreEventElementTreeGridColumnMethod').getEditor();
+                        let methodColumnEditorStore = methodColumnEditor.getStore();
+
+                        methodColumnEditor.setValue(null);
+
+                        methodColumnEditorStore.getProxy().setExtraParam('describerClass', newValue);
+                        methodColumnEditorStore.load();
+
+                        methodColumnEditor.enable();
+                    }
+                }
+            },
+            renderer: function(value, metaData, record) {
+                // let column = me.down('#gosModuleCoreEventElementTreeGridColumnClassName');
+                // let comboBox = column.getEditor();
+                // let comboRecord = comboBox.findRecordByValue(value);
+                //
+                // return comboBox.getStore().count() === 0 ? record.get('classNameTitle') :
+                //     comboRecord === false ? null : comboRecord.get('title');
+            }
+        },{
             header: 'Trigger',
             dataIndex: 'trigger',
             flex: 1,
             editor: {
                 xtype: 'gosFormTextfield',
                 hideLabel: true
+            }
+        },{
+            header: 'Parameter',
+            itemId: 'gosModuleCoreEventTriggerGridColumnParameters',
+            dataIndex: 'hasParameters',
+            flex: 1,
+            renderer: function(value, metaData, record) {
+                // let values = record.get('parameters');
+                // let methodComboBox = me.down('#gosModuleCoreEventElementTreeGridColumnMethod').getEditor();
+                // let methodComboBoxRecord = methodComboBox.findRecordByValue(methodComboBox.getValue());
+                // let returnValue = '';
+                // let parameters = record.get('parameters');
+                //
+                // if (methodComboBoxRecord) {
+                //     parameters = methodComboBoxRecord.get('parameters');
+                // }
+                //
+                // if (!parameters) {
+                //     return returnValue;
+                // }
+                //
+                // Ext.iterate(parameters, function(name, parameter) {
+                //     returnValue += parameter.title + ': ';
+                //
+                //     if (values[name]) {
+                //         returnValue += values[name].value ? values[name].value : '';
+                //     }
+                //
+                //     returnValue += '<br>';
+                // });
+                //
+                // return returnValue;
+            },
+            editor: {
+                xtype: 'gosFormCheckbox',
+                boxLabel: 'Bearbeiten',
+                listeners: {
+                    change: function(checkbox) {
+                        let methodComboBox = me.down('#gosModuleCoreEventElementTreeGridColumnMethod').getEditor();
+                        let methodComboBoxRecord = methodComboBox.findRecordByValue(methodComboBox.getValue());
+                        let record = me.getSelectionModel().getSelection()[0];
+                        record.set('parameters', methodComboBoxRecord.get('parameters'));
+
+                        checkbox.suspendEvents();
+                        checkbox.setValue(true);
+                        checkbox.resumeEvents();
+
+                        new GibsonOS.module.core.event.element.parameter.Window({
+                            gos: {
+                                data: record.get('parameters')
+                            }
+                        });
+                    }
+                }
             }
         },{
             header: 'Wochentag',

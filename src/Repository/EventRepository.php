@@ -61,6 +61,7 @@ class EventRepository extends AbstractRepository
     {
         $table = $this->initializeTable()
             ->setWhere(
+                '`event`.`active`=1 AND ' .
                 '`event_trigger`.`trigger`=? AND ' .
                 '(`event_trigger`.`weekday` IS NULL OR `event_trigger`.`weekday`=?) AND ' .
                 '(`event_trigger`.`day` IS NULL OR `event_trigger`.`day`=?) AND ' .

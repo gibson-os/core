@@ -3,8 +3,14 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Service;
 
-use GibsonOS\Core\Exception\FileNotFound;
+use DateTime;
+use GibsonOS\Core\Event\AbstractEvent;
+use GibsonOS\Core\Event\Describer\DescriberInterface;
+use GibsonOS\Core\Exception\DateTimeError;
+use GibsonOS\Core\Exception\FactoryError;
 use GibsonOS\Core\Model\Event\Element;
+use GibsonOS\Core\Repository\EventRepository;
+use GibsonOS\Core\Service\Event\CodeGeneratorService;
 
 class EventService extends AbstractService
 {
@@ -18,9 +24,24 @@ class EventService extends AbstractService
      */
     private $serviceManagerService;
 
-    public function __construct(ServiceManagerService $serviceManagerService)
-    {
+    /**
+     * @var EventRepository
+     */
+    private $eventRepository;
+
+    /**
+     * @var CodeGeneratorService
+     */
+    private $codeGeneratorService;
+
+    public function __construct(
+        ServiceManagerService $serviceManagerService,
+        EventRepository $eventRepository,
+        CodeGeneratorService $codeGeneratorService
+    ) {
         $this->serviceManagerService = $serviceManagerService;
+        $this->eventRepository = $eventRepository;
+        $this->codeGeneratorService = $codeGeneratorService;
     }
 
     /**
@@ -35,23 +56,30 @@ class EventService extends AbstractService
         $this->events[$trigger][] = $function;
     }
 
+    /**
+     * @throws DateTimeError
+     */
     public function fire(string $trigger, array $parameters = null): void
     {
-        if (!isset($this->events[$trigger])) {
-            return;
-        }
+        // @todo Parameter müssen irgendwie noch im Trigger abgeglichen werden oder an die Methoden weiter gegeben werden
+        $events = $this->eventRepository->getTimeControlled($trigger, new DateTime());
 
-        foreach ($this->events[$trigger] as $event) {
-            $event($parameters);
+        foreach ($events as $event) {
+            eval($this->codeGeneratorService->generateByElements($event->getElements()));
         }
     }
 
     /**
-     * @throws FileNotFound
+     * @throws FactoryError
+     *
+     * @return
      */
     public function runFunction(Element $element)
     {
-        $service = $this->serviceManagerService->get($element->getClass());
+        /** @var DescriberInterface $describer */
+        $describer = $this->serviceManagerService->get($element->getClass());
+        /** @var AbstractEvent $service */
+        $service = $this->serviceManagerService->get($describer->getEventClassName());
 
         return $service->run($element);
     }

@@ -4,8 +4,17 @@ Ext.define('GibsonOS.module.core.event.trigger.model.Grid', {
         name: 'id',
         type: 'int'
     },{
+        name: 'class',
+        type: 'string'
+    },{
         name: 'trigger',
         type: 'string'
+    },{
+        name: 'parameters',
+        type: 'object'
+    },{
+        name: 'hasParameters',
+        type: 'boolean'
     },{
         name: 'weekday',
         type: 'int',

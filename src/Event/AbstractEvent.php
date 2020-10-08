@@ -5,6 +5,7 @@ namespace GibsonOS\Core\Event;
 
 use GibsonOS\Core\Event\Describer\DescriberInterface;
 use GibsonOS\Core\Model\Event\Element;
+use GibsonOS\Core\Utility\JsonUtility;
 
 abstract class AbstractEvent
 {
@@ -36,6 +37,6 @@ abstract class AbstractEvent
     {
         $parameters = $element->getParameters();
 
-        return empty($parameters) ? [] : unserialize($parameters);
+        return empty($parameters) ? [] : array_values(JsonUtility::decode($parameters));
     }
 }

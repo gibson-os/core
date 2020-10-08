@@ -16,6 +16,7 @@ use GibsonOS\Core\Service\PermissionService;
 use GibsonOS\Core\Service\Response\AjaxResponse;
 use GibsonOS\Core\Service\Response\ResponseInterface;
 use GibsonOS\Core\Store\Event\ClassNameStore;
+use GibsonOS\Core\Store\Event\ClassTriggerStore;
 use GibsonOS\Core\Store\Event\ElementStore;
 use GibsonOS\Core\Store\Event\MethodStore;
 use GibsonOS\Core\Store\Event\TriggerStore;
@@ -79,6 +80,19 @@ class EventController extends AbstractController
         $methodStore->setDescriberClass($describerClass);
 
         return $this->returnSuccess($methodStore->getList());
+    }
+
+    /**
+     * @throws LoginRequired
+     * @throws PermissionDenied
+     */
+    public function classTriggers(ClassTriggerStore $classTriggerStore, string $describerClass): AjaxResponse
+    {
+        $this->checkPermission(PermissionService::READ);
+
+        $classTriggerStore->setDescriberClass($describerClass);
+
+        return $this->returnSuccess($classTriggerStore->getList());
     }
 
     /**
