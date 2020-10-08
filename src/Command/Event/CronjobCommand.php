@@ -8,6 +8,7 @@ use GibsonOS\Core\Command\AbstractCommand;
 use GibsonOS\Core\Exception\DateTimeError;
 use GibsonOS\Core\Exception\FileNotFound;
 use GibsonOS\Core\Model\Event\Element;
+use GibsonOS\Core\Model\Event\Trigger;
 use GibsonOS\Core\Repository\EventRepository;
 use GibsonOS\Core\Service\Event\CodeGeneratorService;
 use GibsonOS\Core\Service\EventService;
@@ -44,7 +45,7 @@ class CronjobCommand extends AbstractCommand
      */
     protected function run(): int
     {
-        $events = $this->eventRepository->getTimeControlled(new DateTime());
+        $events = $this->eventRepository->getTimeControlled(Trigger::TRIGGER_CRON, new DateTime());
 
         foreach ($events as $event) {
             eval($this->codeGeneratorService->generateByElements($event->getElements()));

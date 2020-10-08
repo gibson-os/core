@@ -12,7 +12,7 @@
             "source": {
                 "type": "git",
                 "url": "git@wolli.dyndns.tv:/home/git/mdo.git",
-                "reference": "34c29caa17c6b5498032ac1b756d2ea61a14cbd6"
+                "reference": "a854b02cba8cd9eb0ddca616d4b3396f57ca38b4"
             },
             "require": {
                 "ext-mbstring": "*",
@@ -56,7 +56,7 @@
                     "php ./vendor/codeception/codeception/codecept generate:test unit"
                 ]
             },
-            "time": "2020-09-29T21:17:23+00:00"
+            "time": "2020-10-08T11:01:02+00:00"
         },
         {
             "name": "symfony/polyfill-ctype",

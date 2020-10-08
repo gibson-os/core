@@ -90,7 +90,7 @@ class Trigger extends AbstractModel
         return $this->id;
     }
 
-    public function setId(?int $id): Trigger
+    public function setId(int $id): Trigger
     {
         $this->id = $id;
 

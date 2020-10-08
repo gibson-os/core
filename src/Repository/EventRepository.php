@@ -7,6 +7,7 @@ use DateTime;
 use DateTimeInterface;
 use GibsonOS\Core\Exception\DateTimeError;
 use GibsonOS\Core\Exception\Model\SaveError;
+use GibsonOS\Core\Exception\Repository\DeleteError;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\Event;
 use GibsonOS\Core\Model\Event\Element;
@@ -56,21 +57,31 @@ class EventRepository extends AbstractRepository
     /**
      * @return Event[]
      */
-    public function getTimeControlled(DateTimeInterface $dateTime): array
+    public function getTimeControlled(string $trigger, DateTimeInterface $dateTime): array
     {
-        $table = $this->initializeTable();
-        $table->setWhere(
-            '`event_trigger`.`trigger`=' . $this->escape(Trigger::TRIGGER_CRON) . ' AND ' .
-            '(`event_trigger`.`weekday` IS NULL OR `event_trigger`.`weekday`=' . (int) $dateTime->format('w') . ') AND ' .
-            '(`event_trigger`.`day` IS NULL OR `event_trigger`.`day`=' . (int) $dateTime->format('j') . ') AND ' .
-            '(`event_trigger`.`month` IS NULL OR `event_trigger`.`month`=' . (int) $dateTime->format('n') . ') AND ' .
-            '(`event_trigger`.`year` IS NULL OR `event_trigger`.`year`=' . (int) $dateTime->format('Y') . ') AND ' .
-            '(`event_trigger`.`hour` IS NULL OR `event_trigger`.`hour`=' . (int) $dateTime->format('H') . ') AND ' .
-            '(`event_trigger`.`minute` IS NULL OR `event_trigger`.`minute`=' . (int) $dateTime->format('m') . ') AND ' .
-            '(`event_trigger`.`second` IS NULL OR `event_trigger`.`second`=' . (int) $dateTime->format('s') . ')'
-        );
+        $table = $this->initializeTable()
+            ->setWhere(
+                '`event_trigger`.`trigger`=? AND ' .
+                '(`event_trigger`.`weekday` IS NULL OR `event_trigger`.`weekday`=?) AND ' .
+                '(`event_trigger`.`day` IS NULL OR `event_trigger`.`day`=?) AND ' .
+                '(`event_trigger`.`month` IS NULL OR `event_trigger`.`month`=?) AND ' .
+                '(`event_trigger`.`year` IS NULL OR `event_trigger`.`year`=?) AND ' .
+                '(`event_trigger`.`hour` IS NULL OR `event_trigger`.`hour`=?) AND ' .
+                '(`event_trigger`.`minute` IS NULL OR `event_trigger`.`minute`=?) AND ' .
+                '(`event_trigger`.`second` IS NULL OR `event_trigger`.`second`=?)'
+            )
+            ->setWhereParameters([
+                $trigger,
+                (int) $dateTime->format('w'),
+                (int) $dateTime->format('j'),
+                (int) $dateTime->format('n'),
+                (int) $dateTime->format('Y'),
+                (int) $dateTime->format('H'),
+                (int) $dateTime->format('m'),
+                (int) $dateTime->format('s'),
+            ]);
 
-        if (!$table->select(false)) {
+        if (!$table->selectPrepared(false)) {
             return [];
         }
 
@@ -116,15 +127,48 @@ class EventRepository extends AbstractRepository
     }
 
     /**
+     * @param int[]|null $notIds
+     *
+     * @throws DeleteError
+     */
+    public function deleteElements(Event $event, ?array $notIds): void
+    {
+        $table = $this->getTable(Element::getTableName())
+            ->setWhere(
+                (
+                    empty($notIds)
+                    ? ''
+                    : '`id` NOT IN (' . implode(', ', array_fill(0, count($notIds), '?')) . ') AND '
+                ) . '`event_id`=?'
+            )
+        ;
+
+        if (!empty($notIds)) {
+            $table->setWhereParameters($notIds);
+        }
+
+        $table->addWhereParameter($event->getId());
+
+        if (!$table->deletePrepared()) {
+            throw (new DeleteError())->setTable($table);
+        }
+    }
+
+    /**
+     * @param int[] $elementIds
+     *
      * @throws DateTimeError
      * @throws SaveError
+     *
+     * @return int[]
      */
-    public function saveElements(Event $event, array $elements, int $parentId = null): void
+    public function saveElements(Event $event, array $elements, int $parentId = null, array $elementIds = []): array
     {
         $order = 0;
 
         foreach ($elements as $element) {
             $elementModel = (new Event\Element())
+                ->setId($element['id'])
                 ->setEvent($event)
                 ->setParentId($parentId)
                 ->setClass($element['className'])
@@ -138,8 +182,70 @@ class EventRepository extends AbstractRepository
                 ->setOrder($order++)
             ;
             $elementModel->save();
-            $this->saveElements($event, $element['children'], $elementModel->getId());
+            $elementIds[] = $elementModel->getId() ?? 0;
+            $elementIds = $this->saveElements($event, $element['children'], $elementModel->getId() ?? 0, $elementIds);
         }
+
+        return $elementIds;
+    }
+
+    /**
+     * @param int[]|null $notIds
+     *
+     * @throws DeleteError
+     */
+    public function deleteTriggers(Event $event, ?array $notIds): void
+    {
+        $table = $this->getTable(Trigger::getTableName())
+            ->setWhere(
+                (
+                    empty($notIds)
+                    ? ''
+                    : '`id` NOT IN (' . implode(', ', array_fill(0, count($notIds), '?')) . ') AND '
+                ) . '`event_id`=?'
+            )
+        ;
+
+        if (!empty($notIds)) {
+            $table->setWhereParameters($notIds);
+        }
+
+        $table->addWhereParameter($event->getId());
+
+        if (!$table->deletePrepared()) {
+            throw (new DeleteError())->setTable($table);
+        }
+    }
+
+    /**
+     * @throws DateTimeError
+     * @throws SaveError
+     *
+     * @return int[]
+     */
+    public function saveTriggers(Event $event, array $triggers): array
+    {
+        $triggerIds = [];
+
+        foreach ($triggers as $priority => $trigger) {
+            $triggerModel = (new Trigger())
+                ->setId($trigger['id'])
+                ->setEvent($event)
+                ->setTrigger($trigger['trigger'])
+                ->setWeekday($trigger['weekday'])
+                ->setDay($trigger['day'])
+                ->setMonth($trigger['month'])
+                ->setYear($trigger['year'])
+                ->setHour($trigger['hour'])
+                ->setMinute($trigger['minute'])
+                ->setSecond($trigger['second'])
+                ->setPriority($priority)
+            ;
+            $triggerModel->save();
+            $triggerIds[] = $triggerModel->getId() ?? 0;
+        }
+
+        return $triggerIds;
     }
 
     /**

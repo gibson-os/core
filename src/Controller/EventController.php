@@ -105,6 +105,7 @@ class EventController extends AbstractController
         bool $active,
         bool $async,
         array $elements,
+        array $triggers,
         int $eventId = null
     ): AjaxResponse {
         $this->checkPermission(PermissionService::WRITE);
@@ -125,7 +126,14 @@ class EventController extends AbstractController
                 ->setModified(new DateTime())
             ;
             $event->save();
-            $eventRepository->saveElements($event, $elements);
+            $eventRepository->deleteElements(
+                $event,
+                $eventRepository->saveElements($event, $elements)
+            );
+            $eventRepository->deleteTriggers(
+                $event,
+                $eventRepository->saveTriggers($event, $triggers)
+            );
         } catch (Exception $e) {
             $eventRepository->rollback();
 

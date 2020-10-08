@@ -132,12 +132,24 @@ abstract class AbstractModel implements ModelInterface
     {
         foreach ($mysqlTable->fields as $field) {
             $fieldName = $this->transformFieldName($field);
+            $possiblePrefixes = ['get', 'is', 'has', 'should'];
+            $getterPrefix = null;
 
-            if (!method_exists($this, 'get' . $fieldName)) {
+            foreach ($possiblePrefixes as $possiblePrefix) {
+                if (method_exists($this, $possiblePrefix . $fieldName)) {
+                    $getterPrefix = $possiblePrefix;
+
+                    break;
+                }
+            }
+
+            if ($getterPrefix === null) {
                 continue;
             }
 
-            if (null === $this->{'get' . $fieldName}()) {
+            $value = $this->{$getterPrefix . $fieldName}();
+
+            if ($value === null) {
                 continue;
             }
 
@@ -145,10 +157,10 @@ abstract class AbstractModel implements ModelInterface
             $fieldObject = $mysqlTable->{$field};
 
             if ($this->getColumnType($fieldObject->getType()) === self::TYPE_DATE_TIME) {
-                $fieldObject->setValue($this->{'get' . $fieldName}()->format('Y-m-d H:i:s'));
+                $fieldObject->setValue($value->format('Y-m-d H:i:s'));
                 $this->{'set' . $fieldName}($this->dateTime->get((string) $fieldObject->getValue()));
             } else {
-                $fieldObject->setValue($this->{'get' . $fieldName}());
+                $fieldObject->setValue(is_bool($value) ? (int) $value : $value);
             }
         }
     }

@@ -15,7 +15,7 @@ Ext.define('GibsonOS.module.core.event.Panel', {
             region: 'center',
             items: [{
                 xtype: 'gosModuleCoreEventElementTreeGrid',
-                title: 'Ereignis',
+                title: 'Ereignisse',
                 gos: me.gos
             },{
                 xtype: 'gosModuleCoreEventTriggerGrid',
@@ -26,6 +26,7 @@ Ext.define('GibsonOS.module.core.event.Panel', {
 
         let getElementsAjaxData = function(element) {
             let data = {
+                id: element.get('id'),
                 command: element.get('command'),
                 className: element.get('className'),
                 method: element.get('method'),
