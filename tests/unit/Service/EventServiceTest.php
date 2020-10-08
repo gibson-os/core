@@ -54,10 +54,14 @@ class EventServiceTest extends Unit
 
         $globalParams = null;
 
+        $this->eventService->add('dent', function ($params) use (&$globalParams) {
+            $globalParams = $params;
+        });
+
         $this->eventService->fire('arthur', ['Handtuch' => true]);
-        //$this->assertNull($globalParams);
+        $this->assertNull($globalParams);
         $this->eventService->fire('dent', ['Handtuch' => true]);
-        //$this->assertEquals(['Handtuch' => true], $globalParams);
+        $this->assertEquals(['Handtuch' => true], $globalParams);
     }
 
     public function testRunFunction(): void

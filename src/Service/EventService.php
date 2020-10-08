@@ -8,6 +8,7 @@ use GibsonOS\Core\Event\AbstractEvent;
 use GibsonOS\Core\Event\Describer\DescriberInterface;
 use GibsonOS\Core\Exception\DateTimeError;
 use GibsonOS\Core\Exception\FactoryError;
+use GibsonOS\Core\Model\Event;
 use GibsonOS\Core\Model\Event\Element;
 use GibsonOS\Core\Repository\EventRepository;
 use GibsonOS\Core\Service\Event\CodeGeneratorService;
@@ -62,10 +63,17 @@ class EventService extends AbstractService
     public function fire(string $trigger, array $parameters = null): void
     {
         // @todo Parameter müssen irgendwie noch im Trigger abgeglichen werden oder an die Methoden weiter gegeben werden
-        $events = $this->eventRepository->getTimeControlled($trigger, new DateTime());
+        $events = array_merge(
+            $this->events[$trigger] ?? [],
+            $this->eventRepository->getTimeControlled($trigger, new DateTime())
+        );
 
         foreach ($events as $event) {
-            eval($this->codeGeneratorService->generateByElements($event->getElements()));
+            if ($event instanceof Event) {
+                eval($this->codeGeneratorService->generateByElements($event->getElements()));
+            } else {
+                $event($parameters);
+            }
         }
     }
 
