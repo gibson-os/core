@@ -57,7 +57,7 @@ Ext.define('GibsonOS.module.core.event.element.TreeGrid', {
                             });
                             if (!Ext.Object.isEmpty(methodRecord.get('parameters'))) {
                                 Ext.iterate(methodRecord.get('parameters'), function(name, parameter) {
-                                    parameter.value = record.get('parameters')[name];
+                                    parameter.value = record.get('parameters')[name].value;
                                 });
 
                                 parametersCheckbox.enable();
@@ -65,7 +65,7 @@ Ext.define('GibsonOS.module.core.event.element.TreeGrid', {
 
                             if (!Ext.Object.isEmpty(methodRecord.get('returns'))) {
                                 Ext.iterate(methodRecord.get('returns'), function(name, parameter) {
-                                    parameter.value = record.get('returns')[name];
+                                    parameter.value = record.get('returns')[name].value;
                                 });
 
                                 operatorComboBox.enable();
@@ -155,7 +155,6 @@ Ext.define('GibsonOS.module.core.event.element.TreeGrid', {
                         parametersCheckbox.disable();
                         returnCheckbox.disable();
                         operatorComboBox.disable();
-                        operatorComboBox.setValue(null);
 
                         if (record) {
                             parameters = record.get('parameters');
@@ -169,6 +168,8 @@ Ext.define('GibsonOS.module.core.event.element.TreeGrid', {
                                 operatorComboBox.enable();
                                 returnCheckbox.enable();
                             }
+                        } else {
+                            operatorComboBox.setValue(null);
                         }
                     }
                 }

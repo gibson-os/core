@@ -12,19 +12,19 @@ Ext.define('GibsonOS.module.core.event.element.operator.store.ComboBox', {
         operator: '===',
         name: 'Gleich'
     },{
-        command: '!==',
+        operator: '!==',
         name: 'Ungleich'
     },{
-        command: '<',
+        operator: '<',
         name: 'Kleiner'
     },{
-        command: '<=',
+        operator: '<=',
         name: 'Kleiner gleich'
     },{
-        command: '>',
+        operator: '>',
         name: 'Größer'
     },{
-        command: '>=',
+        operator: '>=',
         name: 'Größer gleich'
     }]
 });

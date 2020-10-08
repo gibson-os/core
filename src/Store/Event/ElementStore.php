@@ -68,8 +68,14 @@ class ElementStore extends AbstractDatabaseStore
         $this->table->setWhere($this->getWhere());
         $this->table->setOrderBy('`parent_id`, `order`');
 
-        if (!$this->table->select()) {
+        $select = $this->table->select();
+
+        if ($select === false) {
             throw (new SelectError())->setTable($this->table);
+        }
+
+        if ($select === 0) {
+            return [];
         }
 
         $data = [];

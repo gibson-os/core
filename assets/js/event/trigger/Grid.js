@@ -48,7 +48,7 @@ Ext.define('GibsonOS.module.core.event.trigger.Grid', {
 
                             if (!Ext.Object.isEmpty(triggerRecord.get('parameters'))) {
                                 Ext.iterate(triggerRecord.get('parameters'), function(name, parameter) {
-                                    parameter.value = record.get('parameters')[name];
+                                    parameter.value = record.get('parameters')[name].value;
                                 });
 
                                 parametersCheckbox.enable();

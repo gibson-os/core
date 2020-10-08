@@ -64,8 +64,14 @@ class TriggerStore extends AbstractDatabaseStore
             ->setOrderBy('priority')
         ;
 
-        if (!$this->table->selectPrepared()) {
+        $selectPrepared = $this->table->selectPrepared();
+
+        if (!$selectPrepared === false) {
             throw (new SelectError())->setTable($this->table);
+        }
+
+        if ($selectPrepared === 0) {
+            return [];
         }
 
         $models = [];
