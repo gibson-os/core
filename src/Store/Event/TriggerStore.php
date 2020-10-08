@@ -66,7 +66,7 @@ class TriggerStore extends AbstractDatabaseStore
 
         $selectPrepared = $this->table->selectPrepared();
 
-        if (!$selectPrepared === false) {
+        if ($selectPrepared === false) {
             throw (new SelectError())->setTable($this->table);
         }
 

@@ -3,17 +3,14 @@ Ext.define('GibsonOS.core.component.grid.Panel', {
     alias: ['widget.gosCoreComponentGridPanel'],
     border: false,
     flex: 1,
-    itemContextMenu: [],
-    containerContextMenu: [],
-    autoReload: false,
     enablePagingBar: true,
     enableToolbar: true,
-    enableContextMenu: true,
     enableKeyEvents: true,
     getColumns: null,
     initComponent: function() {
         let me = this;
 
+        me = GibsonOS.decorator.autoReload.init(me);
         me = GibsonOS.decorator.action.add.init(me);
         me = GibsonOS.decorator.action.delete.init(me);
 
@@ -22,14 +19,6 @@ Ext.define('GibsonOS.core.component.grid.Panel', {
         }
 
         me.callParent();
-
-        me.on('enable', me.activateAutoReload);
-        me.on('show', me.activateAutoReload);
-
-        me.on('close', me.deactivateAutoReload);
-        me.on('hide', me.deactivateAutoReload);
-        me.on('destroy', me.deactivateAutoReload);
-        me.on('disable', me.deactivateAutoReload);
 
         if (me.itemContextMenu) {
             me.itemContextMenu = new GibsonOS.contextMenu.ContextMenu({
@@ -60,6 +49,7 @@ Ext.define('GibsonOS.core.component.grid.Panel', {
             }
         });
 
+        GibsonOS.decorator.autoReload.addListeners(me);
         GibsonOS.decorator.action.delete.addListeners(me);
 
         /*if (me.down('gosToolbarPaging')) {
@@ -77,19 +67,5 @@ Ext.define('GibsonOS.core.component.grid.Panel', {
                 priority: 999
             });
         }*/
-    },
-    activateAutoReload: function() {
-        let me = this;
-
-        if (me.getStore()) {
-            me.getStore().gos.autoReload = me.autoReload;
-        }
-    },
-    deactivateAutoReload: function() {
-        let me = this;
-
-        if (me.getStore()) {
-            me.getStore().gos.autoReload = false;
-        }
     }
 });
