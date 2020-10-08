@@ -232,6 +232,8 @@ class EventRepository extends AbstractRepository
             $triggerModel = (new Trigger())
                 ->setId($trigger['id'])
                 ->setEvent($event)
+                ->setClass($trigger['className'])
+                ->setParameters($trigger['parameter'])
                 ->setTrigger($trigger['trigger'])
                 ->setWeekday($trigger['weekday'])
                 ->setDay($trigger['day'])

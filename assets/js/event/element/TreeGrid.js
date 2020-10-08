@@ -55,23 +55,18 @@ Ext.define('GibsonOS.module.core.event.element.TreeGrid', {
                                     return false;
                                 }
                             });
-
-                            if (methodRecord.get('parameters')) {
-                                if (record.get('parameters')) {
-                                    Ext.iterate(methodRecord.get('parameters'), function(name, parameter) {
-                                        parameter.value = record.get('parameters')[name];
-                                    });
-                                }
+                            if (!Ext.Object.isEmpty(methodRecord.get('parameters'))) {
+                                Ext.iterate(methodRecord.get('parameters'), function(name, parameter) {
+                                    parameter.value = record.get('parameters')[name];
+                                });
 
                                 parametersCheckbox.enable();
                             }
 
-                            if (methodRecord.get('returns')) {
-                                if (record.get('returns')) {
-                                    Ext.iterate(methodRecord.get('returns'), function(name, parameter) {
-                                        parameter.value = record.get('returns')[name];
-                                    });
-                                }
+                            if (!Ext.Object.isEmpty(methodRecord.get('returns'))) {
+                                Ext.iterate(methodRecord.get('returns'), function(name, parameter) {
+                                    parameter.value = record.get('returns')[name];
+                                });
 
                                 operatorComboBox.enable();
                                 returnCheckbox.enable();
@@ -166,11 +161,11 @@ Ext.define('GibsonOS.module.core.event.element.TreeGrid', {
                             parameters = record.get('parameters');
                             returns = record.get('returns');
 
-                            if (parameters) {
+                            if (!Ext.Object.isEmpty(parameters)) {
                                 parametersCheckbox.enable();
                             }
 
-                            if (returns) {
+                            if (!Ext.Object.isEmpty(returns)) {
                                 operatorComboBox.enable();
                                 returnCheckbox.enable();
                             }

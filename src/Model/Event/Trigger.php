@@ -7,9 +7,11 @@ use GibsonOS\Core\Exception\DateTimeError;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Model\Event;
+use GibsonOS\Core\Utility\JsonUtility;
+use JsonSerializable;
 use mysqlDatabase;
 
-class Trigger extends AbstractModel
+class Trigger extends AbstractModel implements JsonSerializable
 {
     public const TRIGGER_CRON = 'cronjob';
 
@@ -32,6 +34,20 @@ class Trigger extends AbstractModel
      * @var string
      */
     private $trigger;
+
+    /**
+     * Required for store.
+     *
+     * @var string
+     */
+    private $classTitle;
+
+    /**
+     * Required for store.
+     *
+     * @var string
+     */
+    private $triggerTitle;
 
     /**
      * @var string|null
@@ -139,6 +155,30 @@ class Trigger extends AbstractModel
     public function setTrigger(string $trigger): Trigger
     {
         $this->trigger = $trigger;
+
+        return $this;
+    }
+
+    public function getClassTitle(): string
+    {
+        return $this->classTitle;
+    }
+
+    public function setClassTitle(string $classTitle): Trigger
+    {
+        $this->classTitle = $classTitle;
+
+        return $this;
+    }
+
+    public function getTriggerTitle(): string
+    {
+        return $this->triggerTitle;
+    }
+
+    public function setTriggerTitle(string $triggerTitle): Trigger
+    {
+        $this->triggerTitle = $triggerTitle;
 
         return $this;
     }
@@ -268,5 +308,25 @@ class Trigger extends AbstractModel
         $this->setEventId((int) $event->getId());
 
         return $this;
+    }
+
+    public function jsonSerialize()
+    {
+        return [
+            'id' => $this->getId(),
+            'className' => $this->getClass(),
+            'classNameTitle' => $this->getClassTitle(),
+            'trigger' => $this->getTrigger(),
+            'triggerTitle' => $this->getTriggerTitle(),
+            'parameters' => JsonUtility::decode($this->getParameters() ?? 'null'),
+            'weekday' => $this->getWeekday(),
+            'day' => $this->getDay(),
+            'month' => $this->getMonth(),
+            'year' => $this->getYear(),
+            'hour' => $this->getHour(),
+            'minute' => $this->getMinute(),
+            'second' => $this->getSecond(),
+            'priority' => $this->getPriority(),
+        ];
     }
 }

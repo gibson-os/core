@@ -59,25 +59,25 @@ class ClassTriggerStore extends AbstractStore
         }
 
         $describer = $this->serviceManagerService->get($this->describerClass);
-        $methods = [];
+        $triggers = [];
 
         if (!$describer instanceof DescriberInterface) {
-            $this->list = $methods;
+            $this->list = $triggers;
 
             return;
         }
 
         foreach ($describer->getTriggers() as $name => $trigger) {
-            $methods[$trigger->getTitle()] = [
+            $triggers[$trigger->getTitle()] = [
                 'trigger' => $name,
                 'title' => $trigger->getTitle(),
                 'parameters' => $this->transformParameters($trigger->getParameters()),
             ];
         }
 
-        ksort($methods);
+        ksort($triggers);
 
-        $this->list = array_values($methods);
+        $this->list = array_values($triggers);
     }
 
     /**

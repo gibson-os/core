@@ -5,6 +5,7 @@ namespace GibsonOS\Core\Event\Describer;
 
 use GibsonOS\Core\Dto\Event\Describer\Method;
 use GibsonOS\Core\Dto\Event\Describer\Parameter\IntParameter;
+use GibsonOS\Core\Dto\Event\Describer\Trigger;
 use GibsonOS\Core\Event\TimeEvent;
 
 class TimeDescriber implements DescriberInterface
@@ -19,7 +20,9 @@ class TimeDescriber implements DescriberInterface
      */
     public function getTriggers(): array
     {
-        return [];
+        return [
+            'cronjob' => (new Trigger('Zeitgesteuert')),
+        ];
     }
 
     /**

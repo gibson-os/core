@@ -96,6 +96,7 @@ class EventController extends AbstractController
     }
 
     /**
+     * @throws DateTimeError
      * @throws LoginRequired
      * @throws PermissionDenied
      * @throws SelectError

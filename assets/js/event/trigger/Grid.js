@@ -14,7 +14,49 @@ Ext.define('GibsonOS.module.core.event.trigger.Grid', {
                 saveBtnText: 'Speichern',
                 cancelBtnText: 'Abbrechen',
                 clicksToMoveEditor: 1,
-                pluginId: 'rowEditing'
+                pluginId: 'rowEditing',
+                listeners: {
+                    beforeedit: function(editor, context) {
+                        let form = editor.getEditor().getForm();
+                        let record = context.record;
+                        let triggerComboBox = form.findField('trigger');
+                        let parametersCheckbox = form.findField('hasParameters');
+
+                        triggerComboBox.disable();
+                        parametersCheckbox.disable();
+
+                        if (!record.get('className')) {
+                            return;
+                        }
+
+                        let triggerComboBoxStore = triggerComboBox.getStore();
+
+                        triggerComboBoxStore.getProxy().setExtraParam('describerClass', record.get('className'));
+                        triggerComboBoxStore.load(function(records) {
+                            if (!record.get('trigger')) {
+                                return;
+                            }
+
+                            let triggerRecord = null;
+
+                            Ext.iterate(records, function(iterateRecord) {
+                                if (iterateRecord.get('trigger') === record.get('trigger')) {
+                                    triggerRecord = iterateRecord;
+                                    return false;
+                                }
+                            });
+
+                            if (!Ext.Object.isEmpty(triggerRecord.get('parameters'))) {
+                                Ext.iterate(triggerRecord.get('parameters'), function(name, parameter) {
+                                    parameter.value = record.get('parameters')[name];
+                                });
+
+                                parametersCheckbox.enable();
+                            }
+                        });
+                        triggerComboBox.enable();
+                    }
+                }
             })
         ];
 
@@ -29,6 +71,8 @@ Ext.define('GibsonOS.module.core.event.trigger.Grid', {
         me.getStore().remove(me.getSelectionModel().getSelection());
     },
     getColumns: function() {
+        let me = this;
+
         return [{
             xtype: 'gosGridColumnComboBoxEditor',
             itemId: 'gosModuleCoreEventTriggerGridColumnClassName',
@@ -39,33 +83,58 @@ Ext.define('GibsonOS.module.core.event.trigger.Grid', {
                 xtype: 'gosModuleCoreEventElementClassNameComboBox',
                 listeners: {
                     change: function(comboBox, newValue) {
-                        let methodColumnEditor = me.down('#gosModuleCoreEventElementTreeGridColumnMethod').getEditor();
-                        let methodColumnEditorStore = methodColumnEditor.getStore();
+                        let triggerColumnEditor = me.down('#gosModuleCoreEventTriggerGridColumnTrigger').getEditor();
+                        let triggerColumnEditorStore = triggerColumnEditor.getStore();
 
-                        methodColumnEditor.setValue(null);
+                        triggerColumnEditor.setValue(null);
 
-                        methodColumnEditorStore.getProxy().setExtraParam('describerClass', newValue);
-                        methodColumnEditorStore.load();
+                        triggerColumnEditorStore.getProxy().setExtraParam('describerClass', newValue);
+                        triggerColumnEditorStore.load();
 
-                        methodColumnEditor.enable();
+                        triggerColumnEditor.enable();
                     }
                 }
             },
             renderer: function(value, metaData, record) {
-                // let column = me.down('#gosModuleCoreEventElementTreeGridColumnClassName');
-                // let comboBox = column.getEditor();
-                // let comboRecord = comboBox.findRecordByValue(value);
-                //
-                // return comboBox.getStore().count() === 0 ? record.get('classNameTitle') :
-                //     comboRecord === false ? null : comboRecord.get('title');
+                let column = me.down('#gosModuleCoreEventTriggerGridColumnClassName');
+                let comboBox = column.getEditor();
+                let comboRecord = comboBox.findRecordByValue(value);
+
+                return comboBox.getStore().count() === 0 ? record.get('classNameTitle') :
+                    comboRecord === false ? null : comboRecord.get('title');
             }
         },{
             header: 'Trigger',
             dataIndex: 'trigger',
+            itemId: 'gosModuleCoreEventTriggerGridColumnTrigger',
             flex: 1,
             editor: {
-                xtype: 'gosFormTextfield',
-                hideLabel: true
+                xtype: 'gosModuleCoreEventElementTriggerComboBox',
+                listeners: {
+                    change: function(comboBox, newValue) {
+                        let record = comboBox.findRecordByValue(newValue);
+                        let parametersCheckbox = me.down('#gosModuleCoreEventTriggerGridColumnParameters').getEditor();
+                        let parameters = null;
+
+                        parametersCheckbox.disable();
+
+                        if (record) {
+                            parameters = record.get('parameters');
+
+                            if (!Ext.Object.isEmpty(parameters)) {
+                                parametersCheckbox.enable();
+                            }
+                        }
+                    }
+                }
+            },
+            renderer: function(value, metaData, record) {
+                let column = me.down('#gosModuleCoreEventTriggerGridColumnTrigger');
+                let comboBox = column.getEditor();
+                let comboRecord = comboBox.findRecordByValue(value);
+
+                return comboBox.getStore().count() === 0 ? record.get('triggerTitle') :
+                    comboRecord === false ? null : comboRecord.get('title');
             }
         },{
             header: 'Parameter',
@@ -73,41 +142,41 @@ Ext.define('GibsonOS.module.core.event.trigger.Grid', {
             dataIndex: 'hasParameters',
             flex: 1,
             renderer: function(value, metaData, record) {
-                // let values = record.get('parameters');
-                // let methodComboBox = me.down('#gosModuleCoreEventElementTreeGridColumnMethod').getEditor();
-                // let methodComboBoxRecord = methodComboBox.findRecordByValue(methodComboBox.getValue());
-                // let returnValue = '';
-                // let parameters = record.get('parameters');
-                //
-                // if (methodComboBoxRecord) {
-                //     parameters = methodComboBoxRecord.get('parameters');
-                // }
-                //
-                // if (!parameters) {
-                //     return returnValue;
-                // }
-                //
-                // Ext.iterate(parameters, function(name, parameter) {
-                //     returnValue += parameter.title + ': ';
-                //
-                //     if (values[name]) {
-                //         returnValue += values[name].value ? values[name].value : '';
-                //     }
-                //
-                //     returnValue += '<br>';
-                // });
-                //
-                // return returnValue;
+                let values = record.get('parameters');
+                let triggerComboBox = me.down('#gosModuleCoreEventTriggerGridColumnTrigger').getEditor();
+                let triggerComboBoxRecord = triggerComboBox.findRecordByValue(triggerComboBox.getValue());
+                let returnValue = '';
+                let parameters = record.get('parameters');
+
+                if (triggerComboBoxRecord) {
+                    parameters = triggerComboBoxRecord.get('parameters');
+                }
+
+                if (!parameters) {
+                    return returnValue;
+                }
+
+                Ext.iterate(parameters, function(name, parameter) {
+                    returnValue += parameter.title + ': ';
+
+                    if (values[name]) {
+                        returnValue += values[name].value ? values[name].value : '';
+                    }
+
+                    returnValue += '<br>';
+                });
+
+                return returnValue;
             },
             editor: {
                 xtype: 'gosFormCheckbox',
                 boxLabel: 'Bearbeiten',
                 listeners: {
                     change: function(checkbox) {
-                        let methodComboBox = me.down('#gosModuleCoreEventElementTreeGridColumnMethod').getEditor();
-                        let methodComboBoxRecord = methodComboBox.findRecordByValue(methodComboBox.getValue());
+                        let triggerComboBox = me.down('#gosModuleCoreEventTriggerGridColumnTrigger').getEditor();
+                        let triggerComboBoxRecord = triggerComboBox.findRecordByValue(triggerComboBox.getValue());
                         let record = me.getSelectionModel().getSelection()[0];
-                        record.set('parameters', methodComboBoxRecord.get('parameters'));
+                        record.set('parameters', triggerComboBoxRecord.get('parameters'));
 
                         checkbox.suspendEvents();
                         checkbox.setValue(true);
