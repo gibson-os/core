@@ -24,7 +24,7 @@ Ext.define('GibsonOS.module.core.event.Panel', {
             }]
         }];
 
-        let getAjaxData = function(element) {
+        let getElementsAjaxData = function(element) {
             let data = {
                 command: element.get('command'),
                 className: element.get('className'),
@@ -44,7 +44,7 @@ Ext.define('GibsonOS.module.core.event.Panel', {
             });
 
             element.eachChild(function(children) {
-                data.children.push(getAjaxData(children));
+                data.children.push(getElementsAjaxData(children));
             });
 
             return data;
@@ -60,9 +60,14 @@ Ext.define('GibsonOS.module.core.event.Panel', {
             handler: function() {
                 let form = me.down('gosModuleCoreEventForm').getForm();
                 let elements = [];
+                let triggers = [];
 
                 me.down('gosModuleCoreEventElementTreeGrid').getStore().getRootNode().eachChild(function(element) {
-                    elements.push(getAjaxData(element));
+                    elements.push(getElementsAjaxData(element));
+                });
+
+                me.down('gosModuleCoreEventTriggerGrid').getStore().each(function(trigger) {
+                    triggers.push(trigger.getData());
                 });
 
                 GibsonOS.Ajax.request({
@@ -72,7 +77,8 @@ Ext.define('GibsonOS.module.core.event.Panel', {
                         name: form.findField('name').getValue(),
                         async: form.findField('async').getValue(),
                         active: form.findField('active').getValue(),
-                        elements: Ext.encode(elements)
+                        elements: Ext.encode(elements),
+                        triggers: Ext.encode(triggers)
                     },
                     success: function(response) {
                         me.gos.data.eventId = Ext.decode(response.responseText).data.id;

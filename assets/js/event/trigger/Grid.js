@@ -1,8 +1,8 @@
 Ext.define('GibsonOS.module.core.event.trigger.Grid', {
-    extend: 'GibsonOS.grid.Panel',
+    extend: 'GibsonOS.core.component.grid.Panel',
     alias: ['widget.gosModuleCoreEventTriggerGrid'],
     autoScroll: true,
-    initComponent: function () {
+    initComponent: function() {
         let me = this;
 
         me.store = new GibsonOS.module.core.event.trigger.store.Grid();
@@ -17,7 +17,19 @@ Ext.define('GibsonOS.module.core.event.trigger.Grid', {
                 pluginId: 'rowEditing'
             })
         ];
-        me.columns = [{
+
+        me.callParent();
+    },
+    addFunction: function() {
+        let me = this;
+        me.plugins[0].startEdit(me.getStore().add({})[0], 1);
+    },
+    deleteFunction: function() {
+        let me = this;
+        me.getStore().remove(me.getSelectionModel().getSelection());
+    },
+    getColumns: function() {
+        return [{
             header: 'Trigger',
             dataIndex: 'trigger',
             flex: 1,
@@ -127,29 +139,5 @@ Ext.define('GibsonOS.module.core.event.trigger.Grid', {
                 hideLabel: true
             }
         }];
-
-        me.tbar = [{
-            xtype: 'gosButton',
-            iconCls: 'icon_system system_add',
-            requiredPermission: {
-                action: 'save',
-                permission: GibsonOS.Permission.WRITE
-            },
-            handler: function () {
-                me.plugins[0].startEdit(me.getStore().add({})[0], 1);
-            }
-        },{
-            xtype: 'gosButton',
-            iconCls: 'icon_system system_delete',
-            disabled: true,
-            requiredPermission: {
-                action: 'save',
-                permission: GibsonOS.Permission.WRITE
-            },
-            handler: function() {
-            }
-        }];
-
-        me.callParent();
     }
 });

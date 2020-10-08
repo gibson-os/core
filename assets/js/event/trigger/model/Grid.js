@@ -1,9 +1,6 @@
 Ext.define('GibsonOS.module.core.event.trigger.model.Grid', {
     extend: 'GibsonOS.data.Model',
     fields: [{
-        name: 'id',
-        type: 'int'
-    },{
         name: 'trigger',
         type: 'string'
     },{

@@ -316,6 +316,10 @@ Ext.define('GibsonOS.module.core.event.element.TreeGrid', {
         me.tbar = [{
             xtype: 'gosButton',
             iconCls: 'icon_system system_add',
+            requiredPermission: {
+                action: 'save',
+                permission: GibsonOS.Permission.WRITE
+            },
             handler: function() {
                 let node = me.getSelectionModel().getSelection();
 
@@ -335,6 +339,21 @@ Ext.define('GibsonOS.module.core.event.element.TreeGrid', {
                 node.expand();
 
                 me.plugins[0].startEdit(newNode, 2);
+            }
+        },{
+            xtype: 'gosButton',
+            iconCls: 'icon_system system_delete',
+            //disabled: true,
+            requiredPermission: {
+                action: 'save',
+                permission: GibsonOS.Permission.WRITE
+            },
+            handler: function() {
+                let node = me.getSelectionModel().getSelection();
+
+                if (node.length) {
+                    node.remove();
+                }
             }
         }];
 
