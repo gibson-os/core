@@ -12,7 +12,7 @@ class TestDescriber implements DescriberInterface
 {
     public function getTitle(): string
     {
-        return 'test';
+        return 'Test';
     }
 
     public function getTriggers(): array

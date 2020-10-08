@@ -110,7 +110,7 @@ class ClassNameStore extends AbstractStore
                     continue;
                 }
 
-                $classNames[] = [
+                $classNames[$describer->getTitle()] = [
                     'describerClass' => $classNameWithNamespace,
                     'eventClass' => $describer->getEventClassName(),
                     'title' => $describer->getTitle(),
@@ -118,6 +118,7 @@ class ClassNameStore extends AbstractStore
             }
         }
 
-        $this->list = $classNames;
+        ksort($classNames);
+        $this->list = array_values($classNames);
     }
 }
