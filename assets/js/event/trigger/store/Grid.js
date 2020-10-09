@@ -2,6 +2,7 @@ Ext.define('GibsonOS.module.core.event.trigger.store.Grid', {
     extend: 'GibsonOS.data.Store',
     alias: ['coreEventTriggerGridStore'],
     model: 'GibsonOS.module.core.event.trigger.model.Grid',
+    autoLoad: false,
     constructor: function(data) {
         let me = this;
 

@@ -6,8 +6,11 @@ Ext.define('GibsonOS.module.core.event.trigger.Grid', {
         let me = this;
 
         me.store = new GibsonOS.module.core.event.trigger.store.Grid();
-        me.store.getProxy().setExtraParam('eventId', me.gos.data.eventId);
-        me.store.load();
+
+        if (me.gos.data.eventId) {
+            me.store.getProxy().setExtraParam('eventId', me.gos.data.eventId);
+            me.store.load();
+        }
 
         me.plugins = [
             Ext.create('Ext.grid.plugin.RowEditing', {

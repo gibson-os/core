@@ -12,8 +12,11 @@ Ext.define('GibsonOS.module.core.event.element.TreeGrid', {
         let me = this;
 
         me.store = new GibsonOS.module.core.event.element.store.TreeGrid();
-        me.store.getProxy().setExtraParam('eventId', me.gos.data.eventId);
-        me.store.load();
+
+        if (me.gos.data.eventId) {
+            me.store.getProxy().setExtraParam('eventId', me.gos.data.eventId);
+            me.store.load();
+        }
 
         me.plugins = [
             Ext.create('Ext.grid.plugin.RowEditing', {
