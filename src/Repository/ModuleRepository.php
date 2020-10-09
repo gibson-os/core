@@ -15,10 +15,12 @@ class ModuleRepository extends AbstractRepository
      */
     public function getByName(string $name): ModuleModel
     {
-        $table = $this->getTable(ModuleModel::getTableName());
-        $table->setWhere('`name`=' . $this->escape($name));
+        $table = $this->getTable(ModuleModel::getTableName())
+            ->setWhere('`name`=?')
+            ->addWhereParameter($name)
+        ;
 
-        if (!$table->select()) {
+        if (!$table->selectPrepared()) {
             $exception = new SelectError(sprintf('Modul mit dem Namen "%s" nicht gefunden!', $name));
             $exception->setTable($table);
 

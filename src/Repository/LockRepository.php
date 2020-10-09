@@ -10,11 +10,12 @@ class LockRepository extends AbstractRepository
 {
     public function getByName(string $name): Lock
     {
-        $table = $this->getTable(Lock::getTableName());
-        $table->setWhere('`name`=' . $this->escape($name));
-        $table->select();
+        $table = $this->getTable(Lock::getTableName())
+            ->setWhere('`name`=?')
+            ->addWhereParameter($name)
+        ;
 
-        if (!$table->select()) {
+        if (!$table->selectPrepared()) {
             $exception = new SelectError('Lock not found!');
             $exception->setTable($table);
 

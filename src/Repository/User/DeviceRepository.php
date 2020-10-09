@@ -16,10 +16,12 @@ class DeviceRepository extends AbstractRepository
      */
     public function getById(string $id): Device
     {
-        $table = $this->getTable(Device::getTableName());
-        $table->setWhere('`id`=' . $this->escape($id));
+        $table = $this->getTable(Device::getTableName())
+            ->setWhere('`id`=?')
+            ->addWhereParameter($id)
+        ;
 
-        if (!$table->select()) {
+        if (!$table->selectPrepared()) {
             $exception = new SelectError('Device not found!');
             $exception->setTable($table);
 
@@ -38,10 +40,12 @@ class DeviceRepository extends AbstractRepository
      */
     public function getByToken(string $token): Device
     {
-        $table = $this->getTable(Device::getTableName());
-        $table->setWhere('`token`=' . $this->escape($token));
+        $table = $this->getTable(Device::getTableName())
+            ->setWhere('`token`=?')
+            ->addWhereParameter($token)
+        ;
 
-        if (!$table->select()) {
+        if (!$table->selectPrepared()) {
             $exception = new SelectError('Device not found!');
             $exception->setTable($table);
 
@@ -60,12 +64,12 @@ class DeviceRepository extends AbstractRepository
      */
     public function getByCryptedToken(string $cryptedToken, string $salt, string $secret): Device
     {
-        $table = $this->getTable(Device::getTableName());
-        $table->setWhere(
-            'MD5(CONCAT(`token`, ' . $this->escape($salt) . ', ' . $secret . ')=' . $this->escape($cryptedToken)
-        );
+        $table = $this->getTable(Device::getTableName())
+            ->setWhere('MD5(CONCAT(`token`, ?, ?)=?')
+            ->setWhereParameters([$salt, $secret, $cryptedToken])
+        ;
 
-        if (!$table->select()) {
+        if (!$table->selectPrepared()) {
             $exception = new SelectError('Device not found!');
             $exception->setTable($table);
 

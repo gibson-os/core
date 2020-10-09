@@ -17,13 +17,15 @@ class SettingRepository extends AbstractRepository
      */
     public function getAll(int $moduleId, int $userId): array
     {
-        $table = $this->getTable(Setting::getTableName());
-        $table->setWhere(
-            '`module_id`=' . $moduleId . ' AND ' .
-            '(`user_id`=' . $userId . ' OR `user_id`=0)'
-        );
+        $table = $this->getTable(Setting::getTableName())
+            ->setWhere(
+                '`module_id`=? AND ' .
+                '(`user_id`=? OR `user_id`=0)'
+            )
+            ->setWhereParameters([$moduleId, $userId])
+        ;
 
-        if (!$table->select()) {
+        if (!$table->selectPrepared()) {
             $exception = new SelectError('Einstellungen konnten nicht geladen werden!');
             $exception->setTable($table);
 
@@ -49,14 +51,16 @@ class SettingRepository extends AbstractRepository
      */
     public function getAllByModuleName(string $moduleName, int $userId): array
     {
-        $table = $this->getTable(Setting::getTableName());
-        $table->appendJoin('module', '`' . Setting::getTableName() . '`.`module_id`=`module`.`id`');
-        $table->setWhere(
-            '`module`.`name`=' . $this->escape($moduleName) . ' AND ' .
-            '(`user_id`=' . $userId . ' OR `user_id`=0)'
-        );
+        $table = $this->getTable(Setting::getTableName())
+            ->appendJoin('module', '`' . Setting::getTableName() . '`.`module_id`=`module`.`id`')
+            ->setWhere(
+                '`module`.`name`=? AND ' .
+                '(`user_id`=? OR `user_id`=0)'
+            )
+            ->setWhereParameters([$moduleName, $userId])
+        ;
 
-        if (!$table->select()) {
+        if (!$table->selectPrepared()) {
             $exception = new SelectError('Einstellungen konnten nicht geladen werden!');
             $exception->setTable($table);
 
@@ -80,16 +84,18 @@ class SettingRepository extends AbstractRepository
      */
     public function getByKey(int $moduleId, int $userId, string $key): Setting
     {
-        $table = $this->getTable(Setting::getTableName());
-        $table->setWhere(
-            '`module_id`=' . $this->escape((string) $moduleId) . ' AND ' .
-            '(`user_id`=' . $this->escape((string) $userId) . ' OR `user_id`=0) AND ' .
-            '`key`=' . $this->escape($key)
-        );
-        $table->setOrderBy('`user_id` DESC');
-        $table->setLimit(1);
+        $table = $this->getTable(Setting::getTableName())
+            ->setWhere(
+                '`module_id`=? AND ' .
+                '(`user_id`=? OR `user_id`=0) AND ' .
+                '`key`=?'
+            )
+            ->setWhereParameters([$moduleId, $userId, $key])
+            ->setOrderBy('`user_id` DESC')
+            ->setLimit(1)
+        ;
 
-        if (!$table->select()) {
+        if (!$table->selectPrepared()) {
             $exception = new SelectError(sprintf(
                 'Einstellung mit dem Key "%s" konnte nicht geladen werden!',
                 $key
@@ -112,17 +118,19 @@ class SettingRepository extends AbstractRepository
     public function getByKeyAndModuleName(string $moduleName, int $userId, string $key): Setting
     {
         $tableName = Setting::getTableName();
-        $table = $this->getTable($tableName);
-        $table->appendJoin('module', '`' . $tableName . '`.`module_id`=`module`.`id`');
-        $table->setWhere(
-            '`module`.`name`=' . $this->escape($moduleName) . ' AND ' .
-            '(`' . $tableName . '`.`user_id`=' . $userId . ' OR `' . $tableName . '`.`user_id`=0) AND ' .
-            '`' . $tableName . '`.`key`=' . $this->escape($key)
-        );
-        $table->setOrderBy('`user_id` DESC');
-        $table->setLimit(1);
+        $table = $this->getTable($tableName)
+            ->appendJoin('module', '`' . $tableName . '`.`module_id`=`module`.`id`')
+            ->setWhere(
+                '`module`.`name`=? AND ' .
+                '(`' . $tableName . '`.`user_id`=? OR `' . $tableName . '`.`user_id`=0) AND ' .
+                '`' . $tableName . '`.`key`=?'
+            )
+            ->setWhereParameters([$moduleName, $userId, $key])
+            ->setOrderBy('`user_id` DESC')
+            ->setLimit(1)
+        ;
 
-        if (!$table->select()) {
+        if (!$table->selectPrepared()) {
             $exception = new SelectError(sprintf(
                 'Einstellung mit dem Key "%s" konnte nicht geladen werden!',
                 $key
