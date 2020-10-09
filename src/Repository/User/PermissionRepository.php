@@ -22,11 +22,11 @@ class PermissionRepository extends AbstractRepository
     {
         $table = $this->getTable(Permission::getTableName());
         $table->setWhere(
-            $this->getUserIdWhere($userId) . ' AND ' .
-            $this->getModuleWhere($module)
+            $this->getUserIdWhere($table, $userId) . ' AND ' .
+            $this->getModuleWhere($table, $module)
         );
 
-        if (!$table->select()) {
+        if (!$table->selectPrepared()) {
             $exception = new SelectError(sprintf('Permission für %s nicht gefunden!', $module));
             $exception->setTable($table);
 
@@ -45,16 +45,16 @@ class PermissionRepository extends AbstractRepository
     {
         $table = $this->getTable(Permission::getTableName());
         $table->setWhere(
-            $this->getUserIdWhere($userId) . ' AND ((' .
-            $this->getModuleWhere($module) . ' AND ' .
-            $this->getTaskWhere($task) .
+            $this->getUserIdWhere($table, $userId) . ' AND ((' .
+            $this->getModuleWhere($table, $module) . ' AND ' .
+            $this->getTaskWhere($table, $task) .
             ') OR (' .
-            $this->getModuleWhere($module) . ' AND ' .
-            $this->getTaskWhere('') .
+            $this->getModuleWhere($table, $module) . ' AND ' .
+            $this->getTaskWhere($table, '') .
             '))'
         );
 
-        if (!$table->select()) {
+        if (!$table->selectPrepared()) {
             $exception = new SelectError(sprintf('Permission für %s/%s nicht gefunden!', $module, $task));
             $exception->setTable($table);
 
@@ -73,22 +73,22 @@ class PermissionRepository extends AbstractRepository
     {
         $table = $this->getTable(Permission::getTableName());
         $table->setWhere(
-            $this->getUserIdWhere($userId) . ' AND ((' .
-            $this->getModuleWhere($module) . ' AND ' .
-            $this->getTaskWhere($task) . ' AND ' .
-            $this->getActionWhere($action) .
+            $this->getUserIdWhere($table, $userId) . ' AND ((' .
+            $this->getModuleWhere($table, $module) . ' AND ' .
+            $this->getTaskWhere($table, $task) . ' AND ' .
+            $this->getActionWhere($table, $action) .
             ') OR (' .
-            $this->getModuleWhere($module) . ' AND ' .
-            $this->getTaskWhere($task) . ' AND ' .
-            $this->getActionWhere('') .
+            $this->getModuleWhere($table, $module) . ' AND ' .
+            $this->getTaskWhere($table, $task) . ' AND ' .
+            $this->getActionWhere($table, '') .
             ') OR (' .
-            $this->getModuleWhere($module) . ' AND ' .
-            $this->getTaskWhere('') . ' AND ' .
-            $this->getActionWhere('') .
+            $this->getModuleWhere($table, $module) . ' AND ' .
+            $this->getTaskWhere($table, '') . ' AND ' .
+            $this->getActionWhere($table, '') .
             '))'
         );
 
-        if (!$table->select()) {
+        if (!$table->selectPrepared()) {
             $exception = new SelectError(sprintf('Permission für %s/%s::%s nicht gefunden!', $module, $task, $action));
             $exception->setTable($table);
 
@@ -107,24 +107,34 @@ class PermissionRepository extends AbstractRepository
         return $table;
     }
 
-    private function getModuleWhere(string $module): string
+    private function getModuleWhere(mysqlTable $table, string $module): string
     {
-        return '`module`=' . $this->escape($module);
+        $table->addWhereParameter($module);
+
+        return '`module`=?';
     }
 
-    private function getTaskWhere(string $task): string
+    private function getTaskWhere(mysqlTable $table, string $task): string
     {
-        return '`task`=' . $this->escape($task);
+        $table->addWhereParameter($task);
+
+        return '`task`=?';
     }
 
-    private function getActionWhere(string $action): string
+    private function getActionWhere(mysqlTable $table, string $action): string
     {
-        return '`action`=' . $this->escape($action);
+        $table->addWhereParameter($action);
+
+        return '`action`=?';
     }
 
-    private function getUserIdWhere(int $userId = null): string
+    private function getUserIdWhere(mysqlTable $table, int $userId = null): string
     {
-        return '(`user_id`=0' . ($userId === null ? '' : ' OR `user_id`=' . $userId) . ')';
+        if ($userId !== null) {
+            $table->addWhereParameter($userId);
+        }
+
+        return '(`user_id`=0' . ($userId === null ? '' : ' OR `user_id`=?') . ')';
     }
 
     /**
