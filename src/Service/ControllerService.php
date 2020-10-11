@@ -40,16 +40,23 @@ class ControllerService
      */
     private $twigService;
 
+    /**
+     * @var EnvService
+     */
+    private $envService;
+
     public function __construct(
         ServiceManagerService $serviceManagerService,
         RequestService $requestService,
         StatusCode $statusCode,
-        TwigService $twigService
+        TwigService $twigService,
+        EnvService $envService
     ) {
         $this->serviceManagerService = $serviceManagerService;
         $this->requestService = $requestService;
         $this->statusCode = $statusCode;
         $this->twigService = $twigService;
+        $this->envService = $envService;
     }
 
     public function runAction(): void
@@ -122,8 +129,18 @@ class ControllerService
             'domain' => strtolower($_SERVER['REQUEST_SCHEME']) . '://' . $_SERVER['HTTP_HOST'],
             'serverDate' => [
                 'now' => $now,
-                'sunrise' => date_sunrise($now, SUNFUNCS_RET_TIMESTAMP),
-                'sunset' => date_sunset($now, SUNFUNCS_RET_TIMESTAMP),
+                'sunrise' => date_sunrise(
+                    $now,
+                    SUNFUNCS_RET_TIMESTAMP,
+                    $this->envService->getFloat('DATE_LATITUDE'),
+                    $this->envService->getFloat('DATE_LONGITUDE')
+                ),
+                'sunset' => date_sunset(
+                    $now,
+                    SUNFUNCS_RET_TIMESTAMP,
+                    $this->envService->getFloat('DATE_LATITUDE'),
+                    $this->envService->getFloat('DATE_LONGITUDE')
+                ),
             ],
             'request' => $this->requestService,
             'session' => $this->serviceManagerService->get(SessionService::class),
