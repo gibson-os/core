@@ -10,6 +10,12 @@ use GibsonOS\Core\Event\TimeEvent;
 
 class TimeDescriber implements DescriberInterface
 {
+    public const TRIGGER_CRONJOB = 'cronjob';
+
+    public const TRIGGER_SUNSET = 'sunset';
+
+    public const TRIGGER_SUNRISE = 'sunrise';
+
     public function getTitle(): string
     {
         return 'Zeit';
@@ -21,7 +27,9 @@ class TimeDescriber implements DescriberInterface
     public function getTriggers(): array
     {
         return [
-            'cronjob' => (new Trigger('Zeitgesteuert')),
+            self::TRIGGER_CRONJOB => (new Trigger('Zeitgesteuert')),
+            self::TRIGGER_SUNSET => (new Trigger('Sonnenaufgang')),
+            self::TRIGGER_SUNRISE => (new Trigger('Sonnenuntergang')),
         ];
     }
 

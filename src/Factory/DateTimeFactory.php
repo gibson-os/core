@@ -16,7 +16,11 @@ class DateTimeFactory extends AbstractSingletonFactory
     {
         $env = EnvFactory::create();
 
-        return new DateTimeService(new DateTimeZone($env->getString('timezone')));
+        return new DateTimeService(
+            new DateTimeZone($env->getString('timezone')),
+            $env->getFloat('date_latitude'),
+            $env->getFloat('date_longitude')
+        );
     }
 
     public static function create(): DateTimeService

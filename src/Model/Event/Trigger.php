@@ -13,8 +13,6 @@ use mysqlDatabase;
 
 class Trigger extends AbstractModel implements JsonSerializable
 {
-    public const TRIGGER_CRON = 'cronjob';
-
     /**
      * @var int|null
      */

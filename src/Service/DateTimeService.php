@@ -3,10 +3,10 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Service;
 
-use DateTime as PhpDateTime;
+use DateTime;
+use DateTimeInterface;
 use DateTimeZone;
 use Exception;
-use GibsonOS\Core\Exception\DateTimeError;
 
 class DateTimeService extends AbstractService
 {
@@ -16,31 +16,34 @@ class DateTimeService extends AbstractService
     private $timezone;
 
     /**
-     * DateTime constructor.
+     * @var float
      */
-    public function __construct(DateTimeZone $timezone)
+    private $latitude;
+
+    private $longitude;
+
+    /**
+     * DateTime constructor.
+     *
+     * @param mixed $longitude
+     */
+    public function __construct(DateTimeZone $timezone, float $latitude, $longitude)
     {
         $this->timezone = $timezone;
+        $this->latitude = $latitude;
+        $this->longitude = $longitude;
     }
 
     /**
-     * @throws DateTimeError
+     * @psalm-suppress InvalidReturnType
      */
-    public function new(): PhpDateTime
-    {
-        return $this->get('now');
-    }
-
-    /**
-     * @throws DateTimeError
-     */
-    public function get(string $time): PhpDateTime
+    public function get(string $time = 'now'): DateTime
     {
         try {
-            return new PhpDateTime($time, $this->timezone);
+            return new DateTime($time, $this->timezone);
         } catch (Exception $e) {
-            throw new DateTimeError(sprintf(
-                'Es kann keine Datums Objekkt mit "%s" für die Zeitzone "%s" angelegt werden',
+            error_log(sprintf(
+                'Es kann keine Datums Objekt mit "%s" für die Zeitzone "%s" angelegt werden',
                 $time,
                 $this->timezone->getName()
             ));
@@ -52,5 +55,25 @@ class DateTimeService extends AbstractService
         $this->timezone = $timezone;
 
         return $this;
+    }
+
+    public function getSunset(DateTimeInterface $dateTime): int
+    {
+        return (int) date_sunset(
+            $dateTime->getTimestamp(),
+            SUNFUNCS_RET_TIMESTAMP,
+            $this->latitude,
+            $this->longitude
+        );
+    }
+
+    public function getSunrise(DateTimeInterface $dateTime): int
+    {
+        return (int) date_sunrise(
+            $dateTime->getTimestamp(),
+            SUNFUNCS_RET_TIMESTAMP,
+            $this->latitude,
+            $this->longitude
+        );
     }
 }
