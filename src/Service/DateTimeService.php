@@ -20,14 +20,12 @@ class DateTimeService extends AbstractService
      */
     private $latitude;
 
+    /**
+     * @var float
+     */
     private $longitude;
 
-    /**
-     * DateTime constructor.
-     *
-     * @param mixed $longitude
-     */
-    public function __construct(DateTimeZone $timezone, float $latitude, $longitude)
+    public function __construct(DateTimeZone $timezone, float $latitude, float $longitude)
     {
         $this->timezone = $timezone;
         $this->latitude = $latitude;
