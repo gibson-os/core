@@ -5,8 +5,8 @@ namespace Service;
 use Codeception\Test\Unit;
 use DateTime;
 use DateTimeZone;
-use GibsonOS\Core\Exception\DateTimeError;
 use GibsonOS\Core\Service\DateTimeService;
+use TypeError;
 use UnitTester;
 
 class DateTimeTest extends Unit
@@ -29,19 +29,11 @@ class DateTimeTest extends Unit
     protected function _before()
     {
         $this->timeZone = new DateTimeZone('Europe/Berlin');
-        $this->dateTime = new DateTimeService($this->timeZone);
+        $this->dateTime = new DateTimeService($this->timeZone, 51.2642156, 6.8001438);
     }
 
     protected function _after()
     {
-    }
-
-    public function testNew()
-    {
-        $testDateTime = new DateTime('now', $this->timeZone);
-        $dateTime = $this->dateTime->new();
-
-        $this->assertGreaterThanOrEqual($testDateTime->getTimestamp(), $dateTime->getTimestamp());
     }
 
     public function testGet()
@@ -54,7 +46,7 @@ class DateTimeTest extends Unit
 
     public function testGetError()
     {
-        $this->expectException(DateTimeError::class);
+        $this->expectException(TypeError::class);
 
         $this->dateTime->get('not today');
     }

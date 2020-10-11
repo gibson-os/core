@@ -32,6 +32,8 @@ class EventServiceTest extends Unit
     protected function _before(): void
     {
         putenv('TIMEZONE=Europe/Berlin');
+        putenv('DATE_LATITUDE=51.2642156');
+        putenv('DATE_LONGITUDE=6.8001438');
         $this->serviceManagerService = new ServiceManagerService();
         $this->eventServiceRepository = $this->prophesize(EventRepository::class);
         $this->eventService = new EventService(
