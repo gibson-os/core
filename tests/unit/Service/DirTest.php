@@ -6,11 +6,14 @@ use Codeception\Test\Unit;
 use GibsonOS\Core\Exception\CreateError;
 use GibsonOS\Core\Service\DirService;
 use GibsonOS\Core\Service\FileService;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 use UnitTester;
 
 class DirTest extends Unit
 {
+    use ProphecyTrait;
+
     /**
      * @var UnitTester
      */

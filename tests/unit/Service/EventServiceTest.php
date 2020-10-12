@@ -10,10 +10,13 @@ use GibsonOS\Core\Model\Event\Element;
 use GibsonOS\Core\Repository\EventRepository;
 use GibsonOS\Core\Service\Event\CodeGeneratorService;
 use Prophecy\Argument;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 
 class EventServiceTest extends Unit
 {
+    use ProphecyTrait;
+
     /**
      * @var EventService
      */

@@ -7,10 +7,13 @@ use Codeception\Test\Unit;
 use GibsonOS\Core\Model\User\Permission;
 use GibsonOS\Core\Repository\User\PermissionRepository;
 use GibsonOS\Core\Service\PermissionService;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 
 class PermissionServiceTest extends Unit
 {
+    use ProphecyTrait;
+
     /**
      * @var PermissionService
      */

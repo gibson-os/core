@@ -15,11 +15,14 @@ use GibsonOS\Core\Service\ImageService;
 use GibsonOS\Core\Service\ProcessService;
 use GibsonOS\Mock\Dto\Ffmpeg\Media as MediaMock;
 use Prophecy\Argument;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 use UnitTester;
 
 class FfmpegTest extends Unit
 {
+    use ProphecyTrait;
+
     /**
      * @var UnitTester
      */
