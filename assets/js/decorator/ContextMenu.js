@@ -1,4 +1,4 @@
-GibsonOS.define('GibsonOS.decorator.contextMenu', {
+GibsonOS.define('GibsonOS.decorator.ContextMenu', {
     init: (component) => {
         component = Ext.merge(component, Ext.merge({
             enableContextMenu: true,

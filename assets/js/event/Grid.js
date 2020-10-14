@@ -1,12 +1,47 @@
 Ext.define('GibsonOS.module.core.event.Grid', {
-    extend: 'GibsonOS.grid.Panel',
+    extend: 'GibsonOS.core.component.grid.Panel',
     alias: ['widget.gosModuleCoreEventGrid'],
     autoScroll: true,
     initComponent: function () {
         let me = this;
 
         me.store = new GibsonOS.module.core.event.store.Grid();
-        me.columns = [{
+
+        me.callParent();
+
+        me.addAction({
+            xtype: 'tbseparator',
+            addToContainerContextMenu: false,
+        });
+        me.addAction({
+            iconCls: 'icon_system system_play',
+            disabled: true,
+            addToContainerContextMenu: false,
+        });
+
+        me.on('itemdblclick', function(view, record) {
+            let window = new GibsonOS.module.core.event.Window({
+                gos: {
+                    data: {
+                        eventId: record.get('id')
+                    }
+                }
+            });
+
+            window.down('gosModuleCoreEventForm').loadRecord(record);
+        });
+    },
+    addFunction: function() {
+        let me = this;
+
+        new GibsonOS.module.core.event.Window({
+            gos: me.gos
+        });
+    },
+    deleteFunction: function() {
+    },
+    getColumns: function() {
+        return [{
             header: 'Name',
             dataIndex: 'name',
             flex: 1,
@@ -28,43 +63,5 @@ Ext.define('GibsonOS.module.core.event.Grid', {
             falseText: 'Nein',
             width: 50
         }];
-
-        me.tbar = [{
-            xtype: 'gosButton',
-            iconCls: 'icon_system system_add',
-            requiredPermission: {
-                action: 'save',
-                permission: GibsonOS.Permission.WRITE
-            },
-            handler: function () {
-                new GibsonOS.module.core.event.Window({
-                    gos: me.gos
-                });
-            }
-        },{
-            xtype: 'gosButton',
-            iconCls: 'icon_system system_delete',
-            disabled: true,
-            requiredPermission: {
-                action: 'saveToEeprom',
-                permission: GibsonOS.Permission.DELETE
-            },
-            handler: function() {
-            }
-        }];
-
-        me.callParent();
-
-        me.on('itemdblclick', function(view, record) {
-            let window = new GibsonOS.module.core.event.Window({
-                gos: {
-                    data: {
-                        eventId: record.get('id')
-                    }
-                }
-            });
-
-            window.down('gosModuleCoreEventForm').loadRecord(record);
-        });
     }
 });

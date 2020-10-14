@@ -1,16 +1,14 @@
-GibsonOS.define('GibsonOS.decorator.action.delete', {
+GibsonOS.define('GibsonOS.decorator.action.Delete', {
     init: (component) => {
         component = Ext.merge(component, Ext.merge({
             deleteFunction: null,
-            itemContextMenu: [],
-            containerContextMenu: [],
-            tbar: [],
             deleteButton: {
                 text: 'Löschen',
                 tbarText: null,
                 itemId: 'deleteButton',
                 iconCls: 'icon_system system_delete',
                 disabled: true,
+                addToContainerContextMenu: false,
                 listeners: {
                     click: () => {
                         component.deleteFunction();
@@ -20,8 +18,7 @@ GibsonOS.define('GibsonOS.decorator.action.delete', {
         }, component));
 
         if (typeof(component.deleteFunction) === 'function') {
-            component.tbar.push(Ext.merge(Ext.clone(component.deleteButton), {text: component.deleteButton.tbarText}));
-            component.itemContextMenu.push(component.deleteButton);
+            component.addAction(component.deleteButton);
         }
 
         return component;

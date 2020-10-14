@@ -4,15 +4,17 @@ Ext.define('GibsonOS.core.component.grid.Panel', {
     border: false,
     flex: 1,
     enablePagingBar: true,
+    getColumns: null,
     enableToolbar: true,
     enableKeyEvents: true,
-    getColumns: null,
+    enableContextMenu: true,
     initComponent: function() {
         let me = this;
 
-        me = GibsonOS.decorator.autoReload.init(me);
-        me = GibsonOS.decorator.action.add.init(me);
-        me = GibsonOS.decorator.action.delete.init(me);
+        me = GibsonOS.decorator.ActionManager.init(me);
+        me = GibsonOS.decorator.AutoReload.init(me);
+        me = GibsonOS.decorator.action.Add.init(me);
+        me = GibsonOS.decorator.action.Delete.init(me);
 
         if (typeof(me.getColumns) === 'function') {
             me.columns = me.getColumns();
@@ -20,37 +22,9 @@ Ext.define('GibsonOS.core.component.grid.Panel', {
 
         me.callParent();
 
-        if (me.itemContextMenu) {
-            me.itemContextMenu = new GibsonOS.contextMenu.ContextMenu({
-                items: me.itemContextMenu,
-                parent: me
-            });
-        }
-
-        me.on('itemcontextmenu', function(grid, record, item, index, event, options) {
-            if (me.itemContextMenu) {
-                me.itemContextMenu.record = record;
-                event.stopEvent();
-                me.itemContextMenu.showAt(event.getXY());
-            }
-        });
-
-        if (me.containerContextMenu) {
-            me.containerContextMenu = new GibsonOS.contextMenu.ContextMenu({
-                items: me.containerContextMenu,
-                parent: me
-            });
-        }
-
-        me.on('containercontextmenu', function(grid, event, options) {
-            if (me.containerContextMenu) {
-                event.stopEvent();
-                me.containerContextMenu.showAt(event.getXY());
-            }
-        });
-
-        GibsonOS.decorator.autoReload.addListeners(me);
-        GibsonOS.decorator.action.delete.addListeners(me);
+        GibsonOS.decorator.ActionManager.addListeners(me);
+        GibsonOS.decorator.AutoReload.addListeners(me);
+        GibsonOS.decorator.action.Delete.addListeners(me);
 
         /*if (me.down('gosToolbarPaging')) {
             me.getStore().on('add', function (store, records) {

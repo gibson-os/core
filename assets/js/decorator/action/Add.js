@@ -1,10 +1,7 @@
-GibsonOS.define('GibsonOS.decorator.action.add', {
+GibsonOS.define('GibsonOS.decorator.action.Add', {
     init: (component) => {
         component = Ext.merge(component, Ext.merge({
             addFunction: null,
-            itemContextMenu: [],
-            containerContextMenu: [],
-            tbar: [],
             addButton: {
                 text: 'Hinzufügen',
                 tbarText: null,
@@ -19,9 +16,7 @@ GibsonOS.define('GibsonOS.decorator.action.add', {
         }, component));
 
         if (typeof (component.addFunction) === 'function') {
-            component.tbar.push(Ext.merge(Ext.clone(component.addButton), {text: component.addButton.tbarText}));
-            component.itemContextMenu.push(component.addButton);
-            component.containerContextMenu.push(component.addButton);
+            component.addAction(component.addButton);
         }
 
         return component;

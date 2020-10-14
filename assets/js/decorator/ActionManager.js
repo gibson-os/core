@@ -1,0 +1,92 @@
+GibsonOS.define('GibsonOS.decorator.ActionManager', {
+    init: (component) => {
+        component = Ext.merge(component, Ext.merge({
+            enableToolbar: false,
+            enableKeyEvents: false,
+            enableContextMenu: false,
+            itemContextMenu: [],
+            containerContextMenu: [],
+            actions: [],
+        }, component));
+        let toolbar = null;
+        let containerContextMenu = null;
+        let itemContextMenu = null;
+
+        component.addAction = (button) => {
+            button = Ext.merge({
+                addToToolbar: true,
+                addToContainerContextMenu: true,
+                addToItemContextMenu: true
+            }, button);
+
+            if (component.enableToolbar) {
+                if (button.addToToolbar) {
+                    toolbar.add(Ext.merge(Ext.clone(button), {text: button.tbarText ?? null}));
+                }
+            }
+
+            if (component.enableContextMenu) {
+                if (button.addToContainerContextMenu) {
+                    containerContextMenu.add(button);
+                }
+
+                if (button.addToItemContextMenu) {
+                    itemContextMenu.add(button);
+                }
+            }
+        };
+
+        if (component.enableToolbar) {
+            toolbar = new Ext.toolbar.Toolbar();
+
+            if (!component.dockedItems) {
+                component.dockedItems = [];
+            }
+
+            component.dockedItems.push(toolbar);
+        }
+
+        if (component.enableKeyEvents) {
+            component.on('cellkeydown', function(table, td, cellIndex, record, tr, rowIndex, event) {
+               Ext.iterate(component.actions, (button) => {
+                   if (
+                       button.keyEvent &&
+                       event.getKey() === button.keyEvent
+                   ) {
+                       button.fireEvent('click', [button]);
+                   }
+               });
+            });
+        }
+
+        if (component.enableContextMenu) {
+            itemContextMenu = new GibsonOS.contextMenu.ContextMenu({
+                items: component.itemContextMenu,
+                parent: component
+            });
+            component.itemContextMenu = itemContextMenu;
+
+            containerContextMenu = new GibsonOS.contextMenu.ContextMenu({
+                items: component.containerContextMenu,
+                parent: component
+            });
+            component.containerContextMenu = containerContextMenu;
+        }
+
+        return component;
+    },
+    addListeners: (component) => {
+        if (component.enableContextMenu) {
+            component.on('itemcontextmenu', function(grid, record, item, index, event) {
+                component.itemContextMenu.record = record;
+                event.stopEvent();
+                component.itemContextMenu.showAt(event.getXY());
+            });
+
+            component.on('containercontextmenu', function(grid, event) {
+                event.stopEvent();
+                component.containerContextMenu.showAt(event.getXY());
+            });
+        }
+    }
+});

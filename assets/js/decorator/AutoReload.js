@@ -1,4 +1,4 @@
-GibsonOS.define('GibsonOS.decorator.autoReload', {
+GibsonOS.define('GibsonOS.decorator.AutoReload', {
     init: (component) => {
         component = Ext.merge(component, Ext.merge({
             autoReload: false,
