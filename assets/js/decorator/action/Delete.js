@@ -9,6 +9,7 @@ GibsonOS.define('GibsonOS.decorator.action.Delete', {
                 iconCls: 'icon_system system_delete',
                 disabled: true,
                 addToContainerContextMenu: false,
+                keyEvent: Ext.EventObject.DELETE,
                 listeners: {
                     click: () => {
                         component.deleteFunction();
@@ -46,13 +47,5 @@ GibsonOS.define('GibsonOS.decorator.action.Delete', {
                 }
             }
         });
-
-        if (typeof(component.deleteFunction) === 'function') {
-            component.on('cellkeydown', function(table, td, cellIndex, record, tr, rowIndex, event) {
-                if (event.getKey() === Ext.EventObject.DELETE) {
-                    component.deleteFunction();
-                }
-            });
-        }
     }
 });

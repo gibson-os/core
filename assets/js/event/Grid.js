@@ -40,6 +40,7 @@ Ext.define('GibsonOS.module.core.event.Grid', {
         });
     },
     deleteFunction: function() {
+        console.log('delete');
     },
     getColumns: function() {
         return [{

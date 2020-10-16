@@ -7,6 +7,7 @@ GibsonOS.define('GibsonOS.decorator.ActionManager', {
             itemContextMenu: [],
             containerContextMenu: [],
             actions: [],
+            actionKeyEvents: {}
         }, component));
         let toolbar = null;
         let containerContextMenu = null;
@@ -18,11 +19,8 @@ GibsonOS.define('GibsonOS.decorator.ActionManager', {
                 addToContainerContextMenu: true,
                 addToItemContextMenu: true
             }, button);
-
-            if (component.enableToolbar) {
-                if (button.addToToolbar) {
-                    toolbar.add(Ext.merge(Ext.clone(button), {text: button.tbarText ?? null}));
-                }
+            if (component.enableToolbar && button.addToToolbar) {
+                toolbar.add(Ext.merge(Ext.clone(button), {text: button.tbarText ?? null}));
             }
 
             if (component.enableContextMenu) {
@@ -33,6 +31,10 @@ GibsonOS.define('GibsonOS.decorator.ActionManager', {
                 if (button.addToItemContextMenu) {
                     itemContextMenu.add(button);
                 }
+            }
+
+            if (component.enableKeyEvents && button.keyEvent) {
+                component.actionKeyEvents[button.keyEvent] = new Ext.Component(button);
             }
         };
 
@@ -79,14 +81,14 @@ GibsonOS.define('GibsonOS.decorator.ActionManager', {
 
         if (component.enableKeyEvents) {
             component.on('cellkeydown', function(table, td, cellIndex, record, tr, rowIndex, event) {
-                Ext.iterate(component.actions, (button) => {
-                    if (
-                        button.keyEvent &&
-                        event.getKey() === button.keyEvent
-                    ) {
-                        button.fireEvent('click', [button]);
-                    }
-                });
+                console.log(component.actionKeyEvents);
+                let button = component.actionKeyEvents[event.getKey()];
+
+                if (!button) {
+                    return;
+                }
+
+                button.fireEvent('click', [button]);
             });
         }
     }
