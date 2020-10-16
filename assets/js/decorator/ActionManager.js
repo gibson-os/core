@@ -17,7 +17,9 @@ GibsonOS.define('GibsonOS.decorator.ActionManager', {
             button = Ext.merge({
                 addToToolbar: true,
                 addToContainerContextMenu: true,
-                addToItemContextMenu: true
+                addToItemContextMenu: true,
+                selectionNeeded: false,
+                disabled: button.selectionNeeded,
             }, button);
             if (component.enableToolbar && button.addToToolbar) {
                 toolbar.add(Ext.merge(Ext.clone(button), {text: button.tbarText ?? null}));
@@ -65,12 +67,28 @@ GibsonOS.define('GibsonOS.decorator.ActionManager', {
         return component;
     },
     addListeners: (component) => {
+        component.getSelectionModel().on('selectionchange', function(selection, records, options) {
+            let selectionChangeFunction = (item) => {
+                if (item.selectionNeeded) {
+                    item.enable(!!records.length);
+                }
+            };
+
+            if (component.enableToolbar) {
+                component.down('toolbar').items.each(selectionChangeFunction);
+            }
+
+            if (component.enableContextMenu) {
+                component.itemContextMenu.items.each(selectionChangeFunction);
+                component.containerContextMenu.items.each(selectionChangeFunction);
+            }
+        });
+
         if (component.enableContextMenu) {
             component.on('itemcontextmenu', function(grid, record, item, index, event) {
                 component.itemContextMenu.record = record;
                 event.stopEvent();
                 component.itemContextMenu.showAt(event.getXY());
-                console.log(component.itemContextMenu);
             });
 
             component.on('containercontextmenu', function(grid, event) {
@@ -81,7 +99,6 @@ GibsonOS.define('GibsonOS.decorator.ActionManager', {
 
         if (component.enableKeyEvents) {
             component.on('cellkeydown', function(table, td, cellIndex, record, tr, rowIndex, event) {
-                console.log(component.actionKeyEvents);
                 let button = component.actionKeyEvents[event.getKey()];
 
                 if (!button) {

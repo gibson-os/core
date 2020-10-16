@@ -7,9 +7,9 @@ GibsonOS.define('GibsonOS.decorator.action.Delete', {
                 tbarText: null,
                 itemId: 'deleteButton',
                 iconCls: 'icon_system system_delete',
-                disabled: true,
                 addToContainerContextMenu: false,
                 keyEvent: Ext.EventObject.DELETE,
+                selectionNeeded: true,
                 listeners: {
                     click: () => {
                         component.deleteFunction();
@@ -23,29 +23,5 @@ GibsonOS.define('GibsonOS.decorator.action.Delete', {
         }
 
         return component;
-    },
-    addListeners: (component) => {
-        component.getSelectionModel().on('selectionchange', function(selection, records, options) {
-            let tbarButton = component.down('toolbar').down('#deleteButton');
-            let contextMenuButton = component.itemContextMenu.down('#deleteButton');
-
-            if (selection.getCount() === 0) {
-                if (tbarButton) {
-                    tbarButton.disable()
-                }
-
-                if (contextMenuButton) {
-                    contextMenuButton.disable()
-                }
-            } else {
-                if (tbarButton) {
-                    tbarButton.enable()
-                }
-
-                if (contextMenuButton) {
-                    contextMenuButton.enable()
-                }
-            }
-        });
     }
 });

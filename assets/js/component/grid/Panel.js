@@ -24,7 +24,6 @@ Ext.define('GibsonOS.core.component.grid.Panel', {
 
         GibsonOS.decorator.ActionManager.addListeners(me);
         GibsonOS.decorator.AutoReload.addListeners(me);
-        GibsonOS.decorator.action.Delete.addListeners(me);
 
         /*if (me.down('gosToolbarPaging')) {
             me.getStore().on('add', function (store, records) {
