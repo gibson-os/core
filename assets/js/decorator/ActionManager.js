@@ -46,19 +46,6 @@ GibsonOS.define('GibsonOS.decorator.ActionManager', {
             component.dockedItems.push(toolbar);
         }
 
-        if (component.enableKeyEvents) {
-            component.on('cellkeydown', function(table, td, cellIndex, record, tr, rowIndex, event) {
-               Ext.iterate(component.actions, (button) => {
-                   if (
-                       button.keyEvent &&
-                       event.getKey() === button.keyEvent
-                   ) {
-                       button.fireEvent('click', [button]);
-                   }
-               });
-            });
-        }
-
         if (component.enableContextMenu) {
             itemContextMenu = new GibsonOS.contextMenu.ContextMenu({
                 items: component.itemContextMenu,
@@ -81,11 +68,25 @@ GibsonOS.define('GibsonOS.decorator.ActionManager', {
                 component.itemContextMenu.record = record;
                 event.stopEvent();
                 component.itemContextMenu.showAt(event.getXY());
+                console.log(component.itemContextMenu);
             });
 
             component.on('containercontextmenu', function(grid, event) {
                 event.stopEvent();
                 component.containerContextMenu.showAt(event.getXY());
+            });
+        }
+
+        if (component.enableKeyEvents) {
+            component.on('cellkeydown', function(table, td, cellIndex, record, tr, rowIndex, event) {
+                Ext.iterate(component.actions, (button) => {
+                    if (
+                        button.keyEvent &&
+                        event.getKey() === button.keyEvent
+                    ) {
+                        button.fireEvent('click', [button]);
+                    }
+                });
             });
         }
     }

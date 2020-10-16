@@ -16,6 +16,7 @@ Ext.define('GibsonOS.module.core.event.Grid', {
         me.addAction({
             iconCls: 'icon_system system_play',
             disabled: true,
+            text: 'Ausführen',
             addToContainerContextMenu: false,
         });
 
