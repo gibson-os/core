@@ -7,7 +7,7 @@ Ext.define('GibsonOS.module.core.event.trigger.Grid', {
 
         me.store = new GibsonOS.module.core.event.trigger.store.Grid();
 
-        if (me.gos.data.eventId) {
+        if (me.gos.data && me.gos.data.eventId) {
             me.store.getProxy().setExtraParam('eventId', me.gos.data.eventId);
             me.store.load();
         }

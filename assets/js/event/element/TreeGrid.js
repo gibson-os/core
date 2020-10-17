@@ -1,5 +1,5 @@
 Ext.define('GibsonOS.module.core.event.element.TreeGrid', {
-    extend: 'GibsonOS.tree.Panel',
+    extend: 'GibsonOS.core.component.tree.Panel',
     alias: ['widget.gosModuleCoreEventElementTreeGrid'],
     autoScroll: true,
     useArrows: true,
@@ -13,7 +13,7 @@ Ext.define('GibsonOS.module.core.event.element.TreeGrid', {
 
         me.store = new GibsonOS.module.core.event.element.store.TreeGrid();
 
-        if (me.gos.data.eventId) {
+        if (me.gos.data && me.gos.data.eventId) {
             me.store.getProxy().setExtraParam('eventId', me.gos.data.eventId);
             me.store.load();
         }
@@ -80,7 +80,55 @@ Ext.define('GibsonOS.module.core.event.element.TreeGrid', {
                 }
             })
         ];
-        me.columns = [{
+
+        me.addButton = {
+            requiredPermission: {
+                action: 'save',
+                permission: GibsonOS.Permission.WRITE
+            }
+        };
+        me.deleteButton = {
+            requiredPermission: {
+                action: 'save',
+                permission: GibsonOS.Permission.WRITE
+            }
+        };
+
+        me.callParent();
+    },
+    addFunction: function() {
+        let me = this;
+        let node = me.getSelectionModel().getSelection();
+
+        if (node.length) {
+            node = node[0];
+        } else {
+            node = me.getRootNode();
+        }
+
+        if (node.get('leaf')) {
+            node = node.parentNode;
+        }
+
+        let newNode = node.appendChild({
+            leaf: true
+        });
+        node.expand();
+
+        me.plugins[0].startEdit(newNode, 2);
+    },
+    deleteFunction: function() {
+        let me = this;
+        let node = me.getSelectionModel().getSelection();
+
+        if (node.length) {
+            node.remove();
+        }
+    },
+    getColumns: function() {
+        let me = this;
+
+        return [{
             xtype: 'treecolumn'
         },{
             xtype: 'gosGridColumnComboBoxEditor',
@@ -311,51 +359,5 @@ Ext.define('GibsonOS.module.core.event.element.TreeGrid', {
                 }
             }
         }];
-
-        me.tbar = [{
-            xtype: 'gosButton',
-            iconCls: 'icon_system system_add',
-            requiredPermission: {
-                action: 'save',
-                permission: GibsonOS.Permission.WRITE
-            },
-            handler: function() {
-                let node = me.getSelectionModel().getSelection();
-
-                if (node.length) {
-                    node = node[0];
-                } else {
-                    node = me.getRootNode();
-                }
-
-                if (node.get('leaf')) {
-                    node = node.parentNode;
-                }
-
-                let newNode = node.appendChild({
-                    leaf: true
-                });
-                node.expand();
-
-                me.plugins[0].startEdit(newNode, 2);
-            }
-        },{
-            xtype: 'gosButton',
-            iconCls: 'icon_system system_delete',
-            //disabled: true,
-            requiredPermission: {
-                action: 'save',
-                permission: GibsonOS.Permission.WRITE
-            },
-            handler: function() {
-                let node = me.getSelectionModel().getSelection();
-
-                if (node.length) {
-                    node.remove();
-                }
-            }
-        }];
-
-        me.callParent();
     }
 });

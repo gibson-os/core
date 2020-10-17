@@ -4,7 +4,6 @@ Ext.define('GibsonOS.core.component.grid.Panel', {
     border: false,
     flex: 1,
     enablePagingBar: true,
-    getColumns: null,
     enableToolbar: true,
     enableKeyEvents: true,
     enableClickEvents: true,
@@ -12,11 +11,7 @@ Ext.define('GibsonOS.core.component.grid.Panel', {
     initComponent: function() {
         let me = this;
 
-        me = GibsonOS.decorator.ActionManager.init(me);
-        me = GibsonOS.decorator.AutoReload.init(me);
-        me = GibsonOS.decorator.action.Add.init(me);
-        me = GibsonOS.decorator.action.Enter.init(me);
-        me = GibsonOS.decorator.action.Delete.init(me);
+        me = GibsonOS.decorator.Panel.init(me);
 
         if (typeof(me.getColumns) === 'function') {
             me.columns = me.getColumns();
@@ -24,8 +19,7 @@ Ext.define('GibsonOS.core.component.grid.Panel', {
 
         me.callParent();
 
-        GibsonOS.decorator.ActionManager.addListeners(me);
-        GibsonOS.decorator.AutoReload.addListeners(me);
+        GibsonOS.decorator.Panel.addListeners(me);
 
         /*if (me.down('gosToolbarPaging')) {
             me.getStore().on('add', function (store, records) {
