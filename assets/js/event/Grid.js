@@ -17,19 +17,6 @@ Ext.define('GibsonOS.module.core.event.Grid', {
             iconCls: 'icon_system system_play',
             text: 'Ausführen',
             selectionNeeded: true,
-            addToContainerContextMenu: false,
-        });
-
-        me.on('itemdblclick', function(view, record) {
-            let window = new GibsonOS.module.core.event.Window({
-                gos: {
-                    data: {
-                        eventId: record.get('id')
-                    }
-                }
-            });
-
-            window.down('gosModuleCoreEventForm').loadRecord(record);
         });
     },
     addFunction: function() {
@@ -38,6 +25,17 @@ Ext.define('GibsonOS.module.core.event.Grid', {
         new GibsonOS.module.core.event.Window({
             gos: me.gos
         });
+    },
+    enterFunction: function(record) {
+        let window = new GibsonOS.module.core.event.Window({
+            gos: {
+                data: {
+                    eventId: record.get('id')
+                }
+            }
+        });
+
+        window.down('gosModuleCoreEventForm').loadRecord(record);
     },
     deleteFunction: function() {
         console.log('delete');

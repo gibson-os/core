@@ -7,6 +7,7 @@ Ext.define('GibsonOS.core.component.grid.Panel', {
     getColumns: null,
     enableToolbar: true,
     enableKeyEvents: true,
+    enableClickEvents: true,
     enableContextMenu: true,
     initComponent: function() {
         let me = this;
@@ -14,6 +15,7 @@ Ext.define('GibsonOS.core.component.grid.Panel', {
         me = GibsonOS.decorator.ActionManager.init(me);
         me = GibsonOS.decorator.AutoReload.init(me);
         me = GibsonOS.decorator.action.Add.init(me);
+        me = GibsonOS.decorator.action.Enter.init(me);
         me = GibsonOS.decorator.action.Delete.init(me);
 
         if (typeof(me.getColumns) === 'function') {

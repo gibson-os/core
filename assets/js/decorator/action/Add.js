@@ -4,7 +4,6 @@ GibsonOS.define('GibsonOS.decorator.action.Add', {
             addFunction: null,
             addButton: {
                 text: 'Hinzufügen',
-                tbarText: null,
                 itemId: 'addButton',
                 iconCls: 'icon_system system_add',
                 listeners: {

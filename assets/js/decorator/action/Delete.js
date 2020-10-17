@@ -4,10 +4,8 @@ GibsonOS.define('GibsonOS.decorator.action.Delete', {
             deleteFunction: null,
             deleteButton: {
                 text: 'Löschen',
-                tbarText: null,
                 itemId: 'deleteButton',
                 iconCls: 'icon_system system_delete',
-                addToContainerContextMenu: false,
                 keyEvent: Ext.EventObject.DELETE,
                 selectionNeeded: true,
                 listeners: {
