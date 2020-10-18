@@ -6,6 +6,7 @@ namespace GibsonOS\Core\Controller;
 use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\LoginRequired;
 use GibsonOS\Core\Exception\PermissionDenied;
+use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Service\PermissionService;
 use GibsonOS\Core\Service\Response\AjaxResponse;
 use GibsonOS\Core\Store\Cronjob\TimeStore;
@@ -17,6 +18,7 @@ class CronjobController extends AbstractController
      * @throws GetError
      * @throws LoginRequired
      * @throws PermissionDenied
+     * @throws SelectError
      */
     public function index(CronjobStore $cronjobStore, int $limit = 100, int $start = 0, array $sort = []): AjaxResponse
     {

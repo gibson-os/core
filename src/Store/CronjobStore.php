@@ -30,7 +30,7 @@ class CronjobStore extends AbstractDatabaseStore
 
     public function getList(): array
     {
-        if ($this->table->select(false) !== false) {
+        if ($this->table->select(false) === false) {
             throw (new SelectError())->setTable($this->table);
         }
 
