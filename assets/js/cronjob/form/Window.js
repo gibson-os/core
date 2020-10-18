@@ -1,24 +1,15 @@
 Ext.define('GibsonOS.module.core.cronjob.form.Window', {
     extend: 'GibsonOS.Window',
     alias: ['widget.gosModuleCoreCronjobFormWindow'],
-    itemId: 'coreCronjobFormWindow',
     title: 'Cronjob',
     width: 600,
     height: 400,
-    layout: 'border',
+    maximizable: true,
     initComponent: function() {
         let me = this;
 
         me.items = [{
-            xtype: 'gosModuleCoreCronjobForm',
-            region: 'north',
-            flex: 0,
-            autoHeight: true,
-            gos: me.gos
-        },{
-            xtype: 'gosModuleCoreCronjobTimeGrid',
-            region: 'center',
-            gos: me.gos
+            xtype: 'gosModuleCoreCronjobPanel'
         }];
 
         me.callParent();

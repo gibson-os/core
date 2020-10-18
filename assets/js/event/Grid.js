@@ -36,7 +36,7 @@ Ext.define('GibsonOS.module.core.event.Grid', {
         triggerStore.getProxy().setExtraParam('eventId', record.get('id'));
         triggerStore.load();
     },
-    deleteFunction: function() {
+    deleteFunction: function(records) {
         console.log('delete');
     },
     getColumns: function() {

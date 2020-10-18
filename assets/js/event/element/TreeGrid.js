@@ -112,9 +112,8 @@ Ext.define('GibsonOS.module.core.event.element.TreeGrid', {
 
         me.plugins[0].startEdit(newNode, 2);
     },
-    deleteFunction: function() {
+    deleteFunction: function(node) {
         let me = this;
-        let node = me.getSelectionModel().getSelection();
 
         if (node.length) {
             node.remove();

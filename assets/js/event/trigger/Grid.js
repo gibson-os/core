@@ -64,9 +64,9 @@ Ext.define('GibsonOS.module.core.event.trigger.Grid', {
         let me = this;
         me.plugins[0].startEdit(me.getStore().add({})[0], 1);
     },
-    deleteFunction: function() {
+    deleteFunction: function(records) {
         let me = this;
-        me.getStore().remove(me.getSelectionModel().getSelection());
+        me.getStore().remove(records);
     },
     getColumns: function() {
         let me = this;
