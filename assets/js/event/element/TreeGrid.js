@@ -13,11 +13,6 @@ Ext.define('GibsonOS.module.core.event.element.TreeGrid', {
 
         me.store = new GibsonOS.module.core.event.element.store.TreeGrid();
 
-        if (me.gos.data && me.gos.data.eventId) {
-            me.store.getProxy().setExtraParam('eventId', me.gos.data.eventId);
-            me.store.load();
-        }
-
         me.plugins = [
             Ext.create('Ext.grid.plugin.RowEditing', {
                 saveBtnText: 'Speichern',

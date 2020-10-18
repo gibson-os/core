@@ -1,5 +1,5 @@
 Ext.define('GibsonOS.module.core.event.Panel', {
-    extend: 'GibsonOS.Panel',
+    extend: 'GibsonOS.core.component.Panel',
     alias: ['widget.gosModuleCoreEventPanel'],
     itemId: 'coreEventPanel',
     layout: 'border',
@@ -15,14 +15,28 @@ Ext.define('GibsonOS.module.core.event.Panel', {
             region: 'center',
             items: [{
                 xtype: 'gosModuleCoreEventElementTreeGrid',
-                title: 'Ereignisse',
-                gos: me.gos
+                title: 'Ereignisse'
             },{
                 xtype: 'gosModuleCoreEventTriggerGrid',
-                title: 'Auslöser',
-                gos: me.gos
+                title: 'Auslöser'
             }]
         }];
+
+        me.addButton = {
+            iconCls: 'icon_system system_save',
+            requiredPermission: {
+                action: 'save',
+                permission: GibsonOS.Permission.READ
+            }
+        };
+
+        me.callParent();
+    },
+    addFunction: function() {
+        let me = this;
+        let form = me.down('gosModuleCoreEventForm').getForm();
+        let elements = [];
+        let triggers = [];
 
         let getElementsAjaxData = function(element) {
             let data = {
@@ -51,43 +65,32 @@ Ext.define('GibsonOS.module.core.event.Panel', {
             return data;
         };
 
-        me.tbar = [{
-            xtype: 'gosButton',
-            iconCls: 'icon_system system_save',
-            requiredPermission: {
-                action: 'save',
-                permission: GibsonOS.Permission.READ
+        me.down('gosModuleCoreEventElementTreeGrid').getStore().getRootNode().eachChild(function(element) {
+            elements.push(getElementsAjaxData(element));
+        });
+
+        me.down('gosModuleCoreEventTriggerGrid').getStore().each(function(trigger) {
+            triggers.push(trigger.getData());
+        });
+
+        me.setLoading(true);
+
+        GibsonOS.Ajax.request({
+            url: baseDir + 'core/event/save',
+            params: {
+                eventId: form.findField('id').getValue(),
+                name: form.findField('name').getValue(),
+                async: form.findField('async').getValue(),
+                active: form.findField('active').getValue(),
+                elements: Ext.encode(elements),
+                triggers: Ext.encode(triggers)
             },
-            handler: function() {
-                let form = me.down('gosModuleCoreEventForm').getForm();
-                let elements = [];
-                let triggers = [];
-
-                me.down('gosModuleCoreEventElementTreeGrid').getStore().getRootNode().eachChild(function(element) {
-                    elements.push(getElementsAjaxData(element));
-                });
-
-                me.down('gosModuleCoreEventTriggerGrid').getStore().each(function(trigger) {
-                    triggers.push(trigger.getData());
-                });
-
-                GibsonOS.Ajax.request({
-                    url: baseDir + 'core/event/save',
-                    params: {
-                        eventId: me.gos.data.eventId,
-                        name: form.findField('name').getValue(),
-                        async: form.findField('async').getValue(),
-                        active: form.findField('active').getValue(),
-                        elements: Ext.encode(elements),
-                        triggers: Ext.encode(triggers)
-                    },
-                    success: function(response) {
-                        me.gos.data.eventId = Ext.decode(response.responseText).data.id;
-                    }
-                });
+            callback: function() {
+                me.setLoading(false);
+            },
+            success: function(response) {
+                form.findField('id').setValue(Ext.decode(response.responseText).data.id);
             }
-        }];
-
-        me.callParent();
+        });
     }
 });

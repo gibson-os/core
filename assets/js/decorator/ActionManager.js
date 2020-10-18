@@ -84,22 +84,24 @@ GibsonOS.define('GibsonOS.decorator.ActionManager', {
         return component;
     },
     addListeners: (component) => {
-        component.getSelectionModel().on('selectionchange', function(selection, records) {
-            let selectionChangeFunction = (item) => {
-                if (item.selectionNeeded) {
-                    item.enable(!!records.length);
+        if (typeof(component.getSelectionModel) === 'function') {
+            component.getSelectionModel().on('selectionchange', function(selection, records) {
+                let selectionChangeFunction = (item) => {
+                    if (item.selectionNeeded) {
+                        item.enable(!!records.length);
+                    }
+                };
+
+                if (component.enableToolbar) {
+                    component.down('toolbar').items.each(selectionChangeFunction);
                 }
-            };
 
-            if (component.enableToolbar) {
-                component.down('toolbar').items.each(selectionChangeFunction);
-            }
-
-            if (component.enableContextMenu) {
-                component.itemContextMenu.items.each(selectionChangeFunction);
-                component.containerContextMenu.items.each(selectionChangeFunction);
-            }
-        });
+                if (component.enableContextMenu) {
+                    component.itemContextMenu.items.each(selectionChangeFunction);
+                    component.containerContextMenu.items.each(selectionChangeFunction);
+                }
+            });
+        }
 
         if (component.enableContextMenu) {
             component.on('itemcontextmenu', (grid, record, item, index, event) => {

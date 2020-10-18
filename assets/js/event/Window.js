@@ -13,8 +13,7 @@ Ext.define('GibsonOS.module.core.event.Window', {
         let me = this;
 
         me.items = [{
-            xtype: 'gosModuleCoreEventPanel',
-            gos: me.gos
+            xtype: 'gosModuleCoreEventPanel'
         }];
 
         me.callParent();

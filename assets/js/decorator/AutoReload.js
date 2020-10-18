@@ -3,13 +3,13 @@ GibsonOS.define('GibsonOS.decorator.AutoReload', {
         component = Ext.merge(component, Ext.merge({
             autoReload: false,
             activateAutoReload: function() {
-                if (component.getStore()) {
-                    component.getStore().gos.autoReload = component.autoReload;
+                if (typeof(component.getStore) === 'function') {
+                    component.getStore().autoReload = component.autoReload;
                 }
             },
             deactivateAutoReload: function() {
-                if (component.getStore()) {
-                    component.getStore().gos.autoReload = false;
+                if (typeof(component.getStore) === 'function') {
+                    component.getStore().autoReload = false;
                 }
             }
         }, component));

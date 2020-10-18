@@ -22,20 +22,19 @@ Ext.define('GibsonOS.module.core.event.Grid', {
     addFunction: function() {
         let me = this;
 
-        new GibsonOS.module.core.event.Window({
-            gos: me.gos
-        });
+        new GibsonOS.module.core.event.Window();
     },
     enterFunction: function(record) {
-        let window = new GibsonOS.module.core.event.Window({
-            gos: {
-                data: {
-                    eventId: record.get('id')
-                }
-            }
-        });
-
+        let window = new GibsonOS.module.core.event.Window();
         window.down('gosModuleCoreEventForm').loadRecord(record);
+
+        let elementStore = window.down('gosModuleCoreEventElementTreeGrid').getStore();
+        elementStore.getProxy().setExtraParam('eventId', record.get('id'));
+        elementStore.load();
+
+        let triggerStore = window.down('gosModuleCoreEventTriggerGrid').getStore();
+        triggerStore.getProxy().setExtraParam('eventId', record.get('id'));
+        triggerStore.load();
     },
     deleteFunction: function() {
         console.log('delete');

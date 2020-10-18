@@ -14,6 +14,9 @@ Ext.define('GibsonOS.module.core.event.Form', {
         let me = this;
 
         me.items = [{
+            xtype: 'gosFormHidden',
+            name: 'id'
+        },{
             xtype: 'gosFormTextfield',
             fieldLabel: 'Name',
             name: 'name'
