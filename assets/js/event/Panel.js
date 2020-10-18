@@ -1,7 +1,6 @@
 Ext.define('GibsonOS.module.core.event.Panel', {
     extend: 'GibsonOS.core.component.Panel',
     alias: ['widget.gosModuleCoreEventPanel'],
-    itemId: 'coreEventPanel',
     layout: 'border',
     initComponent: function () {
         let me = this;
@@ -75,13 +74,10 @@ Ext.define('GibsonOS.module.core.event.Panel', {
 
         me.setLoading(true);
 
-        GibsonOS.Ajax.request({
+        form.submit({
+            xtype: 'gosFormActionAction',
             url: baseDir + 'core/event/save',
             params: {
-                eventId: form.findField('id').getValue(),
-                name: form.findField('name').getValue(),
-                async: form.findField('async').getValue(),
-                active: form.findField('active').getValue(),
                 elements: Ext.encode(elements),
                 triggers: Ext.encode(triggers)
             },

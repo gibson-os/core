@@ -14,7 +14,6 @@ Ext.define('GibsonOS.module.core.event.element.parameter.Window', {
 
         me.items = [{
             xtype: 'gosModuleCoreEventElementParameterForm',
-            gos: me.gos
         }];
 
         me.callParent();
@@ -23,6 +22,38 @@ Ext.define('GibsonOS.module.core.event.element.parameter.Window', {
             me.close();
         }, this, {
             priority: -999
+        });
+    },
+    addFieldsByParameters: function(parameters) {
+        let me = this;
+        let form = me.down('gosModuleCoreEventElementParameterForm');
+
+        Ext.iterate(parameters, function(name, parameter) {
+            let item = {
+                name: name,
+                fieldLabel: parameter.title,
+                value: parameter.value ?? null,
+                parameterObject: parameter
+            };
+
+            switch (parameter.type) {
+                case 'string':
+                    item.xtype = 'gosFormTextfield';
+                    break;
+                case 'int':
+                    item.xtype = 'gosFormNumberfield';
+                    break;
+                case 'bool':
+                    item.xtype = 'gosFormCheckbox';
+                    break;
+                case 'autoComplete':
+                    item.xtype = 'gosModuleCoreEventElementParameterTypeAutoComplete';
+                    break;
+                case 'option':
+                    break;
+            }
+
+            form.add(item);
         });
     }
 });

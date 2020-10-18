@@ -112,9 +112,8 @@ Ext.define('GibsonOS.module.core.event.element.TreeGrid', {
 
         me.plugins[0].startEdit(newNode, 2);
     },
-    deleteFunction: function() {
+    deleteFunction: function(node) {
         let me = this;
-        let node = me.getSelectionModel().getSelection();
 
         if (node.length) {
             node.remove();
@@ -274,11 +273,9 @@ Ext.define('GibsonOS.module.core.event.element.TreeGrid', {
                         checkbox.setValue(true);
                         checkbox.resumeEvents();
 
-                        new GibsonOS.module.core.event.element.parameter.Window({
-                            gos: {
-                                data: record.get('parameters')
-                            }
-                        });
+                        new GibsonOS.module.core.event.element.parameter.Window()
+                            .addFieldsByParameters(record.get('parameters'))
+                        ;
                     }
                 }
             }
@@ -345,11 +342,9 @@ Ext.define('GibsonOS.module.core.event.element.TreeGrid', {
                         checkbox.setValue(true);
                         checkbox.resumeEvents();
 
-                        new GibsonOS.module.core.event.element.parameter.Window({
-                            gos: {
-                                data: record.get('returns')
-                            }
-                        });
+                        new GibsonOS.module.core.event.element.parameter.Window()
+                            .addFieldsByParameters(record.get('returns'))
+                        ;
                     }
                 }
             }

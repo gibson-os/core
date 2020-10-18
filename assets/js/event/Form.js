@@ -31,6 +31,6 @@ Ext.define('GibsonOS.module.core.event.Form', {
             boxLabel: 'Aktiv'
         }];
 
-        this.callParent();
+        me.callParent();
     }
 });

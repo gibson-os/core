@@ -1,14 +1,19 @@
 Ext.define('GibsonOS.module.core.cronjob.time.Grid', {
-    extend: 'GibsonOS.grid.Panel',
+    extend: 'GibsonOS.core.component.grid.Panel',
     alias: ['widget.gosModuleCoreCronjobTimeGrid'],
     itemId: 'coreCronjobGrid',
     initComponent: function() {
-        var me = this;
+        let me = this;
 
-        me.store = new GibsonOS.module.core.cronjob.store.Time({
-            gos: me.gos
-        });
-        me.columns = [{
+        me.store = new GibsonOS.module.core.cronjob.store.Time();
+
+        me.callParent();
+    },
+    addFunction: function() {
+
+    },
+    getColumns: function() {
+        return [{
             header: 'Stunden',
             dataIndex: 'hour',
             flex: 1,
@@ -44,13 +49,5 @@ Ext.define('GibsonOS.module.core.cronjob.time.Grid', {
             flex: 1,
             sortable: false
         }];
-        me.tbar = [{
-            iconCls: 'icon_system system_add',
-            handler: function() {
-
-            }
-        }];
-
-        me.callParent();
     }
 });

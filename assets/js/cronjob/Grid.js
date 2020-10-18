@@ -1,12 +1,27 @@
 Ext.define('GibsonOS.module.core.cronjob.Grid', {
-    extend: 'GibsonOS.grid.Panel',
+    extend: 'GibsonOS.core.component.grid.Panel',
     alias: ['widget.gosModuleCoreCronjobGrid'],
     itemId: 'coreCronjobGrid',
     initComponent: function() {
-        var me = this;
+        let me = this;
 
         me.store = new GibsonOS.module.core.cronjob.store.Cronjob();
-        me.columns = [{
+
+        me.callParent();
+    },
+    addFunction: function() {
+        new GibsonOS.module.core.cronjob.form.Window();
+    },
+    enterFunction: function(record) {
+        let window = new GibsonOS.module.core.cronjob.form.Window();
+        window.down('gosModuleCoreCronjobForm').loadRecord(record);
+
+        let timeStore = window.down('gosModuleCoreCronjobTimeGrid').getStore();
+        timeStore.getProxy().setExtraParam('cronjobId', cronjob.id);
+        timeStore.load();
+    },
+    getColumns: function() {
+        return [{
             header: 'Kommando',
             dataIndex: 'command',
             flex: 1
@@ -33,23 +48,5 @@ Ext.define('GibsonOS.module.core.cronjob.Grid', {
             dataIndex: 'active',
             width: 50
         }];
-        me.tbar = [{
-            iconCls: 'icon_system system_add',
-            handler: function() {
-                new GibsonOS.module.core.cronjob.form.Window().show();
-            }
-        }];
-
-        me.callParent();
-
-        me.on('itemdblclick', function(grid, record) {
-            new GibsonOS.module.core.cronjob.form.Window({
-                gos: {
-                    data: {
-                        cronjob: record.getData()
-                    }
-                }
-            }).show();
-        });
     }
 });

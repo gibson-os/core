@@ -6,40 +6,31 @@ Ext.define('GibsonOS.module.core.crontab.form.Form', {
         task: 'crontab',
         action: 'save'
     },
+    defaults: {
+        border: false,
+        xtype: 'panel',
+        flex: 1,
+        layout: 'anchor'
+    },
+    border: false,
+    layout: 'hbox',
     initComponent: function() {
         let me = this;
 
         me.items = [{
+            xtype: 'gosFormHidden',
+            name: 'id'
+        },{
             xtype: 'gosFormTextfield',
             name: 'command',
             fieldLabel: 'Kommando'
         },{
             xtype: 'gosFormTextfield',
             name: 'user',
-            fieldLabel: 'Benutzer'
-        }];
-        me.buttons = [{
-            xtype: 'gosButton',
-            requiredPermission: {
-                permission: GibsonOS.Permission.WRITE
-            },
-            text: 'Speichern',
-            handler: function() {
-                this.up('form').getForm().submit({
-                    xtype: 'gosFormActionAction',
-                    params: {
-                        id: form.gos.data.cronjob ? form.gos.data.cronjob.id : 0
-                    },
-                    url: baseDir + 'core/cronjob/save',
-                    success: function(formAction, action) {
-                        if (form.gos.data.success) {
-                            form.gos.data.success(form, action);
-                        }
-                    }
-                });
-            }
+            fieldLabel: 'Benutzer',
+            margins: '0 0 0 5px',
         }];
 
-        this.callParent();
+        me.callParent();
     }
 });

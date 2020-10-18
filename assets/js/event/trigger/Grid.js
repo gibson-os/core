@@ -64,9 +64,9 @@ Ext.define('GibsonOS.module.core.event.trigger.Grid', {
         let me = this;
         me.plugins[0].startEdit(me.getStore().add({})[0], 1);
     },
-    deleteFunction: function() {
+    deleteFunction: function(records) {
         let me = this;
-        me.getStore().remove(me.getSelectionModel().getSelection());
+        me.getStore().remove(records);
     },
     getColumns: function() {
         let me = this;
@@ -180,11 +180,9 @@ Ext.define('GibsonOS.module.core.event.trigger.Grid', {
                         checkbox.setValue(true);
                         checkbox.resumeEvents();
 
-                        new GibsonOS.module.core.event.element.parameter.Window({
-                            gos: {
-                                data: record.get('parameters')
-                            }
-                        });
+                        new GibsonOS.module.core.event.element.parameter.Window()
+                            .addFieldsByParameters(record.get('parameters'))
+                        ;
                     }
                 }
             }
