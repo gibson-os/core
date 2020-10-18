@@ -4,19 +4,20 @@ Ext.define('GibsonOS.module.core.event.element.parameter.type.AutoComplete', {
     model: 'GibsonOS.module.core.event.model.Slave',
     initComponent: function () {
         let me = this;
+        let config = me.parameterObject.config;
 
-        me.url = baseDir + me.gos.data.url;
-        me.model = me.gos.data.model;
-        me.params = me.gos.data.parameters;
+        me.url = baseDir + config.url;
+        me.model = config.model;
+        me.params = config.parameters;
 
         me.callParent();
 
         me.on('afterrender', function() {
-            if (!me.gos.data.listeners) {
+            if (!config.listeners) {
                 return;
             }
 
-            Ext.iterate(me.gos.data.listeners, function(fieldName, options) {
+            Ext.iterate(config.listeners, function(fieldName, options) {
                 me.up('form').getForm().findField(fieldName).on('change', function(field, value) {
                     let record = field.findRecordByValue(value);
 
