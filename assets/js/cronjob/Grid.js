@@ -10,10 +10,10 @@ Ext.define('GibsonOS.module.core.cronjob.Grid', {
         me.callParent();
     },
     addFunction: function() {
-        new GibsonOS.module.core.cronjob.form.Window();
+        new GibsonOS.module.core.cronjob.Window();
     },
     enterFunction: function(record) {
-        let window = new GibsonOS.module.core.cronjob.form.Window();
+        let window = new GibsonOS.module.core.cronjob.Window();
         window.down('gosModuleCoreCronjobForm').loadRecord(record);
 
         let timeStore = window.down('gosModuleCoreCronjobTimeGrid').getStore();

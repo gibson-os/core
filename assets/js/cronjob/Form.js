@@ -1,4 +1,4 @@
-Ext.define('GibsonOS.module.core.crontab.form.Form', {
+Ext.define('GibsonOS.module.core.crontab.Form', {
     extend: 'GibsonOS.form.Panel',
     alias: ['widget.gosModuleCoreCronjobForm'],
     requiredPermission: {

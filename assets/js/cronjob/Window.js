@@ -1,6 +1,6 @@
-Ext.define('GibsonOS.module.core.cronjob.form.Window', {
+Ext.define('GibsonOS.module.core.cronjob.Window', {
     extend: 'GibsonOS.Window',
-    alias: ['widget.gosModuleCoreCronjobFormWindow'],
+    alias: ['widget.gosModuleCoreCronjobWindow'],
     title: 'Cronjob',
     width: 600,
     height: 400,
