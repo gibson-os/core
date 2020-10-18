@@ -112,7 +112,7 @@ abstract class AbstractModel implements ModelInterface
                         break;
                     case self::TYPE_DATE_TIME:
                         $this->{'set' . $fieldName}($this->dateTime->get(
-                            $fieldObject->getValue() === 'CURRENT_TIMESTAMP' ? 'now' : (string) $fieldObject->getValue()
+                            strtoupper((string) $fieldObject->getValue()) === 'CURRENT_TIMESTAMP()' ? 'now' : (string) $fieldObject->getValue()
                         ));
 
                         break;
