@@ -24,11 +24,13 @@ Ext.define('GibsonOS.module.core.event.Form', {
             xtype: 'gosFormCheckbox',
             name: 'async',
             margins: '0 5px',
-            boxLabel: 'Asynchron'
+            boxLabel: 'Asynchron',
+            uncheckedValue: false
         },{
             xtype: 'gosFormCheckbox',
             name: 'active',
-            boxLabel: 'Aktiv'
+            boxLabel: 'Aktiv',
+            uncheckedValue: false
         }];
 
         me.callParent();
