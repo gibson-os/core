@@ -42,7 +42,8 @@ class EventServiceTest extends Unit
         $this->eventService = new EventService(
             $this->serviceManagerService,
             $this->eventServiceRepository->reveal(),
-            $this->serviceManagerService->get(CodeGeneratorService::class)
+            $this->serviceManagerService->get(CodeGeneratorService::class),
+            $this->serviceManagerService->get(CommandService::class)
         );
     }
 
