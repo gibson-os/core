@@ -9,19 +9,9 @@ Ext.define('GibsonOS.module.core.event.Grid', {
 
         me.callParent();
 
-        me.addAction({
-            xtype: 'tbseparator',
-            addToContainerContextMenu: false,
-        });
-        me.addAction({
-            iconCls: 'icon_system system_play',
-            text: 'Ausführen',
-            selectionNeeded: true,
-        });
+        GibsonOS.event.action.Execute.init(me);
     },
     addFunction: function() {
-        let me = this;
-
         new GibsonOS.module.core.event.Window();
     },
     enterFunction: function(record) {

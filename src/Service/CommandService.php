@@ -28,7 +28,7 @@ class CommandService
     /**
      * @throws FactoryError
      */
-    public function execute(string $commandClassname, array $arguments, array $options): int
+    public function execute(string $commandClassname, array $arguments = [], array $options = []): int
     {
         /** @var CommandInterface $command */
         $command = $this->serviceManager->get($commandClassname);
@@ -40,7 +40,7 @@ class CommandService
         return $command->execute();
     }
 
-    public function executeAsync(string $commandClassname, array $arguments, array $options): void
+    public function executeAsync(string $commandClassname, array $arguments = [], array $options = []): void
     {
         $commandName = mb_substr(str_replace('Command\\', '', $commandClassname), 0, -7);
         $commandName = preg_replace('/^GibsonOS\\\\(Module\\\\)?/', '', $commandName);
@@ -54,10 +54,10 @@ class CommandService
         ) . DIRECTORY_SEPARATOR . 'bin' . DIRECTORY_SEPARATOR . 'command';
 
         $this->processService->executeAsync(
-            $commandPath . ' ' . escapeshellarg($commandName) .
-            implode(' ', array_map(function ($item) {
-                return escapeshellarg('--' . $item);
-            }, $arguments)) . ' ' .
+            $commandPath . ' ' . escapeshellarg($commandName) . ' ' .
+            implode(' ', array_map(function ($item, $key) {
+                return escapeshellarg('--' . $key . '=' . $item);
+            }, $arguments, array_keys($arguments))) . ' ' .
             implode(' ', array_map(function ($item) {
                 return escapeshellarg('-' . $item);
             }, $options))

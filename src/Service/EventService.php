@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Service;
 
 use DateTime;
+use GibsonOS\Core\Command\Event\RunCommand;
 use GibsonOS\Core\Event\AbstractEvent;
 use GibsonOS\Core\Event\Describer\DescriberInterface;
 use GibsonOS\Core\Exception\DateTimeError;
@@ -35,14 +36,21 @@ class EventService extends AbstractService
      */
     private $codeGeneratorService;
 
+    /**
+     * @var CommandService
+     */
+    private $commandService;
+
     public function __construct(
         ServiceManagerService $serviceManagerService,
         EventRepository $eventRepository,
-        CodeGeneratorService $codeGeneratorService
+        CodeGeneratorService $codeGeneratorService,
+        CommandService $commandService
     ) {
         $this->serviceManagerService = $serviceManagerService;
         $this->eventRepository = $eventRepository;
         $this->codeGeneratorService = $codeGeneratorService;
+        $this->commandService = $commandService;
     }
 
     /**
@@ -70,11 +78,25 @@ class EventService extends AbstractService
 
         foreach ($events as $event) {
             if ($event instanceof Event) {
-                eval($this->codeGeneratorService->generateByElements($event->getElements()));
+                $this->runEvent($event, $event->isAsync());
             } else {
                 $event($parameters);
             }
         }
+    }
+
+    /**
+     * @throws DateTimeError
+     */
+    public function runEvent(Event $event, bool $async): void
+    {
+        if ($async) {
+            $this->commandService->executeAsync(RunCommand::class, ['eventId' => $event->getId()], []);
+
+            return;
+        }
+
+        eval($this->codeGeneratorService->generateByElements($event->getElements()));
     }
 
     /**

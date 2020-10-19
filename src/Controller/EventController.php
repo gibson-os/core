@@ -12,6 +12,7 @@ use GibsonOS\Core\Exception\PermissionDenied;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\Event;
 use GibsonOS\Core\Repository\EventRepository;
+use GibsonOS\Core\Service\EventService;
 use GibsonOS\Core\Service\PermissionService;
 use GibsonOS\Core\Service\Response\AjaxResponse;
 use GibsonOS\Core\Service\Response\ResponseInterface;
@@ -158,5 +159,12 @@ class EventController extends AbstractController
         $eventRepository->commit();
 
         return $this->returnSuccess(['id' => $event->getId()]);
+    }
+
+    public function run(EventService $eventService, EventRepository $eventRepository, int $eventId): AjaxResponse
+    {
+        $eventService->runEvent($eventRepository->getById($eventId), true);
+
+        return $this->returnSuccess();
     }
 }

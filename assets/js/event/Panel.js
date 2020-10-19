@@ -30,6 +30,8 @@ Ext.define('GibsonOS.module.core.event.Panel', {
         };
 
         me.callParent();
+
+        GibsonOS.event.action.Execute.init(me);
     },
     addFunction: function() {
         let me = this;
