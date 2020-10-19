@@ -7,7 +7,10 @@ use GibsonOS\Core\Model\ModelInterface;
 
 interface AutoCompleteInterface
 {
-    public function getByNamePart(string $namePart, array $parameters): ModelInterface;
+    /**
+     * @return ModelInterface[]
+     */
+    public function getByNamePart(string $namePart, array $parameters): array;
 
     public function getById($id, array $parameters): ModelInterface;
 
