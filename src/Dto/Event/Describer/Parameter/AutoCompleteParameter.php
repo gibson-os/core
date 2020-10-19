@@ -3,50 +3,26 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Dto\Event\Describer\Parameter;
 
+use GibsonOS\Core\Event\AutoComplete\AutoCompleteInterface;
+
 class AutoCompleteParameter extends AbstractParameter
 {
     /**
-     * @var string
+     * @var AutoCompleteInterface
      */
-    private $url;
+    private $autoComplete;
 
-    /**
-     * @var string
-     */
-    private $model;
-
-    /**
-     * @var array
-     */
-    private $parameters = [];
-
-    public function __construct(string $title, string $url, string $model)
+    public function __construct(string $title, AutoCompleteInterface $autoComplete)
     {
         parent::__construct($title, 'autoComplete');
-        $this->url = $url;
-        $this->model = $model;
-    }
-
-    public function setParameters(array $parameters): AutoCompleteParameter
-    {
-        $this->parameters = $parameters;
-
-        return $this;
-    }
-
-    public function setParameter(string $key, $value): AutoCompleteParameter
-    {
-        $this->parameters[$key] = $value;
-
-        return $this;
+        $this->autoComplete = $autoComplete;
     }
 
     protected function getTypeConfig(): array
     {
         return [
-            'url' => $this->url,
-            'model' => $this->model,
-            'parameters' => $this->parameters,
+            'model' => $this->autoComplete->getModel(),
+            'parameters' => $this->autoComplete->getParameters(),
         ];
     }
 }
