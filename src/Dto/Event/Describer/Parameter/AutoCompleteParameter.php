@@ -18,6 +18,11 @@ class AutoCompleteParameter extends AbstractParameter
         $this->autoComplete = $autoComplete;
     }
 
+    public function getAutoComplete(): AutoCompleteInterface
+    {
+        return $this->autoComplete;
+    }
+
     protected function getTypeConfig(): array
     {
         return [
