@@ -104,6 +104,11 @@ class RequestService
         return $headers[$key];
     }
 
+    public function getRequestValues(): array
+    {
+        return $this->requestValues;
+    }
+
     /**
      * @throws RequestError
      *

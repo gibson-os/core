@@ -5,6 +5,7 @@ namespace GibsonOS\Core\Controller;
 
 use DateTime;
 use Exception;
+use GibsonOS\Core\Event\AutoComplete\AutoCompleteInterface;
 use GibsonOS\Core\Exception\DateTimeError;
 use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\LoginRequired;
@@ -14,8 +15,10 @@ use GibsonOS\Core\Model\Event;
 use GibsonOS\Core\Repository\EventRepository;
 use GibsonOS\Core\Service\EventService;
 use GibsonOS\Core\Service\PermissionService;
+use GibsonOS\Core\Service\RequestService;
 use GibsonOS\Core\Service\Response\AjaxResponse;
 use GibsonOS\Core\Service\Response\ResponseInterface;
+use GibsonOS\Core\Service\ServiceManagerService;
 use GibsonOS\Core\Store\Event\ClassNameStore;
 use GibsonOS\Core\Store\Event\ClassTriggerStore;
 use GibsonOS\Core\Store\Event\ElementStore;
@@ -161,10 +164,42 @@ class EventController extends AbstractController
         return $this->returnSuccess(['id' => $event->getId()]);
     }
 
+    /**
+     * @throws DateTimeError
+     * @throws LoginRequired
+     * @throws PermissionDenied
+     * @throws SelectError
+     */
     public function run(EventService $eventService, EventRepository $eventRepository, int $eventId): AjaxResponse
     {
+        $this->checkPermission(PermissionService::WRITE);
+
         $eventService->runEvent($eventRepository->getById($eventId), true);
 
         return $this->returnSuccess();
+    }
+
+    /**
+     * @throws LoginRequired
+     * @throws PermissionDenied
+     */
+    public function autoComplete(
+        ServiceManagerService $serviceManagerService,
+        RequestService $requestService,
+        string $autoCompleteClassname,
+        int $id = null,
+        string $name = null
+    ): AjaxResponse {
+        $this->checkPermission(PermissionService::READ);
+
+        /** @var AutoCompleteInterface $autoComplete */
+        $autoComplete = $serviceManagerService->get($autoCompleteClassname);
+        $parameters = $requestService->getRequestValues();
+
+        if ($id !== null) {
+            return $this->returnSuccess($autoComplete->getById($id, $parameters));
+        }
+
+        return $this->returnSuccess($autoComplete->getByNamePart($name ?? '', $parameters));
     }
 }

@@ -50,6 +50,7 @@ class AutoCompleteParameter extends AbstractParameter
     protected function getTypeConfig(): array
     {
         return [
+            'autoCompleteClassname' => get_class($this->autoComplete),
             'model' => $this->autoComplete->getModel(),
             'parameters' => $this->getParameters(),
         ];

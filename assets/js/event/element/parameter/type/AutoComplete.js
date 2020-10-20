@@ -1,14 +1,14 @@
 Ext.define('GibsonOS.module.core.event.element.parameter.type.AutoComplete', {
     extend: 'GibsonOS.form.AutoComplete',
     alias: ['widget.gosModuleCoreEventElementParameterTypeAutoComplete'],
-    model: 'GibsonOS.module.core.event.model.Slave',
     initComponent: function () {
         let me = this;
         let config = me.parameterObject.config;
 
-        me.url = baseDir + config.url;
+        me.url = baseDir + 'core/event/autoComplete';
         me.model = config.model;
         me.params = config.parameters;
+        me.params.autoCompleteClassname = config.autoCompleteClassname;
 
         me.callParent();
 
