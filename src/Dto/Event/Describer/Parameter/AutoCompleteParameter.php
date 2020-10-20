@@ -12,6 +12,11 @@ class AutoCompleteParameter extends AbstractParameter
      */
     private $autoComplete;
 
+    /**
+     * @var array
+     */
+    private $parameters = [];
+
     public function __construct(string $title, AutoCompleteInterface $autoComplete)
     {
         parent::__construct($title, 'autoComplete');
@@ -23,11 +28,30 @@ class AutoCompleteParameter extends AbstractParameter
         return $this->autoComplete;
     }
 
+    public function setParameters(array $parameters): AutoCompleteParameter
+    {
+        $this->parameters = $parameters;
+
+        return $this;
+    }
+
+    public function setParameter(string $key, $value): AutoCompleteParameter
+    {
+        $this->parameters[$key] = $value;
+
+        return $this;
+    }
+
+    public function getParameters(): array
+    {
+        return $this->parameters;
+    }
+
     protected function getTypeConfig(): array
     {
         return [
             'model' => $this->autoComplete->getModel(),
-            'parameters' => $this->autoComplete->getParameters(),
+            'parameters' => $this->getParameters(),
         ];
     }
 }
