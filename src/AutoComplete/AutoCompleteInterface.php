@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace GibsonOS\Core\Event\AutoComplete;
+namespace GibsonOS\Core\AutoComplete;
 
 use GibsonOS\Core\Model\ModelInterface;
 

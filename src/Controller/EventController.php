@@ -5,7 +5,7 @@ namespace GibsonOS\Core\Controller;
 
 use DateTime;
 use Exception;
-use GibsonOS\Core\Event\AutoComplete\AutoCompleteInterface;
+use GibsonOS\Core\AutoComplete\AutoCompleteInterface;
 use GibsonOS\Core\Exception\DateTimeError;
 use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\LoginRequired;

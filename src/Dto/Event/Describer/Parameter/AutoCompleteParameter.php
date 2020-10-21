@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Dto\Event\Describer\Parameter;
 
-use GibsonOS\Core\Event\AutoComplete\AutoCompleteInterface;
+use GibsonOS\Core\AutoComplete\AutoCompleteInterface;
 
 class AutoCompleteParameter extends AbstractParameter
 {
