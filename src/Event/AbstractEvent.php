@@ -5,6 +5,7 @@ namespace GibsonOS\Core\Event;
 
 use GibsonOS\Core\Event\Describer\DescriberInterface;
 use GibsonOS\Core\Model\Event\Element;
+use GibsonOS\Core\Service\ServiceManagerService;
 use GibsonOS\Core\Utility\JsonUtility;
 
 abstract class AbstractEvent
@@ -15,11 +16,17 @@ abstract class AbstractEvent
     private $describer;
 
     /**
+     * @var ServiceManagerService
+     */
+    private $serviceManagerService;
+
+    /**
      * AbstractEvent constructor.
      */
-    public function __construct(DescriberInterface $describer)
+    public function __construct(DescriberInterface $describer, ServiceManagerService $serviceManagerService)
     {
         $this->describer = $describer;
+        $this->serviceManagerService = $serviceManagerService;
     }
 
     public function run(Element $element)
