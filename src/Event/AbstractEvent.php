@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Event;
 
+use GibsonOS\Core\Dto\Event\Describer\Parameter\AutoCompleteParameter;
 use GibsonOS\Core\Event\Describer\DescriberInterface;
 use GibsonOS\Core\Model\Event\Element;
 use GibsonOS\Core\Service\ServiceManagerService;
@@ -42,8 +43,21 @@ abstract class AbstractEvent
 
     protected function getParameters(Element $element): array
     {
-        $parameters = $element->getParameters();
+        $parameters = $element->getParameters() ?? '[]';
+        /** @var DescriberInterface $describer */
+        $describer = $this->serviceManagerService->get($element->getClass());
+        $methods = $describer->getMethods();
+        $methodParameters = $methods[$element->getMethod()]->getParameters();
+        $parameters = JsonUtility::decode($parameters);
 
-        return empty($parameters) ? [] : array_values(JsonUtility::decode($parameters));
+        foreach ($methodParameters as $parameterName => $methodParameter) {
+            if (!$methodParameter instanceof AutoCompleteParameter) {
+                continue;
+            }
+
+            $parameters[$parameterName] = $methodParameter->getAutoComplete()->getById($parameters[$parameterName], []);
+        }
+
+        return empty($parameters) ? [] : array_values($parameters);
     }
 }
