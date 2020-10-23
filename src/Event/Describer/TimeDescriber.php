@@ -28,8 +28,8 @@ class TimeDescriber implements DescriberInterface
     {
         return [
             self::TRIGGER_CRONJOB => (new Trigger('Zeitgesteuert')),
-            self::TRIGGER_SUNSET => (new Trigger('Sonnenaufgang')),
-            self::TRIGGER_SUNRISE => (new Trigger('Sonnenuntergang')),
+            self::TRIGGER_SUNRISE => (new Trigger('Sonnenaufgang')),
+            self::TRIGGER_SUNSET => (new Trigger('Sonnenuntergang')),
         ];
     }
 
