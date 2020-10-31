@@ -54,7 +54,7 @@ class Video implements JsonSerializable
         return $this;
     }
 
-    public function getCodec(): ?String
+    public function getCodec(): ?string
     {
         return $this->codec;
     }

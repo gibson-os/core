@@ -3,6 +3,8 @@ Ext.define('GibsonOS.core.component.view.View', {
     alias: ['widget.gosCoreComponentViewView'],
     border: false,
     flex: 1,
+    frame: false,
+    plain: true,
     enablePagingBar: true,
     enableToolbar: true,
     enableKeyEvents: true,
