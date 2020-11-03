@@ -22,11 +22,6 @@ class ModuleSettingService extends AbstractService
     private $moduleSettings = [];
 
     /**
-     * @var RegistryService
-     */
-    private $registry;
-
-    /**
      * @var ModuleRepository
      */
     private $moduleRepository;
@@ -37,16 +32,28 @@ class ModuleSettingService extends AbstractService
     private $settingRepository;
 
     /**
+     * @var RequestService
+     */
+    private $requestService;
+
+    /**
+     * @var SessionService
+     */
+    private $sessionService;
+
+    /**
      * ModuleSettingService constructor.
      */
     public function __construct(
-        RegistryService $registry,
         ModuleRepository $moduleRepository,
-        SettingRepository $settingRepository
+        SettingRepository $settingRepository,
+        RequestService $requestService,
+        SessionService $sessionService
     ) {
-        $this->registry = $registry;
         $this->moduleRepository = $moduleRepository;
         $this->settingRepository = $settingRepository;
+        $this->requestService = $requestService;
+        $this->sessionService = $sessionService;
     }
 
     /**
@@ -138,12 +145,9 @@ class ModuleSettingService extends AbstractService
         $settingModel->save();
     }
 
-    /**
-     * @throws GetError
-     */
     private function getModuleNameByRegistry(): string
     {
-        return (string) $this->registry->get('module');
+        return $this->requestService->getModuleName();
     }
 
     /**
@@ -169,10 +173,10 @@ class ModuleSettingService extends AbstractService
     {
         // User ID holen
         if ($userId === null) {
-            if ($this->registry->exists('session')) {
-                $userId = $this->registry->get('session')->getValueInt('user_id', 0, false);
-            } else {
-                $userId = 0;
+            $userId = 0;
+
+            if ($this->sessionService->isLogin()) {
+                $userId = $this->sessionService->getUserId() ?? 0;
             }
         }
 
