@@ -5,6 +5,7 @@ GibsonOS.define('GibsonOS.decorator.ActionManager', {
             enableKeyEvents: false,
             enableClickEvents: false,
             enableContextMenu: false,
+            viewItem: component,
             itemContextMenu: [],
             containerContextMenu: [],
             actions: [],
@@ -22,7 +23,7 @@ GibsonOS.define('GibsonOS.decorator.ActionManager', {
                 addToContainerContextMenu: !button.selectionNeeded,
                 addToItemContextMenu: true,
                 selectionNeeded: false,
-                disabled: button.selectionNeeded,
+                disabled: button.selectionNeeded ?? false,
                 enableSingleClick: false,
                 enableDoubleClick: false,
                 tbarText: null,
@@ -70,22 +71,22 @@ GibsonOS.define('GibsonOS.decorator.ActionManager', {
         if (component.enableContextMenu) {
             itemContextMenu = new GibsonOS.contextMenu.ContextMenu({
                 items: component.itemContextMenu,
-                parent: component
+                parent: component.viewItem
             });
-            component.itemContextMenu = itemContextMenu;
+            component.viewItem.itemContextMenu = itemContextMenu;
 
             containerContextMenu = new GibsonOS.contextMenu.ContextMenu({
                 items: component.containerContextMenu,
-                parent: component
+                parent: component.viewItem
             });
-            component.containerContextMenu = containerContextMenu;
+            component.viewItem.containerContextMenu = containerContextMenu;
         }
 
         return component;
     },
     addListeners: (component) => {
-        if (typeof(component.getSelectionModel) === 'function') {
-            component.getSelectionModel().on('selectionchange', function(selection, records) {
+        if (typeof(component.viewItem.getSelectionModel) === 'function') {
+            component.viewItem.getSelectionModel().on('selectionchange', function(selection, records) {
                 let selectionChangeFunction = (item) => {
                     if (item.selectionNeeded) {
                         item.enable(!!records.length);
@@ -97,27 +98,27 @@ GibsonOS.define('GibsonOS.decorator.ActionManager', {
                 }
 
                 if (component.enableContextMenu) {
-                    component.itemContextMenu.items.each(selectionChangeFunction);
-                    component.containerContextMenu.items.each(selectionChangeFunction);
+                    component.viewItem.itemContextMenu.items.each(selectionChangeFunction);
+                    component.viewItem.containerContextMenu.items.each(selectionChangeFunction);
                 }
             });
         }
 
         if (component.enableContextMenu) {
-            component.on('itemcontextmenu', (grid, record, item, index, event) => {
-                component.itemContextMenu.record = record;
+            component.viewItem.on('itemcontextmenu', (grid, record, item, index, event) => {
+                component.viewItem.itemContextMenu.record = record;
                 event.stopEvent();
-                component.itemContextMenu.showAt(event.getXY());
+                component.viewItem.itemContextMenu.showAt(event.getXY());
             });
 
-            component.on('containercontextmenu', (grid, event) => {
+            component.viewItem.on('containercontextmenu', (grid, event) => {
                 event.stopEvent();
-                component.containerContextMenu.showAt(event.getXY());
+                component.viewItem.containerContextMenu.showAt(event.getXY());
             });
         }
 
         if (component.enableKeyEvents) {
-            component.on('cellkeydown', (table, td, cellIndex, record, tr, rowIndex, event) => {
+            component.viewItem.on('cellkeydown', (table, td, cellIndex, record, tr, rowIndex, event) => {
                 let button = component.actionKeyEvents[event.getKey()];
 
                 if (!button) {
@@ -130,13 +131,13 @@ GibsonOS.define('GibsonOS.decorator.ActionManager', {
 
         if (component.enableClickEvents) {
             if (component.singleClickAction) {
-                component.on('itemclick', () => {
+                component.viewItem.on('itemclick', () => {
                     component.singleClickAction.fireEvent('click', [component.singleClickAction]);
                 });
             }
 
             if (component.doubleClickAction) {
-                component.on('itemdblclick', () => {
+                component.viewItem.on('itemdblclick', () => {
                     component.doubleClickAction.fireEvent('click', [component.doubleClickAction]);
                 });
             }
