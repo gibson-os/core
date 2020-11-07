@@ -20,7 +20,7 @@ Ext.define('GibsonOS.core.component.form.Panel', {
 
         GibsonOS.decorator.Panel.addListeners(me);
 
-        me.getForm().on('actioncomplete', function(form, action, options) {
+        me.getForm().on('actioncomplete', function(form, action) {
             let responseText = Ext.decode(action.response.responseText);
             GibsonOS.checkResponseForLogin(responseText);
             GibsonOS.checkResponseForErrorMessage(responseText, action);
@@ -31,7 +31,7 @@ Ext.define('GibsonOS.core.component.form.Panel', {
         }, this, {
             priority: 999
         });
-        me.getForm().on('actionfailed', function(form, action, options) {
+        me.getForm().on('actionfailed', function(form, action) {
             let responseText = Ext.decode(action.response.responseText);
             GibsonOS.checkResponseForLogin(responseText);
             GibsonOS.checkResponseForErrorMessage(responseText, action);
