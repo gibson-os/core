@@ -118,15 +118,21 @@ GibsonOS.define('GibsonOS.decorator.ActionManager', {
         }
 
         if (component.enableKeyEvents) {
-            component.viewItem.on('cellkeydown', (table, td, cellIndex, record, tr, rowIndex, event) => {
+            const keyEvent = (event, itemEvent) => {
                 let button = component.actionKeyEvents[event.getKey()];
 
-                if (!button) {
+                if (
+                    !button ||
+                    (button.selectionNeeded && !itemEvent)
+                ) {
                     return;
                 }
 
                 button.fireEvent('click', [button]);
-            });
+            };
+
+            component.viewItem.on('containerkeydown', (view, event) => keyEvent(event, false));
+            component.viewItem.on('itemkeydown', (view, record, item, index, event) => keyEvent(event, true));
         }
 
         if (component.enableClickEvents) {
