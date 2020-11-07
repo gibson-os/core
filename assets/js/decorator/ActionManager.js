@@ -89,7 +89,7 @@ GibsonOS.define('GibsonOS.decorator.ActionManager', {
             component.viewItem.getSelectionModel().on('selectionchange', function(selection, records) {
                 let selectionChangeFunction = (item) => {
                     if (item.selectionNeeded) {
-                        item.enable(!!records.length);
+                        item.setDisabled(!records.length);
                     }
                 };
 

@@ -10,7 +10,8 @@ GibsonOS.define('GibsonOS.decorator.action.Delete', {
                 selectionNeeded: true,
                 listeners: {
                     click: () => {
-                        component.deleteFunction(component.getSelectionModel().getSelection());
+                        const viewItem = component.viewItem ?? component;
+                        component.deleteFunction(viewItem.getSelectionModel().getSelection());
                     }
                 }
             },
