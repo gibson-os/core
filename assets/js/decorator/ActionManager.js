@@ -106,7 +106,14 @@ GibsonOS.define('GibsonOS.decorator.ActionManager', {
 
         if (component.enableContextMenu) {
             component.viewItem.on('itemcontextmenu', (grid, record, item, index, event) => {
+                let selectionModel = component.viewItem.getSelectionModel();
+
                 component.viewItem.itemContextMenu.record = record;
+
+                if (!selectionModel.isSelected(record)) {
+                    selectionModel.select([record]);
+                }
+
                 event.stopEvent();
                 component.viewItem.itemContextMenu.showAt(event.getXY());
             });
