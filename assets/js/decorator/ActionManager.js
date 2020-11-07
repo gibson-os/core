@@ -125,12 +125,12 @@ GibsonOS.define('GibsonOS.decorator.ActionManager', {
         }
 
         if (component.enableKeyEvents) {
-            const keyEvent = (event, itemEvent) => {
+            const keyEvent = (event) => {
                 let button = component.actionKeyEvents[event.getKey()];
 
                 if (
                     !button ||
-                    (button.selectionNeeded && !itemEvent)
+                    (button.selectionNeeded && component.viewItem.getSelectionModel().getCount() === 0)
                 ) {
                     return;
                 }
@@ -138,8 +138,8 @@ GibsonOS.define('GibsonOS.decorator.ActionManager', {
                 button.fireEvent('click', [button]);
             };
 
-            component.viewItem.on('containerkeydown', (view, event) => keyEvent(event, false));
-            component.viewItem.on('itemkeydown', (view, record, item, index, event) => keyEvent(event, true));
+            component.viewItem.on('containerkeydown', (view, event) => keyEvent(event));
+            component.viewItem.on('itemkeydown', (view, record, item, index, event) => keyEvent(event));
         }
 
         if (component.enableClickEvents) {
