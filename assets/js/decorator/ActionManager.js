@@ -23,6 +23,7 @@ GibsonOS.define('GibsonOS.decorator.ActionManager', {
                 addToContainerContextMenu: !button.selectionNeeded,
                 addToItemContextMenu: true,
                 selectionNeeded: false,
+                minSelectionNeeded: 1,
                 disabled: button.selectionNeeded ?? false,
                 enableSingleClick: false,
                 enableDoubleClick: false,
@@ -89,7 +90,7 @@ GibsonOS.define('GibsonOS.decorator.ActionManager', {
             component.viewItem.getSelectionModel().on('selectionchange', function(selection, records) {
                 let selectionChangeFunction = (item) => {
                     if (item.selectionNeeded) {
-                        item.setDisabled(!records.length);
+                        item.setDisabled(records.length < item.minSelectionNeeded);
                     }
                 };
 
