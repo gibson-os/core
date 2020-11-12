@@ -28,6 +28,11 @@ class RequestService
      */
     private $actionName;
 
+    /**
+     * @var string
+     */
+    private $queryString;
+
     public function __construct()
     {
         $queryString = (string) preg_replace('/\?.*/', '', $_SERVER['REQUEST_URI']);
@@ -36,6 +41,7 @@ class RequestService
         $this->moduleName = (string) (array_shift($queryParams) ?: 'core');
         $this->taskName = (string) (array_shift($queryParams) ?: 'index');
         $this->actionName = (string) (array_shift($queryParams) ?: 'index');
+        $this->queryString = implode('/', $queryParams);
 
         $params = [];
 
@@ -135,5 +141,10 @@ class RequestService
     public function getMethod(): string
     {
         return (string) $_SERVER['REQUEST_METHOD'];
+    }
+
+    public function getQueryString(): string
+    {
+        return $this->queryString;
     }
 }
