@@ -184,7 +184,7 @@ class FileService extends AbstractService
      * @throws CreateError
      * @throws FileExistsError
      */
-    public function save(string $path, string $data, bool $overwrite = false): void
+    public function save(string $path, ?string $data, bool $overwrite = false): void
     {
         if (
             !$overwrite &&
