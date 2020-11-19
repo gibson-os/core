@@ -12,6 +12,25 @@ GibsonOS.define('GibsonOS.decorator.ActionManager', {
             actionKeyEvents: {},
             singleClickAction: null,
             doubleClickAction: null,
+            setDisabledAction: (selector, disabled) => {
+                if (component.down(selector)) {
+                    component.down(selector).setDisabled(disabled);
+                }
+
+                if (component.viewItem.itemContextMenu.down(selector)) {
+                    component.viewItem.itemContextMenu.down(selector).setDisabled(disabled);
+                }
+
+                if (component.viewItem.containerContextMenu.down(selector)) {
+                    component.viewItem.containerContextMenu.down(selector).setDisabled(disabled);
+                }
+            },
+            enableAction: (selector) => {
+                component.setDisabledAction(selector, false);
+            },
+            disableAction: (selector) => {
+                component.setDisabledAction(selector, true);
+            }
         }, component));
         let toolbar = null;
         let containerContextMenu = null;
