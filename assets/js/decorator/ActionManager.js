@@ -12,7 +12,7 @@ GibsonOS.define('GibsonOS.decorator.ActionManager', {
             actionKeyEvents: {},
             singleClickAction: null,
             doubleClickAction: null,
-            setDisabledAction: (selector, disabled) => {
+            setActionDisabled: (selector, disabled) => {
                 if (component.down(selector)) {
                     component.down(selector).setDisabled(disabled);
                 }
@@ -26,10 +26,10 @@ GibsonOS.define('GibsonOS.decorator.ActionManager', {
                 }
             },
             enableAction: (selector) => {
-                component.setDisabledAction(selector, false);
+                component.setActionDisabled(selector, false);
             },
             disableAction: (selector) => {
-                component.setDisabledAction(selector, true);
+                component.setActionDisabled(selector, true);
             }
         }, component));
         let toolbar = null;
