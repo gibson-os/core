@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Service;
 
+use GibsonOS\Core\Dto\UdpMessage;
 use GibsonOS\Core\Exception\CreateError;
 use GibsonOS\Core\Exception\Server\ReceiveError;
 use GibsonOS\Core\Exception\Server\SendError;
@@ -14,26 +15,6 @@ class UdpService extends AbstractService
      * @var resource
      */
     private $socket;
-
-    /**
-     * @var string
-     */
-    private $ip;
-
-    /**
-     * @var int
-     */
-    private $port = 0;
-
-    /**
-     * @var string
-     */
-    private $sendIp;
-
-    /**
-     * @var int
-     */
-    private $sendPort = 0;
 
     /**
      * @throws CreateError
@@ -49,11 +30,6 @@ class UdpService extends AbstractService
 
         $this->socket = $socket;
         $this->setTimeout();
-
-        $this->ip = $ip;
-        $this->sendIp = $ip;
-        $this->port = $port;
-        $this->sendPort = $port;
 
         if (!socket_bind($this->socket, $ip, $port)) {
             throw new CreateError('Socket konnte nicht an ' . $ip . ':' . $port . ' gebunden werden!');
@@ -77,12 +53,18 @@ class UdpService extends AbstractService
     /**
      * @throws SendError
      */
-    public function send(string $msg, string $ip, int $port = 0): void
+    public function send(UdpMessage $message): void
     {
-        $this->sendIp = $ip;
-        $this->sendPort = $port;
+        $sendReturn = socket_sendto(
+            $this->socket,
+            $message->getMessage(),
+            strlen($message->getMessage()),
+            0,
+            $message->getIp(),
+            $message->getPort()
+        );
 
-        if (socket_sendto($this->socket, $msg, strlen($msg), 0, $ip, $port) === -1) {
+        if ($sendReturn === -1) {
             throw new SendError();
         }
     }
@@ -90,21 +72,13 @@ class UdpService extends AbstractService
     /**
      * @throws ReceiveError
      */
-    public function receive(int $length, string $ip = null, int $port = null, int $flags = 0): string
+    public function receive(int $length, int $flags = 0): UdpMessage
     {
-        if ($ip === null) {
-            $ip = $this->sendIp;
-        }
-
-        if ($port === null) {
-            $port = $this->sendPort;
-        }
-
         if (socket_recvfrom($this->socket, $buf, $length, $flags, $ip, $port) === false) {
             throw new ReceiveError();
         }
 
-        return $buf;
+        return new UdpMessage($ip, $port, $buf);
     }
 
     public function close(): void
