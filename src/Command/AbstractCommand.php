@@ -29,6 +29,7 @@ abstract class AbstractCommand implements CommandInterface
         $this->setOption('v');
         $this->setOption('vv');
         $this->setOption('vvv');
+        $this->setOption('debug');
     }
 
     abstract protected function run(): int;
@@ -44,11 +45,13 @@ abstract class AbstractCommand implements CommandInterface
         if ($this->logger instanceof LoggerService) {
             $this->logger
                 ->setLevel(
-                    $this->hasOption('vvv') ? LoggerService::LEVEL_DEBUG :
-                    $this->hasOption('vv') ? LoggerService::LEVEL_INFO :
-                    $this->hasOption('v') ? LoggerService::LEVEL_WARNING : LoggerService::LEVEL_ERROR
+                    $this->hasOption('vvv') ? LoggerService::LEVEL_DEBUG : (
+                        $this->hasOption('vv') ? LoggerService::LEVEL_INFO :
+                        ($this->hasOption('v') ? LoggerService::LEVEL_WARNING : LoggerService::LEVEL_ERROR)
+                    )
                 )
                 ->setWriteOut(true)
+                ->setDebug($this->hasOption('debug'))
             ;
         }
 
