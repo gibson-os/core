@@ -9,6 +9,7 @@ use GibsonOS\Core\Exception\DateTimeError;
 use GibsonOS\Core\Repository\EventRepository;
 use GibsonOS\Core\Service\Event\CodeGeneratorService;
 use GibsonOS\Core\Service\EventService;
+use Psr\Log\LoggerInterface;
 
 class CronjobCommand extends AbstractCommand
 {
@@ -30,11 +31,14 @@ class CronjobCommand extends AbstractCommand
     public function __construct(
         EventRepository $eventRepository,
         CodeGeneratorService $codeGeneratorService,
-        EventService $eventService
+        EventService $eventService,
+        LoggerInterface $logger
     ) {
         $this->eventRepository = $eventRepository;
         $this->codeGeneratorService = $codeGeneratorService;
         $this->eventService = $eventService;
+
+        parent::__construct($logger);
     }
 
     /**

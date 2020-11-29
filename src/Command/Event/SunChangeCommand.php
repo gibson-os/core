@@ -6,6 +6,7 @@ use GibsonOS\Core\Command\AbstractCommand;
 use GibsonOS\Core\Event\Describer\TimeDescriber;
 use GibsonOS\Core\Service\DateTimeService;
 use GibsonOS\Core\Service\EventService;
+use Psr\Log\LoggerInterface;
 
 class SunChangeCommand extends AbstractCommand
 {
@@ -19,10 +20,12 @@ class SunChangeCommand extends AbstractCommand
      */
     private $eventService;
 
-    public function __construct(DateTimeService $dateTimeService, EventService $eventService)
+    public function __construct(DateTimeService $dateTimeService, EventService $eventService, LoggerInterface $logger)
     {
         $this->dateTimeService = $dateTimeService;
         $this->eventService = $eventService;
+
+        parent::__construct($logger);
     }
 
     protected function run(): int

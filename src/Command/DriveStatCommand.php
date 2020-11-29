@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Command;
 
 use GibsonOS\Core\Service\ProcessService;
+use Psr\Log\LoggerInterface;
 
 class DriveStatCommand extends AbstractCommand
 {
@@ -12,9 +13,11 @@ class DriveStatCommand extends AbstractCommand
      */
     private $processService;
 
-    public function __construct(ProcessService $processService)
+    public function __construct(ProcessService $processService, LoggerInterface $logger)
     {
         $this->processService = $processService;
+
+        parent::__construct($logger);
     }
 
     protected function run(): int

@@ -12,6 +12,7 @@ use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Repository\LockRepository;
 use GibsonOS\Core\Service\CronjobService;
 use GibsonOS\Core\Service\LockService;
+use Psr\Log\LoggerInterface;
 
 class RunCommand extends AbstractCommand
 {
@@ -37,11 +38,14 @@ class RunCommand extends AbstractCommand
     public function __construct(
         CronjobService $cronjobService,
         LockService $flockService,
-        LockRepository $lockRepository
+        LockRepository $lockRepository,
+        LoggerInterface $logger
     ) {
         $this->cronjobService = $cronjobService;
         $this->lockService = $flockService;
         $this->lockRepository = $lockRepository;
+
+        parent::__construct($logger);
 
         $this->setArgument('user', true);
     }

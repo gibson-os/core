@@ -9,6 +9,7 @@ use GibsonOS\Core\Exception\DateTimeError;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Repository\EventRepository;
 use GibsonOS\Core\Service\EventService;
+use Psr\Log\LoggerInterface;
 
 class RunCommand extends AbstractCommand
 {
@@ -22,10 +23,12 @@ class RunCommand extends AbstractCommand
      */
     private $eventService;
 
-    public function __construct(EventRepository $eventRepository, EventService $eventService)
+    public function __construct(EventRepository $eventRepository, EventService $eventService, LoggerInterface $logger)
     {
         $this->eventRepository = $eventRepository;
         $this->eventService = $eventService;
+
+        parent::__construct($logger);
 
         $this->setArgument('eventId', true);
     }

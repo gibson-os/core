@@ -4,6 +4,8 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Command;
 
 use GibsonOS\Core\Exception\ArgumentError;
+use GibsonOS\Core\Service\LoggerService;
+use Psr\Log\LoggerInterface;
 
 abstract class AbstractCommand implements CommandInterface
 {
@@ -15,6 +17,20 @@ abstract class AbstractCommand implements CommandInterface
 
     private $options = [];
 
+    /**
+     * @var LoggerInterface
+     */
+    protected $logger;
+
+    public function __construct(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
+
+        $this->setOption('v');
+        $this->setOption('vv');
+        $this->setOption('vv');
+    }
+
     abstract protected function run(): int;
 
     /**
@@ -24,6 +40,17 @@ abstract class AbstractCommand implements CommandInterface
     {
         $this->validateArguments();
         $this->validateOptions();
+
+        if ($this->logger instanceof LoggerService) {
+            $this->logger
+                ->setLevel(
+                    $this->hasOption('vvv') ? LoggerService::LEVEL_DEBUG :
+                    $this->hasOption('vv') ? LoggerService::LEVEL_INFO :
+                    $this->hasOption('v') ? LoggerService::LEVEL_WARNING : LoggerService::LEVEL_ERROR
+                )
+                ->setWriteOut(true)
+            ;
+        }
 
         return $this->run();
     }
