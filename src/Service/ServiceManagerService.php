@@ -98,6 +98,10 @@ class ServiceManagerService
         $reflection = $this->getReflectionsClass($classname);
 
         if ($reflection->isInterface()) {
+            if (isset($this->interfaces[$classname])) {
+                return $this->get($this->interfaces[$classname]);
+            }
+
             throw new FactoryError(sprintf(
                 'Class %s is an Interface',
                 $classname
@@ -105,6 +109,10 @@ class ServiceManagerService
         }
 
         if ($reflection->isAbstract()) {
+            if (isset($this->abstracts[$classname])) {
+                return $this->get($this->abstracts[$classname]);
+            }
+
             throw new FactoryError(sprintf(
                 'Class %s is an Abstract class',
                 $classname
@@ -121,28 +129,6 @@ class ServiceManagerService
                 if (!$parameterClass instanceof ReflectionClass) {
                     throw new FactoryError(sprintf(
                         'Parameter %s of Class %s is no Class',
-                        $parameter->getName(),
-                        $classname
-                    ));
-                }
-
-                if (
-                    $parameterClass->isInterface() &&
-                    !isset($this->interfaces[$parameter->getName()])
-                ) {
-                    throw new FactoryError(sprintf(
-                        'Parameter %s of Class %s is an Interface. Please define implementation in constructor or add to interfaces.',
-                        $parameter->getName(),
-                        $classname
-                    ));
-                }
-
-                if (
-                    $parameterClass->isAbstract() &&
-                    !isset($this->abstracts[$parameter->getName()])
-                ) {
-                    throw new FactoryError(sprintf(
-                        'Parameter %s of Class %s is an Abstract Class. Please define implementation in constructor or add to abstracts.',
                         $parameter->getName(),
                         $classname
                     ));
