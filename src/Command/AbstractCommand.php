@@ -28,7 +28,7 @@ abstract class AbstractCommand implements CommandInterface
 
         $this->setOption('v');
         $this->setOption('vv');
-        $this->setOption('vv');
+        $this->setOption('vvv');
     }
 
     abstract protected function run(): int;
