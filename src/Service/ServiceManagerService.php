@@ -16,6 +16,16 @@ class ServiceManagerService
      */
     private $services = [];
 
+    /**
+     * @var string[]
+     */
+    private $interfaces = [];
+
+    /**
+     * @var string[]
+     */
+    private $abstracts = [];
+
     public function __construct()
     {
         $this->services[self::class] = $this;
@@ -116,9 +126,23 @@ class ServiceManagerService
                     ));
                 }
 
-                if ($parameterClass->isInterface()) {
+                if (
+                    $parameterClass->isInterface() &&
+                    !isset($this->interfaces[$parameter->getName()])
+                ) {
                     throw new FactoryError(sprintf(
-                        'Parameter %s of Class %s is an Interface. Please define implementation in constructor',
+                        'Parameter %s of Class %s is an Interface. Please define implementation in constructor or add to interfaces.',
+                        $parameter->getName(),
+                        $classname
+                    ));
+                }
+
+                if (
+                    $parameterClass->isAbstract() &&
+                    !isset($this->abstracts[$parameter->getName()])
+                ) {
+                    throw new FactoryError(sprintf(
+                        'Parameter %s of Class %s is an Abstract Class. Please define implementation in constructor or add to abstracts.',
                         $parameter->getName(),
                         $classname
                     ));
@@ -147,5 +171,15 @@ class ServiceManagerService
     public function setService(string $name, object $class): void
     {
         $this->services[$name] = $class;
+    }
+
+    public function setInterface(string $interfaceName, string $className): void
+    {
+        $this->interfaces[$interfaceName] = $className;
+    }
+
+    public function setAbstract(string $abstractName, string $className): void
+    {
+        $this->abstracts[$abstractName] = $className;
     }
 }
