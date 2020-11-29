@@ -85,7 +85,7 @@ class Marvin extends AbstractEvent
 {
     public function __construct(MarvinDescriber $describer)
     {
-        parent::__construct($describer);
+        parent::__construct($describer, new ServiceManagerService());
     }
 
     public function tears(): string
