@@ -40,8 +40,11 @@ class ServiceManagerService
             $classname = substr($classname, 1);
         }
 
-        if (!class_exists($classname)) {
-            throw new FactoryError(sprintf('Class %s does not exists', $classname));
+        if (
+            !class_exists($classname) &&
+            !interface_exists($classname)
+        ) {
+            throw new FactoryError(sprintf('Class or interface %s does not exists', $classname));
         }
 
         $class = $this->getByFactory($classname);
@@ -56,7 +59,7 @@ class ServiceManagerService
 
         $class = $this->getByCreate($classname);
 
-        if (get_class($class) === $classname) {
+        if ($class instanceof $classname) {
             $this->services[$classname] = $class;
 
             return $class;
