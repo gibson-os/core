@@ -93,7 +93,7 @@ class LoggerService implements LoggerInterface
         $callerPosition = $context['callerPosition'] ?? 1;
         $message =
             $this->getLevelPrefix($level) .
-            ($this->debug ? $caller[$callerPosition]['file'] . '(' . $caller[$callerPosition]['line'] . ') ' : '') . "\033[0m " .
+            ($this->debug ? $caller[$callerPosition]['file'] . ':' . $caller[$callerPosition]['line'] . ' ' : '') . "\033[0m " .
             var_export($message, true)
         ;
 

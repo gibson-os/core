@@ -8,6 +8,7 @@ use GibsonOS\Core\Exception\CreateError;
 use GibsonOS\Core\Exception\Server\ReceiveError;
 use GibsonOS\Core\Exception\Server\SendError;
 use GibsonOS\Core\Exception\SetError;
+use Psr\Log\LoggerInterface;
 
 class UdpService extends AbstractService
 {
@@ -17,10 +18,15 @@ class UdpService extends AbstractService
     private $socket;
 
     /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    /**
      * @throws CreateError
      * @throws SetError
      */
-    public function __construct(string $ip, int $port)
+    public function __construct(LoggerInterface $logger, string $ip, int $port)
     {
         $socket = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP);
 
@@ -28,6 +34,7 @@ class UdpService extends AbstractService
             throw new CreateError('Socket konnte nicht angelegt werden!');
         }
 
+        $this->logger = $logger;
         $this->socket = $socket;
         $this->setTimeout();
 
@@ -41,6 +48,8 @@ class UdpService extends AbstractService
      */
     public function setTimeout(int $timeout = 10): void
     {
+        $this->logger->debug(sprintf('Set UDP timeout %d s', $timeout));
+
         if (!socket_set_option($this->socket, SOL_SOCKET, SO_RCVTIMEO, ['sec' => $timeout, 'usec' => null])) {
             throw new SetError('Receive timeout konnte nicht gesetzt werden!');
         }
@@ -55,6 +64,13 @@ class UdpService extends AbstractService
      */
     public function send(UdpMessage $message): void
     {
+        $this->logger->debug(sprintf(
+            'Send UDP message "%s" to %s:%d',
+            $message->getMessage(),
+            $message->getIp(),
+            $message->getPort()
+        ));
+
         $sendReturn = socket_sendto(
             $this->socket,
             $message->getMessage(),
@@ -74,15 +90,20 @@ class UdpService extends AbstractService
      */
     public function receive(int $length, int $flags = 0): UdpMessage
     {
+        $this->logger->debug(sprintf('UDP receive message with length of %d', $length));
+
         if (socket_recvfrom($this->socket, $buf, $length, $flags, $ip, $port) === false) {
             throw new ReceiveError();
         }
+
+        $this->logger->info(sprintf('UDP received message "%s" from %s:%d', $buf, $ip, $port));
 
         return new UdpMessage($ip, $port, $buf);
     }
 
     public function close(): void
     {
+        $this->logger->debug('Close UDP socket');
         socket_close($this->socket);
     }
 }
