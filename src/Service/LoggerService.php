@@ -5,6 +5,7 @@ namespace GibsonOS\Core\Service;
 
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
+use Throwable;
 
 class LoggerService implements LoggerInterface
 {
@@ -92,10 +93,27 @@ class LoggerService implements LoggerInterface
         $caller = debug_backtrace();
         $callerPosition = $context['callerPosition'] ?? 1;
         $message =
-            $this->getLevelPrefix($level) .
+            $this->getLevelColor($level) . ' ' . $this->getLevelPrefix($level) .
             ($this->debug ? $caller[$callerPosition]['file'] . ':' . $caller[$callerPosition]['line'] . ' ' : '') . "\033[0m " .
             var_export($message, true)
         ;
+
+        if (
+            $this->debug &&
+            isset($context['exception']) &&
+            $context['exception'] instanceof Throwable
+        ) {
+            $message .=
+                PHP_EOL . $this->getLevelColor($level) . PHP_EOL . PHP_EOL .
+                "\t" . get_class($context['exception']) . ': ' . $context['exception']->getMessage() . PHP_EOL
+            ;
+
+            foreach ($context['exception']->getTrace() as $trace) {
+                $message .= "\t" . $trace['file'] . ':' . $trace['line'] . ($trace['type'] ?? ' ') . $trace['function'] . '()' . PHP_EOL;
+            }
+
+            $message .= "\033[0m " . PHP_EOL;
+        }
 
         //$this->writeOut($level, $message);
         error_log($message);
@@ -126,21 +144,40 @@ class LoggerService implements LoggerInterface
     {
         switch ($level) {
             case self::LEVEL_EMERGENCY:
-                return "\033[101m EMERGENCY ";
+                return 'EMERGENCY ';
             case self::LEVEL_ALERT:
-                return "\033[101m ALERT ";
+                return 'ALERT ';
             case self::LEVEL_CRITICAL:
-                return "\033[101m CRITICAL ";
+                return 'CRITICAL ';
             case self::LEVEL_ERROR:
-                return "\033[101m ERROR ";
+                return 'ERROR ';
             case self::LEVEL_WARNING:
-                return "\033[43m WARNING ";
+                return 'WARNING ';
             case self::LEVEL_NOTICE:
-                return "\033[44m NOTICE ";
+                return 'NOTICE ';
             case self::LEVEL_INFO:
-                return "\033[44m INFO ";
+                return 'INFO ';
             case self::LEVEL_DEBUG:
-                return "\033[43m DEBUG ";
+                return 'DEBUG ';
+        }
+
+        return '';
+    }
+
+    private function getLevelColor(int $level): string
+    {
+        switch ($level) {
+            case self::LEVEL_EMERGENCY:
+            case self::LEVEL_ALERT:
+            case self::LEVEL_CRITICAL:
+            case self::LEVEL_ERROR:
+                return "\033[101m";
+            case self::LEVEL_WARNING:
+            case self::LEVEL_DEBUG:
+                return "\033[43m";
+            case self::LEVEL_NOTICE:
+            case self::LEVEL_INFO:
+                return "\033[44m";
         }
 
         return '';
