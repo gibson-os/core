@@ -43,11 +43,12 @@ class FfmpegService extends AbstractService
     private $image;
 
     /**
-     * Ffmpeg constructor.
+     * @throws GetError
      */
-    public function __construct(string $ffpmegPath, DateTimeService $dateTime, FileService $file, ProcessService $process, ImageService $image)
+    public function __construct(EnvService $envService, DateTimeService $dateTime, FileService $file, ProcessService $process, ImageService $image)
     {
-        $this->ffpmegPath = $ffpmegPath;
+        // @todo anders machen
+        $this->ffpmegPath = $envService->getString('FFMPEG_PATH');
         $this->dateTime = $dateTime;
         $this->file = $file;
         $this->process = $process;
