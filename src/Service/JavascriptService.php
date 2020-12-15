@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace GibsonOS\Core\Service;
 
@@ -230,21 +231,5 @@ class JavascriptService extends AbstractService
         }
 
         return $return;
-    }
-
-    private function addBasicDirectories(array &$directories): array
-    {
-        $baseDirectory =
-            $this->vendorPath .
-            'gibson-os' . DIRECTORY_SEPARATOR .
-            'core' . DIRECTORY_SEPARATOR .
-            'assets' . DIRECTORY_SEPARATOR .
-            'js' . DIRECTORY_SEPARATOR
-        ;
-
-        return array_merge([
-            $baseDirectory . 'component' . DIRECTORY_SEPARATOR,
-            $baseDirectory . 'decorator' . DIRECTORY_SEPARATOR,
-        ], $directories);
     }
 }
