@@ -4,9 +4,20 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Service;
 
 use GibsonOS\Core\Exception\ProcessError;
+use Psr\Log\LoggerInterface;
 
 class ProcessService extends AbstractService
 {
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    public function __construct(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
+    }
+
     /**
      * @throws ProcessError
      *
@@ -33,11 +44,15 @@ class ProcessService extends AbstractService
 
     public function execute(string $command): string
     {
+        $this->logger->debug(sprintf('Execute proccess "%s"', $command));
+
         return exec($command);
     }
 
     public function executeAsync(string $command): void
     {
+        $this->logger->debug(sprintf('Execute async proccess "%s"', $command));
+
         system($command . '> /dev/null 2>/dev/null &');
     }
 }

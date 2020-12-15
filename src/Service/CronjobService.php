@@ -6,6 +6,7 @@ namespace GibsonOS\Core\Service;
 use DateTime;
 use GibsonOS\Core\Repository\CronjobRepository;
 use GibsonOS\Core\Utility\JsonUtility;
+use Psr\Log\LoggerInterface;
 
 class CronjobService
 {
@@ -19,10 +20,19 @@ class CronjobService
      */
     private $commandService;
 
-    public function __construct(CronjobRepository $cronjobRepository, CommandService $commandService)
-    {
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    public function __construct(
+        CronjobRepository $cronjobRepository,
+        CommandService $commandService,
+        LoggerInterface $logger
+    ) {
         $this->cronjobRepository = $cronjobRepository;
         $this->commandService = $commandService;
+        $this->logger = $logger;
     }
 
     public function add(
@@ -44,6 +54,8 @@ class CronjobService
         $dateTime = new DateTime();
 
         foreach ($this->cronjobRepository->getRunnableByUser($dateTime, $user) as $cronjob) {
+            $this->logger->info(sprintf('Run cronjob %s', $cronjob->getCommand()));
+
             $arguments = $cronjob->getArguments();
             $options = $cronjob->getOptions();
             $this->commandService->executeAsync(
