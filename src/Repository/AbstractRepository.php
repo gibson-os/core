@@ -53,7 +53,7 @@ abstract class AbstractRepository
     {
         $database = $this->getDatabase($database);
 
-        return $database->getRegexString($search);
+        return $database->getUnescapedRegexString($search);
     }
 
     protected function implode(array $pieces, string $glue = ',', mysqlDatabase $database = null): string

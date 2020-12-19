@@ -7,6 +7,7 @@ use DateTime;
 use Exception;
 use GibsonOS\Core\AutoComplete\AutoCompleteInterface;
 use GibsonOS\Core\Exception\DateTimeError;
+use GibsonOS\Core\Exception\FactoryError;
 use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\LoginRequired;
 use GibsonOS\Core\Exception\PermissionDenied;
@@ -182,6 +183,7 @@ class EventController extends AbstractController
     /**
      * @throws LoginRequired
      * @throws PermissionDenied
+     * @throws FactoryError
      */
     public function autoComplete(
         ServiceManagerService $serviceManagerService,
