@@ -13,89 +13,43 @@ use mysqlDatabase;
 
 class Trigger extends AbstractModel implements JsonSerializable
 {
-    /**
-     * @var int|null
-     */
-    private $id;
+    private ?int $id;
 
-    /**
-     * @var int
-     */
-    private $eventId;
+    private int $eventId;
 
-    /**
-     * @var string
-     */
-    private $class;
+    private string $class;
 
-    /**
-     * @var string
-     */
-    private $trigger;
+    private string $trigger;
 
     /**
      * Required for store.
-     *
-     * @var string
      */
-    private $classTitle;
+    private string $classTitle;
 
     /**
      * Required for store.
-     *
-     * @var string
      */
-    private $triggerTitle;
+    private string $triggerTitle;
 
-    /**
-     * @var string|null
-     */
-    private $parameters;
+    private ?string $parameters;
 
-    /**
-     * @var int|null
-     */
-    private $weekday;
+    private ?int $weekday;
 
-    /**
-     * @var int|null
-     */
-    private $day;
+    private ?int $day;
 
-    /**
-     * @var int|null
-     */
-    private $month;
+    private ?int $month;
 
-    /**
-     * @var int|null
-     */
-    private $year;
+    private ?int $year;
 
-    /**
-     * @var int|null
-     */
-    private $hour;
+    private ?int $hour;
 
-    /**
-     * @var int|null
-     */
-    private $minute;
+    private ?int $minute;
 
-    /**
-     * @var int|null
-     */
-    private $second;
+    private ?int $second;
 
-    /**
-     * @var int|null
-     */
-    private $priority;
+    private ?int $priority;
 
-    /**
-     * @var Event
-     */
-    private $event;
+    private Event $event;
 
     public function __construct(mysqlDatabase $database = null)
     {

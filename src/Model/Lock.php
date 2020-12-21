@@ -5,15 +5,9 @@ namespace GibsonOS\Core\Model;
 
 class Lock extends AbstractModel
 {
-    /**
-     * @var int
-     */
-    private $pid;
+    private int $pid;
 
-    /**
-     * @var string
-     */
-    private $name;
+    private string $name;
 
     public static function getTableName(): string
     {

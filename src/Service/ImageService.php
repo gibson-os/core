@@ -12,14 +12,8 @@ use GibsonOS\Core\Exception\Image\LoadError;
 
 class ImageService extends AbstractService
 {
-    /**
-     * @var FileService
-     */
-    private $file;
+    private FileService $file;
 
-    /**
-     * Image constructor.
-     */
     public function __construct(FileService $file)
     {
         $this->file = $file;

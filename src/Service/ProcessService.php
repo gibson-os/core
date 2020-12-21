@@ -8,10 +8,7 @@ use Psr\Log\LoggerInterface;
 
 class ProcessService extends AbstractService
 {
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
+    private LoggerInterface $logger;
 
     public function __construct(LoggerInterface $logger)
     {

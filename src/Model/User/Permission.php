@@ -7,39 +7,22 @@ use GibsonOS\Core\Exception\DateTimeError;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Model\User;
+use GibsonOS\Core\Service\PermissionService;
 use mysqlDatabase;
 
 class Permission extends AbstractModel
 {
-    /**
-     * @var string
-     */
-    private $module = '';
+    private string $module = '';
 
-    /**
-     * @var string
-     */
-    private $task = '';
+    private string $task = '';
 
-    /**
-     * @var string
-     */
-    private $action = '';
+    private string $action = '';
 
-    /**
-     * @var int
-     */
-    private $userId = 0;
+    private int $userId = 0;
 
-    /**
-     * @var int
-     */
-    private $permission = 1;
+    private int $permission = PermissionService::DENIED;
 
-    /**
-     * @var User
-     */
-    private $user;
+    private User $user;
 
     public function __construct(mysqlDatabase $database = null)
     {

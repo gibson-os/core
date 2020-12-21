@@ -4,6 +4,8 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Store\Event;
 
 use GibsonOS\Core\Exception\DateTimeError;
+use GibsonOS\Core\Exception\FactoryError;
+use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\Event\Trigger;
 use GibsonOS\Core\Store\AbstractDatabaseStore;
@@ -12,20 +14,11 @@ use mysqlDatabase;
 
 class TriggerStore extends AbstractDatabaseStore
 {
-    /**
-     * @var int
-     */
-    private $eventId;
+    private int $eventId;
 
-    /**
-     * @var ClassTriggerStore
-     */
-    private $classTriggerStore;
+    private ClassTriggerStore $classTriggerStore;
 
-    /**
-     * @var ClassNameStore
-     */
-    private $classNameStore;
+    private ClassNameStore $classNameStore;
 
     public function __construct(
         ClassTriggerStore $classTriggerStore,
@@ -53,8 +46,10 @@ class TriggerStore extends AbstractDatabaseStore
     }
 
     /**
-     * @throws SelectError
      * @throws DateTimeError
+     * @throws SelectError
+     * @throws FactoryError
+     * @throws GetError
      */
     public function getList(): iterable
     {

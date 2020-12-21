@@ -10,21 +10,15 @@ class Method
     /**
      * @var AbstractParameter[]
      */
-    private $parameters = [];
+    private array $parameters = [];
 
     /**
      * @var AbstractParameter[]
      */
-    private $returns = [];
+    private array $returns = [];
 
-    /**
-     * @var string
-     */
-    private $title;
+    private string $title;
 
-    /**
-     * Method constructor.
-     */
     public function __construct(string $title)
     {
         $this->title = $title;

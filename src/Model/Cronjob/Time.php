@@ -10,90 +10,39 @@ use GibsonOS\Core\Model\Cronjob;
 
 class Time extends AbstractModel
 {
-    /**
-     * @var int|null
-     */
-    private $id;
+    private ?int $id;
 
-    /**
-     * @var int
-     */
-    private $cronjobId;
+    private int $cronjobId;
 
-    /**
-     * @var int|null
-     */
-    private $fromHour;
+    private ?int $fromHour;
 
-    /**
-     * @var int|null
-     */
-    private $toHour;
+    private ?int $toHour;
 
-    /**
-     * @var int|null
-     */
-    private $fromMinute;
+    private ?int $fromMinute;
 
-    /**
-     * @var int|null
-     */
-    private $toMinute;
+    private ?int $toMinute;
 
-    /**
-     * @var int|null
-     */
-    private $fromSecond;
+    private ?int $fromSecond;
 
-    /**
-     * @var int|null
-     */
-    private $toSecond;
+    private ?int $toSecond;
 
-    /**
-     * @var int|null
-     */
-    private $fromDayOfMonth;
+    private ?int $fromDayOfMonth;
 
-    /**
-     * @var int|null
-     */
-    private $toDayOfMonth;
+    private ?int $toDayOfMonth;
 
-    /**
-     * @var int|null
-     */
-    private $fromDayOfWeek;
+    private ?int $fromDayOfWeek;
 
-    /**
-     * @var int|null
-     */
-    private $toDayOfWeek;
+    private ?int $toDayOfWeek;
 
-    /**
-     * @var int|null
-     */
-    private $fromMonth;
+    private ?int $fromMonth;
 
-    /**
-     * @var int|null
-     */
-    private $toMonth;
+    private ?int $toMonth;
 
-    /**
-     * @var int|null
-     */
-    private $fromYear;
+    private ?int $fromYear;
 
-    /**
-     * @var int|null
-     */
-    private $toYear;
+    private ?int $toYear;
 
-    /**
-     * @var Cronjob
-     */
-    private $cronjob;
+    private Cronjob $cronjob;
 
     public static function getTableName(): string
     {

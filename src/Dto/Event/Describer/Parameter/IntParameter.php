@@ -5,19 +5,10 @@ namespace GibsonOS\Core\Dto\Event\Describer\Parameter;
 
 class IntParameter extends AbstractParameter
 {
-    /**
-     * @var int|null
-     */
-    private $min;
+    private ?int $min;
 
-    /**
-     * @var int|null
-     */
-    private $max;
+    private ?int $max;
 
-    /**
-     * IntParameter constructor.
-     */
     public function __construct(string $title)
     {
         parent::__construct($title, 'int');

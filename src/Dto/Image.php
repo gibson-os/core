@@ -10,19 +10,11 @@ class Image
      */
     private $resource;
 
-    /**
-     * @var string
-     */
-    private $filename;
+    private string $filename;
+
+    private int $quality = 80;
 
     /**
-     * @var int
-     */
-    private $quality = 80;
-
-    /**
-     * Image constructor.
-     *
      * @param resource $resource
      */
     public function __construct($resource)

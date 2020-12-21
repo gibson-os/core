@@ -17,10 +17,7 @@ class UdpService extends AbstractService
      */
     private $socket;
 
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
+    private LoggerInterface $logger;
 
     /**
      * @throws CreateError

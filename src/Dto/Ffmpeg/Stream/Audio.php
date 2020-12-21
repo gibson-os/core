@@ -7,45 +7,24 @@ use JsonSerializable;
 
 class Audio implements JsonSerializable
 {
-    /**
-     * @var string|null
-     */
-    private $language;
+    private ?string $language;
 
-    /**
-     * @var string|null
-     */
-    private $format;
+    private ?string $format;
 
-    /**
-     * @var string|null
-     */
-    private $frequency;
+    private ?string $frequency;
 
-    /**
-     * @var string|null
-     */
-    private $channels;
+    private ?string $channels;
 
-    /**
-     * @var string|null
-     */
-    private $bitRate;
+    private ?string $bitRate;
 
-    /**
-     * @var bool
-     */
-    private $default = false;
+    private bool $default = false;
 
     public function getLanguage(): ?string
     {
         return $this->language;
     }
 
-    /**
-     * @param string|null $language
-     */
-    public function setLanguage($language): Audio
+    public function setLanguage(?string $language): Audio
     {
         $this->language = $language;
 

@@ -17,25 +17,13 @@ class UserService
 {
     private const PASSWORD_MIN_LENGTH = 6;
 
-    /**
-     * @var EnvService
-     */
-    private $envService;
+    private EnvService $envService;
 
-    /**
-     * @var UserRepository
-     */
-    private $userRepository;
+    private UserRepository $userRepository;
 
-    /**
-     * @var DeviceRepository
-     */
-    private $deviceRepository;
+    private DeviceRepository $deviceRepository;
 
-    /**
-     * @var SessionService
-     */
-    private $sessionService;
+    private SessionService $sessionService;
 
     public function __construct(
         EnvService $envService,
@@ -114,6 +102,8 @@ class UserService
     }
 
     /**
+     * @throws DateTimeError
+     * @throws SaveError
      * @throws UserError
      */
     public function save(

@@ -14,17 +14,17 @@ class ServiceManagerService
     /**
      * @var object[]
      */
-    private $services = [];
+    private array $services = [];
 
     /**
      * @var string[]
      */
-    private $interfaces = [];
+    private array $interfaces = [];
 
     /**
      * @var string[]
      */
-    private $abstracts = [];
+    private array $abstracts = [];
 
     public function __construct()
     {

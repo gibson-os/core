@@ -4,35 +4,21 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Service;
 
 use GibsonOS\Core\Dto\Javascript;
+use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Repository\User\PermissionViewRepository;
 
 class JavascriptService extends AbstractService
 {
-    /**
-     * @var PermissionViewRepository
-     */
-    private $permissionViewRepository;
+    private PermissionViewRepository $permissionViewRepository;
 
-    /**
-     * @var DirService
-     */
-    private $dirService;
+    private DirService $dirService;
 
-    /**
-     * @var FileService
-     */
-    private $fileService;
+    private FileService $fileService;
 
-    /**
-     * @var PermissionService
-     */
-    private $permissionService;
+    private PermissionService $permissionService;
 
-    /**
-     * @var string
-     */
-    private $vendorPath;
+    private string $vendorPath;
 
     public function __construct(
         PermissionViewRepository $permissionViewRepository,
@@ -54,6 +40,7 @@ class JavascriptService extends AbstractService
     }
 
     /**
+     * @throws GetError
      * @throws SelectError
      */
     public function getByUserId(?int $userId, string $module = null): string
@@ -91,6 +78,9 @@ class JavascriptService extends AbstractService
         return $content . $oldData;
     }
 
+    /**
+     * @throws GetError
+     */
     public function getByUserIdAndTask(?int $userId, string $module, string $task): string
     {
         if ($this->permissionService->isDenied($module, null, null, $userId)) {
@@ -125,6 +115,8 @@ class JavascriptService extends AbstractService
     }
 
     /**
+     * @throws GetError
+     *
      * @return Javascript[]
      */
     private function getFiles(string $dir): array

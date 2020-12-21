@@ -18,10 +18,7 @@ class TimeStore extends AbstractDatabaseStore
         'second',
     ];
 
-    /**
-     * @var int|null
-     */
-    private $cronjobId;
+    private ?int $cronjobId;
 
     protected function getTableName(): string
     {

@@ -27,9 +27,6 @@ class DrawService extends ImageService
         return imagefilledrectangle($image->getResource(), $startX, $startY, $stopX, $stopY, $color);
     }
 
-    /**
-     * Schreibt einen Text in das Bild.
-     */
     public function setTtfText(
         ImageDto $image,
         string $text,

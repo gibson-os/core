@@ -10,10 +10,7 @@ use GibsonOS\Core\Exception\GetError;
  */
 class RegistryService extends AbstractService
 {
-    /**
-     * @var array
-     */
-    private $registry = [];
+    private array $registry = [];
 
     public function exists(string $key): bool
     {

@@ -9,6 +9,10 @@ use GibsonOS\Core\Model\User;
 
 class UserRepository extends AbstractRepository
 {
+    /**
+     * @throws DateTimeError
+     * @throws SelectError
+     */
     public function getById(int $id): User
     {
         $table = $this->getTable(User::getTableName())

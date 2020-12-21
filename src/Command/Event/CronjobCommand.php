@@ -13,20 +13,11 @@ use Psr\Log\LoggerInterface;
 
 class CronjobCommand extends AbstractCommand
 {
-    /**
-     * @var EventRepository
-     */
-    private $eventRepository;
+    private EventRepository $eventRepository;
 
-    /**
-     * @var CodeGeneratorService
-     */
-    private $codeGeneratorService;
+    private CodeGeneratorService $codeGeneratorService;
 
-    /**
-     * @var EventService
-     */
-    private $eventService;
+    private EventService $eventService;
 
     public function __construct(
         EventRepository $eventRepository,

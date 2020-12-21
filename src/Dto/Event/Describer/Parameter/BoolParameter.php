@@ -5,9 +5,6 @@ namespace GibsonOS\Core\Dto\Event\Describer\Parameter;
 
 class BoolParameter extends AbstractParameter
 {
-    /**
-     * BoolParameter constructor.
-     */
     public function __construct(string $title)
     {
         parent::__construct($title, 'bool');

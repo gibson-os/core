@@ -4,40 +4,21 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Model;
 
 use GibsonOS\Core\Exception\DateTimeError;
-use GibsonOS\Core\Exception\Repository\SelectError;
 use mysqlDatabase;
 
 class Action extends AbstractModel
 {
-    /**
-     * @var int|null
-     */
-    private $id;
+    private ?int $id;
 
-    /**
-     * @var string
-     */
-    private $name = '';
+    private string $name = '';
 
-    /**
-     * @var int
-     */
-    private $moduleId = 0;
+    private int $moduleId = 0;
 
-    /**
-     * @var int
-     */
-    private $taskId = 0;
+    private int $taskId = 0;
 
-    /**
-     * @var Module
-     */
-    private $module;
+    private Module $module;
 
-    /**
-     * @var Task
-     */
-    private $task;
+    private Task $task;
 
     public function __construct(mysqlDatabase $database = null)
     {
@@ -102,7 +83,6 @@ class Action extends AbstractModel
 
     /**
      * @throws DateTimeError
-     * @throws SelectError
      */
     public function getModule(): Module
     {
@@ -120,7 +100,6 @@ class Action extends AbstractModel
 
     /**
      * @throws DateTimeError
-     * @throws SelectError
      */
     public function getTask(): Task
     {

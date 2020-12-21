@@ -7,15 +7,9 @@ use GibsonOS\Core\AutoComplete\AutoCompleteInterface;
 
 class AutoCompleteParameter extends AbstractParameter
 {
-    /**
-     * @var AutoCompleteInterface
-     */
-    private $autoComplete;
+    private AutoCompleteInterface $autoComplete;
 
-    /**
-     * @var array
-     */
-    private $parameters = [];
+    private array $parameters = [];
 
     public function __construct(string $title, AutoCompleteInterface $autoComplete)
     {

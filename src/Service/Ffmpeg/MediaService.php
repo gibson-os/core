@@ -16,27 +16,21 @@ use GibsonOS\Core\Dto\Image;
 use GibsonOS\Core\Exception\DateTimeError;
 use GibsonOS\Core\Exception\DeleteError;
 use GibsonOS\Core\Exception\Ffmpeg\ConvertStatusError;
+use GibsonOS\Core\Exception\Ffmpeg\NoAudioError;
 use GibsonOS\Core\Exception\Ffmpeg\NoVideoError;
 use GibsonOS\Core\Exception\File\OpenError;
 use GibsonOS\Core\Exception\FileNotFound;
 use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\Image\LoadError;
 use GibsonOS\Core\Exception\ProcessError;
-use GibsonOS\Core\Exception\SetError;
 use GibsonOS\Core\Service\FfmpegService;
 use InvalidArgumentException;
 use OutOfRangeException;
 
 class MediaService
 {
-    /**
-     * @var FfmpegService
-     */
-    private $ffmpeg;
+    private FfmpegService $ffmpeg;
 
-    /**
-     * Video constructor.
-     */
     public function __construct(FfmpegService $ffmpeg)
     {
         $this->ffmpeg = $ffmpeg;
@@ -45,6 +39,7 @@ class MediaService
     /**
      * @throws FileNotFound
      * @throws ProcessError
+     * @throws NoAudioError
      */
     public function getMedia(string $filename): MediaDto
     {
@@ -124,7 +119,6 @@ class MediaService
      * @throws DateTimeError
      * @throws FileNotFound
      * @throws OpenError
-     * @throws SetError
      */
     public function getConvertStatus(MediaDto $media, string $outputFilename): ConvertStatus
     {
@@ -139,6 +133,7 @@ class MediaService
      * @throws FileNotFound
      * @throws GetError
      * @throws LoadError
+     * @throws NoAudioError
      * @throws NoVideoError
      */
     public function getImageBySecond(MediaDto $media, int $second, int $frame = null): Image
@@ -156,8 +151,9 @@ class MediaService
      * @throws DeleteError
      * @throws FileNotFound
      * @throws GetError
-     * @throws NoVideoError
      * @throws LoadError
+     * @throws NoAudioError
+     * @throws NoVideoError
      */
     public function getImageByFrame(MediaDto $media, int $frameNumber): Image
     {

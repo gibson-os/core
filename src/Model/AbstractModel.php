@@ -3,11 +3,10 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Model;
 
+use Exception;
 use GibsonOS\Core\Exception\DateTimeError;
-use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\Model\DeleteError;
 use GibsonOS\Core\Exception\Model\SaveError;
-use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Factory\DateTimeFactory;
 use GibsonOS\Core\Service\DateTimeService;
 use mysqlDatabase;
@@ -18,10 +17,7 @@ use Throwable;
 
 abstract class AbstractModel implements ModelInterface
 {
-    /**
-     * @var mysqlDatabase
-     */
-    private $database;
+    private mysqlDatabase $database;
 
     private const TYPE_INT = 'int';
 
@@ -46,16 +42,8 @@ abstract class AbstractModel implements ModelInterface
         'longtext' => self::TYPE_STRING,
     ];
 
-    /**
-     * @var DateTimeService
-     */
-    private $dateTime;
+    private DateTimeService $dateTime;
 
-    /**
-     * AbstractModel constructor.
-     *
-     * @throws GetError
-     */
     public function __construct(mysqlDatabase $database = null)
     {
         // @todo uncooles konstrukt
@@ -125,9 +113,6 @@ abstract class AbstractModel implements ModelInterface
         }
     }
 
-    /**
-     * @throws DateTimeError
-     */
     public function setToMysqlTable(mysqlTable $mysqlTable): void
     {
         foreach ($mysqlTable->fields as $field) {
@@ -168,6 +153,7 @@ abstract class AbstractModel implements ModelInterface
     /**
      * @throws SaveError
      * @throws DateTimeError
+     * @throws Exception
      */
     public function save(mysqlTable $mysqlTable = null): void
     {
@@ -190,7 +176,6 @@ abstract class AbstractModel implements ModelInterface
 
     /**
      * @throws DeleteError
-     * @throws DateTimeError
      */
     public function delete(mysqlTable $mysqlTable = null): void
     {
@@ -217,7 +202,6 @@ abstract class AbstractModel implements ModelInterface
      * @param mixed $value
      *
      * @throws DateTimeError
-     * @throws SelectError
      */
     protected function loadForeignRecord(AbstractModel $model, $value, string $foreignField = 'id'): void
     {

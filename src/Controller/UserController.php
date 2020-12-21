@@ -3,7 +3,9 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Controller;
 
+use GibsonOS\Core\Exception\DateTimeError;
 use GibsonOS\Core\Exception\LoginRequired;
+use GibsonOS\Core\Exception\Model\SaveError;
 use GibsonOS\Core\Exception\PermissionDenied;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Exception\UserError;
@@ -35,6 +37,11 @@ class UserController extends AbstractController
         return new RedirectResponse($this->requestService->getBaseDir());
     }
 
+    /**
+     * @throws UserError
+     * @throws DateTimeError
+     * @throws SaveError
+     */
     public function appLogin(
         UserService $userService,
         string $model,
@@ -76,6 +83,8 @@ class UserController extends AbstractController
     }
 
     /**
+     * @throws LoginRequired
+     * @throws PermissionDenied
      * @throws SelectError
      * @throws UserError
      */
@@ -107,6 +116,12 @@ class UserController extends AbstractController
         ));
     }
 
+    /**
+     * @param $permission
+     *
+     * @throws LoginRequired
+     * @throws PermissionDenied
+     */
     private function checkUserPermission(?int $userId, $permission): void
     {
         if ($userId !== $this->sessionService->getUserId()) {

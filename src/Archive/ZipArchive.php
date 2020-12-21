@@ -8,10 +8,7 @@ use ZipArchive as StandardZipArchive;
 
 class ZipArchive implements ArchiveInterface
 {
-    /**
-     * @var StandardZipArchive
-     */
-    private $zipArchive;
+    private StandardZipArchive $zipArchive;
 
     public function __construct(StandardZipArchive $zipArchive)
     {
@@ -19,6 +16,8 @@ class ZipArchive implements ArchiveInterface
     }
 
     /**
+     * @param string[] $files
+     *
      * @throws ArchiveException
      */
     public function packFiles(string $filename, array $files): void

@@ -7,20 +7,11 @@ use GibsonOS\Core\Utility\StatusCode;
 
 class Response implements ResponseInterface
 {
-    /**
-     * @var string
-     */
-    private $body;
+    private string $body;
 
-    /**
-     * @var array
-     */
-    private $headers;
+    private array $headers;
 
-    /**
-     * @var int
-     */
-    private $code;
+    private int $code;
 
     public function __construct(string $body, int $code = StatusCode::OK, array $headers = [])
     {

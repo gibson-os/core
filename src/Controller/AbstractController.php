@@ -14,25 +14,13 @@ use GibsonOS\Core\Service\TwigService;
 
 abstract class AbstractController
 {
-    /**
-     * @var PermissionService
-     */
-    protected $permissionService;
+    protected PermissionService $permissionService;
 
-    /**
-     * @var RequestService
-     */
-    protected $requestService;
+    protected RequestService $requestService;
 
-    /**
-     * @var TwigService
-     */
-    protected $twigService;
+    protected TwigService $twigService;
 
-    /**
-     * @var SessionService
-     */
-    protected $sessionService;
+    protected SessionService $sessionService;
 
     public function __construct(
         PermissionService $permissionService,

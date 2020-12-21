@@ -16,22 +16,13 @@ class ClassNameStore extends AbstractStore
     /**
      * @var array[]
      */
-    private $list = [];
+    private array $list = [];
 
-    /**
-     * @var DirService
-     */
-    private $dir;
+    private DirService $dir;
 
-    /**
-     * @var FileService
-     */
-    private $file;
+    private FileService $file;
 
-    /**
-     * @var ServiceManagerService
-     */
-    private $serviceManagerService;
+    private ServiceManagerService $serviceManagerService;
 
     public function __construct(DirService $dir, FileService $file, ServiceManagerService $serviceManagerService)
     {

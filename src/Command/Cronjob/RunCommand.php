@@ -20,20 +20,11 @@ class RunCommand extends AbstractCommand
 
     private const FLOCK_NAME_NEW = 'cronjobNew';
 
-    /**
-     * @var CronjobService
-     */
-    private $cronjobService;
+    private CronjobService $cronjobService;
 
-    /**
-     * @var LockService
-     */
-    private $lockService;
+    private LockService $lockService;
 
-    /**
-     * @var LockRepository
-     */
-    private $lockRepository;
+    private LockRepository $lockRepository;
 
     public function __construct(
         CronjobService $cronjobService,

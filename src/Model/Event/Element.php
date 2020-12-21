@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Model\Event;
 
 use GibsonOS\Core\Exception\DateTimeError;
-use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Model\Event;
 use GibsonOS\Core\Utility\JsonUtility;
@@ -14,84 +13,44 @@ use Serializable;
 
 class Element extends AbstractModel implements Serializable, JsonSerializable
 {
-    /**
-     * @var int|null
-     */
-    private $id;
+    private ?int $id;
 
-    /**
-     * @var int
-     */
-    private $eventId;
+    private int $eventId;
 
-    /**
-     * @var int|null
-     */
-    private $parentId;
+    private ?int $parentId;
 
-    /**
-     * @var int
-     */
-    private $order = 0;
+    private int $order = 0;
 
-    /**
-     * @var string
-     */
-    private $class;
+    private string $class;
 
-    /**
-     * @var string
-     */
-    private $method;
+    private string $method;
 
     /**
      * Required for store.
-     *
-     * @var string
      */
-    private $classTitle;
+    private string $classTitle;
 
     /**
      * Required for store.
-     *
-     * @var string
      */
-    private $methodTitle;
+    private string $methodTitle;
+
+    private ?string $parameters;
+
+    private ?string $command;
+
+    private ?string $operator;
+
+    private ?string $returns;
+
+    private Event $event;
+
+    private ?Element $parent;
 
     /**
-     * @var string|null
+     * @var Element[]|null
      */
-    private $parameters;
-
-    /**
-     * @var string|null
-     */
-    private $command;
-
-    /**
-     * @var string|null
-     */
-    private $operator;
-
-    /**
-     * @var string|null
-     */
-    private $returns;
-
-    /**
-     * @var Event
-     */
-    private $event;
-
-    /**
-     * @var Element|null
-     */
-    private $parent;
-
-    /**
-     * @var Element[]
-     */
-    private $children;
+    private ?array $children;
 
     public function __construct(mysqlDatabase $database = null)
     {
@@ -227,7 +186,6 @@ class Element extends AbstractModel implements Serializable, JsonSerializable
 
     /**
      * @throws DateTimeError
-     * @throws SelectError
      */
     public function getEvent(): Event
     {
@@ -246,7 +204,6 @@ class Element extends AbstractModel implements Serializable, JsonSerializable
 
     /**
      * @throws DateTimeError
-     * @throws SelectError
      */
     public function getParent(): ?Element
     {
@@ -272,9 +229,9 @@ class Element extends AbstractModel implements Serializable, JsonSerializable
     /**
      * @throws DateTimeError
      *
-     * @return Element[]
+     * @return Element[]|null
      */
-    public function getChildren(): array
+    public function getChildren(): ?array
     {
         if ($this->children === null) {
             $this->loadChildren();
@@ -300,9 +257,9 @@ class Element extends AbstractModel implements Serializable, JsonSerializable
     }
 
     /**
-     * @param Element[] $children
+     * @param Element[]|null $children
      */
-    public function setChildren(array $children): Element
+    public function setChildren(?array $children): Element
     {
         $this->children = $children;
 
@@ -374,7 +331,10 @@ class Element extends AbstractModel implements Serializable, JsonSerializable
         ;
     }
 
-    public function jsonSerialize()
+    /**
+     * @throws DateTimeError
+     */
+    public function jsonSerialize(): array
     {
         $data = [
             'id' => $this->getId(),
@@ -390,7 +350,7 @@ class Element extends AbstractModel implements Serializable, JsonSerializable
             'leaf' => true,
         ];
 
-        if (count($this->getChildren())) {
+        if (!empty($this->getChildren())) {
             $data['data'] = $this->getChildren();
             $data['leaf'] = false;
         }

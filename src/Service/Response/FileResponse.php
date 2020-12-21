@@ -10,55 +10,25 @@ use GibsonOS\Core\Utility\StatusCode;
 
 class FileResponse implements ResponseInterface
 {
-    /**
-     * @var RequestService
-     */
-    private $requestService;
+    private RequestService $requestService;
 
-    /**
-     * @var string
-     */
-    private $filename;
+    private string $filename;
 
-    /**
-     * @var string
-     */
-    private $type = 'application/octet-stream';
+    private string $type = 'application/octet-stream';
 
-    /**
-     * @var int
-     */
-    private $code = StatusCode::OK;
+    private int $code = StatusCode::OK;
 
-    /**
-     * @var string|null
-     */
-    private $disposition = 'attachment';
+    private ?string $disposition = 'attachment';
 
-    /**
-     * @var int
-     */
-    private $partLength = 8192;
+    private int $partLength = 8192;
 
-    /**
-     * @var bool
-     */
-    private $hasRange = false;
+    private bool $hasRange = false;
 
-    /**
-     * @var int
-     */
-    private $startSize = 0;
+    private int $startSize = 0;
 
-    /**
-     * @var int
-     */
-    private $endSize;
+    private int $endSize;
 
-    /**
-     * @var int
-     */
-    private $size;
+    private int $size;
 
     public function __construct(RequestService $requestService, string $filename)
     {

@@ -4,6 +4,8 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Dto\Ffmpeg;
 
 use DateTime;
+use DateTimeInterface;
+use Exception;
 use GibsonOS\Core\Exception\SetError;
 use JsonSerializable;
 
@@ -24,45 +26,21 @@ class ConvertStatus implements JsonSerializable
         self::STATUS_GENERATED,
     ];
 
-    /**
-     * @var string
-     */
-    private $status;
+    private string $status;
 
-    /**
-     * @var int
-     */
-    private $frame;
+    private int $frame;
 
-    /**
-     * @var int
-     */
-    private $frames = 0;
+    private int $frames = 0;
 
-    /**
-     * @var int
-     */
-    private $fps;
+    private int $fps;
 
-    /**
-     * @var float
-     */
-    private $quality;
+    private float $quality;
 
-    /**
-     * @var int
-     */
-    private $size;
+    private int $size;
 
-    /**
-     * @var DateTime
-     */
-    private $time;
+    private DateTimeInterface $time;
 
-    /**
-     * @var float
-     */
-    private $bitrate;
+    private float $bitrate;
 
     /**
      * ConvertStatus constructor.
@@ -134,12 +112,12 @@ class ConvertStatus implements JsonSerializable
         return $this;
     }
 
-    public function getTime(): DateTime
+    public function getTime(): DateTimeInterface
     {
         return $this->time;
     }
 
-    public function setTime(DateTime $time): ConvertStatus
+    public function setTime(DateTimeInterface $time): ConvertStatus
     {
         $this->time = $time;
 
@@ -169,6 +147,9 @@ class ConvertStatus implements JsonSerializable
         return $percent > 100 ? 100 : $percent;
     }
 
+    /**
+     * @throws Exception
+     */
     public function getTimeRemaining(): ?DateTime
     {
         if ($this->getFrames() === 0) {
@@ -201,6 +182,9 @@ class ConvertStatus implements JsonSerializable
         return $this;
     }
 
+    /**
+     * @throws Exception
+     */
     public function jsonSerialize(): array
     {
         if ($this->status === self::STATUS_GENERATE) {

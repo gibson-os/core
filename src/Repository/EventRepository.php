@@ -5,6 +5,7 @@ namespace GibsonOS\Core\Repository;
 
 use DateTime;
 use DateTimeInterface;
+use Exception;
 use GibsonOS\Core\Exception\DateTimeError;
 use GibsonOS\Core\Exception\Model\SaveError;
 use GibsonOS\Core\Exception\Repository\DeleteError;
@@ -18,10 +19,7 @@ use stdClass;
 
 class EventRepository extends AbstractRepository
 {
-    /**
-     * @var JsonUtility
-     */
-    private $jsonUtility;
+    private JsonUtility $jsonUtility;
 
     public function __construct(JsonUtility $jsonUtility)
     {
@@ -55,6 +53,8 @@ class EventRepository extends AbstractRepository
     }
 
     /**
+     * @throws Exception
+     *
      * @return Event[]
      */
     public function getTimeControlled(string $trigger, DateTimeInterface $dateTime): array
@@ -89,10 +89,7 @@ class EventRepository extends AbstractRepository
         return $this->matchModels($table->connection->fetchObjectList());
     }
 
-    /**
-     * @return mysqlTable
-     */
-    private function initializeTable()
+    private function initializeTable(): mysqlTable
     {
         $table = $this->getTable(Element::getTableName());
         $table->appendJoinLeft('`event`', '`event_element`.`event_id`=`event`.`id`');
@@ -254,9 +251,11 @@ class EventRepository extends AbstractRepository
     /**
      * @param stdClass[] $events
      *
+     * @throws Exception
+     *
      * @return Event[]
      */
-    private function matchModels($events)
+    private function matchModels(array $events): array
     {
         /**
          * @var Event[]

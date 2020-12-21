@@ -13,59 +13,35 @@ use JsonSerializable;
 
 class Media implements JsonSerializable
 {
-    /**
-     * @var string
-     */
-    private $filename;
+    private string $filename;
 
     /**
      * @var Video[]
      */
-    private $videoStreams = [];
+    private array $videoStreams = [];
 
     /**
      * @var Audio[]
      */
-    private $audioStreams = [];
+    private array $audioStreams = [];
 
     /**
      * @var Subtitle[]
      */
-    private $subtitleStreams = [];
+    private array $subtitleStreams = [];
 
-    /**
-     * @var string|null
-     */
-    private $selectedAudioStreamId;
+    private ?string $selectedAudioStreamId;
 
-    /**
-     * @var string|null
-     */
-    private $selectedVideoStreamId;
+    private ?string $selectedVideoStreamId;
 
-    /**
-     * @var string|null
-     */
-    private $selectedSubtitleStreamId;
+    private ?string $selectedSubtitleStreamId;
 
-    /**
-     * @var float
-     */
-    private $duration = 0;
+    private float $duration = 0.0;
 
-    /**
-     * @var int
-     */
-    private $frames = 0;
+    private int $frames = 0;
 
-    /**
-     * @var int
-     */
-    private $bitRate = 0;
+    private int $bitRate = 0;
 
-    /**
-     * Media constructor.
-     */
     public function __construct(string $filename)
     {
         $this->filename = $filename;

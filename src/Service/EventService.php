@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Service;
 
 use DateTime;
+use Exception;
 use GibsonOS\Core\Command\Event\RunCommand;
 use GibsonOS\Core\Event\AbstractEvent;
 use GibsonOS\Core\Event\Describer\DescriberInterface;
@@ -16,30 +17,15 @@ use GibsonOS\Core\Service\Event\CodeGeneratorService;
 
 class EventService extends AbstractService
 {
-    /**
-     * @var array
-     */
-    private $events = [];
+    private array $events = [];
 
-    /**
-     * @var ServiceManagerService
-     */
-    private $serviceManagerService;
+    private ServiceManagerService $serviceManagerService;
 
-    /**
-     * @var EventRepository
-     */
-    private $eventRepository;
+    private EventRepository $eventRepository;
 
-    /**
-     * @var CodeGeneratorService
-     */
-    private $codeGeneratorService;
+    private CodeGeneratorService $codeGeneratorService;
 
-    /**
-     * @var CommandService
-     */
-    private $commandService;
+    private CommandService $commandService;
 
     public function __construct(
         ServiceManagerService $serviceManagerService,
@@ -53,10 +39,7 @@ class EventService extends AbstractService
         $this->commandService = $commandService;
     }
 
-    /**
-     * @param callable $function
-     */
-    public function add(string $trigger, $function): void
+    public function add(string $trigger, callable $function): void
     {
         if (!isset($this->events[$trigger])) {
             $this->events[$trigger] = [];
@@ -67,6 +50,7 @@ class EventService extends AbstractService
 
     /**
      * @throws DateTimeError
+     * @throws Exception
      */
     public function fire(string $trigger, array $parameters = null): void
     {
@@ -96,7 +80,7 @@ class EventService extends AbstractService
             return;
         }
 
-        eval($this->codeGeneratorService->generateByElements($event->getElements()));
+        eval($this->codeGeneratorService->generateByElements($event->getElements() ?? []));
     }
 
     /**

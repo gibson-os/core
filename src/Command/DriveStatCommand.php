@@ -8,10 +8,7 @@ use Psr\Log\LoggerInterface;
 
 class DriveStatCommand extends AbstractCommand
 {
-    /**
-     * @var ProcessService
-     */
-    private $processService;
+    private ProcessService $processService;
 
     public function __construct(ProcessService $processService, LoggerInterface $logger)
     {

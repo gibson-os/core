@@ -37,7 +37,7 @@ class EnvService extends AbstractService
      */
     public function getBool(string $name): bool
     {
-        return mb_strtolower($this->get($name)) === 'true' ? true : false;
+        return mb_strtolower($this->get($name)) === 'true';
     }
 
     /**

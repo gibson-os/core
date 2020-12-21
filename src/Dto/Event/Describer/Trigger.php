@@ -7,19 +7,13 @@ use GibsonOS\Core\Dto\Event\Describer\Parameter\AbstractParameter;
 
 class Trigger
 {
-    /**
-     * @var string
-     */
-    private $title;
+    private string $title;
 
     /**
      * @var AbstractParameter[]
      */
-    private $parameters = [];
+    private array $parameters = [];
 
-    /**
-     * Trigger constructor.
-     */
     public function __construct(string $title)
     {
         $this->title = $title;

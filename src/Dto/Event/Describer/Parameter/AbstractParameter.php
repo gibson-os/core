@@ -5,26 +5,14 @@ namespace GibsonOS\Core\Dto\Event\Describer\Parameter;
 
 abstract class AbstractParameter
 {
-    /**
-     * @var string
-     */
-    private $title;
+    private string $title;
 
-    /**
-     * @var string
-     */
-    private $type;
+    private string $type;
 
-    /**
-     * @var array
-     */
-    private $listeners = [];
+    private array $listeners = [];
 
     abstract protected function getTypeConfig(): array;
 
-    /**
-     * AbstractParameter constructor.
-     */
     public function __construct(string $title, string $type)
     {
         $this->title = $title;

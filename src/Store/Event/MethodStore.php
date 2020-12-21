@@ -5,25 +5,20 @@ namespace GibsonOS\Core\Store\Event;
 
 use GibsonOS\Core\Dto\Event\Describer\Parameter\AbstractParameter;
 use GibsonOS\Core\Event\Describer\DescriberInterface;
+use GibsonOS\Core\Exception\FactoryError;
 use GibsonOS\Core\Service\ServiceManagerService;
 use GibsonOS\Core\Store\AbstractStore;
 
 class MethodStore extends AbstractStore
 {
-    /**
-     * @var string
-     */
-    private $describerClass = '';
+    private string $describerClass = '';
 
     /**
      * @var array[]
      */
-    private $list = [];
+    private array $list = [];
 
-    /**
-     * @var ServiceManagerService
-     */
-    private $serviceManagerService;
+    private ServiceManagerService $serviceManagerService;
 
     public function __construct(ServiceManagerService $serviceManagerService)
     {
@@ -38,6 +33,8 @@ class MethodStore extends AbstractStore
     }
 
     /**
+     * @throws FactoryError
+     *
      * @return array[]
      */
     public function getList(): array
@@ -47,11 +44,17 @@ class MethodStore extends AbstractStore
         return $this->list;
     }
 
+    /**
+     * @throws FactoryError
+     */
     public function getCount(): int
     {
         return count($this->getList());
     }
 
+    /**
+     * @throws FactoryError
+     */
     private function generateList(): void
     {
         if (count($this->list) !== 0) {

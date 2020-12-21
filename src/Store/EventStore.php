@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Store;
 
-use Exception;
 use GibsonOS\Core\Model\Event;
 
 class EventStore extends AbstractDatabaseStore
@@ -26,9 +25,6 @@ class EventStore extends AbstractDatabaseStore
         ];
     }
 
-    /**
-     * @throws Exception
-     */
     public function getList(): array
     {
         $this->table->appendJoinLeft(

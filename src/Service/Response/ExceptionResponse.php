@@ -8,23 +8,17 @@ use GibsonOS\Core\Service\RequestService;
 use GibsonOS\Core\Service\TwigService;
 use GibsonOS\Core\Utility\JsonUtility;
 use Throwable;
+use Twig\Error\LoaderError;
+use Twig\Error\RuntimeError;
+use Twig\Error\SyntaxError;
 
 class ExceptionResponse implements ResponseInterface
 {
-    /**
-     * @var Throwable
-     */
-    private $exception;
+    private Throwable $exception;
 
-    /**
-     * @var RequestService
-     */
-    private $requestService;
+    private RequestService $requestService;
 
-    /**
-     * @var TwigService
-     */
-    private $twigService;
+    private TwigService $twigService;
 
     public function __construct(Throwable $exception, RequestService $requestService, TwigService $twigService)
     {
@@ -49,6 +43,11 @@ class ExceptionResponse implements ResponseInterface
         return $headers;
     }
 
+    /**
+     * @throws LoaderError
+     * @throws RuntimeError
+     * @throws SyntaxError
+     */
     public function getBody(): string
     {
         error_log($this->exception->getMessage());

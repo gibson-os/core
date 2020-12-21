@@ -11,37 +11,22 @@ use Twig\Error\SyntaxError;
 
 class TwigResponse implements ResponseInterface
 {
-    /**
-     * @var string
-     */
-    private $template;
+    private string $template;
 
-    /**
-     * @var array
-     */
-    private $headers;
+    private array $headers;
 
-    /**
-     * @var int
-     */
-    private $code;
+    private int $code;
 
-    /**
-     * @var array
-     */
-    private $variables = [];
+    private array $variables = [];
 
-    /**
-     * @var TwigService
-     */
-    private $twig;
+    private TwigService $twigService;
 
-    public function __construct(TwigService $twig, string $template, int $code = StatusCode::OK, array $headers = [])
+    public function __construct(TwigService $twigService, string $template, int $code = StatusCode::OK, array $headers = [])
     {
         $this->template = $template;
         $this->headers = $headers;
         $this->code = $code;
-        $this->twig = $twig;
+        $this->twigService = $twigService;
     }
 
     public function getHeaders(): array
@@ -56,7 +41,7 @@ class TwigResponse implements ResponseInterface
      */
     public function getBody(): string
     {
-        return $this->twig->getTwig()->render($this->template, $this->variables);
+        return $this->twigService->getTwig()->render($this->template, $this->variables);
     }
 
     public function getRequiredHeaders(): array

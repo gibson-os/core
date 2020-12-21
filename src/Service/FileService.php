@@ -13,14 +13,8 @@ use GibsonOS\Core\Exception\SetError;
 
 class FileService extends AbstractService
 {
-    /**
-     * @var DirService
-     */
-    private $dir;
+    private DirService $dir;
 
-    /**
-     * File constructor.
-     */
     public function __construct(DirService $dir)
     {
         $this->dir = $dir;
@@ -100,7 +94,7 @@ class FileService extends AbstractService
                 $this->move($path, $to . $filename, $overwrite, $ignore);
             }
 
-            $this->delete($from, null);
+            $this->delete($from);
         } elseif ($this->isWritable($to, $overwrite)) {
             if (!rename($from, $to)) {
                 throw new CreateError(sprintf('Konnte %s nicht nach %s verschieben!', $from, $to));

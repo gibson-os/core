@@ -5,21 +5,16 @@ namespace GibsonOS\Core\Command\Event;
 
 use GibsonOS\Core\Command\AbstractCommand;
 use GibsonOS\Core\Event\Describer\TimeDescriber;
+use GibsonOS\Core\Exception\DateTimeError;
 use GibsonOS\Core\Service\DateTimeService;
 use GibsonOS\Core\Service\EventService;
 use Psr\Log\LoggerInterface;
 
 class SunChangeCommand extends AbstractCommand
 {
-    /**
-     * @var DateTimeService
-     */
-    private $dateTimeService;
+    private DateTimeService $dateTimeService;
 
-    /**
-     * @var EventService
-     */
-    private $eventService;
+    private EventService $eventService;
 
     public function __construct(DateTimeService $dateTimeService, EventService $eventService, LoggerInterface $logger)
     {
@@ -29,6 +24,9 @@ class SunChangeCommand extends AbstractCommand
         parent::__construct($logger);
     }
 
+    /**
+     * @throws DateTimeError
+     */
     protected function run(): int
     {
         $dateTimeNow = $this->dateTimeService->get();

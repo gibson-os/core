@@ -11,20 +11,11 @@ use SQLite3Stmt;
 
 class SqLiteService extends AbstractService
 {
-    /**
-     * @var string
-     */
-    private $filename;
+    private string $filename;
 
-    /**
-     * @var SQLite3
-     */
-    private $database;
+    private SQLite3 $database;
 
-    /**
-     * @var FileService
-     */
-    private $file;
+    private FileService $file;
 
     public function __construct(string $filename, FileService $file)
     {

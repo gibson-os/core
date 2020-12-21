@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Model;
 
-use DateTime;
+use DateTimeInterface;
 use GibsonOS\Core\Exception\DateTimeError;
 use GibsonOS\Core\Model\Event\Element;
 use GibsonOS\Core\Model\Event\Trigger;
@@ -11,40 +11,25 @@ use JsonSerializable;
 
 class Event extends AbstractModel implements JsonSerializable
 {
-    /**
-     * @var int|null
-     */
-    private $id;
+    private ?int $id;
+
+    private string $name;
+
+    private bool $active;
+
+    private bool $async;
+
+    private DateTimeInterface $modified;
 
     /**
-     * @var string
+     * @var Element[]|null
      */
-    private $name;
+    private ?array $elements;
 
     /**
-     * @var bool
+     * @var Trigger[]|null
      */
-    private $active;
-
-    /**
-     * @var bool
-     */
-    private $async;
-
-    /**
-     * @var DateTime
-     */
-    private $modified;
-
-    /**
-     * @var Element[]
-     */
-    private $elements;
-
-    /**
-     * @var Trigger[]
-     */
-    private $triggers;
+    private ?array $triggers;
 
     public static function getTableName(): string
     {
@@ -99,12 +84,12 @@ class Event extends AbstractModel implements JsonSerializable
         return $this;
     }
 
-    public function getModified(): DateTime
+    public function getModified(): DateTimeInterface
     {
         return $this->modified;
     }
 
-    public function setModified(DateTime $modified): Event
+    public function setModified(DateTimeInterface $modified): Event
     {
         $this->modified = $modified;
 
@@ -114,9 +99,9 @@ class Event extends AbstractModel implements JsonSerializable
     /**
      * @throws DateTimeError
      *
-     * @return Element[]
+     * @return Element[]|null
      */
-    public function getElements(): array
+    public function getElements(): ?array
     {
         if ($this->elements === null) {
             $this->loadElements();
@@ -126,9 +111,9 @@ class Event extends AbstractModel implements JsonSerializable
     }
 
     /**
-     * @param Element[] $elements
+     * @param Element[]|null $elements
      */
-    public function setElements(array $elements): Event
+    public function setElements(?array $elements): Event
     {
         $this->elements = $elements;
 
@@ -161,9 +146,9 @@ class Event extends AbstractModel implements JsonSerializable
     /**
      * @throws DateTimeError
      *
-     * @return Trigger[]
+     * @return Trigger[]|null
      */
-    public function getTriggers(): array
+    public function getTriggers(): ?array
     {
         if ($this->triggers === null) {
             $this->loadTriggers();
@@ -173,9 +158,9 @@ class Event extends AbstractModel implements JsonSerializable
     }
 
     /**
-     * @param Trigger[] $triggers
+     * @param Trigger[]|null $triggers
      */
-    public function setTriggers(array $triggers): Event
+    public function setTriggers(?array $triggers): Event
     {
         $this->triggers = $triggers;
 
@@ -205,7 +190,7 @@ class Event extends AbstractModel implements JsonSerializable
         $this->setTriggers($triggers);
     }
 
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return [
             'id' => $this->getId(),

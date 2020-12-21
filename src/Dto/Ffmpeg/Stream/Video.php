@@ -7,40 +7,19 @@ use JsonSerializable;
 
 class Video implements JsonSerializable
 {
-    /**
-     * @var string|null
-     */
-    private $language;
+    private ?string $language;
 
-    /**
-     * @var string|null
-     */
-    private $codec;
+    private ?string $codec;
 
-    /**
-     * @var string|null
-     */
-    private $colorSpace;
+    private ?string $colorSpace;
 
-    /**
-     * @var int
-     */
-    private $width = 0;
+    private int $width = 0;
 
-    /**
-     * @var int
-     */
-    private $height = 0;
+    private int $height = 0;
 
-    /**
-     * @var int
-     */
-    private $fps = 0;
+    private int $fps = 0;
 
-    /**
-     * @var bool
-     */
-    private $default = false;
+    private bool $default = false;
 
     public function getLanguage(): ?string
     {

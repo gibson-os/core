@@ -5,9 +5,6 @@ namespace GibsonOS\Core\Dto\Event\Describer\Parameter;
 
 class StringParameter extends AbstractParameter
 {
-    /**
-     * StringParameter constructor.
-     */
     public function __construct(string $title)
     {
         parent::__construct($title, 'string');

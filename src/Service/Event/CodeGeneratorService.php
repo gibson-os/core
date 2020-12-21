@@ -21,27 +21,12 @@ class CodeGeneratorService extends AbstractService
 
     private const OPERATOR_SET = '=';
 
-    private const OPERATOR_EQUAL = '===';
-
-    private const OPERATOR_NOT_EQUAL = '!==';
-
-    private const OPERATOR_SMALLER = '<';
-
-    private const OPERATOR_SMALLER_EQUAL = '<=';
-
-    private const OPERATOR_BIGGER = '>';
-
-    private const OPERATOR_BIGGER_EQUAL = '>=';
-
-    /**
-     * @var int|null
-     */
-    private $parentId;
+    private ?int $parentId;
 
     /**
      * @var Element[]
      */
-    private $parents = [];
+    private array $parents = [];
 
     /**
      * @param Element[] $elements

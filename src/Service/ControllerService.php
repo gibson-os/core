@@ -5,6 +5,7 @@ namespace GibsonOS\Core\Service;
 
 use GibsonOS\Core\Exception\ControllerError;
 use GibsonOS\Core\Exception\FactoryError;
+use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\RequestError;
 use GibsonOS\Core\Service\Response\AjaxResponse;
 use GibsonOS\Core\Service\Response\ExceptionResponse;
@@ -20,30 +21,15 @@ use Throwable;
 
 class ControllerService
 {
-    /**
-     * @var ServiceManagerService
-     */
-    private $serviceManagerService;
+    private ServiceManagerService $serviceManagerService;
 
-    /**
-     * @var RequestService
-     */
-    private $requestService;
+    private RequestService $requestService;
 
-    /**
-     * @var StatusCode
-     */
-    private $statusCode;
+    private StatusCode $statusCode;
 
-    /**
-     * @var TwigService
-     */
-    private $twigService;
+    private TwigService $twigService;
 
-    /**
-     * @var EnvService
-     */
-    private $envService;
+    private EnvService $envService;
 
     public function __construct(
         ServiceManagerService $serviceManagerService,
@@ -121,6 +107,10 @@ class ControllerService
         $this->outputResponse($response);
     }
 
+    /**
+     * @throws FactoryError
+     * @throws GetError
+     */
     private function renderTemplate(): TwigResponse
     {
         $now = time();

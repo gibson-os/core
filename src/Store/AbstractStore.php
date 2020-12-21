@@ -5,15 +5,9 @@ namespace GibsonOS\Core\Store;
 
 abstract class AbstractStore
 {
-    /**
-     * @var int
-     */
-    private $rows = 0;
+    private int $rows = 0;
 
-    /**
-     * @var int
-     */
-    private $from = 0;
+    private int $from = 0;
 
     abstract public function getList(): iterable;
 
@@ -25,18 +19,12 @@ abstract class AbstractStore
         $this->from = $from;
     }
 
-    /**
-     * @return int
-     */
-    public function getRows()
+    public function getRows(): int
     {
         return $this->rows;
     }
 
-    /**
-     * @return int
-     */
-    public function getFrom()
+    public function getFrom(): int
     {
         return $this->from;
     }

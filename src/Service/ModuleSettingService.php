@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Service;
 
 use GibsonOS\Core\Exception\DateTimeError;
-use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\Model\SaveError;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\Setting;
@@ -19,31 +18,16 @@ class ModuleSettingService extends AbstractService
     /**
      * @var Setting[][]|Setting[][][]
      */
-    private $moduleSettings = [];
+    private array $moduleSettings = [];
 
-    /**
-     * @var ModuleRepository
-     */
-    private $moduleRepository;
+    private ModuleRepository $moduleRepository;
 
-    /**
-     * @var SettingRepository
-     */
-    private $settingRepository;
+    private SettingRepository $settingRepository;
 
-    /**
-     * @var RequestService
-     */
-    private $requestService;
+    private RequestService $requestService;
 
-    /**
-     * @var SessionService
-     */
-    private $sessionService;
+    private SessionService $sessionService;
 
-    /**
-     * ModuleSettingService constructor.
-     */
     public function __construct(
         ModuleRepository $moduleRepository,
         SettingRepository $settingRepository,
@@ -58,7 +42,6 @@ class ModuleSettingService extends AbstractService
 
     /**
      * @throws DateTimeError
-     * @throws GetError
      * @throws SelectError
      *
      * @return Setting|Setting[]
@@ -70,7 +53,6 @@ class ModuleSettingService extends AbstractService
 
     /**
      * @throws DateTimeError
-     * @throws GetError
      * @throws SelectError
      *
      * @return Setting|Setting[]
@@ -82,7 +64,6 @@ class ModuleSettingService extends AbstractService
 
     /**
      * @throws DateTimeError
-     * @throws GetError
      * @throws SelectError
      *
      * @return Setting|Setting[]
@@ -110,7 +91,6 @@ class ModuleSettingService extends AbstractService
 
     /**
      * @throws DateTimeError
-     * @throws GetError
      * @throws SaveError
      * @throws SelectError
      */
@@ -121,7 +101,6 @@ class ModuleSettingService extends AbstractService
 
     /**
      * @throws DateTimeError
-     * @throws GetError
      * @throws SaveError
      * @throws SelectError
      */
@@ -132,7 +111,6 @@ class ModuleSettingService extends AbstractService
 
     /**
      * @throws DateTimeError
-     * @throws GetError
      * @throws SaveError
      */
     public function setById(int $moduleId, string $key, string $value, int $userId = null): void
@@ -152,7 +130,6 @@ class ModuleSettingService extends AbstractService
 
     /**
      * @throws DateTimeError
-     * @throws GetError
      * @throws SelectError
      */
     private function getModuleIdByName(string $name): int
@@ -164,7 +141,6 @@ class ModuleSettingService extends AbstractService
 
     /**
      * @throws DateTimeError
-     * @throws GetError
      * @throws SelectError
      *
      * @return Setting[]|Setting

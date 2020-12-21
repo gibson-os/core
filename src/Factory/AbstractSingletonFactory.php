@@ -8,11 +8,11 @@ abstract class AbstractSingletonFactory implements FactoryInterface
     /**
      * @var object[]
      */
-    private static $instances = [];
+    private static array $instances = [];
 
     abstract protected static function createInstance();
 
-    public static function create()
+    public static function create(): object
     {
         $class = get_called_class();
 

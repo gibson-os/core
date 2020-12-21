@@ -36,11 +36,11 @@ class LoggerService implements LoggerInterface
         LogLevel::DEBUG => self::LEVEL_DEBUG,
     ];
 
-    private $level = self::LEVEL_ERROR;
+    private int $level = self::LEVEL_ERROR;
 
-    private $writeOut = false;
+    private bool $writeOut = false;
 
-    private $debug = false;
+    private bool $debug = false;
 
     public function emergency($message, array $context = []): void
     {

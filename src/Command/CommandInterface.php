@@ -5,6 +5,9 @@ namespace GibsonOS\Core\Command;
 
 interface CommandInterface
 {
+    /**
+     * @param string[] $arguments
+     */
     public function setArguments(array $arguments): CommandInterface;
 
     public function setOptions(array $options): CommandInterface;

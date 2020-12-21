@@ -7,20 +7,11 @@ use JsonSerializable;
 
 class Subtitle implements JsonSerializable
 {
-    /**
-     * @var string|null
-     */
-    private $language;
+    private ?string $language;
 
-    /**
-     * @var bool
-     */
-    private $default = false;
+    private bool $default = false;
 
-    /**
-     * @var bool
-     */
-    private $forced = false;
+    private bool $forced = false;
 
     public function getLanguage(): ?string
     {

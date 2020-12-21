@@ -12,10 +12,7 @@ class AjaxResponse implements ResponseInterface
      */
     private $body;
 
-    /**
-     * @var int
-     */
-    private $code;
+    private int $code;
 
     /**
      * @param mixed $body

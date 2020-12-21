@@ -5,14 +5,8 @@ namespace GibsonOS\Core\Dto\Event\Describer\Parameter;
 
 class OptionParameter extends AbstractParameter
 {
-    /**
-     * @var array
-     */
-    private $options;
+    private array $options;
 
-    /**
-     * IntParameter constructor.
-     */
     public function __construct(string $title, array $options)
     {
         parent::__construct($title, 'option');

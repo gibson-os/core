@@ -28,6 +28,9 @@ class CronjobStore extends AbstractDatabaseStore
         ];
     }
 
+    /**
+     * @throws SelectError
+     */
     public function getList(): array
     {
         if ($this->table->select(false) === false) {

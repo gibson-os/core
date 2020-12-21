@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Store\Event;
 
 use GibsonOS\Core\Exception\DateTimeError;
+use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\Event\Element;
 use GibsonOS\Core\Store\AbstractDatabaseStore;
@@ -12,15 +13,9 @@ use mysqlDatabase;
 
 class ElementStore extends AbstractDatabaseStore
 {
-    /**
-     * @var ClassNameStore
-     */
-    private $classNameStore;
+    private ClassNameStore $classNameStore;
 
-    /**
-     * @var MethodStore
-     */
-    private $methodStore;
+    private MethodStore $methodStore;
 
     public function __construct(
         ClassNameStore $classNameStore,
@@ -32,10 +27,7 @@ class ElementStore extends AbstractDatabaseStore
         $this->methodStore = $methodStore;
     }
 
-    /**
-     * @var int|null
-     */
-    private $eventId;
+    private ?int $eventId;
 
     public function setEventId(int $eventId): void
     {
@@ -59,6 +51,8 @@ class ElementStore extends AbstractDatabaseStore
 
     /**
      * @throws DateTimeError
+     * @throws SelectError
+     * @throws GetError
      *
      * @return Element[]
      */

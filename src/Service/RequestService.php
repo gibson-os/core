@@ -11,27 +11,15 @@ class RequestService
 
     public const METHOD_POST = 'POST';
 
-    private $requestValues = [];
+    private array $requestValues = [];
 
-    /**
-     * @var string
-     */
-    private $moduleName;
+    private string $moduleName;
 
-    /**
-     * @var string
-     */
-    private $taskName;
+    private string $taskName;
 
-    /**
-     * @var string
-     */
-    private $actionName;
+    private string $actionName;
 
-    /**
-     * @var string
-     */
-    private $queryString;
+    private string $queryString;
 
     public function __construct()
     {

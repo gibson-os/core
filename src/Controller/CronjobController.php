@@ -30,6 +30,10 @@ class CronjobController extends AbstractController
         return $this->returnSuccess($cronjobStore->getList(), $cronjobStore->getCount());
     }
 
+    /**
+     * @throws LoginRequired
+     * @throws PermissionDenied
+     */
     public function times(TimeStore $timeStore): AjaxResponse
     {
         $this->checkPermission(PermissionService::READ);

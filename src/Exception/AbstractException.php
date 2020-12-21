@@ -26,40 +26,22 @@ abstract class AbstractException extends Exception
 
     const PROMPT = 4;
 
-    /**
-     * @var string|null
-     */
-    private $title;
+    private ?string $title;
 
-    /**
-     * @var int
-     */
-    private $type = self::ERROR;
+    private int $type = self::ERROR;
 
-    /**
-     * @var array
-     */
-    private $extraParameters = [];
+    private array $extraParameters = [];
 
-    /**
-     * @var array
-     */
-    private $buttons = [];
+    private array $buttons = [];
 
-    /**
-     * @var string|null
-     */
-    private $promptParameter;
+    private ?string $promptParameter;
 
     public function getTitle(): ?string
     {
         return $this->title;
     }
 
-    /**
-     * @param string|null $title
-     */
-    public function setTitle($title): AbstractException
+    public function setTitle(?string $title): AbstractException
     {
         $this->title = $title;
 
@@ -71,10 +53,7 @@ abstract class AbstractException extends Exception
         return $this->type;
     }
 
-    /**
-     * @param int $type
-     */
-    public function setType($type): AbstractException
+    public function setType(int $type): AbstractException
     {
         $this->type = $type;
 

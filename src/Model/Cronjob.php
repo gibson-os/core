@@ -7,45 +7,21 @@ use DateTimeInterface;
 
 class Cronjob extends AbstractModel
 {
-    /**
-     * @var int|null
-     */
-    private $id;
+    private ?int $id;
 
-    /**
-     * @var string
-     */
-    private $command;
+    private string $command;
 
-    /**
-     * @var string|null
-     */
-    private $arguments;
+    private ?string $arguments;
 
-    /**
-     * @var string|null
-     */
-    private $options;
+    private ?string $options;
 
-    /**
-     * @var string
-     */
-    private $user;
+    private string $user;
 
-    /**
-     * @var DateTimeInterface|null
-     */
-    private $lastRun;
+    private ?DateTimeInterface $lastRun;
 
-    /**
-     * @var bool
-     */
-    private $active;
+    private bool $active;
 
-    /**
-     * @var DateTimeInterface
-     */
-    private $added;
+    private DateTimeInterface $added;
 
     public static function getTableName(): string
     {

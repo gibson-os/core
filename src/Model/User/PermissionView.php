@@ -7,60 +7,27 @@ use GibsonOS\Core\Model\AbstractModel;
 
 class PermissionView extends AbstractModel
 {
-    /**
-     * @var int
-     */
-    private $userId;
+    private int $userId;
 
-    /**
-     * @var int
-     */
-    private $permission;
+    private int $permission;
 
-    /**
-     * @var string
-     */
-    private $module;
+    private string $module;
 
-    /**
-     * @var string
-     */
-    private $task;
+    private string $task;
 
-    /**
-     * @var string
-     */
-    private $action;
+    private string $action;
 
-    /**
-     * @var int|null
-     */
-    private $moduleId;
+    private ?int $moduleId;
 
-    /**
-     * @var string|null
-     */
-    private $moduleName;
+    private ?string $moduleName;
 
-    /**
-     * @var int|null
-     */
-    private $taskId;
+    private ?int $taskId;
 
-    /**
-     * @var string|null
-     */
-    private $taskName;
+    private ?string $taskName;
 
-    /**
-     * @var int|null
-     */
-    private $actionId;
+    private ?int $actionId;
 
-    /**
-     * @var string|null
-     */
-    private $actionName;
+    private ?string $actionName;
 
     public static function getTableName(): string
     {

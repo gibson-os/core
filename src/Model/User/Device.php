@@ -13,45 +13,21 @@ use mysqlDatabase;
 
 class Device extends AbstractModel
 {
-    /**
-     * @var string
-     */
-    private $id = '';
+    private string $id = '';
 
-    /**
-     * @var int
-     */
-    private $userId = 0;
+    private int $userId = 0;
 
-    /**
-     * @var string
-     */
-    private $model = '';
+    private string $model = '';
 
-    /**
-     * @var string|null
-     */
-    private $registrationId;
+    private ?string $registrationId;
 
-    /**
-     * @var string|null
-     */
-    private $token;
+    private ?string $token;
 
-    /**
-     * @var DateTimeInterface|null
-     */
-    private $lastLogin;
+    private ?DateTimeInterface $lastLogin;
 
-    /**
-     * @var DateTimeInterface
-     */
-    private $added;
+    private DateTimeInterface $added;
 
-    /**
-     * @var User
-     */
-    private $user;
+    private User $user;
 
     public function __construct(mysqlDatabase $database = null)
     {

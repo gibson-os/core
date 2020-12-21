@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Service;
 
+use Exception;
 use GibsonOS\Core\Exception\DateTimeError;
 use GibsonOS\Core\Exception\Flock\LockError;
 use GibsonOS\Core\Exception\Flock\UnlockError;
@@ -14,10 +15,7 @@ use GibsonOS\Core\Repository\LockRepository;
 
 class LockService extends AbstractService
 {
-    /**
-     * @var LockRepository
-     */
-    private $lockRepository;
+    private LockRepository $lockRepository;
 
     public function __construct(LockRepository $lockRepository)
     {
@@ -25,11 +23,11 @@ class LockService extends AbstractService
     }
 
     /**
-     * @param string|null $name
-     *
+     * @throws DateTimeError
      * @throws LockError
+     * @throws Exception
      */
-    public function lock($name = null): void
+    public function lock(string $name = null): void
     {
         $name = $this->getName($name);
 
@@ -56,11 +54,9 @@ class LockService extends AbstractService
     }
 
     /**
-     * @param string|null $name
-     *
      * @throws UnlockError
      */
-    public function unlock($name = null): void
+    public function unlock(string $name = null): void
     {
         $name = $this->getName($name);
 
@@ -73,9 +69,9 @@ class LockService extends AbstractService
     }
 
     /**
-     * @param string|null $name
+     * @throws DateTimeError
      */
-    public function waitUnlockToLock($name = null): void
+    public function waitUnlockToLock(string $name = null): void
     {
         try {
             $this->lock($name);

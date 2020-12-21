@@ -4,26 +4,19 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Service;
 
 use DateTime;
+use GibsonOS\Core\Exception\DateTimeError;
+use GibsonOS\Core\Exception\Model\SaveError;
 use GibsonOS\Core\Repository\CronjobRepository;
 use GibsonOS\Core\Utility\JsonUtility;
 use Psr\Log\LoggerInterface;
 
 class CronjobService
 {
-    /**
-     * @var CronjobRepository
-     */
-    private $cronjobRepository;
+    private CronjobRepository $cronjobRepository;
 
-    /**
-     * @var CommandService
-     */
-    private $commandService;
+    private CommandService $commandService;
 
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
+    private LoggerInterface $logger;
 
     public function __construct(
         CronjobRepository $cronjobRepository,
@@ -49,6 +42,10 @@ class CronjobService
     ): void {
     }
 
+    /**
+     * @throws DateTimeError
+     * @throws SaveError
+     */
     public function run(string $user): void
     {
         $dateTime = new DateTime();

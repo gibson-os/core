@@ -11,25 +11,13 @@ use mysqlTable;
 
 abstract class AbstractDatabaseStore extends AbstractStore
 {
-    /**
-     * @var mysqlDatabase
-     */
-    protected $database;
+    protected mysqlDatabase $database;
 
-    /**
-     * @var mysqlTable
-     */
-    protected $table;
+    protected mysqlTable $table;
 
-    /**
-     * @var array
-     */
-    protected $where = [];
+    protected array $where = [];
 
-    /**
-     * @var string|null
-     */
-    private $orderBy;
+    private ?string $orderBy;
 
     abstract protected function getTableName(): string;
 

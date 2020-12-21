@@ -9,18 +9,24 @@ use Psr\Log\LoggerInterface;
 
 abstract class AbstractCommand implements CommandInterface
 {
-    private $argumentsValues = [];
+    /**
+     * @var string[]
+     */
+    private array $argumentsValues = [];
 
-    private $optionsValues = [];
-
-    private $arguments = [];
-
-    private $options = [];
+    private array $optionsValues = [];
 
     /**
-     * @var LoggerInterface
+     * @var bool[]
      */
-    protected $logger;
+    private array $arguments = [];
+
+    /**
+     * @var string[]
+     */
+    private array $options = [];
+
+    protected LoggerInterface $logger;
 
     public function __construct(LoggerInterface $logger)
     {
@@ -58,6 +64,9 @@ abstract class AbstractCommand implements CommandInterface
         return $this->run();
     }
 
+    /**
+     * @param string[] $callArguments
+     */
     public function setArguments(array $callArguments): CommandInterface
     {
         $this->argumentsValues = $callArguments;

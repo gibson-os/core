@@ -5,30 +5,18 @@ namespace GibsonOS\Core\Dto;
 
 class Javascript
 {
-    /**
-     * @var string
-     */
-    private $filename;
+    private string $filename;
 
-    /**
-     * @var string
-     */
-    private $namespace;
+    private string $namespace;
 
-    /**
-     * @var
-     */
-    private $content;
+    private string $content;
 
-    /**
-     * @var bool
-     */
-    private $loaded = false;
+    private bool $loaded = false;
 
     /**
      * @var string[]
      */
-    private $beforeLoad = [];
+    private array $beforeLoad = [];
 
     public function __construct(string $filename, string $namespace, string $content)
     {
@@ -61,20 +49,12 @@ class Javascript
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getContent()
+    public function getContent(): string
     {
         return $this->content;
     }
 
-    /**
-     * @param mixed $content
-     *
-     * @return Javascript
-     */
-    public function setContent($content)
+    public function setContent(string $content): Javascript
     {
         $this->content = $content;
 

@@ -10,20 +10,11 @@ use Exception;
 
 class DateTimeService extends AbstractService
 {
-    /**
-     * @var DateTimeZone
-     */
-    private $timezone;
+    private DateTimeZone $timezone;
 
-    /**
-     * @var float
-     */
-    private $latitude;
+    private float $latitude;
 
-    /**
-     * @var float
-     */
-    private $longitude;
+    private float $longitude;
 
     public function __construct(DateTimeZone $timezone, float $latitude, float $longitude)
     {

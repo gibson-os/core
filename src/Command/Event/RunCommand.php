@@ -13,15 +13,9 @@ use Psr\Log\LoggerInterface;
 
 class RunCommand extends AbstractCommand
 {
-    /**
-     * @var EventRepository
-     */
-    private $eventRepository;
+    private EventRepository $eventRepository;
 
-    /**
-     * @var EventService
-     */
-    private $eventService;
+    private EventService $eventService;
 
     public function __construct(EventRepository $eventRepository, EventService $eventService, LoggerInterface $logger)
     {

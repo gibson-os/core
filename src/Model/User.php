@@ -10,40 +10,19 @@ use mysqlDatabase;
 
 class User extends AbstractModel implements JsonSerializable
 {
-    /**
-     * @var int|null
-     */
-    private $id;
+    private ?int $id;
 
-    /**
-     * @var string
-     */
-    private $user = '';
+    private string $user = '';
 
-    /**
-     * @var string|null
-     */
-    private $host;
+    private ?string $host;
 
-    /**
-     * @var string|null
-     */
-    private $ip;
+    private ?string $ip;
 
-    /**
-     * @var string|null
-     */
-    private $password;
+    private ?string $password;
 
-    /**
-     * @var DateTimeInterface|null
-     */
-    private $lastLogin;
+    private ?DateTimeInterface $lastLogin;
 
-    /**
-     * @var DateTimeInterface
-     */
-    private $added;
+    private DateTimeInterface $added;
 
     public function __construct(mysqlDatabase $database = null)
     {
@@ -141,7 +120,7 @@ class User extends AbstractModel implements JsonSerializable
         return $this;
     }
 
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return [
             'id' => $this->getId(),

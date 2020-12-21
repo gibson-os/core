@@ -5,20 +5,11 @@ namespace GibsonOS\Core\Dto;
 
 class UdpMessage
 {
-    /**
-     * @var string
-     */
-    private $ip;
+    private string $ip;
 
-    /**
-     * @var int
-     */
-    private $port;
+    private int $port;
 
-    /**
-     * @var string
-     */
-    private $message;
+    private string $message;
 
     public function __construct(string $ip, int $port, string $message)
     {

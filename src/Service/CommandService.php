@@ -9,15 +9,9 @@ use GibsonOS\Core\Exception\FactoryError;
 
 class CommandService
 {
-    /**
-     * @var ServiceManagerService
-     */
-    private $serviceManager;
+    private ServiceManagerService $serviceManager;
 
-    /**
-     * @var ProcessService
-     */
-    private $processService;
+    private ProcessService $processService;
 
     public function __construct(ServiceManagerService $serviceManagerService, ProcessService $processService)
     {

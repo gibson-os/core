@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Service;
 
+use GibsonOS\Core\Exception\DateTimeError;
+use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Repository\User\PermissionRepository;
 
 class PermissionService
@@ -19,16 +21,17 @@ class PermissionService
 
     public const MANAGE = 16; // 10000
 
-    /**
-     * @var PermissionRepository
-     */
-    private $permissionRepository;
+    private PermissionRepository $permissionRepository;
 
     public function __construct(PermissionRepository $permissionRepository)
     {
         $this->permissionRepository = $permissionRepository;
     }
 
+    /**
+     * @throws DateTimeError
+     * @throws SelectError
+     */
     public function getPermission(string $module, string $task = null, string $action = null, int $userId = null): int
     {
         if ($task === null) {
@@ -42,6 +45,10 @@ class PermissionService
         return $this->permissionRepository->getPermissionByAction($module, $task, $action, $userId)->getPermission();
     }
 
+    /**
+     * @throws DateTimeError
+     * @throws SelectError
+     */
     public function hasPermission(
         int $permission,
         string $module,
@@ -61,26 +68,46 @@ class PermissionService
         return ($permissionValue & $permission) === $permission;
     }
 
+    /**
+     * @throws DateTimeError
+     * @throws SelectError
+     */
     public function isDenied(string $module, string $task = null, string $action = null, int $userId = null): bool
     {
         return $this->hasPermission(self::DENIED, $module, $task, $action, $userId);
     }
 
+    /**
+     * @throws DateTimeError
+     * @throws SelectError
+     */
     public function hasReadPermission(string $module, string $task = null, string $action = null, int $userId = null): bool
     {
         return $this->hasPermission(self::READ, $module, $task, $action, $userId);
     }
 
+    /**
+     * @throws DateTimeError
+     * @throws SelectError
+     */
     public function hasWritePermission(string $module, string $task = null, string $action = null, int $userId = null): bool
     {
         return $this->hasPermission(self::WRITE, $module, $task, $action, $userId);
     }
 
+    /**
+     * @throws DateTimeError
+     * @throws SelectError
+     */
     public function hasDeletePermission(string $module, string $task = null, string $action = null, int $userId = null): bool
     {
         return $this->hasPermission(self::DELETE, $module, $task, $action, $userId);
     }
 
+    /**
+     * @throws DateTimeError
+     * @throws SelectError
+     */
     public function hasManagePermission(string $module, string $task = null, string $action = null, int $userId = null): bool
     {
         return $this->hasPermission(self::MANAGE, $module, $task, $action, $userId);

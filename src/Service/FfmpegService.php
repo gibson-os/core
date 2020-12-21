@@ -6,7 +6,6 @@ namespace GibsonOS\Core\Service;
 use GibsonOS\Core\Dto\Ffmpeg\ConvertStatus;
 use GibsonOS\Core\Dto\Ffmpeg\Media;
 use GibsonOS\Core\Dto\Image as ImageDto;
-use GibsonOS\Core\Exception\DateTimeError;
 use GibsonOS\Core\Exception\DeleteError;
 use GibsonOS\Core\Exception\Ffmpeg\ConvertStatusError;
 use GibsonOS\Core\Exception\File\OpenError;
@@ -17,30 +16,15 @@ use GibsonOS\Core\Exception\ProcessError;
 
 class FfmpegService extends AbstractService
 {
-    /**
-     * @var string
-     */
-    public $ffpmegPath;
+    public string $ffpmegPath;
 
-    /**
-     * @var DateTimeService
-     */
-    private $dateTime;
+    private DateTimeService $dateTime;
 
-    /**
-     * @var FileService
-     */
-    private $file;
+    private FileService $file;
 
-    /**
-     * @var ProcessService
-     */
-    private $process;
+    private ProcessService $process;
 
-    /**
-     * @var ImageService
-     */
-    private $image;
+    private ImageService $image;
 
     /**
      * @throws GetError
@@ -156,7 +140,6 @@ class FfmpegService extends AbstractService
 
     /**
      * @throws ConvertStatusError
-     * @throws DateTimeError
      * @throws FileNotFound
      * @throws OpenError
      */

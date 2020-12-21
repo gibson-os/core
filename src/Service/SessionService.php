@@ -12,7 +12,7 @@ class SessionService
 
     const USER_ID = 'userId';
 
-    private $data = [];
+    private array $data;
 
     public function __construct()
     {
