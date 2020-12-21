@@ -17,17 +17,17 @@ class PermissionView extends AbstractModel
 
     private string $action;
 
-    private ?int $moduleId;
+    private ?int $moduleId = null;
 
-    private ?string $moduleName;
+    private ?string $moduleName = null;
 
-    private ?int $taskId;
+    private ?int $taskId = null;
 
-    private ?string $taskName;
+    private ?string $taskName = null;
 
-    private ?int $actionId;
+    private ?int $actionId = null;
 
-    private ?string $actionName;
+    private ?string $actionName = null;
 
     public static function getTableName(): string
     {

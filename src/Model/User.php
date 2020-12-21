@@ -10,17 +10,17 @@ use mysqlDatabase;
 
 class User extends AbstractModel implements JsonSerializable
 {
-    private ?int $id;
+    private ?int $id = null;
 
     private string $user = '';
 
-    private ?string $host;
+    private ?string $host = null;
 
-    private ?string $ip;
+    private ?string $ip = null;
 
-    private ?string $password;
+    private ?string $password = null;
 
-    private ?DateTimeInterface $lastLogin;
+    private ?DateTimeInterface $lastLogin = null;
 
     private DateTimeInterface $added;
 

@@ -26,7 +26,7 @@ abstract class AbstractException extends Exception
 
     const PROMPT = 4;
 
-    private ?string $title;
+    private ?string $title = null;
 
     private int $type = self::ERROR;
 
@@ -34,7 +34,7 @@ abstract class AbstractException extends Exception
 
     private array $buttons = [];
 
-    private ?string $promptParameter;
+    private ?string $promptParameter = null;
 
     public function getTitle(): ?string
     {

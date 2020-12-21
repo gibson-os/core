@@ -13,7 +13,7 @@ use mysqlDatabase;
 
 class Trigger extends AbstractModel implements JsonSerializable
 {
-    private ?int $id;
+    private ?int $id = null;
 
     private int $eventId;
 
@@ -31,23 +31,23 @@ class Trigger extends AbstractModel implements JsonSerializable
      */
     private string $triggerTitle;
 
-    private ?string $parameters;
+    private ?string $parameters = null;
 
-    private ?int $weekday;
+    private ?int $weekday = null;
 
-    private ?int $day;
+    private ?int $day = null;
 
-    private ?int $month;
+    private ?int $month = null;
 
-    private ?int $year;
+    private ?int $year = null;
 
-    private ?int $hour;
+    private ?int $hour = null;
 
-    private ?int $minute;
+    private ?int $minute = null;
 
-    private ?int $second;
+    private ?int $second = null;
 
-    private ?int $priority;
+    private ?int $priority = null;
 
     private Event $event;
 

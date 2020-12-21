@@ -7,17 +7,17 @@ use DateTimeInterface;
 
 class Cronjob extends AbstractModel
 {
-    private ?int $id;
+    private ?int $id = null;
 
     private string $command;
 
-    private ?string $arguments;
+    private ?string $arguments = null;
 
-    private ?string $options;
+    private ?string $options = null;
 
     private string $user;
 
-    private ?DateTimeInterface $lastRun;
+    private ?DateTimeInterface $lastRun = null;
 
     private bool $active;
 

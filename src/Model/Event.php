@@ -11,7 +11,7 @@ use JsonSerializable;
 
 class Event extends AbstractModel implements JsonSerializable
 {
-    private ?int $id;
+    private ?int $id = null;
 
     private string $name;
 
@@ -24,12 +24,12 @@ class Event extends AbstractModel implements JsonSerializable
     /**
      * @var Element[]|null
      */
-    private ?array $elements;
+    private ?array $elements = null;
 
     /**
      * @var Trigger[]|null
      */
-    private ?array $triggers;
+    private ?array $triggers = null;
 
     public static function getTableName(): string
     {

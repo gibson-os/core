@@ -5,9 +5,9 @@ namespace GibsonOS\Core\Dto\Event\Describer\Parameter;
 
 class IntParameter extends AbstractParameter
 {
-    private ?int $min;
+    private ?int $min = null;
 
-    private ?int $max;
+    private ?int $max = null;
 
     public function __construct(string $title)
     {

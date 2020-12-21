@@ -5,7 +5,7 @@ namespace GibsonOS\Core\Model;
 
 class Module extends AbstractModel
 {
-    private ?int $id;
+    private ?int $id = null;
 
     private string $name = '';
 

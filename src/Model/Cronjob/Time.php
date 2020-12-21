@@ -10,37 +10,37 @@ use GibsonOS\Core\Model\Cronjob;
 
 class Time extends AbstractModel
 {
-    private ?int $id;
+    private ?int $id = null;
 
     private int $cronjobId;
 
-    private ?int $fromHour;
+    private ?int $fromHour = null;
 
-    private ?int $toHour;
+    private ?int $toHour = null;
 
-    private ?int $fromMinute;
+    private ?int $fromMinute = null;
 
-    private ?int $toMinute;
+    private ?int $toMinute = null;
 
-    private ?int $fromSecond;
+    private ?int $fromSecond = null;
 
-    private ?int $toSecond;
+    private ?int $toSecond = null;
 
-    private ?int $fromDayOfMonth;
+    private ?int $fromDayOfMonth = null;
 
-    private ?int $toDayOfMonth;
+    private ?int $toDayOfMonth = null;
 
-    private ?int $fromDayOfWeek;
+    private ?int $fromDayOfWeek = null;
 
-    private ?int $toDayOfWeek;
+    private ?int $toDayOfWeek = null;
 
-    private ?int $fromMonth;
+    private ?int $fromMonth = null;
 
-    private ?int $toMonth;
+    private ?int $toMonth = null;
 
-    private ?int $fromYear;
+    private ?int $fromYear = null;
 
-    private ?int $toYear;
+    private ?int $toYear = null;
 
     private Cronjob $cronjob;
 

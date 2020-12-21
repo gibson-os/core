@@ -21,7 +21,7 @@ class CodeGeneratorService extends AbstractService
 
     private const OPERATOR_SET = '=';
 
-    private ?int $parentId;
+    private ?int $parentId = null;
 
     /**
      * @var Element[]

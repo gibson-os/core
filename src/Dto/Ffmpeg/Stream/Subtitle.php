@@ -7,7 +7,7 @@ use JsonSerializable;
 
 class Subtitle implements JsonSerializable
 {
-    private ?string $language;
+    private ?string $language = null;
 
     private bool $default = false;
 

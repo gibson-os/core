@@ -7,11 +7,11 @@ use JsonSerializable;
 
 class Video implements JsonSerializable
 {
-    private ?string $language;
+    private ?string $language = null;
 
-    private ?string $codec;
+    private ?string $codec = null;
 
-    private ?string $colorSpace;
+    private ?string $colorSpace = null;
 
     private int $width = 0;
 

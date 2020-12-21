@@ -7,15 +7,15 @@ use JsonSerializable;
 
 class Audio implements JsonSerializable
 {
-    private ?string $language;
+    private ?string $language = null;
 
-    private ?string $format;
+    private ?string $format = null;
 
-    private ?string $frequency;
+    private ?string $frequency = null;
 
-    private ?string $channels;
+    private ?string $channels = null;
 
-    private ?string $bitRate;
+    private ?string $bitRate = null;
 
     private bool $default = false;
 

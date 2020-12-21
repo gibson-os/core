@@ -30,11 +30,11 @@ class Media implements JsonSerializable
      */
     private array $subtitleStreams = [];
 
-    private ?string $selectedAudioStreamId;
+    private ?string $selectedAudioStreamId = null;
 
-    private ?string $selectedVideoStreamId;
+    private ?string $selectedVideoStreamId = null;
 
-    private ?string $selectedSubtitleStreamId;
+    private ?string $selectedSubtitleStreamId = null;
 
     private float $duration = 0.0;
 

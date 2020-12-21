@@ -19,11 +19,11 @@ class Device extends AbstractModel
 
     private string $model = '';
 
-    private ?string $registrationId;
+    private ?string $registrationId = null;
 
-    private ?string $token;
+    private ?string $token = null;
 
-    private ?DateTimeInterface $lastLogin;
+    private ?DateTimeInterface $lastLogin = null;
 
     private DateTimeInterface $added;
 

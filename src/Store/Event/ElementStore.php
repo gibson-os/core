@@ -27,7 +27,7 @@ class ElementStore extends AbstractDatabaseStore
         $this->methodStore = $methodStore;
     }
 
-    private ?int $eventId;
+    private ?int $eventId = null;
 
     public function setEventId(int $eventId): void
     {

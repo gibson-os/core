@@ -13,11 +13,11 @@ use Serializable;
 
 class Element extends AbstractModel implements Serializable, JsonSerializable
 {
-    private ?int $id;
+    private ?int $id = null;
 
     private int $eventId;
 
-    private ?int $parentId;
+    private ?int $parentId = null;
 
     private int $order = 0;
 
@@ -35,22 +35,22 @@ class Element extends AbstractModel implements Serializable, JsonSerializable
      */
     private string $methodTitle;
 
-    private ?string $parameters;
+    private ?string $parameters = null;
 
-    private ?string $command;
+    private ?string $command = null;
 
-    private ?string $operator;
+    private ?string $operator = null;
 
-    private ?string $returns;
+    private ?string $returns = null;
 
     private Event $event;
 
-    private ?Element $parent;
+    private ?Element $parent = null;
 
     /**
      * @var Element[]|null
      */
-    private ?array $children;
+    private ?array $children = null;
 
     public function __construct(mysqlDatabase $database = null)
     {

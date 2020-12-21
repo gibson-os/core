@@ -17,7 +17,7 @@ abstract class AbstractDatabaseStore extends AbstractStore
 
     protected array $where = [];
 
-    private ?string $orderBy;
+    private ?string $orderBy = null;
 
     abstract protected function getTableName(): string;
 

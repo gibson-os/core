@@ -8,7 +8,7 @@ use mysqlDatabase;
 
 class Action extends AbstractModel
 {
-    private ?int $id;
+    private ?int $id = null;
 
     private string $name = '';
 
