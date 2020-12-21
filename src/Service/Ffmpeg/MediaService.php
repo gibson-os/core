@@ -149,7 +149,7 @@ class MediaService
             );
         }
 
-        return $this->getImageByFrame($media, (int) (($second * $media->getSelectedVideoStream()->getFps()) + $frame));
+        return $this->getImageByFrame($media, ($second * $media->getSelectedVideoStream()->getFps()) + $frame);
     }
 
     /**

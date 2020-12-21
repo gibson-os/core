@@ -38,15 +38,15 @@ class RequestService
         $queryString = (string) preg_replace('/\?.*/', '', $_SERVER['REQUEST_URI']);
         $queryParams = explode('/', mb_substr($queryString, 1));
 
-        $this->moduleName = (string) (array_shift($queryParams) ?: 'core');
-        $this->taskName = (string) (array_shift($queryParams) ?: 'index');
-        $this->actionName = (string) (array_shift($queryParams) ?: 'index');
+        $this->moduleName = array_shift($queryParams) ?: 'core';
+        $this->taskName = array_shift($queryParams) ?: 'index';
+        $this->actionName = array_shift($queryParams) ?: 'index';
         $this->queryString = implode('/', $queryParams);
 
         $params = [];
 
         while (count($queryParams) > 1) {
-            $params[(string) array_shift($queryParams)] = (string) array_shift($queryParams);
+            $params[(string) array_shift($queryParams)] = array_shift($queryParams);
         }
 
         $this->requestValues = array_merge(

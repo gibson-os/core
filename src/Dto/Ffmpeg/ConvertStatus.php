@@ -166,7 +166,7 @@ class ConvertStatus implements JsonSerializable
 
         $percent = intval((100 / $this->getFrames()) * $this->getFrame());
 
-        return (int) ($percent > 100 ? 100 : $percent);
+        return $percent > 100 ? 100 : $percent;
     }
 
     public function getTimeRemaining(): ?DateTime
