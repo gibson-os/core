@@ -86,8 +86,9 @@ Ext.define('GibsonOS.module.core.event.Panel', {
             callback: function() {
                 me.setLoading(false);
             },
-            success: function(response) {
-                form.findField('id').setValue(Ext.decode(response.responseText).data.id);
+            success: function(form, action) {
+                form.findField('id').setValue(Ext.decode(action.response.responseText).data.id);
+                me.up('window').close();
             }
         });
     }
