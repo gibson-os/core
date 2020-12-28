@@ -28,12 +28,12 @@ class Element extends AbstractModel implements Serializable, JsonSerializable
     /**
      * Required for store.
      */
-    private string $classTitle;
+    private ?string $classTitle = null;
 
     /**
      * Required for store.
      */
-    private string $methodTitle;
+    private ?string $methodTitle = null;
 
     private ?string $parameters = null;
 
@@ -273,24 +273,24 @@ class Element extends AbstractModel implements Serializable, JsonSerializable
         return $this;
     }
 
-    public function getClassTitle(): string
+    public function getClassTitle(): ?string
     {
         return $this->classTitle;
     }
 
-    public function setClassTitle(string $classTitle): Element
+    public function setClassTitle(?string $classTitle): Element
     {
         $this->classTitle = $classTitle;
 
         return $this;
     }
 
-    public function getMethodTitle(): string
+    public function getMethodTitle(): ?string
     {
         return $this->methodTitle;
     }
 
-    public function setMethodTitle(string $methodTitle): Element
+    public function setMethodTitle(?string $methodTitle): Element
     {
         $this->methodTitle = $methodTitle;
 
