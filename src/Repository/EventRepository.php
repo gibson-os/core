@@ -78,7 +78,7 @@ class EventRepository extends AbstractRepository
                 (int) $dateTime->format('n'),
                 (int) $dateTime->format('Y'),
                 (int) $dateTime->format('H'),
-                (int) $dateTime->format('m'),
+                (int) $dateTime->format('i'),
                 (int) $dateTime->format('s'),
             ]);
 
