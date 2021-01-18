@@ -14,7 +14,7 @@ class UdpService extends AbstractService
 {
     private const MAX_CREATE_RETRY = 10;
 
-    private const CREATE_RETRY_SLEEP_MS = 10;
+    private const CREATE_RETRY_SLEEP_MS = 10000;
 
     /**
      * @var resource
