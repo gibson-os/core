@@ -41,21 +41,27 @@ class ProcessService extends AbstractService
 
     public function execute(string $command): string
     {
-        $this->logger->debug(sprintf('Execute proccess "%s"', $command));
+        $this->logger->debug(sprintf('Execute process "%s"', $command));
 
         return exec($command);
     }
 
     public function executeAsync(string $command): void
     {
-        $this->logger->debug(sprintf('Execute async proccess "%s"', $command));
+        $this->logger->debug(sprintf('Execute async process "%s"', $command));
 
         system($command . '> /dev/null 2>/dev/null &');
     }
 
     public function kill(int $pid): bool
     {
-        return posix_kill($pid, 0);
+        $this->logger->debug(sprintf('Kill process %d', $pid));
+
+        $return = 0;
+        $out = [];
+        exec('kill -s 0 ' . $pid, $out, $return);
+
+        return $return === 0;
     }
 
     public function pidExists(int $pid): bool

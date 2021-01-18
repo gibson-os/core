@@ -10,8 +10,7 @@
     "ext-sqlite3": "*",
     "ext-sockets": "*",
     "twig/twig": "^3.0",
-    "ext-zip": "*",
-    "ext-posix": "*"
+    "ext-zip": "*"
   },
   "require-dev": {
     "codeception/codeception": "^4.0",
