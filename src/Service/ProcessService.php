@@ -52,4 +52,14 @@ class ProcessService extends AbstractService
 
         system($command . '> /dev/null 2>/dev/null &');
     }
+
+    public function kill(int $pid): bool
+    {
+        return posix_kill($pid, 0);
+    }
+
+    public function pidExists(int $pid): bool
+    {
+        return file_exists('/proc/' . $pid);
+    }
 }

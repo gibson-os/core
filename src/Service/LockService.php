@@ -17,15 +17,16 @@ class LockService extends AbstractService
 {
     private LockRepository $lockRepository;
 
-    public function __construct(LockRepository $lockRepository)
+    private ProcessService $processService;
+
+    public function __construct(LockRepository $lockRepository, ProcessService $processService)
     {
         $this->lockRepository = $lockRepository;
+        $this->processService = $processService;
     }
 
     /**
-     * @throws DateTimeError
      * @throws LockError
-     * @throws Exception
      */
     public function lock(string $name = null): void
     {
@@ -34,10 +35,42 @@ class LockService extends AbstractService
         try {
             $lock = $this->lockRepository->getByName($name);
 
-            if (file_exists('/proc/' . $lock->getPid())) {
+            if ($this->processService->pidExists($lock->getPid())) {
                 throw new LockError();
             }
-        } catch (SelectError $e) {
+        } catch (SelectError | DateTimeError $e) {
+            $lock = (new Lock())
+                ->setName($name)
+            ;
+        }
+
+        try {
+            $lock
+                ->setPid(getmypid())
+                ->save()
+            ;
+        } catch (DateTimeError | SaveError | Exception $e) {
+            throw new LockError();
+        }
+    }
+
+    /**
+     * @throws LockError
+     */
+    public function forceLock(string $name = null): void
+    {
+        $name = $this->getName($name);
+
+        try {
+            $lock = $this->lockRepository->getByName($name);
+
+            if ($this->processService->pidExists($lock->getPid())) {
+                $this->processService->kill($lock->getPid());
+                $lock = (new Lock())
+                    ->setName($name)
+                ;
+            }
+        } catch (SelectError | DateTimeError $e) {
             $lock = (new Lock())
                 ->setName($name)
             ;
