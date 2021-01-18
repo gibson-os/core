@@ -36,7 +36,7 @@ class LockService extends AbstractService
             $lock = $this->lockRepository->getByName($name);
 
             if ($this->processService->pidExists($lock->getPid())) {
-                throw new LockError();
+                throw new LockError('Lock exists!');
             }
         } catch (SelectError | DateTimeError $e) {
             $lock = (new Lock())
@@ -50,7 +50,7 @@ class LockService extends AbstractService
                 ->save()
             ;
         } catch (DateTimeError | SaveError | Exception $e) {
-            throw new LockError();
+            throw new LockError('Can not save lock!');
         }
     }
 
@@ -65,7 +65,10 @@ class LockService extends AbstractService
             $lock = $this->lockRepository->getByName($name);
 
             if ($this->processService->pidExists($lock->getPid())) {
-                $this->processService->kill($lock->getPid());
+                if (!$this->processService->kill($lock->getPid())) {
+                    throw new LockError(sprintf('Can not kill process %d!', $lock->getPid()));
+                }
+
                 $lock = (new Lock())
                     ->setName($name)
                 ;
@@ -82,7 +85,7 @@ class LockService extends AbstractService
                 ->save()
             ;
         } catch (DateTimeError | SaveError $e) {
-            throw new LockError();
+            throw new LockError('Can not save lock!');
         }
     }
 
