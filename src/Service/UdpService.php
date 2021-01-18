@@ -12,6 +12,10 @@ use Psr\Log\LoggerInterface;
 
 class UdpService extends AbstractService
 {
+    private const MAX_CREATE_RETRY = 10;
+
+    private const CREATE_RETRY_SLEEP_MS = 10;
+
     /**
      * @var resource
      */
@@ -34,10 +38,7 @@ class UdpService extends AbstractService
         $this->logger = $logger;
         $this->socket = $socket;
         $this->setTimeout();
-
-        if (!socket_bind($this->socket, $ip, $port)) {
-            throw new CreateError('Socket konnte nicht an ' . $ip . ':' . $port . ' gebunden werden!');
-        }
+        $this->socketBind($ip, $port);
     }
 
     /**
@@ -102,5 +103,19 @@ class UdpService extends AbstractService
     {
         $this->logger->debug('Close UDP socket');
         socket_close($this->socket);
+    }
+
+    private function socketBind(string $ip, int $port, int $retry = 0): void
+    {
+        if (socket_bind($this->socket, $ip, $port)) {
+            return;
+        }
+
+        if ($retry === self::MAX_CREATE_RETRY) {
+            throw new CreateError(sprintf('Socket not bound on %s:%d!', $ip, $port));
+        }
+
+        usleep(self::CREATE_RETRY_SLEEP_MS);
+        $this->socketBind($ip, $port, ++$retry);
     }
 }
