@@ -12,7 +12,7 @@ use Psr\Log\LoggerInterface;
 
 class UdpService extends AbstractService
 {
-    private const MAX_CREATE_RETRY = 10;
+    private const MAX_CREATE_RETRY = 100;
 
     private const CREATE_RETRY_SLEEP_MS = 10000;
 
