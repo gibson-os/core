@@ -5,7 +5,7 @@ Ext.define('GibsonOS.module.core.event.element.parameter.type.AutoComplete', {
         let me = this;
         let config = me.parameterObject.config;
 
-        me.url = baseDir + 'core/event/autoComplete';
+        me.url = baseDir + 'core/autoComplete/autoComplete';
         me.model = config.model;
         me.params = config.parameters;
         me.params.autoCompleteClassname = config.autoCompleteClassname;
