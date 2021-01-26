@@ -75,6 +75,7 @@ class EventController extends AbstractController
     }
 
     /**
+     * @throws FactoryError
      * @throws LoginRequired
      * @throws PermissionDenied
      */
@@ -88,6 +89,7 @@ class EventController extends AbstractController
     }
 
     /**
+     * @throws FactoryError
      * @throws LoginRequired
      * @throws PermissionDenied
      */
@@ -102,6 +104,8 @@ class EventController extends AbstractController
 
     /**
      * @throws DateTimeError
+     * @throws FactoryError
+     * @throws GetError
      * @throws LoginRequired
      * @throws PermissionDenied
      * @throws SelectError

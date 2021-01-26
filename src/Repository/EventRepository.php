@@ -53,6 +53,30 @@ class EventRepository extends AbstractRepository
     }
 
     /**
+     * @return Event[]
+     */
+    public function findByName(string $name, bool $onlyActive): array
+    {
+        $table = $this->getTable(Event::getTableName());
+        $where = '`name` LIKE ?';
+
+        if ($onlyActive) {
+            $where .= ' AND `active`=1';
+        }
+
+        $table
+            ->setWhere($where)
+            ->addWhereParameter($name . '%')
+        ;
+
+        if (!$table->selectPrepared(false)) {
+            return [];
+        }
+
+        return $this->matchModels($table->connection->fetchObjectList());
+    }
+
+    /**
      * @throws Exception
      *
      * @return Event[]
