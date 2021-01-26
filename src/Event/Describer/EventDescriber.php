@@ -5,7 +5,8 @@ namespace GibsonOS\Core\Event\Describer;
 
 use GibsonOS\Core\AutoComplete\EventAutoComplete;
 use GibsonOS\Core\Dto\Event\Describer\Method;
-use GibsonOS\Core\Event\Describer\Parameter\EventParameter;
+use GibsonOS\Core\Dto\Event\Describer\Parameter\BoolParameter;
+use GibsonOS\Core\Dto\Event\Describer\Parameter\EventParameter;
 use GibsonOS\Core\Event\EventEvent;
 
 class EventDescriber implements DescriberInterface
@@ -36,6 +37,9 @@ class EventDescriber implements DescriberInterface
                 ->setParameters(['event' => $this->eventParameter]),
             'deactivate' => (new Method('Dektivieren'))
                 ->setParameters(['event' => $this->eventParameter]),
+            'isActive' => (new Method('Ist aktiviert'))
+                ->setParameters(['event' => $this->eventParameter])
+                ->setReturns(['active' => new BoolParameter('Aktiv')]),
         ];
     }
 

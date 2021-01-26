@@ -69,11 +69,19 @@ class EventRepository extends AbstractRepository
             ->addWhereParameter($name . '%')
         ;
 
-        if (!$table->selectPrepared(false)) {
+        if (!$table->selectPrepared()) {
             return [];
         }
 
-        return $this->matchModels($table->connection->fetchObjectList());
+        $models = [];
+
+        do {
+            $model = new Event();
+            $model->loadFromMysqlTable($table);
+            $models[] = $model;
+        } while ($table->next());
+
+        return $models;
     }
 
     /**

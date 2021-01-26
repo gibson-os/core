@@ -1,10 +1,9 @@
 <?php
 declare(strict_types=1);
 
-namespace GibsonOS\Core\Event\Describer\Parameter;
+namespace GibsonOS\Core\Dto\Event\Describer\Parameter;
 
 use GibsonOS\Core\AutoComplete\EventAutoComplete;
-use GibsonOS\Core\Dto\Event\Describer\Parameter\AutoCompleteParameter;
 
 class EventParameter extends AutoCompleteParameter
 {

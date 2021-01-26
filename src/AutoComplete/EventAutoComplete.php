@@ -17,7 +17,7 @@ class EventAutoComplete implements AutoCompleteInterface
 
     public function getByNamePart(string $namePart, array $parameters): array
     {
-        return $this->eventRepository->findByName($namePart, (bool) $parameters['onlyActive']);
+        return $this->eventRepository->findByName($namePart, (bool) ($parameters['onlyActive'] ?? false));
     }
 
     public function getById($id, array $parameters): Event
@@ -27,6 +27,6 @@ class EventAutoComplete implements AutoCompleteInterface
 
     public function getModel(): string
     {
-        return Event::class;
+        return 'GibsonOS.module.core.event.model.Grid';
     }
 }

@@ -41,4 +41,9 @@ class EventEvent extends AbstractEvent
     {
         $this->eventService->runEvent($event, $async);
     }
+
+    public function isActive(Event $event): bool
+    {
+        return $event->isActive();
+    }
 }
