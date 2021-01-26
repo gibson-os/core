@@ -4,6 +4,8 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Event;
 
 use GibsonOS\Core\Event\Describer\DescriberInterface;
+use GibsonOS\Core\Exception\DateTimeError;
+use GibsonOS\Core\Exception\Model\SaveError;
 use GibsonOS\Core\Model\Event;
 use GibsonOS\Core\Service\EventService;
 use GibsonOS\Core\Service\ServiceManagerService;
@@ -21,6 +23,10 @@ class EventEvent extends AbstractEvent
         $this->eventService = $eventService;
     }
 
+    /**
+     * @throws DateTimeError
+     * @throws SaveError
+     */
     public function activate(Event $event): void
     {
         $event
@@ -29,6 +35,10 @@ class EventEvent extends AbstractEvent
         ;
     }
 
+    /**
+     * @throws DateTimeError
+     * @throws SaveError
+     */
     public function deactivate(Event $event): void
     {
         $event
@@ -37,6 +47,9 @@ class EventEvent extends AbstractEvent
         ;
     }
 
+    /**
+     * @throws DateTimeError
+     */
     public function start(Event $event, bool $async): void
     {
         $this->eventService->runEvent($event, $async);
