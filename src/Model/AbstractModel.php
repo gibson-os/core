@@ -40,6 +40,8 @@ abstract class AbstractModel implements ModelInterface
         'enum' => self::TYPE_STRING,
         'text' => self::TYPE_STRING,
         'longtext' => self::TYPE_STRING,
+        'binary' => self::TYPE_STRING,
+        'varbinary' => self::TYPE_STRING,
     ];
 
     private DateTimeService $dateTime;
