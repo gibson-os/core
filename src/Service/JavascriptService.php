@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Service;
 
 use GibsonOS\Core\Dto\Javascript;
+use GibsonOS\Core\Exception\DateTimeError;
 use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Repository\User\PermissionViewRepository;
@@ -80,6 +81,8 @@ class JavascriptService extends AbstractService
 
     /**
      * @throws GetError
+     * @throws SelectError
+     * @throws DateTimeError
      */
     public function getByUserIdAndTask(?int $userId, string $module, string $task): string
     {
