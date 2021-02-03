@@ -79,15 +79,14 @@ class CssService extends AbstractService
             return '';
         }
 
-        /** @var Css[] $files */
-        $files = array_merge($files, $this->getFiles(
+        $files = $this->getFiles(
             $this->vendorPath .
             'gibson-os' . DIRECTORY_SEPARATOR .
             $module . DIRECTORY_SEPARATOR .
             'assets' . DIRECTORY_SEPARATOR .
             'css' . DIRECTORY_SEPARATOR .
             $task . DIRECTORY_SEPARATOR
-        ));
+        );
 
         $content = '';
 
