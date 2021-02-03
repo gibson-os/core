@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Service\Response;
 
 use GibsonOS\Core\Utility\JsonUtility;
+use GibsonOS\Core\Utility\StatusCode;
 
 class AjaxResponse implements ResponseInterface
 {
@@ -17,7 +18,7 @@ class AjaxResponse implements ResponseInterface
     /**
      * @param mixed $body
      */
-    public function __construct($body, int $code = 200)
+    public function __construct($body, int $code = StatusCode::OK)
     {
         $this->body = $body;
         $this->code = $code;
