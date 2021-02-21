@@ -1,0 +1,252 @@
+<?php
+declare(strict_types=1);
+
+namespace GibsonOS\Core\Model;
+
+use DateTimeInterface;
+
+class Weather extends AbstractModel
+{
+    private float $longitude = 0.0;
+
+    private float $latitude = 0.0;
+
+    private ?DateTimeInterface $date = null;
+
+    private float $temperature = 0.0;
+
+    private float $feelsLike = 0.0;
+
+    private int $pressure = 0;
+
+    private int $humidity = 0;
+
+    private int $clouds = 0;
+
+    private float $uvIndex = 0.0;
+
+    private float $windSpeed = 0.0;
+
+    private int $visibility = 0;
+
+    private ?string $description = null;
+
+    private ?float $minTemperature = null;
+
+    private ?float $maxTemperature = null;
+
+    private ?float $rain = null;
+
+    private ?float $snow = null;
+
+    private ?string $icon = null;
+
+    public static function getTableName(): string
+    {
+        return 'weather';
+    }
+
+    public function getLongitude(): float
+    {
+        return $this->longitude;
+    }
+
+    public function setLongitude(float $longitude): Weather
+    {
+        $this->longitude = $longitude;
+
+        return $this;
+    }
+
+    public function getLatitude(): float
+    {
+        return $this->latitude;
+    }
+
+    public function setLatitude(float $latitude): Weather
+    {
+        $this->latitude = $latitude;
+
+        return $this;
+    }
+
+    public function getDate(): ?DateTimeInterface
+    {
+        return $this->date;
+    }
+
+    public function setDate(?DateTimeInterface $date): Weather
+    {
+        $this->date = $date;
+
+        return $this;
+    }
+
+    public function getTemperature(): float
+    {
+        return $this->temperature;
+    }
+
+    public function setTemperature(float $temperature): Weather
+    {
+        $this->temperature = $temperature;
+
+        return $this;
+    }
+
+    public function getFeelsLike(): float
+    {
+        return $this->feelsLike;
+    }
+
+    public function setFeelsLike(float $feelsLike): Weather
+    {
+        $this->feelsLike = $feelsLike;
+
+        return $this;
+    }
+
+    public function getPressure(): int
+    {
+        return $this->pressure;
+    }
+
+    public function setPressure(int $pressure): Weather
+    {
+        $this->pressure = $pressure;
+
+        return $this;
+    }
+
+    public function getHumidity(): int
+    {
+        return $this->humidity;
+    }
+
+    public function setHumidity(int $humidity): Weather
+    {
+        $this->humidity = $humidity;
+
+        return $this;
+    }
+
+    public function getClouds(): int
+    {
+        return $this->clouds;
+    }
+
+    public function setClouds(int $clouds): Weather
+    {
+        $this->clouds = $clouds;
+
+        return $this;
+    }
+
+    public function getUvIndex(): float
+    {
+        return $this->uvIndex;
+    }
+
+    public function setUvIndex(float $uvIndex): Weather
+    {
+        $this->uvIndex = $uvIndex;
+
+        return $this;
+    }
+
+    public function getWindSpeed(): float
+    {
+        return $this->windSpeed;
+    }
+
+    public function setWindSpeed(float $windSpeed): Weather
+    {
+        $this->windSpeed = $windSpeed;
+
+        return $this;
+    }
+
+    public function getVisibility(): int
+    {
+        return $this->visibility;
+    }
+
+    public function setVisibility(int $visibility): Weather
+    {
+        $this->visibility = $visibility;
+
+        return $this;
+    }
+
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    public function setDescription(?string $description): Weather
+    {
+        $this->description = $description;
+
+        return $this;
+    }
+
+    public function getMinTemperature(): ?float
+    {
+        return $this->minTemperature;
+    }
+
+    public function setMinTemperature(?float $minTemperature): Weather
+    {
+        $this->minTemperature = $minTemperature;
+
+        return $this;
+    }
+
+    public function getMaxTemperature(): ?float
+    {
+        return $this->maxTemperature;
+    }
+
+    public function setMaxTemperature(?float $maxTemperature): Weather
+    {
+        $this->maxTemperature = $maxTemperature;
+
+        return $this;
+    }
+
+    public function getRain(): ?float
+    {
+        return $this->rain;
+    }
+
+    public function setRain(?float $rain): Weather
+    {
+        $this->rain = $rain;
+
+        return $this;
+    }
+
+    public function getSnow(): ?float
+    {
+        return $this->snow;
+    }
+
+    public function setSnow(?float $snow): Weather
+    {
+        $this->snow = $snow;
+
+        return $this;
+    }
+
+    public function getIcon(): ?string
+    {
+        return $this->icon;
+    }
+
+    public function setIcon(?string $icon): Weather
+    {
+        $this->icon = $icon;
+
+        return $this;
+    }
+}

@@ -34,9 +34,11 @@ class Request
         return $this->url;
     }
 
-    public function setUrl(string $url): void
+    public function setUrl(string $url): Request
     {
         $this->url = $url;
+
+        return $this;
     }
 
     public function getPort(): int
@@ -44,9 +46,11 @@ class Request
         return $this->port;
     }
 
-    public function setPort(int $port): void
+    public function setPort(int $port): Request
     {
         $this->port = $port;
+
+        return $this;
     }
 
     /**
