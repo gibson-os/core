@@ -10,6 +10,7 @@ use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Repository\Weather\LocationRepository;
 use GibsonOS\Core\Repository\WeatherRepository;
 use GibsonOS\Core\Service\DateTimeService;
+use GibsonOS\Core\Service\LockService;
 use GibsonOS\Core\Service\WeatherService;
 use JsonException;
 use Psr\Log\LoggerInterface;
@@ -24,18 +25,22 @@ class WeatherCommand extends AbstractCommand
 
     private DateTimeService $dateTimeService;
 
+    private LockService $lockService;
+
     public function __construct(
         LoggerInterface $logger,
         WeatherService $weatherService,
         LocationRepository $locationRepository,
         WeatherRepository $weatherRepository,
-        DateTimeService $dateTimeService
+        DateTimeService $dateTimeService,
+        LockService $lockService
     ) {
         parent::__construct($logger);
         $this->weatherService = $weatherService;
         $this->locationRepository = $locationRepository;
         $this->weatherRepository = $weatherRepository;
         $this->dateTimeService = $dateTimeService;
+        $this->lockService = $lockService;
     }
 
     /**
@@ -46,6 +51,8 @@ class WeatherCommand extends AbstractCommand
      */
     protected function run(): int
     {
+        $this->lockService->lock();
+
         foreach ($this->locationRepository->getToUpdate() as $location) {
             $lastRun = $this->dateTimeService->get();
             $oldLastRun = $location->getLastRun();
@@ -60,6 +67,8 @@ class WeatherCommand extends AbstractCommand
                 ->save()
             ;
         }
+
+        $this->lockService->unlock();
 
         return 1;
     }
