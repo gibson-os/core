@@ -6,7 +6,6 @@ namespace GibsonOS\Core\Model\User;
 use DateTimeImmutable;
 use DateTimeInterface;
 use GibsonOS\Core\Exception\DateTimeError;
-use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Model\User;
 use mysqlDatabase;
@@ -128,7 +127,6 @@ class Device extends AbstractModel
 
     /**
      * @throws DateTimeError
-     * @throws SelectError
      */
     public function getUser(): User
     {

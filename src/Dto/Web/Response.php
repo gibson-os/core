@@ -17,15 +17,18 @@ class Response
      */
     private $body;
 
+    private int $length;
+
     /**
      * @param array<string, string> $headers
      * @param resource              $body
      */
-    public function __construct(Request $request, array $headers, $body)
+    public function __construct(Request $request, array $headers, $body, int $length)
     {
         $this->request = $request;
         $this->headers = $headers;
         $this->body = $body;
+        $this->length = $length;
     }
 
     /**
@@ -51,6 +54,11 @@ class Response
     public function getBody()
     {
         return $this->body;
+    }
+
+    public function getLength(): int
+    {
+        return $this->length;
     }
 
     public function getRequest(): Request

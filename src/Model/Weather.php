@@ -3,15 +3,19 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Model;
 
+use DateTime;
 use DateTimeInterface;
+use GibsonOS\Core\Exception\DateTimeError;
+use GibsonOS\Core\Model\Weather\Location;
+use mysqlDatabase;
 
 class Weather extends AbstractModel
 {
-    private float $longitude = 0.0;
+    private ?int $id = null;
 
-    private float $latitude = 0.0;
+    private int $locationId = 0;
 
-    private ?DateTimeInterface $date = null;
+    private DateTimeInterface $date;
 
     private float $temperature = 0.0;
 
@@ -21,51 +25,64 @@ class Weather extends AbstractModel
 
     private int $humidity = 0;
 
+    private float $dewPoint = 0.0;
+
     private int $clouds = 0;
 
     private float $uvIndex = 0.0;
 
     private float $windSpeed = 0.0;
 
+    private int $windDegree = 0;
+
     private int $visibility = 0;
+
+    private ?float $probabilityOfPrecipitation = 0.0;
 
     private ?string $description = null;
 
-    private ?float $minTemperature = null;
+    private ?int $rain = null;
 
-    private ?float $maxTemperature = null;
+    private ?int $snow = null;
 
-    private ?float $rain = null;
-
-    private ?float $snow = null;
+    private ?float $windGust = null;
 
     private ?string $icon = null;
+
+    private Location $location;
+
+    public function __construct(mysqlDatabase $database = null)
+    {
+        parent::__construct($database);
+        $this->date = new DateTime();
+        $this->location = new Location();
+    }
 
     public static function getTableName(): string
     {
         return 'weather';
     }
 
-    public function getLongitude(): float
+    public function getId(): ?int
     {
-        return $this->longitude;
+        return $this->id;
     }
 
-    public function setLongitude(float $longitude): Weather
+    public function setId(?int $id): Weather
     {
-        $this->longitude = $longitude;
+        $this->id = $id;
 
         return $this;
     }
 
-    public function getLatitude(): float
+    public function getLocationId(): int
     {
-        return $this->latitude;
+        return $this->locationId;
     }
 
-    public function setLatitude(float $latitude): Weather
+    public function setLocationId(int $locationId): Weather
     {
-        $this->latitude = $latitude;
+        $this->locationId = $locationId;
 
         return $this;
     }
@@ -75,7 +92,7 @@ class Weather extends AbstractModel
         return $this->date;
     }
 
-    public function setDate(?DateTimeInterface $date): Weather
+    public function setDate(DateTimeInterface $date): Weather
     {
         $this->date = $date;
 
@@ -130,6 +147,18 @@ class Weather extends AbstractModel
         return $this;
     }
 
+    public function getDewPoint(): float
+    {
+        return $this->dewPoint;
+    }
+
+    public function setDewPoint(float $dewPoint): Weather
+    {
+        $this->dewPoint = $dewPoint;
+
+        return $this;
+    }
+
     public function getClouds(): int
     {
         return $this->clouds;
@@ -166,6 +195,18 @@ class Weather extends AbstractModel
         return $this;
     }
 
+    public function getWindDegree(): int
+    {
+        return $this->windDegree;
+    }
+
+    public function setWindDegree(int $windDegree): Weather
+    {
+        $this->windDegree = $windDegree;
+
+        return $this;
+    }
+
     public function getVisibility(): int
     {
         return $this->visibility;
@@ -174,6 +215,18 @@ class Weather extends AbstractModel
     public function setVisibility(int $visibility): Weather
     {
         $this->visibility = $visibility;
+
+        return $this;
+    }
+
+    public function getProbabilityOfPrecipitation(): ?float
+    {
+        return $this->probabilityOfPrecipitation;
+    }
+
+    public function setProbabilityOfPrecipitation(?float $probabilityOfPrecipitation): Weather
+    {
+        $this->probabilityOfPrecipitation = $probabilityOfPrecipitation;
 
         return $this;
     }
@@ -190,50 +243,38 @@ class Weather extends AbstractModel
         return $this;
     }
 
-    public function getMinTemperature(): ?float
-    {
-        return $this->minTemperature;
-    }
-
-    public function setMinTemperature(?float $minTemperature): Weather
-    {
-        $this->minTemperature = $minTemperature;
-
-        return $this;
-    }
-
-    public function getMaxTemperature(): ?float
-    {
-        return $this->maxTemperature;
-    }
-
-    public function setMaxTemperature(?float $maxTemperature): Weather
-    {
-        $this->maxTemperature = $maxTemperature;
-
-        return $this;
-    }
-
-    public function getRain(): ?float
+    public function getRain(): ?int
     {
         return $this->rain;
     }
 
-    public function setRain(?float $rain): Weather
+    public function setRain(?int $rain): Weather
     {
         $this->rain = $rain;
 
         return $this;
     }
 
-    public function getSnow(): ?float
+    public function getSnow(): ?int
     {
         return $this->snow;
     }
 
-    public function setSnow(?float $snow): Weather
+    public function setSnow(?int $snow): Weather
     {
         $this->snow = $snow;
+
+        return $this;
+    }
+
+    public function getWindGust(): ?float
+    {
+        return $this->windGust;
+    }
+
+    public function setWindGust(?float $windGust): Weather
+    {
+        $this->windGust = $windGust;
 
         return $this;
     }
@@ -246,6 +287,24 @@ class Weather extends AbstractModel
     public function setIcon(?string $icon): Weather
     {
         $this->icon = $icon;
+
+        return $this;
+    }
+
+    /**
+     * @throws DateTimeError
+     */
+    public function getLocation(): Location
+    {
+        $this->loadForeignRecord($this->location, $this->getLocationId());
+
+        return $this->location;
+    }
+
+    public function setLocation(Location $location): Weather
+    {
+        $this->location = $location;
+        $this->setLocationId($location->getId() ?? 0);
 
         return $this;
     }

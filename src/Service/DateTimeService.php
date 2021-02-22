@@ -26,10 +26,10 @@ class DateTimeService extends AbstractService
     /**
      * @psalm-suppress InvalidReturnType
      */
-    public function get(string $time = 'now'): DateTime
+    public function get(string $time = 'now', DateTimeZone $timezone = null): DateTime
     {
         try {
-            return new DateTime($time, $this->timezone);
+            return new DateTime($time, $timezone ?? $this->timezone);
         } catch (Exception $e) {
             error_log(sprintf(
                 'Es kann keine Datums Objekt mit "%s" für die Zeitzone "%s" angelegt werden',

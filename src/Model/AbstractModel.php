@@ -42,6 +42,7 @@ abstract class AbstractModel implements ModelInterface
         'longtext' => self::TYPE_STRING,
         'binary' => self::TYPE_STRING,
         'varbinary' => self::TYPE_STRING,
+        'float' => self::TYPE_FLOAT,
     ];
 
     private DateTimeService $dateTime;

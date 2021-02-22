@@ -54,6 +54,6 @@ class WebService extends AbstractService
 
         rewind($responseHandle);
 
-        return new Response($request, $headers, $responseHandle);
+        return new Response($request, $headers, $responseHandle, (int) curl_getinfo($curl, CURLINFO_CONTENT_LENGTH_DOWNLOAD));
     }
 }
