@@ -41,9 +41,9 @@ class Weather extends AbstractModel
 
     private ?string $description = null;
 
-    private ?int $rain = null;
+    private ?float $rain = null;
 
-    private ?int $snow = null;
+    private ?float $snow = null;
 
     private ?float $windGust = null;
 
@@ -243,24 +243,24 @@ class Weather extends AbstractModel
         return $this;
     }
 
-    public function getRain(): ?int
+    public function getRain(): ?float
     {
         return $this->rain;
     }
 
-    public function setRain(?int $rain): Weather
+    public function setRain(?float $rain): Weather
     {
         $this->rain = $rain;
 
         return $this;
     }
 
-    public function getSnow(): ?int
+    public function getSnow(): ?float
     {
         return $this->snow;
     }
 
-    public function setSnow(?int $snow): Weather
+    public function setSnow(?float $snow): Weather
     {
         $this->snow = $snow;
 

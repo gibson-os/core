@@ -27,15 +27,17 @@ class LocationRepository extends AbstractRepository
     public function getToUpdate(): array
     {
         $table = $this->getTable(Location::getTableName())
-            ->setWhere('`active`=1 AND FROM_UNIXTIME(UNIX_TIMESTAMP(`last_run`)+`interval`)<=?')
+            ->setWhere(
+                '`active`=1 AND ' .
+                '(`last_run` IS NULL OR FROM_UNIXTIME(UNIX_TIMESTAMP(`last_run`)+`interval`) <= ?)'
+            )
             ->addWhereParameter($this->dateTimeService->get()->format('Y-m-d H:i:s'))
         ;
-
-        if (!$table->select()) {
-            throw (new SelectError())->setTable($table);
-        }
-
         $locations = [];
+
+        if (!$table->selectPrepared()) {
+            return $locations;
+        }
 
         do {
             $location = new Location();
