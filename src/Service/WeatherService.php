@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Service;
 
+use DateTimeZone;
 use GibsonOS\Core\Dto\Web\Request;
 use GibsonOS\Core\Dto\Web\Response;
 use GibsonOS\Core\Exception\DateTimeError;
@@ -20,11 +21,18 @@ class WeatherService extends AbstractService
 
     private WeatherMapper $weatherMapper;
 
-    public function __construct(WebService $webService, EnvService $envService, WeatherMapper $weatherMapper)
-    {
+    private DateTimeService $dateTimeService;
+
+    public function __construct(
+        WebService $webService,
+        EnvService $envService,
+        WeatherMapper $weatherMapper,
+        DateTimeService $dateTimeService
+    ) {
         $this->webService = $webService;
         $this->envService = $envService;
         $this->weatherMapper = $weatherMapper;
+        $this->dateTimeService = $dateTimeService;
     }
 
     /**
@@ -36,11 +44,15 @@ class WeatherService extends AbstractService
     {
         $response = $this->getByCoordinates($location->getLatitude(), $location->getLongitude());
         $data = JsonUtility::decode(fread($response->getBody(), $response->getLength()));
-
+        $now = $this->dateTimeService->get('now', new DateTimeZone($location->getTimezone()));
         $this->weatherMapper->mapFromArray($data['current'], $location, $data['timezone_offset'])->save();
 
         foreach ($data['hourly'] as $hourly) {
-            $this->weatherMapper->mapFromArray($hourly, $location, $data['timezone_offset'])->save();
+            $hourlyWeather = $this->weatherMapper->mapFromArray($hourly, $location, $data['timezone_offset']);
+
+            if ($hourlyWeather->getDate() > $now) {
+                $hourlyWeather->save();
+            }
         }
     }
 
