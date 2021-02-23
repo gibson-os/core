@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Command\Cronjob;
 
+use DateTimeZone;
 use GibsonOS\Core\Command\AbstractCommand;
 use GibsonOS\Core\Exception\DateTimeError;
 use GibsonOS\Core\Exception\Model\SaveError;
@@ -58,7 +59,11 @@ class WeatherCommand extends AbstractCommand
             $oldLastRun = $location->getLastRun();
 
             if ($oldLastRun !== null) {
-                $this->weatherRepository->deleteBetweenDates($location, $oldLastRun, $lastRun);
+                $localTimezone = new DateTimeZone($location->getTimezone());
+                $oldLastRun->setTimezone($localTimezone);
+                $lastRunLocalTime = clone $lastRun;
+                $lastRunLocalTime->setTimezone($localTimezone);
+                $this->weatherRepository->deleteBetweenDates($location, $oldLastRun, $lastRunLocalTime);
             }
 
             $this->weatherService->load($location);
