@@ -17,14 +17,14 @@ class WeatherMapper
         $this->dateTimeService = $dateTimeService;
     }
 
-    public function mapFromArray(array $data, Location $location, int $offset = 0): Weather
+    public function mapFromArray(array $data, Location $location): Weather
     {
         return (new Weather())
             ->setLocation($location)
             ->setDate($this->dateTimeService->get(
-                '@' . ($data['dt'] + $offset),
-                new DateTimeZone($location->getTimezone())
-            ))
+                '@' . ($data['dt']),
+                new DateTimeZone('UTC')
+            )->setTimezone(new DateTimeZone($location->getTimezone())))
             ->setTemperature($data['temp'])
             ->setFeelsLike($data['feels_like'])
             ->setPressure($data['pressure'])

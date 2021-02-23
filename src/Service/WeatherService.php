@@ -45,10 +45,10 @@ class WeatherService extends AbstractService
         $response = $this->getByCoordinates($location->getLatitude(), $location->getLongitude());
         $data = JsonUtility::decode(fread($response->getBody(), $response->getLength()));
         $now = $this->dateTimeService->get('now', new DateTimeZone($location->getTimezone()));
-        $this->weatherMapper->mapFromArray($data['current'], $location, $data['timezone_offset'])->save();
+        $this->weatherMapper->mapFromArray($data['current'], $location)->save();
 
         foreach ($data['hourly'] as $hourly) {
-            $hourlyWeather = $this->weatherMapper->mapFromArray($hourly, $location, $data['timezone_offset']);
+            $hourlyWeather = $this->weatherMapper->mapFromArray($hourly, $location);
 
             if ($hourlyWeather->getDate() > $now) {
                 $hourlyWeather->save();
