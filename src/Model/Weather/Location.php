@@ -128,6 +128,8 @@ class Location extends AbstractModel implements JsonSerializable
 
     public function jsonSerialize()
     {
+        $lastRun = $this->getLastRun();
+
         return [
             'id' => $this->getId(),
             'name' => $this->getName(),
@@ -135,7 +137,7 @@ class Location extends AbstractModel implements JsonSerializable
             'longitude' => $this->getLongitude(),
             'timezone' => $this->getTimezone(),
             'active' => $this->isActive(),
-            'lastRun' => $this->getLastRun()->format('Y-m-d H:i:s'),
+            'lastRun' => $lastRun === null ? null : $lastRun->format('Y-m-d H:i:s'),
         ];
     }
 }

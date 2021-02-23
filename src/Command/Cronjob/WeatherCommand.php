@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Command\Cronjob;
 
+use DateTime;
 use DateTimeZone;
 use GibsonOS\Core\Command\AbstractCommand;
 use GibsonOS\Core\Exception\DateTimeError;
@@ -56,6 +57,7 @@ class WeatherCommand extends AbstractCommand
 
         foreach ($this->locationRepository->getToUpdate() as $location) {
             $lastRun = $this->dateTimeService->get();
+            /** @var DateTime $oldLastRun */
             $oldLastRun = $location->getLastRun();
 
             if ($oldLastRun !== null) {

@@ -18,6 +18,24 @@ class LocationRepository extends AbstractRepository
         $this->dateTimeService = $dateTimeService;
     }
 
+    public function getById(int $id): Location
+    {
+        $table = $this->getTable(Location::getTableName())
+            ->setWhere('`id`=?')
+            ->addWhereParameter($id)
+            ->setLimit(1)
+        ;
+
+        if (!$table->selectPrepared()) {
+            throw (new SelectError())->setTable($table);
+        }
+
+        $location = new Location();
+        $location->loadFromMysqlTable($table);
+
+        return $location;
+    }
+
     /**
      * @throws SelectError
      * @throws DateTimeError
