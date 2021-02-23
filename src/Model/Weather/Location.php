@@ -5,8 +5,9 @@ namespace GibsonOS\Core\Model\Weather;
 
 use DateTimeInterface;
 use GibsonOS\Core\Model\AbstractModel;
+use JsonSerializable;
 
-class Location extends AbstractModel
+class Location extends AbstractModel implements JsonSerializable
 {
     private ?int $id = null;
 
@@ -123,5 +124,18 @@ class Location extends AbstractModel
         $this->lastRun = $lastRun;
 
         return $this;
+    }
+
+    public function jsonSerialize()
+    {
+        return [
+            'id' => $this->getId(),
+            'name' => $this->getName(),
+            'latitude' => $this->getLatitude(),
+            'longitude' => $this->getLongitude(),
+            'timezone' => $this->getTimezone(),
+            'active' => $this->isActive(),
+            'lastRun' => $this->getLastRun()->format('Y-m-d H:i:s'),
+        ];
     }
 }
