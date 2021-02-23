@@ -24,16 +24,20 @@ class WeatherService extends AbstractService
 
     private DateTimeService $dateTimeService;
 
+    private EventService $eventService;
+
     public function __construct(
         WebService $webService,
         EnvService $envService,
         WeatherMapper $weatherMapper,
-        DateTimeService $dateTimeService
+        DateTimeService $dateTimeService,
+        EventService $eventService
     ) {
         $this->webService = $webService;
         $this->envService = $envService;
         $this->weatherMapper = $weatherMapper;
         $this->dateTimeService = $dateTimeService;
+        $this->eventService = $eventService;
     }
 
     /**
@@ -44,6 +48,8 @@ class WeatherService extends AbstractService
      */
     public function load(Location $location): void
     {
+        $this->eventService->fire('beforeLoad', ['location' => $location]);
+
         $response = $this->getByCoordinates($location->getLatitude(), $location->getLongitude());
         $data = JsonUtility::decode(fread($response->getBody(), $response->getLength()));
 
@@ -75,6 +81,8 @@ class WeatherService extends AbstractService
                 $hourlyWeather->save();
             }
         }
+
+        $this->eventService->fire('afterLoad', ['location' => $location, 'data' => $data]);
     }
 
     private function getByCoordinates(float $latitude, float $longitude): Response

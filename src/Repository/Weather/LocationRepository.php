@@ -8,14 +8,18 @@ use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\Weather\Location;
 use GibsonOS\Core\Repository\AbstractRepository;
 use GibsonOS\Core\Service\DateTimeService;
+use Psr\Log\LoggerInterface;
 
 class LocationRepository extends AbstractRepository
 {
     private DateTimeService $dateTimeService;
 
-    public function __construct(DateTimeService $dateTimeService)
+    private LoggerInterface $logger;
+
+    public function __construct(DateTimeService $dateTimeService, LoggerInterface $logger)
     {
         $this->dateTimeService = $dateTimeService;
+        $this->logger = $logger;
     }
 
     public function getById(int $id): Location
@@ -34,6 +38,40 @@ class LocationRepository extends AbstractRepository
         $location->loadFromMysqlTable($table);
 
         return $location;
+    }
+
+    /**
+     * @throws DateTimeError
+     */
+    public function findByName(string $name, bool $onlyActive): array
+    {
+        $this->logger->debug(sprintf('Find weather location with name %d', $name));
+
+        $table = $this->getTable(Location::getTableName());
+        $where = '`name` LIKE ?';
+
+        if ($onlyActive) {
+            $where .= ' AND `active`=1';
+        }
+
+        $table
+            ->setWhere($where)
+            ->addWhereParameter($name . '%')
+        ;
+
+        if (!$table->selectPrepared()) {
+            return [];
+        }
+
+        $models = [];
+
+        do {
+            $model = new Location();
+            $model->loadFromMysqlTable($table);
+            $models[] = $model;
+        } while ($table->next());
+
+        return $models;
     }
 
     /**
