@@ -19,6 +19,26 @@ class WeatherRepository extends AbstractRepository
         $this->dateTimeService = $dateTimeService;
     }
 
+    public function getByDate(Location $location, DateTimeInterface $date): Weather
+    {
+        $table = $this->getTable(Weather::getTableName())
+            ->setWhere('`location_id`=? AND date=?')
+            ->setWhereParameters([
+                $location->getId(),
+                $date->format('Y-m-d H:i:s'),
+            ])
+        ;
+
+        if (!$table->selectPrepared()) {
+            throw (new SelectError())->setTable($table);
+        }
+
+        $weather = new Weather();
+        $weather->loadFromMysqlTable($table);
+
+        return $weather;
+    }
+
     public function getCurrent(Location $location): Weather
     {
         $table = $this->getTable(Weather::getTableName())

@@ -8,9 +8,11 @@ use GibsonOS\Core\Dto\Web\Request;
 use GibsonOS\Core\Dto\Web\Response;
 use GibsonOS\Core\Exception\DateTimeError;
 use GibsonOS\Core\Exception\Model\SaveError;
+use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Exception\WeatherError;
 use GibsonOS\Core\Mapper\WeatherMapper;
 use GibsonOS\Core\Model\Weather\Location;
+use GibsonOS\Core\Repository\WeatherRepository;
 use GibsonOS\Core\Utility\JsonUtility;
 use JsonException;
 
@@ -26,18 +28,22 @@ class WeatherService extends AbstractService
 
     private EventService $eventService;
 
+    private WeatherRepository $weatherRepository;
+
     public function __construct(
         WebService $webService,
         EnvService $envService,
         WeatherMapper $weatherMapper,
         DateTimeService $dateTimeService,
-        EventService $eventService
+        EventService $eventService,
+        WeatherRepository $weatherRepository
     ) {
         $this->webService = $webService;
         $this->envService = $envService;
         $this->weatherMapper = $weatherMapper;
         $this->dateTimeService = $dateTimeService;
         $this->eventService = $eventService;
+        $this->weatherRepository = $weatherRepository;
     }
 
     /**
@@ -76,6 +82,14 @@ class WeatherService extends AbstractService
 
         foreach ($data['hourly'] as $hourly) {
             $hourlyWeather = $this->weatherMapper->mapFromArray($hourly, $location);
+
+            try {
+                $hourlyWeather->setId(
+                    $this->weatherRepository->getByDate($location, $hourlyWeather->getDate())->getId()
+                );
+            } catch (SelectError $e) {
+                // Do nothing
+            }
 
             if ($hourlyWeather->getDate() > $now) {
                 $hourlyWeather->save();

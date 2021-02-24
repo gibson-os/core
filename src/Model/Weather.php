@@ -87,7 +87,7 @@ class Weather extends AbstractModel
         return $this;
     }
 
-    public function getDate(): ?DateTimeInterface
+    public function getDate(): DateTimeInterface
     {
         return $this->date;
     }
