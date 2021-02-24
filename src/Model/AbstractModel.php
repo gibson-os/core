@@ -166,10 +166,6 @@ abstract class AbstractModel implements ModelInterface
 
         $this->setToMysqlTable($mysqlTable);
 
-        if (!$mysqlTable->getReplacedRecord()) {
-            $this->setToMysqlTable($mysqlTable);
-        }
-
         if (!$mysqlTable->save()) {
             $exception = new SaveError();
             $exception->setModel($this);
