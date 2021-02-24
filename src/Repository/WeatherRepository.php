@@ -5,6 +5,7 @@ namespace GibsonOS\Core\Repository;
 
 use DateTimeInterface;
 use DateTimeZone;
+use GibsonOS\Core\Exception\DateTimeError;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\Weather;
 use GibsonOS\Core\Model\Weather\Location;
@@ -19,6 +20,10 @@ class WeatherRepository extends AbstractRepository
         $this->dateTimeService = $dateTimeService;
     }
 
+    /**
+     * @throws SelectError
+     * @throws DateTimeError
+     */
     public function getByDate(Location $location, DateTimeInterface $date): Weather
     {
         $table = $this->getTable(Weather::getTableName())
