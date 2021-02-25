@@ -7,8 +7,11 @@ use DateTime;
 use DateTimeZone;
 use GibsonOS\Core\Command\AbstractCommand;
 use GibsonOS\Core\Exception\DateTimeError;
+use GibsonOS\Core\Exception\Flock\LockError;
+use GibsonOS\Core\Exception\Flock\UnlockError;
 use GibsonOS\Core\Exception\Model\SaveError;
 use GibsonOS\Core\Exception\Repository\SelectError;
+use GibsonOS\Core\Exception\WeatherError;
 use GibsonOS\Core\Repository\Weather\LocationRepository;
 use GibsonOS\Core\Repository\WeatherRepository;
 use GibsonOS\Core\Service\DateTimeService;
@@ -47,9 +50,12 @@ class WeatherCommand extends AbstractCommand
 
     /**
      * @throws DateTimeError
+     * @throws JsonException
+     * @throws LockError
      * @throws SaveError
      * @throws SelectError
-     * @throws JsonException
+     * @throws UnlockError
+     * @throws WeatherError
      */
     protected function run(): int
     {
@@ -68,7 +74,18 @@ class WeatherCommand extends AbstractCommand
                 $this->weatherRepository->deleteBetweenDates($location, $oldLastRun, $lastRunLocalTime);
             }
 
-            $this->weatherService->load($location);
+            try {
+                $this->weatherService->load($location);
+            } catch (WeatherError $e) {
+                $location
+                    ->setError($e->getMessage())
+                    ->setActive(false)
+                    ->save()
+                ;
+
+                throw $e;
+            }
+
             $location
                 ->setLastRun($lastRun)
                 ->save()

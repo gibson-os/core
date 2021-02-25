@@ -15,16 +15,25 @@ class WebService extends AbstractService
 
     private const METHOD_HEAD = 'HEAD';
 
+    /**
+     * @throws WebError
+     */
     public function get(Request $request): Response
     {
         return $this->request($request, self::METHOD_GET);
     }
 
+    /**
+     * @throws WebError
+     */
     public function post(Request $request): Response
     {
         return $this->request($request, self::METHOD_POST);
     }
 
+    /**
+     * @throws WebError
+     */
     public function head(Request $request): Response
     {
         return $this->request($request, self::METHOD_HEAD);

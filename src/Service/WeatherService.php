@@ -7,9 +7,11 @@ use DateTimeZone;
 use GibsonOS\Core\Dto\Web\Request;
 use GibsonOS\Core\Dto\Web\Response;
 use GibsonOS\Core\Exception\DateTimeError;
+use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\Model\SaveError;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Exception\WeatherError;
+use GibsonOS\Core\Exception\WebError;
 use GibsonOS\Core\Mapper\WeatherMapper;
 use GibsonOS\Core\Model\Weather\Location;
 use GibsonOS\Core\Repository\WeatherRepository;
@@ -56,7 +58,11 @@ class WeatherService extends AbstractService
     {
         $this->eventService->fire('beforeLoad', ['location' => $location]);
 
-        $response = $this->getByCoordinates($location->getLatitude(), $location->getLongitude());
+        try {
+            $response = $this->getByCoordinates($location->getLatitude(), $location->getLongitude());
+        } catch (GetError | WebError $e) {
+            throw new WeatherError($e->getMessage(), 0, $e);
+        }
         $data = JsonUtility::decode(fread($response->getBody(), $response->getLength()));
 
         if (
@@ -99,6 +105,10 @@ class WeatherService extends AbstractService
         $this->eventService->fire('afterLoad', ['location' => $location, 'data' => $data]);
     }
 
+    /**
+     * @throws GetError
+     * @throws WebError
+     */
     private function getByCoordinates(float $latitude, float $longitude): Response
     {
         return $this->webService->get(

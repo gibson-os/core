@@ -25,6 +25,8 @@ class Location extends AbstractModel implements JsonSerializable
 
     private ?DateTimeInterface $lastRun = null;
 
+    private ?string $error = null;
+
     public static function getTableName(): string
     {
         return 'weather_location';
@@ -126,6 +128,18 @@ class Location extends AbstractModel implements JsonSerializable
         return $this;
     }
 
+    public function getError(): ?string
+    {
+        return $this->error;
+    }
+
+    public function setError(?string $error): Location
+    {
+        $this->error = $error;
+
+        return $this;
+    }
+
     public function jsonSerialize()
     {
         $lastRun = $this->getLastRun();
@@ -138,6 +152,7 @@ class Location extends AbstractModel implements JsonSerializable
             'timezone' => $this->getTimezone(),
             'active' => $this->isActive(),
             'lastRun' => $lastRun === null ? null : $lastRun->format('Y-m-d H:i:s'),
+            'error' => $this->getError(),
         ];
     }
 }
