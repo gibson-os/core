@@ -65,6 +65,27 @@ class WeatherDescriber implements DescriberInterface
             'clouds' => (new Method('Wolken'))
                 ->setParameters($parameters)
                 ->setReturns([(new IntParameter('in Prozent'))->setRange(0, 100)]),
+            'uvIndex' => (new Method('UV Index'))
+                ->setParameters($parameters)
+                ->setReturns([new FloatParameter('UV Index')]),
+            'windSpeed' => (new Method('Wind Geschwindigkeit'))
+                ->setParameters($parameters)
+                ->setReturns([new FloatParameter('m/s')]),
+            'windGust' => (new Method('Wind Böen'))
+                ->setParameters($parameters)
+                ->setReturns([new FloatParameter('m/s')]),
+            'windDegree' => (new Method('Wind Richtung'))
+                ->setParameters($parameters)
+                ->setReturns([new IntParameter('Winkel')]),
+            'visibility' => (new Method('Sichtweite'))
+                ->setParameters($parameters)
+                ->setReturns([new IntParameter('Meter')]),
+            'rain' => (new Method('Regen'))
+                ->setParameters($parameters)
+                ->setReturns([new FloatParameter('mm in der letzten Stunde')]),
+            'snow' => (new Method('Schnee'))
+                ->setParameters($parameters)
+                ->setReturns([new FloatParameter('mm in der letzten Stunde')]),
         ];
     }
 

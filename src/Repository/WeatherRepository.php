@@ -32,6 +32,7 @@ class WeatherRepository extends AbstractRepository
                 $location->getId(),
                 $date->format('Y-m-d H:i:s'),
             ])
+            ->setLimit(1)
         ;
 
         if (!$table->selectPrepared()) {
@@ -44,13 +45,21 @@ class WeatherRepository extends AbstractRepository
         return $weather;
     }
 
-    public function getCurrent(Location $location): Weather
+    /**
+     * @throws DateTimeError
+     * @throws SelectError
+     */
+    public function getByNearestDate(Location $location, DateTimeInterface $dateTime = null): Weather
     {
+        if ($dateTime === null) {
+            $dateTime = $this->dateTimeService->get('now', new DateTimeZone($location->getTimezone()));
+        }
+
         $table = $this->getTable(Weather::getTableName())
             ->setWhere('`location_id`=? AND date<=?')
             ->setWhereParameters([
                 $location->getId(),
-                $this->dateTimeService->get('now', new DateTimeZone($location->getTimezone()))->format('Y-m-d H:i:s'),
+                $dateTime->format('Y-m-d H:i:s'),
             ])
             ->setLimit(1)
             ->setOrderBy('`date` DESC')
