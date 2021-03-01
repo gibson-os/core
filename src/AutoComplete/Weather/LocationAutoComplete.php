@@ -7,7 +7,6 @@ use GibsonOS\Core\AutoComplete\AutoCompleteInterface;
 use GibsonOS\Core\Exception\DateTimeError;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\ModelInterface;
-use GibsonOS\Core\Model\Weather\Location;
 use GibsonOS\Core\Repository\Weather\LocationRepository;
 
 class LocationAutoComplete implements AutoCompleteInterface
@@ -39,6 +38,6 @@ class LocationAutoComplete implements AutoCompleteInterface
 
     public function getModel(): string
     {
-        return Location::class;
+        return 'GibsonOS.module.core.weather.model.Location';
     }
 }
