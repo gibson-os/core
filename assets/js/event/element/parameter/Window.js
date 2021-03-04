@@ -2,9 +2,10 @@ Ext.define('GibsonOS.module.core.event.element.parameter.Window', {
     extend: 'GibsonOS.Window',
     alias: ['widget.gosModuleCoreEventElementParameterWindow'],
     title: 'Parameter',
-    width: 420,
+    width: 435,
     autoHeight: true,
     maximizable: true,
+    withOperator: false,
     requiredPermission: {
         module: 'core',
         task: 'event'
@@ -32,7 +33,6 @@ Ext.define('GibsonOS.module.core.event.element.parameter.Window', {
             let item = {
                 name: name,
                 value: parameter.value ?? null,
-                hideLabel: true,
                 parameterObject: parameter
             };
 
@@ -53,16 +53,22 @@ Ext.define('GibsonOS.module.core.event.element.parameter.Window', {
                     break;
             }
 
-            form.add({
-                xtype: 'fieldcontainer',
-                layout: 'hbox',
-                fieldLabel: parameter.title,
-                items: [{
-                    xtype: 'gosModuleCoreEventElementOperatorComboBox',
-                    name: name + 'Operator',
-                    margins: '0 5px 0 0',
-                },item]
-            });
+            if (me.withOperator) {
+                item.hideLabel = true;
+                form.add({
+                    xtype: 'fieldcontainer',
+                    layout: 'hbox',
+                    fieldLabel: parameter.title,
+                    items: [{
+                        xtype: 'gosModuleCoreEventElementOperatorComboBox',
+                        name: name + 'Operator',
+                        margins: '0 5px 0 0',
+                    }, item]
+                });
+            } else {
+                item.fieldLabel = parameter.title;
+                form.add(item);
+            }
         });
     }
 });

@@ -70,43 +70,43 @@ class WeatherDescriber implements DescriberInterface
         return [
             'temperature' => (new Method('Temperatur'))
                 ->setParameters($parameters)
-                ->setReturns([new FloatParameter('Grad Celsius')]),
+                ->setReturns(['value' => new FloatParameter('Grad Celsius')]),
             'feelsLike' => (new Method('Gefühlte Temperatur'))
                 ->setParameters($parameters)
-                ->setReturns([new FloatParameter('Grad Celsius')]),
+                ->setReturns(['value' => new FloatParameter('Grad Celsius')]),
             'pressure' => (new Method('Luftdruck'))
                 ->setParameters($parameters)
-                ->setReturns([new IntParameter('Luftdruck')]),
+                ->setReturns(['value' => new IntParameter('Luftdruck')]),
             'humidity' => (new Method('Luftfeuchtigkeit'))
                 ->setParameters($parameters)
-                ->setReturns([(new IntParameter('in Prozent'))->setRange(0, 100)]),
+                ->setReturns(['value' => (new IntParameter('in Prozent'))->setRange(0, 100)]),
             'dewPoint' => (new Method('Taupunkt'))
                 ->setParameters($parameters)
-                ->setReturns([new FloatParameter('Grad Celsius')]),
+                ->setReturns(['value' => new FloatParameter('Grad Celsius')]),
             'clouds' => (new Method('Wolken'))
                 ->setParameters($parameters)
-                ->setReturns([(new IntParameter('in Prozent'))->setRange(0, 100)]),
+                ->setReturns(['value' => (new IntParameter('in Prozent'))->setRange(0, 100)]),
             'uvIndex' => (new Method('UV Index'))
                 ->setParameters($parameters)
-                ->setReturns([new FloatParameter('UV Index')]),
+                ->setReturns(['value' => new FloatParameter('UV Index')]),
             'windSpeed' => (new Method('Wind Geschwindigkeit'))
                 ->setParameters($parameters)
-                ->setReturns([new FloatParameter('m/s')]),
+                ->setReturns(['value' => new FloatParameter('m/s')]),
             'windGust' => (new Method('Wind Böen'))
                 ->setParameters($parameters)
-                ->setReturns([new FloatParameter('m/s')]),
+                ->setReturns(['value' => new FloatParameter('m/s')]),
             'windDegree' => (new Method('Wind Richtung'))
                 ->setParameters($parameters)
-                ->setReturns([new IntParameter('Winkel')]),
+                ->setReturns(['value' => new IntParameter('Winkel')]),
             'visibility' => (new Method('Sichtweite'))
                 ->setParameters($parameters)
-                ->setReturns([new IntParameter('Meter')]),
+                ->setReturns(['value' => new IntParameter('Meter')]),
             'rain' => (new Method('Regen'))
                 ->setParameters($parameters)
-                ->setReturns([new FloatParameter('mm in der letzten Stunde')]),
+                ->setReturns(['value' => new FloatParameter('mm in der letzten Stunde')]),
             'snow' => (new Method('Schnee'))
                 ->setParameters($parameters)
-                ->setReturns([new FloatParameter('mm in der letzten Stunde')]),
+                ->setReturns(['value' => new FloatParameter('mm in der letzten Stunde')]),
         ];
     }
 
