@@ -5,7 +5,7 @@ namespace GibsonOS\Core\Dto\Event\Describer\Parameter;
 
 use DateTimeInterface;
 
-class DateTimeParameter extends AbstractParameter
+class TimeParameter extends AbstractParameter
 {
     private ?DateTimeInterface $min = null;
 
@@ -15,10 +15,10 @@ class DateTimeParameter extends AbstractParameter
 
     public function __construct(string $title)
     {
-        parent::__construct($title, 'dateTime');
+        parent::__construct($title, 'date');
     }
 
-    public function setRange(?DateTimeInterface $min, DateTimeInterface $max = null): DateTimeParameter
+    public function setRange(?DateTimeInterface $min, DateTimeInterface $max = null): TimeParameter
     {
         $this->min = $min;
         $this->max = $max;
@@ -26,7 +26,7 @@ class DateTimeParameter extends AbstractParameter
         return $this;
     }
 
-    public function setIncrease(int $increase): DateTimeParameter
+    public function setIncrease(int $increase): TimeParameter
     {
         $this->increase = $increase;
 
@@ -36,8 +36,8 @@ class DateTimeParameter extends AbstractParameter
     protected function getTypeConfig(): array
     {
         return [
-            'min' => $this->min === null ? null : $this->min->format('Y-m-d H:i:s'),
-            'max' => $this->max === null ? null : $this->max->format('Y-m-d H:i:s'),
+            'min' => $this->min === null ? null : $this->min->format('Y-m-d'),
+            'max' => $this->max === null ? null : $this->max->format('Y-m-d'),
             'increase' => $this->increase,
         ];
     }

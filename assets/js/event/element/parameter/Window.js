@@ -2,7 +2,7 @@ Ext.define('GibsonOS.module.core.event.element.parameter.Window', {
     extend: 'GibsonOS.Window',
     alias: ['widget.gosModuleCoreEventElementParameterWindow'],
     title: 'Parameter',
-    width: 435,
+    width: 420,
     y: 50,
     autoHeight: true,
     maximizable: true,
@@ -35,7 +35,8 @@ Ext.define('GibsonOS.module.core.event.element.parameter.Window', {
             let item = {
                 name: name,
                 value: parameter.value ?? null,
-                parameterObject: parameter
+                parameterObject: parameter,
+                fieldLabel: parameter.title
             };
 
             switch (parameter.type) {
@@ -51,15 +52,22 @@ Ext.define('GibsonOS.module.core.event.element.parameter.Window', {
                 case 'autoComplete':
                     item.xtype = 'gosModuleCoreEventElementParameterTypeAutoComplete';
                     break;
+                case 'date':
+                    item.xtype = 'gosCoreComponentFormFieldDate';
+                    break;
+                case 'time':
+                    item.xtype = 'gosCoreComponentFormFieldTime';
+                    break;
+                case 'dateTime':
+                    item.xtype = 'gosCoreComponentFormFieldDateTime';
+                    break;
                 case 'option':
                     break;
             }
 
             if (me.withOperator) {
-                item.hideLabel = true;
                 form.add({
-                    xtype: 'fieldcontainer',
-                    layout: 'hbox',
+                    xtype: 'gosCoreComponentFormFieldContainer',
                     fieldLabel: parameter.title,
                     items: [{
                         xtype: 'gosModuleCoreEventElementOperatorComboBox',
@@ -69,7 +77,6 @@ Ext.define('GibsonOS.module.core.event.element.parameter.Window', {
                     }, item]
                 });
             } else {
-                item.fieldLabel = parameter.title;
                 form.add(item);
             }
         });

@@ -5,7 +5,7 @@ namespace GibsonOS\Core\Event\Describer;
 
 use GibsonOS\Core\AutoComplete\Weather\LocationAutoComplete;
 use GibsonOS\Core\Dto\Event\Describer\Method;
-use GibsonOS\Core\Dto\Event\Describer\Parameter\DateParameter;
+use GibsonOS\Core\Dto\Event\Describer\Parameter\DateTimeParameter;
 use GibsonOS\Core\Dto\Event\Describer\Parameter\FloatParameter;
 use GibsonOS\Core\Dto\Event\Describer\Parameter\IntParameter;
 use GibsonOS\Core\Dto\Event\Describer\Parameter\StringParameter;
@@ -39,7 +39,7 @@ class WeatherDescriber implements DescriberInterface
                 ->setParameters([
                     'location' => $this->locationParameter,
                     'id' => new IntParameter('ID'),
-                    'date' => new DateParameter('Datum'),
+                    'date' => new DateTimeParameter('Datum'),
                     'temperature' => new FloatParameter('Temperature'),
                     'feelsLike' => new FloatParameter('Gefühlte Temperature'),
                     'pressure' => new IntParameter('Luftdruck'),
@@ -64,7 +64,7 @@ class WeatherDescriber implements DescriberInterface
     {
         $parameters = [
             'location' => $this->locationParameter,
-            'date' => new DateParameter('Datum'),
+            'date' => (new DateTimeParameter('Datum'))->setIncrease(10),
         ];
 
         return [
