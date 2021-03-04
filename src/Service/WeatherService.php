@@ -84,7 +84,8 @@ class WeatherService extends AbstractService
         }
 
         $now = $this->dateTimeService->get('now', new DateTimeZone($location->getTimezone()));
-        $this->weatherMapper->mapFromArray($data['current'], $location)->save();
+        $current = $this->weatherMapper->mapFromArray($data['current'], $location);
+        $current->save();
 
         foreach ($data['hourly'] as $hourly) {
             $hourlyWeather = $this->weatherMapper->mapFromArray($hourly, $location);
@@ -102,7 +103,10 @@ class WeatherService extends AbstractService
             }
         }
 
-        $this->eventService->fire('afterLoad', ['location' => $location, 'data' => $data]);
+        $eventParameters = $current->jsonSerialize();
+        $eventParameters['location'] = $location;
+
+        $this->eventService->fire('afterLoad', $eventParameters);
     }
 
     /**

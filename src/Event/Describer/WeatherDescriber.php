@@ -8,6 +8,7 @@ use GibsonOS\Core\Dto\Event\Describer\Method;
 use GibsonOS\Core\Dto\Event\Describer\Parameter\DateParameter;
 use GibsonOS\Core\Dto\Event\Describer\Parameter\FloatParameter;
 use GibsonOS\Core\Dto\Event\Describer\Parameter\IntParameter;
+use GibsonOS\Core\Dto\Event\Describer\Parameter\StringParameter;
 use GibsonOS\Core\Dto\Event\Describer\Parameter\Weather\LocationParameter;
 use GibsonOS\Core\Dto\Event\Describer\Trigger;
 use GibsonOS\Core\Event\WeatherEvent;
@@ -35,7 +36,27 @@ class WeatherDescriber implements DescriberInterface
             'beforeLoad' => (new Trigger('Vor dem laden'))
                 ->setParameters(['location' => $this->locationParameter]),
             'afterLoad' => (new Trigger('Nach dem laden'))
-                ->setParameters(['location' => $this->locationParameter]),
+                ->setParameters([
+                    'location' => $this->locationParameter,
+                    'id' => new IntParameter('ID'),
+                    'date' => new DateParameter('Datum'),
+                    'temperature' => new FloatParameter('Temperature'),
+                    'feelsLike' => new FloatParameter('Gefühlte Temperature'),
+                    'pressure' => new IntParameter('Luftdruck'),
+                    'humidity' => new IntParameter('Luftfeuchtigkeit'),
+                    'dewPoint' => new FloatParameter('Taupunkt'),
+                    'clouds' => new IntParameter('Wolken'),
+                    'uvIndex' => new IntParameter('UV Index'),
+                    'windSpeed' => new IntParameter('Wind Geschwindigkeit'),
+                    'windDegree' => new IntParameter('Wind Richtung'),
+                    'visibility' => new IntParameter('Sichtweite'),
+                    'probabilityOfPrecipitation' => new FloatParameter('Regenwahrscheinlichkeit'),
+                    'description' => new StringParameter('Beschreibung'),
+                    'rain' => new StringParameter('Regen'),
+                    'snow' => new StringParameter('Schnee'),
+                    'windGust' => new StringParameter('Wind Böen'),
+                    'icon' => new StringParameter('Icon'),
+                ]),
         ];
     }
 

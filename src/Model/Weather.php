@@ -7,9 +7,10 @@ use DateTime;
 use DateTimeInterface;
 use GibsonOS\Core\Exception\DateTimeError;
 use GibsonOS\Core\Model\Weather\Location;
+use JsonSerializable;
 use mysqlDatabase;
 
-class Weather extends AbstractModel
+class Weather extends AbstractModel implements JsonSerializable
 {
     private ?int $id = null;
 
@@ -307,5 +308,30 @@ class Weather extends AbstractModel
         $this->setLocationId($location->getId() ?? 0);
 
         return $this;
+    }
+
+    public function jsonSerialize(): array
+    {
+        return [
+            'id' => $this->getId(),
+            'locationId' => $this->getLocationId(),
+            'date' => $this->getDate()->format('Y-m-d H:i:s'),
+            'temperature' => $this->getTemperature(),
+            'feelsLike' => $this->getFeelsLike(),
+            'pressure' => $this->getPressure(),
+            'humidity' => $this->getHumidity(),
+            'dewPoint' => $this->getDewPoint(),
+            'clouds' => $this->getClouds(),
+            'uvIndex' => $this->getUvIndex(),
+            'windSpeed' => $this->getWindSpeed(),
+            'windDegree' => $this->getWindDegree(),
+            'visibility' => $this->getVisibility(),
+            'probabilityOfPrecipitation' => $this->getProbabilityOfPrecipitation(),
+            'description' => $this->getDescription(),
+            'rain' => $this->getRain(),
+            'snow' => $this->getSnow(),
+            'windGust' => $this->getWindGust(),
+            'icon' => $this->getIcon(),
+        ];
     }
 }
