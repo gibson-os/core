@@ -180,7 +180,10 @@ Ext.define('GibsonOS.module.core.event.trigger.Grid', {
                         checkbox.setValue(true);
                         checkbox.resumeEvents();
 
-                        new GibsonOS.module.core.event.element.parameter.Window({withOperator: true})
+                        new GibsonOS.module.core.event.element.parameter.Window({
+                            withOperator: true,
+                            excludeOperators: ['=']
+                        })
                             .addFieldsByParameters(record.get('parameters'))
                         ;
                     }

@@ -3,9 +3,11 @@ Ext.define('GibsonOS.module.core.event.element.parameter.Window', {
     alias: ['widget.gosModuleCoreEventElementParameterWindow'],
     title: 'Parameter',
     width: 435,
+    y: 50,
     autoHeight: true,
     maximizable: true,
     withOperator: false,
+    excludeOperators: [],
     requiredPermission: {
         module: 'core',
         task: 'event'
@@ -63,6 +65,7 @@ Ext.define('GibsonOS.module.core.event.element.parameter.Window', {
                         xtype: 'gosModuleCoreEventElementOperatorComboBox',
                         name: name + 'Operator',
                         margins: '0 5px 0 0',
+                        exclude: me.excludeOperators
                     }, item]
                 });
             } else {
