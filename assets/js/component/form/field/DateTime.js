@@ -16,8 +16,15 @@ Ext.define('GibsonOS.core.component.form.field.DateTime', {
     },
     getValue() {
         const me = this;
-        const date = me.down('gosCoreComponentFormFieldDate').getValue();
-        const time = me.down('gosCoreComponentFormFieldTime').getValue();
+        let date = me.down('gosCoreComponentFormFieldDate').getValue();
+        let time = me.down('gosCoreComponentFormFieldTime').getValue();
+
+        if (date === null && time === null) {
+            return null;
+        }
+
+        date = date ?? new Date();
+        time = time ?? new Date();
 
         return new Date(date.getTime() + (time.getHours()*60000*60) + (time.getMinutes()*60000) + (time.getSeconds()*1000));
     }
