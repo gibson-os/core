@@ -7,6 +7,7 @@ use GibsonOS\Core\Exception\DateTimeError;
 use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Model\Event;
 use GibsonOS\Core\Utility\JsonUtility;
+use JsonException;
 use JsonSerializable;
 use mysqlDatabase;
 use Serializable;
@@ -38,8 +39,6 @@ class Element extends AbstractModel implements Serializable, JsonSerializable
     private ?string $parameters = null;
 
     private ?string $command = null;
-
-    private ?string $operator = null;
 
     private ?string $returns = null;
 
@@ -156,18 +155,6 @@ class Element extends AbstractModel implements Serializable, JsonSerializable
     public function setCommand(?string $command): Element
     {
         $this->command = $command;
-
-        return $this;
-    }
-
-    public function getOperator(): ?string
-    {
-        return $this->operator;
-    }
-
-    public function setOperator(?string $operator): Element
-    {
-        $this->operator = $operator;
 
         return $this;
     }
@@ -307,7 +294,6 @@ class Element extends AbstractModel implements Serializable, JsonSerializable
             'command' => $this->getCommand(),
             'class' => $this->getClass(),
             'method' => $this->getMethod(),
-            'operator' => $this->getOperator(),
             'params' => $this->getParameters(),
             'value' => $this->getReturns(),
         ]);
@@ -325,7 +311,6 @@ class Element extends AbstractModel implements Serializable, JsonSerializable
             ->setCommand($unserialized['command'])
             ->setClass($unserialized['class'])
             ->setMethod($unserialized['method'])
-            ->setOperator($unserialized['operator'])
             ->setParameters($unserialized['params'])
             ->setReturns($unserialized['value'])
         ;
@@ -333,6 +318,7 @@ class Element extends AbstractModel implements Serializable, JsonSerializable
 
     /**
      * @throws DateTimeError
+     * @throws JsonException
      */
     public function jsonSerialize(): array
     {
@@ -344,7 +330,6 @@ class Element extends AbstractModel implements Serializable, JsonSerializable
             'method' => $this->getMethod(),
             'methodTitle' => $this->getMethodTitle(),
             'command' => $this->getCommand(),
-            'operator' => $this->getOperator(),
             'returns' => JsonUtility::decode($this->getReturns() ?? 'null'),
             'parameters' => JsonUtility::decode($this->getParameters() ?? 'null'),
             'leaf' => true,

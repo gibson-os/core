@@ -14,6 +14,7 @@ use GibsonOS\Core\Model\Event;
 use GibsonOS\Core\Model\Event\Element;
 use GibsonOS\Core\Model\Event\Trigger;
 use GibsonOS\Core\Utility\JsonUtility;
+use JsonException;
 use mysqlTable;
 use stdClass;
 
@@ -189,6 +190,7 @@ class EventRepository extends AbstractRepository
      *
      * @throws DateTimeError
      * @throws SaveError
+     * @throws JsonException
      *
      * @return int[]
      */
@@ -204,7 +206,6 @@ class EventRepository extends AbstractRepository
                 ->setClass($element['className'])
                 ->setMethod($element['method'])
                 ->setCommand($element['command'] ?: null)
-                ->setOperator($element['operator'] ?: null)
                 ->setParameters(
                     empty($element['parameters']) ? null : $this->jsonUtility->encode($element['parameters'])
                 )
@@ -332,7 +333,6 @@ class EventRepository extends AbstractRepository
                 ->setMethod($event->elementMethod)
                 ->setParameters($event->elementParameters)
                 ->setCommand($event->elementCommand)
-                ->setOperator($event->elementOperator)
                 ->setReturns($event->elementReturns)
             ;
             $models[$event->id]->addElement($elementModel);

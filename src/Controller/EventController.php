@@ -46,9 +46,11 @@ class EventController extends AbstractController
     }
 
     /**
+     * @throws DateTimeError
+     * @throws GetError
      * @throws LoginRequired
      * @throws PermissionDenied
-     * @throws DateTimeError
+     * @throws SelectError
      */
     public function elements(ElementStore $elementStore, int $eventId): AjaxResponse
     {

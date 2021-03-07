@@ -69,6 +69,7 @@ Ext.define('GibsonOS.module.core.event.element.parameter.Window', {
                 form.add({
                     xtype: 'gosCoreComponentFormFieldContainer',
                     fieldLabel: parameter.title,
+                    value: parameter.operator ?? null,
                     items: [{
                         xtype: 'gosModuleCoreEventElementOperatorComboBox',
                         name: name + 'Operator',

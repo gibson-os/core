@@ -6,6 +6,7 @@ namespace GibsonOS\Core\Service\Event;
 use GibsonOS\Core\Model\Event\Element;
 use GibsonOS\Core\Service\AbstractService;
 use GibsonOS\Core\Utility\JsonUtility;
+use JsonException;
 
 class CodeGeneratorService extends AbstractService
 {
@@ -30,6 +31,8 @@ class CodeGeneratorService extends AbstractService
 
     /**
      * @param Element[] $elements
+     *
+     * @throws JsonException
      */
     public function generateByElements(array $elements): string
     {
@@ -47,6 +50,9 @@ class CodeGeneratorService extends AbstractService
         return $code;
     }
 
+    /**
+     * @throws JsonException
+     */
     private function generateCommandStart(Element $element): string
     {
         $command = '$this->runFunction(unserialize(\'' . str_replace("'", "\\'", serialize($element)) . '\'))';
@@ -74,6 +80,9 @@ class CodeGeneratorService extends AbstractService
         return $conditionStatement . ';';
     }
 
+    /**
+     * @throws JsonException
+     */
     private function generateCommandEnd(Element $element = null): string
     {
         if (
@@ -120,19 +129,45 @@ class CodeGeneratorService extends AbstractService
         return '';
     }
 
+    /**
+     * @throws JsonException
+     */
     private function getConditionStatement(string $command, Element $element): string
     {
-        if ($element->getOperator() === null) {
-            return $command;
-        }
-
         $returns = JsonUtility::decode($element->getReturns() ?? '[]');
+        $hasOperator = false;
+        $statements = [];
+        $commandReturnIndex = '';
 
-        if ($element->getOperator() === self::OPERATOR_SET) {
-            return '$' . reset($returns) . ' = ' . $command;
+        foreach ($returns as $index => $return) {
+            if ($return['operator'] === null) {
+                continue;
+            }
+
+            if (count($returns) !== 1) {
+                $commandReturnIndex = '[' . $index . ']';
+            }
+
+            $hasOperator = true;
+
+            if ($return['operator'] === self::OPERATOR_SET) {
+                //$statement .= '$' . reset($returns['operator']) . ' = $commandReturn' . $commandReturnIndex . ';';
+
+                continue;
+            }
+
+            $statements[] = '$commandReturn' . $commandReturnIndex . ' ' . $return['operator'] . ' ' . $return['value'];
         }
 
-        // @todo multiple returns. Vorstellung: Jedes ELement der Antwort wird durchlaufen und mit jedem gesetzten verglichen
-        return $command . ' ' . $element->getOperator() . ' ' . reset($returns);
+        if ($hasOperator) {
+            return
+                'static function(): bool {' .
+                    '$commandReturn = ' . $command . ';' .
+                    'return ' . implode(' && ', $statements) . ';' .
+                '}'
+            ;
+        }
+
+        return $command;
     }
 }
