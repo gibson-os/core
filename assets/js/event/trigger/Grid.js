@@ -47,6 +47,7 @@ Ext.define('GibsonOS.module.core.event.trigger.Grid', {
                             if (!Ext.Object.isEmpty(triggerRecord.get('parameters'))) {
                                 Ext.iterate(triggerRecord.get('parameters'), function(name, parameter) {
                                     parameter.value = record.get('parameters')[name].value;
+                                    parameter.operator = record.get('parameters')[name].operator;
                                 });
 
                                 parametersCheckbox.enable();
@@ -155,13 +156,16 @@ Ext.define('GibsonOS.module.core.event.trigger.Grid', {
                 }
 
                 Ext.iterate(parameters, function(name, parameter) {
-                    returnValue += parameter.title + ': ';
-
-                    if (values[name]) {
-                        returnValue += values[name].value ? values[name].value : '';
+                    if (!values[name]) {
+                        return true;
                     }
 
-                    returnValue += '<br>';
+                    returnValue +=
+                        parameter.title + ' ' +
+                        (values[name].operator ? values[name].operator + ' ' : ' ') +
+                        (values[name].value ? values[name].value : '') +
+                        '<br>'
+                    ;
                 });
 
                 return returnValue;
