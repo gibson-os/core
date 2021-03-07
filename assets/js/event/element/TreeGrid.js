@@ -25,12 +25,10 @@ Ext.define('GibsonOS.module.core.event.element.TreeGrid', {
                         let record = context.record;
                         let methodComboBox = form.findField('method');
                         let parametersCheckbox = form.findField('hasParameters');
-                        let operatorComboBox = form.findField('operator');
                         let returnCheckbox = form.findField('hasReturn');
 
                         methodComboBox.disable();
                         parametersCheckbox.disable();
-                        operatorComboBox.disable();
                         returnCheckbox.disable();
 
                         if (!record.get('className')) {
@@ -66,7 +64,6 @@ Ext.define('GibsonOS.module.core.event.element.TreeGrid', {
                                     parameter.value = record.get('returns')[name].value;
                                 });
 
-                                operatorComboBox.enable();
                                 returnCheckbox.enable();
                             }
                         });
@@ -193,13 +190,11 @@ Ext.define('GibsonOS.module.core.event.element.TreeGrid', {
                         let record = comboBox.findRecordByValue(newValue);
                         let parametersCheckbox = me.down('#gosModuleCoreEventElementTreeGridColumnParameters').getEditor();
                         let returnCheckbox = me.down('#gosModuleCoreEventElementTreeGridColumnReturn').getEditor();
-                        let operatorComboBox = me.down('#gosModuleCoreEventElementTreeGridColumnOperator').getEditor();
                         let parameters = null;
                         let returns = null;
 
                         parametersCheckbox.disable();
                         returnCheckbox.disable();
-                        operatorComboBox.disable();
 
                         if (record) {
                             parameters = record.get('parameters');
@@ -210,11 +205,8 @@ Ext.define('GibsonOS.module.core.event.element.TreeGrid', {
                             }
 
                             if (!Ext.Object.isEmpty(returns)) {
-                                operatorComboBox.enable();
                                 returnCheckbox.enable();
                             }
-                        } else {
-                            operatorComboBox.setValue(null);
                         }
                     }
                 }
@@ -280,20 +272,6 @@ Ext.define('GibsonOS.module.core.event.element.TreeGrid', {
                 }
             }
         },{
-            xtype: 'gosGridColumnComboBoxEditor',
-            header: 'Operator',
-            itemId: 'gosModuleCoreEventElementTreeGridColumnOperator',
-            dataIndex: 'operator',
-            width: 100,
-            editor: {
-                xtype: 'gosModuleCoreEventElementOperatorComboBox'
-            },
-            renderer: function(value) {
-                let record = me.down('#gosModuleCoreEventElementTreeGridColumnOperator').getEditor().findRecordByValue(value);
-
-                return record === false ? null : record.get('name');
-            }
-        },{
             header: 'Wert',
             itemId: 'gosModuleCoreEventElementTreeGridColumnReturn',
             dataIndex: 'hasReturn',
@@ -309,21 +287,21 @@ Ext.define('GibsonOS.module.core.event.element.TreeGrid', {
                     returns = methodComboBoxRecord.get('returns');
                 }
 
-                if (
-                    !record.get('operator') ||
-                    !returns
-                ) {
+                if (!returns) {
                     return returnValue;
                 }
 
                 Ext.iterate(returns, function(name, parameter) {
-                    returnValue += parameter.title + ': ';
-
-                    if (values[name]) {
-                        returnValue += values[name].value ? values[name].value : '';
+                    if (!values[name]) {
+                        return true;
                     }
 
-                    returnValue += '<br>';
+                    returnValue +=
+                        parameter.title + ' ' +
+                        (values[name].operator ? values[name].operator + ' ' : ' ') +
+                        (values[name].value ? values[name].value : '') +
+                        '<br>'
+                    ;
                 });
 
                 return returnValue;

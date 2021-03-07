@@ -3,8 +3,9 @@ Ext.define('GibsonOS.module.core.event.element.parameter.Form', {
     alias: ['widget.gosModuleCoreEventElementParameterForm'],
     border: false,
     items: [],
-    initComponent: function() {
-        let me = this;
+    withOperator: false,
+    initComponent() {
+        const me = this;
         
         me.buttons = [{
             text: 'Speichern',
@@ -12,6 +13,13 @@ Ext.define('GibsonOS.module.core.event.element.parameter.Form', {
             listeners: {
                 click: function() {
                     me.items.each(function(field) {
+                        if (me.withOperator) {
+                            field.items.items[1].parameterObject.operator = field.items.items[0].getValue();
+                            field.items.items[1].parameterObject.value = field.items.items[1].getValue();
+
+                            return true;
+                        }
+
                         field.parameterObject.value = field.getValue();
                     });
                 }

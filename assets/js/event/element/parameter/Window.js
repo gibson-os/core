@@ -17,6 +17,7 @@ Ext.define('GibsonOS.module.core.event.element.parameter.Window', {
 
         me.items = [{
             xtype: 'gosModuleCoreEventElementParameterForm',
+            withOperator: me.withOperator
         }];
 
         me.callParent();
