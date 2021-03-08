@@ -123,7 +123,15 @@ class ElementStore extends AbstractDatabaseStore
                 continue;
             }
 
-            $methodParameter['value'] = $parameters[$parameterName];
+            $parameter = $parameters[$parameterName];
+
+            if (is_array($parameter)) {
+                $methodParameter = array_merge($methodParameter, $parameter);
+
+                continue;
+            }
+
+            $methodParameter['value'] = $parameter;
         }
 
         return JsonUtility::encode($methodParameters);

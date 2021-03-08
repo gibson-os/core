@@ -45,7 +45,6 @@ Ext.define('GibsonOS.module.core.event.Panel', {
                 command: element.get('command'),
                 className: element.get('className'),
                 method: element.get('method'),
-                operator: element.get('operator'),
                 parameters: {},
                 returns: {},
                 children: []
@@ -56,7 +55,10 @@ Ext.define('GibsonOS.module.core.event.Panel', {
             });
 
             Ext.iterate(element.get('returns'), function(name, parameter) {
-                data.returns[name] = parameter.value;
+                data.returns[name] = {
+                    value: parameter.value,
+                    operator: parameter.operator
+                };
             });
 
             element.eachChild(function(children) {
