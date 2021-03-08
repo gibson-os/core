@@ -119,7 +119,8 @@ class TriggerStore extends AbstractDatabaseStore
                 continue;
             }
 
-            $methodParameter['value'] = $parameters[$parameterName];
+            $methodParameter['value'] = $parameters[$parameterName]['value'];
+            $methodParameter['operator'] = $parameters[$parameterName]['operator'];
         }
 
         return JsonUtility::encode($triggerParameters);

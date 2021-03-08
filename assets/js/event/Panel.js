@@ -39,7 +39,7 @@ Ext.define('GibsonOS.module.core.event.Panel', {
         let elements = [];
         let triggers = [];
 
-        let getElementsAjaxData = function(element) {
+        const getElementsAjaxData = function(element) {
             let data = {
                 id: element.get('id'),
                 command: element.get('command'),
@@ -51,10 +51,18 @@ Ext.define('GibsonOS.module.core.event.Panel', {
             };
 
             Ext.iterate(element.get('parameters'), function(name, parameter) {
+                if (!parameter.value) {
+                    return true;
+                }
+
                 data.parameters[name] = parameter.value;
             });
 
             Ext.iterate(element.get('returns'), function(name, parameter) {
+                if (!parameter.value) {
+                    return true;
+                }
+
                 data.returns[name] = {
                     value: parameter.value,
                     operator: parameter.operator
@@ -67,13 +75,41 @@ Ext.define('GibsonOS.module.core.event.Panel', {
 
             return data;
         };
+        const getTriggerAjaxData = (trigger) => {
+            let data = {
+                id: trigger.get('id'),
+                className: trigger.get('className'),
+                trigger: trigger.get('trigger'),
+                parameters: {},
+                weekday: trigger.get('weekday'),
+                day: trigger.get('day'),
+                month: trigger.get('month'),
+                year: trigger.get('year'),
+                hour: trigger.get('hour'),
+                minute: trigger.get('minute'),
+                second: trigger.get('second')
+            };
+
+            Ext.iterate(trigger.get('parameters'), function(name, parameter) {
+                if (!parameter.value) {
+                    return true;
+                }
+
+                data.parameters[name] = {
+                    value: parameter.value,
+                    operator: parameter.operator
+                };
+            });
+
+            return data;
+        }
 
         me.down('gosModuleCoreEventElementTreeGrid').getStore().getRootNode().eachChild(function(element) {
             elements.push(getElementsAjaxData(element));
         });
 
         me.down('gosModuleCoreEventTriggerGrid').getStore().each(function(trigger) {
-            triggers.push(trigger.getData());
+            triggers.push(getTriggerAjaxData(trigger));
         });
 
         me.setLoading(true);

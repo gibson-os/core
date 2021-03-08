@@ -250,6 +250,7 @@ class EventRepository extends AbstractRepository
 
     /**
      * @throws DateTimeError
+     * @throws JsonException
      * @throws SaveError
      *
      * @return int[]
@@ -263,7 +264,7 @@ class EventRepository extends AbstractRepository
                 ->setId($trigger['id'])
                 ->setEvent($event)
                 ->setClass($trigger['className'])
-                ->setParameters($trigger['parameter'])
+                ->setParameters(empty($trigger['parameters']) ? null : $this->jsonUtility->encode($trigger['parameters']))
                 ->setTrigger($trigger['trigger'])
                 ->setWeekday($trigger['weekday'])
                 ->setDay($trigger['day'])
