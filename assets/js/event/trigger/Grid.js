@@ -156,7 +156,7 @@ Ext.define('GibsonOS.module.core.event.trigger.Grid', {
                 }
 
                 Ext.iterate(parameters, function(name, parameter) {
-                    if (!values[name]) {
+                    if (!values[name] || !values[name].value) {
                         return true;
                     }
 

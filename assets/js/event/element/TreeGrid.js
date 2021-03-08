@@ -301,7 +301,7 @@ Ext.define('GibsonOS.module.core.event.element.TreeGrid', {
                 }
 
                 Ext.iterate(returns, function(name, parameter) {
-                    if (!values[name]) {
+                    if (!values[name] || !values[name].value) {
                         return true;
                     }
 
