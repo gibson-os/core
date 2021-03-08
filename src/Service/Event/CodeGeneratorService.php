@@ -6,6 +6,7 @@ namespace GibsonOS\Core\Service\Event;
 use GibsonOS\Core\Model\Event\Element;
 use GibsonOS\Core\Service\AbstractService;
 use GibsonOS\Core\Utility\JsonUtility;
+use InvalidArgumentException;
 use JsonException;
 
 class CodeGeneratorService extends AbstractService
@@ -19,6 +20,18 @@ class CodeGeneratorService extends AbstractService
     private const COMMAND_WHILE = 'while';
 
     private const COMMAND_DO_WHILE = 'do_while';
+
+    private const OPERATOR_EQUAL = '===';
+
+    private const OPERATOR_NOT_EQUAL = '!==';
+
+    private const OPERATOR_BIGGER = '>';
+
+    private const OPERATOR_BIGGER_EQUAL = '>=';
+
+    private const OPERATOR_SMALLER = '<';
+
+    private const OPERATOR_SMALLER_EQUAL = '<=';
 
     private const OPERATOR_SET = '=';
 
@@ -169,5 +182,22 @@ class CodeGeneratorService extends AbstractService
         }
 
         return $command;
+    }
+
+    /**
+     * @param $value1
+     * @param $value2
+     */
+    public function if($value1, string $operator, $value2): bool
+    {
+        switch ($operator) {
+            case self::OPERATOR_EQUAL: return $value1 === $value2;
+            case self::OPERATOR_NOT_EQUAL: return $value1 !== $value2;
+            case self::OPERATOR_BIGGER: return $value1 > $value2;
+            case self::OPERATOR_BIGGER_EQUAL: return $value1 >= $value2;
+            case self::OPERATOR_SMALLER: return $value1 < $value2;
+            case self::OPERATOR_SMALLER_EQUAL: return $value1 <= $value2;
+            default: throw new InvalidArgumentException(sprintf('Operator "%s" not allowed!', $operator));
+        }
     }
 }

@@ -14,6 +14,8 @@ use GibsonOS\Core\Model\Event;
 use GibsonOS\Core\Model\Event\Element;
 use GibsonOS\Core\Repository\EventRepository;
 use GibsonOS\Core\Service\Event\CodeGeneratorService;
+use GibsonOS\Core\Utility\JsonUtility;
+use JsonException;
 
 class EventService extends AbstractService
 {
@@ -62,7 +64,9 @@ class EventService extends AbstractService
 
         foreach ($events as $event) {
             if ($event instanceof Event) {
-                $this->runEvent($event, $event->isAsync());
+                if ($this->checkTriggerParameters($event, $trigger, $parameters ?? [])) {
+                    $this->runEvent($event, $event->isAsync());
+                }
             } else {
                 $event($parameters);
             }
@@ -96,5 +100,34 @@ class EventService extends AbstractService
         $service = $this->serviceManagerService->get($describer->getEventClassName());
 
         return $service->run($element);
+    }
+
+    /**
+     * @throws DateTimeError
+     * @throws JsonException
+     */
+    private function checkTriggerParameters(Event $event, string $trigger, array $parameters): bool
+    {
+        foreach ($event->getTriggers() ?? [] as $eventTrigger) {
+            if ($eventTrigger->getTrigger() !== $trigger) {
+                continue;
+            }
+
+            $eventParameters = JsonUtility::decode($eventTrigger->getParameters() ?? '[]');
+
+            foreach ($eventParameters ?? [] as $parameterName => $eventParameter) {
+                if (!isset($parameters[$parameterName])) {
+                    continue;
+                }
+
+                if (!$this->codeGeneratorService->if($parameters[$parameterName], $eventParameter['operator'], $eventParameter['value'])) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        return false;
     }
 }
