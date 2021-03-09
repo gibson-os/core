@@ -72,4 +72,19 @@ class TimeEvent extends AbstractEvent
     {
         return (int) $this->dateTimeService->get()->format('s');
     }
+
+    public function isDay(): bool
+    {
+        $now = $this->dateTimeService->get();
+
+        return
+            $now >= $this->dateTimeService->getSunrise($now) &&
+            $now < $this->dateTimeService->getSunset($now)
+        ;
+    }
+
+    public function isNight(): bool
+    {
+        return !$this->isDay();
+    }
 }

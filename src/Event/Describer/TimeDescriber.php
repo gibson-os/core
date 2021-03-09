@@ -102,6 +102,8 @@ class TimeDescriber implements DescriberInterface
                     'value' => (new IntParameter('Sekunde'))
                         ->setRange(0, 59),
                 ]),
+            'isDay' => (new Method('Ist Tag')),
+            'isNight' => (new Method('Ist Nacht')),
         ];
     }
 
