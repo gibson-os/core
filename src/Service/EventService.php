@@ -6,6 +6,7 @@ namespace GibsonOS\Core\Service;
 use DateTime;
 use Exception;
 use GibsonOS\Core\Command\Event\RunCommand;
+use GibsonOS\Core\Dto\Event\Describer\Parameter\AutoCompleteParameter;
 use GibsonOS\Core\Event\AbstractEvent;
 use GibsonOS\Core\Event\Describer\DescriberInterface;
 use GibsonOS\Core\Exception\DateTimeError;
@@ -113,7 +114,19 @@ class EventService extends AbstractService
                 continue;
             }
 
+            /** @var DescriberInterface $describer */
+            $describer = $this->serviceManagerService->get($eventTrigger->getClass());
+            $triggers = $describer->getTriggers();
+            $triggerParameters = $triggers[$eventTrigger->getTrigger()]->getParameters();
             $eventParameters = JsonUtility::decode($eventTrigger->getParameters() ?? '[]');
+
+            foreach ($triggerParameters as $parameterName => $triggerParameter) {
+                if (!$triggerParameter instanceof AutoCompleteParameter) {
+                    continue;
+                }
+
+                $parameters[$parameterName] = $triggerParameter->getAutoComplete()->getIdFromModel($parameters[$parameterName]);
+            }
 
             foreach ($eventParameters ?? [] as $parameterName => $eventParameter) {
                 if (!isset($parameters[$parameterName])) {

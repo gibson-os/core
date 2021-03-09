@@ -34,12 +34,11 @@ abstract class AbstractEvent
 
     protected function getParameters(Element $element): array
     {
-        $parameters = $element->getParameters() ?? '[]';
         /** @var DescriberInterface $describer */
         $describer = $this->serviceManagerService->get($element->getClass());
         $methods = $describer->getMethods();
         $methodParameters = $methods[$element->getMethod()]->getParameters();
-        $parameters = JsonUtility::decode($parameters);
+        $parameters = JsonUtility::decode($element->getParameters() ?? '[]');
 
         foreach ($methodParameters as $parameterName => $methodParameter) {
             if (!$methodParameter instanceof AutoCompleteParameter) {

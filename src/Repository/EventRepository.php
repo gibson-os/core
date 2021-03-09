@@ -144,6 +144,7 @@ class EventRepository extends AbstractRepository
             '`event_element`.`operator` AS `elementOperator`, ' .
             '`event_element`.`returns` AS `elementReturns`, ' .
             '`event_trigger`.`id` AS `triggerId`, ' .
+            '`event_trigger`.`class` AS `triggerClass`, ' .
             '`event_trigger`.`trigger` AS `triggerTrigger`, ' .
             '`event_trigger`.`parameters` AS `triggerParameters`, ' .
             '`event_trigger`.`weekday` AS `triggerWeekday`, ' .
@@ -313,9 +314,10 @@ class EventRepository extends AbstractRepository
             if (!isset($triggerModels[$event->triggerId])) {
                 $triggerModel = (new Trigger())
                     ->setId((int) $event->triggerId)
+                    ->setEvent($models[$event->id])
+                    ->setClass($event->triggerClass)
                     ->setTrigger($event->triggerTrigger)
                     ->setParameters($event->triggerParameters)
-                    ->setEvent($models[$event->id])
                     ->setWeekday((int) $event->triggerWeekday ?: null)
                     ->setDay((int) $event->triggerDay ?: null)
                     ->setMonth((int) $event->triggerMonth ?: null)
