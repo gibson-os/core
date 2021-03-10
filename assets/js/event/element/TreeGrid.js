@@ -4,6 +4,14 @@ Ext.define('GibsonOS.module.core.event.element.TreeGrid', {
     autoScroll: true,
     useArrows: true,
     multiSelect: true,
+    viewConfig: {
+        //@todo change some stuff on drop
+        plugins: {
+            ptype: 'gridviewdragdrop',
+            dragGroup: 'coreEventElementDDGroup',
+            dropGroup: 'coreEventElementDDGroup'
+        }
+    },
     requiredPermission: {
         module: 'core',
         task: 'event'

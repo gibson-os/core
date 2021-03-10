@@ -41,7 +41,7 @@ class MethodStore extends AbstractStore
     {
         $this->generateList();
 
-        return $this->list;
+        return $this->list[$this->describerClass];
     }
 
     /**
@@ -57,7 +57,7 @@ class MethodStore extends AbstractStore
      */
     private function generateList(): void
     {
-        if (count($this->list) !== 0) {
+        if (isset($this->list[$this->describerClass])) {
             return;
         }
 
@@ -65,7 +65,7 @@ class MethodStore extends AbstractStore
         $methods = [];
 
         if (!$describer instanceof DescriberInterface) {
-            $this->list = $methods;
+            $this->list[$this->describerClass] = $methods;
 
             return;
         }
@@ -81,7 +81,7 @@ class MethodStore extends AbstractStore
 
         ksort($methods);
 
-        $this->list = array_values($methods);
+        $this->list[$this->describerClass] = array_values($methods);
     }
 
     /**
