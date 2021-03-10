@@ -1,4 +1,4 @@
-Ext.define('GibsonOS.core.component.Panel', {
+Ext.define('GibsonOS.module.core.component.Panel', {
     extend: 'Ext.Panel',
     alias: ['widget.gosCoreComponentPanel'],
     border: false,

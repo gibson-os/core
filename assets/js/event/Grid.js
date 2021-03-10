@@ -1,5 +1,5 @@
 Ext.define('GibsonOS.module.core.event.Grid', {
-    extend: 'GibsonOS.core.component.grid.Panel',
+    extend: 'GibsonOS.module.core.component.grid.Panel',
     alias: ['widget.gosModuleCoreEventGrid'],
     autoScroll: true,
     initComponent: function () {

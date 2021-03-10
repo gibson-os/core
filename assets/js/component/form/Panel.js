@@ -1,4 +1,4 @@
-Ext.define('GibsonOS.core.component.form.Panel', {
+Ext.define('GibsonOS.module.core.component.form.Panel', {
     extend: 'Ext.form.Panel',
     alias: ['widget.gosCoreComponentFormPanel'],
     buttonAlign: 'center',

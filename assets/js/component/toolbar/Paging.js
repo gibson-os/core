@@ -1,4 +1,4 @@
-Ext.define('GibsonOS.core.component.toolbar.Paging', {
+Ext.define('GibsonOS.module.core.component.toolbar.Paging', {
     extend: 'Ext.toolbar.Paging',
     alias: ['widget.gosCoreComponentToolbarPaging'],
     border: false,

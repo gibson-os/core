@@ -1,5 +1,5 @@
 Ext.define('GibsonOS.module.core.event.element.TreeGrid', {
-    extend: 'GibsonOS.core.component.tree.Panel',
+    extend: 'GibsonOS.module.core.component.tree.Panel',
     alias: ['widget.gosModuleCoreEventElementTreeGrid'],
     autoScroll: true,
     useArrows: true,

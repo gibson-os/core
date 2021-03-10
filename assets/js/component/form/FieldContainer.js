@@ -1,4 +1,4 @@
-Ext.define('GibsonOS.core.component.form.FieldContainer', {
+Ext.define('GibsonOS.module.core.component.form.FieldContainer', {
     extend: 'Ext.form.FieldContainer',
     alias: ['widget.gosCoreComponentFormFieldContainer'],
     anchor: '100%',

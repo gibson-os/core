@@ -1,5 +1,5 @@
 Ext.define('GibsonOS.module.core.cronjob.Grid', {
-    extend: 'GibsonOS.core.component.grid.Panel',
+    extend: 'GibsonOS.module.core.component.grid.Panel',
     alias: ['widget.gosModuleCoreCronjobGrid'],
     itemId: 'coreCronjobGrid',
     initComponent: function() {

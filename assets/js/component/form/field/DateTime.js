@@ -1,5 +1,5 @@
-Ext.define('GibsonOS.core.component.form.field.DateTime', {
-    extend: 'GibsonOS.core.component.form.FieldContainer',
+Ext.define('GibsonOS.module.core.component.form.field.DateTime', {
+    extend: 'GibsonOS.module.core.component.form.FieldContainer',
     alias: ['widget.gosCoreComponentFormFieldDateTime'],
     fieldLabel: 'Datum und Zeit',
     initComponent() {

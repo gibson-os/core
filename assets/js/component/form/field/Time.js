@@ -1,4 +1,4 @@
-Ext.define('GibsonOS.core.component.form.field.Time', {
+Ext.define('GibsonOS.module.core.component.form.field.Time', {
     extend: 'Ext.form.field.Time',
     alias: ['widget.gosCoreComponentFormFieldTime'],
     anchor: '100%',
