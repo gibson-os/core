@@ -21,16 +21,11 @@ class EventStore extends AbstractDatabaseStore
     {
         return [
             'name' => '`' . $this->getTableName() . '`.`name`',
-            'event_trigger' => '`event_trigger`.`trigger`',
         ];
     }
 
     public function getList(): array
     {
-        $this->table->appendJoinLeft(
-            '`gibson_os`.`event_trigger`',
-            '`event_trigger`.`event_id`=`' . $this->getTableName() . '`.`id`'
-        );
         $this->table->setWhere($this->getWhere());
         $this->table->setOrderBy($this->getOrderBy());
         $this->table->select(
