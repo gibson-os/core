@@ -329,7 +329,10 @@ Ext.define('GibsonOS.module.core.event.element.TreeGrid', {
                         checkbox.setValue(true);
                         checkbox.resumeEvents();
 
-                        new GibsonOS.module.core.event.element.parameter.Window({withOperator: true})
+                        new GibsonOS.module.core.event.element.parameter.Window({
+                            withOperator: true,
+                            withSet: true
+                        })
                             .addFieldsByParameters(record.get('returns'))
                         ;
                     }
