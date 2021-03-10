@@ -52,9 +52,16 @@ class EventController extends AbstractController
      * @throws PermissionDenied
      * @throws SelectError
      */
-    public function elements(ElementStore $elementStore, int $eventId): AjaxResponse
+    public function elements(ElementStore $elementStore, int $eventId = null, string $node = null): AjaxResponse
     {
         $this->checkPermission(PermissionService::READ);
+
+        if (
+            $eventId === null ||
+            ($node !== null && $node !== 'NaN')
+        ) {
+            return $this->returnSuccess([]);
+        }
 
         $elementStore->setEventId($eventId);
 
