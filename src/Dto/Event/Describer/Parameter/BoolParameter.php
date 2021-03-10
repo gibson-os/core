@@ -14,4 +14,12 @@ class BoolParameter extends AbstractParameter
     {
         return [];
     }
+
+    public function getAllowedOperators(): array
+    {
+        return [
+            self::OPERATOR_EQUAL,
+            self::OPERATOR_NOT_EQUAL,
+        ];
+    }
 }

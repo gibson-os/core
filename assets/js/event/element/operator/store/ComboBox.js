@@ -35,7 +35,7 @@ Ext.define('GibsonOS.module.core.event.element.operator.store.ComboBox', {
         me.data = [];
 
         Ext.iterate(operators, (operator) => {
-            if (data.exclude.indexOf(operator.operator) !== -1) {
+            if (data.allowed.indexOf(operator.operator) === -1) {
                 return true;
             }
 

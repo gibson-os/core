@@ -19,4 +19,12 @@ class OptionParameter extends AbstractParameter
             'options' => $this->options,
         ];
     }
+
+    public function getAllowedOperators(): array
+    {
+        return [
+            self::OPERATOR_EQUAL,
+            self::OPERATOR_NOT_EQUAL,
+        ];
+    }
 }

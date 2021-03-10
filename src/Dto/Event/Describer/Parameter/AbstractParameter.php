@@ -5,6 +5,18 @@ namespace GibsonOS\Core\Dto\Event\Describer\Parameter;
 
 abstract class AbstractParameter
 {
+    protected const OPERATOR_EQUAL = '===';
+
+    protected const OPERATOR_NOT_EQUAL = '!==';
+
+    protected const OPERATOR_BIGGER = '>';
+
+    protected const OPERATOR_BIGGER_EQUAL = '>=';
+
+    protected const OPERATOR_SMALLER = '<';
+
+    protected const OPERATOR_SMALLER_EQUAL = '<=';
+
     private string $title;
 
     private string $type;
@@ -12,6 +24,8 @@ abstract class AbstractParameter
     private array $listeners = [];
 
     abstract protected function getTypeConfig(): array;
+
+    abstract public function getAllowedOperators(): array;
 
     public function __construct(string $title, string $type)
     {

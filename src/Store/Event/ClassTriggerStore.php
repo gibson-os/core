@@ -94,6 +94,7 @@ class ClassTriggerStore extends AbstractStore
             $parametersArray[$name] = [
                 'title' => $parameter->getTitle(),
                 'type' => $parameter->getType(),
+                'allowedOperators' => $parameter->getAllowedOperators(),
                 'config' => $parameter->getConfig(),
             ];
         }

@@ -49,4 +49,12 @@ class AutoCompleteParameter extends AbstractParameter
             'parameters' => $this->getParameters(),
         ];
     }
+
+    public function getAllowedOperators(): array
+    {
+        return [
+            self::OPERATOR_EQUAL,
+            self::OPERATOR_NOT_EQUAL,
+        ];
+    }
 }

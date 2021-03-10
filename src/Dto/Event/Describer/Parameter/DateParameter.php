@@ -31,4 +31,16 @@ class DateParameter extends AbstractParameter
             'max' => $this->max === null ? null : $this->max->format('Y-m-d'),
         ];
     }
+
+    public function getAllowedOperators(): array
+    {
+        return [
+            self::OPERATOR_EQUAL,
+            self::OPERATOR_NOT_EQUAL,
+            self::OPERATOR_SMALLER,
+            self::OPERATOR_SMALLER_EQUAL,
+            self::OPERATOR_BIGGER,
+            self::OPERATOR_BIGGER_EQUAL,
+        ];
+    }
 }

@@ -186,7 +186,7 @@ Ext.define('GibsonOS.module.core.event.trigger.Grid', {
 
                         new GibsonOS.module.core.event.element.parameter.Window({
                             withOperator: true,
-                            excludeOperators: ['=']
+                            withSet: true
                         })
                             .addFieldsByParameters(record.get('parameters'))
                         ;

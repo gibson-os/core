@@ -4,11 +4,11 @@ Ext.define('GibsonOS.module.core.event.element.operator.ComboBox', {
     emptyText: 'Keiner',
     displayField: 'name',
     valueField: 'operator',
-    exclude: [],
+    allowed: [],
     initComponent: function() {
         let me = this;
 
-        me.store = new GibsonOS.module.core.event.element.operator.store.ComboBox({exclude: me.exclude});
+        me.store = new GibsonOS.module.core.event.element.operator.store.ComboBox({allowed: me.allowed});
 
         me.callParent();
     }

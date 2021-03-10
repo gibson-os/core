@@ -7,7 +7,7 @@ Ext.define('GibsonOS.module.core.event.element.parameter.Window', {
     autoHeight: true,
     maximizable: true,
     withOperator: false,
-    excludeOperators: [],
+    withSet: false,
     requiredPermission: {
         module: 'core',
         task: 'event'
@@ -67,6 +67,10 @@ Ext.define('GibsonOS.module.core.event.element.parameter.Window', {
             }
 
             if (me.withOperator) {
+                if (me.withSet) {
+                    parameter.allowedOperators.push('=');
+                }
+
                 form.add({
                     xtype: 'gosCoreComponentFormFieldContainer',
                     fieldLabel: parameter.title,
@@ -75,7 +79,7 @@ Ext.define('GibsonOS.module.core.event.element.parameter.Window', {
                         name: name + 'Operator',
                         margins: '0 5px 0 0',
                         value: parameter.operator ?? null,
-                        exclude: me.excludeOperators
+                        allowed: parameter.allowedOperators
                     }, item]
                 });
             } else {
