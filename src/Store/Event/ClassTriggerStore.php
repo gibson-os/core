@@ -41,7 +41,7 @@ class ClassTriggerStore extends AbstractStore
     {
         $this->generateList();
 
-        return $this->list;
+        return $this->list[$this->describerClass];
     }
 
     /**
@@ -57,7 +57,7 @@ class ClassTriggerStore extends AbstractStore
      */
     private function generateList(): void
     {
-        if (count($this->list) !== 0) {
+        if (isset($this->list[$this->describerClass])) {
             return;
         }
 
@@ -65,7 +65,7 @@ class ClassTriggerStore extends AbstractStore
         $triggers = [];
 
         if (!$describer instanceof DescriberInterface) {
-            $this->list = $triggers;
+            $this->list[$this->describerClass] = $triggers;
 
             return;
         }
@@ -80,7 +80,7 @@ class ClassTriggerStore extends AbstractStore
 
         ksort($triggers);
 
-        $this->list = array_values($triggers);
+        $this->list[$this->describerClass] = array_values($triggers);
     }
 
     /**
