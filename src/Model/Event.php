@@ -154,7 +154,23 @@ class Event extends AbstractModel implements JsonSerializable
             'event_id'
         );
 
-        $this->setElements($elements);
+        $groupedElements = [];
+        $indexedElements = [];
+
+        foreach ($elements as $element) {
+            $indexedElements[$element->getId() ?? 0] = $element;
+            $parentId = $element->getParentId();
+
+            if ($parentId === null) {
+                $groupedElements[] = $element;
+
+                continue;
+            }
+
+            $indexedElements[$parentId]->addChildren($element);
+        }
+
+        $this->setElements($groupedElements);
     }
 
     /**
