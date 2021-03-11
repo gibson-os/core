@@ -21,6 +21,8 @@ class Event extends AbstractModel implements JsonSerializable
 
     private DateTimeInterface $modified;
 
+    private ?DateTimeInterface $lastRun = null;
+
     /**
      * @var Element[]|null
      */
@@ -92,6 +94,18 @@ class Event extends AbstractModel implements JsonSerializable
     public function setModified(DateTimeInterface $modified): Event
     {
         $this->modified = $modified;
+
+        return $this;
+    }
+
+    public function getLastRun(): ?DateTimeInterface
+    {
+        return $this->lastRun;
+    }
+
+    public function setLastRun(?DateTimeInterface $lastRun): Event
+    {
+        $this->lastRun = $lastRun;
 
         return $this;
     }

@@ -11,6 +11,7 @@ use GibsonOS\Core\Event\AbstractEvent;
 use GibsonOS\Core\Event\Describer\DescriberInterface;
 use GibsonOS\Core\Exception\DateTimeError;
 use GibsonOS\Core\Exception\FactoryError;
+use GibsonOS\Core\Exception\Model\SaveError;
 use GibsonOS\Core\Model\Event;
 use GibsonOS\Core\Model\Event\Element;
 use GibsonOS\Core\Repository\EventRepository;
@@ -30,16 +31,20 @@ class EventService extends AbstractService
 
     private CommandService $commandService;
 
+    private DateTimeService $dateTimeService;
+
     public function __construct(
         ServiceManagerService $serviceManagerService,
         EventRepository $eventRepository,
         CodeGeneratorService $codeGeneratorService,
-        CommandService $commandService
+        CommandService $commandService,
+        DateTimeService $dateTimeService
     ) {
         $this->serviceManagerService = $serviceManagerService;
         $this->eventRepository = $eventRepository;
         $this->codeGeneratorService = $codeGeneratorService;
         $this->commandService = $commandService;
+        $this->dateTimeService = $dateTimeService;
     }
 
     public function add(string $trigger, callable $function): void
@@ -76,6 +81,8 @@ class EventService extends AbstractService
 
     /**
      * @throws DateTimeError
+     * @throws JsonException
+     * @throws SaveError
      */
     public function runEvent(Event $event, bool $async): void
     {
@@ -85,6 +92,7 @@ class EventService extends AbstractService
             return;
         }
 
+        $event->setLastRun($this->dateTimeService->get())->save();
         eval($this->codeGeneratorService->generateByElements($event->getElements() ?? []));
     }
 
