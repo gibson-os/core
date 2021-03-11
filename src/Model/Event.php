@@ -222,11 +222,14 @@ class Event extends AbstractModel implements JsonSerializable
 
     public function jsonSerialize(): array
     {
+        $lastRun = $this->getLastRun();
+
         return [
             'id' => $this->getId(),
             'name' => $this->getName(),
             'active' => $this->isActive(),
             'async' => $this->isAsync(),
+            'lastRun' => $lastRun === null ? null : $lastRun->format('Y-m-d H:i:s'),
         ];
     }
 }

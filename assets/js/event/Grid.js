@@ -62,12 +62,9 @@ Ext.define('GibsonOS.module.core.event.Grid', {
                 allowBlank: false
             }
         },{
-            header: 'Trigger',
-            dataIndex: 'triggers',
-            flex: 1,
-            renderer: function(value) {
-                return value;
-            }
+            header: 'Letzter Lauf',
+            dataIndex: 'lastRun',
+            width: 120
         },{
             xtype: 'booleancolumn',
             header: 'Aktiv',
@@ -75,6 +72,13 @@ Ext.define('GibsonOS.module.core.event.Grid', {
             trueText: 'Ja',
             falseText: 'Nein',
             width: 50
+        },{
+            xtype: 'booleancolumn',
+            header: 'Asynchron',
+            dataIndex: 'async',
+            trueText: 'Ja',
+            falseText: 'Nein',
+            width: 70
         }];
     }
 });

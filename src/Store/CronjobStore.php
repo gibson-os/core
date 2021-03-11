@@ -23,7 +23,7 @@ class CronjobStore extends AbstractDatabaseStore
         return [
             'command' => 'command',
             'user' => 'user',
-            'last_run' => 'last_rund',
+            'last_run' => 'last_run',
             'active' => 'active',
         ];
     }

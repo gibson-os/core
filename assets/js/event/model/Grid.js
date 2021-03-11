@@ -15,5 +15,8 @@ Ext.define('GibsonOS.module.core.event.model.Grid', {
     },{
         name: 'async',
         type: 'bool'
+    },{
+        name: 'lastRun',
+        type: 'string'
     }]
 });

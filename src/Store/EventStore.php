@@ -34,7 +34,8 @@ class EventStore extends AbstractDatabaseStore
             '`' . $this->getTableName() . '`.`name`, ' .
             '`' . $this->getTableName() . '`.`active`, ' .
             '`' . $this->getTableName() . '`.`async`, ' .
-            '`' . $this->getTableName() . '`.`modified`'
+            '`' . $this->getTableName() . '`.`modified`, ' .
+            '`' . $this->getTableName() . '`.`last_run` AS `lastRun`'
         );
 
         return $this->table->connection->fetchAssocList();
