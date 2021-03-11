@@ -56,7 +56,7 @@ class WeatherService extends AbstractService
      */
     public function load(Location $location): void
     {
-        $this->eventService->fire('beforeLoad', ['location' => $location]);
+        $this->eventService->fire('beforeLoadWeather', ['location' => $location]);
 
         try {
             $response = $this->getByCoordinates($location->getLatitude(), $location->getLongitude());
@@ -106,7 +106,7 @@ class WeatherService extends AbstractService
         $eventParameters = $current->jsonSerialize();
         $eventParameters['location'] = $location;
 
-        $this->eventService->fire('afterLoad', $eventParameters);
+        $this->eventService->fire('afterLoadWeather', $eventParameters);
     }
 
     /**

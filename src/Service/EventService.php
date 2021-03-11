@@ -18,6 +18,7 @@ use GibsonOS\Core\Repository\EventRepository;
 use GibsonOS\Core\Service\Event\CodeGeneratorService;
 use GibsonOS\Core\Utility\JsonUtility;
 use JsonException;
+use Psr\Log\LoggerInterface;
 
 class EventService extends AbstractService
 {
@@ -33,18 +34,22 @@ class EventService extends AbstractService
 
     private DateTimeService $dateTimeService;
 
+    private LoggerInterface $logger;
+
     public function __construct(
         ServiceManagerService $serviceManagerService,
         EventRepository $eventRepository,
         CodeGeneratorService $codeGeneratorService,
         CommandService $commandService,
-        DateTimeService $dateTimeService
+        DateTimeService $dateTimeService,
+        LoggerInterface $logger
     ) {
         $this->serviceManagerService = $serviceManagerService;
         $this->eventRepository = $eventRepository;
         $this->codeGeneratorService = $codeGeneratorService;
         $this->commandService = $commandService;
         $this->dateTimeService = $dateTimeService;
+        $this->logger = $logger;
     }
 
     public function add(string $trigger, callable $function): void
@@ -62,7 +67,7 @@ class EventService extends AbstractService
      */
     public function fire(string $trigger, array $parameters = null): void
     {
-        // @todo Parameter müssen irgendwie noch im Trigger abgeglichen werden oder an die Methoden weiter gegeben werden
+        $this->logger->info('Fire event "' . $trigger . '"');
         $events = array_merge(
             $this->events[$trigger] ?? [],
             $this->eventRepository->getTimeControlled($trigger, new DateTime())
@@ -87,11 +92,13 @@ class EventService extends AbstractService
     public function runEvent(Event $event, bool $async): void
     {
         if ($async) {
+            $this->logger->info('Run async event ' . $event->getId());
             $this->commandService->executeAsync(RunCommand::class, ['eventId' => $event->getId()], []);
 
             return;
         }
 
+        $this->logger->info('Run event ' . $event->getId());
         $event->setLastRun($this->dateTimeService->get())->save();
         eval($this->codeGeneratorService->generateByElements($event->getElements() ?? []));
     }
@@ -107,6 +114,8 @@ class EventService extends AbstractService
         $describer = $this->serviceManagerService->get($element->getClass());
         /** @var AbstractEvent $service */
         $service = $this->serviceManagerService->get($describer->getEventClassName());
+
+        $this->logger->debug('Run event function ' . $element->getClass() . '::' . $element->getMethod());
 
         return $service->run($element);
     }
