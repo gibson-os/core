@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace GibsonOS\Core\Service;
 
@@ -8,7 +9,7 @@ use GibsonOS\Core\Event\AbstractEvent;
 use GibsonOS\Core\Event\Describer\DescriberInterface;
 use GibsonOS\Core\Model\Event\Element;
 use GibsonOS\Core\Repository\EventRepository;
-use GibsonOS\Core\Service\Event\CodeGeneratorService;
+use GibsonOS\Core\Service\Event\ElementService;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
@@ -42,7 +43,7 @@ class EventServiceTest extends Unit
         $this->eventService = new EventService(
             $this->serviceManagerService,
             $this->eventServiceRepository->reveal(),
-            $this->serviceManagerService->get(CodeGeneratorService::class),
+            $this->serviceManagerService->get(ElementService::class),
             $this->serviceManagerService->get(CommandService::class)
         );
     }

@@ -7,15 +7,12 @@ use DateTime;
 use Exception;
 use GibsonOS\Core\Command\Event\RunCommand;
 use GibsonOS\Core\Dto\Event\Describer\Parameter\AutoCompleteParameter;
-use GibsonOS\Core\Event\AbstractEvent;
 use GibsonOS\Core\Event\Describer\DescriberInterface;
 use GibsonOS\Core\Exception\DateTimeError;
-use GibsonOS\Core\Exception\FactoryError;
 use GibsonOS\Core\Exception\Model\SaveError;
 use GibsonOS\Core\Model\Event;
-use GibsonOS\Core\Model\Event\Element;
 use GibsonOS\Core\Repository\EventRepository;
-use GibsonOS\Core\Service\Event\CodeGeneratorService;
+use GibsonOS\Core\Service\Event\ElementService;
 use GibsonOS\Core\Utility\JsonUtility;
 use JsonException;
 use Psr\Log\LoggerInterface;
@@ -28,7 +25,7 @@ class EventService extends AbstractService
 
     private EventRepository $eventRepository;
 
-    private CodeGeneratorService $codeGeneratorService;
+    private ElementService $elementService;
 
     private CommandService $commandService;
 
@@ -39,14 +36,14 @@ class EventService extends AbstractService
     public function __construct(
         ServiceManagerService $serviceManagerService,
         EventRepository $eventRepository,
-        CodeGeneratorService $codeGeneratorService,
+        ElementService $codeGeneratorService,
         CommandService $commandService,
         DateTimeService $dateTimeService,
         LoggerInterface $logger
     ) {
         $this->serviceManagerService = $serviceManagerService;
         $this->eventRepository = $eventRepository;
-        $this->codeGeneratorService = $codeGeneratorService;
+        $this->elementService = $codeGeneratorService;
         $this->commandService = $commandService;
         $this->dateTimeService = $dateTimeService;
         $this->logger = $logger;
@@ -100,24 +97,7 @@ class EventService extends AbstractService
 
         $this->logger->info('Run event ' . $event->getId());
         $event->setLastRun($this->dateTimeService->get())->save();
-        eval($this->codeGeneratorService->generateByElements($event->getElements() ?? []));
-    }
-
-    /**
-     * @throws FactoryError
-     *
-     * @return
-     */
-    public function runFunction(Element $element)
-    {
-        /** @var DescriberInterface $describer */
-        $describer = $this->serviceManagerService->get($element->getClass());
-        /** @var AbstractEvent $service */
-        $service = $this->serviceManagerService->get($describer->getEventClassName());
-
-        $this->logger->debug('Run event function ' . $element->getClass() . '::' . $element->getMethod());
-
-        return $service->run($element);
+        $this->elementService->runElements($event->getElements() ?? []);
     }
 
     /**
@@ -150,13 +130,22 @@ class EventService extends AbstractService
                     continue;
                 }
 
-                if (!$this->codeGeneratorService->if($parameters[$parameterName], $eventParameter['operator'], $eventParameter['value'])) {
+                if (!$this->elementService->getConditionResult($parameters[$parameterName], $eventParameter['operator'], $eventParameter['value'])) {
+                    $this->logger->debug(
+                        'Trigger parameter for event ' . $event->getId() . ' not true' .
+                        '(' . $parameters[$parameterName] . ' ' . $eventParameter['operator'] . ' ' . $eventParameter['value'] . ')'
+                    );
+
                     return false;
                 }
             }
 
+            $this->logger->debug('Parameter passed for trigger "' . $trigger . '"');
+
             return true;
         }
+
+        $this->logger->info('Trigger "' . $trigger . '" not defined for event ' . $event->getId());
 
         return false;
     }

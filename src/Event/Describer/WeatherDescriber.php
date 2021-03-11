@@ -35,7 +35,7 @@ class WeatherDescriber implements DescriberInterface
         return [
             'beforeLoadWeather' => (new Trigger('Vor dem laden'))
                 ->setParameters(['location' => $this->locationParameter]),
-            'afterLoadWeahter' => (new Trigger('Nach dem laden'))
+            'afterLoadWeather' => (new Trigger('Nach dem laden'))
                 ->setParameters([
                     'location' => $this->locationParameter,
                     'id' => new IntParameter('ID'),

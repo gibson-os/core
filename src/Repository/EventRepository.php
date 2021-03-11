@@ -292,11 +292,11 @@ class EventRepository extends AbstractRepository
      */
     private function matchModels(array $events): array
     {
-        /**
-         * @var Event[]
-         */
+        /** @var Event[] */
         $models = [];
+        /** @var Trigger[] $triggerModels */
         $triggerModels = [];
+        /** @var Element[] $elementModels */
         $elementModels = [];
 
         foreach ($events as $event) {
@@ -340,7 +340,13 @@ class EventRepository extends AbstractRepository
                 ->setCommand($event->elementCommand)
                 ->setReturns($event->elementReturns)
             ;
-            $models[$event->id]->addElement($elementModel);
+
+            if ($event->elementParentId === null) {
+                $models[$event->id]->addElement($elementModel);
+            } else {
+                $elementModels[$event->elementParentId]->addChildren($elementModel);
+            }
+
             $elementModels[$event->elementId] = $elementModel;
         }
 

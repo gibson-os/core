@@ -61,8 +61,15 @@ class MethodStore extends AbstractStore
             return;
         }
 
-        $describer = $this->serviceManagerService->get($this->describerClass);
         $methods = [];
+
+        try {
+            $describer = $this->serviceManagerService->get($this->describerClass);
+        } catch (FactoryError $e) {
+            $this->list[$this->describerClass] = $methods;
+
+            return;
+        }
 
         if (!$describer instanceof DescriberInterface) {
             $this->list[$this->describerClass] = $methods;
