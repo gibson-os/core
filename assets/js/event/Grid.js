@@ -27,7 +27,31 @@ Ext.define('GibsonOS.module.core.event.Grid', {
         triggerStore.load();
     },
     deleteFunction: function(records) {
-        console.log('delete');
+        const me = this;
+
+        Ext.MessageBox.confirm(
+            'Wirklich löschen?',
+            'Möchtest du das Event ' + records[0].get('name') + ' wirklich löschen?', buttonId => {
+                if (buttonId === 'no') {
+                    return false;
+                }
+
+                me.setLoading(true);
+
+                GibsonOS.Ajax.request({
+                    url: baseDir + 'core/event/delete',
+                    params: {
+                        eventId: records[0].get('id')
+                    },
+                    success() {
+                        me.getStore().load();
+                    },
+                    callback() {
+                        me.setLoading(false);
+                    }
+                });
+            }
+        );
     },
     getColumns: function() {
         return [{

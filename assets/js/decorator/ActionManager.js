@@ -160,6 +160,7 @@ GibsonOS.define('GibsonOS.decorator.ActionManager', {
 
             component.viewItem.on('containerkeydown', (view, event) => keyEvent(event));
             component.viewItem.on('itemkeydown', (view, record, item, index, event) => keyEvent(event));
+            component.viewItem.on('cellkeydown', (view, td, cellIndex, record, tr, rowIndex, event) => keyEvent(event));
         }
 
         if (component.enableClickEvents) {

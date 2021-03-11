@@ -189,4 +189,21 @@ class EventController extends AbstractController
 
         return $this->returnSuccess();
     }
+
+    /**
+     * @throws DateTimeError
+     * @throws LoginRequired
+     * @throws PermissionDenied
+     * @throws SelectError
+     * @throws \GibsonOS\Core\Exception\Model\DeleteError
+     */
+    public function delete(EventRepository $eventRepository, int $eventId): AjaxResponse
+    {
+        $this->checkPermission(PermissionService::DELETE);
+
+        $event = $eventRepository->getById($eventId);
+        $event->delete();
+
+        return $this->returnSuccess();
+    }
 }
