@@ -141,7 +141,6 @@ class EventRepository extends AbstractRepository
             '`event_element`.`method` AS `elementMethod`, ' .
             '`event_element`.`parameters` AS `elementParameters`, ' .
             '`event_element`.`command` AS `elementCommand`, ' .
-            '`event_element`.`operator` AS `elementOperator`, ' .
             '`event_element`.`returns` AS `elementReturns`, ' .
             '`event_trigger`.`id` AS `triggerId`, ' .
             '`event_trigger`.`class` AS `triggerClass`, ' .
