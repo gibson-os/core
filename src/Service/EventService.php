@@ -145,7 +145,7 @@ class EventService extends AbstractService
                         '(' . $parameters[$parameterName] . ' ' . $eventParameter['operator'] . ' ' . $eventParameter['value'] . ')'
                     );
 
-                    return false;
+                    continue 2;
                 }
             }
 
@@ -154,7 +154,7 @@ class EventService extends AbstractService
             return true;
         }
 
-        $this->logger->info('Trigger ' . $triggerName . ' not defined for event ' . $event->getId());
+        $this->logger->info('Trigger ' . $triggerName . ' not passed for event ' . $event->getId());
 
         return false;
     }
