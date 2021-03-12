@@ -17,14 +17,14 @@ GibsonOS.define('GibsonOS.decorator.PagingBar', {
 
             component.store.on('add', (store, records) => {
                 store.totalCount += records.length;
-                grid.down('gosCoreComponentToolbarPaging').onLoad();
+                component.down('gosCoreComponentToolbarPaging').onLoad();
             }, component, {
                 priority: 999
             });
 
             component.store.on('remove', (store) => {
                 store.totalCount--;
-                grid.down('gosCoreComponentToolbarPaging').onLoad();
+                component.down('gosCoreComponentToolbarPaging').onLoad();
             }, component, {
                 priority: 999
             });
