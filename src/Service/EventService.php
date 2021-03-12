@@ -71,7 +71,7 @@ class EventService extends AbstractService
         $this->logger->info('Fire event ' . $triggerName);
         $events = array_merge(
             $this->events[$triggerName] ?? [],
-            $this->eventRepository->getTimeControlled($trigger, new DateTime())
+            $this->eventRepository->getTimeControlled($className, $trigger, new DateTime())
         );
 
         foreach ($events as $event) {

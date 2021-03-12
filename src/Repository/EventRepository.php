@@ -90,11 +90,12 @@ class EventRepository extends AbstractRepository
      *
      * @return Event[]
      */
-    public function getTimeControlled(string $trigger, DateTimeInterface $dateTime): array
+    public function getTimeControlled(string $className, string $trigger, DateTimeInterface $dateTime): array
     {
         $table = $this->initializeTable()
             ->setWhere(
                 '`event`.`active`=1 AND ' .
+                '`event_trigger`.`class`=? AND ' .
                 '`event_trigger`.`trigger`=? AND ' .
                 '(`event_trigger`.`weekday` IS NULL OR `event_trigger`.`weekday`=?) AND ' .
                 '(`event_trigger`.`day` IS NULL OR `event_trigger`.`day`=?) AND ' .
@@ -105,6 +106,7 @@ class EventRepository extends AbstractRepository
                 '(`event_trigger`.`second` IS NULL OR `event_trigger`.`second`=?)'
             )
             ->setWhereParameters([
+                $className,
                 $trigger,
                 (int) $dateTime->format('w'),
                 (int) $dateTime->format('j'),
