@@ -15,6 +15,10 @@ use GibsonOS\Core\Event\WeatherEvent;
 
 class WeatherDescriber implements DescriberInterface
 {
+    public const TRIGGER_BEFORE_LOAD = 'beforeLoad';
+
+    public const TRIGGER_AFTER_LOAD = 'afterLoad';
+
     private LocationAutoComplete $locationAutoComplete;
 
     private LocationParameter $locationParameter;
@@ -33,9 +37,9 @@ class WeatherDescriber implements DescriberInterface
     public function getTriggers(): array
     {
         return [
-            'beforeLoadWeather' => (new Trigger('Vor dem laden'))
+            self::TRIGGER_BEFORE_LOAD => (new Trigger('Vor dem laden'))
                 ->setParameters(['location' => $this->locationParameter]),
-            'afterLoadWeather' => (new Trigger('Nach dem laden'))
+            self::TRIGGER_AFTER_LOAD => (new Trigger('Nach dem laden'))
                 ->setParameters([
                     'location' => $this->locationParameter,
                     'id' => new IntParameter('ID'),

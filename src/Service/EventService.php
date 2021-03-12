@@ -49,30 +49,34 @@ class EventService extends AbstractService
         $this->logger = $logger;
     }
 
-    public function add(string $trigger, callable $function): void
+    public function add(string $className, string $trigger, callable $function): void
     {
+        $triggerName = $className . '::' . $trigger;
+        $this->logger->info('Add event for trigger ' . $className . '::' . $trigger);
+
         if (!isset($this->events[$trigger])) {
-            $this->events[$trigger] = [];
+            $this->events[$triggerName] = [];
         }
 
-        $this->events[$trigger][] = $function;
+        $this->events[$triggerName][] = $function;
     }
 
     /**
      * @throws DateTimeError
      * @throws Exception
      */
-    public function fire(string $trigger, array $parameters = null): void
+    public function fire(string $className, string $trigger, array $parameters = null): void
     {
-        $this->logger->info('Fire event "' . $trigger . '"');
+        $triggerName = $className . '::' . $trigger;
+        $this->logger->info('Fire event ' . $triggerName);
         $events = array_merge(
-            $this->events[$trigger] ?? [],
+            $this->events[$triggerName] ?? [],
             $this->eventRepository->getTimeControlled($trigger, new DateTime())
         );
 
         foreach ($events as $event) {
             if ($event instanceof Event) {
-                if ($this->checkTriggerParameters($event, $trigger, $parameters ?? [])) {
+                if ($this->checkTriggerParameters($event, $className, $trigger, $parameters ?? [])) {
                     $this->runEvent($event, $event->isAsync());
                 }
             } else {
@@ -104,10 +108,15 @@ class EventService extends AbstractService
      * @throws DateTimeError
      * @throws JsonException
      */
-    private function checkTriggerParameters(Event $event, string $trigger, array $parameters): bool
+    private function checkTriggerParameters(Event $event, string $className, string $trigger, array $parameters): bool
     {
+        $triggerName = $this->getTriggerName($className, $trigger);
+
         foreach ($event->getTriggers() ?? [] as $eventTrigger) {
-            if ($eventTrigger->getTrigger() !== $trigger) {
+            if (
+                $eventTrigger->getTrigger() !== $trigger &&
+                $eventTrigger->getClass() !== $className
+            ) {
                 continue;
             }
 
@@ -140,13 +149,18 @@ class EventService extends AbstractService
                 }
             }
 
-            $this->logger->debug('Parameter passed for trigger "' . $trigger . '"');
+            $this->logger->debug('Parameter passed for trigger ' . $triggerName);
 
             return true;
         }
 
-        $this->logger->info('Trigger "' . $trigger . '" not defined for event ' . $event->getId());
+        $this->logger->info('Trigger ' . $triggerName . ' not defined for event ' . $event->getId());
 
         return false;
+    }
+
+    private function getTriggerName(string $className, string $trigger): string
+    {
+        return $className . '::' . $trigger;
     }
 }

@@ -34,13 +34,13 @@ class SunChangeCommand extends AbstractCommand
         $sunChangeDateTime->setTimestamp($this->dateTimeService->getSunrise($dateTimeNow));
 
         if ($sunChangeDateTime->format('Y-m-d H:i') === $dateTimeNow->format('Y-m-d H:i')) {
-            $this->eventService->fire(TimeDescriber::TRIGGER_SUNRISE);
+            $this->eventService->fire(TimeDescriber::class, TimeDescriber::TRIGGER_SUNRISE);
         }
 
         $sunChangeDateTime->setTimestamp($this->dateTimeService->getSunset($dateTimeNow));
 
         if ($sunChangeDateTime->format('Y-m-d H:i') === $dateTimeNow->format('Y-m-d H:i')) {
-            $this->eventService->fire(TimeDescriber::TRIGGER_SUNSET);
+            $this->eventService->fire(TimeDescriber::class, TimeDescriber::TRIGGER_SUNSET);
         }
 
         return 0;

@@ -25,7 +25,7 @@ class CronjobCommand extends AbstractCommand
      */
     protected function run(): int
     {
-        $this->eventService->fire(TimeDescriber::TRIGGER_CRONJOB);
+        $this->eventService->fire(TimeDescriber::class, TimeDescriber::TRIGGER_CRONJOB);
 
         return 0;
     }
