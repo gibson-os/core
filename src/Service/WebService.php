@@ -7,6 +7,9 @@ use GibsonOS\Core\Dto\Web\Body;
 use GibsonOS\Core\Dto\Web\Request;
 use GibsonOS\Core\Dto\Web\Response;
 use GibsonOS\Core\Exception\WebException;
+use GibsonOS\Core\Utility\JsonUtility;
+use JsonException;
+use Psr\Log\LoggerInterface;
 
 class WebService extends AbstractService
 {
@@ -15,6 +18,13 @@ class WebService extends AbstractService
     private const METHOD_POST = 'POST';
 
     private const METHOD_HEAD = 'HEAD';
+
+    private LoggerInterface $logger;
+
+    public function __construct(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
+    }
 
     /**
      * @throws WebException
@@ -42,20 +52,26 @@ class WebService extends AbstractService
 
     /**
      * @throws WebException
+     * @throws JsonException
      */
     private function request(Request $request, string $method): Response
     {
         $responseHandle = fopen('php://memory', 'r+');
         $headers = [];
 
-        $curl = curl_init($request->getUrl());
+        $port = $request->getPort();
+        $url = $request->getUrl();
+        $this->logger->debug('Call ' . $method . ' ' . $url . '::' . $port);
+        $curl = curl_init($url);
         curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $method);
+        $parameters = $request->getParameters();
 
-        if (!empty($request->getParameters())) {
-            curl_setopt($curl, CURLOPT_POSTFIELDS, $request->getParameters());
+        if (!empty($parameters)) {
+            $this->logger->debug('With parameters: ' . JsonUtility::encode($parameters));
+            curl_setopt($curl, CURLOPT_POSTFIELDS, $parameters);
         }
 
-        curl_setopt($curl, CURLOPT_PORT, $request->getPort());
+        curl_setopt($curl, CURLOPT_PORT, $port);
         curl_setopt($curl, CURLOPT_FILE, $responseHandle);
 
         $cookieFile = $request->getCookieFile();
@@ -65,6 +81,7 @@ class WebService extends AbstractService
         }
 
         $cookieFile ??= sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'cookies' . uniqid();
+        $this->logger->debug('Cookies saved in: ' . $cookieFile);
         curl_setopt($curl, CURLOPT_COOKIEJAR, $cookieFile);
 
         if (!curl_exec($curl)) {
@@ -72,14 +89,13 @@ class WebService extends AbstractService
         }
 
         rewind($responseHandle);
+        $length = (int) curl_getinfo($curl, CURLINFO_CONTENT_LENGTH_DOWNLOAD);
+        $this->logger->debug('Get response with length ' . $length);
 
         return new Response(
             $request,
             $headers,
-            (new Body())->setResource(
-                $responseHandle,
-                (int) curl_getinfo($curl, CURLINFO_CONTENT_LENGTH_DOWNLOAD)
-            ),
+            (new Body())->setResource($responseHandle, $length),
             $cookieFile
         );
     }
