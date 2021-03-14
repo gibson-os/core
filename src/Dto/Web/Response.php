@@ -14,14 +14,17 @@ class Response
 
     private Body $body;
 
+    private string $cookieFile;
+
     /**
      * @param array<string, string> $headers
      */
-    public function __construct(Request $request, array $headers, Body $body)
+    public function __construct(Request $request, array $headers, Body $body, string $cookieFile)
     {
         $this->request = $request;
         $this->headers = $headers;
         $this->body = $body;
+        $this->cookieFile = $cookieFile;
     }
 
     /**
@@ -44,5 +47,10 @@ class Response
     public function getBody(): Body
     {
         return $this->body;
+    }
+
+    public function getCookieFile(): string
+    {
+        return $this->cookieFile;
     }
 }

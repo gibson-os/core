@@ -58,6 +58,15 @@ class WebService extends AbstractService
         curl_setopt($curl, CURLOPT_PORT, $request->getPort());
         curl_setopt($curl, CURLOPT_FILE, $responseHandle);
 
+        $cookieFile = $request->getCookieFile();
+
+        if ($cookieFile !== null) {
+            curl_setopt($curl, CURLOPT_COOKIEFILE, $cookieFile);
+        }
+
+        $cookieFile ??= sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'cookies' . uniqid();
+        curl_setopt($curl, CURLOPT_COOKIEJAR, $cookieFile);
+
         if (!curl_exec($curl)) {
             throw new WebException(curl_error($curl));
         }
@@ -69,7 +78,8 @@ class WebService extends AbstractService
             $headers,
             (new Body())
                 ->setResource($responseHandle)
-                ->setLength((int) curl_getinfo($curl, CURLINFO_CONTENT_LENGTH_DOWNLOAD))
+                ->setLength((int) curl_getinfo($curl, CURLINFO_CONTENT_LENGTH_DOWNLOAD)),
+            $cookieFile
         );
     }
 }

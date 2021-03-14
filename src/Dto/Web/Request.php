@@ -21,6 +21,8 @@ class Request
 
     private ?Body $body = null;
 
+    private ?string $cookieFile = null;
+
     public function __construct(string $url)
     {
         $this->url = $url;
@@ -110,6 +112,18 @@ class Request
     public function setBody(?Body $body): Request
     {
         $this->body = $body;
+
+        return $this;
+    }
+
+    public function getCookieFile(): ?string
+    {
+        return $this->cookieFile;
+    }
+
+    public function setCookieFile(?string $cookieFile): Request
+    {
+        $this->cookieFile = $cookieFile;
 
         return $this;
     }
