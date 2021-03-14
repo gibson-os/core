@@ -131,7 +131,7 @@ class WeatherService extends AbstractService
                 'onecall?lat=' . $latitude . '&lon=' . $longitude .
                 '&appid=' . $this->envService->getString('OPENWEATHERMAP_API_KEY') .
                 '&units=metric&lang=de&exclude=minutely,daily'
-            ))->setPort(443)
+            ))
         );
     }
 }

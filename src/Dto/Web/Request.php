@@ -26,6 +26,10 @@ class Request
     public function __construct(string $url)
     {
         $this->url = $url;
+
+        if (mb_strpos($this->url, 'https://') === 0) {
+            $this->port = 443;
+        }
     }
 
     public function getUrl(): string
