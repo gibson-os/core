@@ -12,7 +12,7 @@ use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\Model\SaveError;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Exception\WeatherError;
-use GibsonOS\Core\Exception\WebError;
+use GibsonOS\Core\Exception\WebException;
 use GibsonOS\Core\Mapper\WeatherMapper;
 use GibsonOS\Core\Model\Weather\Location;
 use GibsonOS\Core\Repository\WeatherRepository;
@@ -65,10 +65,11 @@ class WeatherService extends AbstractService
 
         try {
             $response = $this->getByCoordinates($location->getLatitude(), $location->getLongitude());
-        } catch (GetError | WebError $e) {
+        } catch (GetError | WebException $e) {
             throw new WeatherError($e->getMessage(), 0, $e);
         }
-        $data = JsonUtility::decode(fread($response->getBody(), $response->getLength()));
+
+        $data = JsonUtility::decode($response->getBody()->getContent());
 
         if (
             abs($location->getLatitude() - $data['lat']) >= .0001 ||
@@ -120,7 +121,7 @@ class WeatherService extends AbstractService
 
     /**
      * @throws GetError
-     * @throws WebError
+     * @throws WebException
      */
     private function getByCoordinates(float $latitude, float $longitude): Response
     {

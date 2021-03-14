@@ -19,10 +19,7 @@ class Request
      */
     private array $headers = [];
 
-    /**
-     * @var resource|null
-     */
-    private $body;
+    private ?Body $body = null;
 
     public function __construct(string $url)
     {
@@ -105,18 +102,12 @@ class Request
         return $this;
     }
 
-    /**
-     * @return resource|null
-     */
-    public function getBody()
+    public function getBody(): ?Body
     {
         return $this->body;
     }
 
-    /**
-     * @param resource|null $body
-     */
-    public function setBody($body): Request
+    public function setBody(?Body $body): Request
     {
         $this->body = $body;
 

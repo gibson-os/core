@@ -3,9 +3,10 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Service;
 
+use GibsonOS\Core\Dto\Web\Body;
 use GibsonOS\Core\Dto\Web\Request;
 use GibsonOS\Core\Dto\Web\Response;
-use GibsonOS\Core\Exception\WebError;
+use GibsonOS\Core\Exception\WebException;
 
 class WebService extends AbstractService
 {
@@ -16,7 +17,7 @@ class WebService extends AbstractService
     private const METHOD_HEAD = 'HEAD';
 
     /**
-     * @throws WebError
+     * @throws WebException
      */
     public function get(Request $request): Response
     {
@@ -24,7 +25,7 @@ class WebService extends AbstractService
     }
 
     /**
-     * @throws WebError
+     * @throws WebException
      */
     public function post(Request $request): Response
     {
@@ -32,7 +33,7 @@ class WebService extends AbstractService
     }
 
     /**
-     * @throws WebError
+     * @throws WebException
      */
     public function head(Request $request): Response
     {
@@ -40,7 +41,7 @@ class WebService extends AbstractService
     }
 
     /**
-     * @throws WebError
+     * @throws WebException
      */
     private function request(Request $request, string $method): Response
     {
@@ -58,11 +59,17 @@ class WebService extends AbstractService
         curl_setopt($curl, CURLOPT_FILE, $responseHandle);
 
         if (!curl_exec($curl)) {
-            throw new WebError(curl_error($curl));
+            throw new WebException(curl_error($curl));
         }
 
         rewind($responseHandle);
 
-        return new Response($request, $headers, $responseHandle, (int) curl_getinfo($curl, CURLINFO_CONTENT_LENGTH_DOWNLOAD));
+        return new Response(
+            $request,
+            $headers,
+            (new Body())
+                ->setResource($responseHandle)
+                ->setLength((int) curl_getinfo($curl, CURLINFO_CONTENT_LENGTH_DOWNLOAD))
+        );
     }
 }

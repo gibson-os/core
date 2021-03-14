@@ -12,23 +12,16 @@ class Response
      */
     private array $headers;
 
-    /**
-     * @var resource
-     */
-    private $body;
-
-    private int $length;
+    private Body $body;
 
     /**
      * @param array<string, string> $headers
-     * @param resource              $body
      */
-    public function __construct(Request $request, array $headers, $body, int $length)
+    public function __construct(Request $request, array $headers, Body $body)
     {
         $this->request = $request;
         $this->headers = $headers;
         $this->body = $body;
-        $this->length = $length;
     }
 
     /**
@@ -48,21 +41,8 @@ class Response
         return $this->headers[$name];
     }
 
-    /**
-     * @return resource
-     */
-    public function getBody()
+    public function getBody(): Body
     {
         return $this->body;
-    }
-
-    public function getLength(): int
-    {
-        return $this->length;
-    }
-
-    public function getRequest(): Request
-    {
-        return $this->request;
     }
 }
