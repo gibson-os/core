@@ -1,20 +1,22 @@
 <?php
 declare(strict_types=1);
 
-namespace GibsonOS\Core\Dto\Event\Describer\Parameter;
+namespace GibsonOS\Core\Dto\Parameter;
 
-class IntParameter extends AbstractParameter
+use DateTimeInterface;
+
+class DateParameter extends AbstractParameter
 {
-    private ?int $min = null;
+    private ?DateTimeInterface $min = null;
 
-    private ?int $max = null;
+    private ?DateTimeInterface $max = null;
 
     public function __construct(string $title)
     {
-        parent::__construct($title, 'int');
+        parent::__construct($title, 'date');
     }
 
-    public function setRange(?int $min, int $max = null): IntParameter
+    public function setRange(?DateTimeInterface $min, DateTimeInterface $max = null): DateParameter
     {
         $this->min = $min;
         $this->max = $max;
@@ -25,8 +27,8 @@ class IntParameter extends AbstractParameter
     protected function getTypeConfig(): array
     {
         return [
-            'min' => $this->min,
-            'max' => $this->max,
+            'min' => $this->min === null ? null : $this->min->format('Y-m-d'),
+            'max' => $this->max === null ? null : $this->max->format('Y-m-d'),
         ];
     }
 

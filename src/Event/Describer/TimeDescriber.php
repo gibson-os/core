@@ -4,11 +4,11 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Event\Describer;
 
 use GibsonOS\Core\Dto\Event\Describer\Method;
-use GibsonOS\Core\Dto\Event\Describer\Parameter\BoolParameter;
-use GibsonOS\Core\Dto\Event\Describer\Parameter\DateTimeParameter;
-use GibsonOS\Core\Dto\Event\Describer\Parameter\IntParameter;
-use GibsonOS\Core\Dto\Event\Describer\Parameter\OptionParameter;
 use GibsonOS\Core\Dto\Event\Describer\Trigger;
+use GibsonOS\Core\Dto\Parameter\BoolParameter;
+use GibsonOS\Core\Dto\Parameter\DateTimeParameter;
+use GibsonOS\Core\Dto\Parameter\IntParameter;
+use GibsonOS\Core\Dto\Parameter\OptionParameter;
 use GibsonOS\Core\Event\TimeEvent;
 
 class TimeDescriber implements DescriberInterface

@@ -5,12 +5,12 @@ namespace GibsonOS\Core\Event\Describer;
 
 use GibsonOS\Core\AutoComplete\Weather\LocationAutoComplete;
 use GibsonOS\Core\Dto\Event\Describer\Method;
-use GibsonOS\Core\Dto\Event\Describer\Parameter\DateTimeParameter;
-use GibsonOS\Core\Dto\Event\Describer\Parameter\FloatParameter;
-use GibsonOS\Core\Dto\Event\Describer\Parameter\IntParameter;
-use GibsonOS\Core\Dto\Event\Describer\Parameter\StringParameter;
-use GibsonOS\Core\Dto\Event\Describer\Parameter\Weather\LocationParameter;
 use GibsonOS\Core\Dto\Event\Describer\Trigger;
+use GibsonOS\Core\Dto\Parameter\DateTimeParameter;
+use GibsonOS\Core\Dto\Parameter\FloatParameter;
+use GibsonOS\Core\Dto\Parameter\IntParameter;
+use GibsonOS\Core\Dto\Parameter\StringParameter;
+use GibsonOS\Core\Dto\Parameter\Weather\LocationParameter;
 use GibsonOS\Core\Event\WeatherEvent;
 
 class WeatherDescriber implements DescriberInterface

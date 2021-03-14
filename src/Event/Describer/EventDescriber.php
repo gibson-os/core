@@ -5,8 +5,8 @@ namespace GibsonOS\Core\Event\Describer;
 
 use GibsonOS\Core\AutoComplete\EventAutoComplete;
 use GibsonOS\Core\Dto\Event\Describer\Method;
-use GibsonOS\Core\Dto\Event\Describer\Parameter\BoolParameter;
-use GibsonOS\Core\Dto\Event\Describer\Parameter\EventParameter;
+use GibsonOS\Core\Dto\Parameter\BoolParameter;
+use GibsonOS\Core\Dto\Parameter\EventParameter;
 use GibsonOS\Core\Event\EventEvent;
 
 class EventDescriber implements DescriberInterface

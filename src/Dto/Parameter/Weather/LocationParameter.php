@@ -1,10 +1,10 @@
 <?php
 declare(strict_types=1);
 
-namespace GibsonOS\Core\Dto\Event\Describer\Parameter\Weather;
+namespace GibsonOS\Core\Dto\Parameter\Weather;
 
 use GibsonOS\Core\AutoComplete\Weather\LocationAutoComplete;
-use GibsonOS\Core\Dto\Event\Describer\Parameter\AutoCompleteParameter;
+use GibsonOS\Core\Dto\Parameter\AutoCompleteParameter;
 
 class LocationParameter extends AutoCompleteParameter
 {

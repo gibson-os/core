@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Event;
 
-use GibsonOS\Core\Dto\Event\Describer\Parameter\AutoCompleteParameter;
+use GibsonOS\Core\Dto\Parameter\AutoCompleteParameter;
 use GibsonOS\Core\Event\Describer\DescriberInterface;
 use GibsonOS\Core\Model\Event\Element;
 use GibsonOS\Core\Service\ServiceManagerService;

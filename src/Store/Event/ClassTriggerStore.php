@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Store\Event;
 
-use GibsonOS\Core\Dto\Event\Describer\Parameter\AbstractParameter;
+use GibsonOS\Core\Dto\Parameter\AbstractParameter;
 use GibsonOS\Core\Event\Describer\DescriberInterface;
 use GibsonOS\Core\Exception\FactoryError;
 use GibsonOS\Core\Service\ServiceManagerService;

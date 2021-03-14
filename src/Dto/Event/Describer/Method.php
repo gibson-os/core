@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Dto\Event\Describer;
 
-use GibsonOS\Core\Dto\Event\Describer\Parameter\AbstractParameter;
+use GibsonOS\Core\Dto\Parameter\AbstractParameter;
 
 class Method
 {

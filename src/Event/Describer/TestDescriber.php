@@ -4,8 +4,8 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Event\Describer;
 
 use GibsonOS\Core\Dto\Event\Describer\Method;
-use GibsonOS\Core\Dto\Event\Describer\Parameter\IntParameter;
-use GibsonOS\Core\Dto\Event\Describer\Parameter\StringParameter;
+use GibsonOS\Core\Dto\Parameter\IntParameter;
+use GibsonOS\Core\Dto\Parameter\StringParameter;
 use GibsonOS\Core\Event\TestEvent;
 
 class TestDescriber implements DescriberInterface

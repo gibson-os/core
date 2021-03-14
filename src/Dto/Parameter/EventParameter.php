@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace GibsonOS\Core\Dto\Event\Describer\Parameter;
+namespace GibsonOS\Core\Dto\Parameter;
 
 use GibsonOS\Core\AutoComplete\EventAutoComplete;
 
