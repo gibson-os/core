@@ -12,7 +12,7 @@ class Body
      */
     private $resource;
 
-    private int $length;
+    private int $length = 0;
 
     /**
      * @return resource|null
@@ -22,25 +22,17 @@ class Body
         return $this->resource;
     }
 
-    /**
-     * @param resource $resource
-     *
-     * @return Body
-     */
-    public function setResource($resource)
-    {
-        $this->resource = $resource;
-
-        return $this;
-    }
-
     public function getLength(): int
     {
         return $this->length;
     }
 
-    public function setLength(int $length): Body
+    /**
+     * @param resource $resource
+     */
+    public function setResource($resource, int $length): Body
     {
+        $this->resource = $resource;
         $this->length = $length;
 
         return $this;
@@ -51,7 +43,7 @@ class Body
      */
     public function getContent(): string
     {
-        if ($this->resource === null) {
+        if ($this->resource === null || $this->length === 0) {
             throw new WebException('No body!');
         }
 
