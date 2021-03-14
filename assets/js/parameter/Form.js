@@ -1,6 +1,6 @@
-Ext.define('GibsonOS.module.core.event.element.parameter.Form', {
+Ext.define('GibsonOS.module.core.parameter.Form', {
     extend: 'GibsonOS.form.Panel',
-    alias: ['widget.gosModuleCoreEventElementParameterForm'],
+    alias: ['widget.gosModuleCoreParameterForm'],
     border: false,
     items: [],
     withOperator: false,

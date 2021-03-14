@@ -1,6 +1,6 @@
-Ext.define('GibsonOS.module.core.event.element.parameter.type.AutoComplete', {
+Ext.define('GibsonOS.module.core.parameter.type.AutoComplete', {
     extend: 'GibsonOS.form.AutoComplete',
-    alias: ['widget.gosModuleCoreEventElementParameterTypeAutoComplete'],
+    alias: ['widget.gosModuleCoreParameterTypeAutoComplete'],
     initComponent: function () {
         let me = this;
         let config = me.parameterObject.config;

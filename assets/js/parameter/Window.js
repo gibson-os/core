@@ -1,6 +1,6 @@
-Ext.define('GibsonOS.module.core.event.element.parameter.Window', {
+Ext.define('GibsonOS.module.core.parameter.Window', {
     extend: 'GibsonOS.Window',
-    alias: ['widget.gosModuleCoreEventElementParameterWindow'],
+    alias: ['widget.gosModuleCoreParameterWindow'],
     title: 'Parameter',
     width: 420,
     y: 50,
@@ -16,7 +16,7 @@ Ext.define('GibsonOS.module.core.event.element.parameter.Window', {
         let me = this;
 
         me.items = [{
-            xtype: 'gosModuleCoreEventElementParameterForm',
+            xtype: 'gosModuleCoreParameterForm',
             withOperator: me.withOperator
         }];
 
@@ -30,7 +30,7 @@ Ext.define('GibsonOS.module.core.event.element.parameter.Window', {
     },
     addFieldsByParameters: function(parameters) {
         const me = this;
-        let form = me.down('gosModuleCoreEventElementParameterForm');
+        let form = me.down('gosModuleCoreParameterForm');
 
         Ext.iterate(parameters, function(name, parameter) {
             let item = {
@@ -43,6 +43,7 @@ Ext.define('GibsonOS.module.core.event.element.parameter.Window', {
             switch (parameter.type) {
                 case 'string':
                     item.xtype = 'gosFormTextfield';
+                    item.inputType = parameter.config.inputType;
                     break;
                 case 'int':
                     item.xtype = 'gosFormNumberfield';
@@ -51,7 +52,7 @@ Ext.define('GibsonOS.module.core.event.element.parameter.Window', {
                     item.xtype = 'gosFormCheckbox';
                     break;
                 case 'autoComplete':
-                    item.xtype = 'gosModuleCoreEventElementParameterTypeAutoComplete';
+                    item.xtype = 'gosModuleCoreParameterTypeAutoComplete';
                     break;
                 case 'date':
                     item.xtype = 'gosCoreComponentFormFieldDate';

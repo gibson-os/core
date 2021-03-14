@@ -5,6 +5,16 @@ namespace GibsonOS\Core\Dto\Parameter;
 
 class StringParameter extends AbstractParameter
 {
+    public const INPUT_TYPE_TEXT = 'text';
+
+    public const INPUT_TYPE_PASSWORD = 'password';
+
+    public const INPUT_TYPE_URL = 'url';
+
+    public const INPUT_TYPE_EMAIL = 'email';
+
+    private string $inputType = self::INPUT_TYPE_TEXT;
+
     public function __construct(string $title)
     {
         parent::__construct($title, 'string');
@@ -12,7 +22,7 @@ class StringParameter extends AbstractParameter
 
     protected function getTypeConfig(): array
     {
-        return [];
+        return ['inputType' => $this->inputType];
     }
 
     public function getAllowedOperators(): array
@@ -20,10 +30,13 @@ class StringParameter extends AbstractParameter
         return [
             self::OPERATOR_EQUAL,
             self::OPERATOR_NOT_EQUAL,
-            self::OPERATOR_SMALLER,
-            self::OPERATOR_SMALLER_EQUAL,
-            self::OPERATOR_BIGGER,
-            self::OPERATOR_BIGGER_EQUAL,
         ];
+    }
+
+    public function setInputType(string $inputType): StringParameter
+    {
+        $this->inputType = $inputType;
+
+        return $this;
     }
 }
