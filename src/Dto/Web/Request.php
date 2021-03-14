@@ -61,6 +61,16 @@ class Request
         return $this->parameters;
     }
 
+    /**
+     * @param array<string, string> $parameters
+     */
+    public function setParameters(array $parameters): Request
+    {
+        $this->parameters = $parameters;
+
+        return $this;
+    }
+
     public function getParameter(string $name): ?string
     {
         if (!isset($this->parameters[$name])) {
