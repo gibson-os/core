@@ -7,8 +7,6 @@ use GibsonOS\Core\Dto\Web\Body;
 use GibsonOS\Core\Dto\Web\Request;
 use GibsonOS\Core\Dto\Web\Response;
 use GibsonOS\Core\Exception\WebException;
-use GibsonOS\Core\Utility\JsonUtility;
-use JsonException;
 use Psr\Log\LoggerInterface;
 
 class WebService extends AbstractService
@@ -52,7 +50,6 @@ class WebService extends AbstractService
 
     /**
      * @throws WebException
-     * @throws JsonException
      */
     private function request(Request $request, string $method): Response
     {
@@ -67,8 +64,10 @@ class WebService extends AbstractService
         $parameters = $request->getParameters();
 
         if (!empty($parameters)) {
-            $this->logger->debug('With parameters: ' . JsonUtility::encode($parameters));
-            curl_setopt($curl, CURLOPT_POSTFIELDS, $parameters);
+            $parameterString = http_build_query($parameters);
+            $this->logger->debug('With parameters: ' . $parameterString);
+            curl_setopt($curl, CURLOPT_HTTPHEADER, ['Content-Length: ' . strlen($parameterString)]);
+            curl_setopt($curl, CURLOPT_POSTFIELDS, $parameterString);
         }
 
         curl_setopt($curl, CURLOPT_ENCODING, 'gzip');
