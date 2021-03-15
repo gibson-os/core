@@ -91,7 +91,8 @@ class WebService extends AbstractService
         }
 
         rewind($responseHandle);
-        $length = (int) curl_getinfo($curl, CURLINFO_CONTENT_LENGTH_DOWNLOAD);
+        curl_close($curl);
+        $length = fstat($responseHandle)['size'];
 
         if ($length <= 0) {
             throw new WebException('No response length! Length: ' . $length);
