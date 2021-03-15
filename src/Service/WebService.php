@@ -71,6 +71,8 @@ class WebService extends AbstractService
             curl_setopt($curl, CURLOPT_POSTFIELDS, $parameters);
         }
 
+        curl_setopt($curl, CURLOPT_ENCODING, 'gzip');
+        curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
         curl_setopt($curl, CURLOPT_PORT, $port);
         curl_setopt($curl, CURLOPT_FILE, $responseHandle);
 
@@ -90,6 +92,11 @@ class WebService extends AbstractService
 
         rewind($responseHandle);
         $length = (int) curl_getinfo($curl, CURLINFO_CONTENT_LENGTH_DOWNLOAD);
+
+        if ($length <= 0) {
+            throw new WebException('No response length! Length: ' . $length);
+        }
+
         $this->logger->debug('Get response with length ' . $length);
 
         return new Response(
