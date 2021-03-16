@@ -17,7 +17,7 @@ class StringParameter extends AbstractParameter
 
     public function __construct(string $title)
     {
-        parent::__construct($title, 'string');
+        parent::__construct($title, 'gosFormTextfield');
     }
 
     protected function getTypeConfig(): array

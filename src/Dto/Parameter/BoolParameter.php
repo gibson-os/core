@@ -7,7 +7,7 @@ class BoolParameter extends AbstractParameter
 {
     public function __construct(string $title)
     {
-        parent::__construct($title, 'bool');
+        parent::__construct($title, 'gosFormCheckbox');
     }
 
     protected function getTypeConfig(): array

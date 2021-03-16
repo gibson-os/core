@@ -13,7 +13,7 @@ class AutoCompleteParameter extends AbstractParameter
 
     public function __construct(string $title, AutoCompleteInterface $autoComplete)
     {
-        parent::__construct($title, 'autoComplete');
+        parent::__construct($title, 'gosModuleCoreParameterTypeAutoComplete');
         $this->autoComplete = $autoComplete;
     }
 

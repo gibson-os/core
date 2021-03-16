@@ -101,7 +101,7 @@ class MethodStore extends AbstractStore
         foreach ($parameters as $name => $parameter) {
             $parametersArray[$name] = [
                 'title' => $parameter->getTitle(),
-                'type' => $parameter->getType(),
+                'xtype' => $parameter->getXtype(),
                 'allowedOperators' => $parameter->getAllowedOperators(),
                 'config' => $parameter->getConfig(),
             ];

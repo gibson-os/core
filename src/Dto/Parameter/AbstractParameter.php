@@ -19,7 +19,7 @@ abstract class AbstractParameter
 
     private string $title;
 
-    private string $type;
+    private string $xtype;
 
     private array $listeners = [];
 
@@ -27,10 +27,10 @@ abstract class AbstractParameter
 
     abstract public function getAllowedOperators(): array;
 
-    public function __construct(string $title, string $type)
+    public function __construct(string $title, string $xtype)
     {
         $this->title = $title;
-        $this->type = $type;
+        $this->xtype = $xtype;
     }
 
     public function getTitle(): string
@@ -38,9 +38,9 @@ abstract class AbstractParameter
         return $this->title;
     }
 
-    public function getType(): string
+    public function getXtype(): string
     {
-        return $this->type;
+        return $this->xtype;
     }
 
     public function getConfig(): array

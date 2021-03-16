@@ -13,7 +13,7 @@ class FloatParameter extends AbstractParameter
 
     public function __construct(string $title)
     {
-        parent::__construct($title, 'int');
+        parent::__construct($title, 'gosFormNumberfield');
     }
 
     public function setRange(?int $min, int $max = null): FloatParameter

@@ -34,37 +34,15 @@ Ext.define('GibsonOS.module.core.parameter.Window', {
 
         Ext.iterate(parameters, function(name, parameter) {
             let item = {
+                xtype: parameter.xtype,
                 name: name,
                 value: parameter.value ?? null,
                 parameterObject: parameter,
                 fieldLabel: parameter.title
             };
 
-            switch (parameter.type) {
-                case 'string':
-                    item.xtype = 'gosFormTextfield';
-                    item.inputType = parameter.config.inputType;
-                    break;
-                case 'int':
-                    item.xtype = 'gosFormNumberfield';
-                    break;
-                case 'bool':
-                    item.xtype = 'gosFormCheckbox';
-                    break;
-                case 'autoComplete':
-                    item.xtype = 'gosModuleCoreParameterTypeAutoComplete';
-                    break;
-                case 'date':
-                    item.xtype = 'gosCoreComponentFormFieldDate';
-                    break;
-                case 'time':
-                    item.xtype = 'gosCoreComponentFormFieldTime';
-                    break;
-                case 'dateTime':
-                    item.xtype = 'gosCoreComponentFormFieldDateTime';
-                    break;
-                case 'option':
-                    break;
+            if (parameter.config.inputType) {
+                item.inputType = parameter.config.inputType;
             }
 
             if (me.withOperator) {
