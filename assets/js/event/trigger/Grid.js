@@ -185,7 +185,7 @@ Ext.define('GibsonOS.module.core.event.trigger.Grid', {
                         checkbox.resumeEvents();
 
                         new GibsonOS.module.core.parameter.Window({withOperator: true})
-                            .addFieldsByParameters(record.get('parameters'))
+                            .down('gosModuleCoreParameterForm').addFields(record.get('parameters'))
                         ;
                     }
                 }

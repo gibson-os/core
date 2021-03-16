@@ -281,7 +281,7 @@ Ext.define('GibsonOS.module.core.event.element.TreeGrid', {
                         checkbox.resumeEvents();
 
                         new GibsonOS.module.core.parameter.Window()
-                            .addFieldsByParameters(record.get('parameters'))
+                            .down('gosModuleCoreParameterForm').addFields(record.get('parameters'))
                         ;
                     }
                 }
@@ -339,7 +339,7 @@ Ext.define('GibsonOS.module.core.event.element.TreeGrid', {
                             withOperator: true,
                             withSet: true
                         })
-                            .addFieldsByParameters(record.get('returns'))
+                            .down('gosModuleCoreParameterForm').addFields(record.get('returns'))
                         ;
                     }
                 }

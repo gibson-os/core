@@ -1,5 +1,5 @@
 Ext.define('GibsonOS.module.core.parameter.Form', {
-    extend: 'GibsonOS.form.Panel',
+    extend: 'GibsonOS.module.core.component.form.Panel',
     alias: ['widget.gosModuleCoreParameterForm'],
     border: false,
     items: [],
@@ -28,4 +28,45 @@ Ext.define('GibsonOS.module.core.parameter.Form', {
 
         me.callParent();
     },
+    addField(name, parameter) {
+        const me = this;
+        let item = {
+            xtype: parameter.xtype,
+            name: name,
+            value: parameter.value ?? null,
+            parameterObject: parameter,
+            fieldLabel: parameter.title
+        };
+
+        if (parameter.config.inputType) {
+            item.inputType = parameter.config.inputType;
+        }
+
+        if (me.withOperator) {
+            if (me.withSet) {
+                parameter.allowedOperators.push('=');
+            }
+
+            me.add({
+                xtype: 'gosCoreComponentFormFieldContainer',
+                fieldLabel: parameter.title,
+                items: [{
+                    xtype: 'gosModuleCoreEventElementOperatorComboBox',
+                    name: name + 'Operator',
+                    margins: '0 5px 0 0',
+                    value: parameter.operator ?? null,
+                    allowed: parameter.allowedOperators
+                }, item]
+            });
+        } else {
+            me.add(item);
+        }
+    },
+    addFields(parameters) {
+        const me = this;
+
+        Ext.iterate(parameters, function(name, parameter) {
+            me.addField(name, parameter)
+        });
+    }
 });
