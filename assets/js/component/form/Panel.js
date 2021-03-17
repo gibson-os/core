@@ -7,8 +7,8 @@ Ext.define('GibsonOS.module.core.component.form.Panel', {
     defaults: {
         xtype: 'gosCoreComponentPanel'
     },
-    enableToolbar: true,
-    enableKeyEvents: true,
+    enableToolbar: false,
+    enableKeyEvents: false,
     enableClickEvents: false,
     enableContextMenu: false,
     initComponent: function() {
