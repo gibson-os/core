@@ -3,21 +3,21 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\AutoComplete;
 
-use GibsonOS\Core\Model\ModelInterface;
+use GibsonOS\Core\Model\AutoCompleteModelInterface;
 
 interface AutoCompleteInterface
 {
     /**
-     * @return ModelInterface[]
+     * @return AutoCompleteModelInterface[]
      */
     public function getByNamePart(string $namePart, array $parameters): array;
 
-    public function getById($id, array $parameters): ModelInterface;
+    public function getById($id, array $parameters): AutoCompleteModelInterface;
 
     public function getModel(): string;
 
     /**
      * @return int|string|float
      */
-    public function getIdFromModel(ModelInterface $model);
+    public function getIdFromModel(AutoCompleteModelInterface $model);
 }

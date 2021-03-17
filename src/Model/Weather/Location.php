@@ -5,9 +5,10 @@ namespace GibsonOS\Core\Model\Weather;
 
 use DateTimeInterface;
 use GibsonOS\Core\Model\AbstractModel;
+use GibsonOS\Core\Model\AutoCompleteModelInterface;
 use JsonSerializable;
 
-class Location extends AbstractModel implements JsonSerializable
+class Location extends AbstractModel implements JsonSerializable, AutoCompleteModelInterface
 {
     private ?int $id = null;
 

@@ -9,7 +9,7 @@ use GibsonOS\Core\Model\Event\Element;
 use GibsonOS\Core\Model\Event\Trigger;
 use JsonSerializable;
 
-class Event extends AbstractModel implements JsonSerializable
+class Event extends AbstractModel implements JsonSerializable, AutoCompleteModelInterface
 {
     private ?int $id = null;
 

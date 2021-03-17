@@ -7,7 +7,7 @@ use GibsonOS\Core\AutoComplete\AutoCompleteInterface;
 use GibsonOS\Core\Exception\AutoCompleteException;
 use GibsonOS\Core\Exception\DateTimeError;
 use GibsonOS\Core\Exception\Repository\SelectError;
-use GibsonOS\Core\Model\ModelInterface;
+use GibsonOS\Core\Model\AutoCompleteModelInterface;
 use GibsonOS\Core\Model\Weather\Location;
 use GibsonOS\Core\Repository\Weather\LocationRepository;
 
@@ -33,7 +33,7 @@ class LocationAutoComplete implements AutoCompleteInterface
      *
      * @throws SelectError
      */
-    public function getById($id, array $parameters): ModelInterface
+    public function getById($id, array $parameters): Location
     {
         return $this->locationRepository->getById($id);
     }
@@ -46,7 +46,7 @@ class LocationAutoComplete implements AutoCompleteInterface
     /**
      * @throws AutoCompleteException
      */
-    public function getIdFromModel(ModelInterface $model): int
+    public function getIdFromModel(AutoCompleteModelInterface $model): int
     {
         if (!$model instanceof Location) {
             throw new AutoCompleteException(sprintf('Model is not instance of %s', Location::class));
