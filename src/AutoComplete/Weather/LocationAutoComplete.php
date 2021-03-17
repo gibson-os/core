@@ -4,10 +4,8 @@ declare(strict_types=1);
 namespace GibsonOS\Core\AutoComplete\Weather;
 
 use GibsonOS\Core\AutoComplete\AutoCompleteInterface;
-use GibsonOS\Core\Exception\AutoCompleteException;
 use GibsonOS\Core\Exception\DateTimeError;
 use GibsonOS\Core\Exception\Repository\SelectError;
-use GibsonOS\Core\Model\AutoCompleteModelInterface;
 use GibsonOS\Core\Model\Weather\Location;
 use GibsonOS\Core\Repository\Weather\LocationRepository;
 
@@ -41,17 +39,5 @@ class LocationAutoComplete implements AutoCompleteInterface
     public function getModel(): string
     {
         return 'GibsonOS.module.core.weather.model.Location';
-    }
-
-    /**
-     * @throws AutoCompleteException
-     */
-    public function getIdFromModel(AutoCompleteModelInterface $model): int
-    {
-        if (!$model instanceof Location) {
-            throw new AutoCompleteException(sprintf('Model is not instance of %s', Location::class));
-        }
-
-        return $model->getId() ?? 0;
     }
 }

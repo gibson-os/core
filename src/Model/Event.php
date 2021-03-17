@@ -232,4 +232,9 @@ class Event extends AbstractModel implements JsonSerializable, AutoCompleteModel
             'lastRun' => $lastRun === null ? null : $lastRun->format('Y-m-d H:i:s'),
         ];
     }
+
+    public function getAutoCompleteId(): int
+    {
+        return $this->getId() ?? 0;
+    }
 }

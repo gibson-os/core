@@ -156,4 +156,9 @@ class Location extends AbstractModel implements JsonSerializable, AutoCompleteMo
             'error' => $this->getError(),
         ];
     }
+
+    public function getAutoCompleteId(): int
+    {
+        return $this->getId() ?? 0;
+    }
 }

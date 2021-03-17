@@ -3,8 +3,6 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\AutoComplete;
 
-use GibsonOS\Core\Exception\AutoCompleteException;
-use GibsonOS\Core\Model\AutoCompleteModelInterface;
 use GibsonOS\Core\Model\Event;
 use GibsonOS\Core\Repository\EventRepository;
 
@@ -30,17 +28,5 @@ class EventAutoComplete implements AutoCompleteInterface
     public function getModel(): string
     {
         return 'GibsonOS.module.core.event.model.Grid';
-    }
-
-    /**
-     * @throws AutoCompleteException
-     */
-    public function getIdFromModel(AutoCompleteModelInterface $model): int
-    {
-        if (!$model instanceof Event) {
-            throw new AutoCompleteException(sprintf('Model is not instance of %s', Event::class));
-        }
-
-        return $model->getId() ?? 0;
     }
 }

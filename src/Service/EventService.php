@@ -10,6 +10,7 @@ use GibsonOS\Core\Dto\Parameter\AutoCompleteParameter;
 use GibsonOS\Core\Event\Describer\DescriberInterface;
 use GibsonOS\Core\Exception\DateTimeError;
 use GibsonOS\Core\Exception\Model\SaveError;
+use GibsonOS\Core\Model\AutoCompleteModelInterface;
 use GibsonOS\Core\Model\Event;
 use GibsonOS\Core\Repository\EventRepository;
 use GibsonOS\Core\Service\Event\ElementService;
@@ -131,7 +132,9 @@ class EventService extends AbstractService
                     continue;
                 }
 
-                $parameters[$parameterName] = $triggerParameter->getAutoComplete()->getIdFromModel($parameters[$parameterName]);
+                if ($parameters[$parameterName] instanceof AutoCompleteModelInterface) {
+                    $parameters[$parameterName] = $parameters[$parameterName]->getAutoCompleteId();
+                }
             }
 
             foreach ($eventParameters ?? [] as $parameterName => $eventParameter) {

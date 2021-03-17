@@ -15,9 +15,4 @@ interface AutoCompleteInterface
     public function getById($id, array $parameters): AutoCompleteModelInterface;
 
     public function getModel(): string;
-
-    /**
-     * @return int|string|float
-     */
-    public function getIdFromModel(AutoCompleteModelInterface $model);
 }
