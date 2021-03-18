@@ -3,7 +3,9 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Dto\Parameter;
 
-abstract class AbstractParameter
+use JsonSerializable;
+
+abstract class AbstractParameter implements JsonSerializable
 {
     protected const OPERATOR_EQUAL = '===';
 
@@ -22,6 +24,10 @@ abstract class AbstractParameter
     private string $xtype;
 
     private array $listeners = [];
+
+    private ?string $operator = null;
+
+    private $value;
 
     abstract protected function getTypeConfig(): array;
 
@@ -53,5 +59,49 @@ abstract class AbstractParameter
     public function setListener(string $field, array $options): void
     {
         $this->listeners[$field] = $options;
+    }
+
+    public function getOperator(): ?string
+    {
+        return $this->operator;
+    }
+
+    public function setOperator(?string $operator): AbstractParameter
+    {
+        $this->operator = $operator;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getValue()
+    {
+        return $this->value;
+    }
+
+    /**
+     * @param mixed $value
+     *
+     * @return AbstractParameter
+     */
+    public function setValue($value)
+    {
+        $this->value = $value;
+
+        return $this;
+    }
+
+    public function jsonSerialize()
+    {
+        return [
+            'title' => $this->getTitle(),
+            'xtype' => $this->getXtype(),
+            'allowedOperators' => $this->getAllowedOperators(),
+            'config' => $this->getConfig(),
+            'operator' => $this->getOperator(),
+            'value' => $this->getValue(),
+        ];
     }
 }

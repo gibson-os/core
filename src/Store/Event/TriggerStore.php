@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Store\Event;
 
+use GibsonOS\Core\Dto\Parameter\AbstractParameter;
 use GibsonOS\Core\Exception\DateTimeError;
 use GibsonOS\Core\Exception\FactoryError;
 use GibsonOS\Core\Exception\GetError;
@@ -10,6 +11,7 @@ use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\Event\Trigger;
 use GibsonOS\Core\Store\AbstractDatabaseStore;
 use GibsonOS\Core\Utility\JsonUtility;
+use JsonException;
 use mysqlDatabase;
 
 class TriggerStore extends AbstractDatabaseStore
@@ -110,17 +112,22 @@ class TriggerStore extends AbstractDatabaseStore
         return $this;
     }
 
+    /**
+     * @param array<string, AbstractParameter> $triggerParameters
+     *
+     * @throws JsonException
+     */
     private function completeParameters(array $triggerParameters, ?string $parameters): ?string
     {
         $parameters = $parameters === null ? [] : JsonUtility::decode($parameters);
 
-        foreach ($triggerParameters as $parameterName => &$methodParameter) {
+        foreach ($triggerParameters as $parameterName => $methodParameter) {
             if (!isset($parameters[$parameterName])) {
                 continue;
             }
 
-            $methodParameter['value'] = $parameters[$parameterName]['value'];
-            $methodParameter['operator'] = $parameters[$parameterName]['operator'];
+            $methodParameter->setValue($parameters[$parameterName]['value']);
+            $methodParameter->setOperator($parameters[$parameterName]['operator']);
         }
 
         return JsonUtility::encode($triggerParameters);

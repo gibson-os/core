@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Store\Event;
 
-use GibsonOS\Core\Dto\Parameter\AbstractParameter;
 use GibsonOS\Core\Event\Describer\DescriberInterface;
 use GibsonOS\Core\Exception\FactoryError;
 use GibsonOS\Core\Service\ServiceManagerService;
@@ -74,31 +73,12 @@ class ClassTriggerStore extends AbstractStore
             $triggers[$trigger->getTitle()] = [
                 'trigger' => $name,
                 'title' => $trigger->getTitle(),
-                'parameters' => $this->transformParameters($trigger->getParameters()),
+                'parameters' => $trigger->getParameters(),
             ];
         }
 
         ksort($triggers);
 
         $this->list[$this->describerClass] = array_values($triggers);
-    }
-
-    /**
-     * @param AbstractParameter[] $parameters
-     */
-    private function transformParameters(array $parameters): array
-    {
-        $parametersArray = [];
-
-        foreach ($parameters as $name => $parameter) {
-            $parametersArray[$name] = [
-                'title' => $parameter->getTitle(),
-                'xtype' => $parameter->getXtype(),
-                'allowedOperators' => $parameter->getAllowedOperators(),
-                'config' => $parameter->getConfig(),
-            ];
-        }
-
-        return $parametersArray;
     }
 }
