@@ -9,7 +9,7 @@ class OptionParameter extends AbstractParameter
 
     public function __construct(string $title, array $options)
     {
-        parent::__construct($title, 'option');
+        parent::__construct($title, 'gosCoreComponentFormFieldComboBox');
         $this->options = $options;
     }
 
