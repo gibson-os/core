@@ -11,7 +11,8 @@
     "ext-sockets": "*",
     "twig/twig": "^3.0",
     "ext-zip": "*",
-    "ext-curl": "*"
+    "ext-curl": "*",
+    "ext-openssl": "*"
   },
   "require-dev": {
     "codeception/codeception": "^4.0",

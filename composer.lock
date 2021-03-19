@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "0c264dea78cb4e0cd2ef6b903ea52e1c",
+    "content-hash": "cca69f21cce21690fbc6b02c79fd9d7a",
     "packages": [
         {
             "name": "mdo/mdo",
@@ -6354,7 +6354,8 @@
         "ext-sqlite3": "*",
         "ext-sockets": "*",
         "ext-zip": "*",
-        "ext-curl": "*"
+        "ext-curl": "*",
+        "ext-openssl": "*"
     },
     "platform-dev": [],
     "plugin-api-version": "2.0.0"
