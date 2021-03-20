@@ -42,6 +42,17 @@ Ext.define('GibsonOS.module.core.parameter.Form', {
             item.inputType = parameter.config.inputType;
         }
 
+        if (parameter.config.options) {
+            item.data = [];
+
+            Ext.iterate(parameter.config.options, (id, value) => {
+                item.data.push({
+                    id: id,
+                    name: value
+                });
+            });
+        }
+
         if (me.withOperator) {
             if (me.withSet) {
                 parameter.allowedOperators.push('=');
