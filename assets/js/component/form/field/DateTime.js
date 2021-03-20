@@ -14,6 +14,9 @@ Ext.define('GibsonOS.module.core.component.form.field.DateTime', {
 
         me.callParent();
     },
+    getName() {
+        return this.name;
+    },
     getValue() {
         const me = this;
         let date = me.down('gosCoreComponentFormFieldDate').getValue();
