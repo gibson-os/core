@@ -34,7 +34,7 @@ class ServiceManagerService
     /**
      * @throws FactoryError
      */
-    public function get(string $classname): object
+    public function get(string $classname, string $instanceOf = null): object
     {
         if (mb_strpos($classname, '\\') === 0) {
             $classname = substr($classname, 1);
@@ -50,11 +50,11 @@ class ServiceManagerService
         $class = $this->getByFactory($classname);
 
         if (!empty($class) && get_class($class) === $classname) {
-            return $class;
+            return $this->checkInstanceOf($class, $instanceOf);
         }
 
         if (isset($this->services[$classname])) {
-            return $this->services[$classname];
+            return $this->checkInstanceOf($this->services[$classname], $instanceOf);
         }
 
         $class = $this->getByCreate($classname);
@@ -62,10 +62,22 @@ class ServiceManagerService
         if ($class instanceof $classname) {
             $this->services[$classname] = $class;
 
-            return $class;
+            return $this->checkInstanceOf($class, $instanceOf);
         }
 
         throw new FactoryError(sprintf('Class %s could not be created', $classname));
+    }
+
+    private function checkInstanceOf(object $class, string $className = null): object
+    {
+        if (
+            $className !== null &&
+            !$class instanceof $className
+        ) {
+            throw new FactoryError(sprintf('%d is no instanceof of %d', get_class($class), $className));
+        }
+
+        return $class;
     }
 
     /**
