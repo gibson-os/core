@@ -68,11 +68,14 @@ class ServiceManagerService
         throw new FactoryError(sprintf('Class %s could not be created', $classname));
     }
 
+    /**
+     * @throws FactoryError
+     */
     private function checkInstanceOf(object $class, string $className = null): object
     {
         if (
             $className !== null &&
-            !$class instanceof $className
+            !is_subclass_of($class, $className)
         ) {
             throw new FactoryError(sprintf('%d is no instanceof of %d', get_class($class), $className));
         }
