@@ -27,13 +27,11 @@ class LocationAutoComplete implements AutoCompleteInterface
     }
 
     /**
-     * @param int $id
-     *
      * @throws SelectError
      */
-    public function getById($id, array $parameters): Location
+    public function getById(string $id, array $parameters): Location
     {
-        return $this->locationRepository->getById($id);
+        return $this->locationRepository->getById((int) $id);
     }
 
     public function getModel(): string

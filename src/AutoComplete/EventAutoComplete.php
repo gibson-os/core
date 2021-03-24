@@ -20,9 +20,9 @@ class EventAutoComplete implements AutoCompleteInterface
         return $this->eventRepository->findByName($namePart, (bool) ($parameters['onlyActive'] ?? false));
     }
 
-    public function getById($id, array $parameters): Event
+    public function getById(string $id, array $parameters): Event
     {
-        return $this->eventRepository->getById($id);
+        return $this->eventRepository->getById((int) $id);
     }
 
     public function getModel(): string

@@ -12,7 +12,7 @@ interface AutoCompleteInterface
      */
     public function getByNamePart(string $namePart, array $parameters): array;
 
-    public function getById($id, array $parameters): AutoCompleteModelInterface;
+    public function getById(string $id, array $parameters): AutoCompleteModelInterface;
 
     public function getModel(): string;
 }

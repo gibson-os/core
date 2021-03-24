@@ -1,5 +1,5 @@
 Ext.define('GibsonOS.module.core.parameter.type.AutoComplete', {
-    extend: 'GibsonOS.form.AutoComplete',
+    extend: 'GibsonOS.module.core.component.form.field.AutoComplete',
     alias: ['widget.gosModuleCoreParameterTypeAutoComplete'],
     initComponent: function () {
         let me = this;
