@@ -76,8 +76,12 @@ Ext.define('GibsonOS.module.core.parameter.Form', {
     addFields(parameters) {
         const me = this;
 
+        me.fireEvent('beforeAddFields', parameters);
+
         Ext.iterate(parameters, function(name, parameter) {
             me.addField(name, parameter)
         });
+
+        me.fireEvent('afterAddFields', parameters);
     }
 });
