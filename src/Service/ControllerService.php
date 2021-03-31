@@ -241,6 +241,17 @@ class ControllerService
             ), 0, $e);
         }
 
+        if ($value === null || $value === '') {
+            if ($parameter->allowsNull()) {
+                return null;
+            }
+
+            throw new ControllerError(sprintf(
+                'Parameter %s doesnt allows null!',
+                $parameter->getName()
+            ));
+        }
+
         switch ($parameter->getType()) {
             case 'int':
                 return (int) $value;
