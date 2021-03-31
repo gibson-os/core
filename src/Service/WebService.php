@@ -101,6 +101,7 @@ class WebService extends AbstractService
 
         return new Response(
             $request,
+            (int) curl_getinfo($curl, CURLINFO_HTTP_CODE),
             $headers,
             (new Body())->setResource($responseHandle, $length),
             $cookieFile

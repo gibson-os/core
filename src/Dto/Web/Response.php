@@ -7,6 +7,8 @@ class Response
 {
     private Request $request;
 
+    private int $statusCode;
+
     /**
      * @var array<string, string>
      */
@@ -19,12 +21,23 @@ class Response
     /**
      * @param array<string, string> $headers
      */
-    public function __construct(Request $request, array $headers, Body $body, string $cookieFile)
+    public function __construct(Request $request, int $statusCode, array $headers, Body $body, string $cookieFile)
     {
         $this->request = $request;
+        $this->statusCode = $statusCode;
         $this->headers = $headers;
         $this->body = $body;
         $this->cookieFile = $cookieFile;
+    }
+
+    public function getRequest(): Request
+    {
+        return $this->request;
+    }
+
+    public function getStatusCode(): int
+    {
+        return $this->statusCode;
     }
 
     /**
