@@ -10,7 +10,7 @@ class Trigger
     private string $title;
 
     /**
-     * @var AbstractParameter[]
+     * @var array<string, AbstractParameter>
      */
     private array $parameters = [];
 
@@ -25,7 +25,7 @@ class Trigger
     }
 
     /**
-     * @return AbstractParameter[]
+     * @return array<string, AbstractParameter>
      */
     public function getParameters(): array
     {
@@ -33,7 +33,7 @@ class Trigger
     }
 
     /**
-     * @param AbstractParameter[] $parameters
+     * @param array<string, AbstractParameter> $parameters
      */
     public function setParameters(array $parameters): Trigger
     {

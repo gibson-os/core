@@ -5,6 +5,7 @@ namespace GibsonOS\Core\Event;
 
 use GibsonOS\Core\Dto\Parameter\AutoCompleteParameter;
 use GibsonOS\Core\Event\Describer\DescriberInterface;
+use GibsonOS\Core\Model\AutoCompleteModelInterface;
 use GibsonOS\Core\Model\Event\Element;
 use GibsonOS\Core\Service\ServiceManagerService;
 use GibsonOS\Core\Utility\JsonUtility;
@@ -41,11 +42,17 @@ abstract class AbstractEvent
         $parameters = JsonUtility::decode($element->getParameters() ?? '[]');
 
         foreach ($methodParameters as $parameterName => $methodParameter) {
-            if (!$methodParameter instanceof AutoCompleteParameter) {
+            if (
+                !$methodParameter instanceof AutoCompleteParameter ||
+                $parameters[$parameterName] instanceof AutoCompleteModelInterface
+            ) {
                 continue;
             }
 
-            $parameters[$parameterName] = $methodParameter->getAutoComplete()->getById($parameters[$parameterName], []);
+            $parameters[$parameterName] = $methodParameter->getAutoComplete()->getById(
+                (string) $parameters[$parameterName],
+                []
+            );
         }
 
         return empty($parameters) ? [] : array_values($parameters);

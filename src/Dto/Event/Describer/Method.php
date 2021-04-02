@@ -8,12 +8,12 @@ use GibsonOS\Core\Dto\Parameter\AbstractParameter;
 class Method
 {
     /**
-     * @var AbstractParameter[]
+     * @var array<string, AbstractParameter>
      */
     private array $parameters = [];
 
     /**
-     * @var AbstractParameter[]
+     * @var array<string, AbstractParameter>
      */
     private array $returns = [];
 
@@ -25,7 +25,7 @@ class Method
     }
 
     /**
-     * @return AbstractParameter[]
+     * @return array<string, AbstractParameter>
      */
     public function getParameters(): array
     {
@@ -33,7 +33,7 @@ class Method
     }
 
     /**
-     * @param AbstractParameter[] $parameters
+     * @param array<string, AbstractParameter> $parameters
      */
     public function setParameters(array $parameters): Method
     {
@@ -43,7 +43,7 @@ class Method
     }
 
     /**
-     * @return AbstractParameter[]
+     * @return array<string, AbstractParameter>
      */
     public function getReturns(): array
     {
@@ -51,7 +51,7 @@ class Method
     }
 
     /**
-     * @param AbstractParameter[] $returns
+     * @param array<string, AbstractParameter> $returns
      */
     public function setReturns(array $returns): Method
     {
