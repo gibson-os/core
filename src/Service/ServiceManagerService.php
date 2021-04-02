@@ -144,15 +144,21 @@ class ServiceManagerService
             foreach ($constructor->getParameters() as $parameter) {
                 $parameterClass = $parameter->getClass();
 
-                if (!$parameterClass instanceof ReflectionClass) {
+                if ($parameterClass instanceof ReflectionClass) {
+                    $parameters[] = $this->get($parameterClass->getName());
+
+                    continue;
+                }
+
+                try {
+                    $parameters[] = $parameter->getDefaultValue();
+                } catch (ReflectionException $e) {
                     throw new FactoryError(sprintf(
                         'Parameter %s of Class %s is no Class',
                         $parameter->getName(),
                         $classname
                     ));
                 }
-
-                $parameters[] = $this->get($parameterClass->getName());
             }
         }
 
