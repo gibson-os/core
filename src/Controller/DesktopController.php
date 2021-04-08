@@ -14,12 +14,15 @@ use GibsonOS\Core\Repository\SettingRepository;
 use GibsonOS\Core\Service\PermissionService;
 use GibsonOS\Core\Service\Response\AjaxResponse;
 use GibsonOS\Core\Utility\JsonUtility;
+use JsonException;
 
 class DesktopController extends AbstractController
 {
     private const DESKTOP_KEY = 'desktop';
 
     private const APPS_KEY = 'apps';
+
+    private const TOOLS_KEY = 'tools';
 
     /**
      * @throws DateTimeError
@@ -31,39 +34,40 @@ class DesktopController extends AbstractController
         $this->checkPermission(PermissionService::READ);
 
         $moduleName = $this->requestService->getModuleName();
+        $userId = $this->sessionService->getUserId() ?? 0;
 
         try {
-            $desktop = $settingRepository->getByKeyAndModuleName(
-                $moduleName,
-                $this->sessionService->getUserId() ?? 0,
-                self::DESKTOP_KEY
-            )->getValue();
+            $desktop = $settingRepository->getByKeyAndModuleName($moduleName, $userId, self::DESKTOP_KEY)->getValue();
         } catch (SelectError $e) {
             $desktop = '[]';
         }
 
         try {
-            $apps = $settingRepository->getByKeyAndModuleName(
-                $moduleName,
-                $this->sessionService->getUserId() ?? 0,
-                self::APPS_KEY
-            )->getValue();
+            $apps = $settingRepository->getByKeyAndModuleName($moduleName, $userId, self::APPS_KEY)->getValue();
         } catch (SelectError $e) {
             $apps = '[]';
+        }
+
+        try {
+            $tools = $settingRepository->getByKeyAndModuleName($moduleName, $userId, self::TOOLS_KEY)->getValue();
+        } catch (SelectError $e) {
+            $tools = '[]';
         }
 
         return $this->returnSuccess([
             self::DESKTOP_KEY => JsonUtility::decode($desktop),
             self::APPS_KEY => JsonUtility::decode($apps),
+            self::TOOLS_KEY => JsonUtility::decode($tools),
         ]);
     }
 
     /**
      * @throws DateTimeError
      * @throws LoginRequired
-     * @throws SaveError
      * @throws PermissionDenied
+     * @throws SaveError
      * @throws SelectError
+     * @throws JsonException
      */
     public function save(ModuleRepository $moduleRepository, array $items): AjaxResponse
     {
