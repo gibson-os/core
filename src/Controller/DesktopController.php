@@ -75,6 +75,12 @@ class DesktopController extends AbstractController
 
         $module = $moduleRepository->getByName($this->requestService->getModuleName());
 
+        foreach ($items as &$item) {
+            if (empty($item['params'])) {
+                $item['params'] = null;
+            }
+        }
+
         (new Setting())
             ->setUserId($this->sessionService->getUserId() ?? 0)
             ->setModule($module)
