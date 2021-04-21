@@ -43,10 +43,13 @@ Ext.define('GibsonOS.module.core.parameter.Form', {
         }
 
         if (parameter.config.options) {
-            item.data = [];
+            item.store = {
+                fields: ['id', 'name'],
+                data: []
+            }
 
-            Ext.iterate(parameter.config.options, (id, value) => {
-                item.data.push({
+            Ext.iterate(parameter.config.options, (value, id) => {
+                item.store.data.push({
                     id: id,
                     name: value
                 });

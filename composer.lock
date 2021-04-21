@@ -529,16 +529,16 @@
         },
         {
             "name": "captainhook/captainhook",
-            "version": "5.5.1",
+            "version": "5.6.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/captainhookphp/captainhook.git",
-                "reference": "8ac90abf81288694568a7093a9b2267e5cda8904"
+                "reference": "cfca3e3075669744c389b826902476f7a2d64a8e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/captainhookphp/captainhook/zipball/8ac90abf81288694568a7093a9b2267e5cda8904",
-                "reference": "8ac90abf81288694568a7093a9b2267e5cda8904",
+                "url": "https://api.github.com/repos/captainhookphp/captainhook/zipball/cfca3e3075669744c389b826902476f7a2d64a8e",
+                "reference": "cfca3e3075669744c389b826902476f7a2d64a8e",
                 "shasum": ""
             },
             "require": {
@@ -599,7 +599,7 @@
             ],
             "support": {
                 "issues": "https://github.com/captainhookphp/captainhook/issues",
-                "source": "https://github.com/captainhookphp/captainhook/tree/5.5.1"
+                "source": "https://github.com/captainhookphp/captainhook/tree/5.6.2"
             },
             "funding": [
                 {
@@ -607,7 +607,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2021-03-27T20:32:35+00:00"
+            "time": "2021-04-16T11:52:24+00:00"
         },
         {
             "name": "captainhook/plugin-composer",
@@ -1927,16 +1927,16 @@
         },
         {
             "name": "pdepend/pdepend",
-            "version": "2.9.0",
+            "version": "2.9.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pdepend/pdepend.git",
-                "reference": "b6452ce4b570f540be3a4f46276dd8d8f4fa5ead"
+                "reference": "1632f0cee84512ffd6dde71e58536b3b06528c41"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pdepend/pdepend/zipball/b6452ce4b570f540be3a4f46276dd8d8f4fa5ead",
-                "reference": "b6452ce4b570f540be3a4f46276dd8d8f4fa5ead",
+                "url": "https://api.github.com/repos/pdepend/pdepend/zipball/1632f0cee84512ffd6dde71e58536b3b06528c41",
+                "reference": "1632f0cee84512ffd6dde71e58536b3b06528c41",
                 "shasum": ""
             },
             "require": {
@@ -1972,7 +1972,7 @@
             "description": "Official version of pdepend to be handled with Composer",
             "support": {
                 "issues": "https://github.com/pdepend/pdepend/issues",
-                "source": "https://github.com/pdepend/pdepend/tree/2.9.0"
+                "source": "https://github.com/pdepend/pdepend/tree/2.9.1"
             },
             "funding": [
                 {
@@ -1980,7 +1980,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-03-11T09:20:40+00:00"
+            "time": "2021-04-15T21:36:28+00:00"
         },
         {
             "name": "phar-io/manifest",
@@ -4444,16 +4444,16 @@
         },
         {
             "name": "sebastianfeldmann/git",
-            "version": "3.6.0",
+            "version": "3.7.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianfeldmann/git.git",
-                "reference": "426acdd89c4fcf77027c38b44f53625ba90d3439"
+                "reference": "ca827dc741a90043ee46e59a96b1ca88b9ed5264"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianfeldmann/git/zipball/426acdd89c4fcf77027c38b44f53625ba90d3439",
-                "reference": "426acdd89c4fcf77027c38b44f53625ba90d3439",
+                "url": "https://api.github.com/repos/sebastianfeldmann/git/zipball/ca827dc741a90043ee46e59a96b1ca88b9ed5264",
+                "reference": "ca827dc741a90043ee46e59a96b1ca88b9ed5264",
                 "shasum": ""
             },
             "require": {
@@ -4490,7 +4490,7 @@
             ],
             "support": {
                 "issues": "https://github.com/sebastianfeldmann/git/issues",
-                "source": "https://github.com/sebastianfeldmann/git/tree/3.6.0"
+                "source": "https://github.com/sebastianfeldmann/git/tree/3.7.0"
             },
             "funding": [
                 {
@@ -4498,7 +4498,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2021-04-03T19:19:26+00:00"
+            "time": "2021-04-10T08:31:02+00:00"
         },
         {
             "name": "symfony/config",
