@@ -90,6 +90,7 @@ class WebService extends AbstractService
         }
 
         rewind($responseHandle);
+        $httpCode = (int) curl_getinfo($curl, CURLINFO_HTTP_CODE);
         curl_close($curl);
         $length = fstat($responseHandle)['size'];
 
@@ -101,7 +102,7 @@ class WebService extends AbstractService
 
         return new Response(
             $request,
-            (int) curl_getinfo($curl, CURLINFO_HTTP_CODE),
+            $httpCode,
             $headers,
             (new Body())->setResource($responseHandle, $length),
             $cookieFile
