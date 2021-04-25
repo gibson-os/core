@@ -9,9 +9,23 @@ class Lock extends AbstractModel
 
     private string $name;
 
+    private bool $stop;
+
     public static function getTableName(): string
     {
         return 'lock';
+    }
+
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    public function setName(string $name): Lock
+    {
+        $this->name = $name;
+
+        return $this;
     }
 
     public function getPid(): int
@@ -26,14 +40,14 @@ class Lock extends AbstractModel
         return $this;
     }
 
-    public function getName(): string
+    public function shouldStop(): bool
     {
-        return $this->name;
+        return $this->stop;
     }
 
-    public function setName(string $name): Lock
+    public function setStop(bool $stop): Lock
     {
-        $this->name = $name;
+        $this->stop = $stop;
 
         return $this;
     }

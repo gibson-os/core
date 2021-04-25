@@ -117,7 +117,51 @@ class LockService extends AbstractService
         }
     }
 
-    private function getName(?string $name = null): string
+    /**
+     * @throws DeleteError
+     */
+    public function kill(string $name = null): void
+    {
+        $name = $this->getName($name);
+
+        try {
+            $lock = $this->lockRepository->getByName($name);
+            $this->processService->kill($lock->getPid());
+            $lock->delete();
+        } catch (SelectError | DateTimeError $e) {
+            // Do nothing
+        }
+    }
+
+    /**
+     * @throws SaveError
+     */
+    public function stop(string $name = null): void
+    {
+        $name = $this->getName($name);
+
+        try {
+            $this->lockRepository->getByName($name)
+                ->setStop(true)
+                ->save()
+            ;
+        } catch (SelectError | DateTimeError $e) {
+            // Do nothing
+        }
+    }
+
+    public function shouldStop(string $name = null): bool
+    {
+        $name = $this->getName($name);
+
+        try {
+            return $this->lockRepository->getByName($name)->shouldStop();
+        } catch (SelectError | DateTimeError $e) {
+            throw new LockError('Can not save lock!');
+        }
+    }
+
+    private function getName(string $name = null): string
     {
         if (null !== $name) {
             return $name;
