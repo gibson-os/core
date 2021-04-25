@@ -9,7 +9,7 @@ class Lock extends AbstractModel
 
     private string $name;
 
-    private bool $stop;
+    private bool $stop = false;
 
     public static function getTableName(): string
     {
