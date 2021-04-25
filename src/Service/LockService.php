@@ -104,6 +104,19 @@ class LockService extends AbstractService
         }
     }
 
+    public function isLocked(string $name = null): bool
+    {
+        $name = $this->getName($name);
+
+        try {
+            $this->lockRepository->getByName($name);
+
+            return true;
+        } catch (SelectError | DateTimeError $e) {
+            return false;
+        }
+    }
+
     /**
      * @throws DateTimeError
      */
