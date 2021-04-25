@@ -26,26 +26,20 @@ class LockService extends AbstractService
     }
 
     /**
+     * @throws DeleteError
      * @throws LockError
      */
     public function lock(string $name = null): void
     {
         $name = $this->getName($name);
 
-        try {
-            $lock = $this->lockRepository->getByName($name);
-
-            if ($this->processService->pidExists($lock->getPid())) {
-                throw new LockError('Lock exists!');
-            }
-        } catch (SelectError | DateTimeError $e) {
-            $lock = (new Lock())
-                ->setName($name)
-            ;
+        if ($this->isLocked($name)) {
+            throw new LockError('Lock exists!');
         }
 
         try {
-            $lock
+            (new Lock())
+                ->setName($name)
                 ->setPid(getmypid())
                 ->save()
             ;
@@ -104,14 +98,23 @@ class LockService extends AbstractService
         }
     }
 
+    /**
+     * @throws DeleteError
+     */
     public function isLocked(string $name = null): bool
     {
         $name = $this->getName($name);
 
         try {
-            $this->lockRepository->getByName($name);
+            $lock = $this->lockRepository->getByName($name);
 
-            return true;
+            if ($this->processService->pidExists($lock->getPid())) {
+                return true;
+            }
+
+            $lock->delete();
+
+            return false;
         } catch (SelectError | DateTimeError $e) {
             return false;
         }
@@ -119,6 +122,7 @@ class LockService extends AbstractService
 
     /**
      * @throws DateTimeError
+     * @throws DeleteError
      */
     public function waitUnlockToLock(string $name = null): void
     {
