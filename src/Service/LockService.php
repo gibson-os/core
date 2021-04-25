@@ -26,7 +26,6 @@ class LockService extends AbstractService
     }
 
     /**
-     * @throws DeleteError
      * @throws LockError
      */
     public function lock(string $name = null): void
@@ -63,14 +62,10 @@ class LockService extends AbstractService
                     throw new LockError(sprintf('Can not kill process %d!', $lock->getPid()));
                 }
 
-                $lock = (new Lock())
-                    ->setName($name)
-                ;
+                $lock = (new Lock())->setName($name);
             }
         } catch (SelectError | DateTimeError $e) {
-            $lock = (new Lock())
-                ->setName($name)
-            ;
+            $lock = (new Lock())->setName($name);
         }
 
         try {
@@ -98,9 +93,6 @@ class LockService extends AbstractService
         }
     }
 
-    /**
-     * @throws DeleteError
-     */
     public function isLocked(string $name = null): bool
     {
         $name = $this->getName($name);
@@ -112,7 +104,11 @@ class LockService extends AbstractService
                 return true;
             }
 
-            $lock->delete();
+            try {
+                $lock->delete();
+            } catch (DeleteError $e) {
+                // do nothing
+            }
 
             return false;
         } catch (SelectError | DateTimeError $e) {
@@ -122,7 +118,6 @@ class LockService extends AbstractService
 
     /**
      * @throws DateTimeError
-     * @throws DeleteError
      */
     public function waitUnlockToLock(string $name = null): void
     {
