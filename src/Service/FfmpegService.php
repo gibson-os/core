@@ -90,7 +90,14 @@ class FfmpegService extends AbstractService
         string $audioCodec = null,
         array $options = []
     ): void {
-        $optionString = '-i ' . escapeshellarg($media->getFilename()) . ' ';
+        $optionString = '';
+
+        if (isset($options['activation_bytes'])) {
+            $optionString .= '-activation_bytes ' . escapeshellarg($options['activation_bytes']) . ' ';
+            unset($options['activation_bytes']);
+        }
+
+        $optionString .= '-i ' . escapeshellarg($media->getFilename()) . ' ';
 
         if (
             $audioCodec !== null &&
@@ -224,7 +231,7 @@ class FfmpegService extends AbstractService
         while ($out = fgets($ffMpeg)) {
             $matches = ['', ''];
 
-            if (preg_match('/file checksum == (\w)*/', $out, $matches) === false) {
+            if (preg_match('/file checksum == (\w*)/', $out, $matches) !== 1) {
                 continue;
             }
 
