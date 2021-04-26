@@ -8,6 +8,7 @@ use GibsonOS\Core\Dto\Ffmpeg\Media;
 use GibsonOS\Core\Dto\Image as ImageDto;
 use GibsonOS\Core\Exception\DeleteError;
 use GibsonOS\Core\Exception\Ffmpeg\ConvertStatusError;
+use GibsonOS\Core\Exception\FfmpegException;
 use GibsonOS\Core\Exception\File\OpenError;
 use GibsonOS\Core\Exception\FileNotFound;
 use GibsonOS\Core\Exception\GetError;
@@ -17,6 +18,8 @@ use GibsonOS\Core\Exception\ProcessError;
 class FfmpegService extends AbstractService
 {
     public string $ffpmegPath;
+
+    public string $ffprobePath;
 
     private DateTimeService $dateTime;
 
@@ -33,6 +36,7 @@ class FfmpegService extends AbstractService
     {
         // @todo anders machen
         $this->ffpmegPath = $envService->getString('FFMPEG_PATH');
+        $this->ffprobePath = $envService->getString('FFPROBE_PATH');
         $this->dateTime = $dateTime;
         $this->file = $file;
         $this->process = $process;
@@ -197,6 +201,41 @@ class FfmpegService extends AbstractService
         $this->file->delete(sys_get_temp_dir(), $tmpFilename);
 
         return $image;
+    }
+
+    /**
+     * @throws FfmpegException
+     */
+    public function getChecksum(string $filename): string
+    {
+        if (
+            !$this->file->exists($filename) ||
+            !$this->file->isReadable($filename)
+        ) {
+            throw new FfmpegException(sprintf('File %s not found!', $filename));
+        }
+
+        try {
+            $ffMpeg = $this->process->open(sprintf('%s %s', $this->ffprobePath, escapeshellarg($filename)), 'r');
+        } catch (ProcessError $e) {
+            throw new FfmpegException('Ffprobe not found!');
+        }
+
+        while ($out = fgets($ffMpeg)) {
+            $matches = ['', ''];
+
+            if (preg_match('/file checksum == (\w)*/', $out, $matches) === false) {
+                continue;
+            }
+
+            $this->process->close($ffMpeg);
+
+            return $matches[1];
+        }
+
+        $this->process->close($ffMpeg);
+
+        throw new FfmpegException('Checksum not found!');
     }
 
     private function execute(string $parameters): void
