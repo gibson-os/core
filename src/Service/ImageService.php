@@ -37,7 +37,7 @@ class ImageService extends AbstractService
         $image = imagecreatetruecolor($width, $height);
 
         if (is_bool($image)) {
-            throw new CreateError('Bild jonnte nicht erstellt werden!');
+            throw new CreateError('Image could not be created!');
         }
 
         $image = new Image($image);
