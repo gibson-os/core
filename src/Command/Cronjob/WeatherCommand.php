@@ -79,7 +79,7 @@ class WeatherCommand extends AbstractCommand
             } catch (WeatherError | SaveError $e) {
                 $location
                     ->setError($e->getMessage())
-                    ->setActive(false)
+                    ->setLastRun($lastRun)
                     ->save()
                 ;
 
@@ -87,6 +87,7 @@ class WeatherCommand extends AbstractCommand
             }
 
             $location
+                ->setError(null)
                 ->setLastRun($lastRun)
                 ->save()
             ;
