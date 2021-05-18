@@ -71,7 +71,7 @@ class CryptService
             (int) openssl_cipher_iv_length($this->cryptAlgo)
         );
 
-        return openssl_decrypt($data, $this->cryptAlgo, $this->cryptSalt, 1, $initializationVector);
+        return openssl_decrypt($data, $this->cryptAlgo, $this->cryptSalt, 0, $initializationVector);
     }
 
     /**
