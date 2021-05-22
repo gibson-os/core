@@ -258,7 +258,7 @@ Ext.define('GibsonOS.module.core.event.element.TreeGrid', {
                     returnValue += parameter.title + ': ';
 
                     if (values[name]) {
-                        returnValue += values[name].value ? values[name].value : '';
+                        returnValue += values[name].value !== null ? values[name].value : '';
                     }
 
                     returnValue += '<br>';
@@ -307,14 +307,14 @@ Ext.define('GibsonOS.module.core.event.element.TreeGrid', {
                 }
 
                 Ext.iterate(returns, function(name, parameter) {
-                    if (!values[name] || !values[name].value) {
+                    if (!values[name] || values[name].value === null) {
                         return true;
                     }
 
                     returnValue +=
                         parameter.title + ' ' +
                         (values[name].operator ? values[name].operator + ' ' : ' ') +
-                        (values[name].value ? values[name].value : '') +
+                        values[name].value +
                         '<br>'
                     ;
                 });

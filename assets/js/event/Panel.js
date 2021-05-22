@@ -51,7 +51,7 @@ Ext.define('GibsonOS.module.core.event.Panel', {
             };
 
             Ext.iterate(element.get('parameters'), function(name, parameter) {
-                if (!parameter.value) {
+                if (parameter.value === null) {
                     return true;
                 }
 
