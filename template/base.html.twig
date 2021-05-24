@@ -40,6 +40,15 @@
     <div id="extBody"></div>
     <script type="text/javascript">
         /* <![CDATA[ */
+        window['__onGCastApiAvailable'] = function(loaded, errorInfo)
+        {
+            if (loaded) {
+                initializeCastApi({{ session.userId }});
+            } else {
+                console.log(errorInfo);
+            }
+        };
+
         Ext.onReady(function()
         {
             {% set moduleName = request.getModuleName() == 'core' ? 'system' : request.getTaskName() %}
