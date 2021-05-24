@@ -65,18 +65,18 @@ abstract class AbstractCommand implements CommandInterface
     }
 
     /**
-     * @param string[] $callArguments
+     * @param string[] $arguments
      */
-    public function setArguments(array $callArguments): CommandInterface
+    public function setArguments(array $arguments): CommandInterface
     {
-        $this->argumentsValues = $callArguments;
+        $this->argumentsValues = $arguments;
 
         return $this;
     }
 
-    public function setOptions(array $callOptions): CommandInterface
+    public function setOptions(array $options): CommandInterface
     {
-        $this->optionsValues = $callOptions;
+        $this->optionsValues = $options;
 
         return $this;
     }
