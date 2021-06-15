@@ -40,10 +40,11 @@
     <div id="extBody"></div>
     <script type="text/javascript">
         /* <![CDATA[ */
+        const gosUser = {{ session.user|json_encode() }};
         window['__onGCastApiAvailable'] = function(loaded, errorInfo)
         {
             if (loaded) {
-                initializeCastApi({{ session.userId }});
+                initializeCastApi();
             } else {
                 console.log(errorInfo);
             }

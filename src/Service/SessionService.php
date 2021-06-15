@@ -8,9 +8,9 @@ use OutOfBoundsException;
 
 class SessionService
 {
-    const LOGIN = 'login';
+    private const LOGIN = 'login';
 
-    const USER_ID = 'userId';
+    private const USER = 'user';
 
     private array $data;
 
@@ -75,7 +75,7 @@ class SessionService
     {
         return $this
             ->set(self::LOGIN, true)
-            ->set(self::USER_ID, $user->getId())
+            ->set(self::USER, $user)
             // @todo old stuff. Entfernen wenn alles umgebaut ist
             ->set('user_id', $user->getId())
             ->set('user_name', $user->getUser())
@@ -86,7 +86,7 @@ class SessionService
     {
         return $this
             ->unset(self::LOGIN)
-            ->unset(self::USER_ID)
+            ->unset(self::USER)
             // @todo old stuff. Entfernen wenn alles umgebaut ist
             ->unset('user_id')
             ->unset('user_name')
@@ -98,10 +98,16 @@ class SessionService
         return (bool) $this->getWithDefault(self::LOGIN, false);
     }
 
+    public function getUser(): ?User
+    {
+        return $this->getWithDefault(self::USER, null);
+    }
+
     public function getUserId(): ?int
     {
-        $userId = (int) $this->getWithDefault(self::USER_ID, 0);
+        /** @var User $user */
+        $user = $this->getWithDefault(self::USER, (new User())->setId(0));
 
-        return $userId === 0 ? null : $userId;
+        return $user->getId();
     }
 }
