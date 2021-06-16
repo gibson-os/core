@@ -40,7 +40,7 @@
     <div id="extBody"></div>
     <script type="text/javascript">
         /* <![CDATA[ */
-        const gosUser = {{ session.user|json_encode() }};
+        const gosUser = {{ session.user|json_encode()|raw }};
         window['__onGCastApiAvailable'] = function(loaded, errorInfo)
         {
             if (loaded) {
