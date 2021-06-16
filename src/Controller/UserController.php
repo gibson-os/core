@@ -55,7 +55,11 @@ class UserController extends AbstractController
         $user = $userService->login($username, $password);
         $device = $userService->addDevice($user, $model);
 
-        return $this->returnSuccess(['token' => $device->getToken()]);
+        return $this->returnSuccess([
+            'id' => $user->getId(),
+            'name' => $user->getUser(),
+            'token' => $device->getToken(),
+        ]);
     }
 
     /**
