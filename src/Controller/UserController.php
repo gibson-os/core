@@ -57,7 +57,7 @@ class UserController extends AbstractController
 
         return $this->returnSuccess([
             'id' => $user->getId(),
-            'name' => $user->getUser(),
+            'user' => $user->getUser(),
             'token' => $device->getToken(),
         ]);
     }
