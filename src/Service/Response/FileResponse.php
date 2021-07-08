@@ -38,7 +38,13 @@ class FileResponse implements ResponseInterface
         $this->endSize = $this->size;
 
         try {
-            $ranges = explode('-', substr($this->requestService->getHeader('HTTP_RANGE'), 6));
+            try {
+                $range = $this->requestService->getHeader('Range');
+            } catch (RequestError $e) {
+                $range = $this->requestService->getHeader('HTTP_RANGE');
+            }
+
+            $ranges = explode('-', substr($range, 6));
             $this->hasRange = true;
 
             if (!$ranges[1]) {
