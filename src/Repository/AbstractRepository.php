@@ -65,8 +65,6 @@ abstract class AbstractRepository
     /**
      * @throws SelectError
      *
-     * @psalm-suppress MoreSpecificReturnType
-     *
      * @return AbstractModel[]
      */
     protected function fetchAll(
@@ -91,6 +89,7 @@ abstract class AbstractRepository
             throw $exception;
         }
 
+        /** @var AbstractModel[] $models */
         $models = [];
 
         if ($table->countRecords() === 0) {
@@ -99,13 +98,22 @@ abstract class AbstractRepository
 
         do {
             $model = new $abstractModelClassName();
+
+            if (!$model instanceof AbstractModel) {
+                $exception = new SelectError(sprintf(
+                    '%s is no instance of %s',
+                    $abstractModelClassName,
+                    AbstractModel::class
+                ));
+                $exception->setTable($table);
+
+                throw $exception;
+            }
+
             $model->loadFromMysqlTable($table);
             $models[] = $model;
         } while ($table->next());
 
-        /**
-         * @psalm-suppress LessSpecificReturnStatement
-         */
         return $models;
     }
 
