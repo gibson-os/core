@@ -83,7 +83,7 @@ abstract class AbstractRepository
             ->setLimit($limit, $offset)
         ;
 
-        if ($table->select() === false) {
+        if ($table->selectPrepared() === false) {
             $exception = new SelectError();
             $exception->setTable($table);
 
