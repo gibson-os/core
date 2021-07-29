@@ -64,9 +64,10 @@ abstract class AbstractRepository
 
     /**
      * @throws SelectError
-     * @throws DateTimeError
      *
-     * @return list<object>
+     * @psalm-return list<object>
+     *
+     * @return AbstractModel[]
      */
     protected function fetchAll(
         string $where,
