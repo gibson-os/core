@@ -3,6 +3,9 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Repository;
 
+use GibsonOS\Core\Exception\DateTimeError;
+use GibsonOS\Core\Exception\Repository\SelectError;
+use GibsonOS\Core\Model\AbstractModel;
 use InvalidArgumentException;
 use mysqlDatabase;
 use mysqlRegistry;
@@ -28,6 +31,80 @@ abstract class AbstractRepository
         $database->rollback();
     }
 
+    /**
+     * @throws SelectError
+     * @throws DateTimeError
+     */
+    protected function fetchOne(
+        string $where,
+        array $parameters,
+        string $abstractModelClassName = AbstractModel::class
+    ): AbstractModel {
+        /** @var AbstractModel $abstractModelClassNameCopy */
+        $abstractModelClassNameCopy = $abstractModelClassName;
+        $table = $this->getTable($abstractModelClassNameCopy::getTableName())
+            ->setWhere($where)
+            ->setWhereParameters($parameters)
+            ->setLimit(1)
+        ;
+
+        if (!$table->select()) {
+            $exception = new SelectError();
+            $exception->setTable($table);
+
+            throw $exception;
+        }
+
+        /** @var AbstractModel $model */
+        $model = new $abstractModelClassName();
+        $model->loadFromMysqlTable($table);
+
+        return $model;
+    }
+
+    /**
+     * @throws SelectError
+     * @throws DateTimeError
+     *
+     * @return list<object>
+     */
+    protected function fetchAll(
+        string $where,
+        array $parameters,
+        string $abstractModelClassName = AbstractModel::class,
+        int $limit = null,
+        int $offset = null
+    ): array {
+        /** @var AbstractModel $abstractModelClassNameCopy */
+        $abstractModelClassNameCopy = $abstractModelClassName;
+        $table = $this->getTable($abstractModelClassNameCopy::getTableName())
+            ->setWhere($where)
+            ->setWhereParameters($parameters)
+            ->setLimit($limit, $offset)
+        ;
+
+        if ($table->select() === false) {
+            $exception = new SelectError();
+            $exception->setTable($table);
+
+            throw $exception;
+        }
+
+        $models = [];
+
+        if ($table->countRecords() === 0) {
+            return $models;
+        }
+
+        do {
+            $model = new $abstractModelClassName();
+            $model->loadFromMysqlTable($table);
+            $models[] = $model;
+        } while ($table->next());
+
+        return $models;
+    }
+
     protected function getTable(string $tableName, mysqlDatabase $database = null): mysqlTable
     {
         $database = $this->getDatabase($database);
@@ -35,6 +112,9 @@ abstract class AbstractRepository
         return new mysqlTable($database, $tableName);
     }
 
+    /**
+     * @deprecated
+     */
     protected function escape(string $value, mysqlDatabase $database = null): string
     {
         $database = $this->getDatabase($database);
@@ -42,6 +122,9 @@ abstract class AbstractRepository
         return $database->escape($value);
     }
 
+    /**
+     * @deprecated
+     */
     protected function escapeWithoutQuotes(string $value, mysqlDatabase $database = null): string
     {
         $database = $this->getDatabase($database);
@@ -56,6 +139,9 @@ abstract class AbstractRepository
         return $database->getUnescapedRegexString($search);
     }
 
+    /**
+     * @deprecated
+     */
     protected function implode(array $pieces, string $glue = ',', mysqlDatabase $database = null): string
     {
         $database = $this->getDatabase($database);
