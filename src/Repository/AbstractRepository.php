@@ -63,6 +63,7 @@ abstract class AbstractRepository
     }
 
     /**
+     * @throws DateTimeError
      * @throws SelectError
      *
      * @return AbstractModel[]
