@@ -65,7 +65,7 @@ abstract class AbstractRepository
     /**
      * @throws SelectError
      *
-     * @psalm-return list<object>
+     * @psalm-suppress MoreSpecificReturnType
      *
      * @return AbstractModel[]
      */
@@ -103,6 +103,9 @@ abstract class AbstractRepository
             $models[] = $model;
         } while ($table->next());
 
+        /**
+         * @psalm-suppress LessSpecificReturnStatement
+         */
         return $models;
     }
 
