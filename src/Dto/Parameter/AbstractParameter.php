@@ -23,6 +23,10 @@ abstract class AbstractParameter implements JsonSerializable
 
     private string $xtype;
 
+    private ?string $image = null;
+
+    private ?string $subText = null;
+
     private array $listeners = [];
 
     private ?string $operator = null;
@@ -93,6 +97,30 @@ abstract class AbstractParameter implements JsonSerializable
         return $this;
     }
 
+    public function getImage(): ?string
+    {
+        return $this->image;
+    }
+
+    public function setImage(?string $image): AbstractParameter
+    {
+        $this->image = $image;
+
+        return $this;
+    }
+
+    public function getSubText(): ?string
+    {
+        return $this->subText;
+    }
+
+    public function setSubText(?string $subText): AbstractParameter
+    {
+        $this->subText = $subText;
+
+        return $this;
+    }
+
     public function jsonSerialize()
     {
         return [
@@ -102,6 +130,8 @@ abstract class AbstractParameter implements JsonSerializable
             'config' => $this->getConfig(),
             'operator' => $this->getOperator(),
             'value' => $this->getValue(),
+            'subText' => $this->getSubText(),
+            'image' => $this->getImage(),
         ];
     }
 }
