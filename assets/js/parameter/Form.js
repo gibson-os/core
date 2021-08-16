@@ -20,7 +20,9 @@ Ext.define('GibsonOS.module.core.parameter.Form', {
                             return true;
                         }
 
-                        field.parameterObject.value = field.getValue();
+                        if (field.xtype !== 'gosCoreComponentFormFieldDisplay') {
+                            field.parameterObject.value = field.getValue();
+                        }
                     });
                 }
             }
@@ -53,6 +55,15 @@ Ext.define('GibsonOS.module.core.parameter.Form', {
                     id: id,
                     name: value
                 });
+            });
+        }
+
+        if (parameter.image) {
+            me.add({
+                xtype: 'gosCoreComponentFormFieldDisplay',
+                value: '<img src="' + parameter.image + '" alt="image" />',
+                fieldLabel: '&nbsp;',
+                labelSeparator: ''
             });
         }
 
