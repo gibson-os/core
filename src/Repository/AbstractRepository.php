@@ -32,6 +32,48 @@ abstract class AbstractRepository
     }
 
     /**
+     * @throws DateTimeError
+     * @throws SelectError
+     * @return AbstractModel[]
+     */
+    public function getModels(mysqlTable $table, string $abstractModelClassName): array
+    {
+        if ($table->selectPrepared() === false) {
+            $exception = new SelectError();
+            $exception->setTable($table);
+
+            throw $exception;
+        }
+
+        /** @var AbstractModel[] $models */
+        $models = [];
+
+        if ($table->countRecords() === 0) {
+            return $models;
+        }
+
+        do {
+            $model = new $abstractModelClassName();
+
+            if (!$model instanceof AbstractModel) {
+                $exception = new SelectError(sprintf(
+                    '%s is no instance of %s',
+                    $abstractModelClassName,
+                    AbstractModel::class
+                ));
+                $exception->setTable($table);
+
+                throw $exception;
+            }
+
+            $model->loadFromMysqlTable($table);
+            $models[] = $model;
+        } while ($table->next());
+
+        return $models;
+    }
+
+    /**
      * @throws SelectError
      * @throws DateTimeError
      */
@@ -83,39 +125,7 @@ abstract class AbstractRepository
             ->setLimit($limit, $offset)
         ;
 
-        if ($table->selectPrepared() === false) {
-            $exception = new SelectError();
-            $exception->setTable($table);
-
-            throw $exception;
-        }
-
-        /** @var AbstractModel[] $models */
-        $models = [];
-
-        if ($table->countRecords() === 0) {
-            return $models;
-        }
-
-        do {
-            $model = new $abstractModelClassName();
-
-            if (!$model instanceof AbstractModel) {
-                $exception = new SelectError(sprintf(
-                    '%s is no instance of %s',
-                    $abstractModelClassName,
-                    AbstractModel::class
-                ));
-                $exception->setTable($table);
-
-                throw $exception;
-            }
-
-            $model->loadFromMysqlTable($table);
-            $models[] = $model;
-        } while ($table->next());
-
-        return $models;
+        return $this->getModels($table, $abstractModelClassName);
     }
 
     protected function getTable(string $tableName, mysqlDatabase $database = null): mysqlTable
