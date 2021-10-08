@@ -2,7 +2,7 @@
   "name": "gibson-os/core",
   "require": {
     "php": " ^8.0",
-    "mdo/mdo": "dev-master",
+    "mdo/mdo": "dev-feature/php8.0",
     "ext-mbstring": "*",
     "ext-gd": "*",
     "ext-fileinfo": "*",
@@ -40,6 +40,15 @@
     }
   },
   "scripts": {
+    "fix": [
+      "@php-cs"
+    ],
+    "test": [
+      "@php-cs-dry",
+      "@php-psalm",
+      "@php-md",
+      "@php-unit"
+    ],
     "php-cs": "php ./vendor/friendsofphp/php-cs-fixer/php-cs-fixer fix src --verbose",
     "php-cs-dry": "php ./vendor/friendsofphp/php-cs-fixer/php-cs-fixer fix src --verbose --dry-run",
     "php-psalm": "php ./vendor/vimeo/psalm/psalm",

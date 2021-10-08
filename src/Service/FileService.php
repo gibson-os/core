@@ -211,7 +211,6 @@ class FileService extends AbstractService
     }
 
     /**
-     * @param string|array|null $files
      *
      * @throws DeleteError
      * @throws FileNotFound

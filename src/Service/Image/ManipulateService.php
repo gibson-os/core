@@ -47,8 +47,8 @@ class ManipulateService extends DrawService
 
         if (
             !imagecopyresampled(
-                $newImage->getResource(),
-                $image->getResource(),
+                $newImage->getImage(),
+                $image->getImage(),
                 0,
                 0,
                 0,
@@ -63,7 +63,7 @@ class ManipulateService extends DrawService
         }
 
         $this->destroy($image);
-        $image->setResource($newImage->getResource());
+        $image->setImage($newImage->getImage());
 
         return true;
     }
@@ -103,7 +103,7 @@ class ManipulateService extends DrawService
             return false;
         }
 
-        $image->setResource($manipulate->getResource());
+        $image->setImage($manipulate->getImage());
 
         return true;
     }
@@ -124,7 +124,7 @@ class ManipulateService extends DrawService
             return false;
         }
 
-        $image->setResource($manipulate->getResource());
+        $image->setImage($manipulate->getImage());
 
         return true;
     }
@@ -154,8 +154,8 @@ class ManipulateService extends DrawService
         }
 
         if (imagecopyresampled(
-            $draw->getResource(),
-            $image->getResource(),
+            $draw->getImage(),
+            $image->getImage(),
             0,
             0,
             $startX,
@@ -168,7 +168,7 @@ class ManipulateService extends DrawService
             return false;
         }
 
-        $image->setResource($draw->getResource());
+        $image->setImage($draw->getImage());
 
         return true;
     }
@@ -234,8 +234,8 @@ class ManipulateService extends DrawService
         }
 
         return imagecopyresampled(
-            $destinationImage->getResource(),
-            $sourceImage->getResource(),
+            $destinationImage->getImage(),
+            $sourceImage->getImage(),
             $destX,
             $destY,
             $srcX,

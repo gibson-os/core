@@ -24,7 +24,7 @@ class DrawService extends ImageService
             $stopY = $this->getHeight($image);
         }
 
-        return imagefilledrectangle($image->getResource(), $startX, $startY, $stopX, $stopY, $color);
+        return imagefilledrectangle($image->getImage(), $startX, $startY, $stopX, $stopY, $color);
     }
 
     public function setTtfText(
@@ -41,7 +41,7 @@ class DrawService extends ImageService
             $startY = $size;
         }
 
-        return imagettftext($image->getResource(), $size, $angle, $startX, $startY, $color, $fontFile, $text);
+        return imagettftext($image->getImage(), $size, $angle, $startX, $startY, $color, $fontFile, $text);
     }
 
     /**

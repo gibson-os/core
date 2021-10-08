@@ -32,6 +32,7 @@ class ServiceManagerService
     }
 
     /**
+     * @param class-string|null $instanceOf
      * @throws FactoryError
      */
     public function get(string $classname, string $instanceOf = null): object
@@ -69,6 +70,7 @@ class ServiceManagerService
     }
 
     /**
+     * @param class-string $className
      * @throws FactoryError
      */
     private function checkInstanceOf(object $class, string $className = null): object

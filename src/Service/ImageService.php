@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Service;
 
+use GdImage;
 use GibsonOS\Core\Dto\Image;
 use GibsonOS\Core\Exception\DeleteError;
 use GibsonOS\Core\Exception\FileNotFound;
@@ -18,12 +19,12 @@ class ImageService extends AbstractService
 
     public function getWidth(Image $image): int
     {
-        return (int) imagesx($image->getResource());
+        return (int) imagesx($image->getImage());
     }
 
     public function getHeight(Image $image): int
     {
-        return (int) imagesy($image->getResource());
+        return (int) imagesy($image->getImage());
     }
 
     /**
@@ -51,17 +52,17 @@ class ImageService extends AbstractService
 
     public function getColor(Image $image, int $red, int $green, int $blue, int $alpha = 0): int
     {
-        return (int) imagecolorallocatealpha($image->getResource(), $red, $green, $blue, $alpha);
+        return (int) imagecolorallocatealpha($image->getImage(), $red, $green, $blue, $alpha);
     }
 
     public function getTransparentColor(Image $image): int
     {
-        return (int) imagecolortransparent($image->getResource());
+        return (int) imagecolortransparent($image->getImage());
     }
 
     public function setTransparentColor(Image $image, int $color): void
     {
-        imagecolortransparent($image->getResource(), $color);
+        imagecolortransparent($image->getImage(), $color);
     }
 
     /**
@@ -69,7 +70,7 @@ class ImageService extends AbstractService
      */
     public function destroy(Image $image): bool
     {
-        return imagedestroy($image->getResource());
+        return imagedestroy($image->getImage());
     }
 
     /**
@@ -96,7 +97,7 @@ class ImageService extends AbstractService
             'string' => imagecreatefromstring($filename),
         };
 
-        if (!is_resource($image)) {
+        if (!$image instanceof GdImage) {
             throw new LoadError(sprintf('Bild "%s" konnte nicht geladen werden!', $filename));
         }
 
@@ -132,10 +133,10 @@ class ImageService extends AbstractService
     public function output(Image $image, string $type = 'jpg'): bool
     {
         return match ($type) {
-            'bmp' => imagewbmp($image->getResource(), null, 80),
-            'jpg', 'jpeg' => imagejpeg($image->getResource(), null, 80),
-            'gif' => imagegif($image->getResource()),
-            'png' => imagepng($image->getResource()),
+            'bmp' => imagewbmp($image->getImage(), null, 80),
+            'jpg', 'jpeg' => imagejpeg($image->getImage(), null, 80),
+            'gif' => imagegif($image->getImage()),
+            'png' => imagepng($image->getImage()),
             default => false,
         };
     }
@@ -192,38 +193,39 @@ class ImageService extends AbstractService
             );
         } catch (FileNotFound) {
         }
+
         return match ($type) {
-            'bmp' => imagewbmp($image->getResource(), $image->getFilename()),
-            'jpg', 'jpeg' => imagejpeg($image->getResource(), $image->getFilename(), $image->getQuality()),
-            'gif' => imagegif($image->getResource(), $image->getFilename()),
-            'png' => imagepng($image->getResource(), $image->getFilename()),
+            'bmp' => imagewbmp($image->getImage(), $image->getFilename()),
+            'jpg', 'jpeg' => imagejpeg($image->getImage(), $image->getFilename(), $image->getQuality()),
+            'gif' => imagegif($image->getImage(), $image->getFilename()),
+            'png' => imagepng($image->getImage(), $image->getFilename()),
             default => false,
         };
     }
 
     public function enableAlphaBlending(Image $image): bool
     {
-        return imagealphablending($image->getResource(), true);
+        return imagealphablending($image->getImage(), true);
     }
 
     public function disableAlphaBlending(Image $image): bool
     {
-        return imagealphablending($image->getResource(), false);
+        return imagealphablending($image->getImage(), false);
     }
 
     public function enableAlpha(Image $image): bool
     {
-        return imagesavealpha($image->getResource(), true);
+        return imagesavealpha($image->getImage(), true);
     }
 
     public function disableAlpha(Image $image): bool
     {
-        return imagesavealpha($image->getResource(), false);
+        return imagesavealpha($image->getImage(), false);
     }
 
     public function fill(Image $image, int $color, int $x = 0, int $y = 0): bool
     {
-        return imagefill($image->getResource(), $x, $y, $color);
+        return imagefill($image->getImage(), $x, $y, $color);
     }
 
     /**
@@ -235,7 +237,7 @@ class ImageService extends AbstractService
         $height = $this->getHeight($image);
 
         $newImage = $this->create($width, $height);
-        imagecopy($newImage->getResource(), $image->getResource(), 0, 0, 0, 0, $width, $height);
+        imagecopy($newImage->getImage(), $image->getImage(), 0, 0, 0, 0, $width, $height);
 
         $newImage->setFilename($image->getFilename());
         $newImage->setQuality($image->getQuality());
