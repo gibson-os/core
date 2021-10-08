@@ -12,14 +12,8 @@ use GibsonOS\Core\Utility\JsonUtility;
 
 abstract class AbstractEvent
 {
-    private DescriberInterface $describer;
-
-    private ServiceManagerService $serviceManagerService;
-
-    public function __construct(DescriberInterface $describer, ServiceManagerService $serviceManagerService)
+    public function __construct(private DescriberInterface $describer, private ServiceManagerService $serviceManagerService)
     {
-        $this->describer = $describer;
-        $this->serviceManagerService = $serviceManagerService;
     }
 
     public function run(Element $element)

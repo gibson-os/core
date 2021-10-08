@@ -13,18 +13,12 @@ use mysqlDatabase;
 
 class ElementStore extends AbstractDatabaseStore
 {
-    private ClassNameStore $classNameStore;
-
-    private MethodStore $methodStore;
-
     public function __construct(
-        ClassNameStore $classNameStore,
-        MethodStore $methodStore,
+        private ClassNameStore $classNameStore,
+        private MethodStore $methodStore,
         mysqlDatabase $database = null
     ) {
         parent::__construct($database);
-        $this->classNameStore = $classNameStore;
-        $this->methodStore = $methodStore;
     }
 
     private ?int $eventId = null;

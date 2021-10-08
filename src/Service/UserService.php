@@ -17,24 +17,8 @@ class UserService
 {
     private const PASSWORD_MIN_LENGTH = 6;
 
-    private EnvService $envService;
-
-    private UserRepository $userRepository;
-
-    private DeviceRepository $deviceRepository;
-
-    private SessionService $sessionService;
-
-    public function __construct(
-        EnvService $envService,
-        UserRepository $userRepository,
-        DeviceRepository $deviceRepository,
-        SessionService $sessionService
-    ) {
-        $this->envService = $envService;
-        $this->userRepository = $userRepository;
-        $this->deviceRepository = $deviceRepository;
-        $this->sessionService = $sessionService;
+    public function __construct(private EnvService $envService, private UserRepository $userRepository, private DeviceRepository $deviceRepository, private SessionService $sessionService)
+    {
     }
 
     /**
@@ -80,7 +64,7 @@ class UserService
 
             try {
                 $this->deviceRepository->getById($id);
-            } catch (SelectError $e) {
+            } catch (SelectError) {
                 break;
             }
         } while (true);

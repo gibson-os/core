@@ -8,11 +8,8 @@ use ZipArchive as StandardZipArchive;
 
 class ZipArchive implements ArchiveInterface
 {
-    private StandardZipArchive $zipArchive;
-
-    public function __construct(StandardZipArchive $zipArchive)
+    public function __construct(private StandardZipArchive $zipArchive)
     {
-        $this->zipArchive = $zipArchive;
     }
 
     /**

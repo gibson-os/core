@@ -121,7 +121,7 @@ class RequestService
     {
         try {
             return $this->getHeader('X-REQUESTED-WITH') === 'XMLHttpRequest';
-        } catch (RequestError $e) {
+        } catch (RequestError) {
             return false;
         }
     }

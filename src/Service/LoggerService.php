@@ -105,7 +105,7 @@ class LoggerService implements LoggerInterface
         ) {
             $message .=
                 PHP_EOL . $this->getLevelColor($level) . PHP_EOL . PHP_EOL .
-                "\t" . get_class($context['exception']) . ': ' . $context['exception']->getMessage() . PHP_EOL
+                "\t" . $context['exception']::class . ': ' . $context['exception']->getMessage() . PHP_EOL
             ;
 
             foreach ($context['exception']->getTrace() as $trace) {
@@ -142,45 +142,27 @@ class LoggerService implements LoggerInterface
 
     private function getLevelPrefix(int $level): string
     {
-        switch ($level) {
-            case self::LEVEL_EMERGENCY:
-                return 'EMERGENCY ';
-            case self::LEVEL_ALERT:
-                return 'ALERT ';
-            case self::LEVEL_CRITICAL:
-                return 'CRITICAL ';
-            case self::LEVEL_ERROR:
-                return 'ERROR ';
-            case self::LEVEL_WARNING:
-                return 'WARNING ';
-            case self::LEVEL_NOTICE:
-                return 'NOTICE ';
-            case self::LEVEL_INFO:
-                return 'INFO ';
-            case self::LEVEL_DEBUG:
-                return 'DEBUG ';
-        }
-
-        return '';
+        return match ($level) {
+            self::LEVEL_EMERGENCY => 'EMERGENCY ',
+            self::LEVEL_ALERT => 'ALERT ',
+            self::LEVEL_CRITICAL => 'CRITICAL ',
+            self::LEVEL_ERROR => 'ERROR ',
+            self::LEVEL_WARNING => 'WARNING ',
+            self::LEVEL_NOTICE => 'NOTICE ',
+            self::LEVEL_INFO => 'INFO ',
+            self::LEVEL_DEBUG => 'DEBUG ',
+            default => '',
+        };
     }
 
     private function getLevelColor(int $level): string
     {
-        switch ($level) {
-            case self::LEVEL_EMERGENCY:
-            case self::LEVEL_ALERT:
-            case self::LEVEL_CRITICAL:
-            case self::LEVEL_ERROR:
-                return "\033[101m";
-            case self::LEVEL_WARNING:
-            case self::LEVEL_DEBUG:
-                return "\033[43m";
-            case self::LEVEL_NOTICE:
-            case self::LEVEL_INFO:
-                return "\033[44m";
-        }
-
-        return '';
+        return match ($level) {
+            self::LEVEL_EMERGENCY, self::LEVEL_ALERT, self::LEVEL_CRITICAL, self::LEVEL_ERROR => "\033[101m",
+            self::LEVEL_WARNING, self::LEVEL_DEBUG => "\033[43m",
+            self::LEVEL_NOTICE, self::LEVEL_INFO => "\033[44m",
+            default => '',
+        };
     }
 
     private function writeOut(int $level, string $message): void

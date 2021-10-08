@@ -11,22 +11,13 @@ use Twig\Error\SyntaxError;
 
 class TwigResponse implements ResponseInterface
 {
-    private string $template;
-
     private array $headers;
-
-    private int $code;
 
     private array $variables = [];
 
-    private TwigService $twigService;
-
-    public function __construct(TwigService $twigService, string $template, int $code = StatusCode::OK, array $headers = [])
+    public function __construct(private TwigService $twigService, private string $template, private int $code = StatusCode::OK, array $headers = [])
     {
-        $this->template = $template;
         $this->headers = $headers;
-        $this->code = $code;
-        $this->twigService = $twigService;
     }
 
     public function getHeaders(): array

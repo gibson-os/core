@@ -11,16 +11,10 @@ use SQLite3Stmt;
 
 class SqLiteService extends AbstractService
 {
-    private string $filename;
-
     private SQLite3 $database;
 
-    private FileService $file;
-
-    public function __construct(string $filename, FileService $file)
+    public function __construct(private string $filename, private FileService $file)
     {
-        $this->filename = $filename;
-        $this->file = $file;
         $this->database = new SQLite3($this->filename);
     }
 

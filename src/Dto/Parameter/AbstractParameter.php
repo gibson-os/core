@@ -19,10 +19,6 @@ abstract class AbstractParameter implements JsonSerializable
 
     protected const OPERATOR_SMALLER_EQUAL = '<=';
 
-    private string $title;
-
-    private string $xtype;
-
     private ?string $image = null;
 
     private ?string $subText = null;
@@ -37,10 +33,8 @@ abstract class AbstractParameter implements JsonSerializable
 
     abstract public function getAllowedOperators(): array;
 
-    public function __construct(string $title, string $xtype)
+    public function __construct(private string $title, private string $xtype)
     {
-        $this->title = $title;
-        $this->xtype = $xtype;
     }
 
     public function getTitle(): string

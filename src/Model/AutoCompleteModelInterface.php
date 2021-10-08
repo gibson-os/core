@@ -5,8 +5,5 @@ namespace GibsonOS\Core\Model;
 
 interface AutoCompleteModelInterface
 {
-    /**
-     * @return string|int|float
-     */
-    public function getAutoCompleteId();
+    public function getAutoCompleteId(): string|int|float;
 }

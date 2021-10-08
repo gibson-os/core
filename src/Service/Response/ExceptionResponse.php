@@ -14,17 +14,8 @@ use Twig\Error\SyntaxError;
 
 class ExceptionResponse implements ResponseInterface
 {
-    private Throwable $exception;
-
-    private RequestService $requestService;
-
-    private TwigService $twigService;
-
-    public function __construct(Throwable $exception, RequestService $requestService, TwigService $twigService)
+    public function __construct(private Throwable $exception, private RequestService $requestService, private TwigService $twigService)
     {
-        $this->exception = $exception;
-        $this->requestService = $requestService;
-        $this->twigService = $twigService;
     }
 
     public function getCode(): int

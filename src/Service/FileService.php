@@ -13,11 +13,8 @@ use GibsonOS\Core\Exception\SetError;
 
 class FileService extends AbstractService
 {
-    private DirService $dir;
-
-    public function __construct(DirService $dir)
+    public function __construct(private DirService $dir)
     {
-        $this->dir = $dir;
     }
 
     public function exists(string $filename): bool
@@ -222,7 +219,7 @@ class FileService extends AbstractService
      *
      * @todo Refactor to files only array or null
      */
-    public function delete(string $dir, $files = null): void
+    public function delete(string $dir, string|array|null $files = null): void
     {
         $dir = $this->dir->addEndSlash($dir);
 

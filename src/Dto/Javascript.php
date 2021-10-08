@@ -3,14 +3,8 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Dto;
 
-class Javascript
+class Javascript implements \Stringable
 {
-    private string $filename;
-
-    private string $namespace;
-
-    private string $content;
-
     private bool $loaded = false;
 
     /**
@@ -18,11 +12,8 @@ class Javascript
      */
     private array $beforeLoad = [];
 
-    public function __construct(string $filename, string $namespace, string $content)
+    public function __construct(private string $filename, private string $namespace, private string $content)
     {
-        $this->filename = $filename;
-        $this->namespace = $namespace;
-        $this->content = $content;
     }
 
     public function getFilename(): string

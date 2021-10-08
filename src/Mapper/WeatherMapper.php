@@ -10,11 +10,8 @@ use GibsonOS\Core\Service\DateTimeService;
 
 class WeatherMapper
 {
-    private DateTimeService $dateTimeService;
-
-    public function __construct(DateTimeService $dateTimeService)
+    public function __construct(private DateTimeService $dateTimeService)
     {
-        $this->dateTimeService = $dateTimeService;
     }
 
     public function mapFromArray(array $data, Location $location): Weather

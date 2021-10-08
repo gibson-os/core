@@ -42,16 +42,8 @@ class ElementService extends AbstractService
 
     private const OPERATOR_SET = '=';
 
-    private LoggerInterface $logger;
-
-    private ServiceManagerService $serviceManagerService;
-
-    public function __construct(
-        LoggerInterface $logger,
-        ServiceManagerService $serviceManagerService
-    ) {
-        $this->logger = $logger;
-        $this->serviceManagerService = $serviceManagerService;
+    public function __construct(private LoggerInterface $logger, private ServiceManagerService $serviceManagerService)
+    {
     }
 
     /**
@@ -76,15 +68,15 @@ class ElementService extends AbstractService
      */
     public function getConditionResult($value1, string $operator, $value2): bool
     {
-        switch ($operator) {
-            case self::OPERATOR_EQUAL: return $value1 === $value2;
-            case self::OPERATOR_NOT_EQUAL: return $value1 !== $value2;
-            case self::OPERATOR_BIGGER: return $value1 > $value2;
-            case self::OPERATOR_BIGGER_EQUAL: return $value1 >= $value2;
-            case self::OPERATOR_SMALLER: return $value1 < $value2;
-            case self::OPERATOR_SMALLER_EQUAL: return $value1 <= $value2;
-            default: throw new InvalidArgumentException(sprintf('Operator "%s" not allowed!', $operator));
-        }
+        return match ($operator) {
+            self::OPERATOR_EQUAL => $value1 === $value2,
+            self::OPERATOR_NOT_EQUAL => $value1 !== $value2,
+            self::OPERATOR_BIGGER => $value1 > $value2,
+            self::OPERATOR_BIGGER_EQUAL => $value1 >= $value2,
+            self::OPERATOR_SMALLER => $value1 < $value2,
+            self::OPERATOR_SMALLER_EQUAL => $value1 <= $value2,
+            default => throw new InvalidArgumentException(sprintf('Operator "%s" not allowed!', $operator)),
+        };
     }
 
     /**

@@ -21,28 +21,8 @@ use Throwable;
 
 class ControllerService
 {
-    private ServiceManagerService $serviceManagerService;
-
-    private RequestService $requestService;
-
-    private StatusCode $statusCode;
-
-    private TwigService $twigService;
-
-    private EnvService $envService;
-
-    public function __construct(
-        ServiceManagerService $serviceManagerService,
-        RequestService $requestService,
-        StatusCode $statusCode,
-        TwigService $twigService,
-        EnvService $envService
-    ) {
-        $this->serviceManagerService = $serviceManagerService;
-        $this->requestService = $requestService;
-        $this->statusCode = $statusCode;
-        $this->twigService = $twigService;
-        $this->envService = $envService;
+    public function __construct(private ServiceManagerService $serviceManagerService, private RequestService $requestService, private StatusCode $statusCode, private TwigService $twigService, private EnvService $envService)
+    {
     }
 
     public function runAction(): void

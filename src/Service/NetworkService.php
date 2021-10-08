@@ -6,11 +6,8 @@ use GibsonOS\Core\Event\Describer\NetworkDescriber;
 
 class NetworkService extends AbstractService
 {
-    private EventService $eventService;
-
-    public function __construct(EventService $eventService)
+    public function __construct(private EventService $eventService)
     {
-        $this->eventService = $eventService;
     }
 
     public function ping(string $host, int $timeout = 1): bool

@@ -7,14 +7,8 @@ use GibsonOS\Core\Utility\StatusCode;
 
 class RedirectResponse implements ResponseInterface
 {
-    private string $url;
-
-    private int $code;
-
-    public function __construct(string $url, int $code = StatusCode::MOVED_PERMANENTLY)
+    public function __construct(private string $url, private int $code = StatusCode::MOVED_PERMANENTLY)
     {
-        $this->url = $url;
-        $this->code = $code;
     }
 
     public function getCode(): int

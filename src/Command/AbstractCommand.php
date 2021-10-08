@@ -26,12 +26,8 @@ abstract class AbstractCommand implements CommandInterface
      */
     private array $options = [];
 
-    protected LoggerInterface $logger;
-
-    public function __construct(LoggerInterface $logger)
+    public function __construct(protected LoggerInterface $logger)
     {
-        $this->logger = $logger;
-
         $this->setOption('v');
         $this->setOption('vv');
         $this->setOption('vvv');

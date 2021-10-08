@@ -13,8 +13,6 @@ use JsonSerializable;
 
 class Media implements JsonSerializable
 {
-    private string $filename;
-
     /**
      * @var Video[]
      */
@@ -42,9 +40,8 @@ class Media implements JsonSerializable
 
     private int $bitRate = 0;
 
-    public function __construct(string $filename)
+    public function __construct(private string $filename)
     {
-        $this->filename = $filename;
     }
 
     public function getFilename(): string

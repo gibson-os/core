@@ -12,15 +12,8 @@ use Psr\Log\LoggerInterface;
 
 class SunChangeCommand extends AbstractCommand
 {
-    private DateTimeService $dateTimeService;
-
-    private EventService $eventService;
-
-    public function __construct(DateTimeService $dateTimeService, EventService $eventService, LoggerInterface $logger)
+    public function __construct(private DateTimeService $dateTimeService, private EventService $eventService, LoggerInterface $logger)
     {
-        $this->dateTimeService = $dateTimeService;
-        $this->eventService = $eventService;
-
         parent::__construct($logger);
     }
 

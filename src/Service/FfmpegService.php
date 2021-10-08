@@ -21,26 +21,14 @@ class FfmpegService extends AbstractService
 
     public string $ffprobePath;
 
-    private DateTimeService $dateTime;
-
-    private FileService $file;
-
-    private ProcessService $process;
-
-    private ImageService $image;
-
     /**
      * @throws GetError
      */
-    public function __construct(EnvService $envService, DateTimeService $dateTime, FileService $file, ProcessService $process, ImageService $image)
+    public function __construct(EnvService $envService, private DateTimeService $dateTime, private FileService $file, private ProcessService $process, private ImageService $image)
     {
         // @todo anders machen
         $this->ffpmegPath = $envService->getString('FFMPEG_PATH');
         $this->ffprobePath = $envService->getString('FFPROBE_PATH');
-        $this->dateTime = $dateTime;
-        $this->file = $file;
-        $this->process = $process;
-        $this->image = $image;
     }
 
     /**
@@ -224,7 +212,7 @@ class FfmpegService extends AbstractService
 
         try {
             $ffMpeg = $this->process->open(sprintf('%s %s', $this->ffprobePath, escapeshellarg($filename)), 'r');
-        } catch (ProcessError $e) {
+        } catch (ProcessError) {
             throw new FfmpegException('Ffprobe not found!');
         }
 

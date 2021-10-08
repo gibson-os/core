@@ -66,7 +66,7 @@ class SessionService
     {
         try {
             return $this->get($key);
-        } catch (OutOfBoundsException $e) {
+        } catch (OutOfBoundsException) {
             return $default;
         }
     }

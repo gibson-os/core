@@ -18,11 +18,8 @@ class MethodStore extends AbstractStore
      */
     private array $list = [];
 
-    private ServiceManagerService $serviceManagerService;
-
-    public function __construct(ServiceManagerService $serviceManagerService)
+    public function __construct(private ServiceManagerService $serviceManagerService)
     {
-        $this->serviceManagerService = $serviceManagerService;
     }
 
     public function setDescriberClass(string $describerClass): MethodStore
@@ -65,7 +62,7 @@ class MethodStore extends AbstractStore
 
         try {
             $describer = $this->serviceManagerService->get($this->describerClass);
-        } catch (FactoryError $e) {
+        } catch (FactoryError) {
             $this->list[$this->describerClass] = $methods;
 
             return;

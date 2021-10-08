@@ -5,29 +5,17 @@ namespace GibsonOS\Core\Dto\Web;
 
 class Response
 {
-    private Request $request;
-
-    private int $statusCode;
-
     /**
      * @var array<string, string>
      */
     private array $headers;
 
-    private Body $body;
-
-    private string $cookieFile;
-
     /**
      * @param array<string, string> $headers
      */
-    public function __construct(Request $request, int $statusCode, array $headers, Body $body, string $cookieFile)
+    public function __construct(private Request $request, private int $statusCode, array $headers, private Body $body, private string $cookieFile)
     {
-        $this->request = $request;
-        $this->statusCode = $statusCode;
         $this->headers = $headers;
-        $this->body = $body;
-        $this->cookieFile = $cookieFile;
     }
 
     public function getRequest(): Request

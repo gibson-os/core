@@ -9,19 +9,10 @@ use GibsonOS\Core\Utility\StatusCode;
 class AjaxResponse implements ResponseInterface
 {
     /**
-     * @var mixed
-     */
-    private $body;
-
-    private int $code;
-
-    /**
      * @param mixed $body
      */
-    public function __construct($body, int $code = StatusCode::OK)
+    public function __construct(private $body, private int $code = StatusCode::OK)
     {
-        $this->body = $body;
-        $this->code = $code;
     }
 
     public function getCode(): int

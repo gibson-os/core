@@ -21,32 +21,8 @@ use JsonException;
 
 class WeatherService extends AbstractService
 {
-    private WebService $webService;
-
-    private EnvService $envService;
-
-    private WeatherMapper $weatherMapper;
-
-    private DateTimeService $dateTimeService;
-
-    private EventService $eventService;
-
-    private WeatherRepository $weatherRepository;
-
-    public function __construct(
-        WebService $webService,
-        EnvService $envService,
-        WeatherMapper $weatherMapper,
-        DateTimeService $dateTimeService,
-        EventService $eventService,
-        WeatherRepository $weatherRepository
-    ) {
-        $this->webService = $webService;
-        $this->envService = $envService;
-        $this->weatherMapper = $weatherMapper;
-        $this->dateTimeService = $dateTimeService;
-        $this->eventService = $eventService;
-        $this->weatherRepository = $weatherRepository;
+    public function __construct(private WebService $webService, private EnvService $envService, private WeatherMapper $weatherMapper, private DateTimeService $dateTimeService, private EventService $eventService, private WeatherRepository $weatherRepository)
+    {
     }
 
     /**
@@ -100,7 +76,7 @@ class WeatherService extends AbstractService
                 $hourlyWeather->setId(
                     $this->weatherRepository->getByDate($location, $hourlyWeather->getDate())->getId()
                 );
-            } catch (SelectError $e) {
+            } catch (SelectError) {
                 // Do nothing
             }
 

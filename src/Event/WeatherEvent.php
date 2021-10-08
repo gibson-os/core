@@ -13,15 +13,12 @@ use GibsonOS\Core\Service\ServiceManagerService;
 
 class WeatherEvent extends AbstractEvent
 {
-    private WeatherRepository $weatherRepository;
-
     public function __construct(
         WeatherDescriber $describer,
         ServiceManagerService $serviceManagerService,
-        WeatherRepository $weatherRepository
+        private WeatherRepository $weatherRepository
     ) {
         parent::__construct($describer, $serviceManagerService);
-        $this->weatherRepository = $weatherRepository;
     }
 
     /**

@@ -5,10 +5,7 @@ namespace GibsonOS\Core\Utility;
 
 class ArrayKeyUtility
 {
-    /**
-     * @param string|int|array $key
-     */
-    public static function exists($key, array $search): bool
+    public static function exists(string|int|array $key, array $search): bool
     {
         if (is_array($key)) {
             foreach ($key as $keyValue) {

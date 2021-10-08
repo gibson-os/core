@@ -29,11 +29,8 @@ use OutOfRangeException;
 
 class MediaService
 {
-    private FfmpegService $ffmpeg;
-
-    public function __construct(FfmpegService $ffmpeg)
+    public function __construct(private FfmpegService $ffmpeg)
     {
-        $this->ffmpeg = $ffmpeg;
     }
 
     /**
@@ -171,7 +168,7 @@ class MediaService
             $date = (new DateTime('01.01.2000 00:00:00'))->add(
                 new DateInterval('PT' . (int) ($frameNumber / $media->getSelectedVideoStream()->getFps()) . 'S')
             );
-        } catch (Exception $e) {
+        } catch (Exception) {
             throw new OutOfRangeException('Frame Nummer ' . $frameNumber . ' kann nicht addiert werden!');
         }
 

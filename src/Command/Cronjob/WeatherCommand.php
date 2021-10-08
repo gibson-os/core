@@ -22,30 +22,15 @@ use Psr\Log\LoggerInterface;
 
 class WeatherCommand extends AbstractCommand
 {
-    private WeatherService $weatherService;
-
-    private LocationRepository $locationRepository;
-
-    private WeatherRepository $weatherRepository;
-
-    private DateTimeService $dateTimeService;
-
-    private LockService $lockService;
-
     public function __construct(
         LoggerInterface $logger,
-        WeatherService $weatherService,
-        LocationRepository $locationRepository,
-        WeatherRepository $weatherRepository,
-        DateTimeService $dateTimeService,
-        LockService $lockService
+        private WeatherService $weatherService,
+        private LocationRepository $locationRepository,
+        private WeatherRepository $weatherRepository,
+        private DateTimeService $dateTimeService,
+        private LockService $lockService
     ) {
         parent::__construct($logger);
-        $this->weatherService = $weatherService;
-        $this->locationRepository = $locationRepository;
-        $this->weatherRepository = $weatherRepository;
-        $this->dateTimeService = $dateTimeService;
-        $this->lockService = $lockService;
     }
 
     /**

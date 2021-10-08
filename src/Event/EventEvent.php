@@ -12,15 +12,12 @@ use GibsonOS\Core\Service\ServiceManagerService;
 
 class EventEvent extends AbstractEvent
 {
-    private EventService $eventService;
-
     public function __construct(
         DescriberInterface $describer,
         ServiceManagerService $serviceManagerService,
-        EventService $eventService
+        private EventService $eventService
     ) {
         parent::__construct($describer, $serviceManagerService);
-        $this->eventService = $eventService;
     }
 
     /**

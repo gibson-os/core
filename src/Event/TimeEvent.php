@@ -10,15 +10,12 @@ use GibsonOS\Core\Service\ServiceManagerService;
 
 class TimeEvent extends AbstractEvent
 {
-    private DateTimeService $dateTimeService;
-
     public function __construct(
         TimeDescriber $describer,
         ServiceManagerService $serviceManagerService,
-        DateTimeService $dateTimeService
+        private DateTimeService $dateTimeService
     ) {
         parent::__construct($describer, $serviceManagerService);
-        $this->dateTimeService = $dateTimeService;
     }
 
     public function sleep(int $seconds)

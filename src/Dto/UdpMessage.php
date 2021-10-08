@@ -5,17 +5,8 @@ namespace GibsonOS\Core\Dto;
 
 class UdpMessage
 {
-    private string $ip;
-
-    private int $port;
-
-    private string $message;
-
-    public function __construct(string $ip, int $port, string $message)
+    public function __construct(private string $ip, private int $port, private string $message)
     {
-        $this->ip = $ip;
-        $this->port = $port;
-        $this->message = $message;
     }
 
     public function getIp(): string

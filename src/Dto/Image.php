@@ -5,11 +5,6 @@ namespace GibsonOS\Core\Dto;
 
 class Image
 {
-    /**
-     * @var resource
-     */
-    private $resource;
-
     private string $filename;
 
     private int $quality = 80;
@@ -17,9 +12,8 @@ class Image
     /**
      * @param resource $resource
      */
-    public function __construct($resource)
+    public function __construct(private $resource)
     {
-        $this->resource = $resource;
     }
 
     /**

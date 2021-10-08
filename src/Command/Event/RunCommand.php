@@ -13,15 +13,8 @@ use Psr\Log\LoggerInterface;
 
 class RunCommand extends AbstractCommand
 {
-    private EventRepository $eventRepository;
-
-    private EventService $eventService;
-
-    public function __construct(EventRepository $eventRepository, EventService $eventService, LoggerInterface $logger)
+    public function __construct(private EventRepository $eventRepository, private EventService $eventService, LoggerInterface $logger)
     {
-        $this->eventRepository = $eventRepository;
-        $this->eventService = $eventService;
-
         parent::__construct($logger);
 
         $this->setArgument('eventId', true);

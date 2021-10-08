@@ -8,11 +8,8 @@ use GibsonOS\Core\Repository\EventRepository;
 
 class EventAutoComplete implements AutoCompleteInterface
 {
-    private EventRepository $eventRepository;
-
-    public function __construct(EventRepository $eventRepository)
+    public function __construct(private EventRepository $eventRepository)
     {
-        $this->eventRepository = $eventRepository;
     }
 
     public function getByNamePart(string $namePart, array $parameters): array

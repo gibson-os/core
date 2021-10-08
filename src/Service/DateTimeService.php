@@ -10,17 +10,8 @@ use Exception;
 
 class DateTimeService extends AbstractService
 {
-    private DateTimeZone $timezone;
-
-    private float $latitude;
-
-    private float $longitude;
-
-    public function __construct(DateTimeZone $timezone, float $latitude, float $longitude)
+    public function __construct(private DateTimeZone $timezone, private float $latitude, private float $longitude)
     {
-        $this->timezone = $timezone;
-        $this->latitude = $latitude;
-        $this->longitude = $longitude;
     }
 
     /**
@@ -30,7 +21,7 @@ class DateTimeService extends AbstractService
     {
         try {
             return new DateTime($time, $timezone ?? $this->timezone);
-        } catch (Exception $e) {
+        } catch (Exception) {
             error_log(sprintf(
                 'Es kann keine Datums Objekt mit "%s" für die Zeitzone "%s" angelegt werden',
                 $time,

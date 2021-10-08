@@ -21,21 +21,17 @@ class UdpService extends AbstractService
      */
     private $socket;
 
-    private LoggerInterface $logger;
-
     /**
      * @throws CreateError
      * @throws SetError
      */
-    public function __construct(LoggerInterface $logger, string $ip, int $port)
+    public function __construct(private LoggerInterface $logger, string $ip, int $port)
     {
         $socket = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP);
 
         if (!is_resource($socket)) {
             throw new CreateError('Socket konnte nicht angelegt werden!');
         }
-
-        $this->logger = $logger;
         $this->socket = $socket;
         $this->setTimeout();
         $this->socketBind($ip, $port);

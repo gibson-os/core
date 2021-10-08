@@ -18,17 +18,8 @@ class ClassNameStore extends AbstractStore
      */
     private array $list = [];
 
-    private DirService $dir;
-
-    private FileService $file;
-
-    private ServiceManagerService $serviceManagerService;
-
-    public function __construct(DirService $dir, FileService $file, ServiceManagerService $serviceManagerService)
+    public function __construct(private DirService $dir, private FileService $file, private ServiceManagerService $serviceManagerService)
     {
-        $this->dir = $dir;
-        $this->file = $file;
-        $this->serviceManagerService = $serviceManagerService;
     }
 
     /**
@@ -93,7 +84,7 @@ class ClassNameStore extends AbstractStore
 
                 try {
                     $describer = $this->serviceManagerService->get($classNameWithNamespace);
-                } catch (FactoryError $e) {
+                } catch (FactoryError) {
                     continue;
                 }
 

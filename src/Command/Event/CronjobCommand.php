@@ -11,12 +11,8 @@ use Psr\Log\LoggerInterface;
 
 class CronjobCommand extends AbstractCommand
 {
-    private EventService $eventService;
-
-    public function __construct(EventService $eventService, LoggerInterface $logger)
+    public function __construct(private EventService $eventService, LoggerInterface $logger)
     {
-        $this->eventService = $eventService;
-
         parent::__construct($logger);
     }
 

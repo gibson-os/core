@@ -17,11 +17,8 @@ class WebService extends AbstractService
 
     private const METHOD_HEAD = 'HEAD';
 
-    private LoggerInterface $logger;
-
-    public function __construct(LoggerInterface $logger)
+    public function __construct(private LoggerInterface $logger)
     {
-        $this->logger = $logger;
     }
 
     /**

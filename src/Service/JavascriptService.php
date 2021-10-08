@@ -11,26 +11,14 @@ use GibsonOS\Core\Repository\User\PermissionViewRepository;
 
 class JavascriptService extends AbstractService
 {
-    private PermissionViewRepository $permissionViewRepository;
-
-    private DirService $dirService;
-
-    private FileService $fileService;
-
-    private PermissionService $permissionService;
-
     private string $vendorPath;
 
     public function __construct(
-        PermissionViewRepository $permissionViewRepository,
-        DirService $dirService,
-        FileService $fileService,
-        PermissionService $permissionService
+        private PermissionViewRepository $permissionViewRepository,
+        private DirService $dirService,
+        private FileService $fileService,
+        private PermissionService $permissionService
     ) {
-        $this->permissionViewRepository = $permissionViewRepository;
-        $this->dirService = $dirService;
-        $this->fileService = $fileService;
-        $this->permissionService = $permissionService;
         $this->vendorPath = realpath(
             dirname(__FILE__) . DIRECTORY_SEPARATOR .
             '..' . DIRECTORY_SEPARATOR .

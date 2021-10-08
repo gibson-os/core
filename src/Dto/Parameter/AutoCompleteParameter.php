@@ -7,14 +7,11 @@ use GibsonOS\Core\AutoComplete\AutoCompleteInterface;
 
 class AutoCompleteParameter extends AbstractParameter
 {
-    private AutoCompleteInterface $autoComplete;
-
     private array $parameters = [];
 
-    public function __construct(string $title, AutoCompleteInterface $autoComplete)
+    public function __construct(string $title, private AutoCompleteInterface $autoComplete)
     {
         parent::__construct($title, 'gosModuleCoreParameterTypeAutoComplete');
-        $this->autoComplete = $autoComplete;
     }
 
     public function getAutoComplete(): AutoCompleteInterface
@@ -44,7 +41,7 @@ class AutoCompleteParameter extends AbstractParameter
     protected function getTypeConfig(): array
     {
         return [
-            'autoCompleteClassname' => get_class($this->autoComplete),
+            'autoCompleteClassname' => $this->autoComplete::class,
             'model' => $this->autoComplete->getModel(),
             'parameters' => $this->getParameters(),
         ];

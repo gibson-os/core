@@ -49,7 +49,7 @@ class ServiceManagerService
 
         $class = $this->getByFactory($classname);
 
-        if (!empty($class) && get_class($class) === $classname) {
+        if (!empty($class) && $class::class === $classname) {
             return $this->checkInstanceOf($class, $instanceOf);
         }
 
@@ -77,7 +77,7 @@ class ServiceManagerService
             $className !== null &&
             !is_subclass_of($class, $className)
         ) {
-            throw new FactoryError(sprintf('%d is no instanceof of %d', get_class($class), $className));
+            throw new FactoryError(sprintf('%d is no instanceof of %d', $class::class, $className));
         }
 
         return $class;
@@ -101,7 +101,7 @@ class ServiceManagerService
         /** @var FactoryInterface $factoryName */
         $class = $factoryName::create();
 
-        if (get_class($class) !== $classname) {
+        if ($class::class !== $classname) {
             throw new FactoryError(sprintf('Factory not found for %s', $classname));
         }
 
@@ -152,7 +152,7 @@ class ServiceManagerService
 
                 try {
                     $parameters[] = $parameter->getDefaultValue();
-                } catch (ReflectionException $e) {
+                } catch (ReflectionException) {
                     throw new FactoryError(sprintf(
                         'Parameter %s of Class %s is no Class',
                         $parameter->getName(),

@@ -5,12 +5,9 @@ namespace GibsonOS\Core\Dto\Parameter;
 
 class OptionParameter extends AbstractParameter
 {
-    private array $options;
-
-    public function __construct(string $title, array $options)
+    public function __construct(string $title, private array $options)
     {
         parent::__construct($title, 'gosCoreComponentFormFieldComboBox');
-        $this->options = $options;
     }
 
     protected function getTypeConfig(): array

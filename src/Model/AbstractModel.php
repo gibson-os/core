@@ -92,7 +92,7 @@ abstract class AbstractModel implements ModelInterface
                     case self::TYPE_INT:
                         try {
                             $this->{'set' . $fieldName}((int) $fieldObject->getValue());
-                        } catch (Throwable $exception) {
+                        } catch (Throwable) {
                             $this->{'set' . $fieldName}((bool) $fieldObject->getValue());
                         }
 

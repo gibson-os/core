@@ -19,13 +19,10 @@ class WeatherDescriber implements DescriberInterface
 
     public const TRIGGER_AFTER_LOAD = 'afterLoad';
 
-    private LocationAutoComplete $locationAutoComplete;
-
     private LocationParameter $locationParameter;
 
-    public function __construct(LocationAutoComplete $locationAutoComplete)
+    public function __construct(private LocationAutoComplete $locationAutoComplete)
     {
-        $this->locationAutoComplete = $locationAutoComplete;
         $this->locationParameter = new LocationParameter($this->locationAutoComplete);
     }
 

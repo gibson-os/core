@@ -38,19 +38,19 @@ class DesktopController extends AbstractController
 
         try {
             $desktop = $settingRepository->getByKeyAndModuleName($moduleName, $userId, self::DESKTOP_KEY)->getValue();
-        } catch (SelectError $e) {
+        } catch (SelectError) {
             $desktop = '[]';
         }
 
         try {
             $apps = $settingRepository->getByKeyAndModuleName($moduleName, $userId, self::APPS_KEY)->getValue();
-        } catch (SelectError $e) {
+        } catch (SelectError) {
             $apps = '[]';
         }
 
         try {
             $tools = $settingRepository->getByKeyAndModuleName($moduleName, $userId, self::TOOLS_KEY)->getValue();
-        } catch (SelectError $e) {
+        } catch (SelectError) {
             $tools = '[]';
         }
 

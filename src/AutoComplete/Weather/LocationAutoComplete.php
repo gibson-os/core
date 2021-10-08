@@ -11,11 +11,8 @@ use GibsonOS\Core\Repository\Weather\LocationRepository;
 
 class LocationAutoComplete implements AutoCompleteInterface
 {
-    private LocationRepository $locationRepository;
-
-    public function __construct(LocationRepository $locationRepository)
+    public function __construct(private LocationRepository $locationRepository)
     {
-        $this->locationRepository = $locationRepository;
     }
 
     /**

@@ -3,16 +3,10 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Dto;
 
-class Css
+class Css implements \Stringable
 {
-    private string $filename;
-
-    private string $content;
-
-    public function __construct(string $filename, string $content)
+    public function __construct(private string $filename, private string $content)
     {
-        $this->filename = $filename;
-        $this->content = $content;
     }
 
     public function getFilename(): string

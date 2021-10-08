@@ -19,13 +19,10 @@ class PermissionService
 
     public const DELETE = 8;  // 01000
 
-    public const MANAGE = 16; // 10000
+    public const MANAGE = 16;
 
-    private PermissionRepository $permissionRepository;
-
-    public function __construct(PermissionRepository $permissionRepository)
+    public function __construct(private PermissionRepository $permissionRepository)
     {
-        $this->permissionRepository = $permissionRepository;
     }
 
     /**

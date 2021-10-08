@@ -8,12 +8,8 @@ use Psr\Log\LoggerInterface;
 
 class DriveStatCommand extends AbstractCommand
 {
-    private ProcessService $processService;
-
-    public function __construct(ProcessService $processService, LoggerInterface $logger)
+    public function __construct(private ProcessService $processService, LoggerInterface $logger)
     {
-        $this->processService = $processService;
-
         parent::__construct($logger);
     }
 

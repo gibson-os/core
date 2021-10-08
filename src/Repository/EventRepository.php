@@ -20,11 +20,8 @@ use stdClass;
 
 class EventRepository extends AbstractRepository
 {
-    private JsonUtility $jsonUtility;
-
-    public function __construct(JsonUtility $jsonUtility)
+    public function __construct(private JsonUtility $jsonUtility)
     {
-        $this->jsonUtility = $jsonUtility;
     }
 
     /**

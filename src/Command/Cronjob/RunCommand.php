@@ -20,22 +20,12 @@ class RunCommand extends AbstractCommand
 
     private const FLOCK_NAME_NEW = 'cronjobNew';
 
-    private CronjobService $cronjobService;
-
-    private LockService $lockService;
-
-    private LockRepository $lockRepository;
-
     public function __construct(
-        CronjobService $cronjobService,
-        LockService $flockService,
-        LockRepository $lockRepository,
+        private CronjobService $cronjobService,
+        private LockService $lockService,
+        private LockRepository $lockRepository,
         LoggerInterface $logger
     ) {
-        $this->cronjobService = $cronjobService;
-        $this->lockService = $flockService;
-        $this->lockRepository = $lockRepository;
-
         parent::__construct($logger);
 
         $this->setArgument('user', true);
@@ -53,7 +43,7 @@ class RunCommand extends AbstractCommand
 
         try {
             $this->lockService->unlock(self::FLOCK_NAME_NEW . $user);
-        } catch (UnlockError $e) {
+        } catch (UnlockError) {
             // Lock not exist
         }
 

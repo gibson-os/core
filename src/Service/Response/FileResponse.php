@@ -10,10 +10,6 @@ use GibsonOS\Core\Utility\StatusCode;
 
 class FileResponse implements ResponseInterface
 {
-    private RequestService $requestService;
-
-    private string $filename;
-
     private string $type = 'application/octet-stream';
 
     private int $code = StatusCode::OK;
@@ -30,17 +26,15 @@ class FileResponse implements ResponseInterface
 
     private int $size;
 
-    public function __construct(RequestService $requestService, string $filename)
+    public function __construct(private RequestService $requestService, private string $filename)
     {
-        $this->requestService = $requestService;
-        $this->filename = $filename;
         $this->size = (int) filesize($filename);
         $this->endSize = $this->size;
 
         try {
             try {
                 $range = $this->requestService->getHeader('Range');
-            } catch (RequestError $e) {
+            } catch (RequestError) {
                 $range = $this->requestService->getHeader('HTTP_RANGE');
             }
 
@@ -55,7 +49,7 @@ class FileResponse implements ResponseInterface
             $this->startSize = (int) $ranges[0];
 
             $this->setCode(StatusCode::PARTIAL_CONTENT);
-        } catch (RequestError $e) {
+        } catch (RequestError) {
             // Range not exists
         }
     }

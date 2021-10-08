@@ -12,20 +12,8 @@ use Psr\Log\LoggerInterface;
 
 class CronjobService
 {
-    private CronjobRepository $cronjobRepository;
-
-    private CommandService $commandService;
-
-    private LoggerInterface $logger;
-
-    public function __construct(
-        CronjobRepository $cronjobRepository,
-        CommandService $commandService,
-        LoggerInterface $logger
-    ) {
-        $this->cronjobRepository = $cronjobRepository;
-        $this->commandService = $commandService;
-        $this->logger = $logger;
+    public function __construct(private CronjobRepository $cronjobRepository, private CommandService $commandService, private LoggerInterface $logger)
+    {
     }
 
     public function add(

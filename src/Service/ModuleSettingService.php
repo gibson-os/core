@@ -20,24 +20,8 @@ class ModuleSettingService extends AbstractService
      */
     private array $moduleSettings = [];
 
-    private ModuleRepository $moduleRepository;
-
-    private SettingRepository $settingRepository;
-
-    private RequestService $requestService;
-
-    private SessionService $sessionService;
-
-    public function __construct(
-        ModuleRepository $moduleRepository,
-        SettingRepository $settingRepository,
-        RequestService $requestService,
-        SessionService $sessionService
-    ) {
-        $this->moduleRepository = $moduleRepository;
-        $this->settingRepository = $settingRepository;
-        $this->requestService = $requestService;
-        $this->sessionService = $sessionService;
+    public function __construct(private ModuleRepository $moduleRepository, private SettingRepository $settingRepository, private RequestService $requestService, private SessionService $sessionService)
+    {
     }
 
     /**
@@ -46,7 +30,7 @@ class ModuleSettingService extends AbstractService
      *
      * @return Setting|Setting[]
      */
-    public function getByRegistry(string $key = null, int $userId = null)
+    public function getByRegistry(string $key = null, int $userId = null): \GibsonOS\Core\Model\Setting|array
     {
         return $this->getByName($this->getModuleNameByRegistry(), $key, $userId);
     }
@@ -57,7 +41,7 @@ class ModuleSettingService extends AbstractService
      *
      * @return Setting|Setting[]
      */
-    public function getByName(string $moduleName, string $key = null, int $userId = null)
+    public function getByName(string $moduleName, string $key = null, int $userId = null): \GibsonOS\Core\Model\Setting|array
     {
         return $this->getById($this->getModuleIdByName($moduleName), $key, $userId);
     }
@@ -68,7 +52,7 @@ class ModuleSettingService extends AbstractService
      *
      * @return Setting|Setting[]
      */
-    public function getById(int $moduleId, string $key = null, int $userId = null)
+    public function getById(int $moduleId, string $key = null, int $userId = null): \GibsonOS\Core\Model\Setting|array
     {
         // Einstellungen nur neu laden wenn sie nicht schon geladen wurden
         if (
@@ -145,7 +129,7 @@ class ModuleSettingService extends AbstractService
      *
      * @return Setting[]|Setting
      */
-    private function loadSettings(int $moduleId, int $userId = null, string $key = null)
+    private function loadSettings(int $moduleId, int $userId = null, string $key = null): array|\GibsonOS\Core\Model\Setting
     {
         // User ID holen
         if ($userId === null) {

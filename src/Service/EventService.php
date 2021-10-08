@@ -22,32 +22,8 @@ class EventService extends AbstractService
 {
     private array $events = [];
 
-    private ServiceManagerService $serviceManagerService;
-
-    private EventRepository $eventRepository;
-
-    private ElementService $elementService;
-
-    private CommandService $commandService;
-
-    private DateTimeService $dateTimeService;
-
-    private LoggerInterface $logger;
-
-    public function __construct(
-        ServiceManagerService $serviceManagerService,
-        EventRepository $eventRepository,
-        ElementService $codeGeneratorService,
-        CommandService $commandService,
-        DateTimeService $dateTimeService,
-        LoggerInterface $logger
-    ) {
-        $this->serviceManagerService = $serviceManagerService;
-        $this->eventRepository = $eventRepository;
-        $this->elementService = $codeGeneratorService;
-        $this->commandService = $commandService;
-        $this->dateTimeService = $dateTimeService;
-        $this->logger = $logger;
+    public function __construct(private ServiceManagerService $serviceManagerService, private EventRepository $eventRepository, private ElementService $elementService, private CommandService $commandService, private DateTimeService $dateTimeService, private LoggerInterface $logger)
+    {
     }
 
     public function add(string $className, string $trigger, callable $function): void

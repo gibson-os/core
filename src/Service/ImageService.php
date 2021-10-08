@@ -12,11 +12,8 @@ use GibsonOS\Core\Exception\Image\LoadError;
 
 class ImageService extends AbstractService
 {
-    private FileService $file;
-
-    public function __construct(FileService $file)
+    public function __construct(private FileService $file)
     {
-        $this->file = $file;
     }
 
     public function getWidth(Image $image): int
@@ -91,33 +88,13 @@ class ImageService extends AbstractService
         ) {
             throw new FileNotFound(sprintf('Bild %s existiert nicht!', $filename));
         }
-
-        $image = false;
-
-        switch ($type) {
-            case 'bmp':
-                // @todo BMPs gehen nicht!
-                $image = imagecreatefromgd($filename);
-
-                break;
-            case 'jpg':
-            case 'jpeg':
-                $image = imagecreatefromjpeg($filename);
-
-                break;
-            case 'gif':
-                $image = imagecreatefromgif($filename);
-
-                break;
-            case 'png':
-                $image = imagecreatefrompng($filename);
-
-                break;
-            case 'string':
-                $image = imagecreatefromstring($filename);
-
-                break;
-        }
+        $image = match ($type) {
+            'bmp' => imagecreatefromgd($filename),
+            'jpg', 'jpeg' => imagecreatefromjpeg($filename),
+            'gif' => imagecreatefromgif($filename),
+            'png' => imagecreatefrompng($filename),
+            'string' => imagecreatefromstring($filename),
+        };
 
         if (!is_resource($image)) {
             throw new LoadError(sprintf('Bild "%s" konnte nicht geladen werden!', $filename));
@@ -154,19 +131,13 @@ class ImageService extends AbstractService
 
     public function output(Image $image, string $type = 'jpg'): bool
     {
-        switch ($type) {
-            case 'bmp':
-                return imagewbmp($image->getResource(), null, 80);
-            case 'jpg':
-            case 'jpeg':
-                return imagejpeg($image->getResource(), null, 80);
-            case 'gif':
-                return imagegif($image->getResource());
-            case 'png':
-                return imagepng($image->getResource());
-        }
-
-        return false;
+        return match ($type) {
+            'bmp' => imagewbmp($image->getResource(), null, 80),
+            'jpg', 'jpeg' => imagejpeg($image->getResource(), null, 80),
+            'gif' => imagegif($image->getResource()),
+            'png' => imagepng($image->getResource()),
+            default => false,
+        };
     }
 
     public function show(Image $image, string $type = 'jpg'): bool
@@ -219,22 +190,15 @@ class ImageService extends AbstractService
                 $this->file->getDir($image->getFilename()),
                 $this->file->getFilename($image->getFilename())
             );
-        } catch (FileNotFound $exception) {
+        } catch (FileNotFound) {
         }
-
-        switch ($type) {
-            case 'bmp':
-                return imagewbmp($image->getResource(), $image->getFilename());
-            case 'jpg':
-            case 'jpeg':
-                return imagejpeg($image->getResource(), $image->getFilename(), $image->getQuality());
-            case 'gif':
-                return imagegif($image->getResource(), $image->getFilename());
-            case 'png':
-                return imagepng($image->getResource(), $image->getFilename());
-        }
-
-        return false;
+        return match ($type) {
+            'bmp' => imagewbmp($image->getResource(), $image->getFilename()),
+            'jpg', 'jpeg' => imagejpeg($image->getResource(), $image->getFilename(), $image->getQuality()),
+            'gif' => imagegif($image->getResource(), $image->getFilename()),
+            'png' => imagepng($image->getResource(), $image->getFilename()),
+            default => false,
+        };
     }
 
     public function enableAlphaBlending(Image $image): bool

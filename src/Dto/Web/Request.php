@@ -5,8 +5,6 @@ namespace GibsonOS\Core\Dto\Web;
 
 class Request
 {
-    private string $url;
-
     private int $port = 80;
 
     /**
@@ -23,10 +21,8 @@ class Request
 
     private ?string $cookieFile = null;
 
-    public function __construct(string $url)
+    public function __construct(private string $url)
     {
-        $this->url = $url;
-
         if (mb_strpos($this->url, 'https://') === 0) {
             $this->port = 443;
         }

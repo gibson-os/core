@@ -18,18 +18,12 @@ class TriggerStore extends AbstractDatabaseStore
 {
     private int $eventId;
 
-    private ClassTriggerStore $classTriggerStore;
-
-    private ClassNameStore $classNameStore;
-
     public function __construct(
-        ClassTriggerStore $classTriggerStore,
-        ClassNameStore $classNameStore,
+        private ClassTriggerStore $classTriggerStore,
+        private ClassNameStore $classNameStore,
         mysqlDatabase $database = null
     ) {
         parent::__construct($database);
-        $this->classTriggerStore = $classTriggerStore;
-        $this->classNameStore = $classNameStore;
     }
 
     protected function getTableName(): string

@@ -15,14 +15,8 @@ use GibsonOS\Core\Repository\LockRepository;
 
 class LockService extends AbstractService
 {
-    private LockRepository $lockRepository;
-
-    private ProcessService $processService;
-
-    public function __construct(LockRepository $lockRepository, ProcessService $processService)
+    public function __construct(private LockRepository $lockRepository, private ProcessService $processService)
     {
-        $this->lockRepository = $lockRepository;
-        $this->processService = $processService;
     }
 
     /**
@@ -42,7 +36,7 @@ class LockService extends AbstractService
                 ->setPid(getmypid())
                 ->save()
             ;
-        } catch (DateTimeError | SaveError | Exception $e) {
+        } catch (DateTimeError | SaveError | Exception) {
             throw new LockError('Can not save lock!');
         }
     }
@@ -64,7 +58,7 @@ class LockService extends AbstractService
 
                 $lock = (new Lock())->setName($name);
             }
-        } catch (SelectError | DateTimeError $e) {
+        } catch (SelectError | DateTimeError) {
             $lock = (new Lock())->setName($name);
         }
 
@@ -73,7 +67,7 @@ class LockService extends AbstractService
                 ->setPid(getmypid())
                 ->save()
             ;
-        } catch (DateTimeError | SaveError $e) {
+        } catch (DateTimeError | SaveError) {
             throw new LockError('Can not save lock!');
         }
     }
@@ -88,7 +82,7 @@ class LockService extends AbstractService
         try {
             $lock = $this->lockRepository->getByName($name);
             $lock->delete();
-        } catch (SelectError | DeleteError | DateTimeError $e) {
+        } catch (SelectError | DeleteError | DateTimeError) {
             throw new UnlockError();
         }
     }
@@ -106,12 +100,12 @@ class LockService extends AbstractService
 
             try {
                 $lock->delete();
-            } catch (DeleteError $e) {
+            } catch (DeleteError) {
                 // do nothing
             }
 
             return false;
-        } catch (SelectError | DateTimeError $e) {
+        } catch (SelectError | DateTimeError) {
             return false;
         }
     }
@@ -123,7 +117,7 @@ class LockService extends AbstractService
     {
         try {
             $this->lock($name);
-        } catch (LockError $e) {
+        } catch (LockError) {
             usleep(10);
             $this->waitUnlockToLock($name);
         }
@@ -140,7 +134,7 @@ class LockService extends AbstractService
             $lock = $this->lockRepository->getByName($name);
             $this->processService->kill($lock->getPid());
             $lock->delete();
-        } catch (SelectError | DateTimeError $e) {
+        } catch (SelectError | DateTimeError) {
             // Do nothing
         }
     }
@@ -157,7 +151,7 @@ class LockService extends AbstractService
                 ->setStop(true)
                 ->save()
             ;
-        } catch (SelectError | DateTimeError $e) {
+        } catch (SelectError | DateTimeError) {
             // Do nothing
         }
     }
@@ -168,7 +162,7 @@ class LockService extends AbstractService
 
         try {
             return $this->lockRepository->getByName($name)->shouldStop();
-        } catch (SelectError | DateTimeError $e) {
+        } catch (SelectError | DateTimeError) {
             throw new LockError('Can not save lock!');
         }
     }

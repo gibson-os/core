@@ -63,7 +63,6 @@ class Body
     /**
      * @throws WebException
      *
-     * @return $this
      */
     public function setContent(string $content, int $length): Body
     {

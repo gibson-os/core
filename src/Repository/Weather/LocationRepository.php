@@ -12,14 +12,8 @@ use Psr\Log\LoggerInterface;
 
 class LocationRepository extends AbstractRepository
 {
-    private DateTimeService $dateTimeService;
-
-    private LoggerInterface $logger;
-
-    public function __construct(DateTimeService $dateTimeService, LoggerInterface $logger)
+    public function __construct(private DateTimeService $dateTimeService, private LoggerInterface $logger)
     {
-        $this->dateTimeService = $dateTimeService;
-        $this->logger = $logger;
     }
 
     public function getById(int $id): Location

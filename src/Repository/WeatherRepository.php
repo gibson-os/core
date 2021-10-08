@@ -13,11 +13,8 @@ use GibsonOS\Core\Service\DateTimeService;
 
 class WeatherRepository extends AbstractRepository
 {
-    private DateTimeService $dateTimeService;
-
-    public function __construct(DateTimeService $dateTimeService)
+    public function __construct(private DateTimeService $dateTimeService)
     {
-        $this->dateTimeService = $dateTimeService;
     }
 
     /**
