@@ -25,8 +25,8 @@ class UserController extends AbstractController
      */
     public function login(
         UserService $userService,
-        ?string $username,
-        ?string $password
+        string $username = '',
+        string $password = ''
     ): RedirectResponse {
         if (empty($password) || empty($username)) {
             return new RedirectResponse($this->requestService->getBaseDir());
@@ -87,8 +87,10 @@ class UserController extends AbstractController
     }
 
     /**
+     * @throws DateTimeError
      * @throws LoginRequired
      * @throws PermissionDenied
+     * @throws SaveError
      * @throws SelectError
      * @throws UserError
      */
@@ -100,13 +102,13 @@ class UserController extends AbstractController
         string $passwordRepeat,
         string $host = null,
         string $ip = null,
-        int $id = null
+        int $id = 0
     ): AjaxResponse {
         $this->checkUserPermission($id, PermissionService::WRITE);
 
         $user = new User();
 
-        if ($id !== null) {
+        if ($id > 0) {
             $user = $userRepository->getById($id);
         }
 
@@ -121,12 +123,10 @@ class UserController extends AbstractController
     }
 
     /**
-     * @param $permission
-     *
      * @throws LoginRequired
      * @throws PermissionDenied
      */
-    private function checkUserPermission(?int $userId, $permission): void
+    private function checkUserPermission(?int $userId, int $permission): void
     {
         if ($userId !== $this->sessionService->getUserId()) {
             $this->checkPermission($permission & PermissionService::MANAGE);
