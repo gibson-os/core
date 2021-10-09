@@ -23,8 +23,8 @@ class AutoCompleteController extends AbstractController
         ServiceManagerService $serviceManagerService,
         RequestService $requestService,
         string $autoCompleteClassname,
-        string $id = null,
-        string $name = null
+        string $id = '',
+        string $name = ''
     ): AjaxResponse {
         $this->checkPermission(PermissionService::READ);
 
@@ -32,10 +32,10 @@ class AutoCompleteController extends AbstractController
         $autoComplete = $serviceManagerService->get($autoCompleteClassname);
         $parameters = $requestService->getRequestValues();
 
-        if ($id !== null) {
+        if (!empty($id)) {
             return $this->returnSuccess($autoComplete->getById($id, $parameters));
         }
 
-        return $this->returnSuccess($autoComplete->getByNamePart($name ?? '', $parameters));
+        return $this->returnSuccess($autoComplete->getByNamePart($name, $parameters));
     }
 }
