@@ -96,6 +96,8 @@ class FileService extends AbstractService
             if (!rename($from, $to)) {
                 throw new CreateError(sprintf('Konnte %s nicht nach %s verschieben!', $from, $to));
             }
+        } else {
+            throw new CreateError(sprintf('%s is not writable!', $to));
         }
     }
 
