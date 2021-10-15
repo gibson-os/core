@@ -26,6 +26,7 @@ class DesktopController extends AbstractController
 
     /**
      * @throws DateTimeError
+     * @throws JsonException
      * @throws LoginRequired
      * @throws PermissionDenied
      */
