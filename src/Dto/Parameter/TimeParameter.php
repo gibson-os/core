@@ -36,8 +36,8 @@ class TimeParameter extends AbstractParameter
     protected function getTypeConfig(): array
     {
         return [
-            'min' => $this->min === null ? null : $this->min->format('Y-m-d'),
-            'max' => $this->max === null ? null : $this->max->format('Y-m-d'),
+            'min' => $this->min?->format('Y-m-d'),
+            'max' => $this->max?->format('Y-m-d'),
             'increase' => $this->increase,
         ];
     }

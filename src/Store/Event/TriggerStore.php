@@ -42,10 +42,11 @@ class TriggerStore extends AbstractDatabaseStore
     }
 
     /**
-     * @throws DateTimeError
-     * @throws SelectError
      * @throws FactoryError
      * @throws GetError
+     * @throws JsonException
+     * @throws SelectError
+     * @return iterable
      */
     public function getList(): iterable
     {

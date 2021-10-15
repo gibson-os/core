@@ -6,8 +6,10 @@ namespace GibsonOS\Core\Command\Cronjob;
 use DateTime;
 use GibsonOS\Core\Command\AbstractCommand;
 use GibsonOS\Core\Exception\ArgumentError;
+use GibsonOS\Core\Exception\DateTimeError;
 use GibsonOS\Core\Exception\Flock\LockError;
 use GibsonOS\Core\Exception\Flock\UnlockError;
+use GibsonOS\Core\Exception\Model\SaveError;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Repository\LockRepository;
 use GibsonOS\Core\Service\CronjobService;
@@ -33,9 +35,11 @@ class RunCommand extends AbstractCommand
 
     /**
      * @throws ArgumentError
-     * @throws UnlockError
      * @throws LockError
      * @throws SelectError
+     * @throws UnlockError
+     * @throws DateTimeError
+     * @throws SaveError
      */
     protected function run(): int
     {

@@ -59,9 +59,6 @@ abstract class AbstractModel implements ModelInterface
         }
     }
 
-    /**
-     * @throws DateTimeError
-     */
     public function getMysqlTable(): mysqlTable
     {
         $mysqlTable = new mysqlTable($this->database, $this->getTableName());
@@ -70,9 +67,6 @@ abstract class AbstractModel implements ModelInterface
         return $mysqlTable;
     }
 
-    /**
-     * @throws DateTimeError
-     */
     public function loadFromMysqlTable(mysqlTable $mysqlTable): void
     {
         foreach ($mysqlTable->fields as $field) {
@@ -155,7 +149,6 @@ abstract class AbstractModel implements ModelInterface
 
     /**
      * @throws SaveError
-     * @throws DateTimeError
      * @throws Exception
      */
     public function save(mysqlTable $mysqlTable = null): void
@@ -203,22 +196,23 @@ abstract class AbstractModel implements ModelInterface
 
     /**
      * @param mixed $value
-     *
-     * @throws DateTimeError
      */
-    protected function loadForeignRecord(AbstractModel $model, $value, string $foreignField = 'id'): void
+    protected function loadForeignRecord(AbstractModel $model, string|int $value, string $foreignField = 'id'): void
     {
         $fieldName = $this->transformFieldName($foreignField);
 
-        if ($model->{'get' . $fieldName}() == $value) {
+        if ($model->{'get' . $fieldName}() === $value) {
             return;
         }
 
         $mysqlTable = new mysqlTable($this->database, $model->getTableName());
-        $mysqlTable->setWhere('`' . $foreignField . '`=' . (is_int($value) ? $value : $this->database->escape($value)));
-        $mysqlTable->setLimit(1);
+        $mysqlTable
+            ->setWhere('`' . $foreignField . '`=?')
+            ->addWhereParameter($value)
+            ->setLimit(1)
+        ;
 
-        if (!$mysqlTable->select()) {
+        if (!$mysqlTable->selectPrepared()) {
             return;
         }
 
@@ -227,8 +221,6 @@ abstract class AbstractModel implements ModelInterface
 
     /**
      * @param mixed $value
-     *
-     * @throws DateTimeError
      *
      * @return AbstractModel[]
      */
@@ -251,6 +243,22 @@ abstract class AbstractModel implements ModelInterface
         } while ($mysqlTable->next());
 
         return $models;
+    }
+
+    protected function setForeignValueByModelOrId(
+        AbstractModel|null $model,
+        null|string|int $id,
+        callable $setModelFunction,
+        callable $setIdFunction
+    ): void {
+        if ($model !== null) {
+            $setModelFunction($model);
+        } elseif ($id !== null) {
+            $setIdFunction($id);
+        } else {
+            $setModelFunction(null);
+            $setIdFunction(null);
+        }
     }
 
     private function getColumnType(string $type): string

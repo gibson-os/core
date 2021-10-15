@@ -8,6 +8,7 @@ use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Model\Event;
 use GibsonOS\Core\Utility\JsonUtility;
+use JsonException;
 use JsonSerializable;
 use mysqlDatabase;
 
@@ -243,10 +244,6 @@ class Trigger extends AbstractModel implements JsonSerializable
         return $this;
     }
 
-    /**
-     * @throws DateTimeError
-     * @throws SelectError
-     */
     public function getEvent(): Event
     {
         $this->loadForeignRecord($this->event, $this->getEventId());
@@ -262,7 +259,10 @@ class Trigger extends AbstractModel implements JsonSerializable
         return $this;
     }
 
-    public function jsonSerialize()
+    /**
+     * @throws JsonException
+     */
+    public function jsonSerialize(): array
     {
         return [
             'id' => $this->getId(),

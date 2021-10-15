@@ -47,10 +47,6 @@ class Body
             throw new WebException('No body!');
         }
 
-        if ($this->resource === null) {
-            throw new WebException('No length!');
-        }
-
         $body = fread($this->resource, $this->length);
 
         if ($body === false) {

@@ -4,11 +4,13 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Store\Event;
 
 use GibsonOS\Core\Exception\DateTimeError;
+use GibsonOS\Core\Exception\FactoryError;
 use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\Event\Element;
 use GibsonOS\Core\Store\AbstractDatabaseStore;
 use GibsonOS\Core\Utility\JsonUtility;
+use JsonException;
 use mysqlDatabase;
 
 class ElementStore extends AbstractDatabaseStore
@@ -44,9 +46,9 @@ class ElementStore extends AbstractDatabaseStore
     }
 
     /**
-     * @throws DateTimeError
      * @throws SelectError
      * @throws GetError
+     * @throws FactoryError
      *
      * @return Element[]
      */
@@ -108,6 +110,9 @@ class ElementStore extends AbstractDatabaseStore
         return $data;
     }
 
+    /**
+     * @throws JsonException
+     */
     private function completeParameters(array $methodParameters, ?string $parameters): ?string
     {
         $parameters = $parameters === null ? [] : JsonUtility::decode($parameters);

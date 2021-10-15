@@ -36,8 +36,8 @@ class DateTimeParameter extends AbstractParameter
     protected function getTypeConfig(): array
     {
         return [
-            'min' => $this->min === null ? null : $this->min->format('Y-m-d H:i:s'),
-            'max' => $this->max === null ? null : $this->max->format('Y-m-d H:i:s'),
+            'min' => $this->min?->format('Y-m-d H:i:s'),
+            'max' => $this->max?->format('Y-m-d H:i:s'),
             'increase' => $this->increase,
         ];
     }

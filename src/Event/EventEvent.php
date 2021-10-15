@@ -9,6 +9,7 @@ use GibsonOS\Core\Exception\Model\SaveError;
 use GibsonOS\Core\Model\Event;
 use GibsonOS\Core\Service\EventService;
 use GibsonOS\Core\Service\ServiceManagerService;
+use JsonException;
 
 class EventEvent extends AbstractEvent
 {
@@ -46,6 +47,8 @@ class EventEvent extends AbstractEvent
 
     /**
      * @throws DateTimeError
+     * @throws SaveError
+     * @throws JsonException
      */
     public function start(Event $event, bool $async): void
     {

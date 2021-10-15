@@ -229,7 +229,7 @@ class Event extends AbstractModel implements JsonSerializable, AutoCompleteModel
             'name' => $this->getName(),
             'active' => $this->isActive(),
             'async' => $this->isAsync(),
-            'lastRun' => $lastRun === null ? null : $lastRun->format('Y-m-d H:i:s'),
+            'lastRun' => $lastRun?->format('Y-m-d H:i:s'),
         ];
     }
 

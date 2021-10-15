@@ -5,10 +5,12 @@ namespace GibsonOS\Core\Event;
 
 use GibsonOS\Core\Dto\Parameter\AutoCompleteParameter;
 use GibsonOS\Core\Event\Describer\DescriberInterface;
+use GibsonOS\Core\Exception\FactoryError;
 use GibsonOS\Core\Model\AutoCompleteModelInterface;
 use GibsonOS\Core\Model\Event\Element;
 use GibsonOS\Core\Service\ServiceManagerService;
 use GibsonOS\Core\Utility\JsonUtility;
+use JsonException;
 
 abstract class AbstractEvent
 {
@@ -16,6 +18,10 @@ abstract class AbstractEvent
     {
     }
 
+    /**
+     * @throws FactoryError
+     * @throws JsonException
+     */
     public function run(Element $element)
     {
         $method = $element->getMethod();
@@ -27,6 +33,10 @@ abstract class AbstractEvent
         return $this->{$method}(...$this->getParameters($element));
     }
 
+    /**
+     * @throws JsonException
+     * @throws FactoryError
+     */
     protected function getParameters(Element $element): array
     {
         /** @var DescriberInterface $describer */

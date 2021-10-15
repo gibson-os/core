@@ -141,7 +141,7 @@ class Location extends AbstractModel implements JsonSerializable, AutoCompleteMo
         return $this;
     }
 
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         $lastRun = $this->getLastRun();
 
@@ -152,7 +152,7 @@ class Location extends AbstractModel implements JsonSerializable, AutoCompleteMo
             'longitude' => $this->getLongitude(),
             'timezone' => $this->getTimezone(),
             'active' => $this->isActive(),
-            'lastRun' => $lastRun === null ? null : $lastRun->format('Y-m-d H:i:s'),
+            'lastRun' => $lastRun?->format('Y-m-d H:i:s'),
             'error' => $this->getError(),
         ];
     }

@@ -6,9 +6,11 @@ namespace GibsonOS\Core\Command\Event;
 use GibsonOS\Core\Command\AbstractCommand;
 use GibsonOS\Core\Exception\ArgumentError;
 use GibsonOS\Core\Exception\DateTimeError;
+use GibsonOS\Core\Exception\Model\SaveError;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Repository\EventRepository;
 use GibsonOS\Core\Service\EventService;
+use JsonException;
 use Psr\Log\LoggerInterface;
 
 class RunCommand extends AbstractCommand
@@ -24,6 +26,8 @@ class RunCommand extends AbstractCommand
      * @throws ArgumentError
      * @throws DateTimeError
      * @throws SelectError
+     * @throws SaveError
+     * @throws JsonException
      */
     protected function run(): int
     {

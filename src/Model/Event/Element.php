@@ -299,7 +299,7 @@ class Element extends AbstractModel implements Serializable, JsonSerializable
         ]);
     }
 
-    public function unserialize($serialized)
+    public function unserialize($serialized): void
     {
         $unserialized = unserialize($serialized);
 

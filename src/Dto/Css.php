@@ -3,7 +3,9 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Dto;
 
-class Css implements \Stringable
+use Stringable;
+
+class Css implements Stringable
 {
     public function __construct(private string $filename, private string $content)
     {
