@@ -232,13 +232,13 @@ class ControllerService
             ));
         }
 
-        switch ($parameter->getType()) {
+        switch ($parameter->getType()?->getName()) {
             case 'int':
                 return (int) $value;
             case 'float':
                 return (float) $value;
             case 'bool':
-                return $value === 'true' ? true : (bool) ((int) $value);
+                return $value === 'true' || (bool)((int)$value);
             case 'string':
                 return (string) $value;
             case 'array':

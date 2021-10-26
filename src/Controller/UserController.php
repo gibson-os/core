@@ -25,8 +25,8 @@ class UserController extends AbstractController
      */
     public function login(
         UserService $userService,
-        string $username = '',
-        string $password = ''
+        ?string $username,
+        ?string $password
     ): RedirectResponse {
         if (empty($password) || empty($username)) {
             return new RedirectResponse($this->requestService->getBaseDir());
@@ -102,13 +102,13 @@ class UserController extends AbstractController
         string $passwordRepeat,
         string $host = null,
         string $ip = null,
-        int $id = 0
+        int $id = null
     ): AjaxResponse {
         $this->checkUserPermission($id, PermissionService::WRITE);
 
         $user = new User();
 
-        if ($id > 0) {
+        if ($id !== null) {
             $user = $userRepository->getById($id);
         }
 
