@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Model;
 
 use Exception;
-use GibsonOS\Core\Exception\DateTimeError;
 use GibsonOS\Core\Exception\Model\DeleteError;
 use GibsonOS\Core\Exception\Model\SaveError;
 use GibsonOS\Core\Factory\DateTimeFactory;
@@ -181,7 +180,7 @@ abstract class AbstractModel implements ModelInterface
 
         $this->setToMysqlTable($mysqlTable);
 
-        if (!$mysqlTable->delete()) {
+        if (!$mysqlTable->deletePrepared()) {
             $exception = new DeleteError();
             $exception->setModel($this);
 
