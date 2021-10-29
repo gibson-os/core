@@ -8,6 +8,7 @@ GibsonOS.define('GibsonOS.decorator.action.Enter', {
                 iconCls: 'icon_system system_edit',
                 keyEvent: Ext.EventObject.ENTER,
                 selectionNeeded: true,
+                maxSelectionAllowed: 1,
                 enableDoubleClick: true,
                 listeners: {
                     click: () => {

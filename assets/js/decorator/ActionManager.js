@@ -43,6 +43,7 @@ GibsonOS.define('GibsonOS.decorator.ActionManager', {
                 addToItemContextMenu: true,
                 selectionNeeded: false,
                 minSelectionNeeded: 1,
+                maxSelectionAllowed: 0,
                 disabled: button.selectionNeeded ?? false,
                 enableSingleClick: false,
                 enableDoubleClick: false,
@@ -109,7 +110,10 @@ GibsonOS.define('GibsonOS.decorator.ActionManager', {
             component.viewItem.getSelectionModel().on('selectionchange', function(selection, records) {
                 let selectionChangeFunction = (item) => {
                     if (item.selectionNeeded) {
-                        item.setDisabled(records.length < item.minSelectionNeeded);
+                        item.setDisabled(
+                            records.length < item.minSelectionNeeded ||
+                            records.length > (item.maxSelectionAllowed === 0 ? records.length : item.maxSelectionAllowed)
+                        );
                     }
                 };
 
@@ -146,11 +150,18 @@ GibsonOS.define('GibsonOS.decorator.ActionManager', {
 
         if (component.enableKeyEvents) {
             const keyEvent = (event) => {
-                let button = component.actionKeyEvents[event.getKey()];
+                const button = component.actionKeyEvents[event.getKey()];
+                const count = component.viewItem.getSelectionModel().getCount();
 
                 if (
                     !button ||
-                    (button.selectionNeeded && component.viewItem.getSelectionModel().getCount() === 0)
+                    (
+                        button.selectionNeeded &&
+                        (
+                            count < button.minSelectionNeeded ||
+                            count > (button.maxSelectionAllowed === 0 ? count : button.maxSelectionAllowed)
+                        )
+                    )
                 ) {
                     return;
                 }
