@@ -4,15 +4,15 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "dc54de5d72983e12227bc9d1ef678bc4",
+    "content-hash": "462c167044db3f61821b893bd951802e",
     "packages": [
         {
             "name": "mdo/mdo",
-            "version": "dev-feature/php8.0",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "git@wolli.dyndns.tv:/home/git/mdo.git",
-                "reference": "8b6f70b7cd6ab061a6b4bf416dc430d64e79b5b3"
+                "reference": "953e31a4e5b5400cbbedf801d54167f6e08af14e"
             },
             "require": {
                 "ext-mbstring": "*",
@@ -29,6 +29,7 @@
                 "rector/rector": "^0.11.57",
                 "vimeo/psalm": "^4.0"
             },
+            "default-branch": true,
             "type": "library",
             "autoload": {
                 "classmap": [
@@ -67,7 +68,7 @@
                     "php ./vendor/codeception/codeception/codecept generate:test unit"
                 ]
             },
-            "time": "2021-10-29T13:29:10+00:00"
+            "time": "2021-10-30T07:28:45+00:00"
         },
         {
             "name": "symfony/polyfill-ctype",

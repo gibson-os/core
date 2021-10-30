@@ -2,7 +2,7 @@
   "name": "gibson-os/core",
   "require": {
     "php": " ^8.0",
-    "mdo/mdo": "dev-feature/php8.0",
+    "mdo/mdo": "dev-master",
     "ext-mbstring": "*",
     "ext-gd": "*",
     "ext-fileinfo": "*",
