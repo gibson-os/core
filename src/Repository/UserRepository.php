@@ -3,58 +3,28 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Repository;
 
-use GibsonOS\Core\Exception\DateTimeError;
 use GibsonOS\Core\Exception\Repository\SelectError;
+use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Model\User;
 
+/**
+ * @method User fetchOne(string $where, array $parameters, string $abstractModelClassName = AbstractModel::class)
+ */
 class UserRepository extends AbstractRepository
 {
     /**
-     * @throws DateTimeError
      * @throws SelectError
      */
     public function getById(int $id): User
     {
-        $table = $this->getTable(User::getTableName())
-            ->setWhere('`id`=?')
-            ->addWhereParameter($id)
-            ->setLimit(1)
-        ;
-
-        if (!$table->selectPrepared()) {
-            $exception = new SelectError('User not found!');
-            $exception->setTable($table);
-
-            throw $exception;
-        }
-
-        $model = new User();
-        $model->loadFromMysqlTable($table);
-
-        return $model;
+        return $this->fetchOne('`id`=?', [$id], User::class);
     }
 
     /**
      * @throws SelectError
-     * @throws DateTimeError
      */
     public function getByUsernameAndPassword(string $username, string $passwordHash): User
     {
-        $table = $this->getTable(User::getTableName())
-            ->setWhere('`user`=? AND `password`=MD5(?)')
-            ->setWhereParameters([$username, $passwordHash])
-        ;
-
-        if (!$table->selectPrepared()) {
-            $exception = new SelectError('User not found!');
-            $exception->setTable($table);
-
-            throw $exception;
-        }
-
-        $model = new User();
-        $model->loadFromMysqlTable($table);
-
-        return $model;
+        return $this->fetchOne('`user`=? AND `password`=MD5(?)', [$username, $passwordHash], User::class);
     }
 }

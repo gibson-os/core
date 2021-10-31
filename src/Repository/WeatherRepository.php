@@ -5,12 +5,15 @@ namespace GibsonOS\Core\Repository;
 
 use DateTimeInterface;
 use DateTimeZone;
-use GibsonOS\Core\Exception\DateTimeError;
 use GibsonOS\Core\Exception\Repository\SelectError;
+use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Model\Weather;
 use GibsonOS\Core\Model\Weather\Location;
 use GibsonOS\Core\Service\DateTimeService;
 
+/**
+ * @method Weather fetchOne(string $where, array $parameters, string $abstractModelClassName = AbstractModel::class)
+ */
 class WeatherRepository extends AbstractRepository
 {
     public function __construct(private DateTimeService $dateTimeService)
@@ -19,31 +22,17 @@ class WeatherRepository extends AbstractRepository
 
     /**
      * @throws SelectError
-     * @throws DateTimeError
      */
     public function getByDate(Location $location, DateTimeInterface $date): Weather
     {
-        $table = $this->getTable(Weather::getTableName())
-            ->setWhere('`location_id`=? AND date=?')
-            ->setWhereParameters([
-                $location->getId(),
-                $date->format('Y-m-d H:i:s'),
-            ])
-            ->setLimit(1)
-        ;
-
-        if (!$table->selectPrepared()) {
-            throw (new SelectError())->setTable($table);
-        }
-
-        $weather = new Weather();
-        $weather->loadFromMysqlTable($table);
-
-        return $weather;
+        return $this->fetchOne(
+            '`location_id`=? AND date=?',
+            [$location->getId(), $date->format('Y-m-d H:i:s')],
+            Weather::class
+        );
     }
 
     /**
-     * @throws DateTimeError
      * @throws SelectError
      */
     public function getByNearestDate(Location $location, DateTimeInterface $dateTime = null): Weather
@@ -52,24 +41,11 @@ class WeatherRepository extends AbstractRepository
             $dateTime = $this->dateTimeService->get('now', new DateTimeZone($location->getTimezone()));
         }
 
-        $table = $this->getTable(Weather::getTableName())
-            ->setWhere('`location_id`=? AND date<=?')
-            ->setWhereParameters([
-                $location->getId(),
-                $dateTime->format('Y-m-d H:i:s'),
-            ])
-            ->setLimit(1)
-            ->setOrderBy('`date` DESC')
-        ;
-
-        if (!$table->selectPrepared()) {
-            throw (new SelectError())->setTable($table);
-        }
-
-        $weather = new Weather();
-        $weather->loadFromMysqlTable($table);
-
-        return $weather;
+        return $this->fetchOne(
+            '`location_id`=? AND date<=?',
+            [$location->getId(), $dateTime->format('Y-m-d H:i:s')],
+            Weather::class
+        );
     }
 
     public function deleteBetweenDates(Location $location, DateTimeInterface $from, DateTimeInterface $to): void

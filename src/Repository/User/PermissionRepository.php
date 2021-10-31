@@ -3,21 +3,23 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Repository\User;
 
-use GibsonOS\Core\Exception\DateTimeError;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\User\Permission;
 use GibsonOS\Core\Repository\AbstractRepository;
 use mysqlDatabase;
 use mysqlTable;
 
+/**
+ * @method Permission getModel(mysqlTable $table, string $abstractModelClassName)
+ */
 class PermissionRepository extends AbstractRepository
 {
     /**
-     * @throws DateTimeError
      * @throws SelectError
      */
     public function getPermissionByModule(string $module, int $userId = null): Permission
     {
+
         $table = $this->getTable(Permission::getTableName());
         $table->setWhere(
             $this->getUserIdWhere($table, $userId) . ' AND ' .
@@ -31,11 +33,10 @@ class PermissionRepository extends AbstractRepository
             throw $exception;
         }
 
-        return $this->getPermission($table);
+        return $this->getModel($table, Permission::class);
     }
 
     /**
-     * @throws DateTimeError
      * @throws SelectError
      */
     public function getPermissionByTask(string $module, string $task, int $userId = null): Permission
@@ -58,11 +59,10 @@ class PermissionRepository extends AbstractRepository
             throw $exception;
         }
 
-        return $this->getPermission($table);
+        return $this->getModel($table, Permission::class);
     }
 
     /**
-     * @throws DateTimeError
      * @throws SelectError
      */
     public function getPermissionByAction(string $module, string $task, string $action, int $userId = null): Permission
@@ -91,7 +91,7 @@ class PermissionRepository extends AbstractRepository
             throw $exception;
         }
 
-        return $this->getPermission($table);
+        return $this->getModel($table, Permission::class);
     }
 
     protected function getTable(string $tableName, mysqlDatabase $database = null): mysqlTable
@@ -126,21 +126,9 @@ class PermissionRepository extends AbstractRepository
 
     private function getUserIdWhere(mysqlTable $table, int $userId = null): string
     {
-        if ($userId !== null) {
-            $table->addWhereParameter($userId);
-        }
+        $table->addWhereParameter(0);
+        $table->addWhereParameter($userId ?? 0);
 
-        return '(`user_id`=0' . ($userId === null ? '' : ' OR `user_id`=?') . ')';
-    }
-
-    /**
-     * @throws DateTimeError
-     */
-    private function getPermission(mysqlTable $table): Permission
-    {
-        $permission = new Permission();
-        $permission->loadFromMysqlTable($table);
-
-        return $permission;
+        return '(`user_id`=?' . ($userId === null ? '' : ' OR `user_id`=?') . ')';
     }
 }

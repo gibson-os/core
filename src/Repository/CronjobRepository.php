@@ -4,14 +4,17 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Repository;
 
 use DateTimeInterface;
-use GibsonOS\Core\Exception\DateTimeError;
+use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\Cronjob;
+use mysqlTable;
 
+/**
+ * @method Cronjob[] getModels(mysqlTable $table, string $abstractModelClassName)
+ */
 class CronjobRepository extends AbstractRepository
 {
     /**
-     * @throws DateTimeError
-     *
+     * @throws SelectError
      * @return Cronjob[]
      */
     public function getRunnableByUser(DateTimeInterface $dateTime, string $user): array
@@ -54,15 +57,7 @@ class CronjobRepository extends AbstractRepository
             return [];
         }
 
-        $models = [];
-
-        do {
-            $model = new Cronjob();
-            $model->loadFromMysqlTable($table);
-            $models[] = $model;
-        } while ($table->next());
-
-        return $models;
+        return $this->getModels($table, Cronjob::class);
     }
 
     private function getTimePartWhere(string $field, int $value): string

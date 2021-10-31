@@ -232,6 +232,7 @@ class ControllerService
             ));
         }
 
+        /** @psalm-suppress UndefinedMethod */
         switch ($parameter->getType()?->getName()) {
             case 'int':
                 return (int) $value;

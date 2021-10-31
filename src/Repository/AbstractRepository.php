@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Repository;
 
-use GibsonOS\Core\Exception\DateTimeError;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\AbstractModel;
 use InvalidArgumentException;
@@ -32,7 +31,6 @@ abstract class AbstractRepository
     }
 
     /**
-     * @throws DateTimeError
      * @throws SelectError
      * @return AbstractModel[]
      */
@@ -53,29 +51,34 @@ abstract class AbstractRepository
         }
 
         do {
-            $model = new $abstractModelClassName();
-
-            if (!$model instanceof AbstractModel) {
-                $exception = new SelectError(sprintf(
-                    '%s is no instance of %s',
-                    $abstractModelClassName,
-                    AbstractModel::class
-                ));
-                $exception->setTable($table);
-
-                throw $exception;
-            }
-
-            $model->loadFromMysqlTable($table);
-            $models[] = $model;
+            $models[] = $this->getModel($table, $abstractModelClassName);
         } while ($table->next());
 
         return $models;
     }
 
+    protected function getModel(mysqlTable $table, string $abstractModelClassName): AbstractModel
+    {
+        $model = new $abstractModelClassName();
+
+        if (!$model instanceof AbstractModel) {
+            $exception = new SelectError(sprintf(
+                '%s is no instance of %s',
+                $abstractModelClassName,
+                AbstractModel::class
+            ));
+            $exception->setTable($table);
+
+            throw $exception;
+        }
+
+        $model->loadFromMysqlTable($table);
+
+        return $model;
+    }
+
     /**
      * @throws SelectError
-     * @throws DateTimeError
      */
     protected function fetchOne(
         string $where,
@@ -97,15 +100,10 @@ abstract class AbstractRepository
             throw $exception;
         }
 
-        /** @var AbstractModel $model */
-        $model = new $abstractModelClassName();
-        $model->loadFromMysqlTable($table);
-
-        return $model;
+        return $this->getModel($table, $abstractModelClassName);
     }
 
     /**
-     * @throws DateTimeError
      * @throws SelectError
      *
      * @return AbstractModel[]
@@ -126,6 +124,22 @@ abstract class AbstractRepository
         ;
 
         return $this->getModels($table, $abstractModelClassName);
+    }
+
+    protected function getAggregate(
+        string $function,
+        string $where,
+        array $parameters,
+        string $abstractModelClassName = AbstractModel::class
+    ): ?array {
+        /** @var AbstractModel $abstractModelClassNameCopy */
+        $abstractModelClassNameCopy = $abstractModelClassName;
+        $table = $this->getTable($abstractModelClassNameCopy::getTableName())
+            ->setWhere($where)
+            ->setWhereParameters($parameters)
+        ;
+
+        return $table->selectAggregate($function);
     }
 
     protected function getTable(string $tableName, mysqlDatabase $database = null): mysqlTable

@@ -6,10 +6,10 @@ namespace GibsonOS\Core\Repository;
 use DateTime;
 use DateTimeInterface;
 use Exception;
-use GibsonOS\Core\Exception\DateTimeError;
 use GibsonOS\Core\Exception\Model\SaveError;
 use GibsonOS\Core\Exception\Repository\DeleteError;
 use GibsonOS\Core\Exception\Repository\SelectError;
+use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Model\Event;
 use GibsonOS\Core\Model\Event\Element;
 use GibsonOS\Core\Model\Event\Trigger;
@@ -18,6 +18,10 @@ use JsonException;
 use mysqlTable;
 use stdClass;
 
+/**
+ * @method Event fetchOne(string $where, array $parameters, string $abstractModelClassName = AbstractModel::class)
+ * @method Event[] fetchAll(string $where, array $parameters, string $abstractModelClassName = AbstractModel::class, int $limit = null, int $offset = null)
+ */
 class EventRepository extends AbstractRepository
 {
     public function __construct(private JsonUtility $jsonUtility)
@@ -25,61 +29,35 @@ class EventRepository extends AbstractRepository
     }
 
     /**
-     * @throws DateTimeError
      * @throws SelectError
      */
     public function getById(int $id): Event
     {
-        $table = $this->getTable(Event::getTableName());
-        $table
-            ->setWhere('`id`=?')
-            ->addWhereParameter($id)
-            ->setLimit(1)
-        ;
+        $model = $this->fetchOne('`id`=?', [$id], Event::class);
 
-        if (!$table->selectPrepared()) {
-            $exception = new SelectError('Event not found!');
-            $exception->setTable($table);
-
-            throw $exception;
+        if (!$model instanceof Event) {
+            throw new SelectError();
         }
-
-        $model = new Event();
-        $model->loadFromMysqlTable($table);
 
         return $model;
     }
 
     /**
+     * @throws SelectError
+     *
      * @return Event[]
      */
     public function findByName(string $name, bool $onlyActive): array
     {
-        $table = $this->getTable(Event::getTableName());
         $where = '`name` LIKE ?';
+        $parameters = [$name . '%'];
 
         if ($onlyActive) {
-            $where .= ' AND `active`=1';
+            $where .= ' AND `active`=?';
+            $parameters[] = 1;
         }
 
-        $table
-            ->setWhere($where)
-            ->addWhereParameter($name . '%')
-        ;
-
-        if (!$table->selectPrepared()) {
-            return [];
-        }
-
-        $models = [];
-
-        do {
-            $model = new Event();
-            $model->loadFromMysqlTable($table);
-            $models[] = $model;
-        } while ($table->next());
-
-        return $models;
+        return $this->fetchAll($where, $parameters, Event::class);
     }
 
     /**
@@ -91,7 +69,7 @@ class EventRepository extends AbstractRepository
     {
         $table = $this->initializeTable()
             ->setWhere(
-                '`event`.`active`=1 AND ' .
+                '`event`.`active`=? AND ' .
                 '`event_trigger`.`class`=? AND ' .
                 '`event_trigger`.`trigger`=? AND ' .
                 '(`event_trigger`.`weekday` IS NULL OR `event_trigger`.`weekday`=?) AND ' .
@@ -103,6 +81,7 @@ class EventRepository extends AbstractRepository
                 '(`event_trigger`.`second` IS NULL OR `event_trigger`.`second`=?)'
             )
             ->setWhereParameters([
+                1,
                 $className,
                 $trigger,
                 (int) $dateTime->format('w'),
@@ -188,7 +167,6 @@ class EventRepository extends AbstractRepository
     /**
      * @param int[] $elementIds
      *
-     * @throws DateTimeError
      * @throws SaveError
      * @throws JsonException
      *
@@ -249,7 +227,6 @@ class EventRepository extends AbstractRepository
     }
 
     /**
-     * @throws DateTimeError
      * @throws JsonException
      * @throws SaveError
      *
