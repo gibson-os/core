@@ -4,9 +4,9 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Repository\User;
 
 use GibsonOS\Core\Exception\Repository\SelectError;
+use GibsonOS\Core\Model\User\Permission;
 use GibsonOS\Core\Model\User\PermissionView;
 use GibsonOS\Core\Repository\AbstractRepository;
-use GibsonOS\Core\Service\PermissionService;
 use stdClass;
 
 class PermissionViewRepository extends AbstractRepository
@@ -26,7 +26,7 @@ class PermissionViewRepository extends AbstractRepository
                 '`task_id` IS NOT NULL' .
                 ($module === null ? '' : ' AND `module`=?')
             )
-            ->setWhereParameters([$userId ?? 0, PermissionService::DENIED])
+            ->setWhereParameters([$userId ?? 0, Permission::DENIED])
         ;
 
         if ($module !== null) {

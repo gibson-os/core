@@ -3,11 +3,8 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Model\User;
 
-use GibsonOS\Core\Exception\DateTimeError;
-use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Model\User;
-use GibsonOS\Core\Service\PermissionService;
 use mysqlDatabase;
 
 class Permission extends AbstractModel
@@ -32,7 +29,7 @@ class Permission extends AbstractModel
 
     private int $userId = 0;
 
-    private int $permission = PermissionService::DENIED;
+    private int $permission = self::DENIED;
 
     private User $user;
 
@@ -108,10 +105,6 @@ class Permission extends AbstractModel
         return $this;
     }
 
-    /**
-     * @throws DateTimeError
-     * @throws SelectError
-     */
     public function getUser(): User
     {
         $this->loadForeignRecord($this->user, $this->getUserId());

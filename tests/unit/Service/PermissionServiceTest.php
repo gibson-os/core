@@ -93,7 +93,7 @@ class PermissionServiceTest extends Unit
         $this->prophesizeGetPermission($permission, $module, $task, $action);
         $this->assertEquals(
             $denied,
-            $this->permissionService->hasPermission(PermissionService::DENIED, $module, $task, $action, 42)
+            $this->permissionService->hasPermission(Permission::DENIED, $module, $task, $action, 42)
         );
     }
 
@@ -114,7 +114,7 @@ class PermissionServiceTest extends Unit
         $this->prophesizeGetPermission($permission, $module, $task, $action);
         $this->assertEquals(
             $read,
-            $this->permissionService->hasPermission(PermissionService::READ, $module, $task, $action, 42)
+            $this->permissionService->hasPermission(Permission::READ, $module, $task, $action, 42)
         );
     }
 
@@ -135,7 +135,7 @@ class PermissionServiceTest extends Unit
         $this->prophesizeGetPermission($permission, $module, $task, $action);
         $this->assertEquals(
             $write,
-            $this->permissionService->hasPermission(PermissionService::WRITE, $module, $task, $action, 42)
+            $this->permissionService->hasPermission(Permission::WRITE, $module, $task, $action, 42)
         );
     }
 
@@ -156,7 +156,7 @@ class PermissionServiceTest extends Unit
         $this->prophesizeGetPermission($permission, $module, $task, $action);
         $this->assertEquals(
             $delete,
-            $this->permissionService->hasPermission(PermissionService::DELETE, $module, $task, $action, 42)
+            $this->permissionService->hasPermission(Permission::DELETE, $module, $task, $action, 42)
         );
     }
 
@@ -177,7 +177,7 @@ class PermissionServiceTest extends Unit
         $this->prophesizeGetPermission($permission, $module, $task, $action);
         $this->assertEquals(
             $manage,
-            $this->permissionService->hasPermission(PermissionService::MANAGE, $module, $task, $action, 42)
+            $this->permissionService->hasPermission(Permission::MANAGE, $module, $task, $action, 42)
         );
     }
 

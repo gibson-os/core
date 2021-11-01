@@ -4,22 +4,11 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Service;
 
 use GibsonOS\Core\Exception\Repository\SelectError;
+use GibsonOS\Core\Model\User\Permission;
 use GibsonOS\Core\Repository\User\PermissionRepository;
 
 class PermissionService
 {
-    public const INHERIT = 0; // 00000
-
-    public const DENIED = 1;  // 00001
-
-    public const READ = 2;    // 00010
-
-    public const WRITE = 4;   // 00100
-
-    public const DELETE = 8;  // 01000
-
-    public const MANAGE = 16;
-
     public function __construct(private PermissionRepository $permissionRepository)
     {
     }
@@ -40,9 +29,6 @@ class PermissionService
         return $this->permissionRepository->getPermissionByAction($module, $task, $action, $userId)->getPermission();
     }
 
-    /**
-     * @throws SelectError
-     */
     public function hasPermission(
         int $permission,
         string $module,
@@ -50,11 +36,15 @@ class PermissionService
         string $action = null,
         int $userId = null
     ): bool {
-        $permissionValue = $this->getPermission($module, $task, $action, $userId);
+        try {
+            $permissionValue = $this->getPermission($module, $task, $action, $userId);
+        } catch (SelectError) {
+            return false;
+        }
 
         if (
-            $permission !== self::DENIED &&
-            ($permissionValue & self::DENIED)
+            $permission !== Permission::DENIED &&
+            ($permissionValue & Permission::DENIED)
         ) {
             return false;
         }
@@ -62,43 +52,28 @@ class PermissionService
         return ($permissionValue & $permission) === $permission;
     }
 
-    /**
-     * @throws SelectError
-     */
     public function isDenied(string $module, string $task = null, string $action = null, int $userId = null): bool
     {
-        return $this->hasPermission(self::DENIED, $module, $task, $action, $userId);
+        return $this->hasPermission(Permission::DENIED, $module, $task, $action, $userId);
     }
 
-    /**
-     * @throws SelectError
-     */
     public function hasReadPermission(string $module, string $task = null, string $action = null, int $userId = null): bool
     {
-        return $this->hasPermission(self::READ, $module, $task, $action, $userId);
+        return $this->hasPermission(Permission::READ, $module, $task, $action, $userId);
     }
 
-    /**
-     * @throws SelectError
-     */
     public function hasWritePermission(string $module, string $task = null, string $action = null, int $userId = null): bool
     {
-        return $this->hasPermission(self::WRITE, $module, $task, $action, $userId);
+        return $this->hasPermission(Permission::WRITE, $module, $task, $action, $userId);
     }
 
-    /**
-     * @throws SelectError
-     */
     public function hasDeletePermission(string $module, string $task = null, string $action = null, int $userId = null): bool
     {
-        return $this->hasPermission(self::DELETE, $module, $task, $action, $userId);
+        return $this->hasPermission(Permission::DELETE, $module, $task, $action, $userId);
     }
 
-    /**
-     * @throws SelectError
-     */
     public function hasManagePermission(string $module, string $task = null, string $action = null, int $userId = null): bool
     {
-        return $this->hasPermission(self::MANAGE, $module, $task, $action, $userId);
+        return $this->hasPermission(Permission::MANAGE, $module, $task, $action, $userId);
     }
 }

@@ -14,7 +14,6 @@ use GibsonOS\Core\Model\User;
 use GibsonOS\Core\Model\User\Permission;
 use GibsonOS\Core\Repository\UserRepository;
 use GibsonOS\Core\Service\Attribute\PermissionAttribute;
-use GibsonOS\Core\Service\PermissionService;
 use GibsonOS\Core\Service\RequestService;
 use GibsonOS\Core\Service\Response\AjaxResponse;
 use GibsonOS\Core\Service\Response\RedirectResponse;
@@ -27,16 +26,12 @@ use GibsonOS\Core\Utility\StatusCode;
 class UserController extends AbstractController
 {
     public function __construct(
-        PermissionService $permissionService,
         RequestService $requestService,
         TwigService $twigService,
         SessionService $sessionService,
         private PermissionAttribute $permissionAttribute
     ) {
-        $this->permissionService = $permissionService;
-        $this->requestService = $requestService;
-        $this->twigService = $twigService;
-        $this->sessionService = $sessionService;
+        parent::__construct($requestService, $twigService, $sessionService);
     }
 
     /**
@@ -113,7 +108,7 @@ class UserController extends AbstractController
         string $ip = null,
         int $id = null
     ): AjaxResponse {
-        $this->checkUserPermission($id, PermissionService::WRITE);
+        $this->checkUserPermission($id, Permission::WRITE);
 
         $user = new User();
 

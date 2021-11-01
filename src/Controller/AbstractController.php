@@ -3,10 +3,6 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Controller;
 
-use GibsonOS\Core\Exception\LoginRequired;
-use GibsonOS\Core\Exception\PermissionDenied;
-use GibsonOS\Core\Exception\Repository\SelectError;
-use GibsonOS\Core\Service\PermissionService;
 use GibsonOS\Core\Service\RequestService;
 use GibsonOS\Core\Service\Response\AjaxResponse;
 use GibsonOS\Core\Service\Response\TwigResponse;
@@ -15,35 +11,11 @@ use GibsonOS\Core\Service\TwigService;
 
 abstract class AbstractController
 {
-    public function __construct(protected PermissionService $permissionService, protected RequestService $requestService, protected TwigService $twigService, protected SessionService $sessionService)
-    {
-    }
-
-    /**
-     * @deprecated Use CheckPermission annotation
-     * @throws LoginRequired
-     * @throws PermissionDenied
-     * @throws SelectError
-     */
-    protected function checkPermission(int $permission): void
-    {
-        $hasPermission = $this->permissionService->hasPermission(
-            $permission,
-            $this->requestService->getModuleName(),
-            $this->requestService->getTaskName(),
-            $this->requestService->getActionName(),
-            $this->sessionService->getUserId()
-        );
-
-        if ($hasPermission) {
-            return;
-        }
-
-        if ($this->sessionService->isLogin()) {
-            throw new PermissionDenied();
-        }
-
-        throw new LoginRequired();
+    public function __construct(
+        protected RequestService $requestService,
+        protected TwigService $twigService,
+        protected SessionService $sessionService
+    ) {
     }
 
     protected function renderTemplate(string $templatePath, array $context = []): TwigResponse
