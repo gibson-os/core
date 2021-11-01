@@ -20,6 +20,7 @@ abstract class AbstractController
     }
 
     /**
+     * @deprecated Use CheckPermission annotation
      * @throws LoginRequired
      * @throws PermissionDenied
      * @throws SelectError

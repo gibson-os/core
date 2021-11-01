@@ -13,15 +13,32 @@ use GibsonOS\Core\Exception\UserError;
 use GibsonOS\Core\Model\User;
 use GibsonOS\Core\Model\User\Permission;
 use GibsonOS\Core\Repository\UserRepository;
+use GibsonOS\Core\Service\Attribute\PermissionAttribute;
 use GibsonOS\Core\Service\PermissionService;
+use GibsonOS\Core\Service\RequestService;
 use GibsonOS\Core\Service\Response\AjaxResponse;
 use GibsonOS\Core\Service\Response\RedirectResponse;
 use GibsonOS\Core\Service\Response\ResponseInterface;
+use GibsonOS\Core\Service\SessionService;
+use GibsonOS\Core\Service\TwigService;
 use GibsonOS\Core\Service\UserService;
 use GibsonOS\Core\Utility\StatusCode;
 
 class UserController extends AbstractController
 {
+    public function __construct(
+        PermissionService $permissionService,
+        RequestService $requestService,
+        TwigService $twigService,
+        SessionService $sessionService,
+        private PermissionAttribute $permissionAttribute
+    ) {
+        $this->permissionService = $permissionService;
+        $this->requestService = $requestService;
+        $this->twigService = $twigService;
+        $this->sessionService = $sessionService;
+    }
+
     /**
      * @throws UserError
      */
@@ -117,16 +134,15 @@ class UserController extends AbstractController
     /**
      * @throws LoginRequired
      * @throws PermissionDenied
-     * @throws SelectError
      */
     private function checkUserPermission(?int $userId, int $permission): void
     {
         if ($userId !== $this->sessionService->getUserId()) {
-            $this->checkPermission($permission & Permission::MANAGE);
+            $this->permissionAttribute->evaluateAttribute(new CheckPermission($permission & Permission::MANAGE));
 
             return;
         }
 
-        $this->checkPermission($permission);
+        $this->permissionAttribute->evaluateAttribute(new CheckPermission($permission));
     }
 }
