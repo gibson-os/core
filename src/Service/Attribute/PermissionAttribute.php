@@ -8,6 +8,7 @@ use GibsonOS\Core\Attribute\CheckPermission;
 use GibsonOS\Core\Exception\LoginRequired;
 use GibsonOS\Core\Exception\PermissionDenied;
 use GibsonOS\Core\Exception\Repository\SelectError;
+use GibsonOS\Core\Exception\RequestError;
 use GibsonOS\Core\Service\PermissionService;
 use GibsonOS\Core\Service\RequestService;
 use GibsonOS\Core\Service\SessionService;
@@ -33,9 +34,20 @@ class PermissionAttribute implements AttributeServiceInterface
             return false;
         }
 
+        $permission = $attribute->getPermission();
+
+        foreach ($attribute->getPermissionsByRequestValues() as $requestKey => $requestPermission) {
+            try {
+                $this->requestService->getRequestValue($requestKey);
+                $permission = $requestPermission;
+            } catch (RequestError) {
+                // do nothing
+            }
+        }
+
         try {
             $hasPermission = $this->permissionService->hasPermission(
-                $attribute->getPermission(),
+                $permission,
                 $this->requestService->getModuleName(),
                 $this->requestService->getTaskName(),
                 $this->requestService->getActionName(),

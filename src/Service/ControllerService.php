@@ -169,6 +169,7 @@ class ControllerService
 
     /**
      * @throws ControllerError
+     * @throws JsonException
      */
     private function getParameters(ReflectionMethod $reflectionMethod): array
     {
@@ -267,7 +268,7 @@ class ControllerService
             case 'float':
                 return (float) $value;
             case 'bool':
-                return $value === 'true' || (bool)((int)$value);
+                return $value === 'true' || ((int)$value);
             case 'string':
                 return (string) $value;
             case 'array':
