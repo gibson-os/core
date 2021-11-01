@@ -5,16 +5,17 @@ namespace GibsonOS\Core\Controller;
 
 use DateTime;
 use Exception;
+use GibsonOS\Core\Attribute\CheckPermission;
 use GibsonOS\Core\Exception\DateTimeError;
 use GibsonOS\Core\Exception\FactoryError;
 use GibsonOS\Core\Exception\GetError;
-use GibsonOS\Core\Exception\LoginRequired;
-use GibsonOS\Core\Exception\PermissionDenied;
+use GibsonOS\Core\Exception\Model\DeleteError;
+use GibsonOS\Core\Exception\Model\SaveError;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\Event;
+use GibsonOS\Core\Model\User\Permission;
 use GibsonOS\Core\Repository\EventRepository;
 use GibsonOS\Core\Service\EventService;
-use GibsonOS\Core\Service\PermissionService;
 use GibsonOS\Core\Service\Response\AjaxResponse;
 use GibsonOS\Core\Service\Response\ResponseInterface;
 use GibsonOS\Core\Store\Event\ClassNameStore;
@@ -23,22 +24,20 @@ use GibsonOS\Core\Store\Event\ElementStore;
 use GibsonOS\Core\Store\Event\MethodStore;
 use GibsonOS\Core\Store\Event\TriggerStore;
 use GibsonOS\Core\Store\EventStore;
+use JsonException;
 
 class EventController extends AbstractController
 {
     /**
      * @throws GetError
-     * @throws LoginRequired
-     * @throws PermissionDenied
      */
+    #[CheckPermission(Permission::READ)]
     public function index(
         EventStore $eventStore,
         int $start = 0,
         int $limit = 0,
         array $sort = []
     ): ResponseInterface {
-        $this->checkPermission(PermissionService::READ);
-
         $eventStore->setLimit($limit, $start);
         $eventStore->setSortByExt($sort);
 
@@ -46,16 +45,13 @@ class EventController extends AbstractController
     }
 
     /**
-     * @throws DateTimeError
      * @throws GetError
-     * @throws LoginRequired
-     * @throws PermissionDenied
      * @throws SelectError
+     * @throws FactoryError
      */
+    #[CheckPermission(Permission::READ)]
     public function elements(ElementStore $elementStore, int $eventId = null, string $node = null): AjaxResponse
     {
-        $this->checkPermission(PermissionService::READ);
-
         if (
             $eventId === null ||
             ($node !== null && $node !== 'NaN')
@@ -70,25 +66,19 @@ class EventController extends AbstractController
 
     /**
      * @throws GetError
-     * @throws LoginRequired
-     * @throws PermissionDenied
      */
+    #[CheckPermission(Permission::READ)]
     public function classNames(ClassNameStore $classNameStore): AjaxResponse
     {
-        $this->checkPermission(PermissionService::READ);
-
         return $this->returnSuccess($classNameStore->getList());
     }
 
     /**
      * @throws FactoryError
-     * @throws LoginRequired
-     * @throws PermissionDenied
      */
+    #[CheckPermission(Permission::READ)]
     public function methods(MethodStore $methodStore, string $describerClass): AjaxResponse
     {
-        $this->checkPermission(PermissionService::READ);
-
         $methodStore->setDescriberClass($describerClass);
 
         return $this->returnSuccess($methodStore->getList());
@@ -96,39 +86,30 @@ class EventController extends AbstractController
 
     /**
      * @throws FactoryError
-     * @throws LoginRequired
-     * @throws PermissionDenied
      */
+    #[CheckPermission(Permission::READ)]
     public function classTriggers(ClassTriggerStore $classTriggerStore, string $describerClass): AjaxResponse
     {
-        $this->checkPermission(PermissionService::READ);
-
         $classTriggerStore->setDescriberClass($describerClass);
 
         return $this->returnSuccess($classTriggerStore->getList());
     }
 
     /**
-     * @throws DateTimeError
      * @throws FactoryError
      * @throws GetError
-     * @throws LoginRequired
-     * @throws PermissionDenied
      * @throws SelectError
+     * @throws JsonException
      */
+    #[CheckPermission(Permission::READ)]
     public function triggers(TriggerStore $triggerStore, int $eventId): AjaxResponse
     {
-        $this->checkPermission(PermissionService::READ);
-
         $triggerStore->setEventId($eventId);
 
         return $this->returnSuccess($triggerStore->getList());
     }
 
-    /**
-     * @throws LoginRequired
-     * @throws PermissionDenied
-     */
+    #[CheckPermission(Permission::WRITE)]
     public function save(
         EventRepository $eventRepository,
         string $name,
@@ -138,8 +119,6 @@ class EventController extends AbstractController
         array $triggers,
         int $eventId = null
     ): AjaxResponse {
-        $this->checkPermission(PermissionService::WRITE);
-
         $eventRepository->startTransaction();
 
         try {
@@ -177,30 +156,25 @@ class EventController extends AbstractController
 
     /**
      * @throws DateTimeError
-     * @throws LoginRequired
-     * @throws PermissionDenied
+     * @throws JsonException
      * @throws SelectError
+     * @throws SaveError
      */
+    #[CheckPermission(Permission::WRITE)]
     public function run(EventService $eventService, EventRepository $eventRepository, int $eventId): AjaxResponse
     {
-        $this->checkPermission(PermissionService::WRITE);
-
         $eventService->runEvent($eventRepository->getById($eventId), true);
 
         return $this->returnSuccess();
     }
 
     /**
-     * @throws DateTimeError
-     * @throws LoginRequired
-     * @throws PermissionDenied
      * @throws SelectError
-     * @throws \GibsonOS\Core\Exception\Model\DeleteError
+     * @throws DeleteError
      */
+    #[CheckPermission(Permission::DELETE)]
     public function delete(EventRepository $eventRepository, int $eventId): AjaxResponse
     {
-        $this->checkPermission(PermissionService::DELETE);
-
         $event = $eventRepository->getById($eventId);
         $event->delete();
 

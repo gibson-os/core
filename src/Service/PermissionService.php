@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Service;
 
-use GibsonOS\Core\Exception\DateTimeError;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Repository\User\PermissionRepository;
 
@@ -26,7 +25,6 @@ class PermissionService
     }
 
     /**
-     * @throws DateTimeError
      * @throws SelectError
      */
     public function getPermission(string $module, string $task = null, string $action = null, int $userId = null): int
@@ -43,7 +41,6 @@ class PermissionService
     }
 
     /**
-     * @throws DateTimeError
      * @throws SelectError
      */
     public function hasPermission(
@@ -66,7 +63,6 @@ class PermissionService
     }
 
     /**
-     * @throws DateTimeError
      * @throws SelectError
      */
     public function isDenied(string $module, string $task = null, string $action = null, int $userId = null): bool
@@ -75,7 +71,6 @@ class PermissionService
     }
 
     /**
-     * @throws DateTimeError
      * @throws SelectError
      */
     public function hasReadPermission(string $module, string $task = null, string $action = null, int $userId = null): bool
@@ -84,7 +79,6 @@ class PermissionService
     }
 
     /**
-     * @throws DateTimeError
      * @throws SelectError
      */
     public function hasWritePermission(string $module, string $task = null, string $action = null, int $userId = null): bool
@@ -93,7 +87,6 @@ class PermissionService
     }
 
     /**
-     * @throws DateTimeError
      * @throws SelectError
      */
     public function hasDeletePermission(string $module, string $task = null, string $action = null, int $userId = null): bool
@@ -102,7 +95,6 @@ class PermissionService
     }
 
     /**
-     * @throws DateTimeError
      * @throws SelectError
      */
     public function hasManagePermission(string $module, string $task = null, string $action = null, int $userId = null): bool

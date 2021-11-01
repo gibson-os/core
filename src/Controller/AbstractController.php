@@ -5,6 +5,7 @@ namespace GibsonOS\Core\Controller;
 
 use GibsonOS\Core\Exception\LoginRequired;
 use GibsonOS\Core\Exception\PermissionDenied;
+use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Service\PermissionService;
 use GibsonOS\Core\Service\RequestService;
 use GibsonOS\Core\Service\Response\AjaxResponse;
@@ -21,6 +22,7 @@ abstract class AbstractController
     /**
      * @throws LoginRequired
      * @throws PermissionDenied
+     * @throws SelectError
      */
     protected function checkPermission(int $permission): void
     {

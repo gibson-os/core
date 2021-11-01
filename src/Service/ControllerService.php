@@ -3,16 +3,20 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Service;
 
+use GibsonOS\Core\Attribute\AttributeInterface;
 use GibsonOS\Core\Exception\ControllerError;
 use GibsonOS\Core\Exception\FactoryError;
 use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\RequestError;
+use GibsonOS\Core\Service\Attribute\AttributeServiceInterface;
 use GibsonOS\Core\Service\Response\AjaxResponse;
 use GibsonOS\Core\Service\Response\ExceptionResponse;
 use GibsonOS\Core\Service\Response\ResponseInterface;
 use GibsonOS\Core\Service\Response\TwigResponse;
 use GibsonOS\Core\Utility\JsonUtility;
 use GibsonOS\Core\Utility\StatusCode;
+use JsonException;
+use ReflectionAttribute;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionMethod;
@@ -67,6 +71,8 @@ class ControllerService
         }
 
         try {
+            $this->evaluateAttributes($reflectionMethod);
+
             $parameters = $this->getParameters($reflectionMethod);
             /** @var ResponseInterface $response */
             $response = $controller->$action(...$parameters);
@@ -194,11 +200,33 @@ class ControllerService
     }
 
     /**
+     * @throws FactoryError
      * @throws ControllerError
-     *
-     * @return array|bool|float|int|string|null
      */
-    private function getParameterFromRequest(ReflectionParameter $parameter)
+    private function evaluateAttributes(ReflectionMethod $reflectionMethod): void
+    {
+        $attributes = $reflectionMethod->getAttributes(
+            AttributeInterface::class,
+            ReflectionAttribute::IS_INSTANCEOF
+        );
+
+        foreach ($attributes as $attribute) {
+            /** @var AttributeInterface $attributeClass */
+            $attributeClass = $attribute->newInstance();
+            /** @var AttributeServiceInterface $attributeService */
+            $attributeService = $this->serviceManagerService->get($attributeClass->getAttributeServiceName());
+
+            if ($attributeService->evaluateAttribute($attributeClass) === false) {
+                throw new ControllerError(sprintf('Attribute %d is not valid!', $attribute->getName()));
+            }
+        }
+    }
+
+    /**
+     * @throws ControllerError
+     * @throws JsonException
+     */
+    private function getParameterFromRequest(ReflectionParameter $parameter): array|bool|float|int|string|null
     {
         try {
             $value = $this->requestService->getRequestValue($parameter->getName());

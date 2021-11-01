@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Controller;
 
+use GibsonOS\Core\Attribute\CheckPermission;
 use GibsonOS\Core\Exception\DateTimeError;
 use GibsonOS\Core\Exception\LoginRequired;
 use GibsonOS\Core\Exception\Model\SaveError;
@@ -10,6 +11,7 @@ use GibsonOS\Core\Exception\PermissionDenied;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Exception\UserError;
 use GibsonOS\Core\Model\User;
+use GibsonOS\Core\Model\User\Permission;
 use GibsonOS\Core\Repository\UserRepository;
 use GibsonOS\Core\Service\PermissionService;
 use GibsonOS\Core\Service\Response\AjaxResponse;
@@ -62,27 +64,17 @@ class UserController extends AbstractController
         ]);
     }
 
-    /**
-     * @throws LoginRequired
-     * @throws PermissionDenied
-     */
+    #[CheckPermission(Permission::WRITE)]
     public function logout(UserService $userService): ResponseInterface
     {
-        $this->checkPermission(PermissionService::WRITE);
-
         $userService->logout();
 
         return new RedirectResponse($this->requestService->getBaseDir());
     }
 
-    /**
-     * @throws LoginRequired
-     * @throws PermissionDenied
-     */
+    #[CheckPermission(Permission::READ)]
     public function sessionRefresh(): AjaxResponse
     {
-        $this->checkPermission(PermissionService::READ);
-
         return $this->returnSuccess();
     }
 
@@ -125,11 +117,12 @@ class UserController extends AbstractController
     /**
      * @throws LoginRequired
      * @throws PermissionDenied
+     * @throws SelectError
      */
     private function checkUserPermission(?int $userId, int $permission): void
     {
         if ($userId !== $this->sessionService->getUserId()) {
-            $this->checkPermission($permission & PermissionService::MANAGE);
+            $this->checkPermission($permission & Permission::MANAGE);
 
             return;
         }

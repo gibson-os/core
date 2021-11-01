@@ -3,15 +3,13 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Controller;
 
-use GibsonOS\Core\Exception\DateTimeError;
-use GibsonOS\Core\Exception\LoginRequired;
+use GibsonOS\Core\Attribute\CheckPermission;
 use GibsonOS\Core\Exception\Model\SaveError;
-use GibsonOS\Core\Exception\PermissionDenied;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\Setting;
+use GibsonOS\Core\Model\User\Permission;
 use GibsonOS\Core\Repository\ModuleRepository;
 use GibsonOS\Core\Repository\SettingRepository;
-use GibsonOS\Core\Service\PermissionService;
 use GibsonOS\Core\Service\Response\AjaxResponse;
 use GibsonOS\Core\Utility\JsonUtility;
 use JsonException;
@@ -25,15 +23,11 @@ class DesktopController extends AbstractController
     private const TOOLS_KEY = 'tools';
 
     /**
-     * @throws DateTimeError
      * @throws JsonException
-     * @throws LoginRequired
-     * @throws PermissionDenied
      */
+    #[CheckPermission(Permission::READ)]
     public function index(SettingRepository $settingRepository): AjaxResponse
     {
-        $this->checkPermission(PermissionService::READ);
-
         $moduleName = $this->requestService->getModuleName();
         $userId = $this->sessionService->getUserId() ?? 0;
 
@@ -63,17 +57,13 @@ class DesktopController extends AbstractController
     }
 
     /**
-     * @throws DateTimeError
-     * @throws LoginRequired
-     * @throws PermissionDenied
      * @throws SaveError
      * @throws SelectError
      * @throws JsonException
      */
+    #[CheckPermission(Permission::WRITE)]
     public function save(ModuleRepository $moduleRepository, array $items): AjaxResponse
     {
-        $this->checkPermission(PermissionService::WRITE);
-
         $module = $moduleRepository->getByName($this->requestService->getModuleName());
 
         foreach ($items as &$item) {

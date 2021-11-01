@@ -12,6 +12,18 @@ use mysqlDatabase;
 
 class Permission extends AbstractModel
 {
+    public const INHERIT = 0; // 00000
+
+    public const DENIED = 1;  // 00001
+
+    public const READ = 2;    // 00010
+
+    public const WRITE = 4;   // 00100
+
+    public const DELETE = 8;  // 01000
+
+    public const MANAGE = 16;
+
     private string $module = '';
 
     private string $task = '';

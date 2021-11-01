@@ -3,11 +3,10 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Controller;
 
+use GibsonOS\Core\Attribute\CheckPermission;
 use GibsonOS\Core\AutoComplete\AutoCompleteInterface;
 use GibsonOS\Core\Exception\FactoryError;
-use GibsonOS\Core\Exception\LoginRequired;
-use GibsonOS\Core\Exception\PermissionDenied;
-use GibsonOS\Core\Service\PermissionService;
+use GibsonOS\Core\Model\User\Permission;
 use GibsonOS\Core\Service\RequestService;
 use GibsonOS\Core\Service\Response\AjaxResponse;
 use GibsonOS\Core\Service\ServiceManagerService;
@@ -15,10 +14,9 @@ use GibsonOS\Core\Service\ServiceManagerService;
 class AutoCompleteController extends AbstractController
 {
     /**
-     * @throws LoginRequired
-     * @throws PermissionDenied
      * @throws FactoryError
      */
+    #[CheckPermission(Permission::READ)]
     public function autoComplete(
         ServiceManagerService $serviceManagerService,
         RequestService $requestService,
@@ -26,8 +24,6 @@ class AutoCompleteController extends AbstractController
         string $id = null,
         string $name = null
     ): AjaxResponse {
-        $this->checkPermission(PermissionService::READ);
-
         /** @var AutoCompleteInterface $autoComplete */
         $autoComplete = $serviceManagerService->get($autoCompleteClassname);
         $parameters = $requestService->getRequestValues();

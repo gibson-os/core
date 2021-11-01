@@ -3,18 +3,14 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Controller;
 
-use GibsonOS\Core\Exception\DateTimeError;
-use GibsonOS\Core\Exception\LoginRequired;
-use GibsonOS\Core\Exception\PermissionDenied;
 use GibsonOS\Core\Repository\SettingRepository;
 use GibsonOS\Core\Service\Response\AjaxResponse;
+use JsonException;
 
 class IndexController extends AbstractController
 {
     /**
-     * @throws DateTimeError
-     * @throws LoginRequired
-     * @throws PermissionDenied
+     * @throws JsonException
      */
     public function index(DesktopController $desktopController, SettingRepository $settingRepository): AjaxResponse
     {
