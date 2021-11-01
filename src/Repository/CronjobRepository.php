@@ -15,6 +15,7 @@ class CronjobRepository extends AbstractRepository
 {
     /**
      * @throws SelectError
+     *
      * @return Cronjob[]
      */
     public function getRunnableByUser(DateTimeInterface $dateTime, string $user): array

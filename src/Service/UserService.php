@@ -31,7 +31,7 @@ class UserService
             $this->sessionService->login($user);
 
             return $user;
-        } catch (SelectError | DateTimeError $e) {
+        } catch (SelectError $e) {
             throw new UserError($e->getMessage(), 0, $e);
         }
     }
@@ -46,7 +46,7 @@ class UserService
             $this->sessionService->login($device->getUser());
 
             return $device;
-        } catch (SelectError | DateTimeError $e) {
+        } catch (SelectError|DateTimeError $e) {
             throw new UserError($e->getMessage(), 0, $e);
         }
     }
@@ -59,7 +59,7 @@ class UserService
     public function addDevice(User $user, string $model): User\Device
     {
         // @todo remove after app release
-        do {
+        while (true) {
             $id = (string) random_int(1, 9999999999999999);
 
             try {
@@ -67,7 +67,7 @@ class UserService
             } catch (SelectError) {
                 break;
             }
-        } while (true);
+        }
 
         $device = (new User\Device())
             ->setId($id) // @todo change to int value

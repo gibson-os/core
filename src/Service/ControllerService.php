@@ -38,7 +38,7 @@ class ControllerService
             $controller = $this->serviceManagerService->get($controllerName);
             /** @psalm-suppress ArgumentTypeCoercion */
             $reflectionClass = new ReflectionClass($controllerName);
-        } catch (ReflectionException | FactoryError $e) {
+        } catch (ReflectionException|FactoryError $e) {
             $this->outputResponse(new ExceptionResponse(
                 new ControllerError(sprintf('Controller %s not found!', $controllerName), 404, $e),
                 $this->requestService,
@@ -268,7 +268,7 @@ class ControllerService
             case 'float':
                 return (float) $value;
             case 'bool':
-                return $value === 'true' || ((int)$value);
+                return $value === 'true' || ((int) $value);
             case 'string':
                 return (string) $value;
             case 'array':

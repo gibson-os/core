@@ -32,6 +32,7 @@ abstract class AbstractRepository
 
     /**
      * @throws SelectError
+     *
      * @return AbstractModel[]
      */
     public function getModels(mysqlTable $table, string $abstractModelClassName): array

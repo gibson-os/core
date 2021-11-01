@@ -19,7 +19,6 @@ class PermissionRepository extends AbstractRepository
      */
     public function getPermissionByModule(string $module, int $userId = null): Permission
     {
-
         $table = $this->getTable(Permission::getTableName());
         $table->setWhere(
             $this->getUserIdWhere($table, $userId) . ' AND ' .

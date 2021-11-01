@@ -46,7 +46,7 @@ class NetworkDescriber implements DescriberInterface
                 ->setParameters([
                     'host' => new StringParameter('Host'),
                     'timeout' => new IntParameter('Timeout'),
-                ])
+                ]),
         ];
     }
 

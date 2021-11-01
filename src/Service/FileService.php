@@ -213,7 +213,6 @@ class FileService extends AbstractService
     }
 
     /**
-     *
      * @throws DeleteError
      * @throws FileNotFound
      * @throws GetError

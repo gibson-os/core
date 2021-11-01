@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Store\Event;
 
 use GibsonOS\Core\Dto\Parameter\AbstractParameter;
-use GibsonOS\Core\Exception\DateTimeError;
 use GibsonOS\Core\Exception\FactoryError;
 use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\Repository\SelectError;
@@ -46,7 +45,6 @@ class TriggerStore extends AbstractDatabaseStore
      * @throws GetError
      * @throws JsonException
      * @throws SelectError
-     * @return iterable
      */
     public function getList(): iterable
     {

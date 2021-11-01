@@ -16,15 +16,15 @@ use Exception;
  */
 abstract class AbstractException extends Exception
 {
-    const INFO = 0;
+    public const INFO = 0;
 
-    const WARNING = 1;
+    public const WARNING = 1;
 
-    const ERROR = 2;
+    public const ERROR = 2;
 
-    const QUESTION = 3;
+    public const QUESTION = 3;
 
-    const PROMPT = 4;
+    public const PROMPT = 4;
 
     private ?string $title = null;
 

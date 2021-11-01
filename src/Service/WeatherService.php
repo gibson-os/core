@@ -41,7 +41,7 @@ class WeatherService extends AbstractService
 
         try {
             $response = $this->getByCoordinates($location->getLatitude(), $location->getLongitude());
-        } catch (GetError | WebException $e) {
+        } catch (GetError|WebException $e) {
             throw new WeatherError($e->getMessage(), 0, $e);
         }
 

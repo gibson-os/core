@@ -5,5 +5,4 @@ namespace GibsonOS\Core\Event;
 
 class NetworkEvent extends AbstractEvent
 {
-
 }

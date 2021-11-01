@@ -61,7 +61,7 @@ class WeatherCommand extends AbstractCommand
 
             try {
                 $this->weatherService->load($location);
-            } catch (WeatherError | SaveError $e) {
+            } catch (WeatherError|SaveError $e) {
                 $location
                     ->setError($e->getMessage())
                     ->setLastRun($lastRun)

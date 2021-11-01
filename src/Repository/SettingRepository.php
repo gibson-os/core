@@ -9,9 +9,9 @@ use GibsonOS\Core\Model\Setting;
 use mysqlTable;
 
 /**
- * @method Setting fetchOne(string $where, array $parameters, string $abstractModelClassName = AbstractModel::class)
+ * @method Setting   fetchOne(string $where, array $parameters, string $abstractModelClassName = AbstractModel::class)
  * @method Setting[] fetchAll(string $where, array $parameters, string $abstractModelClassName = AbstractModel::class, int $limit = null, int $offset = null, string $orderBy = null)
- * @method Setting getModel(mysqlTable $table, string $abstractModelClassName)
+ * @method Setting   getModel(mysqlTable $table, string $abstractModelClassName)
  * @method Setting[] getModels(mysqlTable $table, string $abstractModelClassName)
  */
 class SettingRepository extends AbstractRepository

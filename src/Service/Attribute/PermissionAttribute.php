@@ -23,10 +23,8 @@ class PermissionAttribute implements AttributeServiceInterface
     }
 
     /**
-     * @param AttributeInterface $attribute
      * @throws LoginRequired
      * @throws PermissionDenied
-     * @return bool
      */
     public function evaluateAttribute(AttributeInterface $attribute): bool
     {

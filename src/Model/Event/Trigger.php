@@ -3,8 +3,6 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Model\Event;
 
-use GibsonOS\Core\Exception\DateTimeError;
-use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Model\Event;
 use GibsonOS\Core\Utility\JsonUtility;
