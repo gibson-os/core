@@ -20,7 +20,7 @@ use stdClass;
 
 /**
  * @method Event fetchOne(string $where, array $parameters, string $abstractModelClassName = AbstractModel::class)
- * @method Event[] fetchAll(string $where, array $parameters, string $abstractModelClassName = AbstractModel::class, int $limit = null, int $offset = null)
+ * @method Event[] fetchAll(string $where, array $parameters, string $abstractModelClassName = AbstractModel::class, int $limit = null, int $offset = null, string $orderBy = null)
  */
 class EventRepository extends AbstractRepository
 {

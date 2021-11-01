@@ -113,7 +113,8 @@ abstract class AbstractRepository
         array $parameters,
         string $abstractModelClassName = AbstractModel::class,
         int $limit = null,
-        int $offset = null
+        int $offset = null,
+        string $orderBy = null
     ): array {
         /** @var AbstractModel $abstractModelClassNameCopy */
         $abstractModelClassNameCopy = $abstractModelClassName;
@@ -121,6 +122,7 @@ abstract class AbstractRepository
             ->setWhere($where)
             ->setWhereParameters($parameters)
             ->setLimit($limit, $offset)
+            ->setOrderBy($orderBy)
         ;
 
         return $this->getModels($table, $abstractModelClassName);
