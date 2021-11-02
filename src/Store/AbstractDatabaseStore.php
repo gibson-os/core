@@ -76,7 +76,7 @@ abstract class AbstractDatabaseStore extends AbstractStore
             )
         ;
 
-        yield $this->getModels();
+        return $this->getModels();
     }
 
     /**
@@ -205,7 +205,7 @@ abstract class AbstractDatabaseStore extends AbstractStore
         }
 
         if ($this->table->countRecords() === 0) {
-            return [];
+            return;
         }
 
         do {

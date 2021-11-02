@@ -8,7 +8,6 @@ use GibsonOS\Core\Service\Response\AjaxResponse;
 use GibsonOS\Core\Service\Response\TwigResponse;
 use GibsonOS\Core\Service\SessionService;
 use GibsonOS\Core\Service\TwigService;
-use iterable;
 
 abstract class AbstractController
 {
@@ -31,7 +30,7 @@ abstract class AbstractController
         $return = [
             'success' => true,
             'failure' => false,
-            'data' => $data instanceof iterable ? [...$data] : $data,
+            'data' => is_iterable($data) && !is_array($data) ? iterator_to_array($data) : $data,
         ];
 
         if ($total !== null) {

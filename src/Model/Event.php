@@ -222,14 +222,12 @@ class Event extends AbstractModel implements JsonSerializable, AutoCompleteModel
 
     public function jsonSerialize(): array
     {
-        $lastRun = $this->getLastRun();
-
         return [
             'id' => $this->getId(),
             'name' => $this->getName(),
             'active' => $this->isActive(),
             'async' => $this->isAsync(),
-            'lastRun' => $lastRun?->format('Y-m-d H:i:s'),
+            'lastRun' => $this->getLastRun()?->format('Y-m-d H:i:s'),
         ];
     }
 
