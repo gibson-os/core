@@ -58,6 +58,8 @@ abstract class AbstractDatabaseStore extends AbstractStore
 
     /**
      * @throws SelectError
+     *
+     * @return AbstractModel[]|iterable
      */
     public function getList(): iterable
     {
@@ -74,7 +76,7 @@ abstract class AbstractDatabaseStore extends AbstractStore
             )
         ;
 
-        return $this->getModels();
+        yield $this->getModels();
     }
 
     /**
@@ -191,9 +193,9 @@ abstract class AbstractDatabaseStore extends AbstractStore
     /**
      * @throws SelectError
      *
-     * @return AbstractModel[]
+     * @return AbstractModel[]|iterable
      */
-    protected function getModels(): array
+    protected function getModels(): iterable
     {
         if ($this->table->selectPrepared() === false) {
             $exception = new SelectError();
@@ -202,18 +204,13 @@ abstract class AbstractDatabaseStore extends AbstractStore
             throw $exception;
         }
 
-        /** @var AbstractModel[] $models */
-        $models = [];
-
         if ($this->table->countRecords() === 0) {
-            return $models;
+            return [];
         }
 
         do {
-            $models[] = $this->getModel();
+            yield $this->getModel();
         } while ($this->table->next());
-
-        return $models;
     }
 
     /**
