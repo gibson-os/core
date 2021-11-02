@@ -22,42 +22,38 @@ class ElementStore extends AbstractDatabaseStore
         parent::__construct($database);
     }
 
-    private ?int $eventId = null;
+    private int $eventId;
 
     public function setEventId(int $eventId): void
     {
         $this->eventId = $eventId;
     }
 
-    protected function getTableName(): string
+    protected function getModelClassName(): string
     {
-        return Element::getTableName();
+        return Element::class;
     }
 
-    protected function getCountField(): string
+    protected function setWheres(): void
     {
-        return '`id`';
-    }
-
-    protected function getOrderMapping(): array
-    {
-        return [];
+        $this->addWhere('`event_id`=?', [$this->eventId]);
     }
 
     /**
-     * @throws SelectError
      * @throws GetError
      * @throws FactoryError
+     * @throws JsonException
+     * @throws SelectError
      *
      * @return Element[]
      */
     public function getList(): array
     {
-        $this->where[] = '`event_id`=' . ($this->eventId ?? 0);
-        $this->table->setWhere($this->getWhere());
+        $this->setWheres();
+        $this->table->setWhere($this->getWhereString());
         $this->table->setOrderBy('`parent_id`, `order`');
 
-        $select = $this->table->select();
+        $select = $this->table->selectPrepared();
 
         if ($select === false) {
             throw (new SelectError())->setTable($this->table);

@@ -20,28 +20,24 @@ class TimeStore extends AbstractDatabaseStore
 
     private ?int $cronjobId = null;
 
-    protected function getTableName(): string
+    protected function getModelClassName(): string
     {
-        return Time::getTableName();
+        return Time::class;
     }
 
-    protected function getCountField(): string
+    protected function setWheres(): void
     {
-        return '`id`';
-    }
-
-    protected function getOrderMapping(): array
-    {
-        return [];
+        if ($this->cronjobId !== null) {
+            $this->addWhere('`cronjob_d`=?', [$this->cronjobId]);
+        }
     }
 
     public function getList(): array
     {
-        if (!empty($this->cronjobId)) {
-            $this->table->setWhere('`cronjob_id`=' . $this->cronjobId);
-        }
+        $this->setWheres();
+        $this->table->setWhere($this->getWhereString());
 
-        $this->table->select(
+        $this->table->selectPrepared(
             false,
             'IF(`from_hour` = `to_hour`, `from_hour`, IF(`from_hour` = 0 AND `to_hour` = 23, "*", CONCAT(`from_hour`, "-", `to_hour`))) AS `hour`, ' .
             'IF(`from_minute` = `to_minute`, `from_minute`, IF(`from_minute` = 0 AND `to_minute` = 59, "*", CONCAT(`from_minute`, "-", `to_minute`))) AS `minute`, ' .
@@ -52,9 +48,7 @@ class TimeStore extends AbstractDatabaseStore
             'IF(`from_year` = `to_year`, `from_year`, IF(`from_year` = 0 AND `to_year` = 9999, "*", CONCAT(`from_year`, "-", `to_year`))) AS `year`'
         );
 
-        $cronjobs = $this->table->connection->fetchAssocList();
-
-        return $this->group($cronjobs);
+        return $this->group($this->table->connection->fetchAssocList());
     }
 
     public function setCronjobId(?int $cronjobId): TimeStore

@@ -7,37 +7,15 @@ use GibsonOS\Core\Model\Event;
 
 class EventStore extends AbstractDatabaseStore
 {
-    protected function getTableName(): string
+    protected function getModelClassName(): string
     {
-        return Event::getTableName();
-    }
-
-    protected function getCountField(): string
-    {
-        return '`' . $this->getTableName() . '`.`id`';
+        return Event::class;
     }
 
     protected function getOrderMapping(): array
     {
         return [
-            'name' => '`' . $this->getTableName() . '`.`name`',
+            'name' => '`name`',
         ];
-    }
-
-    public function getList(): array
-    {
-        $this->table->setWhere($this->getWhere());
-        $this->table->setOrderBy($this->getOrderBy());
-        $this->table->select(
-            false,
-            '`' . $this->getTableName() . '`.`id`, ' .
-            '`' . $this->getTableName() . '`.`name`, ' .
-            '`' . $this->getTableName() . '`.`active`, ' .
-            '`' . $this->getTableName() . '`.`async`, ' .
-            '`' . $this->getTableName() . '`.`modified`, ' .
-            '`' . $this->getTableName() . '`.`last_run` AS `lastRun`'
-        );
-
-        return $this->table->connection->fetchAssocList();
     }
 }

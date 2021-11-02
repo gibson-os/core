@@ -35,7 +35,7 @@ abstract class AbstractRepository
      *
      * @return AbstractModel[]
      */
-    public function getModels(mysqlTable $table, string $abstractModelClassName): array
+    protected function getModels(mysqlTable $table, string $abstractModelClassName): array
     {
         if ($table->selectPrepared() === false) {
             $exception = new SelectError();

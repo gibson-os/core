@@ -42,13 +42,6 @@ class SettingRepository extends AbstractRepository
             ->setWhereParameters([$moduleName, $userId])
         ;
 
-        if (!$table->selectPrepared()) {
-            $exception = new SelectError('Einstellungen konnten nicht geladen werden!');
-            $exception->setTable($table);
-
-            throw $exception;
-        }
-
         return $this->getModels($table, Setting::class);
     }
 

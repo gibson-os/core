@@ -3,19 +3,13 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Store;
 
-use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\Cronjob;
 
 class CronjobStore extends AbstractDatabaseStore
 {
-    protected function getTableName(): string
+    protected function getModelClassName(): string
     {
-        return Cronjob::getTableName();
-    }
-
-    protected function getCountField(): string
-    {
-        return '`id`';
+        return Cronjob::class;
     }
 
     protected function getOrderMapping(): array
@@ -26,17 +20,5 @@ class CronjobStore extends AbstractDatabaseStore
             'last_run' => 'last_run',
             'active' => 'active',
         ];
-    }
-
-    /**
-     * @throws SelectError
-     */
-    public function getList(): array
-    {
-        if ($this->table->select(false) === false) {
-            throw (new SelectError())->setTable($this->table);
-        }
-
-        return $this->table->connection->fetchAssocList();
     }
 }

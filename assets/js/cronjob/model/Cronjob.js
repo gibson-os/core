@@ -20,6 +20,6 @@ Ext.define('GibsonOS.module.core.cronjob.model.Cronjob', {
         type: 'string'
     },{
         name: 'active',
-        type: 'int'
+        type: 'bool'
     }]
 });

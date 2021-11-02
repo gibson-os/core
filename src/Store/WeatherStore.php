@@ -8,55 +8,25 @@ use GibsonOS\Core\Model\Weather;
 
 class WeatherStore extends AbstractDatabaseStore
 {
-    private ?int $locationId = null;
+    private int $locationId;
 
     private ?DateTimeInterface $date = null;
 
-    protected function getTableName(): string
+    protected function getModelClassName(): string
     {
-        return Weather::getTableName();
+        return Weather::class;
     }
 
-    protected function getCountField(): string
+    protected function setWheres(): void
     {
-        return '`id`';
-    }
+        $this->addWhere('`location_id`=?', [$this->locationId]);
 
-    protected function getOrderMapping(): array
-    {
-        return [];
-    }
-
-    public function getList(): iterable
-    {
-        $this->table
-            ->setWhere('`location_id`=? AND `date`<=?')
-            ->setOrderBy('`date` DESC')
-            ->setLimit(1)
-            ->appendUnion()
-            ->setWhere('`location_id`=? AND `date`>?')
-            ->setOrderBy('`date` ASC')
-            ->setLimit()
-            ->appendUnion()
-            ->setWhereParameters([])
-        ;
-
-        $weathers = [];
-
-        if (!$this->table->selectUnion()) {
-            return $weathers;
+        if ($this->date !== null) {
+            $this->addWhere('`date`>', [$this->date->format('Y-m-d H:i:s')]);
         }
-
-        do {
-            $weather = new Weather();
-            $weather->loadFromMysqlTable($this->table);
-            $weathers[] = $weather;
-        } while ($this->table->next());
-
-        return $weathers;
     }
 
-    public function setLocationId(?int $locationId): WeatherStore
+    public function setLocationId(int $locationId): WeatherStore
     {
         $this->locationId = $locationId;
 

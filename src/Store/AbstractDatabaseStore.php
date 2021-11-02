@@ -5,6 +5,9 @@ namespace GibsonOS\Core\Store;
 
 use GibsonOS\Core\Exception\CreateError;
 use GibsonOS\Core\Exception\GetError;
+use GibsonOS\Core\Exception\Repository\SelectError;
+use GibsonOS\Core\Model\AbstractModel;
+use JsonSerializable;
 use mysqlDatabase;
 use mysqlRegistry;
 use mysqlTable;
@@ -15,18 +18,16 @@ abstract class AbstractDatabaseStore extends AbstractStore
 
     protected mysqlTable $table;
 
-    protected array $where = [];
+    private array $wheres = [];
+
+    private array $whereParameters = [];
 
     private ?string $orderBy = null;
 
-    abstract protected function getTableName(): string;
-
-    abstract protected function getCountField(): string;
-
     /**
-     * @return string[]
+     * @return class-string
      */
-    abstract protected function getOrderMapping(): array;
+    abstract protected function getModelClassName(): string;
 
     /**
      * @throws CreateError
@@ -43,7 +44,9 @@ abstract class AbstractDatabaseStore extends AbstractStore
             throw new CreateError('Kein Datenbank Objekt vorhanden!');
         }
 
-        $this->table = new mysqlTable($this->database, $this->getTableName());
+        /** @var AbstractModel $modelClassName */
+        $modelClassName = $this->getModelClassName();
+        $this->table = new mysqlTable($this->database, $modelClassName::getTableName());
     }
 
     public function setLimit(int $rows, int $from): void
@@ -54,16 +57,42 @@ abstract class AbstractDatabaseStore extends AbstractStore
     }
 
     /**
+     * @throws SelectError
+     */
+    public function getList(): iterable
+    {
+        $this->wheres = [];
+        $this->setWheres();
+        $this->table
+            ->setWhere($this->getWhereString())
+            ->setOrderBy($this->getOrderBy())
+            ->setWhere($this->getWhereString())
+            ->setWhereParameters($this->whereParameters)
+            ->setLimit(
+                $this->getRows() === 0 ? null : $this->getRows(),
+                $this->getFrom() === 0 ? null : $this->getFrom()
+            )
+        ;
+
+        return $this->getModels();
+    }
+
+    /**
      * @throws GetError
      */
     public function getCount(): int
     {
-        $this->table->clearJoin();
-        $this->table->setOrderBy();
-        $this->table->setWhere($this->getWhere());
-        $this->table->setLimit();
+        $this->wheres = [];
+        $this->setWheres();
+        $this->table
+            ->clearJoin()
+            ->setWhere($this->getWhereString())
+            ->setWhereParameters($this->whereParameters)
+            ->setOrderBy()
+            ->setLimit()
+        ;
 
-        $count = $this->table->selectAggregate('COUNT(' . $this->getCountField() . ')');
+        $count = $this->table->selectAggregatePrepared('COUNT(' . $this->getCountField() . ')');
         $this->table->setLimit(
             $this->getRows() === 0 ? null : $this->getRows(),
             $this->getFrom() === 0 ? null : $this->getFrom()
@@ -79,13 +108,46 @@ abstract class AbstractDatabaseStore extends AbstractStore
         return (int) $count[0];
     }
 
-    protected function getWhere(): ?string
+    public function getWhereParameters(): array
     {
-        if (!count($this->where)) {
+        return $this->whereParameters;
+    }
+
+    protected function getCountField(): string
+    {
+        return '`id`';
+    }
+
+    protected function getDefaultOrder(): string
+    {
+        return '`id`';
+    }
+
+    /**
+     * @return string[]
+     */
+    protected function getOrderMapping(): array
+    {
+        return [];
+    }
+
+    protected function addWhere(string $where, array $parameters = []): void
+    {
+        $this->wheres[] = $where;
+        $this->whereParameters = array_merge($this->whereParameters, $parameters);
+    }
+
+    protected function setWheres(): void
+    {
+    }
+
+    protected function getWhereString(): ?string
+    {
+        if (count($this->wheres) === 0) {
             return null;
         }
 
-        return '(' . implode(') AND (', $this->where) . ')';
+        return '(' . implode(') AND (', $this->wheres) . ')';
     }
 
     public function setSortByExt(array $sort): void
@@ -109,20 +171,79 @@ abstract class AbstractDatabaseStore extends AbstractStore
                 continue;
             }
 
-            $order = '`' . $this->database->escapeWithoutQuotes($sortItem['property']) . '`';
+            $order = '`' . $sortItem['property'] . '`';
 
             if (array_key_exists('direction', $sortItem)) {
-                $order .= ' ' . $this->database->escapeWithoutQuotes($sortItem['direction']);
+                $order .= ' ' . (mb_strtolower($sortItem['direction']) === 'asc' ? 'ASC' : 'DESC');
             }
 
             $orderBy[] = $order;
         }
 
-        $this->orderBy = empty($orderBy) ? null : implode(', ', $orderBy);
+        $this->orderBy = empty($orderBy) ? $this->getDefaultOrder() : implode(', ', $orderBy);
     }
 
     protected function getOrderBy(): ?string
     {
         return $this->orderBy;
+    }
+
+    /**
+     * @throws SelectError
+     *
+     * @return AbstractModel[]
+     */
+    protected function getModels(): array
+    {
+        if ($this->table->selectPrepared() === false) {
+            $exception = new SelectError();
+            $exception->setTable($this->table);
+
+            throw $exception;
+        }
+
+        /** @var AbstractModel[] $models */
+        $models = [];
+
+        if ($this->table->countRecords() === 0) {
+            return $models;
+        }
+
+        do {
+            $models[] = $this->getModel();
+        } while ($this->table->next());
+
+        return $models;
+    }
+
+    /**
+     * @throws SelectError
+     */
+    private function getModel(): AbstractModel
+    {
+        $abstractModelClassName = $this->getModelClassName();
+        $model = new $abstractModelClassName();
+
+        if (!$model instanceof AbstractModel) {
+            $exception = new SelectError(sprintf(
+                '%s is no instance of %s',
+                $abstractModelClassName,
+                AbstractModel::class
+            ));
+            $exception->setTable($this->table);
+
+            throw $exception;
+        }
+
+        if (!$model instanceof JsonSerializable) {
+            $exception = new SelectError(sprintf('%s is not json serializable', $abstractModelClassName));
+            $exception->setTable($this->table);
+
+            throw $exception;
+        }
+
+        $model->loadFromMysqlTable($this->table);
+
+        return $model;
     }
 }

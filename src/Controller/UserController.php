@@ -6,6 +6,7 @@ namespace GibsonOS\Core\Controller;
 use GibsonOS\Core\Attribute\CheckPermission;
 use GibsonOS\Core\Exception\DateTimeError;
 use GibsonOS\Core\Exception\LoginRequired;
+use GibsonOS\Core\Exception\Model\DeleteError;
 use GibsonOS\Core\Exception\Model\SaveError;
 use GibsonOS\Core\Exception\PermissionDenied;
 use GibsonOS\Core\Exception\Repository\SelectError;
@@ -21,6 +22,7 @@ use GibsonOS\Core\Service\Response\ResponseInterface;
 use GibsonOS\Core\Service\SessionService;
 use GibsonOS\Core\Service\TwigService;
 use GibsonOS\Core\Service\UserService;
+use GibsonOS\Core\Store\UserStore;
 use GibsonOS\Core\Utility\StatusCode;
 
 class UserController extends AbstractController
@@ -32,6 +34,12 @@ class UserController extends AbstractController
         private PermissionAttribute $permissionAttribute
     ) {
         parent::__construct($requestService, $twigService, $sessionService);
+    }
+
+    #[CheckPermission(Permission::MANAGE + Permission::READ)]
+    public function index(UserStore $userStore): AjaxResponse
+    {
+        return $this->returnSuccess($userStore->getList());
     }
 
     /**
@@ -49,6 +57,22 @@ class UserController extends AbstractController
         $userService->login($username, $password);
 
         return new RedirectResponse($this->requestService->getBaseDir());
+    }
+
+    /**
+     * @throws LoginRequired
+     * @throws PermissionDenied
+     * @throws SelectError
+     */
+    public function settings(UserRepository $userRepository, int $id = null): AjaxResponse
+    {
+        $this->checkUserPermission($id, Permission::READ);
+
+        if ($id === null) {
+            $id = $this->sessionService->getUserId() ?? 0;
+        }
+
+        return $this->returnSuccess($userRepository->getById($id));
     }
 
     /**
@@ -124,6 +148,18 @@ class UserController extends AbstractController
             $host,
             $ip
         ));
+    }
+
+    /**
+     * @throws SelectError
+     * @throws DeleteError
+     */
+    #[CheckPermission(Permission::MANAGE + Permission::DELETE)]
+    public function delete(UserRepository $userRepository, int $id): AjaxResponse
+    {
+        $userRepository->getById($id)->delete();
+
+        return $this->returnSuccess();
     }
 
     /**

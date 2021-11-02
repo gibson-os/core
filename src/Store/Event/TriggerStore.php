@@ -25,19 +25,14 @@ class TriggerStore extends AbstractDatabaseStore
         parent::__construct($database);
     }
 
-    protected function getTableName(): string
+    protected function getModelClassName(): string
     {
-        return Trigger::getTableName();
+        return Trigger::class;
     }
 
-    protected function getCountField(): string
+    protected function setWheres(): void
     {
-        return '`id`';
-    }
-
-    protected function getOrderMapping(): array
-    {
-        return [];
+        $this->addWhere('`event_id`=?', [$this->eventId]);
     }
 
     /**
@@ -48,9 +43,10 @@ class TriggerStore extends AbstractDatabaseStore
      */
     public function getList(): iterable
     {
+        $this->setWheres();
         $this->table
-            ->setWhere('`event_id`=?')
-            ->addWhereParameter($this->eventId)
+            ->setWhere($this->getWhereString())
+            ->addWhereParameter($this->getWhereParameters())
             ->setOrderBy('priority')
         ;
 

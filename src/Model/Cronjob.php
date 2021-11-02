@@ -4,8 +4,9 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Model;
 
 use DateTimeInterface;
+use JsonSerializable;
 
-class Cronjob extends AbstractModel
+class Cronjob extends AbstractModel implements JsonSerializable
 {
     private ?int $id = null;
 
@@ -122,5 +123,19 @@ class Cronjob extends AbstractModel
         $this->added = $added;
 
         return $this;
+    }
+
+    public function jsonSerialize(): array
+    {
+        return [
+            'id' => $this->getId(),
+            'command' => $this->getCommand(),
+            'arguments' => $this->getArguments(),
+            'options' => $this->getOptions(),
+            'user' => $this->getUser(),
+            'active' => $this->isActive(),
+            'lastRun' => $this->getLastRun()?->format('Y-m-d H:i:s'),
+            'added' => $this->getAdded()->format('Y-m-d H:i:s'),
+        ];
     }
 }

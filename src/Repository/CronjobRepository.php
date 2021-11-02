@@ -54,11 +54,11 @@ class CronjobRepository extends AbstractRepository
                 ')'
         );
 
-        if (!$table->select()) {
+        try {
+            return $this->getModels($table, Cronjob::class);
+        } catch (SelectError $e) {
             return [];
         }
-
-        return $this->getModels($table, Cronjob::class);
     }
 
     private function getTimePartWhere(string $field, int $value): string
