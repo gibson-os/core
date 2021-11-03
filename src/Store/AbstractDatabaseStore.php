@@ -100,11 +100,15 @@ abstract class AbstractDatabaseStore extends AbstractStore
             $this->getFrom() === 0 ? null : $this->getFrom()
         );
 
+        if ($count === null) {
+            throw new GetError('Anzahl konnte nicht ermittelt werden!');
+        }
+
         if (
             empty($count) ||
             !isset($count[0])
         ) {
-            throw new GetError('Anzahl konnte nicht ermittelt werden!');
+            return 0;
         }
 
         return (int) $count[0];
