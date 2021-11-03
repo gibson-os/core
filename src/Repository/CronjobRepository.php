@@ -24,53 +24,84 @@ class CronjobRepository extends AbstractRepository
         $timeTableName = Cronjob\Time::getTableName();
 
         $table = $this->getTable($tableName);
-        $table->appendJoin($timeTableName, '`' . $tableName . '`.`id`=`' . $timeTableName . '`.`cronjob_id`');
-        $table->setWhere(
-            '`' . $tableName . '`.`user`=' . $this->escape($user) . ' AND ' .
-            '`' . $tableName . '`.`active`=1 AND ' .
-            '(`' . $tableName . '`.`last_run` IS NULL OR `' . $tableName . '`.`last_run` < ' . $this->escape($dateTime->format('Y-m-d H:i:s')) . ') AND ' .
-            'UNIX_TIMESTAMP(CONCAT(' .
-                $this->getTimePartWhere('year', (int) $dateTime->format('Y')) . ', \'-\', ' .
-                $this->getTimePartWhere('month', (int) $dateTime->format('n')) . ', \'-\', ' .
-                $this->getTimePartWhere('day_of_month', (int) $dateTime->format('j')) . ', \' \', ' .
-                $this->getTimePartWhere('hour', (int) $dateTime->format('H')) . ', \':\', ' .
-                $this->getTimePartWhere('minute', (int) $dateTime->format('i')) . ', \':\', ' .
-                $this->getTimePartWhere('second', (int) $dateTime->format('s')) .
-            ')) BETWEEN UNIX_TIMESTAMP(COALESCE(`' . $tableName . '`.`last_run`, `' . $tableName . '`.`added`)) AND UNIX_TIMESTAMP(\'' .
-                ((int) $dateTime->format('Y')) . '-' . ((int) $dateTime->format('n')) . '-' . ((int) $dateTime->format('j')) . ' ' .
-                ((int) $dateTime->format('H')) . ':' . ((int) $dateTime->format('i')) . ':' . ((int) $dateTime->format('s')) . '\'' .
-            ') AND ' .
-            $this->getTimePartWhere('day_of_week', (int) $dateTime->format('w')) .
-            ' BETWEEN ' .
-                'IF(' .
-                    'DATE_FORMAT(COALESCE(`' . $tableName . '`.`last_run`, `' . $tableName . '`.`added`), \'%w\') < ' . (int) $dateTime->format('w') . ', ' .
-                    'DATE_FORMAT(COALESCE(`' . $tableName . '`.`last_run`, `' . $tableName . '`.`added`), \'%w\'), ' .
-                    (int) $dateTime->format('w') .
-                ') AND ' .
-                'IF(' .
-                    'DATE_FORMAT(COALESCE(`' . $tableName . '`.`last_run`, `' . $tableName . '`.`added`), \'%w\') > ' . (int) $dateTime->format('w') . ', ' .
-                    'DATE_FORMAT(COALESCE(`' . $tableName . '`.`last_run`, `' . $tableName . '`.`added`), \'%w\'), ' .
-                    (int) $dateTime->format('w') .
-                ')'
-        );
+        $table
+            ->appendJoin($timeTableName, '`' . $tableName . '`.`id`=`' . $timeTableName . '`.`cronjob_id`')
+            ->setWhereParameters([$user, $dateTime->format('Y-m-d H:i:s')])
+            ->setWhere(
+                '`' . $tableName . '`.`user`=? AND ' .
+                '`' . $tableName . '`.`active`=1 AND ' .
+                '(`' . $tableName . '`.`last_run` IS NULL OR `' . $tableName . '`.`last_run` < ?) AND ' .
+                'UNIX_TIMESTAMP(CONCAT(' .
+                    $this->getTimePart($table, 'year', (int) $dateTime->format('Y')) . ', \'-\', ' .
+                    $this->getTimePart($table, 'month', (int) $dateTime->format('n')) . ', \'-\', ' .
+                    $this->getTimePart($table, 'day_of_month', (int) $dateTime->format('j')) . ', \' \', ' .
+                    $this->getTimePart($table, 'hour', (int) $dateTime->format('H')) . ', \':\', ' .
+                    $this->getTimePart($table, 'minute', (int) $dateTime->format('i')) . ', \':\', ' .
+                    $this->getTimePart($table, 'second', (int) $dateTime->format('s')) .
+                ')) BETWEEN UNIX_TIMESTAMP(COALESCE(`' . $tableName . '`.`last_run`, `' . $tableName . '`.`added`)) AND  ' .
+                $this->getTimeAsUnixTimestampFunction($table, $dateTime) . ' AND ' .
+                $this->getTimePart($table, 'day_of_week', (int) $dateTime->format('w')) .
+                $this->getFirstRunBetweenPart($table, $dateTime)
+            )
+        ;
 
         try {
             return $this->getModels($table, Cronjob::class);
-        } catch (SelectError $e) {
+        } catch (SelectError) {
             return [];
         }
     }
 
-    private function getTimePartWhere(string $field, int $value): string
+    private function getFirstRunBetweenPart(mysqlTable $table, DateTimeInterface $dateTime): string
+    {
+        $tableName = Cronjob::getTableName();
+        $table
+            ->addWhereParameter((int) $dateTime->format('w'))
+            ->addWhereParameter((int) $dateTime->format('w'))
+            ->addWhereParameter((int) $dateTime->format('w'))
+            ->addWhereParameter((int) $dateTime->format('w'))
+        ;
+
+        return
+            ' BETWEEN ' .
+                'IF(' .
+                    'DATE_FORMAT(COALESCE(`' . $tableName . '`.`last_run`, `' . $tableName . '`.`added`), \'%w\') < ?, ' .
+                    'DATE_FORMAT(COALESCE(`' . $tableName . '`.`last_run`, `' . $tableName . '`.`added`), \'%w\'), ' .
+                    '?' .
+                ') AND ' .
+                    'IF(' .
+                    'DATE_FORMAT(COALESCE(`' . $tableName . '`.`last_run`, `' . $tableName . '`.`added`), \'%w\') > ?, ' .
+                    'DATE_FORMAT(COALESCE(`' . $tableName . '`.`last_run`, `' . $tableName . '`.`added`), \'%w\'), ' .
+                    '?' .
+                ')'
+        ;
+    }
+
+    private function getTimeAsUnixTimestampFunction(mysqlTable $table, DateTimeInterface $dateTime): string
+    {
+        $tableName = Cronjob::getTableName();
+        $table->addWhereParameter(
+            ((int) $dateTime->format('Y')) . '-' . ((int) $dateTime->format('n')) . '-' . ((int) $dateTime->format('j')) . ' ' .
+            ((int) $dateTime->format('H')) . ':' . ((int) $dateTime->format('i')) . ':' . ((int) $dateTime->format('s'))
+        );
+
+        return 'UNIX_TIMESTAMP(?)';
+    }
+
+    private function getTimePart(mysqlTable $table, string $field, int $value): string
     {
         $tableName = Cronjob\Time::getTableName();
+        $table
+            ->addWhereParameter($value)
+            ->addWhereParameter($value)
+            ->addWhereParameter($value)
+        ;
 
         return
             'IF(' .
-                $value . ' BETWEEN `' . $tableName . '`.`from_' . $field . '` AND `' . $tableName . '`.`to_' . $field . '`,' .
-                $value . ',' .
+                '? BETWEEN `' . $tableName . '`.`from_' . $field . '` AND `' . $tableName . '`.`to_' . $field . '`, ?,' .
                 'IF(' .
-                    '`' . $tableName . '`.`from_' . $field . '` > ' . $value . ',' .
+                    '`' . $tableName . '`.`from_' . $field . '` > ?,' .
                     '`' . $tableName . '`.`from_' . $field . '`,' .
                     '`' . $tableName . '`.`to_' . $field . '`' .
                 ')' .

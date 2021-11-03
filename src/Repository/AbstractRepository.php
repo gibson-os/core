@@ -152,41 +152,11 @@ abstract class AbstractRepository
         return new mysqlTable($database, $tableName);
     }
 
-    /**
-     * @deprecated
-     */
-    protected function escape(string $value, mysqlDatabase $database = null): string
-    {
-        $database = $this->getDatabase($database);
-
-        return $database->escape($value);
-    }
-
-    /**
-     * @deprecated
-     */
-    protected function escapeWithoutQuotes(string $value, mysqlDatabase $database = null): string
-    {
-        $database = $this->getDatabase($database);
-
-        return $database->escapeWithoutQuotes($value);
-    }
-
     protected function getRegexString(string $search, mysqlDatabase $database = null): string
     {
         $database = $this->getDatabase($database);
 
         return $database->getUnescapedRegexString($search);
-    }
-
-    /**
-     * @deprecated
-     */
-    protected function implode(array $pieces, string $glue = ',', mysqlDatabase $database = null): string
-    {
-        $database = $this->getDatabase($database);
-
-        return $database->implode($pieces, $glue);
     }
 
     private function getDatabase(mysqlDatabase $database = null): mysqlDatabase
