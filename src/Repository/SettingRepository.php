@@ -54,7 +54,8 @@ class SettingRepository extends AbstractRepository
             '`module_id`=? AND ' .
             '(`user_id`=? OR `user_id`=?) AND ' .
             '`key`=?',
-            [$moduleId, $userId, 0, $key]
+            [$moduleId, $userId, 0, $key],
+            Setting::class
         );
     }
 

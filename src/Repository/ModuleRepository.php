@@ -17,6 +17,6 @@ class ModuleRepository extends AbstractRepository
      */
     public function getByName(string $name): Module
     {
-        return $this->fetchOne('`name`', [$name], Module::class);
+        return $this->fetchOne('`name`=?', [$name], Module::class);
     }
 }

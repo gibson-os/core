@@ -69,7 +69,7 @@ abstract class AbstractDatabaseStore extends AbstractStore
             ->setWhere($this->getWhereString())
             ->setOrderBy($this->getOrderBy())
             ->setWhere($this->getWhereString())
-            ->setWhereParameters($this->whereParameters)
+            ->setWhereParameters($this->getWhereParameters())
             ->setLimit(
                 $this->getRows() === 0 ? null : $this->getRows(),
                 $this->getFrom() === 0 ? null : $this->getFrom()
@@ -87,9 +87,8 @@ abstract class AbstractDatabaseStore extends AbstractStore
         $this->wheres = [];
         $this->setWheres();
         $this->table
-            ->clearJoin()
             ->setWhere($this->getWhereString())
-            ->setWhereParameters($this->whereParameters)
+            ->setWhereParameters($this->getWhereParameters())
             ->setOrderBy()
             ->setLimit()
         ;
