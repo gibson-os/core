@@ -58,6 +58,7 @@ abstract class AbstractDatabaseStore extends AbstractStore
     protected function initTable(): void
     {
         $this->wheres = [];
+        $this->whereParameters = [];
         $this->setWheres();
         $this->table->reset();
         $this->table
