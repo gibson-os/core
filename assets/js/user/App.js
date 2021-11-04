@@ -10,14 +10,20 @@ Ext.define('GibsonOS.module.core.user.App', {
         module: 'core',
         task: 'user'
     },
+    enableToolbar: true,
+    enableKeyEvents: true,
+    enableClickEvents: false,
+    enableContextMenu: true,
     addFunction() {
+        const me = this;
+
         new GibsonOS.module.core.user.add.Window({
             gos: {
                 data: {
                     success: function(form, action) {
                         const data = action.result.data;
 
-                        app.down('#coreUserGrid').getStore().add({
+                        me.down('#coreUserGrid').getStore().add({
                             id: data.id,
                             user: data.user
                         });
@@ -30,7 +36,7 @@ Ext.define('GibsonOS.module.core.user.App', {
     },
     deleteFunction(records) {
         const me = this;
-        const grid = me.down('#coreUserGrid');
+        const grid = me.down('gosModuleCoreUserGrid');
         const record = records[0];
 
         GibsonOS.MessageBox.show({
@@ -56,9 +62,7 @@ Ext.define('GibsonOS.module.core.user.App', {
     initComponent: function() {
         let me = this;
 
-        me = GibsonOS.decorator.ActionManager.init(me);
-        me = GibsonOS.decorator.action.Add.init(me);
-        me = GibsonOS.decorator.action.Delete.init(me);
+        me = GibsonOS.decorator.Panel.init(me);
 
         me.items = [{
             layout: 'border',
@@ -69,7 +73,13 @@ Ext.define('GibsonOS.module.core.user.App', {
                 collapsible: true,
                 split: true,
                 flex: 0,
-                hideCollapseTool: true
+                hideCollapseTool: true,
+                enableToolbar: false,
+                enableKeyEvents: true,
+                enableClickEvents: false,
+                enableContextMenu: true,
+                addFunction: me.addFunction,
+                deleteFunction: me.deleteFunction
             },{
                 xtype: 'gosPanel',
                 itemId: 'coreUserView',
@@ -81,6 +91,6 @@ Ext.define('GibsonOS.module.core.user.App', {
         me.callParent();
 
         me.viewItem = me.down('gosModuleCoreUserGrid');
-        GibsonOS.decorator.ActionManager.addListeners(me);
+        GibsonOS.decorator.Panel.addListeners(me);
     }
 });
