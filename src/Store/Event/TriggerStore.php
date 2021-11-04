@@ -43,12 +43,8 @@ class TriggerStore extends AbstractDatabaseStore
      */
     public function getList(): iterable
     {
-        $this->setWheres();
-        $this->table
-            ->setWhere($this->getWhereString())
-            ->addWhereParameter($this->getWhereParameters())
-            ->setOrderBy('priority')
-        ;
+        $this->initTable();
+        $this->table->setOrderBy('priority');
 
         $selectPrepared = $this->table->selectPrepared();
 

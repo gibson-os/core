@@ -34,8 +34,7 @@ class TimeStore extends AbstractDatabaseStore
 
     public function getList(): array
     {
-        $this->setWheres();
-        $this->table->setWhere($this->getWhereString());
+        $this->initTable();
 
         $this->table->selectPrepared(
             false,
