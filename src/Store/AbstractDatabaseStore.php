@@ -56,12 +56,7 @@ abstract class AbstractDatabaseStore extends AbstractStore
         $this->table->setLimit($rows, $from);
     }
 
-    /**
-     * @throws SelectError
-     *
-     * @return AbstractModel[]|iterable
-     */
-    public function getList(): iterable
+    protected function initTable(): void
     {
         $this->wheres = [];
         $this->setWheres();
@@ -75,6 +70,16 @@ abstract class AbstractDatabaseStore extends AbstractStore
                 $this->getFrom() === 0 ? null : $this->getFrom()
             )
         ;
+    }
+
+    /**
+     * @throws SelectError
+     *
+     * @return AbstractModel[]|iterable
+     */
+    public function getList(): iterable
+    {
+        $this->initTable();
 
         return $this->getModels();
     }
@@ -84,11 +89,8 @@ abstract class AbstractDatabaseStore extends AbstractStore
      */
     public function getCount(): int
     {
-        $this->wheres = [];
-        $this->setWheres();
+        $this->initTable();
         $this->table
-            ->setWhere($this->getWhereString())
-            ->setWhereParameters($this->getWhereParameters())
             ->setOrderBy()
             ->setLimit()
         ;
