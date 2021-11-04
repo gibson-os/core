@@ -50,6 +50,11 @@ GibsonOS.define('GibsonOS.decorator.ActionManager', {
                 tbarText: null,
             }, button);
 
+            if (!button.requiredPermission) {
+                console.warn('Button has no `requiredPermission` property!');
+                console.warn(button);
+            }
+
             if (component.enableToolbar && button.addToToolbar) {
                 toolbar.add(Ext.merge(Ext.clone(button), {text: button.tbarText ?? null}));
             }

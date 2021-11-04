@@ -14,6 +14,12 @@ Ext.define('GibsonOS.module.core.user.App', {
     enableKeyEvents: true,
     enableClickEvents: false,
     enableContextMenu: true,
+    addButton: {
+        requiredPermission: {
+            action: 'save',
+            permission: GibsonOS.Permission.MANAGE + GibsonOS.Permission.WRITE
+        }
+    },
     addFunction() {
         const me = this;
 
@@ -33,6 +39,12 @@ Ext.define('GibsonOS.module.core.user.App', {
                 }
             }
         });
+    },
+    deleteButton: {
+        requiredPermission: {
+            action: 'delete',
+            permission: GibsonOS.Permission.MANAGE + GibsonOS.Permission.DELETE
+        }
     },
     deleteFunction(records) {
         const me = this;
@@ -78,7 +90,9 @@ Ext.define('GibsonOS.module.core.user.App', {
                 enableKeyEvents: true,
                 enableClickEvents: false,
                 enableContextMenu: true,
+                addButton: me.addButton,
                 addFunction: me.addFunction,
+                deleteButton: me.deleteButton,
                 deleteFunction: me.deleteFunction
             },{
                 xtype: 'gosPanel',
