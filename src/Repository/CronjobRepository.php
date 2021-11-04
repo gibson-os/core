@@ -9,7 +9,7 @@ use GibsonOS\Core\Model\Cronjob;
 use mysqlTable;
 
 /**
- * @method Cronjob[] getModels(mysqlTable $table, string $abstractModelClassName)
+ * @method Cronjob[] getModels(mysqlTable $table, string $modelClassName)
  */
 class CronjobRepository extends AbstractRepository
 {

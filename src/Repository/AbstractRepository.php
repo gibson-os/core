@@ -5,6 +5,7 @@ namespace GibsonOS\Core\Repository;
 
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\AbstractModel;
+use GibsonOS\Core\Model\ModelInterface;
 use InvalidArgumentException;
 use mysqlDatabase;
 use mysqlRegistry;
@@ -33,9 +34,9 @@ abstract class AbstractRepository
     /**
      * @throws SelectError
      *
-     * @return AbstractModel[]
+     * @return ModelInterface[]
      */
-    protected function getModels(mysqlTable $table, string $abstractModelClassName): array
+    protected function getModels(mysqlTable $table, string $modelClassName): array
     {
         if ($table->selectPrepared() === false) {
             $exception = new SelectError();
@@ -44,7 +45,7 @@ abstract class AbstractRepository
             throw $exception;
         }
 
-        /** @var AbstractModel[] $models */
+        /** @var ModelInterface[] $models */
         $models = [];
 
         if ($table->countRecords() === 0) {
@@ -52,20 +53,23 @@ abstract class AbstractRepository
         }
 
         do {
-            $models[] = $this->getModel($table, $abstractModelClassName);
+            $models[] = $this->getModel($table, $modelClassName);
         } while ($table->next());
 
         return $models;
     }
 
-    protected function getModel(mysqlTable $table, string $abstractModelClassName): AbstractModel
+    /**
+     * @throws SelectError
+     */
+    protected function getModel(mysqlTable $table, string $modelClassName): AbstractModel
     {
-        $model = new $abstractModelClassName();
+        $model = new $modelClassName();
 
         if (!$model instanceof AbstractModel) {
             $exception = new SelectError(sprintf(
                 '%s is no instance of %s',
-                $abstractModelClassName,
+                $modelClassName,
                 AbstractModel::class
             ));
             $exception->setTable($table);
@@ -84,11 +88,11 @@ abstract class AbstractRepository
     protected function fetchOne(
         string $where,
         array $parameters,
-        string $abstractModelClassName = AbstractModel::class
-    ): AbstractModel {
-        /** @var AbstractModel $abstractModelClassNameCopy */
-        $abstractModelClassNameCopy = $abstractModelClassName;
-        $table = $this->getTable($abstractModelClassNameCopy::getTableName())
+        string $modelClassName
+    ): ModelInterface {
+        /** @var ModelInterface $modelClassNameCopy */
+        $modelClassNameCopy = $modelClassName;
+        $table = $this->getTable($modelClassNameCopy::getTableName())
             ->setWhere($where)
             ->setWhereParameters($parameters)
             ->setLimit(1)
@@ -101,48 +105,48 @@ abstract class AbstractRepository
             throw $exception;
         }
 
-        return $this->getModel($table, $abstractModelClassName);
+        return $this->getModel($table, $modelClassName);
     }
 
     /**
      * @throws SelectError
      *
-     * @return AbstractModel[]
+     * @return ModelInterface[]
      */
     protected function fetchAll(
         string $where,
         array $parameters,
-        string $abstractModelClassName = AbstractModel::class,
+        string $modelClassName,
         int $limit = null,
         int $offset = null,
         string $orderBy = null
     ): array {
-        /** @var AbstractModel $abstractModelClassNameCopy */
-        $abstractModelClassNameCopy = $abstractModelClassName;
-        $table = $this->getTable($abstractModelClassNameCopy::getTableName())
+        /** @var ModelInterface $modelClassNameCopy */
+        $modelClassNameCopy = $modelClassName;
+        $table = $this->getTable($modelClassNameCopy::getTableName())
             ->setWhere($where)
             ->setWhereParameters($parameters)
             ->setLimit($limit, $offset)
             ->setOrderBy($orderBy)
         ;
 
-        return $this->getModels($table, $abstractModelClassName);
+        return $this->getModels($table, $modelClassName);
     }
 
     protected function getAggregate(
         string $function,
         string $where,
         array $parameters,
-        string $abstractModelClassName = AbstractModel::class
+        string $modelClassName = ModelInterface::class
     ): ?array {
-        /** @var AbstractModel $abstractModelClassNameCopy */
-        $abstractModelClassNameCopy = $abstractModelClassName;
-        $table = $this->getTable($abstractModelClassNameCopy::getTableName())
+        /** @var ModelInterface $modelClassNameCopy */
+        $modelClassNameCopy = $modelClassName;
+        $table = $this->getTable($modelClassNameCopy::getTableName())
             ->setWhere($where)
             ->setWhereParameters($parameters)
         ;
 
-        return $table->selectAggregate($function);
+        return $table->selectAggregatePrepared($function);
     }
 
     protected function getTable(string $tableName, mysqlDatabase $database = null): mysqlTable

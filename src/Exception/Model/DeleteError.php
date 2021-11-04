@@ -4,13 +4,13 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Exception\Model;
 
 use GibsonOS\Core\Exception\AbstractException;
-use GibsonOS\Core\Model\AbstractModel;
+use GibsonOS\Core\Model\ModelInterface;
 use Throwable;
 
 class DeleteError extends AbstractException
 {
     /**
-     * @var AbstractModel
+     * @var ModelInterface
      */
     private $model;
 
@@ -20,7 +20,7 @@ class DeleteError extends AbstractException
     }
 
     /**
-     * @return AbstractModel
+     * @return ModelInterface
      */
     public function getModel()
     {
@@ -28,7 +28,7 @@ class DeleteError extends AbstractException
     }
 
     /**
-     * @param AbstractModel $model
+     * @param ModelInterface $model
      *
      * @return DeleteError
      */

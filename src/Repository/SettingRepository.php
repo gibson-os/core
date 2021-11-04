@@ -4,15 +4,14 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Repository;
 
 use GibsonOS\Core\Exception\Repository\SelectError;
-use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Model\Setting;
 use mysqlTable;
 
 /**
- * @method Setting   fetchOne(string $where, array $parameters, string $abstractModelClassName = AbstractModel::class)
- * @method Setting[] fetchAll(string $where, array $parameters, string $abstractModelClassName = AbstractModel::class, int $limit = null, int $offset = null, string $orderBy = null)
- * @method Setting   getModel(mysqlTable $table, string $abstractModelClassName)
- * @method Setting[] getModels(mysqlTable $table, string $abstractModelClassName)
+ * @method Setting   fetchOne(string $where, array $parameters, string $modelClassName)
+ * @method Setting[] fetchAll(string $where, array $parameters, string $modelClassName, int $limit = null, int $offset = null, string $orderBy = null)
+ * @method Setting   getModel(mysqlTable $table, string $modelClassName)
+ * @method Setting[] getModels(mysqlTable $table, string $modelClassName)
  */
 class SettingRepository extends AbstractRepository
 {

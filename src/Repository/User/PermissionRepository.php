@@ -10,7 +10,7 @@ use mysqlDatabase;
 use mysqlTable;
 
 /**
- * @method Permission getModel(mysqlTable $table, string $abstractModelClassName)
+ * @method Permission getModel(mysqlTable $table, string $modelClassName)
  */
 class PermissionRepository extends AbstractRepository
 {

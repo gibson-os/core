@@ -4,12 +4,11 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Repository\User;
 
 use GibsonOS\Core\Exception\Repository\SelectError;
-use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Model\User\Device;
 use GibsonOS\Core\Repository\AbstractRepository;
 
 /**
- * @method Device fetchOne(string $where, array $parameters, string $abstractModelClassName = AbstractModel::class)
+ * @method Device fetchOne(string $where, array $parameters, string $modelClassName)
  */
 class DeviceRepository extends AbstractRepository
 {

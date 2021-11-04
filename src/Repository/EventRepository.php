@@ -9,7 +9,6 @@ use Exception;
 use GibsonOS\Core\Exception\Model\SaveError;
 use GibsonOS\Core\Exception\Repository\DeleteError;
 use GibsonOS\Core\Exception\Repository\SelectError;
-use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Model\Event;
 use GibsonOS\Core\Model\Event\Element;
 use GibsonOS\Core\Model\Event\Trigger;
@@ -19,8 +18,8 @@ use mysqlTable;
 use stdClass;
 
 /**
- * @method Event   fetchOne(string $where, array $parameters, string $abstractModelClassName = AbstractModel::class)
- * @method Event[] fetchAll(string $where, array $parameters, string $abstractModelClassName = AbstractModel::class, int $limit = null, int $offset = null, string $orderBy = null)
+ * @method Event   fetchOne(string $where, array $parameters, string $modelClassName)
+ * @method Event[] fetchAll(string $where, array $parameters, string $modelClassName, int $limit = null, int $offset = null, string $orderBy = null)
  */
 class EventRepository extends AbstractRepository
 {
@@ -33,13 +32,7 @@ class EventRepository extends AbstractRepository
      */
     public function getById(int $id): Event
     {
-        $model = $this->fetchOne('`id`=?', [$id], Event::class);
-
-        if (!$model instanceof Event) {
-            throw new SelectError();
-        }
-
-        return $model;
+        return $this->fetchOne('`id`=?', [$id], Event::class);
     }
 
     /**

@@ -6,13 +6,12 @@ namespace GibsonOS\Core\Repository;
 use DateTimeInterface;
 use DateTimeZone;
 use GibsonOS\Core\Exception\Repository\SelectError;
-use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Model\Weather;
 use GibsonOS\Core\Model\Weather\Location;
 use GibsonOS\Core\Service\DateTimeService;
 
 /**
- * @method Weather fetchOne(string $where, array $parameters, string $abstractModelClassName = AbstractModel::class)
+ * @method Weather fetchOne(string $where, array $parameters, string $modelClassName)
  */
 class WeatherRepository extends AbstractRepository
 {

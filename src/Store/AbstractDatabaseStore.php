@@ -232,13 +232,13 @@ abstract class AbstractDatabaseStore extends AbstractStore
      */
     private function getModel(): AbstractModel
     {
-        $abstractModelClassName = $this->getModelClassName();
-        $model = new $abstractModelClassName();
+        $modelClassName = $this->getModelClassName();
+        $model = new $modelClassName();
 
         if (!$model instanceof AbstractModel) {
             $exception = new SelectError(sprintf(
                 '%s is no instance of %s',
-                $abstractModelClassName,
+                $modelClassName,
                 AbstractModel::class
             ));
             $exception->setTable($this->table);
@@ -247,7 +247,7 @@ abstract class AbstractDatabaseStore extends AbstractStore
         }
 
         if (!$model instanceof JsonSerializable) {
-            $exception = new SelectError(sprintf('%s is not json serializable', $abstractModelClassName));
+            $exception = new SelectError(sprintf('%s is not json serializable', $modelClassName));
             $exception->setTable($this->table);
 
             throw $exception;
