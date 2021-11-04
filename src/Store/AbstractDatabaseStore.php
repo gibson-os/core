@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Store;
 
 use GibsonOS\Core\Exception\CreateError;
-use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\AbstractModel;
 use JsonSerializable;
@@ -72,6 +71,14 @@ abstract class AbstractDatabaseStore extends AbstractStore
         ;
     }
 
+    protected function getTableName(): string
+    {
+        /** @var AbstractModel $modelClassName */
+        $modelClassName = $this->getModelClassName();
+
+        return $modelClassName::getTableName();
+    }
+
     /**
      * @throws SelectError
      *
@@ -85,7 +92,7 @@ abstract class AbstractDatabaseStore extends AbstractStore
     }
 
     /**
-     * @throws GetError
+     * @throws SelectError
      */
     public function getCount(): int
     {
@@ -102,7 +109,7 @@ abstract class AbstractDatabaseStore extends AbstractStore
         );
 
         if ($count === null) {
-            throw new GetError('Anzahl konnte nicht ermittelt werden!');
+            throw new SelectError($this->table->connection->error());
         }
 
         if (
