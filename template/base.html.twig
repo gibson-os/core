@@ -52,7 +52,7 @@
 
         Ext.onReady(function()
         {
-            {% set moduleName = request.getModuleName() == 'core' ? 'system' : request.getTaskName() %}
+            {% set moduleName = request.getModuleName() %}
             {% set taskName = request.getTaskName() %}
             {% set actionName = request.getActionName() %}
             {% if session.getWithDefault('login', false) != true %}

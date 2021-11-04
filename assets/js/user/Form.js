@@ -1,8 +1,8 @@
-Ext.define('GibsonOS.module.system.user.Form', {
+Ext.define('GibsonOS.module.core.user.Form', {
     extend: 'GibsonOS.form.Panel',
-    alias: ['widget.gosModuleSystemUserForm'],
+    alias: ['widget.gosModuleCoreUserForm'],
     requiredPermission: {
-        module: 'system',
+        module: 'core',
         task: 'user'
     },
     initComponent: function() {
@@ -23,7 +23,7 @@ Ext.define('GibsonOS.module.system.user.Form', {
 
         this.items = [{
             xtype: 'gosFormTextfield',
-            itemId: 'systemUserFormUsername',
+            itemId: 'coreUserFormUsername',
             name: 'username',
             fieldLabel: 'Benutzername',
             requiredPermission: {
@@ -32,7 +32,7 @@ Ext.define('GibsonOS.module.system.user.Form', {
             }
         },{
             xtype: 'gosFormTextfield',
-            itemId: 'systemUserFormHost',
+            itemId: 'coreUserFormHost',
             name: 'host',
             fieldLabel: 'Host',
             requiredPermission: {
@@ -41,7 +41,7 @@ Ext.define('GibsonOS.module.system.user.Form', {
             }
         },{
             xtype: 'gosFormTextfield',
-            itemId: 'systemUserFormIp',
+            itemId: 'coreUserFormIp',
             name: 'ip',
             fieldLabel: 'IP',
             requiredPermission: {

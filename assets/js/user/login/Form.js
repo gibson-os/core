@@ -1,6 +1,6 @@
-Ext.define('GibsonOS.module.system.user.login.Form', {
+Ext.define('GibsonOS.module.core.user.login.Form', {
     extend: 'GibsonOS.form.Panel',
-    alias: ['widget.gosModuleSystemUserLoginForm'],
+    alias: ['widget.gosModuleCoreUserLoginForm'],
     standardSubmit: true,
     frame: true,
     buttonAlign: 'right',

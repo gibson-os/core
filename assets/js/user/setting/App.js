@@ -1,20 +1,20 @@
-Ext.define('GibsonOS.module.system.user.setting.App', {
+Ext.define('GibsonOS.module.core.user.setting.App', {
     extend: 'GibsonOS.App',
-    alias: ['widget.gosModuleSystemUserSettingApp'],
-    itemId: 'systemUserSettingApp',
+    alias: ['widget.gosModuleCoreUserSettingApp'],
+    itemId: 'coreUserSettingApp',
     appIcon: 'icon_settings',
     title: 'Einstellungen',
     width: 400,
     height: 260,
     requiredPermission: {
-        module: 'system',
+        module: 'core',
         task: 'user'
     },
     initComponent: function() {
         var app = this;
 
         this.items = [{
-            xtype: 'gosModuleSystemUserTabPanel',
+            xtype: 'gosModuleCoreUserTabPanel',
             gos: {
                 data: {
                     success: function(form, action) {

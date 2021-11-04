@@ -1,6 +1,6 @@
-Ext.define('GibsonOS.module.system.user.login.Window', {
+Ext.define('GibsonOS.module.core.user.login.Window', {
     extend: 'GibsonOS.Window',
-    alias: ['widget.gosModuleSystemUserLoginWindow'],
+    alias: ['widget.gosModuleCoreUserLoginWindow'],
     title: 'Login',
     width: 400,
     y: 150,
@@ -18,7 +18,7 @@ Ext.define('GibsonOS.module.system.user.login.Window', {
                 height: 64,
                 margin: 15
             },{
-                xtype: 'gosModuleSystemUserLoginForm',
+                xtype: 'gosModuleCoreUserLoginForm',
                 columnWidth: 1
             }]
         }];

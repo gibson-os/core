@@ -125,7 +125,7 @@ class User extends AbstractModel implements JsonSerializable
         return [
             'id' => $this->getId(),
             'user' => $this->getUser(),
-            'password' => $this->getPassword(),
+//            'password' => $this->getPassword(),
             'host' => $this->getHost(),
             'ip' => $this->getIp(),
             'lastLogin' => $this->getLastLogin(),

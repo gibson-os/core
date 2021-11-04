@@ -8,7 +8,8 @@ use GibsonOS\Core\Model\User\Device;
 use GibsonOS\Core\Repository\AbstractRepository;
 
 /**
- * @method Device fetchOne(string $where, array $parameters, string $modelClassName)
+ * @method Device   fetchOne(string $where, array $parameters, string $modelClassName)
+ * @method Device[] fetchAll(string $where, array $parameters, string $modelClassName, int $limit = null, int $offset = null, string $orderBy = null)
  */
 class DeviceRepository extends AbstractRepository
 {
@@ -34,5 +35,15 @@ class DeviceRepository extends AbstractRepository
     public function getByCryptedToken(string $cryptedToken, string $salt, string $secret): Device
     {
         return $this->fetchOne('MD5(CONCAT(`token`, ?, ?)=?', [$salt, $secret, $cryptedToken], Device::class);
+    }
+
+    /**
+     * @throws SelectError
+     *
+     * @return Device[]
+     */
+    public function findByUserId(int $userId): array
+    {
+        return $this->fetchAll('`user_id`=?', [$userId], Device::class);
     }
 }

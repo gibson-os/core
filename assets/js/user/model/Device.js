@@ -1,4 +1,4 @@
-Ext.define('GibsonOS.module.system.user.model.Device', {
+Ext.define('GibsonOS.module.core.user.model.Device', {
     extend: 'GibsonOS.data.Model',
     fields: [{
         name: 'id',

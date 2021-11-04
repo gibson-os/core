@@ -13,6 +13,7 @@ use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Exception\UserError;
 use GibsonOS\Core\Model\User;
 use GibsonOS\Core\Model\User\Permission;
+use GibsonOS\Core\Repository\User\DeviceRepository;
 use GibsonOS\Core\Repository\UserRepository;
 use GibsonOS\Core\Service\Attribute\PermissionAttribute;
 use GibsonOS\Core\Service\RequestService;
@@ -64,15 +65,21 @@ class UserController extends AbstractController
      * @throws PermissionDenied
      * @throws SelectError
      */
-    public function settings(UserRepository $userRepository, int $id = null): AjaxResponse
-    {
+    public function settings(
+        UserRepository $userRepository,
+        DeviceRepository $deviceRepository,
+        int $id = null
+    ): AjaxResponse {
         $this->checkUserPermission($id, Permission::READ);
 
         if ($id === null) {
             $id = $this->sessionService->getUserId() ?? 0;
         }
 
-        return $this->returnSuccess($userRepository->getById($id));
+        $user = $userRepository->getById($id)->jsonSerialize();
+        $user['devices'] = $deviceRepository->findByUserId($id);
+
+        return $this->returnSuccess($user);
     }
 
     /**

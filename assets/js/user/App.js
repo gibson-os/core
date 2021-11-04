@@ -1,82 +1,69 @@
-Ext.define('GibsonOS.module.system.user.App', {
+Ext.define('GibsonOS.module.core.user.App', {
     extend: 'GibsonOS.App',
-    alias: ['widget.gosModuleSystemUserApp'],
-    id: 'systemUser',
+    alias: ['widget.gosModuleCoreUserApp'],
+    id: 'coreUser',
     appIcon: 'icon_user',
     title: 'Benutzer',
     width: 600,
     height: 260,
     requiredPermission: {
-        module: 'system',
+        module: 'core',
         task: 'user'
     },
-    initComponent: function() {
-        var app = this;
-        this.tbar = [{
-            xtype: 'gosButton',
-            iconCls: 'icon_system system_add',
-            requiredPermission: {
-                action: 'save',
-                permission: GibsonOS.Permission.WRITE
-            },
-            handler: function() {
-                new GibsonOS.module.system.user.add.Window({
-                    gos: {
-                        data: {
-                            success: function(form, action) {
-                                var data = action.result.data;
+    addFunction() {
+        new GibsonOS.module.core.user.add.Window({
+            gos: {
+                data: {
+                    success: function(form, action) {
+                        const data = action.result.data;
 
-                                app.down('#systemUserGrid').getStore().add({
-                                    id: data.id,
-                                    user: data.user
-                                });
+                        app.down('#coreUserGrid').getStore().add({
+                            id: data.id,
+                            user: data.user
+                        });
 
-                                form.up('window').close();
-                            }
-                        }
+                        form.up('window').close();
                     }
-                });
+                }
             }
+        });
+    },
+    deleteFunction(records) {
+        const me = this;
+        const grid = me.down('#coreUserGrid');
+        const record = records[0];
+
+        GibsonOS.MessageBox.show({
+            title: 'Wirklich löschen?',
+            msg: 'Möchten Sie den Benutzer ' + record.get('user') + ' wirklich löschen?',
+            type: GibsonOS.MessageBox.type.QUESTION,
+            buttons: [{
+                text: 'Ja',
+                sendRequest: true
+            },{
+                text: 'Nein'
+            }]
         },{
-            xtype: 'gosButton',
-            itemId: 'systemUserDeleteButton',
-            iconCls: 'icon_system system_delete',
-            requiredPermission: {
-                action: 'delete',
-                permission: GibsonOS.Permission.DELETE
+            url: baseDir + 'core/user/delete',
+            params: {
+                id: record.get('id')
             },
-            disabled: true,
-            handler: function() {
-                var button = this;
-                var grid = app.down('#systemUserGrid');
-                var record = grid.getSelectionModel().getSelection()[0];
-
-                GibsonOS.MessageBox.show({
-                    title: 'Wirklich löschen?',
-                    msg: 'Möchten Sie den Benutzer ' + record.get('user') + ' wirklich löschen?',
-                    type: GibsonOS.MessageBox.type.QUESTION,
-                    buttons: [{
-                        text: 'Ja',
-                        sendRequest: true
-                    },{
-                        text: 'Nein'
-                    }]
-                },{
-                    url: baseDir + 'core/user/delete',
-                    params: {
-                        id: record.get('id')
-                    },
-                    success: function(response) {
-                        grid.getStore().remove(grid.getSelectionModel().getSelection());
-                        button.disable();
-                    }
-                });
+            success: function(response) {
+                grid.getStore().remove(grid.getSelectionModel().getSelection());
             }
-        }];
-        this.items = [{
+        });
+    },
+    initComponent: function() {
+        let me = this;
+
+        me = GibsonOS.decorator.ActionManager.init(me);
+        me = GibsonOS.decorator.action.Add.init(me);
+        me = GibsonOS.decorator.action.Delete.init(me);
+
+        me.items = [{
             layout: 'border',
             items: [{
-                xtype: 'gosModuleSystemUserGrid',
+                xtype: 'gosModuleCoreUserGrid',
                 region: 'west',
                 width: 120,
                 collapsible: true,
@@ -85,21 +72,15 @@ Ext.define('GibsonOS.module.system.user.App', {
                 hideCollapseTool: true
             },{
                 xtype: 'gosPanel',
-                itemId: 'systemUserView',
+                itemId: 'coreUserView',
                 region: 'center',
                 layout: 'fit'
             }]
         }];
 
-        this.callParent();
+        me.callParent();
 
-        this.down('#systemUserGrid').on('select', function(selection, record, index, options) {
-            app.down('#systemUserDeleteButton').enable();
-        });
-        this.down('#systemUserGrid').on('deselect', function(selection, record, index, options) {
-            if (selection.getCount() == 0) {
-                app.down('#systemUserDeleteButton').disable();
-            }
-        });
+        me.viewItem = me.down('gosModuleCoreUserGrid');
+        GibsonOS.decorator.ActionManager.addListeners(me);
     }
 });

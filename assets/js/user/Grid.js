@@ -1,31 +1,32 @@
-Ext.define('GibsonOS.module.system.user.Grid', {
-    extend: 'GibsonOS.grid.Panel',
-    alias: ['widget.gosModuleSystemUserGrid'],
-    itemId: 'systemUserGrid',
+Ext.define('GibsonOS.module.core.user.Grid', {
+    extend: 'GibsonOS.module.core.component.grid.Panel',
+    alias: ['widget.gosModuleCoreUserGrid'],
+    itemId: 'coreUserGrid',
     header: false,
     hideHeaders: true,
+    enablePagingBar: false,
     initComponent: function() {
-        var grid = this;
+        const me = this;
 
-        this.store = new GibsonOS.module.system.user.store.User();
-        this.columns = [{
+        me.store = new GibsonOS.module.core.user.store.User();
+        me.columns = [{
             header: 'Benutzer',
             dataIndex: 'user',
             flex: 1
         }];
 
-        this.callParent();
+        me.callParent();
 
-        this.on('select', function(selection, record, index, options) {
-            var view = grid.up('#app').down('#systemUserView');
+        me.on('select', function(selection, record) {
+            const view = me.up('#app').down('#coreUserView');
             view.removeAll();
             view.add({
-                xtype: 'gosModuleSystemUserTabPanel',
+                xtype: 'gosModuleCoreUserTabPanel',
                 gos: {
                     data: {
                         userId: record.get('id'),
                         success: function(form, action) {
-                            var data = action.result.data;
+                            const data = action.result.data;
 
                             record.set('user', data.user);
                             record.commit();

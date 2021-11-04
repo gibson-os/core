@@ -1,7 +1,7 @@
-Ext.define('GibsonOS.module.system.user.add.Window', {
+Ext.define('GibsonOS.module.core.user.add.Window', {
     extend: 'GibsonOS.Window',
-    alias: ['widget.gosModuleSystemUserAddWindow'],
-    itemId: 'systemUserAddWindow',
+    alias: ['widget.gosModuleCoreUserAddWindow'],
+    itemId: 'coreUserAddWindow',
     title: 'Benutzer hinzufügen',
     width: 400,
     height: 210,
@@ -9,7 +9,7 @@ Ext.define('GibsonOS.module.system.user.add.Window', {
         var window = this;
 
         this.items = [{
-            xtype: 'gosModuleSystemUserForm',
+            xtype: 'gosModuleCoreUserForm',
             gos: {
                 data: {
                     add: true,

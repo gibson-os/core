@@ -1,6 +1,6 @@
-Ext.define('GibsonOS.module.system.user.store.Device', {
+Ext.define('GibsonOS.module.core.user.store.Device', {
     extend: 'GibsonOS.data.Store',
-    alias: ['store.gosModuleSystemUserDeviceStore'],
+    alias: ['store.gosModuleCoreUserDeviceStore'],
     autoLoad: false,
-    model: 'GibsonOS.module.system.user.model.Device'
+    model: 'GibsonOS.module.core.user.model.Device'
 });

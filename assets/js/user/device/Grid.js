@@ -1,9 +1,9 @@
-Ext.define('GibsonOS.module.system.user.device.Grid', {
+Ext.define('GibsonOS.module.core.user.device.Grid', {
     extend: 'GibsonOS.grid.Panel',
-    alias: ['widget.gosModuleSystemUserDeviceGrid'],
+    alias: ['widget.gosModuleCoreUserDeviceGrid'],
     title: 'Geräte',
     multiSelect: true,
-    itemId: 'systemUserDeviceGrid',
+    itemId: 'coreUserDeviceGrid',
     initComponent: function() {
         var grid = this;
         var permissionWrite = GibsonOS.Permission.WRITE;
@@ -17,7 +17,7 @@ Ext.define('GibsonOS.module.system.user.device.Grid', {
             permissionDelete += GibsonOS.Permission.MANAGE;
         }
 
-        this.store = new GibsonOS.module.system.user.store.Device();
+        this.store = new GibsonOS.module.core.user.store.Device();
         this.columns = [{
             header: 'Model',
             dataIndex: 'model',
@@ -30,7 +30,7 @@ Ext.define('GibsonOS.module.system.user.device.Grid', {
         this.tbar = [{
             xtype: 'gosButton',
             iconCls: 'icon_system system_delete',
-            itemId: 'systemUserDeviceDeleteButton',
+            itemId: 'coreUserDeviceDeleteButton',
             disabled: true,
             requiredPermission: {
                 action: 'deletedevice',
@@ -79,11 +79,11 @@ Ext.define('GibsonOS.module.system.user.device.Grid', {
         this.callParent();
 
         this.on('select', function(selection, record, index, options) {
-            grid.down('#systemUserDeviceDeleteButton').enable();
+            grid.down('#coreUserDeviceDeleteButton').enable();
         });
         this.on('deselect', function(selection, record, index, options) {
             if (selection.getCount() == 0) {
-                grid.down('#systemUserDeviceDeleteButton').disable();
+                grid.down('#coreUserDeviceDeleteButton').disable();
             }
         });
     }
