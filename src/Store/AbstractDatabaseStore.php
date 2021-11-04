@@ -59,6 +59,7 @@ abstract class AbstractDatabaseStore extends AbstractStore
     {
         $this->wheres = [];
         $this->setWheres();
+        $this->table->reset();
         $this->table
             ->setWhere($this->getWhereString())
             ->setOrderBy($this->getOrderBy())
