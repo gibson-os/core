@@ -255,6 +255,10 @@ class ControllerService
                 return null;
             }
 
+            if ($parameter->isOptional()) {
+                return $parameter->getDefaultValue();
+            }
+
             throw new ControllerError(sprintf(
                 'Parameter %s doesnt allows null!',
                 $parameter->getName()

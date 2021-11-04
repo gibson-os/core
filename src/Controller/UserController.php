@@ -141,10 +141,38 @@ class UserController extends AbstractController
     ): AjaxResponse {
         $this->checkUserPermission($id, Permission::WRITE);
 
+        if (empty($username)) {
+            return $this->returnFailure(['msg' => 'Benutzername ist leer.']);
+        }
+
         $user = new User();
 
         if ($id !== null) {
             $user = $userRepository->getById($id);
+        } else {
+            try {
+                $userRepository->getByUsername($username);
+
+                return $this->returnFailure('Benutzername existiert schon.');
+            } catch (SelectError) {
+                // Do nothing
+            }
+        }
+
+        if (
+            !empty($password) ||
+            !empty($passwordRepeat)
+        ) {
+            if ($password != $passwordRepeat) {
+                return $this->returnFailure('Passwort stimmt nicht überein.');
+            }
+
+            if (
+                !empty($password) &&
+                mb_strlen($password) < 6
+            ) {
+                return $this->returnFailure('Passwort zu kurz. Mindestens 6 Zeichen.');
+            }
         }
 
         return $this->returnSuccess($userService->save(
@@ -155,6 +183,42 @@ class UserController extends AbstractController
             $host,
             $ip
         ));
+    }
+
+    /**
+     * @throws LoginRequired
+     * @throws PermissionDenied
+     */
+    public function deleteDevice(DeviceRepository $deviceRepository, int $id, array $devices): AjaxResponse
+    {
+        $this->checkUserPermission($id, Permission::DELETE);
+
+        $deviceRepository->deleteByIds($devices, $id);
+
+        return $this->returnSuccess();
+    }
+
+    /**
+     * @throws SaveError
+     */
+    #[CheckPermission(Permission::MANAGE + Permission::WRITE)]
+    public function savePermission(
+        int $id,
+        int $permission,
+        string $module,
+        string $task = '',
+        string $action = ''
+    ): AjaxResponse {
+        (new Permission())
+            ->setUserId($id)
+            ->setPermission($permission)
+            ->setModule($module)
+            ->setTask($task)
+            ->setAction($action)
+            ->save()
+        ;
+
+        return $this->returnSuccess();
     }
 
     /**

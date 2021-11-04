@@ -13,9 +13,9 @@ Ext.define('GibsonOS.module.core.module.store.Permission', {
 
         this.on('update', function(store, record, operation, options) {
             GibsonOS.Ajax.request({
-                url: baseDir + 'system/user/savepermission',
+                url: baseDir + 'core/user/savePermission',
                 params: {
-                    user: record.get('user_id'),
+                    id: record.get('user_id'),
                     permission: record.get('permission'),
                     module: store.gos.data.module,
                     task: store.gos.data.task,

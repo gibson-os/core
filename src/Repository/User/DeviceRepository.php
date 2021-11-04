@@ -46,4 +46,22 @@ class DeviceRepository extends AbstractRepository
     {
         return $this->fetchAll('`user_id`=?', [$userId], Device::class);
     }
+
+    public function deleteByIds(array $ids, int $userId = null): void
+    {
+        $table = $this->getTable(Device::getTableName());
+        $table
+            ->setWhereParameters($ids)
+            ->deletePrepared()
+        ;
+
+        $where = '`id` IN (' . $table->getParametersString($ids) . ')';
+
+        if ($userId !== null) {
+            $where .= ' AND `user_id`=?';
+            $table->addWhereParameter($userId);
+        }
+
+        $table->setWhere($where);
+    }
 }

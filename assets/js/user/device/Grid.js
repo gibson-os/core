@@ -60,7 +60,7 @@ Ext.define('GibsonOS.module.core.user.device.Grid', {
                         text: 'Nein'
                     }]
                 },{
-                    url: baseDir + 'system/user/deletedevice',
+                    url: baseDir + 'core/user/deleteDevice',
                     params: {
                         user: grid.gos.data.userId ? grid.gos.data.userId : 0,
                         'devices[]': ids
