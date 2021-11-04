@@ -129,12 +129,12 @@ abstract class AbstractDatabaseStore extends AbstractStore
 
     protected function getCountField(): string
     {
-        return '`id`';
+        return '`' . $this->getTableName() . '`.`id`';
     }
 
     protected function getDefaultOrder(): string
     {
-        return '`id`';
+        return '`' . $this->getTableName() . '`.`id`';
     }
 
     /**
