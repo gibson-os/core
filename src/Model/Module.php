@@ -3,7 +3,9 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Model;
 
-class Module extends AbstractModel
+use JsonSerializable;
+
+class Module extends AbstractModel implements JsonSerializable
 {
     private ?int $id = null;
 
@@ -36,5 +38,13 @@ class Module extends AbstractModel
         $this->name = $name;
 
         return $this;
+    }
+
+    public function jsonSerialize(): array
+    {
+        return [
+            'id' => $this->getId(),
+            'text' => $this->getName(),
+        ];
     }
 }

@@ -4,6 +4,6 @@ Ext.define('GibsonOS.module.core.module.store.Tree', {
     autoLoad: true,
     proxy: {
         type: 'gosDataProxyAjax',
-        url: baseDir + 'system/module/index'
+        url: baseDir + 'core/module/index'
     }
 });
