@@ -18,4 +18,15 @@ class TaskRepository extends AbstractRepository
     {
         return $this->fetchOne('`name`=? AND `module_id`=?', [$name, $moduleId], Task::class);
     }
+
+    public function deleteByIdsNot(array $ids): bool
+    {
+        $table = $this->getTable(Task::getTableName());
+
+        return $table
+            ->setWhere('`ids` IN (' . $table->getParametersString($ids) . ')')
+            ->setWhereParameters($ids)
+            ->deletePrepared()
+        ;
+    }
 }

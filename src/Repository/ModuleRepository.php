@@ -18,4 +18,15 @@ class ModuleRepository extends AbstractRepository
     {
         return $this->fetchOne('`name`=?', [$name], Module::class);
     }
+
+    public function deleteByIdsNot(array $ids): bool
+    {
+        $table = $this->getTable(Module::getTableName());
+
+        return $table
+            ->setWhere('`ids` IN (' . $table->getParametersString($ids) . ')')
+            ->setWhereParameters($ids)
+            ->deletePrepared()
+        ;
+    }
 }
