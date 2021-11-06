@@ -22,6 +22,11 @@ class ModuleService
 {
     private string $vendorPath;
 
+    /**
+     * @deprecated
+     */
+    private string $oldPath;
+
     public function __construct(
         private ModuleRepository $moduleRepository,
         private TaskRepository $taskRepository,
@@ -35,6 +40,17 @@ class ModuleService
             '..' . DIRECTORY_SEPARATOR .
             '..' . DIRECTORY_SEPARATOR
         ) . DIRECTORY_SEPARATOR;
+
+        $this->oldPath = realpath(
+            dirname(__FILE__) . DIRECTORY_SEPARATOR .
+            '..' . DIRECTORY_SEPARATOR .
+            '..' . DIRECTORY_SEPARATOR .
+            '..' . DIRECTORY_SEPARATOR .
+            '..' . DIRECTORY_SEPARATOR .
+            '..' . DIRECTORY_SEPARATOR .
+            'includes' . DIRECTORY_SEPARATOR .
+            'module' . DIRECTORY_SEPARATOR
+        ) . DIRECTORY_SEPARATOR;
     }
 
     /**
@@ -45,12 +61,11 @@ class ModuleService
     public function scan(): void
     {
         $result = $this->scanModules();
+        $oldResult = $this->scanOldModules();
 
+        $this->actionRepository->deleteByIdsNot(array_merge($result['actionIds'], $oldResult['actionIds']));
+        $this->taskRepository->deleteByIdsNot(array_merge_recursive($result['taskIds'], $oldResult['taskIds']));
         $this->actionRepository->deleteByIdsNot($result['actionIds']);
-        $this->taskRepository->deleteByIdsNot($result['taskIds']);
-        $this->actionRepository->deleteByIdsNot($result['actionIds']);
-
-        // @todo old shit einbauen
     }
 
     /**
@@ -199,6 +214,150 @@ class ModuleService
                         ->save()
                     ;
                 }
+            }
+        }
+
+        return $actionIds;
+    }
+
+    /**
+     * @throws GetError
+     * @throws SaveError
+     *
+     * @return array{moduleIds: array<int>, taskIds: array<int>, actionIds: array<int>}
+     *
+     * @deprecated
+     */
+    private function scanOldModules(): array
+    {
+        $moduleIds = [];
+        $taskIds = [];
+        $actionIds = [];
+
+        foreach ($this->dirService->getFiles($this->oldPath) as $dir) {
+            if (!is_dir($dir)) {
+                continue;
+            }
+
+            $pos = mb_strrpos($dir, '/') ?: -1;
+            $moduleName = mb_substr($dir, $pos + 1);
+
+            try {
+                $module = $this->moduleRepository->getByName($moduleName);
+            } catch (SelectError) {
+                $module = (new Module())->setName($moduleName);
+                $module->save();
+            }
+
+            $moduleIds[] = $module->getId() ?? 0;
+            $result = $this->scanOldTasks(
+                $module,
+                $dir . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'Controller' . DIRECTORY_SEPARATOR
+            );
+            $taskIds = array_merge($taskIds, $result['taskIds']);
+            $actionIds = array_merge($actionIds, $result['actionIds']);
+        }
+
+        return [
+            'moduleIds' => $moduleIds,
+            'taskIds' => $taskIds,
+            'actionIds' => $actionIds,
+        ];
+    }
+
+    /**
+     * @deprecated
+     *
+     * @throws GetError
+     * @throws SaveError
+     *
+     * @return array{taskIds: array<int>, actionIds: array<int>}
+     */
+    private function scanOldTasks(Module $module, string $path): array
+    {
+        $taskIds = [];
+        $actionIds = [];
+
+        foreach ($this->dirService->getFiles($path, '*.php') as $filename) {
+            $pos = mb_strrpos($filename, '/') ?: -1;
+            $taskName = mb_substr($filename, $pos + 1);
+            $pos = mb_strpos($taskName, '.');
+            $taskName = strtolower(mb_substr($taskName, 0, $pos ?: null));
+            $taskName = str_replace('controller', '', $taskName);
+
+            try {
+                $task = $this->taskRepository->getByNameAndModuleId($taskName, $module->getId() ?? 0);
+            } catch (SelectError) {
+                $task = (new Task())
+                    ->setName($taskName)
+                    ->setModule($module)
+                ;
+                $task->save();
+            }
+
+            $taskIds[] = $task->getId() ?? 0;
+            $actionIds = array_merge($this->scanOldActions($module, $task, $filename), $actionIds);
+        }
+
+        return [
+            'taskIds' => $taskIds,
+            'actionIds' => $actionIds,
+        ];
+    }
+
+    /**
+     * @throws SaveError
+     *
+     * @return int[]
+     *
+     * @deprecated
+     */
+    private function scanOldActions(Module $module, Task $task, string $filename): array
+    {
+        $actionIds = [];
+        $file = file_get_contents($filename) ?: '';
+        preg_match_all('/\spublic function ([^_][^\(]+).../si', $file, $actions);
+
+        foreach ($actions[1] as $index => $actionName) {
+            try {
+                $action = $this->actionRepository->getByNameAndTaskId($actionName, $task->getId() ?? 0);
+            } catch (SelectError) {
+                $action = (new Action())
+                    ->setName($actionName)
+                    ->setTask($task)
+                    ->setModule($module)
+                ;
+                $action->save();
+            }
+
+            $actionIds[] = $action->getId() ?? 0;
+            $start = (mb_strpos($file, $actions[0][$index]) ?: 0) + mb_strlen($actions[0][$index]);
+
+            if (mb_strpos(mb_substr($file, $start), ' function ')) {
+                $length = mb_strpos(mb_substr($file, $start), ' function ') ?: null;
+            } else {
+                $length = null;
+            }
+
+            $substr = mb_substr($file, $start, $length);
+            preg_match_all('/\$this-\>checkPermission\((.+?)\)/si', $substr, $permissions);
+            $this->permissionRepository->deleteByAction($action->getName());
+
+            foreach ($permissions[1] as $permissionString) {
+                $permission = null;
+                eval(
+                    'use GibsonOS\Core\Model\Permission;' .
+                    '$permission = ' . $permissionString . ';'
+                );
+
+                if ($permission === null) {
+                    continue;
+                }
+
+                (new Action\Permission())
+                    ->setActionId($action->getId())
+                    ->setPermission($permission)
+                ;
             }
         }
 
