@@ -4,6 +4,8 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Store\User;
 
 use Generator;
+use GibsonOS\Core\Exception\Repository\SelectError;
+use GibsonOS\Core\Model\User;
 use GibsonOS\Core\Model\User\PermissionView;
 use GibsonOS\Core\Store\AbstractDatabaseStore;
 
@@ -23,14 +25,11 @@ class PermissionStore extends AbstractDatabaseStore
     protected function setWheres(): void
     {
         if ($this->moduleId !== null) {
-            $this->addWhere(
-                '`module_id`=? AND `task`=? AND `action`=? AND `module_row_number`=?',
-                [$this->moduleId, '', '', 1]
-            );
+            $this->addWhere('`module_id`=? AND `task`=? AND `action`=?', [$this->moduleId, '', '']);
         }
 
         if ($this->taskId !== null) {
-            $this->addWhere('`task_id`=? AND `action`=? AND `module_row_number`=?', [$this->taskId, '', 1]);
+            $this->addWhere('`task_id`=? AND `action`=?', [$this->taskId, '']);
         }
 
         if ($this->actionId !== null) {
@@ -43,19 +42,43 @@ class PermissionStore extends AbstractDatabaseStore
         return '`user_ip`, `user_host`, `user_name`';
     }
 
+    protected function initTable(): void
+    {
+        parent::initTable();
+
+        $this->table->appendJoin(User::getTableName(), '`user`.`id`=`view_user_permission`.`user_id`');
+    }
+
     public function getList(): Generator
     {
-        /** @var PermissionView $permissionView */
-        foreach (parent::getList() as $permissionView) {
-            $data = $permissionView->jsonSerialize();
-            $data['parentPermission'] = 0;
+        $this->initTable();
+        $select = 'DISTINCT ' .
+            '`user_id` `userId`, ' .
+            '`user`.`user` `userName`, ' .
+            '`user`.`host` `userHost`, ' .
+            '`user`.`ip` `userIp`, ' .
+            'IFNULL(`permission`, 1) `permission`, ' .
+            '`module`, ' .
+            '`task`, ' .
+            '`action`'
+        ;
+
+        if ($this->table->selectPrepared(false, $select) === false) {
+            $exception = new SelectError($this->table->connection->error());
+            $exception->setTable($this->table);
+
+            throw $exception;
+        }
+
+        foreach ($this->table->connection->fetchAssocList() as $permissionView) {
+            $permissionView['parentPermission'] = 0;
 
             if ($this->isParentPermission($permissionView)) {
-                $data['parentPermission'] = $data['permission'];
-                $data['permission'] = 0;
+                $permissionView['parentPermission'] = $permissionView['permission'];
+                $permissionView['permission'] = 0;
             }
 
-            yield $data;
+            yield $permissionView;
         }
         error_log($this->table->sql);
     }
@@ -81,13 +104,13 @@ class PermissionStore extends AbstractDatabaseStore
         return $this;
     }
 
-    private function isParentPermission(PermissionView $permissionView): bool
+    private function isParentPermission(array $permissionView): bool
     {
-        if ($this->taskId !== null && $permissionView->getTaskId() === null) {
+        if ($this->taskId !== null && $permissionView['task'] === '') {
             return true;
         }
 
-        if ($this->actionId !== null && $permissionView->getActionId() === null) {
+        if ($this->actionId !== null && $permissionView['action'] === '') {
             return true;
         }
 
