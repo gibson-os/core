@@ -4,18 +4,25 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Model\User;
 
 use GibsonOS\Core\Model\AbstractModel;
+use JsonSerializable;
 
-class PermissionView extends AbstractModel
+class PermissionView extends AbstractModel implements JsonSerializable
 {
-    private int $userId;
+    private int $userId = 0;
 
-    private int $permission;
+    private string $userName = 'Allgemein';
 
-    private string $module;
+    private ?string $userIp = null;
 
-    private string $task;
+    private ?string $userHost = null;
 
-    private string $action;
+    private int $permission = 0;
+
+    private string $module = '';
+
+    private string $task = '';
+
+    private string $action = '';
 
     private ?int $moduleId = null;
 
@@ -42,6 +49,42 @@ class PermissionView extends AbstractModel
     public function setUserId(int $userId): PermissionView
     {
         $this->userId = $userId;
+
+        return $this;
+    }
+
+    public function getUserName(): string
+    {
+        return $this->userName;
+    }
+
+    public function setUserName(string $userName): PermissionView
+    {
+        $this->userName = $userName;
+
+        return $this;
+    }
+
+    public function getUserIp(): ?string
+    {
+        return $this->userIp;
+    }
+
+    public function setUserIp(?string $userIp): PermissionView
+    {
+        $this->userIp = $userIp;
+
+        return $this;
+    }
+
+    public function getUserHost(): ?string
+    {
+        return $this->userHost;
+    }
+
+    public function setUserHost(?string $userHost): PermissionView
+    {
+        $this->userHost = $userHost;
 
         return $this;
     }
@@ -164,5 +207,25 @@ class PermissionView extends AbstractModel
         $this->actionName = $actionName;
 
         return $this;
+    }
+
+    public function jsonSerialize(): array
+    {
+        return [
+            'userId' => $this->getUserId(),
+            'userName' => $this->getUserName(),
+            'userHost' => $this->getUserHost(),
+            'userIp' => $this->getUserIp(),
+            'permission' => $this->getPermission(),
+            'module' => $this->getModule(),
+            'task' => $this->getTask(),
+            'action' => $this->getAction(),
+            'moduleId' => $this->getModuleId(),
+            'moduleName' => $this->getModuleName(),
+            'taskId' => $this->getTaskId(),
+            'taskName' => $this->getTaskName(),
+            'actionId' => $this->getActionId(),
+            'actionName' => $this->getActionName(),
+        ];
     }
 }

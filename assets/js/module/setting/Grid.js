@@ -6,7 +6,7 @@ Ext.define('GibsonOS.module.core.module.setting.Grid', {
         ftype: 'gosGridFeatureGrouping'
     }],
     initComponent: function() {
-        this.store = new GibsonOS.module.core.module.store.Permission();
+        this.store = new GibsonOS.module.core.module.store.Setting();
         this.columns = [{
             header: 'Schlüssel',
             dataIndex: 'key',

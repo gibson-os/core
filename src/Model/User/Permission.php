@@ -5,7 +5,6 @@ namespace GibsonOS\Core\Model\User;
 
 use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Model\User;
-use mysqlDatabase;
 
 class Permission extends AbstractModel
 {
@@ -27,18 +26,11 @@ class Permission extends AbstractModel
 
     private string $action = '';
 
-    private int $userId = 0;
+    private ?int $userId = null;
 
     private int $permission = self::DENIED;
 
-    private User $user;
-
-    public function __construct(mysqlDatabase $database = null)
-    {
-        parent::__construct($database);
-
-        $this->user = new User();
-    }
+    private ?User $user;
 
     public static function getTableName(): string
     {
@@ -81,12 +73,12 @@ class Permission extends AbstractModel
         return $this;
     }
 
-    public function getUserId(): int
+    public function getUserId(): ?int
     {
         return $this->userId;
     }
 
-    public function setUserId(int $userId): Permission
+    public function setUserId(?int $userId): Permission
     {
         $this->userId = $userId;
 
@@ -105,17 +97,23 @@ class Permission extends AbstractModel
         return $this;
     }
 
-    public function getUser(): User
+    public function getUser(): ?User
     {
-        $this->loadForeignRecord($this->user, $this->getUserId());
+        $userId = $this->getUserId();
+
+        if ($userId === null) {
+            $this->user = null;
+        } else {
+            $this->loadForeignRecord(new User(), $userId);
+        }
 
         return $this->user;
     }
 
-    public function setUser(User $user): Permission
+    public function setUser(?User $user): Permission
     {
         $this->user = $user;
-        $this->setUserId($user->getId() ?? 0);
+        $this->setUserId($user?->getId());
 
         return $this;
     }

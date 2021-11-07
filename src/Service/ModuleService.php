@@ -143,11 +143,13 @@ class ModuleService
                 '\\Controller\\',
                 $classname
             )));
+            /** @var class-string $fqClassname */
             $fqClassname = 'GibsonOS\\Module\\' . $classname;
 
             try {
                 $reflectionClass = new ReflectionClass($fqClassname);
             } catch (ReflectionException) {
+                /** @var class-string $fqClassname */
                 $fqClassname = 'GibsonOS\\' . $classname;
                 $reflectionClass = new ReflectionClass($fqClassname);
             }

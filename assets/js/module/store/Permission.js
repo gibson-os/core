@@ -5,7 +5,7 @@ Ext.define('GibsonOS.module.core.module.store.Permission', {
     pageSize: 100,
     proxy: {
         type: 'gosDataProxyAjax',
-        url: baseDir + 'system/module/permission'
+        url: baseDir + 'core/module/permission'
     },
     model: 'GibsonOS.module.core.module.model.Permission',
     constructor: function(data) {
@@ -15,7 +15,7 @@ Ext.define('GibsonOS.module.core.module.store.Permission', {
             GibsonOS.Ajax.request({
                 url: baseDir + 'core/user/savePermission',
                 params: {
-                    id: record.get('user_id'),
+                    id: record.get('userId'),
                     permission: record.get('permission'),
                     module: store.gos.data.module,
                     task: store.gos.data.task,

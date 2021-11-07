@@ -9,15 +9,15 @@ Ext.define('GibsonOS.module.core.module.permission.Grid', {
         this.store = new GibsonOS.module.core.module.store.Permission();
         this.columns = [{
             header: 'Benutzer',
-            dataIndex: 'user',
+            dataIndex: 'userName',
             flex: 1
         },{
             header: 'Host',
-            dataIndex: 'host',
+            dataIndex: 'userHost',
             flex: 1
         },{
             header: 'IP',
-            dataIndex: 'ip',
+            dataIndex: 'userIp',
             flex: 1
         },{
             header: 'Rechte',
@@ -42,7 +42,7 @@ Ext.define('GibsonOS.module.core.module.permission.Grid', {
                             newValue = item[1];
                             return false;
                         }
-                    } else if (record.get('parent_permission') == item[0]) {
+                    } else if (record.get('parentPermission') == item[0]) {
                         newValue = '- Geerbt (' + item[1] + ') -';
                         return false;
                     }
