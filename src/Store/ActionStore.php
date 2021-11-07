@@ -14,6 +14,11 @@ class ActionStore extends AbstractDatabaseStore
         return Action::class;
     }
 
+    protected function getDefaultOrder(): string
+    {
+        return '`name`';
+    }
+
     protected function setWheres(): void
     {
         if ($this->taskId !== null) {

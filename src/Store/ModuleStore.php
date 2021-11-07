@@ -7,6 +7,11 @@ use GibsonOS\Core\Model\Module;
 
 class ModuleStore extends AbstractDatabaseStore
 {
+    protected function getDefaultOrder(): string
+    {
+        return '`name`';
+    }
+
     protected function getModelClassName(): string
     {
         return Module::class;

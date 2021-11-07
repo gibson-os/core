@@ -196,12 +196,12 @@ abstract class AbstractDatabaseStore extends AbstractStore
             $orderBy[] = $order;
         }
 
-        $this->orderBy = empty($orderBy) ? $this->getDefaultOrder() : implode(', ', $orderBy);
+        $this->orderBy = empty($orderBy) ? null : implode(', ', $orderBy);
     }
 
     protected function getOrderBy(): ?string
     {
-        return $this->orderBy;
+        return $this->orderBy ?? $this->getDefaultOrder();
     }
 
     /**

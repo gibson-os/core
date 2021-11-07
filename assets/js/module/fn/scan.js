@@ -1,6 +1,6 @@
 GibsonOS.define('GibsonOS.module.core.module.fn.scan', function(params) {
     GibsonOS.Ajax.request({
-        url: baseDir + 'system/module/scan',
+        url: baseDir + 'core/module/scan',
         success: function(response, options) {
             GibsonOS.MessageBox.show({
                 title: 'Erfolgreich!',

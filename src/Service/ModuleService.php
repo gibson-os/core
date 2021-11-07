@@ -55,17 +55,20 @@ class ModuleService
 
     /**
      * @throws GetError
-     * @throws ReflectionException
      * @throws SaveError
      */
     public function scan(): void
     {
-        $result = $this->scanModules();
-        $oldResult = $this->scanOldModules();
+        try {
+            $result = $this->scanModules();
+            $oldResult = $this->scanOldModules();
 
-        $this->actionRepository->deleteByIdsNot(array_merge($result['actionIds'], $oldResult['actionIds']));
-        $this->taskRepository->deleteByIdsNot(array_merge_recursive($result['taskIds'], $oldResult['taskIds']));
-        $this->actionRepository->deleteByIdsNot($result['actionIds']);
+            $this->actionRepository->deleteByIdsNot(array_merge($result['actionIds'], $oldResult['actionIds']));
+            $this->taskRepository->deleteByIdsNot(array_merge_recursive($result['taskIds'], $oldResult['taskIds']));
+            $this->actionRepository->deleteByIdsNot($result['actionIds']);
+        } catch (ReflectionException $e) {
+            throw new GetError($e->getMessage());
+        }
     }
 
     /**
@@ -135,14 +138,19 @@ class ModuleService
             $taskName = strtolower(mb_substr($taskName, 0, $pos ?: null));
             $taskName = str_replace('controller', '', $taskName);
             $classname = str_replace($this->vendorPath, '', $controller);
-            $classname = str_replace(
+            $classname = ucfirst(str_replace('.php', '', str_replace(
                 DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'Controller' . DIRECTORY_SEPARATOR,
                 '\\Controller\\',
                 $classname
-            );
-            /** @var class-string $classname */
-            $classname = 'GibsonOS\\' . ucfirst(str_replace('.php', '', $classname));
-            $reflectionClass = new ReflectionClass($classname);
+            )));
+            $fqClassname = 'GibsonOS\\Module\\' . $classname;
+
+            try {
+                $reflectionClass = new ReflectionClass($fqClassname);
+            } catch (ReflectionException) {
+                $fqClassname = 'GibsonOS\\' . $classname;
+                $reflectionClass = new ReflectionClass($fqClassname);
+            }
 
             if (
                 $reflectionClass->isAbstract() ||
@@ -250,10 +258,7 @@ class ModuleService
             }
 
             $moduleIds[] = $module->getId() ?? 0;
-            $result = $this->scanOldTasks(
-                $module,
-                $dir . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'Controller' . DIRECTORY_SEPARATOR
-            );
+            $result = $this->scanOldTasks($module, $dir);
             $taskIds = array_merge($taskIds, $result['taskIds']);
             $actionIds = array_merge($actionIds, $result['actionIds']);
         }

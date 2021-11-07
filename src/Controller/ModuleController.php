@@ -4,8 +4,11 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Controller;
 
 use GibsonOS\Core\Attribute\CheckPermission;
+use GibsonOS\Core\Exception\GetError;
+use GibsonOS\Core\Exception\Model\SaveError;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\User\Permission;
+use GibsonOS\Core\Service\ModuleService;
 use GibsonOS\Core\Service\Response\AjaxResponse;
 use GibsonOS\Core\Store\ActionStore;
 use GibsonOS\Core\Store\ModuleStore;
@@ -38,9 +41,16 @@ class ModuleController extends AbstractController
         return $this->returnSuccess($taskStore->getList());
     }
 
+    /**
+     * @throws SelectError
+     * @throws GetError
+     * @throws SaveError
+     */
     #[CheckPermission(Permission::MANAGE + Permission::READ)]
-    public function scan(ModuleStore $moduleStore): AjaxResponse
+    public function scan(ModuleService $moduleService, ModuleStore $moduleStore): AjaxResponse
     {
+        $moduleService->scan();
+
         return $this->returnSuccess($moduleStore->getList());
     }
 }

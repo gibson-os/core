@@ -21,6 +21,11 @@ class TaskStore extends AbstractDatabaseStore
         }
     }
 
+    protected function getDefaultOrder(): string
+    {
+        return '`name`';
+    }
+
     public function getList(): iterable
     {
         /** @var Task $task */
