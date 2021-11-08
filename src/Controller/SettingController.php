@@ -39,7 +39,10 @@ class SettingController extends AbstractController
 
         return $this->returnSuccess([
             'settings' => JsonUtility::decode($windowSettings === null ? '[]' : $windowSettings->getValue()),
-            'permissions' => [...$permissionService->getRequiredPermissions($requiredPermissions)],
+            'permissions' => $permissionService->getRequiredPermissions(
+                $requiredPermissions,
+                $this->sessionService->getUserId() ?? 0
+            ),
         ]);
     }
 }

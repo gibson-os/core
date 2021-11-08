@@ -79,31 +79,36 @@ class PermissionService
 
     /**
      * @param array<string, array{permissionRequired: bool, items: array}> $requiredPermissions
-     *
-     * @throws SelectError
      */
-    public function getRequiredPermissions(array $requiredPermissions): iterable
+    public function getRequiredPermissions(array $requiredPermissions, int $userId): array
     {
+        $permissions = [];
+
         foreach ($requiredPermissions as $moduleName => $requiredPermission) {
-            yield $this->getRequiredPermissionItem($requiredPermission, $moduleName);
+            $permissions[$moduleName] = $this->getRequiredPermissionItem($requiredPermission, $userId, $moduleName);
         }
+
+        return $permissions;
     }
 
     /**
      * @param array{permissionRequired: bool, items: array} $permissionItem
-     *
-     * @throws SelectError
      */
     private function getRequiredPermissionItem(
         array $permissionItem,
+        int $userId,
         string $module,
         string $task = null,
-        string $action = null
+        string $action = null,
     ): array {
         $permissions = [];
 
         if ($permissionItem['permissionRequired'] ?? false) {
-            $permissions['permission'] = $this->getPermission($module, $task, $action);
+            try {
+                $permissions['permission'] = $this->getPermission($module, $task, $action, $userId);
+            } catch (SelectError) {
+                $permissions['permission'] = Permission::DENIED;
+            }
         }
 
         if (isset($permissionItem['items'])) {
@@ -118,7 +123,13 @@ class PermissionService
                     $itemAction = $key;
                 }
 
-                $permissions['items'][$key] = $this->getRequiredPermissionItem($item, $module, $itemTask, $itemAction);
+                $permissions['items'][$key] = $this->getRequiredPermissionItem(
+                    $item,
+                    $userId,
+                    $module,
+                    $itemTask,
+                    $itemAction
+                );
             }
         }
 

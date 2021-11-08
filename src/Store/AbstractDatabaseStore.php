@@ -212,7 +212,7 @@ abstract class AbstractDatabaseStore extends AbstractStore
     protected function getModels(): iterable
     {
         if ($this->table->selectPrepared() === false) {
-            $exception = new SelectError();
+            $exception = new SelectError($this->table->connection->error());
             $exception->setTable($this->table);
 
             throw $exception;

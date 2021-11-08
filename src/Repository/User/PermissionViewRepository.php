@@ -102,14 +102,11 @@ class PermissionViewRepository extends AbstractRepository
             ->getTable(PermissionView::getTableName())
             ->setLimit(1)
         ;
-        $where =
+        $table->setWhere(
             $this->getUserIdWhere($table, $userId) . ' AND ' .
             $this->getModuleWhere($table, $module) . ' AND ' .
             $this->getTaskWhere($table, $task) . ' AND ' .
             $this->getActionWhere($table, $action)
-        ;
-        $table->setWhere(
-            $where
         );
 
         if (!$table->selectPrepared()) {

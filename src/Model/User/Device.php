@@ -5,7 +5,6 @@ namespace GibsonOS\Core\Model\User;
 
 use DateTimeImmutable;
 use DateTimeInterface;
-use GibsonOS\Core\Exception\DateTimeError;
 use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Model\User;
 use mysqlDatabase;
@@ -125,9 +124,6 @@ class Device extends AbstractModel
         return $this;
     }
 
-    /**
-     * @throws DateTimeError
-     */
     public function getUser(): User
     {
         $this->loadForeignRecord($this->user, $this->getUserId());

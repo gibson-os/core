@@ -39,7 +39,7 @@ abstract class AbstractRepository
     protected function getModels(mysqlTable $table, string $modelClassName): array
     {
         if ($table->selectPrepared() === false) {
-            $exception = new SelectError();
+            $exception = new SelectError($table->connection->error());
             $exception->setTable($table);
 
             throw $exception;
@@ -99,7 +99,7 @@ abstract class AbstractRepository
         ;
 
         if (!$table->selectPrepared()) {
-            $exception = new SelectError();
+            $exception = new SelectError($table->connection->error() ?: 'No results!');
             $exception->setTable($table);
 
             throw $exception;
