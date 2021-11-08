@@ -21,13 +21,12 @@ Ext.define('GibsonOS.module.core.module.App', {
                 hideCollapseTool: true,
                 listeners: {
                     itemclick: function(tree, record, item, index, event, options) {
-                        var id = record.get('id');
-                        var settingStore = app.down('#coreModuleManageSettingsGrid').getStore();
-                        var permissionStore = app.down('#coreModulePermissionGrid').getStore();
-                        var permissionPanel = app.down('#coreModulePermissionPanel');
+                        const id = record.get('id');
+                        const settingStore = app.down('#coreModuleManageSettingsGrid').getStore();
+                        const permissionStore = app.down('#coreModulePermissionGrid').getStore();
 
                         if (!isNaN(id)) {
-                            settingStore.getProxy().extraParams.module = id;
+                            settingStore.getProxy().extraParams.moduleId = id;
                             settingStore.load();
                         }
 

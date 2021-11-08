@@ -13,6 +13,7 @@ use GibsonOS\Core\Service\ModuleService;
 use GibsonOS\Core\Service\Response\AjaxResponse;
 use GibsonOS\Core\Store\ActionStore;
 use GibsonOS\Core\Store\ModuleStore;
+use GibsonOS\Core\Store\SettingStore;
 use GibsonOS\Core\Store\TaskStore;
 use GibsonOS\Core\Store\User\PermissionStore;
 
@@ -21,7 +22,7 @@ class ModuleController extends AbstractController
     /**
      * @throws SelectError
      */
-    #[CheckPermission(Permission::READ)]
+    #[CheckPermission(Permission::MANAGE + Permission::READ)]
     public function index(
         ModuleStore $moduleStore,
         TaskStore $taskStore,
@@ -48,7 +49,7 @@ class ModuleController extends AbstractController
      * @throws GetError
      * @throws SaveError
      */
-    #[CheckPermission(Permission::MANAGE + Permission::READ)]
+    #[CheckPermission(Permission::MANAGE + Permission::WRITE)]
     public function scan(ModuleService $moduleService, ModuleStore $moduleStore): AjaxResponse
     {
         $moduleService->scan();
@@ -59,7 +60,7 @@ class ModuleController extends AbstractController
     /**
      * @throws SelectError
      */
-    #[CheckPermission(Permission::READ)]
+    #[CheckPermission(Permission::MANAGE + Permission::READ)]
     public function permission(
         PermissionStore $permissionStore,
         PermissionRepository $permissionRepository,
@@ -86,5 +87,16 @@ class ModuleController extends AbstractController
             'data' => [...$permissionStore->getList()],
             'requiredPermissions' => $requiredPermissions,
         ]);
+    }
+
+    /**
+     * @throws SelectError
+     */
+    #[CheckPermission(Permission::MANAGE + Permission::READ)]
+    public function setting(SettingStore $settingStore, int $moduleId): AjaxResponse
+    {
+        $settingStore->setModuleId($moduleId);
+
+        return $this->returnSuccess($settingStore->getList(), $settingStore->getCount());
     }
 }

@@ -6,7 +6,7 @@ Ext.define('GibsonOS.module.core.module.store.Setting', {
     pageSize: 100,
     proxy: {
         type: 'gosDataProxyAjax',
-        url: baseDir + 'system/module/setting'
+        url: baseDir + 'core/module/setting'
     },
     model: 'GibsonOS.module.core.module.model.Setting'
 });

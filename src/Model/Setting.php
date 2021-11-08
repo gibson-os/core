@@ -4,9 +4,10 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Model;
 
 use GibsonOS\Core\Exception\DateTimeError;
+use JsonSerializable;
 use mysqlDatabase;
 
-class Setting extends AbstractModel
+class Setting extends AbstractModel implements JsonSerializable
 {
     private int $userId = 0;
 
@@ -114,5 +115,15 @@ class Setting extends AbstractModel
         $this->setModuleId($module->getId() ?? 0);
 
         return $this;
+    }
+
+    public function jsonSerialize(): array
+    {
+        return [
+            'key' => $this->getKey(),
+            'value' => $this->getValue(),
+            'userId' => $this->getUserId(),
+            'moduleId' => $this->getModuleId(),
+        ];
     }
 }
