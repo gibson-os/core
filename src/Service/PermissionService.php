@@ -5,11 +5,11 @@ namespace GibsonOS\Core\Service;
 
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\User\Permission;
-use GibsonOS\Core\Repository\User\PermissionRepository;
+use GibsonOS\Core\Repository\User\PermissionViewRepository;
 
 class PermissionService
 {
-    public function __construct(private PermissionRepository $permissionRepository)
+    public function __construct(private PermissionViewRepository $permissionViewRepository)
     {
     }
 
@@ -19,14 +19,14 @@ class PermissionService
     public function getPermission(string $module, string $task = null, string $action = null, int $userId = null): int
     {
         if ($task === null) {
-            return $this->permissionRepository->getPermissionByModule($module, $userId)->getPermission();
+            return $this->permissionViewRepository->getPermissionByModule($module, $userId)->getPermission();
         }
 
         if ($action === null) {
-            return $this->permissionRepository->getPermissionByTask($module, $task, $userId)->getPermission();
+            return $this->permissionViewRepository->getPermissionByTask($module, $task, $userId)->getPermission();
         }
 
-        return $this->permissionRepository->getPermissionByAction($module, $task, $action, $userId)->getPermission();
+        return $this->permissionViewRepository->getPermissionByAction($module, $task, $action, $userId)->getPermission();
     }
 
     public function hasPermission(
@@ -75,5 +75,53 @@ class PermissionService
     public function hasManagePermission(string $module, string $task = null, string $action = null, int $userId = null): bool
     {
         return $this->hasPermission(Permission::MANAGE, $module, $task, $action, $userId);
+    }
+
+    /**
+     * @param array<string, array{permissionRequired: bool, items: array}> $requiredPermissions
+     *
+     * @throws SelectError
+     */
+    public function getRequiredPermissions(array $requiredPermissions): iterable
+    {
+        foreach ($requiredPermissions as $moduleName => $requiredPermission) {
+            yield $this->getRequiredPermissionItem($requiredPermission, $moduleName);
+        }
+    }
+
+    /**
+     * @param array{permissionRequired: bool, items: array} $permissionItem
+     *
+     * @throws SelectError
+     */
+    private function getRequiredPermissionItem(
+        array $permissionItem,
+        string $module,
+        string $task = null,
+        string $action = null
+    ): array {
+        $permissions = [];
+
+        if ($permissionItem['permissionRequired'] ?? false) {
+            $permissions['permission'] = $this->getPermission($module, $task, $action);
+        }
+
+        if (isset($permissionItem['items'])) {
+            $itemTask = $task;
+            $itemAction = $action;
+            $permissions['items'] = [];
+
+            foreach ($permissionItem['items'] as $key => $item) {
+                if ($task === null) {
+                    $itemTask = $key;
+                } elseif ($action === null) {
+                    $itemAction = $key;
+                }
+
+                $permissions['items'][$key] = $this->getRequiredPermissionItem($item, $module, $itemTask, $itemAction);
+            }
+        }
+
+        return $permissions;
     }
 }

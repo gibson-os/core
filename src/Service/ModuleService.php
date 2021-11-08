@@ -14,6 +14,7 @@ use GibsonOS\Core\Repository\Action\PermissionRepository;
 use GibsonOS\Core\Repository\ActionRepository;
 use GibsonOS\Core\Repository\ModuleRepository;
 use GibsonOS\Core\Repository\TaskRepository;
+use Psr\Log\LoggerInterface;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionMethod;
@@ -32,7 +33,8 @@ class ModuleService
         private TaskRepository $taskRepository,
         private ActionRepository $actionRepository,
         private PermissionRepository $permissionRepository,
-        private DirService $dirService
+        private DirService $dirService,
+        private LoggerInterface $logger
     ) {
         $this->vendorPath = realpath(
             dirname(__FILE__) . DIRECTORY_SEPARATOR .
@@ -80,6 +82,8 @@ class ModuleService
      */
     private function scanModules(): array
     {
+        $this->logger->info('Scan modules...');
+
         $moduleIds = [];
         $taskIds = [];
         $actionIds = [];
@@ -124,6 +128,7 @@ class ModuleService
      */
     private function scanTasks(Module $module, string $path): array
     {
+        $this->logger->info(sprintf('Scan tasks for module %s...', $module->getName()));
         $taskIds = [];
         $actionIds = [];
 
@@ -189,12 +194,18 @@ class ModuleService
      */
     private function scanActions(Module $module, Task $task, ReflectionClass $reflectionClass): array
     {
+        $this->logger->info(sprintf('Scan actions for task %s in module %s...', $task->getName(), $module->getName()));
         $actionIds = [];
 
         foreach ($reflectionClass->getMethods(ReflectionMethod::IS_PUBLIC) as $method) {
+            if (mb_strpos($method->getName(), '__') === 0) {
+                continue;
+            }
+
             try {
                 $action = $this->actionRepository->getByNameAndTaskId($method->getName(), $task->getId() ?? 0);
             } catch (SelectError) {
+                $this->logger->info(sprintf('New action %s', $method->getName()));
                 $action = (new Action())
                     ->setName($method->getName())
                     ->setModule($module)

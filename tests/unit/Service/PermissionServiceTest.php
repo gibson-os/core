@@ -5,7 +5,7 @@ namespace Service;
 
 use Codeception\Test\Unit;
 use GibsonOS\Core\Model\User\Permission;
-use GibsonOS\Core\Repository\User\PermissionRepository;
+use GibsonOS\Core\Repository\User\PermissionViewRepository;
 use GibsonOS\Core\Service\PermissionService;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
@@ -20,15 +20,15 @@ class PermissionServiceTest extends Unit
     private $permissionService;
 
     /**
-     * @var ObjectProphecy|PermissionRepository
+     * @var ObjectProphecy|PermissionViewRepository
      */
-    private $permissionRepository;
+    private $permissionViewRepository;
 
     protected function _before()
     {
-        $this->permissionRepository = $this->prophesize(PermissionRepository::class);
+        $this->permissionViewRepository = $this->prophesize(PermissionViewRepository::class);
 
-        $this->permissionService = new PermissionService($this->permissionRepository->reveal());
+        $this->permissionService = new PermissionService($this->permissionViewRepository->reveal());
     }
 
     /**
@@ -62,15 +62,15 @@ class PermissionServiceTest extends Unit
             ->willReturn($permission)
         ;
 
-        $this->permissionRepository->getPermissionByModule($module, 42)
+        $this->permissionViewRepository->getPermissionByModule($module, 42)
             ->shouldBeCalledTimes($task === null ? 1 : 0)
             ->willReturn($permissionModel->reveal())
         ;
-        $this->permissionRepository->getPermissionByTask($module, $task, 42)
+        $this->permissionViewRepository->getPermissionByTask($module, $task, 42)
             ->shouldBeCalledTimes($task !== null && $action === null ? 1 : 0)
             ->willReturn($permissionModel->reveal())
         ;
-        $this->permissionRepository->getPermissionByAction($module, $task, $action, 42)
+        $this->permissionViewRepository->getPermissionByAction($module, $task, $action, 42)
             ->shouldBeCalledTimes($action === null ? 0 : 1)
             ->willReturn($permissionModel->reveal())
         ;

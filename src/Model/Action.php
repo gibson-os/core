@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Model;
 
-use GibsonOS\Core\Exception\DateTimeError;
 use JsonSerializable;
 use mysqlDatabase;
 
@@ -82,9 +81,6 @@ class Action extends AbstractModel implements JsonSerializable
         return $this;
     }
 
-    /**
-     * @throws DateTimeError
-     */
     public function getModule(): Module
     {
         $this->loadForeignRecord($this->module, $this->getModuleId());
@@ -95,13 +91,11 @@ class Action extends AbstractModel implements JsonSerializable
     public function setModule(Module $module): Action
     {
         $this->module = $module;
+        $this->setModuleId($module->getId() ?? 0);
 
         return $this;
     }
 
-    /**
-     * @throws DateTimeError
-     */
     public function getTask(): Task
     {
         $this->loadForeignRecord($this->task, $this->getTaskId());
@@ -112,6 +106,7 @@ class Action extends AbstractModel implements JsonSerializable
     public function setTask(Task $task): Action
     {
         $this->task = $task;
+        $this->setTaskId($task->getId() ?? 0);
 
         return $this;
     }

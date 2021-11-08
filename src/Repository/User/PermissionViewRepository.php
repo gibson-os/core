@@ -7,8 +7,12 @@ use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\User\Permission;
 use GibsonOS\Core\Model\User\PermissionView;
 use GibsonOS\Core\Repository\AbstractRepository;
+use mysqlTable;
 use stdClass;
 
+/**
+ * @method PermissionView getModel(mysqlTable $table, string $modelClassName)
+ */
 class PermissionViewRepository extends AbstractRepository
 {
     /**
@@ -38,5 +42,112 @@ class PermissionViewRepository extends AbstractRepository
         }
 
         return $table->connection->fetchObjectList();
+    }
+
+    /**
+     * @throws SelectError
+     */
+    public function getPermissionByModule(string $module, int $userId = null): PermissionView
+    {
+        $table = $this
+            ->getTable(PermissionView::getTableName())
+            ->setLimit(1)
+        ;
+        $table->setWhere(
+            $this->getUserIdWhere($table, $userId) . ' AND ' .
+            $this->getModuleWhere($table, $module)
+        );
+
+        if (!$table->selectPrepared()) {
+            $exception = new SelectError(sprintf('Permission für %s nicht gefunden!', $module));
+            $exception->setTable($table);
+
+            throw $exception;
+        }
+
+        return $this->getModel($table, PermissionView::class);
+    }
+
+    /**
+     * @throws SelectError
+     */
+    public function getPermissionByTask(string $module, string $task, int $userId = null): PermissionView
+    {
+        $table = $this
+            ->getTable(PermissionView::getTableName())
+            ->setLimit(1)
+        ;
+        $table->setWhere(
+            $this->getUserIdWhere($table, $userId) . ' AND ' .
+            $this->getModuleWhere($table, $module) . ' AND ' .
+            $this->getTaskWhere($table, $task)
+        );
+
+        if (!$table->selectPrepared()) {
+            $exception = new SelectError(sprintf('Permission für %s/%s nicht gefunden!', $module, $task));
+            $exception->setTable($table);
+
+            throw $exception;
+        }
+
+        return $this->getModel($table, PermissionView::class);
+    }
+
+    /**
+     * @throws SelectError
+     */
+    public function getPermissionByAction(string $module, string $task, string $action, int $userId = null): PermissionView
+    {
+        $table = $this
+            ->getTable(PermissionView::getTableName())
+            ->setLimit(1)
+        ;
+        $where =
+            $this->getUserIdWhere($table, $userId) . ' AND ' .
+            $this->getModuleWhere($table, $module) . ' AND ' .
+            $this->getTaskWhere($table, $task) . ' AND ' .
+            $this->getActionWhere($table, $action)
+        ;
+        $table->setWhere(
+            $where
+        );
+
+        if (!$table->selectPrepared()) {
+            $exception = new SelectError(sprintf('Permission für %s/%s::%s nicht gefunden!', $module, $task, $action));
+            $exception->setTable($table);
+
+            throw $exception;
+        }
+
+        return $this->getModel($table, PermissionView::class);
+    }
+
+    private function getModuleWhere(mysqlTable $table, string $module): string
+    {
+        $table->addWhereParameter($module);
+
+        return '`module_name`=?';
+    }
+
+    private function getTaskWhere(mysqlTable $table, string $task): string
+    {
+        $table->addWhereParameter($task);
+
+        return '`task_name`=?';
+    }
+
+    private function getActionWhere(mysqlTable $table, string $action): string
+    {
+        $table->addWhereParameter($action);
+
+        return '`action_name`=?';
+    }
+
+    private function getUserIdWhere(mysqlTable $table, int $userId = null): string
+    {
+        $table->addWhereParameter(0);
+        $table->addWhereParameter($userId ?? 0);
+
+        return '(`user_id`=? OR `user_id`=?)';
     }
 }
