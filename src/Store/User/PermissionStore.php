@@ -33,20 +33,39 @@ class PermissionStore extends AbstractDatabaseStore
         }
 
         if ($this->actionId !== null) {
-            $this->addWhere('`action_id`=?', [$this->actionId, 1]);
+            $this->addWhere('`action_id`=?', [$this->actionId]);
         }
     }
 
     protected function getDefaultOrder(): string
     {
-        return '`user_ip`, `user_host`, `user_name`';
+        return '`userIp`, `userHost`, `userName`';
     }
 
     protected function initTable(): void
     {
         parent::initTable();
 
-        $this->table->appendJoin(User::getTableName(), '`user`.`id`=`view_user_permission`.`user_id`');
+        $this->table->setWhere();
+        $this->table
+            ->appendJoin(User::getTableName(), '`user`.`id`=`view_user_permission`.`user_id` AND ' . $this->getWhereString())
+            ->appendUnion(
+                'SELECT DISTINCT ' .
+                    '0 `userId`, ' .
+                    '"Allgemein" `userName`, ' .
+                    'NULL `userHost`, ' .
+                    'NULL `userIp`, ' .
+                    'IFNULL(`permission`, 1) `permission`, ' .
+                    '`module`, ' .
+                    '`task`, ' .
+                    '`action` ' .
+                'FROM (SELECT 0 `id`) `user` ' .
+                'LEFT JOIN `' . PermissionView::getTableName() . '` ON' .
+                    '`user`.`id` = `view_user_permission`.`user_id` AND ' .
+                    $this->getWhereString()
+            )
+            ->setWhereParameters(array_merge($this->table->getWhereParameters(), $this->table->getWhereParameters()))
+        ;
     }
 
     public function getList(): Generator
@@ -80,7 +99,6 @@ class PermissionStore extends AbstractDatabaseStore
 
             yield $permissionView;
         }
-        error_log($this->table->sql);
     }
 
     public function setModuleId(?int $moduleId): PermissionStore

@@ -12,7 +12,7 @@
             "source": {
                 "type": "git",
                 "url": "git@wolli.dyndns.tv:/home/git/mdo.git",
-                "reference": "4db7ba5bb82b6406cb281f75b2defdfc8eeeb731"
+                "reference": "07f4b0a1da410a5c7357b15bae0fa9315895c68d"
             },
             "require": {
                 "ext-mbstring": "*",
@@ -68,7 +68,7 @@
                     "php ./vendor/codeception/codeception/codecept generate:test unit"
                 ]
             },
-            "time": "2021-11-07T19:26:30+00:00"
+            "time": "2021-11-08T11:18:07+00:00"
         },
         {
             "name": "symfony/polyfill-ctype",
@@ -6627,6 +6627,7 @@
                 "issues": "https://github.com/webmozart/path-util/issues",
                 "source": "https://github.com/webmozart/path-util/tree/2.3.0"
             },
+            "abandoned": "symfony/filesystem",
             "time": "2015-12-17T08:42:14+00:00"
         }
     ],
