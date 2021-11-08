@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Service;
 
 use GibsonOS\Core\Dto\Javascript;
-use GibsonOS\Core\Exception\DateTimeError;
 use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Repository\User\PermissionViewRepository;
@@ -34,7 +33,7 @@ class JavascriptService extends AbstractService
      */
     public function getByUserId(?int $userId, string $module = null): string
     {
-        $files = [];
+        $files = $this->getDefaultFiles();
         $oldData = '';
 
         foreach ($this->permissionViewRepository->getTaskList($userId, $module) as $task) {
@@ -60,7 +59,7 @@ class JavascriptService extends AbstractService
 
         $content = '';
 
-        foreach ($files as $file) {
+        foreach (array_unique($files) as $file) {
             $content .= $this->loadFile($file->getNamespace(), $files);
         }
 
@@ -69,8 +68,6 @@ class JavascriptService extends AbstractService
 
     /**
      * @throws GetError
-     * @throws SelectError
-     * @throws DateTimeError
      */
     public function getByUserIdAndTask(?int $userId, string $module, string $task): string
     {
@@ -78,13 +75,14 @@ class JavascriptService extends AbstractService
             return '';
         }
 
+        $files = $this->getDefaultFiles();
         $dir =
             'js' . DIRECTORY_SEPARATOR .
             'module' . DIRECTORY_SEPARATOR .
             $module . DIRECTORY_SEPARATOR .
             $task . DIRECTORY_SEPARATOR
         ;
-        $files = $this->getFiles($dir);
+        $files = array_merge($files, $this->getFiles($dir));
 
         /** @var Javascript[] $files */
         $files = array_merge($files, $this->getFiles(
@@ -98,7 +96,7 @@ class JavascriptService extends AbstractService
 
         $content = '';
 
-        foreach ($files as $file) {
+        foreach (array_unique($files) as $file) {
             $content .= $this->loadFile($file->getNamespace(), $files);
         }
 
@@ -214,5 +212,30 @@ class JavascriptService extends AbstractService
         }
 
         return $return;
+    }
+
+    /**
+     * @throws GetError
+     */
+    private function getDefaultFiles(): array
+    {
+        return array_merge(
+            $this->getFiles(
+                $this->vendorPath .
+                'gibson-os' . DIRECTORY_SEPARATOR .
+                'core' . DIRECTORY_SEPARATOR .
+                'assets' . DIRECTORY_SEPARATOR .
+                'js' . DIRECTORY_SEPARATOR .
+                'decorator' . DIRECTORY_SEPARATOR
+            ),
+            $this->getFiles(
+                $this->vendorPath .
+                'gibson-os' . DIRECTORY_SEPARATOR .
+                'core' . DIRECTORY_SEPARATOR .
+                'assets' . DIRECTORY_SEPARATOR .
+                'js' . DIRECTORY_SEPARATOR .
+                'component' . DIRECTORY_SEPARATOR
+            )
+        );
     }
 }

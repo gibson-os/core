@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Controller;
 
+use Generator;
 use GibsonOS\Core\Attribute\CheckPermission;
 use GibsonOS\Core\Exception\Model\SaveError;
 use GibsonOS\Core\Exception\Repository\SelectError;
@@ -24,11 +25,16 @@ class IconController extends AbstractController
     {
         $iconStore->setTags($tags);
 
+        /** @var Generator $icons */
+        $icons = $iconStore->getList();
+        /** @var Generator $tags */
+        $tags = $tagStore->getList();
+
         return new AjaxResponse([
             'success' => true,
             'failure' => false,
-            'data' => [...$iconStore->getList()],
-            'tags' => [...$tagStore->getList()],
+            'data' => [...$icons],
+            'tags' => [...$tags],
         ]);
     }
 

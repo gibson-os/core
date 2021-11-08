@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Controller;
 
-use GibsonOS\Core\Exception\DateTimeError;
 use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Service\JavascriptService;
@@ -14,7 +13,6 @@ class JavascriptController extends AbstractController
 {
     /**
      * @throws SelectError
-     * @throws DateTimeError
      * @throws GetError
      */
     public function index(JavascriptService $javaScriptService, string $module = 'all', string $task = 'all'): Response
