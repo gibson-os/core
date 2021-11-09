@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Service\Attribute;
 
 use GibsonOS\Core\Attribute\AttributeInterface;
-use GibsonOS\Core\Attribute\Env;
+use GibsonOS\Core\Attribute\GetEnv;
 use GibsonOS\Core\Service\EnvService;
 use ReflectionNamedType;
 
@@ -21,14 +21,14 @@ class EnvAttribute extends AbstractActionAttributeService implements ServiceAttr
 
     public function usedParameters(AttributeInterface $attribute): array
     {
-        if (!$attribute instanceof Env) {
+        if (!$attribute instanceof GetEnv) {
             return [];
         }
 
         return [$this->getKey($attribute)];
     }
 
-    private function getKey(Env $attribute): string
+    private function getKey(GetEnv $attribute): string
     {
         return $attribute->getName() ?? lcfirst(implode(
             '',
@@ -46,7 +46,7 @@ class EnvAttribute extends AbstractActionAttributeService implements ServiceAttr
 
     public function getEnv(AttributeInterface $attribute, array $parameters, array $reflectionParameters): array
     {
-        if (!$attribute instanceof Env) {
+        if (!$attribute instanceof GetEnv) {
             return $parameters;
         }
 

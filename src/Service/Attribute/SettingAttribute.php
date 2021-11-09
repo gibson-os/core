@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Service\Attribute;
 
 use GibsonOS\Core\Attribute\AttributeInterface;
-use GibsonOS\Core\Attribute\Setting;
+use GibsonOS\Core\Attribute\GetSetting;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Repository\SettingRepository;
 use GibsonOS\Core\Service\RequestService;
@@ -34,14 +34,14 @@ class SettingAttribute extends AbstractActionAttributeService implements Service
 
     public function usedParameters(AttributeInterface $attribute): array
     {
-        if (!$attribute instanceof Setting) {
+        if (!$attribute instanceof GetSetting) {
             return [];
         }
 
         return [$this->getKey($attribute)];
     }
 
-    private function getKey(Setting $attribute): string
+    private function getKey(GetSetting $attribute): string
     {
         return $attribute->getName() ?? lcfirst(implode(
             '',
@@ -67,7 +67,7 @@ class SettingAttribute extends AbstractActionAttributeService implements Service
      */
     public function getSetting(AttributeInterface $attribute, array $parameters, array $reflectionParameters): array
     {
-        if (!$attribute instanceof Setting) {
+        if (!$attribute instanceof GetSetting) {
             return $parameters;
         }
 

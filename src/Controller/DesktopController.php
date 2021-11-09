@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Controller;
 
 use GibsonOS\Core\Attribute\CheckPermission;
-use GibsonOS\Core\Attribute\Setting as SettingAttribute;
+use GibsonOS\Core\Attribute\GetSetting;
 use GibsonOS\Core\Exception\Model\SaveError;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\Setting;
@@ -26,9 +26,9 @@ class DesktopController extends AbstractController
      * @throws JsonException
      */
     #[CheckPermission(Permission::READ)]
-    #[SettingAttribute(self::DESKTOP_KEY)]
-    #[SettingAttribute(self::APPS_KEY)]
-    #[SettingAttribute(self::TOOLS_KEY)]
+    #[GetSetting(self::DESKTOP_KEY)]
+    #[GetSetting(self::APPS_KEY)]
+    #[GetSetting(self::TOOLS_KEY)]
     public function index(?Setting $desktop, ?Setting $apps, ?Setting $tools): AjaxResponse
     {
         return $this->returnSuccess([

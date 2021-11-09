@@ -3,32 +3,27 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Service;
 
+use GibsonOS\Core\Attribute\GetSetting;
 use GibsonOS\Core\Exception\CreateError;
 use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\Model\SaveError;
-use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Exception\SetError;
 use GibsonOS\Core\Model\Icon;
+use GibsonOS\Core\Model\Setting;
 use GibsonOS\Core\Repository\Icon\TagRepository;
-use GibsonOS\Core\Repository\SettingRepository;
 use Throwable;
 
 class IconService
 {
     private string $iconPath;
 
-    /**
-     * @throws SelectError
-     */
+    #[GetSetting('custom_icon_path', 'core')]
     public function __construct(
         private TagRepository $tagRepository,
         private FileService $fileService,
-        SettingRepository $settingRepository
+        Setting $customIconPath
     ) {
-        $this->iconPath = $settingRepository
-            ->getByKeyAndModuleName('core', 0, 'custom_icon_path')
-            ->getValue()
-        ;
+        $this->iconPath = $customIconPath->getValue();
     }
 
     /**
