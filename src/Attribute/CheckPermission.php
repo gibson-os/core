@@ -4,13 +4,16 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Attribute;
 
 use Attribute;
-use GibsonOS\Core\Service\Attribute\PermissionAttribute;
+use GibsonOS\Core\Service\Attribute\PermissionAbstractActionAttribute;
 
 #[Attribute(Attribute::TARGET_METHOD)]
 class CheckPermission implements AttributeInterface
 {
-    public function __construct(private int $permission, private array $permissionsByRequestValues = [])
-    {
+    public function __construct(
+        private int $permission,
+        private array $permissionsByRequestValues = [],
+        private string $permissionParameter = 'userPermission'
+    ) {
     }
 
     public function getPermission(): int
@@ -25,6 +28,11 @@ class CheckPermission implements AttributeInterface
 
     public function getAttributeServiceName(): string
     {
-        return PermissionAttribute::class;
+        return PermissionAbstractActionAttribute::class;
+    }
+
+    public function getPermissionParameter(): string
+    {
+        return $this->permissionParameter;
     }
 }

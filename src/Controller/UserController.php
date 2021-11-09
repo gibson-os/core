@@ -15,7 +15,7 @@ use GibsonOS\Core\Model\User;
 use GibsonOS\Core\Model\User\Permission;
 use GibsonOS\Core\Repository\User\DeviceRepository;
 use GibsonOS\Core\Repository\UserRepository;
-use GibsonOS\Core\Service\Attribute\PermissionAttribute;
+use GibsonOS\Core\Service\Attribute\PermissionAbstractActionAttribute;
 use GibsonOS\Core\Service\RequestService;
 use GibsonOS\Core\Service\Response\AjaxResponse;
 use GibsonOS\Core\Service\Response\RedirectResponse;
@@ -32,7 +32,7 @@ class UserController extends AbstractController
         RequestService $requestService,
         TwigService $twigService,
         SessionService $sessionService,
-        private PermissionAttribute $permissionAttribute
+        private PermissionAbstractActionAttribute $permissionAttribute
     ) {
         parent::__construct($requestService, $twigService, $sessionService);
     }
@@ -240,11 +240,11 @@ class UserController extends AbstractController
     private function checkUserPermission(?int $userId, int $permission): void
     {
         if ($userId !== $this->sessionService->getUserId()) {
-            $this->permissionAttribute->evaluateAttribute(new CheckPermission($permission & Permission::MANAGE));
+            $this->permissionAttribute->preExecute(new CheckPermission($permission & Permission::MANAGE), []);
 
             return;
         }
 
-        $this->permissionAttribute->evaluateAttribute(new CheckPermission($permission));
+        $this->permissionAttribute->preExecute(new CheckPermission($permission), []);
     }
 }

@@ -42,14 +42,19 @@ class PermissionService
             return false;
         }
 
+        return $this->checkPermission($permission, $permissionValue);
+    }
+
+    public function checkPermission(int $requiredPermission, int $permission): bool
+    {
         if (
-            $permission !== Permission::DENIED &&
-            ($permissionValue & Permission::DENIED)
+            $requiredPermission !== Permission::DENIED &&
+            ($permission & Permission::DENIED)
         ) {
             return false;
         }
 
-        return ($permissionValue & $permission) === $permission;
+        return ($permission & $requiredPermission) === $requiredPermission;
     }
 
     public function isDenied(string $module, string $task = null, string $action = null, int $userId = null): bool
