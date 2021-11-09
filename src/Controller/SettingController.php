@@ -18,7 +18,6 @@ class SettingController extends AbstractController
      * @param array<string, array{permissionRequired: bool, items: array}> $requiredPermissions
      *
      * @throws JsonException
-     * @throws SelectError
      */
     #[CheckPermission(Permission::READ)]
     public function window(

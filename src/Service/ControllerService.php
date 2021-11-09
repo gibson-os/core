@@ -218,7 +218,7 @@ class ControllerService
         $newParameters = [];
 
         foreach ($reflectionMethod->getParameters() as $parameter) {
-            if (!isset($parameters[$parameter->getName()])) {
+            if (!array_key_exists($parameter->getName(), $parameters)) {
                 continue;
             }
 

@@ -45,7 +45,7 @@ class SettingAttribute extends AbstractActionAttributeService
             $reflectionParameter = $this->getReflectionParameter($key, $reflectionParameters);
 
             if ($reflectionParameter !== null) {
-                if (!$reflectionParameter->isOptional() && $reflectionParameter->allowsNull()) {
+                if (!$reflectionParameter->isOptional() && !$reflectionParameter->allowsNull()) {
                     throw $exception;
                 }
 

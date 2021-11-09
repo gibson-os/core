@@ -29,12 +29,12 @@ class DesktopController extends AbstractController
     #[SettingAttribute(self::DESKTOP_KEY)]
     #[SettingAttribute(self::APPS_KEY)]
     #[SettingAttribute(self::TOOLS_KEY)]
-    public function index(?string $desktop, ?string $apps, ?string $tools): AjaxResponse
+    public function index(?Setting $desktop, ?Setting $apps, ?Setting $tools): AjaxResponse
     {
         return $this->returnSuccess([
-            self::DESKTOP_KEY => JsonUtility::decode($desktop ?: '[]'),
-            self::APPS_KEY => JsonUtility::decode($apps ?: '[]'),
-            self::TOOLS_KEY => JsonUtility::decode($tools ?: '[]'),
+            self::DESKTOP_KEY => JsonUtility::decode($desktop?->getValue() ?: '[]'),
+            self::APPS_KEY => JsonUtility::decode($apps?->getValue() ?: '[]'),
+            self::TOOLS_KEY => JsonUtility::decode($tools?->getValue() ?: '[]'),
         ]);
     }
 
