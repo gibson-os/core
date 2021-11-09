@@ -3,11 +3,14 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Service;
 
+use GibsonOS\Core\Dto\Attribute;
 use GibsonOS\Core\Exception\FactoryError;
 use GibsonOS\Core\Factory\FactoryInterface;
+use GibsonOS\Core\Service\Attribute\ServiceAttributeServiceInterface;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionMethod;
+use ReflectionNamedType;
 
 class ServiceManagerService
 {
@@ -26,9 +29,17 @@ class ServiceManagerService
      */
     private array $abstracts = [];
 
+    private AttributeService $attributeService;
+
+    /**
+     * @throws FactoryError
+     */
     public function __construct()
     {
         $this->services[self::class] = $this;
+        $attributeService = new AttributeService($this);
+        $this->services[AttributeService::class] = $attributeService;
+        $this->attributeService = $attributeService;
     }
 
     /**
@@ -145,17 +156,29 @@ class ServiceManagerService
         $parameters = [];
 
         if ($constructor instanceof ReflectionMethod) {
-            foreach ($constructor->getParameters() as $parameter) {
-                $parameterClass = $parameter->getClass();
+            $attributes = $this->attributeService->getMethodAttributes($constructor);
+            $parameters = $this->beforeConstructAttributes($attributes, $parameters, $constructor->getParameters());
 
-                if ($parameterClass instanceof ReflectionClass) {
-                    $parameters[] = $this->get($parameterClass->getName());
+            foreach ($constructor->getParameters() as $parameter) {
+                $name = $parameter->getName();
+
+                if (array_key_exists($name, $parameters)) {
+                    continue;
+                }
+
+                $parameterType = $parameter->getType();
+
+                if (
+                    $parameterType instanceof ReflectionNamedType &&
+                    !$parameterType->isBuiltin()
+                ) {
+                    $parameters[$name] = $this->get($parameterType->getName());
 
                     continue;
                 }
 
                 try {
-                    $parameters[] = $parameter->getDefaultValue();
+                    $parameters[$name] = $parameter->getDefaultValue();
                 } catch (ReflectionException) {
                     throw new FactoryError(sprintf(
                         'Parameter %s of Class %s is no Class',
@@ -164,6 +187,8 @@ class ServiceManagerService
                     ));
                 }
             }
+
+            $parameters = $this->cleanParameters($constructor, $parameters);
         }
 
         return new $classname(...$parameters);
@@ -195,5 +220,38 @@ class ServiceManagerService
     public function setAbstract(string $abstractName, string $className): void
     {
         $this->abstracts[$abstractName] = $className;
+    }
+
+    private function cleanParameters(ReflectionMethod $reflectionMethod, array $parameters): array
+    {
+        $newParameters = [];
+
+        foreach ($reflectionMethod->getParameters() as $parameter) {
+            if (!array_key_exists($parameter->getName(), $parameters)) {
+                continue;
+            }
+
+            $newParameters[] = $parameters[$parameter->getName()];
+        }
+
+        return $newParameters;
+    }
+
+    /**
+     * @param Attribute[] $attributes
+     */
+    private function beforeConstructAttributes(array $attributes, array $parameters, array $reflectionParameters): array
+    {
+        foreach ($attributes as $attribute) {
+            $attributeService = $attribute->getService();
+
+            if (!$attributeService instanceof ServiceAttributeServiceInterface) {
+                continue;
+            }
+
+            $parameters = $attributeService->beforeConstruct($attribute->getAttribute(), $parameters, $reflectionParameters);
+        }
+
+        return $parameters;
     }
 }

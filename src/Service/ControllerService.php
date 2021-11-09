@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Service;
 
-use GibsonOS\Core\Attribute\AttributeInterface;
+use GibsonOS\Core\Dto\Attribute;
 use GibsonOS\Core\Exception\ControllerError;
 use GibsonOS\Core\Exception\FactoryError;
 use GibsonOS\Core\Exception\GetError;
@@ -16,17 +16,23 @@ use GibsonOS\Core\Service\Response\TwigResponse;
 use GibsonOS\Core\Utility\JsonUtility;
 use GibsonOS\Core\Utility\StatusCode;
 use JsonException;
-use ReflectionAttribute;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionMethod;
+use ReflectionNamedType;
 use ReflectionParameter;
 use Throwable;
 
 class ControllerService
 {
-    public function __construct(private ServiceManagerService $serviceManagerService, private RequestService $requestService, private StatusCode $statusCode, private TwigService $twigService, private EnvService $envService)
-    {
+    public function __construct(
+        private ServiceManagerService $serviceManagerService,
+        private RequestService $requestService,
+        private StatusCode $statusCode,
+        private TwigService $twigService,
+        private EnvService $envService,
+        private AttributeService $attributeService
+    ) {
     }
 
     public function runAction(): void
@@ -71,7 +77,7 @@ class ControllerService
         }
 
         try {
-            $attributes = $this->getAttributes($reflectionMethod);
+            $attributes = $this->attributeService->getMethodAttributes($reflectionMethod);
             $parameters = $this->getParameters($reflectionMethod, $attributes);
             $parameters = $this->preExecuteAttributes($attributes, $parameters, $reflectionMethod->getParameters());
             $parameters = $this->cleanParameters($reflectionMethod, $parameters);
@@ -170,7 +176,7 @@ class ControllerService
     }
 
     /**
-     * @param array<array-key, array{service: AbstractActionAttributeService, attribute: AttributeInterface}> $attributes
+     * @param Attribute[] $attributes
      *
      * @throws ControllerError
      * @throws JsonException
@@ -180,25 +186,39 @@ class ControllerService
         $parameters = [];
         $attributeParameters = [];
 
-        /** @var array{service: AbstractActionAttributeService, attribute: AttributeInterface} $attribute */
         foreach ($attributes as $attribute) {
+            $attributeService = $attribute->getService();
+
+            if (!$attributeService instanceof AbstractActionAttributeService) {
+                continue;
+            }
+
             $attributeParameters = array_merge(
                 $attributeParameters,
-                $attribute['service']->usedParameters($attribute['attribute'])
+                $attributeService->usedParameters($attribute->getAttribute())
             );
         }
 
         foreach ($reflectionMethod->getParameters() as $parameter) {
-            $parameterClass = $parameter->getClass();
+            $name = $parameter->getName();
 
-            if ($parameterClass instanceof ReflectionClass) {
+            if (array_key_exists($name, $parameters)) {
+                continue;
+            }
+
+            $parameterType = $parameter->getType();
+
+            if (
+                $parameterType instanceof ReflectionNamedType &&
+                !$parameterType->isBuiltin()
+            ) {
                 try {
-                    $parameters[$parameter->getName()] = $this->serviceManagerService->get($parameterClass->getName());
+                    $parameters[$name] = $this->serviceManagerService->get($parameterType->getName());
                 } catch (FactoryError $e) {
                     throw new ControllerError(sprintf(
                         'Class %s of parameter $%s for %s::%s not found!',
-                        $parameterClass->getName(),
-                        $parameter->getName(),
+                        $parameterType->getName(),
+                        $name,
                         $reflectionMethod->getDeclaringClass()->getName(),
                         $reflectionMethod->getName()
                     ), 0, $e);
@@ -207,7 +227,7 @@ class ControllerService
                 continue;
             }
 
-            $parameters[$parameter->getName()] = $this->getParameterFromRequest($parameter, $attributeParameters);
+            $parameters[$name] = $this->getParameterFromRequest($parameter, $attributeParameters);
         }
 
         return $parameters;
@@ -229,57 +249,36 @@ class ControllerService
     }
 
     /**
-     * @throws FactoryError
-     *
-     * @return array<array-key, array{service: AbstractActionAttributeService, attribute: AttributeInterface}>
-     */
-    private function getAttributes(ReflectionMethod $reflectionMethod): array
-    {
-        $attributesClasses = [];
-        $attributes = $reflectionMethod->getAttributes(
-            AttributeInterface::class,
-            ReflectionAttribute::IS_INSTANCEOF
-        );
-
-        foreach ($attributes as $attribute) {
-            /** @var AttributeInterface $attributeClass */
-            $attributeClass = $attribute->newInstance();
-            /** @var AbstractActionAttributeService $attributeService */
-            $attributeService = $this->serviceManagerService->get(
-                $attributeClass->getAttributeServiceName(),
-                AbstractActionAttributeService::class
-            );
-
-            $attributesClasses[] = [
-                'service' => $attributeService,
-                'attribute' => $attributeClass,
-            ];
-        }
-
-        return $attributesClasses;
-    }
-
-    /**
-     * @param array<array-key, array{service: AbstractActionAttributeService, attribute: AttributeInterface}> $attributes
+     * @param Attribute[] $attributes
      */
     private function preExecuteAttributes(array $attributes, array $parameters, array $reflectionParameters): array
     {
-        /** @var array{service: AbstractActionAttributeService, attribute: AttributeInterface} $attribute */
         foreach ($attributes as $attribute) {
-            $parameters = $attribute['service']->preExecute($attribute['attribute'], $parameters, $reflectionParameters);
+            $attributeService = $attribute->getService();
+
+            if (!$attributeService instanceof AbstractActionAttributeService) {
+                continue;
+            }
+
+            $parameters = $attributeService->preExecute($attribute->getAttribute(), $parameters, $reflectionParameters);
         }
 
         return $parameters;
     }
 
     /**
-     * @param array<array-key, array{service: AbstractActionAttributeService, attribute: AttributeInterface}> $attributes
+     * @param Attribute[] $attributes
      */
     private function postExecuteAttributes(array $attributes, ResponseInterface $response): void
     {
-        /** @var array{service: AbstractActionAttributeService, attribute: AttributeInterface} $attribute */
         foreach ($attributes as $attribute) {
-            $attribute['service']->postExecute($attribute['attribute'], $response);
+            $attributeService = $attribute->getService();
+
+            if (!$attributeService instanceof AbstractActionAttributeService) {
+                continue;
+            }
+
+            $attributeService->postExecute($attribute->getAttribute(), $response);
         }
     }
 

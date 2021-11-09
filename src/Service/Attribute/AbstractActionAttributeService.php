@@ -7,7 +7,7 @@ use GibsonOS\Core\Attribute\AttributeInterface;
 use GibsonOS\Core\Service\Response\ResponseInterface;
 use ReflectionParameter;
 
-abstract class AbstractActionAttributeService
+abstract class AbstractActionAttributeService implements AttributeServiceInterface
 {
     /**
      * @param ReflectionParameter[] $reflectionParameters

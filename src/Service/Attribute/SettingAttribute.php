@@ -12,7 +12,7 @@ use GibsonOS\Core\Service\SessionService;
 use ReflectionException;
 use ReflectionParameter;
 
-class SettingAttribute extends AbstractActionAttributeService
+class SettingAttribute extends AbstractActionAttributeService implements ServiceAttributeServiceInterface, AttributeServiceInterface
 {
     public function __construct(
         private SettingRepository $settingRepository,
@@ -28,6 +28,44 @@ class SettingAttribute extends AbstractActionAttributeService
      * @throws ReflectionException
      */
     public function preExecute(AttributeInterface $attribute, array $parameters, array $reflectionParameters): array
+    {
+        return $this->getSetting($attribute, $parameters, $reflectionParameters);
+    }
+
+    public function usedParameters(AttributeInterface $attribute): array
+    {
+        if (!$attribute instanceof Setting) {
+            return [];
+        }
+
+        return [$this->getKey($attribute)];
+    }
+
+    private function getKey(Setting $attribute): string
+    {
+        return $attribute->getName() ?? lcfirst(implode(
+            '',
+            array_map(
+                fn (string $part) => ucfirst(mb_strtolower($part)),
+                explode('_', $attribute->getKey())
+            )
+        ));
+    }
+
+    /**
+     * @throws ReflectionException
+     * @throws SelectError
+     */
+    public function beforeConstruct(AttributeInterface $attribute, array $parameters, array $reflectionParameters): array
+    {
+        return $this->getSetting($attribute, $parameters, $reflectionParameters);
+    }
+
+    /**
+     * @throws ReflectionException
+     * @throws SelectError
+     */
+    public function getSetting(AttributeInterface $attribute, array $parameters, array $reflectionParameters): array
     {
         if (!$attribute instanceof Setting) {
             return $parameters;
@@ -58,25 +96,5 @@ class SettingAttribute extends AbstractActionAttributeService
         }
 
         return $parameters;
-    }
-
-    public function usedParameters(AttributeInterface $attribute): array
-    {
-        if (!$attribute instanceof Setting) {
-            return [];
-        }
-
-        return [$this->getKey($attribute)];
-    }
-
-    private function getKey(Setting $attribute): string
-    {
-        return $attribute->getName() ?? lcfirst(implode(
-            '',
-            array_map(
-                fn (string $part) => ucfirst(mb_strtolower($part)),
-                explode('_', $attribute->getKey())
-            )
-        ));
     }
 }
