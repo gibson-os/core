@@ -68,10 +68,10 @@ class SettingRepository extends AbstractRepository
             ->appendJoin('module', '`' . $tableName . '`.`module_id`=`module`.`id`')
             ->setWhere(
                 '`module`.`name`=? AND ' .
-                '(`' . $tableName . '`.`user_id`=? OR `' . $tableName . '`.`user_id`=0) AND ' .
+                '(`' . $tableName . '`.`user_id`=? OR `' . $tableName . '`.`user_id`=?) AND ' .
                 '`' . $tableName . '`.`key`=?'
             )
-            ->setWhereParameters([$moduleName, $userId, $key])
+            ->setWhereParameters([$moduleName, $userId, 0, $key])
             ->setOrderBy('`user_id` DESC')
             ->setLimit(1)
         ;

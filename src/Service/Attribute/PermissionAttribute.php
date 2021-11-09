@@ -12,7 +12,7 @@ use GibsonOS\Core\Service\PermissionService;
 use GibsonOS\Core\Service\RequestService;
 use GibsonOS\Core\Service\SessionService;
 
-class PermissionAbstractActionAttribute extends AbstractActionAttributeService
+class PermissionAttribute extends AbstractActionAttributeService
 {
     public function __construct(
         private PermissionService $permissionService,
@@ -25,7 +25,7 @@ class PermissionAbstractActionAttribute extends AbstractActionAttributeService
      * @throws LoginRequired
      * @throws PermissionDenied
      */
-    public function preExecute(AttributeInterface $attribute, array $parameters): array
+    public function preExecute(AttributeInterface $attribute, array $parameters, array $reflectionParameters): array
     {
         if (!$attribute instanceof CheckPermission) {
             return $parameters;
@@ -51,10 +51,7 @@ class PermissionAbstractActionAttribute extends AbstractActionAttributeService
 
         if ($this->permissionService->checkPermission($requiredPermission, $permission)) {
             $permissionParameter = $attribute->getPermissionParameter();
-
-            if (!isset($parameters[$permissionParameter])) {
-                $parameters[$permissionParameter] = $permission;
-            }
+            $parameters[$permissionParameter] = $permission;
 
             return $parameters;
         }

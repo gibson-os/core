@@ -4,55 +4,37 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Controller;
 
 use GibsonOS\Core\Attribute\CheckPermission;
+use GibsonOS\Core\Attribute\Setting as SettingAttribute;
 use GibsonOS\Core\Exception\Model\SaveError;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\Setting;
 use GibsonOS\Core\Model\User\Permission;
 use GibsonOS\Core\Repository\ModuleRepository;
-use GibsonOS\Core\Repository\SettingRepository;
 use GibsonOS\Core\Service\Response\AjaxResponse;
 use GibsonOS\Core\Utility\JsonUtility;
 use JsonException;
 
 class DesktopController extends AbstractController
 {
-    private const DESKTOP_KEY = 'desktop';
+    public const DESKTOP_KEY = 'desktop';
 
-    private const APPS_KEY = 'apps';
+    public const APPS_KEY = 'apps';
 
-    private const TOOLS_KEY = 'tools';
+    public const TOOLS_KEY = 'tools';
 
     /**
      * @throws JsonException
      */
     #[CheckPermission(Permission::READ)]
-    public function index(SettingRepository $settingRepository): AjaxResponse
+    #[SettingAttribute(self::DESKTOP_KEY)]
+    #[SettingAttribute(self::APPS_KEY)]
+    #[SettingAttribute(self::TOOLS_KEY)]
+    public function index(?string $desktop, ?string $apps, ?string $tools): AjaxResponse
     {
-        $moduleName = $this->requestService->getModuleName();
-        $userId = $this->sessionService->getUserId() ?? 0;
-
-        try {
-            $desktop = $settingRepository->getByKeyAndModuleName($moduleName, $userId, self::DESKTOP_KEY)->getValue();
-        } catch (SelectError) {
-            $desktop = '[]';
-        }
-
-        try {
-            $apps = $settingRepository->getByKeyAndModuleName($moduleName, $userId, self::APPS_KEY)->getValue();
-        } catch (SelectError) {
-            $apps = '[]';
-        }
-
-        try {
-            $tools = $settingRepository->getByKeyAndModuleName($moduleName, $userId, self::TOOLS_KEY)->getValue();
-        } catch (SelectError) {
-            $tools = '[]';
-        }
-
         return $this->returnSuccess([
-            self::DESKTOP_KEY => JsonUtility::decode($desktop),
-            self::APPS_KEY => JsonUtility::decode($apps),
-            self::TOOLS_KEY => JsonUtility::decode($tools),
+            self::DESKTOP_KEY => JsonUtility::decode($desktop ?: '[]'),
+            self::APPS_KEY => JsonUtility::decode($apps ?: '[]'),
+            self::TOOLS_KEY => JsonUtility::decode($tools ?: '[]'),
         ]);
     }
 

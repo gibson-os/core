@@ -5,7 +5,6 @@ namespace GibsonOS\Core\Controller;
 
 use GibsonOS\Core\Attribute\CheckPermission;
 use GibsonOS\Core\Exception\DateTimeError;
-use GibsonOS\Core\Exception\LoginRequired;
 use GibsonOS\Core\Exception\Model\DeleteError;
 use GibsonOS\Core\Exception\Model\SaveError;
 use GibsonOS\Core\Exception\PermissionDenied;
@@ -15,7 +14,7 @@ use GibsonOS\Core\Model\User;
 use GibsonOS\Core\Model\User\Permission;
 use GibsonOS\Core\Repository\User\DeviceRepository;
 use GibsonOS\Core\Repository\UserRepository;
-use GibsonOS\Core\Service\Attribute\PermissionAbstractActionAttribute;
+use GibsonOS\Core\Service\PermissionService;
 use GibsonOS\Core\Service\RequestService;
 use GibsonOS\Core\Service\Response\AjaxResponse;
 use GibsonOS\Core\Service\Response\RedirectResponse;
@@ -32,11 +31,18 @@ class UserController extends AbstractController
         RequestService $requestService,
         TwigService $twigService,
         SessionService $sessionService,
-        private PermissionAbstractActionAttribute $permissionAttribute
+        private PermissionService $permissionService
     ) {
         parent::__construct($requestService, $twigService, $sessionService);
     }
 
+    /**
+     * @param UserStore $userStore
+     *
+     * @throws SelectError
+     *
+     * @return AjaxResponse
+     */
     #[CheckPermission(Permission::MANAGE + Permission::READ)]
     public function index(UserStore $userStore): AjaxResponse
     {
@@ -61,16 +67,17 @@ class UserController extends AbstractController
     }
 
     /**
-     * @throws LoginRequired
      * @throws PermissionDenied
      * @throws SelectError
      */
+    #[CheckPermission(Permission::READ)]
     public function settings(
         UserRepository $userRepository,
         DeviceRepository $deviceRepository,
+        int $userPermission,
         int $id = null
     ): AjaxResponse {
-        $this->checkUserPermission($id, Permission::READ);
+        $this->checkUserPermission($id, Permission::READ, $userPermission);
 
         if ($id === null) {
             $id = $this->sessionService->getUserId() ?? 0;
@@ -123,7 +130,6 @@ class UserController extends AbstractController
 
     /**
      * @throws DateTimeError
-     * @throws LoginRequired
      * @throws PermissionDenied
      * @throws SaveError
      * @throws SelectError
@@ -132,6 +138,7 @@ class UserController extends AbstractController
     public function save(
         UserService $userService,
         UserRepository $userRepository,
+        int $userPermission,
         string $username,
         string $password,
         string $passwordRepeat,
@@ -139,7 +146,7 @@ class UserController extends AbstractController
         string $ip = null,
         int $id = null
     ): AjaxResponse {
-        $this->checkUserPermission($id, Permission::WRITE);
+        $this->checkUserPermission($id, Permission::WRITE, $userPermission);
 
         if (empty($username)) {
             return $this->returnFailure(['msg' => 'Benutzername ist leer.']);
@@ -186,12 +193,15 @@ class UserController extends AbstractController
     }
 
     /**
-     * @throws LoginRequired
      * @throws PermissionDenied
      */
-    public function deleteDevice(DeviceRepository $deviceRepository, int $id, array $devices): AjaxResponse
-    {
-        $this->checkUserPermission($id, Permission::DELETE);
+    public function deleteDevice(
+        DeviceRepository $deviceRepository,
+        int $id,
+        array $devices,
+        int $userPermission
+    ): AjaxResponse {
+        $this->checkUserPermission($id, Permission::DELETE, $userPermission);
 
         $deviceRepository->deleteByIds($devices, $id);
 
@@ -234,17 +244,15 @@ class UserController extends AbstractController
     }
 
     /**
-     * @throws LoginRequired
      * @throws PermissionDenied
      */
-    private function checkUserPermission(?int $userId, int $permission): void
+    private function checkUserPermission(?int $userId, int $requiredPermission, int $permission): void
     {
-        if ($userId !== $this->sessionService->getUserId()) {
-            $this->permissionAttribute->preExecute(new CheckPermission($permission & Permission::MANAGE), []);
-
-            return;
+        if (
+            $userId !== $this->sessionService->getUserId() &&
+            !$this->permissionService->checkPermission($requiredPermission + Permission::MANAGE, $permission)
+        ) {
+            throw new PermissionDenied();
         }
-
-        $this->permissionAttribute->preExecute(new CheckPermission($permission), []);
     }
 }

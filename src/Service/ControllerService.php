@@ -73,10 +73,11 @@ class ControllerService
         try {
             $attributes = $this->getAttributes($reflectionMethod);
             $parameters = $this->getParameters($reflectionMethod, $attributes);
-            $parameters = $this->preExecuteAttributes($attributes, $parameters);
+            $parameters = $this->preExecuteAttributes($attributes, $parameters, $reflectionMethod->getParameters());
             $parameters = $this->cleanParameters($reflectionMethod, $parameters);
             /** @var ResponseInterface $response */
             $response = $controller->$action(...$parameters);
+            $this->postExecuteAttributes($attributes, $response);
 
             try {
                 $this->checkRequiredHeaders($response);
@@ -260,14 +261,12 @@ class ControllerService
 
     /**
      * @param array<array-key, array{service: AbstractActionAttributeService, attribute: AttributeInterface}> $attributes
-     *
-     * @throws FactoryError
      */
-    private function preExecuteAttributes(array $attributes, array $parameters): array
+    private function preExecuteAttributes(array $attributes, array $parameters, array $reflectionParameters): array
     {
         /** @var array{service: AbstractActionAttributeService, attribute: AttributeInterface} $attribute */
         foreach ($attributes as $attribute) {
-            $parameters = $attribute['service']->preExecute($attribute['attribute'], $parameters);
+            $parameters = $attribute['service']->preExecute($attribute['attribute'], $parameters, $reflectionParameters);
         }
 
         return $parameters;
@@ -275,8 +274,6 @@ class ControllerService
 
     /**
      * @param array<array-key, array{service: AbstractActionAttributeService, attribute: AttributeInterface}> $attributes
-     *
-     * @throws FactoryError
      */
     private function postExecuteAttributes(array $attributes, ResponseInterface $response): void
     {
@@ -301,7 +298,7 @@ class ControllerService
                 try {
                     return $parameter->getDefaultValue();
                 } catch (ReflectionException $e) {
-                    throw new ControllerError($e->getMessage(), 0, $e);
+                    throw new ControllerError($e->getMessage(), StatusCode::BAD_REQUEST, $e);
                 }
             }
 

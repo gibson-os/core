@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Attribute;
 
 use Attribute;
-use GibsonOS\Core\Service\Attribute\PermissionAbstractActionAttribute;
+use GibsonOS\Core\Service\Attribute\PermissionAttribute;
 
 #[Attribute(Attribute::TARGET_METHOD)]
 class CheckPermission implements AttributeInterface
@@ -28,7 +28,7 @@ class CheckPermission implements AttributeInterface
 
     public function getAttributeServiceName(): string
     {
-        return PermissionAbstractActionAttribute::class;
+        return PermissionAttribute::class;
     }
 
     public function getPermissionParameter(): string
