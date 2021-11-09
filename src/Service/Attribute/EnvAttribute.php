@@ -8,7 +8,7 @@ use GibsonOS\Core\Attribute\Env;
 use GibsonOS\Core\Service\EnvService;
 use ReflectionNamedType;
 
-class EnvAttribute extends AbstractActionAttributeService implements ServiceAttributeServiceInterface, AttributeServiceInterface
+class EnvAttribute extends AbstractActionAttributeService implements ServiceAttributeServiceInterface
 {
     public function __construct(private EnvService $envService)
     {

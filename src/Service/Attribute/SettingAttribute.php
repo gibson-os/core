@@ -12,7 +12,7 @@ use GibsonOS\Core\Service\SessionService;
 use ReflectionException;
 use ReflectionParameter;
 
-class SettingAttribute extends AbstractActionAttributeService implements ServiceAttributeServiceInterface, AttributeServiceInterface
+class SettingAttribute extends AbstractActionAttributeService implements ServiceAttributeServiceInterface
 {
     public function __construct(
         private SettingRepository $settingRepository,
