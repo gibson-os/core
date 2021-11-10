@@ -3,31 +3,29 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Factory;
 
-use DateTimeZone;
 use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Service\DateTimeService;
+use GibsonOS\Core\Service\EnvService;
 
-class DateTimeFactory extends AbstractSingletonFactory
+class DateTimeFactory
 {
+    private static ?DateTimeService $instance = null;
+
     /**
      * @throws GetError
      */
-    protected static function createInstance(): DateTimeService
+    public static function get(): DateTimeService
     {
-        $env = EnvFactory::create();
+        if (self::$instance === null) {
+            $env = new EnvService();
 
-        return new DateTimeService(
-            new DateTimeZone($env->getString('timezone')),
-            $env->getFloat('date_latitude'),
-            $env->getFloat('date_longitude')
-        );
-    }
+            self::$instance = new DateTimeService(
+                $env->getString('timezone'),
+                $env->getFloat('date_latitude'),
+                $env->getFloat('date_longitude')
+            );
+        }
 
-    public static function create(): DateTimeService
-    {
-        /** @var DateTimeService $service */
-        $service = parent::create();
-
-        return $service;
+        return self::$instance;
     }
 }

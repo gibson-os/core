@@ -5,7 +5,6 @@ namespace GibsonOS\Core\Service;
 
 use GibsonOS\Core\Dto\Attribute;
 use GibsonOS\Core\Exception\FactoryError;
-use GibsonOS\Core\Factory\FactoryInterface;
 use GibsonOS\Core\Service\Attribute\ServiceAttributeServiceInterface;
 use ReflectionClass;
 use ReflectionException;
@@ -60,12 +59,6 @@ class ServiceManagerService
             throw new FactoryError(sprintf('Class or interface %s does not exists', $classname));
         }
 
-        $class = $this->getByFactory($classname);
-
-        if (!empty($class) && $class::class === $classname) {
-            return $this->checkInstanceOf($class, $instanceOf);
-        }
-
         if (isset($this->services[$classname])) {
             return $this->checkInstanceOf($this->services[$classname], $instanceOf);
         }
@@ -93,31 +86,6 @@ class ServiceManagerService
             !is_subclass_of($class, $className)
         ) {
             throw new FactoryError(sprintf('%d is no instanceof of %d', $class::class, $className));
-        }
-
-        return $class;
-    }
-
-    /**
-     * @throws FactoryError
-     */
-    private function getByFactory(string $classname): ?object
-    {
-        $factoryName = mb_substr($classname, 0, -7) . 'Factory';
-        $factoryName = str_replace('\\Service\\', '\\Factory\\', $factoryName);
-
-        if (
-            !class_exists($factoryName) ||
-            $factoryName === $classname
-        ) {
-            return null;
-        }
-
-        /** @var FactoryInterface $factoryName */
-        $class = $factoryName::create();
-
-        if ($class::class !== $classname) {
-            throw new FactoryError(sprintf('Factory not found for %s', $classname));
         }
 
         return $class;
@@ -188,7 +156,7 @@ class ServiceManagerService
                 }
             }
 
-            $parameters = $this->cleanParameters($constructor, $parameters);
+            $parameters = $this->transformParameters($constructor, $parameters);
         }
 
         return new $classname(...$parameters);
@@ -222,7 +190,10 @@ class ServiceManagerService
         $this->abstracts[$abstractName] = $className;
     }
 
-    private function cleanParameters(ReflectionMethod $reflectionMethod, array $parameters): array
+    /**
+     * @throws FactoryError
+     */
+    private function transformParameters(ReflectionMethod $reflectionMethod, array $parameters): array
     {
         $newParameters = [];
 
@@ -232,6 +203,13 @@ class ServiceManagerService
             }
 
             $newParameters[] = $parameters[$parameter->getName()];
+        }
+
+        if (count($newParameters) < count($parameters)) {
+            throw new FactoryError(sprintf(
+                'Following parameters not in method signature: $%s',
+                implode(', $', array_diff($parameters, $newParameters))
+            ));
         }
 
         return $newParameters;

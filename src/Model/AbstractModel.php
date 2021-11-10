@@ -48,8 +48,7 @@ abstract class AbstractModel implements ModelInterface
 
     public function __construct(mysqlDatabase $database = null)
     {
-        // @todo uncooles konstrukt
-        $this->dateTime = DateTimeFactory::create();
+        $this->dateTime = DateTimeFactory::get();
 
         if ($database === null) {
             $this->database = mysqlRegistry::getInstance()->get('database');

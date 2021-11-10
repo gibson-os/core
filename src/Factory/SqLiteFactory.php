@@ -3,14 +3,17 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Factory;
 
+use GibsonOS\Core\Service\FileService;
 use GibsonOS\Core\Service\SqLiteService;
 
 class SqLiteFactory
 {
-    public static function create(string $filename): SqLiteService
+    public function __construct(private FileService $fileService)
     {
-        $sqLite = new SqLiteService($filename, FileFactory::create());
+    }
 
-        return $sqLite;
+    public function create(string $filename): SqLiteService
+    {
+        return new SqLiteService($filename, $this->fileService);
     }
 }

@@ -7,11 +7,18 @@ use DateTime;
 use DateTimeInterface;
 use DateTimeZone;
 use Exception;
+use GibsonOS\Core\Attribute\GetEnv;
 
 class DateTimeService extends AbstractService
 {
-    public function __construct(private DateTimeZone $timezone, private float $latitude, private float $longitude)
+    private DateTimeZone $timezone;
+
+    #[GetEnv('timezone')]
+    #[GetEnv('date_latitude', 'latitude')]
+    #[GetEnv('date_longitude', 'longitude')]
+    public function __construct(string $timezone, private float $latitude, private float $longitude)
     {
+        $this->timezone = new DateTimeZone($timezone);
     }
 
     /**
