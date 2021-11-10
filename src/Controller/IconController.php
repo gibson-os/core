@@ -34,14 +34,12 @@ class IconController extends AbstractController
 
         /** @var Generator $icons */
         $icons = $iconStore->getList();
-        /** @var Generator $tags */
-        $tags = $tagStore->getList();
 
         return new AjaxResponse([
             'success' => true,
             'failure' => false,
             'data' => [...$icons],
-            'tags' => [...$tags],
+            'tags' => $tagStore->getList(),
         ]);
     }
 

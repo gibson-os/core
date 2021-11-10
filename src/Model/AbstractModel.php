@@ -65,6 +65,11 @@ abstract class AbstractModel implements ModelInterface
         return $mysqlTable;
     }
 
+    public function getDatabase(): mysqlDatabase
+    {
+        return $this->database;
+    }
+
     public function loadFromMysqlTable(mysqlTable $mysqlTable): void
     {
         foreach ($mysqlTable->fields as $field) {
@@ -151,7 +156,7 @@ abstract class AbstractModel implements ModelInterface
      */
     public function save(mysqlTable $mysqlTable = null): void
     {
-        if (null === $mysqlTable) {
+        if ($mysqlTable === null) {
             $mysqlTable = new mysqlTable($this->database, $this->getTableName());
         }
 

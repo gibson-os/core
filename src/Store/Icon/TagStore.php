@@ -22,4 +22,17 @@ class TagStore extends AbstractDatabaseStore
     {
         return '`tag`';
     }
+
+    protected function initTable(): void
+    {
+        parent::initTable();
+        $this->table->setGroupBy('`tag`');
+    }
+
+    public function getList(): iterable
+    {
+        $this->table->selectPrepared(false, '`tag`, COUNT(`icon_id`) AS `count`');
+
+        return $this->table->connection->fetchAssocList();
+    }
 }

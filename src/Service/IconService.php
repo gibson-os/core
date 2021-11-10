@@ -38,8 +38,8 @@ class IconService
      */
     public function save(Icon $icon, string $imageFilename, string $iconFilename = null, array $tags = []): void
     {
-        $connection = $icon->getMysqlTable()->connection;
-        $connection->startTransaction();
+        $database = $icon->getDatabase();
+        $database->startTransaction();
 
         try {
             $icon->save();
@@ -64,15 +64,15 @@ class IconService
                     ->save();
             }
         } catch (Throwable $exception) {
-            $connection->rollback();
+            $database->rollback();
 
             throw $exception;
         }
 
-        $connection->commit();
+        $database->commit();
     }
 
-    /**
+    /**N
      * @throws GetError
      * @throws FileDeleteError
      * @throws FileNotFound
