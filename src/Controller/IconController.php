@@ -3,7 +3,9 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Controller;
 
+use Exception;
 use Generator;
+use GibsonOS\Core\Attribute\AlwaysAjaxResponse;
 use GibsonOS\Core\Attribute\CheckPermission;
 use GibsonOS\Core\Exception\CreateError;
 use GibsonOS\Core\Exception\GetError;
@@ -54,12 +56,13 @@ class IconController extends AbstractController
      * @return AjaxResponse
      */
     #[CheckPermission(Permission::WRITE)]
+    #[AlwaysAjaxResponse]
     public function save(
         IconRepository $iconRepository,
         ImageService $imageService,
         IconService $iconService,
         string $name,
-        array $tags,
+        string $tags,
         array $icon,
         array $iconIco = null,
         int $id = null
@@ -73,19 +76,33 @@ class IconController extends AbstractController
             ;
         }
 
-        $iconService->save($iconModel, $icon['tmp_name'], $iconIco === null ? null : $iconIco['tmp_name'], $tags);
+        $iconService->save(
+            $iconModel,
+            $icon['tmp_name'],
+            $iconIco === null ? null : $iconIco['tmp_name'],
+            explode(',', $tags)
+        );
 
         return $this->returnSuccess();
     }
 
     #[CheckPermission(Permission::DELETE)]
-    public function delete(IconRepository $iconRepository, array $ids): AjaxResponse
+    public function delete(IconRepository $iconRepository, array $ids, IconService $iconService): AjaxResponse
     {
-        // @todo bilder löschen
-        if ($iconRepository->deleteByIds($ids)) {
-            return $this->returnSuccess();
+        $iconRepository->startTransaction();
+
+        try {
+            foreach ($iconRepository->findByIds($ids) as $icon) {
+                $iconService->delete($icon);
+            }
+        } catch (Exception) {
+            $iconRepository->rollback();
+
+            return $this->returnFailure('Icons not deleted!');
         }
 
-        return $this->returnFailure('Icons not deleted!');
+        $iconRepository->commit();
+
+        return $this->returnSuccess();
     }
 }

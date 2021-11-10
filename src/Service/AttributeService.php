@@ -23,9 +23,21 @@ class AttributeService
      */
     public function getMethodAttributes(ReflectionMethod $reflectionMethod): array
     {
+        return $this->getMethodAttributesByClassName($reflectionMethod, AttributeInterface::class);
+    }
+
+    /**
+     * @param class-string $attributeClassName
+     *
+     * @throws FactoryError
+     *
+     * @return Attribute[]
+     */
+    public function getMethodAttributesByClassName(ReflectionMethod $reflectionMethod, string $attributeClassName): array
+    {
         $attributesClasses = [];
         $attributes = $reflectionMethod->getAttributes(
-            AttributeInterface::class,
+            $attributeClassName,
             ReflectionAttribute::IS_INSTANCEOF
         );
 

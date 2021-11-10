@@ -197,10 +197,22 @@ class StatusCode
         self::NETWORK_AUTHENTICATION_REQUIRED => 'Network Authentication Required',
     ];
 
-    public function getStatusHeader(int $code): string
+    public function isValidCode(int $code): bool
     {
         if (!isset(self::CODES[$code])) {
-            throw new OutOfBoundsException(sprintf('Status Code %d is not allowed!', $code));
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * @throws OutOfBoundsException
+     */
+    public function getStatusHeader(int $code): string
+    {
+        if (!$this->isValidCode($code)) {
+            throw new OutOfBoundsException(sprintf('Status Code %d is not allowed!', $code), self::BAD_REQUEST);
         }
 
         return 'HTTP/1.0 ' . $code . ' ' . self::CODES[$code];

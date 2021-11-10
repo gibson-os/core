@@ -5,9 +5,10 @@ namespace GibsonOS\Core\Model;
 
 use DateTimeImmutable;
 use DateTimeInterface;
+use JsonSerializable;
 use mysqlDatabase;
 
-class Icon extends AbstractModel
+class Icon extends AbstractModel implements JsonSerializable
 {
     private ?int $id = null;
 
@@ -75,5 +76,14 @@ class Icon extends AbstractModel
         $this->added = $added;
 
         return $this;
+    }
+
+    public function jsonSerialize(): array
+    {
+        return [
+            'id' => $this->getId(),
+            'name' => $this->getName(),
+            'originalType' => $this->getOriginalType(),
+        ];
     }
 }

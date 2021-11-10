@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Service;
 
+use GibsonOS\Core\Attribute\AlwaysAjaxResponse;
 use GibsonOS\Core\Dto\Attribute;
 use GibsonOS\Core\Exception\ControllerError;
 use GibsonOS\Core\Exception\FactoryError;
@@ -16,6 +17,7 @@ use GibsonOS\Core\Service\Response\TwigResponse;
 use GibsonOS\Core\Utility\JsonUtility;
 use GibsonOS\Core\Utility\StatusCode;
 use JsonException;
+use OutOfBoundsException;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionMethod;
@@ -48,7 +50,8 @@ class ControllerService
             $this->outputResponse(new ExceptionResponse(
                 new ControllerError(sprintf('Controller %s not found!', $controllerName), 404, $e),
                 $this->requestService,
-                $this->twigService
+                $this->twigService,
+                $this->statusCode
             ));
 
             return;
@@ -60,7 +63,8 @@ class ControllerService
             $this->outputResponse(new ExceptionResponse(
                 new ControllerError(sprintf('Action %s::%s not exists!', $controllerName, $action), 404, $e),
                 $this->requestService,
-                $this->twigService
+                $this->twigService,
+                $this->statusCode
             ));
 
             return;
@@ -70,7 +74,8 @@ class ControllerService
             $this->outputResponse(new ExceptionResponse(
                 new ControllerError(sprintf('Action %s::%s is not public!', $controllerName, $action), 405),
                 $this->requestService,
-                $this->twigService
+                $this->twigService,
+                $this->statusCode
             ));
 
             return;
@@ -85,17 +90,26 @@ class ControllerService
             $response = $controller->$action(...$parameters);
             $this->postExecuteAttributes($attributes, $response);
 
-            try {
-                $this->checkRequiredHeaders($response);
-            } catch (ControllerError $e) {
-                if (!$response instanceof AjaxResponse) {
-                    throw $e;
-                }
+            $alwaysAjaxAttributes = $this->attributeService->getMethodAttributesByClassName(
+                $reflectionMethod,
+                AlwaysAjaxResponse::class
+            );
 
-                $response = $this->renderTemplate();
+            if (count($alwaysAjaxAttributes) === 0) {
+                try {
+                    $this->checkRequiredHeaders($response);
+                } catch (ControllerError $e) {
+                    error_log($e->getMessage());
+
+                    if (!$response instanceof AjaxResponse) {
+                        throw $e;
+                    }
+
+                    $response = $this->renderTemplate();
+                }
             }
         } catch (Throwable $e) {
-            $response = new ExceptionResponse($e, $this->requestService, $this->twigService);
+            $response = new ExceptionResponse($e, $this->requestService, $this->twigService, $this->statusCode);
         }
 
         $this->outputResponse($response);
@@ -137,7 +151,18 @@ class ControllerService
 
     private function outputResponse(ResponseInterface $response): void
     {
-        header($this->statusCode->getStatusHeader($response->getCode()));
+        try {
+            header($this->statusCode->getStatusHeader($response->getCode()));
+        } catch (OutOfBoundsException $exception) {
+            $this->outputResponse(new ExceptionResponse(
+                $exception,
+                $this->requestService,
+                $this->twigService,
+                $this->statusCode
+            ));
+
+            return;
+        }
 
         foreach ($response->getHeaders() as $headerName => $headerValues) {
             if (!is_array($headerValues)) {

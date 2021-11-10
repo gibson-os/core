@@ -41,7 +41,8 @@ class RequestService
             $_GET,
             $_POST,
             $params,
-            $_COOKIE
+            $_COOKIE,
+            $_FILES
         );
     }
 

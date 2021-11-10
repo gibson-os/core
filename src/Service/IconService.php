@@ -5,7 +5,10 @@ namespace GibsonOS\Core\Service;
 
 use GibsonOS\Core\Attribute\GetSetting;
 use GibsonOS\Core\Exception\CreateError;
+use GibsonOS\Core\Exception\DeleteError as FileDeleteError;
+use GibsonOS\Core\Exception\FileNotFound;
 use GibsonOS\Core\Exception\GetError;
+use GibsonOS\Core\Exception\Model\DeleteError;
 use GibsonOS\Core\Exception\Model\SaveError;
 use GibsonOS\Core\Exception\SetError;
 use GibsonOS\Core\Model\Icon;
@@ -33,10 +36,8 @@ class IconService
      * @throws SetError
      * @throws Throwable
      */
-    public function save(Icon $icon, string $imageFilename, string $iconFilename = null, array $tags = []): bool
+    public function save(Icon $icon, string $imageFilename, string $iconFilename = null, array $tags = []): void
     {
-        // @todo das Bild muss hochgeladen werden
-
         $connection = $icon->getMysqlTable()->connection;
         $connection->startTransaction();
 
@@ -44,13 +45,13 @@ class IconService
             $icon->save();
             $this->fileService->copy(
                 $imageFilename,
-                $this->iconPath . 'original' . DIRECTORY_SEPARATOR . 'icon' . $icon->getId() . '.' . $icon->getOriginalType()
+                $this->iconPath . DIRECTORY_SEPARATOR . 'icon' . $icon->getId() . '.' . $icon->getOriginalType()
             );
 
-            if ($iconFilename !== null) {
+            if (!empty($iconFilename)) {
                 $this->fileService->copy(
                     $iconFilename,
-                    $this->iconPath . 'original' . DIRECTORY_SEPARATOR . 'icon' . $icon->getId() . '.ico'
+                    $this->iconPath . DIRECTORY_SEPARATOR . 'icon' . $icon->getId() . '.ico'
                 );
             }
 
@@ -59,7 +60,7 @@ class IconService
             foreach ($tags as $tag) {
                 (new Icon\Tag())
                     ->setIcon($icon)
-                    ->setTag($tag)
+                    ->setTag(trim($tag))
                     ->save();
             }
         } catch (Throwable $exception) {
@@ -69,5 +70,21 @@ class IconService
         }
 
         $connection->commit();
+    }
+
+    /**
+     * @throws GetError
+     * @throws FileDeleteError
+     * @throws FileNotFound
+     * @throws DeleteError
+     */
+    public function delete(Icon $icon): void
+    {
+        $icon->delete();
+        $this->fileService->delete($this->iconPath . DIRECTORY_SEPARATOR . 'icon' . $icon->getId() . '.' . $icon->getOriginalType());
+
+        if ($this->fileService->exists($this->iconPath . DIRECTORY_SEPARATOR . 'icon' . $icon->getId() . '.ico')) {
+            $this->fileService->delete($this->iconPath . DIRECTORY_SEPARATOR . 'icon' . $icon->getId() . '.ico');
+        }
     }
 }

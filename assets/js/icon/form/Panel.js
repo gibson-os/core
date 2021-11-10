@@ -27,7 +27,7 @@ Ext.define('GibsonOS.module.core.icon.form.Panel', {
             xtype: this.gos.data.record ? 'gosFormTextfield' : 'gosFormFile',
             fieldLabel: 'Icon',
             name: 'icon',
-            disabled: this.gos.data.record ? true : false,
+            disabled: !!this.gos.data.record,
             requiredPermission: {
                 action: 'save',
                 permission: GibsonOS.Permission.WRITE
@@ -36,7 +36,7 @@ Ext.define('GibsonOS.module.core.icon.form.Panel', {
             xtype: this.gos.data.record ? 'gosFormTextfield' : 'gosFormFile',
             fieldLabel: 'Icon (*.ico)',
             name: 'iconIco',
-            disabled: this.gos.data.record ? true : false,
+            disabled: !!this.gos.data.record,
             requiredPermission: {
                 action: 'save',
                 permission: GibsonOS.Permission.WRITE

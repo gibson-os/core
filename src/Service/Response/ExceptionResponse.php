@@ -7,6 +7,7 @@ use GibsonOS\Core\Exception\AbstractException;
 use GibsonOS\Core\Service\RequestService;
 use GibsonOS\Core\Service\TwigService;
 use GibsonOS\Core\Utility\JsonUtility;
+use GibsonOS\Core\Utility\StatusCode;
 use Throwable;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
@@ -14,13 +15,23 @@ use Twig\Error\SyntaxError;
 
 class ExceptionResponse implements ResponseInterface
 {
-    public function __construct(private Throwable $exception, private RequestService $requestService, private TwigService $twigService)
-    {
+    public function __construct(
+        private Throwable $exception,
+        private RequestService $requestService,
+        private TwigService $twigService,
+        private StatusCode $statusCode
+    ) {
     }
 
     public function getCode(): int
     {
-        return (int) ($this->exception->getCode() ?: 500);
+        $code = (int) ($this->exception->getCode() ?: 500);
+
+        if (!$this->statusCode->isValidCode($code)) {
+            $code = StatusCode::BAD_REQUEST;
+        }
+
+        return $code;
     }
 
     public function getHeaders(): array
@@ -42,6 +53,12 @@ class ExceptionResponse implements ResponseInterface
     public function getBody(): string
     {
         error_log($this->exception->getMessage());
+        $traces = explode(PHP_EOL, $this->exception->getTraceAsString());
+
+        foreach ($traces as $trace) {
+            error_log($trace);
+        }
+
         $exception = $this->getExceptionJson($this->exception);
 
         if ($this->requestService->isAjax()) {
