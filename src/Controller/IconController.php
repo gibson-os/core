@@ -59,6 +59,8 @@ class IconController extends AbstractController
         IconRepository $iconRepository,
         ImageService $imageService,
         IconService $iconService,
+        IconStore $iconStore,
+        TagStore $tagStore,
         string $name,
         string $tags,
         array $icon,
@@ -81,7 +83,15 @@ class IconController extends AbstractController
             explode(',', $tags)
         );
 
-        return $this->returnSuccess();
+        /** @var Generator $icons */
+        $icons = $iconStore->getList();
+
+        return new AjaxResponse([
+            'success' => true,
+            'failure' => false,
+            'data' => [...$icons],
+            'tags' => $tagStore->getList(),
+        ]);
     }
 
     #[CheckPermission(Permission::DELETE)]
