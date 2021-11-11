@@ -3,10 +3,13 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Controller;
 
-use Generator;
 use GibsonOS\Core\Attribute\CheckPermission;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\User\Permission;
+use GibsonOS\Core\Repository\Drive\StatRepository;
+use GibsonOS\Core\Repository\DriveRepository;
+use GibsonOS\Core\Repository\SmartAttributeRepository;
+use GibsonOS\Core\Service\DateTimeService;
 use GibsonOS\Core\Service\Response\AjaxResponse;
 use GibsonOS\Core\Store\DriveStore;
 
@@ -16,15 +19,44 @@ class DriveController extends AbstractController
      * @throws SelectError
      */
     #[CheckPermission(Permission::READ)]
-    public function index(DriveStore $driveStore): AjaxResponse
-    {
-        /** @var Generator $drives */
-        $drives = $driveStore->getList();
+    public function index(
+        DriveRepository $driveRepository,
+        SmartAttributeRepository $smartAttributeRepository,
+        StatRepository $statRepository
+    ): AjaxResponse {
+        $range = $statRepository->getTimeRange();
 
         return new AjaxResponse([
             'success' => true,
             'failure' => false,
-            'data' => [...$drives],
+            'data' => $driveRepository->getDrivesWithAttributes(),
+            'attributes' => $smartAttributeRepository->getAll(),
+            'from' => $range['min'],
+            'to' => $range['max'],
         ]);
+    }
+
+    /**
+     * @throws SelectError
+     */
+    #[CheckPermission(Permission::READ)]
+    public function chart(
+        DriveStore $driveStore,
+        DateTimeService $dateTimeService,
+        string $from = null,
+        string $fromTime = null,
+        string $to = null,
+        string $toTime = null,
+        int $attributeId = 194
+    ): AjaxResponse {
+        $driveStore
+            ->setAttributeId($attributeId)
+            ->setFrom($from === null ? null : $dateTimeService->get($from))
+            ->setFromTime($dateTimeService->get($fromTime ?? 'now'))
+            ->setTo($to === null ? null : $dateTimeService->get($to))
+            ->setToTime($dateTimeService->get($toTime ?? 'now'))
+        ;
+
+        return $this->returnSuccess($driveStore->getList());
     }
 }

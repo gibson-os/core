@@ -3,7 +3,9 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Model;
 
-class SmartAttribute extends AbstractModel
+use JsonSerializable;
+
+class SmartAttribute extends AbstractModel implements JsonSerializable
 {
     private ?int $id = null;
 
@@ -50,5 +52,14 @@ class SmartAttribute extends AbstractModel
         $this->description = $description;
 
         return $this;
+    }
+
+    public function jsonSerialize(): array
+    {
+        return [
+            'id' => $this->getId(),
+            'short' => $this->getShort(),
+            'description' => $this->getDescription(),
+        ];
     }
 }

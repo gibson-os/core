@@ -7,49 +7,91 @@ use GibsonOS\Core\Model\AbstractModel;
 
 class StatAttribute extends AbstractModel
 {
-    private ?int $id = null;
+    private int $statId;
 
-    private string $short;
+    private int $attributeId;
 
-    private string $description;
+    private int $value;
+
+    private int $worst;
+
+    private int $thresh;
+
+    private int $rawValue;
 
     public static function getTableName(): string
     {
         return 'system_drive_stat_attribute';
     }
 
-    public function getId(): ?int
+    public function getStatId(): int
     {
-        return $this->id;
+        return $this->statId;
     }
 
-    public function setId(?int $id): StatAttribute
+    public function setStatId(int $statId): StatAttribute
     {
-        $this->id = $id;
+        $this->statId = $statId;
 
         return $this;
     }
 
-    public function getShort(): string
+    public function getAttributeId(): int
     {
-        return $this->short;
+        return $this->attributeId;
     }
 
-    public function setShort(string $short): StatAttribute
+    public function setAttributeId(int $attributeId): StatAttribute
     {
-        $this->short = $short;
+        $this->attributeId = $attributeId;
 
         return $this;
     }
 
-    public function getDescription(): string
+    public function getValue(): int
     {
-        return $this->description;
+        return $this->value;
     }
 
-    public function setDescription(string $description): StatAttribute
+    public function setValue(int $value): StatAttribute
     {
-        $this->description = $description;
+        $this->value = $value;
+
+        return $this;
+    }
+
+    public function getWorst(): int
+    {
+        return $this->worst;
+    }
+
+    public function setWorst(int $worst): StatAttribute
+    {
+        $this->worst = $worst;
+
+        return $this;
+    }
+
+    public function getThresh(): int
+    {
+        return $this->thresh;
+    }
+
+    public function setThresh(int $thresh): StatAttribute
+    {
+        $this->thresh = $thresh;
+
+        return $this;
+    }
+
+    public function getRawValue(): int
+    {
+        return $this->rawValue;
+    }
+
+    public function setRawValue(int $rawValue): StatAttribute
+    {
+        $this->rawValue = $rawValue;
 
         return $this;
     }
