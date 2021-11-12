@@ -52,6 +52,7 @@ class ElementService extends AbstractService
      * @throws DateTimeError
      * @throws FactoryError
      * @throws JsonException
+     * @throws EventException
      */
     public function runElements(array $elements, array $variables = []): void
     {
@@ -176,6 +177,7 @@ class ElementService extends AbstractService
 
     /**
      * @throws FactoryError
+     * @throws JsonException
      *
      * @return mixed
      */
