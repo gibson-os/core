@@ -89,7 +89,8 @@ abstract class AbstractRepository
     protected function fetchOne(
         string $where,
         array $parameters,
-        string $modelClassName
+        string $modelClassName,
+        string $orderBy = null
     ): ModelInterface {
         /** @var ModelInterface $modelClassNameCopy */
         $modelClassNameCopy = $modelClassName;
@@ -97,6 +98,7 @@ abstract class AbstractRepository
             ->setWhere($where)
             ->setWhereParameters($parameters)
             ->setLimit(1)
+            ->setOrderBy($orderBy)
         ;
 
         if (!$table->selectPrepared()) {
