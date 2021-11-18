@@ -5,11 +5,7 @@ namespace GibsonOS\Core\Repository;
 
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\Drive;
-use mysqlTable;
 
-/**
- * @method Drive[] getModels(mysqlTable $table, string $modelClassName)
- */
 class DriveRepository extends AbstractRepository
 {
     /**

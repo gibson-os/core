@@ -10,9 +10,6 @@ use GibsonOS\Core\Model\Weather;
 use GibsonOS\Core\Model\Weather\Location;
 use GibsonOS\Core\Service\DateTimeService;
 
-/**
- * @method Weather fetchOne(string $where, array $parameters, string $modelClassName)
- */
 class WeatherRepository extends AbstractRepository
 {
     public function __construct(private DateTimeService $dateTimeService)

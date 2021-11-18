@@ -10,9 +10,6 @@ use GibsonOS\Core\Repository\AbstractRepository;
 use mysqlTable;
 use stdClass;
 
-/**
- * @method PermissionView getModel(mysqlTable $table, string $modelClassName)
- */
 class PermissionViewRepository extends AbstractRepository
 {
     /**

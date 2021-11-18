@@ -7,10 +7,6 @@ use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\User\Device;
 use GibsonOS\Core\Repository\AbstractRepository;
 
-/**
- * @method Device   fetchOne(string $where, array $parameters, string $modelClassName)
- * @method Device[] fetchAll(string $where, array $parameters, string $modelClassName, int $limit = null, int $offset = null, string $orderBy = null)
- */
 class DeviceRepository extends AbstractRepository
 {
     /**

@@ -3,21 +3,19 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Service;
 
+use GibsonOS\Core\Attribute\GetEnv;
 use GibsonOS\Core\Exception\FileNotFound;
 
 class CryptService
 {
-    private string $cryptInitializationVector;
-
-    private string $cryptAlgo;
-
-    private string $cryptSalt;
-
-    public function __construct(EnvService $envService)
-    {
-        $this->cryptInitializationVector = $envService->getString('CRYPT_INITIALIZATION_VECTOR');
-        $this->cryptAlgo = $envService->getString('CRYPT_ALGO');
-        $this->cryptSalt = $envService->getString('CRYPT_SALT');
+    #[GetEnv('CRYPT_INITIALIZATION_VECTOR')]
+    #[GetEnv('CRYPT_ALGO')]
+    #[GetEnv('CRYPT_SALT')]
+    public function __construct(
+        private string $cryptInitializationVector,
+        private string $cryptAlgo,
+        private string $cryptSalt
+    ) {
     }
 
     public function encrypt(string $data): string
@@ -63,7 +61,7 @@ class CryptService
         fclose($outputFile);
     }
 
-    public function decrypt($data): string
+    public function decrypt(string $data): string
     {
         $initializationVector = substr(
             $this->cryptInitializationVector,

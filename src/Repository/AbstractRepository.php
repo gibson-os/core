@@ -32,9 +32,13 @@ abstract class AbstractRepository
     }
 
     /**
+     * @template T of AbstractModel
+     *
+     * @param class-string<T> $modelClassName
+     *
      * @throws SelectError
      *
-     * @return ModelInterface[]
+     * @return T[]
      */
     protected function getModels(mysqlTable $table, string $modelClassName): array
     {
@@ -45,7 +49,6 @@ abstract class AbstractRepository
             throw $exception;
         }
 
-        /** @var ModelInterface[] $models */
         $models = [];
 
         if ($table->countRecords() === 0) {
@@ -60,30 +63,28 @@ abstract class AbstractRepository
     }
 
     /**
-     * @throws SelectError
+     * @template T of AbstractModel
+     *
+     * @param class-string<T> $modelClassName
+     *
+     * @return T
      */
     protected function getModel(mysqlTable $table, string $modelClassName): AbstractModel
     {
         $model = new $modelClassName();
-
-        if (!$model instanceof AbstractModel) {
-            $exception = new SelectError(sprintf(
-                '%s is no instance of %s',
-                $modelClassName,
-                AbstractModel::class
-            ));
-            $exception->setTable($table);
-
-            throw $exception;
-        }
-
         $model->loadFromMysqlTable($table);
 
         return $model;
     }
 
     /**
+     * @template T of AbstractModel
+     *
+     * @param class-string<T> $modelClassName
+     *
      * @throws SelectError
+     *
+     * @return T
      */
     protected function fetchOne(
         string $where,
@@ -109,9 +110,13 @@ abstract class AbstractRepository
     }
 
     /**
+     * @template T of AbstractModel
+     *
+     * @param class-string<T> $modelClassName
+     *
      * @throws SelectError
      *
-     * @return ModelInterface[]
+     * @return T[]
      */
     protected function fetchAll(
         string $where,

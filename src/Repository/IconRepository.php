@@ -6,10 +6,6 @@ namespace GibsonOS\Core\Repository;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\Icon;
 
-/**
- * @method Icon   fetchOne(string $where, array $parameters, string $modelClassName)
- * @method Icon[] fetchAll(string $where, array $parameters, string $modelClassName, int $limit = null, int $offset = null, string $orderBy = null)
- */
 class IconRepository extends AbstractRepository
 {
     /**

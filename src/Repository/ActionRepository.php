@@ -6,9 +6,6 @@ namespace GibsonOS\Core\Repository;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\Action;
 
-/**
- * @method Action fetchOne(string $where, array $parameters, string $modelClassName)
- */
 class ActionRepository extends AbstractRepository
 {
     /**

@@ -7,9 +7,6 @@ use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\Action\Permission;
 use GibsonOS\Core\Repository\AbstractRepository;
 
-/**
- * @method Permission[] fetchAll(string $where, array $parameters, string $modelClassName, int $limit = null, int $offset = null, string $orderBy = null)
- */
 class PermissionRepository extends AbstractRepository
 {
     /**

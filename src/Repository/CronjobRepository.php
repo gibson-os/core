@@ -8,14 +8,9 @@ use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\Cronjob;
 use mysqlTable;
 
-/**
- * @method Cronjob[] getModels(mysqlTable $table, string $modelClassName)
- */
 class CronjobRepository extends AbstractRepository
 {
     /**
-     * @throws SelectError
-     *
      * @return Cronjob[]
      */
     public function getRunnableByUser(DateTimeInterface $dateTime, string $user): array
@@ -79,7 +74,6 @@ class CronjobRepository extends AbstractRepository
 
     private function getTimeAsUnixTimestampFunction(mysqlTable $table, DateTimeInterface $dateTime): string
     {
-        $tableName = Cronjob::getTableName();
         $table->addWhereParameter(
             ((int) $dateTime->format('Y')) . '-' . ((int) $dateTime->format('n')) . '-' . ((int) $dateTime->format('j')) . ' ' .
             ((int) $dateTime->format('H')) . ':' . ((int) $dateTime->format('i')) . ':' . ((int) $dateTime->format('s'))

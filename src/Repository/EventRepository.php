@@ -17,10 +17,6 @@ use JsonException;
 use mysqlTable;
 use stdClass;
 
-/**
- * @method Event   fetchOne(string $where, array $parameters, string $modelClassName)
- * @method Event[] fetchAll(string $where, array $parameters, string $modelClassName, int $limit = null, int $offset = null, string $orderBy = null)
- */
 class EventRepository extends AbstractRepository
 {
     public function __construct(private JsonUtility $jsonUtility)
