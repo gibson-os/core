@@ -80,4 +80,12 @@ class DirService extends AbstractService
 
         return $files;
     }
+
+    public function getDirName(string $path, $directorySeparator = DIRECTORY_SEPARATOR): string
+    {
+        $pathParts = explode($directorySeparator, $path);
+        unset($pathParts[count($pathParts) - 1]);
+
+        return implode($directorySeparator, $pathParts);
+    }
 }
