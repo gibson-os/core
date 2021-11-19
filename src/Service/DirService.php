@@ -83,9 +83,9 @@ class DirService extends AbstractService
 
     public function getDirName(string $path, $directorySeparator = DIRECTORY_SEPARATOR): string
     {
-        $pathParts = explode($directorySeparator, $path);
+        $pathParts = explode($directorySeparator, $this->removeEndSlash($path, $directorySeparator));
         unset($pathParts[count($pathParts) - 1]);
 
-        return implode($directorySeparator, $pathParts);
+        return $this->addEndSlash(implode($directorySeparator, $pathParts), $directorySeparator);
     }
 }
