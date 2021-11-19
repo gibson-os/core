@@ -384,15 +384,21 @@ class ControllerService
         }
     }
 
+    /**
+     * @return class-string
+     */
     public function getControllerClassname(): string
     {
         $moduleName = $this->requestService->getModuleName();
 
-        return
+        /** @var class-string $className */
+        $className =
             'GibsonOS\\' .
             ($moduleName === 'core' ? '' : 'Module\\') .
             ucfirst($moduleName) . '\\Controller\\' .
             ucfirst($this->requestService->getTaskName()) . 'Controller'
         ;
+
+        return $className;
     }
 }

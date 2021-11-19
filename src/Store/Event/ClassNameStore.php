@@ -80,6 +80,7 @@ class ClassNameStore extends AbstractStore
 
             foreach ($this->dir->getFiles($eventDescriberDir, '*.php') as $classPath) {
                 $className = str_replace('.php', '', $this->file->getFilename($classPath));
+                /** @var class-string $classNameWithNamespace */
                 $classNameWithNamespace = $namespace . $className;
 
                 try {

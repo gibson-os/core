@@ -14,6 +14,8 @@ use GibsonOS\Core\Service\ServiceManagerService;
 class AutoCompleteController extends AbstractController
 {
     /**
+     * @param class-string $autoCompleteClassname
+     *
      * @throws FactoryError
      */
     #[CheckPermission(Permission::READ)]

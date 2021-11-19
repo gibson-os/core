@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Model;
 
 use Exception;
+use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\Model\DeleteError;
 use GibsonOS\Core\Exception\Model\SaveError;
 use GibsonOS\Core\Factory\DateTimeFactory;
@@ -46,6 +47,9 @@ abstract class AbstractModel implements ModelInterface
 
     private DateTimeService $dateTime;
 
+    /**
+     * @throws GetError
+     */
     public function __construct(mysqlDatabase $database = null)
     {
         $this->dateTime = DateTimeFactory::get();
@@ -197,10 +201,7 @@ abstract class AbstractModel implements ModelInterface
         return str_replace(' ', '', ucwords(str_replace('_', ' ', $fieldName)));
     }
 
-    /**
-     * @param mixed $value
-     */
-    protected function loadForeignRecord(AbstractModel $model, string|int $value, string $foreignField = 'id'): void
+    protected function loadForeignRecord(AbstractModel $model, string|int|float $value, string $foreignField = 'id'): void
     {
         $fieldName = $this->transformFieldName($foreignField);
 
@@ -223,23 +224,35 @@ abstract class AbstractModel implements ModelInterface
     }
 
     /**
-     * @param mixed $value
+     * @template T of AbstractModel
      *
-     * @return AbstractModel[]
+     * @param class-string<T> $modelClassName
+     *
+     * @return T[]
      */
-    protected function loadForeignRecords(string $modelClassName, $value, string $foreignTable, string $foreignField): array
-    {
-        $mysqlTable = new mysqlTable($this->database, $foreignTable);
-        $mysqlTable->setWhere('`' . $foreignField . '`=' . (is_int($value) ? $value : $this->database->escape($value)));
-
+    protected function loadForeignRecords(
+        string $modelClassName,
+        string|int|float|null $value,
+        string $foreignTable,
+        string $foreignField
+    ): array {
         $models = [];
 
-        if (!$mysqlTable->select()) {
+        if ($value === null) {
+            return $models;
+        }
+
+        $mysqlTable = new mysqlTable($this->database, $foreignTable);
+        $mysqlTable
+            ->setWhere('`' . $foreignField . '`=?')
+            ->addWhereParameter($value)
+        ;
+
+        if (!$mysqlTable->selectPrepared()) {
             return $models;
         }
 
         do {
-            /** @var AbstractModel $model */
             $model = new $modelClassName();
             $model->loadFromMysqlTable($mysqlTable);
             $models[] = $model;

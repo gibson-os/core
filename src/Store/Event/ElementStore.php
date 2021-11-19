@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Store\Event;
 
-use GibsonOS\Core\Exception\FactoryError;
 use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\Event\Element;
@@ -41,7 +40,6 @@ class ElementStore extends AbstractDatabaseStore
 
     /**
      * @throws GetError
-     * @throws FactoryError
      * @throws JsonException
      * @throws SelectError
      *

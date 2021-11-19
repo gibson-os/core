@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Model\Event;
 
-use GibsonOS\Core\Exception\DateTimeError;
 use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Model\Event;
 use GibsonOS\Core\Utility\JsonUtility;
@@ -22,6 +21,9 @@ class Element extends AbstractModel implements Serializable, JsonSerializable
 
     private int $order = 0;
 
+    /**
+     * @var class-string
+     */
     private string $class;
 
     private string $method;
@@ -111,11 +113,17 @@ class Element extends AbstractModel implements Serializable, JsonSerializable
         return $this;
     }
 
+    /**
+     * @return class-string
+     */
     public function getClass(): string
     {
         return $this->class;
     }
 
+    /**
+     * @param class-string $class
+     */
     public function setClass(string $class): Element
     {
         $this->class = $class;
@@ -171,9 +179,6 @@ class Element extends AbstractModel implements Serializable, JsonSerializable
         return $this;
     }
 
-    /**
-     * @throws DateTimeError
-     */
     public function getEvent(): Event
     {
         $this->loadForeignRecord($this->event, $this->getEventId());
@@ -189,17 +194,16 @@ class Element extends AbstractModel implements Serializable, JsonSerializable
         return $this;
     }
 
-    /**
-     * @throws DateTimeError
-     */
     public function getParent(): ?Element
     {
-        if ($this->getParentId() != null) {
+        $parentId = $this->getParentId();
+
+        if ($parentId != null) {
             if ($this->parent === null) {
                 $this->parent = new Element();
             }
 
-            $this->loadForeignRecord($this->parent, $this->getParentId());
+            $this->loadForeignRecord($this->parent, $parentId);
         }
 
         return $this->parent;
@@ -214,8 +218,6 @@ class Element extends AbstractModel implements Serializable, JsonSerializable
     }
 
     /**
-     * @throws DateTimeError
-     *
      * @return Element[]|null
      */
     public function getChildren(): ?array
@@ -227,9 +229,6 @@ class Element extends AbstractModel implements Serializable, JsonSerializable
         return $this->children;
     }
 
-    /**
-     * @throws DateTimeError
-     */
     public function loadChildren(): void
     {
         /** @var Element[] $children */
@@ -299,9 +298,12 @@ class Element extends AbstractModel implements Serializable, JsonSerializable
         ]);
     }
 
-    public function unserialize($serialized): void
+    /**
+     * @param string $data
+     */
+    public function unserialize($data): void
     {
-        $unserialized = unserialize($serialized);
+        $unserialized = unserialize($data);
 
         $this
             ->setId($unserialized['id'])
@@ -317,7 +319,6 @@ class Element extends AbstractModel implements Serializable, JsonSerializable
     }
 
     /**
-     * @throws DateTimeError
      * @throws JsonException
      */
     public function jsonSerialize(): array

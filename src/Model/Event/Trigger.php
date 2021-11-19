@@ -16,6 +16,9 @@ class Trigger extends AbstractModel implements JsonSerializable
 
     private int $eventId;
 
+    /**
+     * @var class-string
+     */
     private string $class;
 
     private string $trigger;
@@ -86,11 +89,17 @@ class Trigger extends AbstractModel implements JsonSerializable
         return $this;
     }
 
+    /**
+     * @return class-string
+     */
     public function getClass(): string
     {
         return $this->class;
     }
 
+    /**
+     * @param class-string $class
+     */
     public function setClass(string $class): Trigger
     {
         $this->class = $class;

@@ -10,7 +10,10 @@ use GibsonOS\Core\Store\AbstractStore;
 
 class ClassTriggerStore extends AbstractStore
 {
-    private string $describerClass = '';
+    /**
+     * @var class-string
+     */
+    private string $describerClass;
 
     /**
      * @var array[]
@@ -21,6 +24,9 @@ class ClassTriggerStore extends AbstractStore
     {
     }
 
+    /**
+     * @param class-string $describerClass
+     */
     public function setDescriberClass(string $describerClass): ClassTriggerStore
     {
         $this->describerClass = $describerClass;

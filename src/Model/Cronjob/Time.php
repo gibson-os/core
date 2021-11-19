@@ -3,8 +3,6 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Model\Cronjob;
 
-use GibsonOS\Core\Exception\DateTimeError;
-use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Model\Cronjob;
 
@@ -241,10 +239,6 @@ class Time extends AbstractModel
         return $this;
     }
 
-    /**
-     * @throws DateTimeError
-     * @throws SelectError
-     */
     public function getCronjob(): Cronjob
     {
         $this->loadForeignRecord($this->cronjob, $this->getCronjobId());

@@ -259,14 +259,12 @@ class MediaService
         $properties = explode(',', $propertiesString);
         $properties[count($properties) - 1] = preg_replace('/\(.*?$/', '', $properties[count($properties) - 1]);
 
-        $properties = array_map(
+        return array_map(
             function (string $str) {
                 return str_replace('{%%KOMMA%%}', ',', $str);
             },
             $properties
         );
-
-        return $properties;
     }
 
     private function getLanguageFromString(string $string): ?string

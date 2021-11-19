@@ -14,6 +14,8 @@ class CommandService
     }
 
     /**
+     * @param class-string $commandClassname
+     *
      * @throws FactoryError
      */
     public function execute(string $commandClassname, array $arguments = [], array $options = []): int

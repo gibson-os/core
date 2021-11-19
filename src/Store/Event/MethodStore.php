@@ -11,7 +11,10 @@ use GibsonOS\Core\Store\AbstractStore;
 
 class MethodStore extends AbstractStore
 {
-    private string $describerClass = '';
+    /**
+     * @var class-string
+     */
+    private string $describerClass;
 
     /**
      * @var array[]
@@ -22,6 +25,9 @@ class MethodStore extends AbstractStore
     {
     }
 
+    /**
+     * @param class-string $describerClass
+     */
     public function setDescriberClass(string $describerClass): MethodStore
     {
         $this->describerClass = $describerClass;
@@ -30,8 +36,6 @@ class MethodStore extends AbstractStore
     }
 
     /**
-     * @throws FactoryError
-     *
      * @return array[]
      */
     public function getList(): array
@@ -41,17 +45,11 @@ class MethodStore extends AbstractStore
         return $this->list[$this->describerClass];
     }
 
-    /**
-     * @throws FactoryError
-     */
     public function getCount(): int
     {
         return count($this->getList());
     }
 
-    /**
-     * @throws FactoryError
-     */
     private function generateList(): void
     {
         if (isset($this->list[$this->describerClass])) {

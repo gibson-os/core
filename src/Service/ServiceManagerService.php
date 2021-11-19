@@ -14,25 +14,22 @@ use ReflectionNamedType;
 class ServiceManagerService
 {
     /**
-     * @var object[]
+     * @var array<class-string, object>
      */
     private array $services = [];
 
     /**
-     * @var string[]
+     * @var array<class-string, class-string>
      */
     private array $interfaces = [];
 
     /**
-     * @var string[]
+     * @var array<class-string, class-string>
      */
     private array $abstracts = [];
 
     private AttributeService $attributeService;
 
-    /**
-     * @throws FactoryError
-     */
     public function __construct()
     {
         $this->services[self::class] = $this;
@@ -42,9 +39,14 @@ class ServiceManagerService
     }
 
     /**
+     * @template T
+     *
+     * @param class-string<T>   $classname
      * @param class-string|null $instanceOf
      *
      * @throws FactoryError
+     *
+     * @return T|object
      */
     public function get(string $classname, string $instanceOf = null): object
     {
@@ -60,7 +62,9 @@ class ServiceManagerService
         }
 
         if (isset($this->services[$classname])) {
-            return $this->checkInstanceOf($this->services[$classname], $instanceOf);
+            $this->checkInstanceOf($this->services[$classname], $instanceOf);
+
+            return $this->services[$classname];
         }
 
         $class = $this->getByCreate($classname);
@@ -68,31 +72,37 @@ class ServiceManagerService
         if ($class instanceof $classname) {
             $this->services[$classname] = $class;
 
-            return $this->checkInstanceOf($class, $instanceOf);
+            $this->checkInstanceOf($class, $instanceOf);
+
+            return $class;
         }
 
         throw new FactoryError(sprintf('Class %s could not be created', $classname));
     }
 
     /**
-     * @param class-string $className
+     * @param class-string|null $className
      *
      * @throws FactoryError
      */
-    private function checkInstanceOf(object $class, string $className = null): object
+    private function checkInstanceOf(object $class, string $className = null): void
     {
         if (
             $className !== null &&
             !is_subclass_of($class, $className)
         ) {
-            throw new FactoryError(sprintf('%d is no instanceof of %d', $class::class, $className));
+            throw new FactoryError(sprintf('%d is no instance of %d', $class::class, $className));
         }
-
-        return $class;
     }
 
     /**
+     * @template T
+     *
+     * @param class-string<T> $classname
+     *
      * @throws FactoryError
+     *
+     * @return T|object
      */
     private function getByCreate(string $classname): object
     {
@@ -163,7 +173,13 @@ class ServiceManagerService
     }
 
     /**
+     * @template T
+     *
+     * @param class-string<T> $classname
+     *
      * @throws FactoryError
+     *
+     * @return ReflectionClass<T>
      */
     private function getReflectionsClass(string $classname): ReflectionClass
     {
@@ -175,16 +191,27 @@ class ServiceManagerService
         }
     }
 
+    /**
+     * @param class-string $name
+     */
     public function setService(string $name, object $class): void
     {
         $this->services[$name] = $class;
     }
 
+    /**
+     * @param class-string $interfaceName
+     * @param class-string $className
+     */
     public function setInterface(string $interfaceName, string $className): void
     {
         $this->interfaces[$interfaceName] = $className;
     }
 
+    /**
+     * @param class-string $abstractName
+     * @param class-string $className
+     */
     public function setAbstract(string $abstractName, string $className): void
     {
         $this->abstracts[$abstractName] = $className;

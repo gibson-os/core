@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Model;
 
 use DateTimeInterface;
-use GibsonOS\Core\Exception\DateTimeError;
 use GibsonOS\Core\Model\Event\Element;
 use GibsonOS\Core\Model\Event\Trigger;
 use JsonSerializable;
@@ -111,8 +110,6 @@ class Event extends AbstractModel implements JsonSerializable, AutoCompleteModel
     }
 
     /**
-     * @throws DateTimeError
-     *
      * @return Element[]|null
      */
     public function getElements(): ?array
@@ -141,9 +138,6 @@ class Event extends AbstractModel implements JsonSerializable, AutoCompleteModel
         return $this;
     }
 
-    /**
-     * @throws DateTimeError
-     */
     public function loadElements()
     {
         /** @var Element[] $elements */
@@ -174,8 +168,6 @@ class Event extends AbstractModel implements JsonSerializable, AutoCompleteModel
     }
 
     /**
-     * @throws DateTimeError
-     *
      * @return Trigger[]|null
      */
     public function getTriggers(): ?array
@@ -204,9 +196,6 @@ class Event extends AbstractModel implements JsonSerializable, AutoCompleteModel
         return $this;
     }
 
-    /**
-     * @throws DateTimeError
-     */
     public function loadTriggers()
     {
         /** @var Trigger[] $triggers */

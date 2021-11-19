@@ -171,16 +171,10 @@ class LoggerService implements LoggerInterface
             return;
         }
 
-        $handle = STDOUT;
-
-        switch ($level) {
-            case self::LEVEL_EMERGENCY:
-            case self::LEVEL_ALERT:
-            case self::LEVEL_CRITICAL:
-            case self::LEVEL_ERROR:
-            case self::LEVEL_WARNING:
-                $handle = STDERR;
-        }
+        $handle = match ($level) {
+            self::LEVEL_EMERGENCY, self::LEVEL_ALERT, self::LEVEL_CRITICAL, self::LEVEL_ERROR, self::LEVEL_WARNING => STDERR,
+            default => STDOUT,
+        };
 
         fwrite($handle, $message);
     }

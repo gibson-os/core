@@ -19,6 +19,7 @@ class RegistryService extends AbstractService
 
     public function loadFromSession(string $name = 'REGISTRY'): bool
     {
+        /** @psalm-suppress InvalidScalarArgument */
         if (array_key_exists($name, $_SESSION)) {
             $this->registry = $_SESSION[$name];
 

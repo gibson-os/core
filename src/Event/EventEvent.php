@@ -22,7 +22,6 @@ class EventEvent extends AbstractEvent
     }
 
     /**
-     * @throws DateTimeError
      * @throws SaveError
      */
     public function activate(Event $event): void
@@ -34,7 +33,6 @@ class EventEvent extends AbstractEvent
     }
 
     /**
-     * @throws DateTimeError
      * @throws SaveError
      */
     public function deactivate(Event $event): void

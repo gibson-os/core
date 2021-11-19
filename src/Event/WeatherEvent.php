@@ -5,7 +5,6 @@ namespace GibsonOS\Core\Event;
 
 use DateTimeInterface;
 use GibsonOS\Core\Event\Describer\WeatherDescriber;
-use GibsonOS\Core\Exception\DateTimeError;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\Weather\Location;
 use GibsonOS\Core\Repository\WeatherRepository;
@@ -23,7 +22,6 @@ class WeatherEvent extends AbstractEvent
 
     /**
      * @throws SelectError
-     * @throws DateTimeError
      */
     public function temperature(Location $location, DateTimeInterface $dateTime = null): float
     {
@@ -32,7 +30,6 @@ class WeatherEvent extends AbstractEvent
 
     /**
      * @throws SelectError
-     * @throws DateTimeError
      */
     public function feelsLike(Location $location, DateTimeInterface $dateTime = null): float
     {
@@ -41,7 +38,6 @@ class WeatherEvent extends AbstractEvent
 
     /**
      * @throws SelectError
-     * @throws DateTimeError
      */
     public function pressure(Location $location, DateTimeInterface $dateTime = null): int
     {
@@ -50,7 +46,6 @@ class WeatherEvent extends AbstractEvent
 
     /**
      * @throws SelectError
-     * @throws DateTimeError
      */
     public function humidity(Location $location, DateTimeInterface $dateTime = null): int
     {
@@ -59,7 +54,6 @@ class WeatherEvent extends AbstractEvent
 
     /**
      * @throws SelectError
-     * @throws DateTimeError
      */
     public function dewPoint(Location $location, DateTimeInterface $dateTime = null): float
     {
@@ -68,7 +62,6 @@ class WeatherEvent extends AbstractEvent
 
     /**
      * @throws SelectError
-     * @throws DateTimeError
      */
     public function clouds(Location $location, DateTimeInterface $dateTime = null): int
     {
@@ -77,7 +70,6 @@ class WeatherEvent extends AbstractEvent
 
     /**
      * @throws SelectError
-     * @throws DateTimeError
      */
     public function uvIndex(Location $location, DateTimeInterface $dateTime = null): float
     {
@@ -86,7 +78,6 @@ class WeatherEvent extends AbstractEvent
 
     /**
      * @throws SelectError
-     * @throws DateTimeError
      */
     public function windSpeed(Location $location, DateTimeInterface $dateTime = null): float
     {
@@ -95,7 +86,6 @@ class WeatherEvent extends AbstractEvent
 
     /**
      * @throws SelectError
-     * @throws DateTimeError
      */
     public function windGust(Location $location, DateTimeInterface $dateTime = null): ?float
     {
@@ -104,7 +94,6 @@ class WeatherEvent extends AbstractEvent
 
     /**
      * @throws SelectError
-     * @throws DateTimeError
      */
     public function windDegree(Location $location, DateTimeInterface $dateTime = null): int
     {
@@ -113,7 +102,6 @@ class WeatherEvent extends AbstractEvent
 
     /**
      * @throws SelectError
-     * @throws DateTimeError
      */
     public function visibility(Location $location, DateTimeInterface $dateTime = null): int
     {
@@ -122,7 +110,6 @@ class WeatherEvent extends AbstractEvent
 
     /**
      * @throws SelectError
-     * @throws DateTimeError
      */
     public function rain(Location $location, DateTimeInterface $dateTime = null): ?float
     {
@@ -131,7 +118,6 @@ class WeatherEvent extends AbstractEvent
 
     /**
      * @throws SelectError
-     * @throws DateTimeError
      */
     public function snow(Location $location, DateTimeInterface $dateTime = null): ?float
     {

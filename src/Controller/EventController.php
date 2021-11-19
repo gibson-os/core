@@ -28,9 +28,6 @@ use JsonException;
 
 class EventController extends AbstractController
 {
-    /**
-     * @throws GetError
-     */
     #[CheckPermission(Permission::READ)]
     public function index(
         EventStore $eventStore,
@@ -45,9 +42,10 @@ class EventController extends AbstractController
     }
 
     /**
-     * @throws GetError
-     * @throws SelectError
      * @throws FactoryError
+     * @throws GetError
+     * @throws JsonException
+     * @throws SelectError
      */
     #[CheckPermission(Permission::READ)]
     public function elements(ElementStore $elementStore, int $eventId = null, string $node = null): AjaxResponse
@@ -74,7 +72,7 @@ class EventController extends AbstractController
     }
 
     /**
-     * @throws FactoryError
+     * @param class-string $describerClass
      */
     #[CheckPermission(Permission::READ)]
     public function methods(MethodStore $methodStore, string $describerClass): AjaxResponse
@@ -85,6 +83,8 @@ class EventController extends AbstractController
     }
 
     /**
+     * @param class-string $describerClass
+     *
      * @throws FactoryError
      */
     #[CheckPermission(Permission::READ)]

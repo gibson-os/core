@@ -17,6 +17,10 @@ class SessionService
     public function __construct()
     {
         session_start();
+        /**
+         * @psalm-suppress InvalidScalarArgument
+         * @psalm-suppress InvalidPropertyAssignmentValue
+         */
         $this->data = $_SESSION;
         session_write_close();
     }

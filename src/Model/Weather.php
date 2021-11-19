@@ -5,7 +5,6 @@ namespace GibsonOS\Core\Model;
 
 use DateTime;
 use DateTimeInterface;
-use GibsonOS\Core\Exception\DateTimeError;
 use GibsonOS\Core\Model\Weather\Location;
 use JsonSerializable;
 use mysqlDatabase;
@@ -292,9 +291,6 @@ class Weather extends AbstractModel implements JsonSerializable
         return $this;
     }
 
-    /**
-     * @throws DateTimeError
-     */
     public function getLocation(): Location
     {
         $this->loadForeignRecord($this->location, $this->getLocationId());

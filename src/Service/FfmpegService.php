@@ -115,7 +115,7 @@ class FfmpegService extends AbstractService
         }
 
         foreach ($options as $key => $option) {
-            $optionString .= '-' . $key . ' ' . escapeshellarg((string) $option) . ' ';
+            $optionString .= '-' . $key . ' ' . escapeshellarg($option) . ' ';
         }
 
         $filename = 'ffmpeg' . $this->file->getFilename($outputFilename);
