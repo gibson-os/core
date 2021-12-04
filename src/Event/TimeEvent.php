@@ -18,11 +18,17 @@ class TimeEvent extends AbstractEvent
         parent::__construct($describer, $serviceManagerService);
     }
 
+    /**
+     * @param positive-int $seconds
+     */
     public function sleep(int $seconds)
     {
         sleep($seconds);
     }
 
+    /**
+     * @param positive-int $microseconds
+     */
     public function usleep(int $microseconds)
     {
         usleep($microseconds);
