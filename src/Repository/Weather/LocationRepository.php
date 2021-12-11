@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Repository\Weather;
 
-use GibsonOS\Core\Exception\DateTimeError;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\Weather\Location;
 use GibsonOS\Core\Repository\AbstractRepository;
@@ -16,6 +15,9 @@ class LocationRepository extends AbstractRepository
     {
     }
 
+    /**
+     * @throws SelectError
+     */
     public function getById(int $id): Location
     {
         $table = $this->getTable(Location::getTableName())
@@ -34,9 +36,6 @@ class LocationRepository extends AbstractRepository
         return $location;
     }
 
-    /**
-     * @throws DateTimeError
-     */
     public function findByName(string $name, bool $onlyActive): array
     {
         $this->logger->debug(sprintf('Find weather location with name %d', $name));
@@ -69,9 +68,6 @@ class LocationRepository extends AbstractRepository
     }
 
     /**
-     * @throws SelectError
-     * @throws DateTimeError
-     *
      * @return Location[]
      */
     public function getToUpdate(): array

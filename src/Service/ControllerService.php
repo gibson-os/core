@@ -205,6 +205,7 @@ class ControllerService
      *
      * @throws ControllerError
      * @throws JsonException
+     * @throws ReflectionException
      */
     private function getParameters(ReflectionMethod $reflectionMethod, array $attributes): array
     {
@@ -310,6 +311,7 @@ class ControllerService
     /**
      * @throws ControllerError
      * @throws JsonException
+     * @throws ReflectionException
      */
     private function getParameterFromRequest(
         ReflectionParameter $parameter,

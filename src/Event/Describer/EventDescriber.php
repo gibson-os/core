@@ -35,7 +35,7 @@ class EventDescriber implements DescriberInterface
                 ->setParameters(['event' => $this->eventParameter]),
             'activate' => (new Method('Aktivieren'))
                 ->setParameters(['event' => $this->eventParameter]),
-            'deactivate' => (new Method('Dektivieren'))
+            'deactivate' => (new Method('Deaktivieren'))
                 ->setParameters(['event' => $this->eventParameter]),
             'isActive' => (new Method('Ist aktiviert'))
                 ->setParameters(['event' => $this->eventParameter])
