@@ -3,14 +3,18 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Event;
 
+use GibsonOS\Core\Attribute\Event;
+use GibsonOS\Core\Dto\Parameter\BoolParameter;
+use GibsonOS\Core\Dto\Parameter\EventParameter;
 use GibsonOS\Core\Event\Describer\DescriberInterface;
 use GibsonOS\Core\Exception\DateTimeError;
 use GibsonOS\Core\Exception\Model\SaveError;
-use GibsonOS\Core\Model\Event;
+use GibsonOS\Core\Model\Event as EventModel;
 use GibsonOS\Core\Service\EventService;
 use GibsonOS\Core\Service\ServiceManagerService;
 use JsonException;
 
+#[Event('Event')]
 class EventEvent extends AbstractEvent
 {
     public function __construct(
@@ -24,8 +28,10 @@ class EventEvent extends AbstractEvent
     /**
      * @throws SaveError
      */
-    public function activate(Event $event): void
-    {
+    #[Event\Method('Aktivieren')]
+    public function activate(
+        #[Event\Parameter(EventParameter::class)] EventModel $event
+    ): void {
         $event
             ->setActive(true)
             ->save()
@@ -35,8 +41,10 @@ class EventEvent extends AbstractEvent
     /**
      * @throws SaveError
      */
-    public function deactivate(Event $event): void
-    {
+    #[Event\Method('Deaktivieren')]
+    public function deactivate(
+        #[Event\Parameter(EventParameter::class)] EventModel $event
+    ): void {
         $event
             ->setActive(false)
             ->save()
@@ -48,13 +56,19 @@ class EventEvent extends AbstractEvent
      * @throws SaveError
      * @throws JsonException
      */
-    public function start(Event $event, bool $async): void
-    {
+    #[Event\Method('Starten')]
+    public function start(
+        #[Event\Parameter(EventParameter::class)] EventModel $event,
+        #[Event\Parameter(BoolParameter::class, 'Asynchron')] bool $async
+    ): void {
         $this->eventService->runEvent($event, $async);
     }
 
-    public function isActive(Event $event): bool
-    {
+    #[Event\Method('Ist aktiv')]
+    #[Event\ReturnValue(BoolParameter::class, 'Aktiv')]
+    public function isActive(
+        #[Event\Parameter(EventParameter::class)] EventModel $event
+    ): bool {
         return $event->isActive();
     }
 }

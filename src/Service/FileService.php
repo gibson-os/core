@@ -42,14 +42,14 @@ class FileService extends AbstractService
                 $this->dir->create($to);
             }
 
-            $chmod = $this->getPerms($from);
-            $this->setPerms($to, $chmod);
-
-            $owner = $this->getOwner($from);
-            $this->setOwner($to, $owner);
-
-            $group = $this->getGroup($from);
-            $this->setGroup($to, $group);
+//            $chmod = $this->getPerms($from);
+//            $this->setPerms($to, $chmod);
+//
+//            $owner = $this->getOwner($from);
+//            $this->setOwner($to, $owner);
+//
+//            $group = $this->getGroup($from);
+//            $this->setGroup($to, $group);
 
             foreach ($this->dir->getFiles($from) as $path) {
                 $filename = $this->getFilename($path);
@@ -177,7 +177,7 @@ class FileService extends AbstractService
      * @throws CreateError
      * @throws FileExistsError
      */
-    public function save(string $path, ?string $data, bool $overwrite = false): void
+    public function save(string $path, string $data, bool $overwrite = false): void
     {
         if (
             !$overwrite &&

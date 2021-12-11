@@ -4,14 +4,49 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Event;
 
 use DateTimeInterface;
+use GibsonOS\Core\Attribute\Event;
+use GibsonOS\Core\Dto\Parameter\DateTimeParameter;
+use GibsonOS\Core\Dto\Parameter\FloatParameter;
+use GibsonOS\Core\Dto\Parameter\IntParameter;
+use GibsonOS\Core\Dto\Parameter\StringParameter;
+use GibsonOS\Core\Dto\Parameter\Weather\LocationParameter;
 use GibsonOS\Core\Event\Describer\WeatherDescriber;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\Weather\Location;
 use GibsonOS\Core\Repository\WeatherRepository;
 use GibsonOS\Core\Service\ServiceManagerService;
 
+#[Event('Wetter')]
 class WeatherEvent extends AbstractEvent
 {
+    #[Event\Trigger('Vor dem laden', [
+        ['key' => 'location', 'className' => LocationParameter::class],
+    ])]
+    public const TRIGGER_BEFORE_LOAD = 'beforeLoad';
+
+    #[Event\Trigger('Nach dem laden', [
+        ['key' => 'location', 'className' => LocationParameter::class],
+        ['key' => 'id', 'className' => IntParameter::class, 'title' => 'ID'],
+        ['key' => 'date', 'className' => DateTimeParameter::class, 'title' => 'Datum'],
+        ['key' => 'temperature', 'className' => FloatParameter::class, 'title' => 'Temperature'],
+        ['key' => 'feelsLike', 'className' => FloatParameter::class, 'title' => 'Gefühlte Temperature'],
+        ['key' => 'pressure', 'className' => IntParameter::class, 'title' => 'Luftdruck'],
+        ['key' => 'humidity', 'className' => IntParameter::class, 'title' => 'Luftfeuchtigkeit'],
+        ['key' => 'dewPoint', 'className' => FloatParameter::class, 'title' => 'Taupunkt'],
+        ['key' => 'clouds', 'className' => IntParameter::class, 'title' => 'Wolken'],
+        ['key' => 'uvIndex', 'className' => IntParameter::class, 'title' => 'UV Index'],
+        ['key' => 'windSpeed', 'className' => IntParameter::class, 'title' => 'Wind Geschwindigkeit'],
+        ['key' => 'windDegree', 'className' => IntParameter::class, 'title' => 'Wind Richtung'],
+        ['key' => 'visibility', 'className' => IntParameter::class, 'title' => 'Sichtweite'],
+        ['key' => 'probabilityOfPrecipitation', 'className' => FloatParameter::class, 'title' => 'Regenwahrscheinlichkeit'],
+        ['key' => 'description', 'className' => StringParameter::class, 'title' => 'Beschreibung'],
+        ['key' => 'rain', 'className' => StringParameter::class, 'title' => 'Regen'],
+        ['key' => 'snow', 'className' => StringParameter::class, 'title' => 'Schnee'],
+        ['key' => 'windGust', 'className' => StringParameter::class, 'title' => 'Wind Böen'],
+        ['key' => 'icon', 'className' => StringParameter::class, 'title' => 'Icon'],
+    ])]
+    public const TRIGGER_AFTER_LOAD = 'afterLoad';
+
     public function __construct(
         WeatherDescriber $describer,
         ServiceManagerService $serviceManagerService,
@@ -23,104 +58,143 @@ class WeatherEvent extends AbstractEvent
     /**
      * @throws SelectError
      */
-    public function temperature(Location $location, DateTimeInterface $dateTime = null): float
-    {
+    #[Event\Method('Temperatur')]
+    public function temperature(
+        #[Event\Parameter(LocationParameter::class)] Location $location,
+        #[Event\Parameter(DateTimeParameter::class, 'Datum', ['increase' => [10]])] DateTimeInterface $dateTime = null
+    ): float {
         return $this->weatherRepository->getByNearestDate($location, $dateTime)->getTemperature();
     }
 
     /**
      * @throws SelectError
      */
-    public function feelsLike(Location $location, DateTimeInterface $dateTime = null): float
-    {
+    #[Event\Method('Gefühlte Temperatur')]
+    public function feelsLike(
+        #[Event\Parameter(LocationParameter::class)] Location $location,
+        #[Event\Parameter(DateTimeParameter::class, 'Datum', ['increase' => [10]])] DateTimeInterface $dateTime = null
+    ): float {
         return $this->weatherRepository->getByNearestDate($location, $dateTime)->getFeelsLike();
     }
 
     /**
      * @throws SelectError
      */
-    public function pressure(Location $location, DateTimeInterface $dateTime = null): int
-    {
+    #[Event\Method('Luftdruck')]
+    public function pressure(
+        #[Event\Parameter(LocationParameter::class)] Location $location,
+        #[Event\Parameter(DateTimeParameter::class, 'Datum', ['increase' => [10]])] DateTimeInterface $dateTime = null
+    ): int {
         return $this->weatherRepository->getByNearestDate($location, $dateTime)->getPressure();
     }
 
     /**
      * @throws SelectError
      */
-    public function humidity(Location $location, DateTimeInterface $dateTime = null): int
-    {
+    #[Event\Method('Luftfeuchtigkeit')]
+    public function humidity(
+        #[Event\Parameter(LocationParameter::class)] Location $location,
+        #[Event\Parameter(DateTimeParameter::class, 'Datum', ['increase' => [10]])] DateTimeInterface $dateTime = null
+    ): int {
         return $this->weatherRepository->getByNearestDate($location, $dateTime)->getHumidity();
     }
 
     /**
      * @throws SelectError
      */
-    public function dewPoint(Location $location, DateTimeInterface $dateTime = null): float
-    {
+    #[Event\Method('Taupunkt')]
+    public function dewPoint(
+        #[Event\Parameter(LocationParameter::class)] Location $location,
+        #[Event\Parameter(DateTimeParameter::class, 'Datum', ['increase' => [10]])] DateTimeInterface $dateTime = null
+    ): float {
         return $this->weatherRepository->getByNearestDate($location, $dateTime)->getDewPoint();
     }
 
     /**
      * @throws SelectError
      */
-    public function clouds(Location $location, DateTimeInterface $dateTime = null): int
-    {
+    #[Event\Method('Wolken')]
+    public function clouds(
+        #[Event\Parameter(LocationParameter::class)] Location $location,
+        #[Event\Parameter(DateTimeParameter::class, 'Datum', ['increase' => [10]])] DateTimeInterface $dateTime = null
+    ): int {
         return $this->weatherRepository->getByNearestDate($location, $dateTime)->getClouds();
     }
 
     /**
      * @throws SelectError
      */
-    public function uvIndex(Location $location, DateTimeInterface $dateTime = null): float
-    {
+    #[Event\Method('UV Index')]
+    public function uvIndex(
+        #[Event\Parameter(LocationParameter::class)] Location $location,
+        #[Event\Parameter(DateTimeParameter::class, 'Datum', ['increase' => [10]])] DateTimeInterface $dateTime = null
+    ): float {
         return $this->weatherRepository->getByNearestDate($location, $dateTime)->getUvIndex();
     }
 
     /**
      * @throws SelectError
      */
-    public function windSpeed(Location $location, DateTimeInterface $dateTime = null): float
-    {
+    #[Event\Method('Wind Geschwindigkeit')]
+    public function windSpeed(
+        #[Event\Parameter(LocationParameter::class)] Location $location,
+        #[Event\Parameter(DateTimeParameter::class, 'Datum', ['increase' => [10]])] DateTimeInterface $dateTime = null
+    ): float {
         return $this->weatherRepository->getByNearestDate($location, $dateTime)->getWindSpeed();
     }
 
     /**
      * @throws SelectError
      */
-    public function windGust(Location $location, DateTimeInterface $dateTime = null): ?float
-    {
+    #[Event\Method('Wind Böen')]
+    public function windGust(
+        #[Event\Parameter(LocationParameter::class)] Location $location,
+        #[Event\Parameter(DateTimeParameter::class, 'Datum', ['increase' => [10]])] DateTimeInterface $dateTime = null
+    ): ?float {
         return $this->weatherRepository->getByNearestDate($location, $dateTime)->getWindGust();
     }
 
     /**
      * @throws SelectError
      */
-    public function windDegree(Location $location, DateTimeInterface $dateTime = null): int
-    {
+    #[Event\Method('Wind Richtung')]
+    public function windDegree(
+        #[Event\Parameter(LocationParameter::class)] Location $location,
+        #[Event\Parameter(DateTimeParameter::class, 'Datum', ['increase' => [10]])] DateTimeInterface $dateTime = null
+    ): int {
         return $this->weatherRepository->getByNearestDate($location, $dateTime)->getWindDegree();
     }
 
     /**
      * @throws SelectError
      */
-    public function visibility(Location $location, DateTimeInterface $dateTime = null): int
-    {
+    #[Event\Method('Sichtweite')]
+    public function visibility(
+        #[Event\Parameter(LocationParameter::class)] Location $location,
+        #[Event\Parameter(DateTimeParameter::class, 'Datum', ['increase' => [10]])] DateTimeInterface $dateTime = null
+    ): int {
         return $this->weatherRepository->getByNearestDate($location, $dateTime)->getVisibility();
     }
 
     /**
      * @throws SelectError
      */
-    public function rain(Location $location, DateTimeInterface $dateTime = null): ?float
-    {
+    #[Event\Method('Regen')]
+    public function rain(
+        #[Event\Parameter(LocationParameter::class)] Location $location,
+        #[Event\Parameter(DateTimeParameter::class, 'Datum', ['increase' => [10]])] DateTimeInterface $dateTime = null
+    ): ?float {
         return $this->weatherRepository->getByNearestDate($location, $dateTime)->getRain();
     }
 
     /**
      * @throws SelectError
      */
-    public function snow(Location $location, DateTimeInterface $dateTime = null): ?float
-    {
+    #[Event\Method('Schnee')]
+    public function snow(
+        #[Event\Parameter(LocationParameter::class)] Location $location,
+        #[Event\Parameter(DateTimeParameter::class, 'Datum', ['increase' => [10]])] DateTimeInterface $dateTime = null
+    ): ?float {
         return $this->weatherRepository->getByNearestDate($location, $dateTime)->getSnow();
     }
 }
