@@ -12,8 +12,12 @@ class ReturnValue
      * @param class-string         $className
      * @param array<string, array> $options
      */
-    public function __construct(private string $className, private ?string $title = null, private array $options = [])
-    {
+    public function __construct(
+        private string $className,
+        private ?string $title = null,
+        private array $options = [],
+        private ?string $key = null
+    ) {
     }
 
     public function getClassName(): string
@@ -29,5 +33,10 @@ class ReturnValue
     public function getOptions(): array
     {
         return $this->options;
+    }
+
+    public function getKey(): ?string
+    {
+        return $this->key;
     }
 }
