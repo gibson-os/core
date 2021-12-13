@@ -65,8 +65,6 @@ class FfmpegService extends AbstractService
     }
 
     /**
-     * @param string[] $options
-     *
      * @throws DeleteError
      * @throws FileNotFound
      * @throws GetError
@@ -115,7 +113,7 @@ class FfmpegService extends AbstractService
         }
 
         foreach ($options as $key => $option) {
-            $optionString .= '-' . $key . ' ' . escapeshellarg($option) . ' ';
+            $optionString .= '-' . $key . ' ' . escapeshellarg((string) $option) . ' ';
         }
 
         $filename = 'ffmpeg' . $this->file->getFilename($outputFilename);
