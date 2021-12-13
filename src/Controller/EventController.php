@@ -25,6 +25,7 @@ use GibsonOS\Core\Store\Event\MethodStore;
 use GibsonOS\Core\Store\Event\TriggerStore;
 use GibsonOS\Core\Store\EventStore;
 use JsonException;
+use ReflectionException;
 
 class EventController extends AbstractController
 {
@@ -72,25 +73,31 @@ class EventController extends AbstractController
     }
 
     /**
-     * @param class-string $describerClass
+     * @param MethodStore  $methodStore
+     * @param class-string $className
+     *
+     * @throws FactoryError
+     * @throws ReflectionException
+     *
+     * @return AjaxResponse
      */
     #[CheckPermission(Permission::READ)]
-    public function methods(MethodStore $methodStore, string $describerClass): AjaxResponse
+    public function methods(MethodStore $methodStore, string $className): AjaxResponse
     {
-        $methodStore->setDescriberClass($describerClass);
+        $methodStore->setClassName($className);
 
         return $this->returnSuccess($methodStore->getList());
     }
 
     /**
-     * @param class-string $describerClass
+     * @param class-string $className
      *
      * @throws FactoryError
      */
     #[CheckPermission(Permission::READ)]
-    public function classTriggers(ClassTriggerStore $classTriggerStore, string $describerClass): AjaxResponse
+    public function classTriggers(ClassTriggerStore $classTriggerStore, string $className): AjaxResponse
     {
-        $classTriggerStore->setDescriberClass($describerClass);
+        $classTriggerStore->setClassName($className);
 
         return $this->returnSuccess($classTriggerStore->getList());
     }

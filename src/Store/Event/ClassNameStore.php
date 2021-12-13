@@ -3,13 +3,14 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Store\Event;
 
-use GibsonOS\Core\Event\Describer\DescriberInterface;
-use GibsonOS\Core\Exception\FactoryError;
+use GibsonOS\Core\Attribute\Event;
 use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Service\DirService;
 use GibsonOS\Core\Service\FileService;
 use GibsonOS\Core\Service\ServiceManagerService;
 use GibsonOS\Core\Store\AbstractStore;
+use ReflectionAttribute;
+use ReflectionClass;
 
 class ClassNameStore extends AbstractStore
 {
@@ -67,36 +68,35 @@ class ClassNameStore extends AbstractStore
                 continue;
             }
 
-            $eventDescriberDir = $moduleDir . DIRECTORY_SEPARATOR .
+            $eventDir = $moduleDir . DIRECTORY_SEPARATOR .
                 'src' . DIRECTORY_SEPARATOR .
-                'Event' . DIRECTORY_SEPARATOR .
-                'Describer' . DIRECTORY_SEPARATOR;
+                'Event' . DIRECTORY_SEPARATOR
+            ;
             $moduleName = ucfirst(str_replace($vendorDir, '', $moduleDir));
             $namespace =
                 'GibsonOS\\' .
                 ($moduleName === 'Core' ? '' : 'Module\\') . $moduleName .
-                '\\Event\\Describer\\'
+                '\\Event\\'
             ;
 
-            foreach ($this->dir->getFiles($eventDescriberDir, '*.php') as $classPath) {
+            foreach ($this->dir->getFiles($eventDir, '*.php') as $classPath) {
                 $className = str_replace('.php', '', $this->file->getFilename($classPath));
                 /** @var class-string $classNameWithNamespace */
                 $classNameWithNamespace = $namespace . $className;
 
-                try {
-                    $describer = $this->serviceManagerService->get($classNameWithNamespace);
-                } catch (FactoryError) {
+                $reflectionClass = new ReflectionClass($classNameWithNamespace);
+                $eventAttributes = $reflectionClass->getAttributes(Event::class, ReflectionAttribute::IS_INSTANCEOF);
+
+                if (empty($eventAttributes)) {
                     continue;
                 }
 
-                if (!$describer instanceof DescriberInterface) {
-                    continue;
-                }
+                /** @var Event $eventAttribute */
+                $eventAttribute = $eventAttributes[0]->newInstance();
 
-                $classNames[$describer->getTitle()] = [
-                    'describerClass' => $classNameWithNamespace,
-                    'eventClass' => $describer->getEventClassName(),
-                    'title' => $describer->getTitle(),
+                $classNames[$eventAttribute->getTitle()] = [
+                    'className' => $classNameWithNamespace,
+                    'title' => $eventAttribute->getTitle(),
                 ];
             }
         }

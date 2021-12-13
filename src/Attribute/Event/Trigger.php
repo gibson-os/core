@@ -9,7 +9,7 @@ use Attribute;
 class Trigger
 {
     /**
-     * @param array<array-key, array{key: string, className: class-string, title: ?string}> $parameters
+     * @param array<array-key, array{key: string, className: class-string, options: array<string, array>|null, title: ?string}> $parameters
      */
     public function __construct(private string $title, private array $parameters = [])
     {
@@ -20,6 +20,9 @@ class Trigger
         return $this->title;
     }
 
+    /**
+     * @return array<array-key, array{key: string, className: class-string, options: array<string, array>|null, title: ?string}>
+     */
     public function getParameters(): array
     {
         return $this->parameters;

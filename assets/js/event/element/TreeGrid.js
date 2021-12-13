@@ -45,7 +45,7 @@ Ext.define('GibsonOS.module.core.event.element.TreeGrid', {
 
                         let methodComboBoxStore = methodComboBox.getStore();
 
-                        methodComboBoxStore.getProxy().setExtraParam('describerClass', record.get('className'));
+                        methodComboBoxStore.getProxy().setExtraParam('className', record.get('className'));
                         methodComboBoxStore.load(function(records) {
                             if (!record.get('method')) {
                                 return;
@@ -177,7 +177,7 @@ Ext.define('GibsonOS.module.core.event.element.TreeGrid', {
 
                         methodColumnEditor.setValue(null);
 
-                        methodColumnEditorStore.getProxy().setExtraParam('describerClass', newValue);
+                        methodColumnEditorStore.getProxy().setExtraParam('className', newValue);
                         methodColumnEditorStore.load();
 
                         methodColumnEditor.enable();

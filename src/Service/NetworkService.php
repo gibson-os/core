@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Service;
 
 use GibsonOS\Core\Event\Describer\NetworkDescriber;
+use GibsonOS\Core\Event\NetworkEvent;
 
 class NetworkService extends AbstractService
 {
@@ -14,8 +15,8 @@ class NetworkService extends AbstractService
     public function ping(string $host, int $timeout = 1): bool
     {
         $this->eventService->fire(
-            NetworkDescriber::class,
-            NetworkDescriber::TRIGGER_BEFORE_PING,
+            NetworkEvent::class,
+            NetworkEvent::TRIGGER_BEFORE_PING,
             [
                 'host' => $host,
                 'timeout' => $timeout,

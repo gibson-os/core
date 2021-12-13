@@ -81,6 +81,31 @@ class ServiceManagerService
     }
 
     /**
+     * @template T
+     *
+     * @param class-string<T>   $classname
+     * @param class-string|null $instanceOf
+     *
+     * @throws FactoryError
+     *
+     * @return T|object
+     */
+    public function create(string $classname, array $parameters = [], string $instanceOf = null): object
+    {
+        $class = $this->getByCreate($classname, $parameters);
+
+        if ($class instanceof $classname) {
+            $this->services[$classname] = $class;
+
+            $this->checkInstanceOf($class, $instanceOf);
+
+            return $class;
+        }
+
+        throw new FactoryError(sprintf('Class %s could not be created', $classname));
+    }
+
+    /**
      * @param class-string|null $className
      *
      * @throws FactoryError
@@ -104,7 +129,7 @@ class ServiceManagerService
      *
      * @return T|object
      */
-    private function getByCreate(string $classname): object
+    private function getByCreate(string $classname, array $parameters = []): object
     {
         $reflection = $this->getReflectionsClass($classname);
 
@@ -131,7 +156,6 @@ class ServiceManagerService
         }
 
         $constructor = $reflection->getConstructor();
-        $parameters = [];
 
         if ($constructor instanceof ReflectionMethod) {
             $attributes = $this->attributeService->getMethodAttributes($constructor);

@@ -29,7 +29,7 @@ Ext.define('GibsonOS.module.core.event.trigger.Grid', {
 
                         let triggerComboBoxStore = triggerComboBox.getStore();
 
-                        triggerComboBoxStore.getProxy().setExtraParam('describerClass', record.get('className'));
+                        triggerComboBoxStore.getProxy().setExtraParam('className', record.get('className'));
                         triggerComboBoxStore.load(function(records) {
                             if (!record.get('trigger')) {
                                 return;
@@ -87,7 +87,7 @@ Ext.define('GibsonOS.module.core.event.trigger.Grid', {
 
                         triggerColumnEditor.setValue(null);
 
-                        triggerColumnEditorStore.getProxy().setExtraParam('describerClass', newValue);
+                        triggerColumnEditorStore.getProxy().setExtraParam('className', newValue);
                         triggerColumnEditorStore.load();
 
                         triggerColumnEditor.enable();

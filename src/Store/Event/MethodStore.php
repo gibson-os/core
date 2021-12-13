@@ -3,105 +3,151 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Store\Event;
 
+use GibsonOS\Core\Attribute\Event\Method;
+use GibsonOS\Core\Attribute\Event\Parameter;
+use GibsonOS\Core\Attribute\Event\ReturnValue;
 use GibsonOS\Core\Dto\Parameter\AbstractParameter;
-use GibsonOS\Core\Event\Describer\DescriberInterface;
 use GibsonOS\Core\Exception\FactoryError;
-use GibsonOS\Core\Service\ServiceManagerService;
+use GibsonOS\Core\Service\EventService;
 use GibsonOS\Core\Store\AbstractStore;
+use ReflectionAttribute;
+use ReflectionClass;
+use ReflectionException;
+use ReflectionMethod;
 
 class MethodStore extends AbstractStore
 {
     /**
      * @var class-string
      */
-    private string $describerClass;
+    private string $className;
 
     /**
      * @var array[]
      */
     private array $list = [];
 
-    public function __construct(private ServiceManagerService $serviceManagerService)
+    public function __construct(private EventService $eventService)
     {
     }
 
     /**
-     * @param class-string $describerClass
+     * @param class-string $className
      */
-    public function setDescriberClass(string $describerClass): MethodStore
+    public function setClassName(string $className): MethodStore
     {
-        $this->describerClass = $describerClass;
+        $this->className = $className;
 
         return $this;
     }
 
     /**
+     * @throws FactoryError
+     * @throws ReflectionException
+     *
      * @return array[]
      */
     public function getList(): array
     {
         $this->generateList();
 
-        return $this->list[$this->describerClass];
+        return $this->list[$this->className];
     }
 
+    /**
+     * @throws FactoryError
+     * @throws ReflectionException
+     */
     public function getCount(): int
     {
         return count($this->getList());
     }
 
+    /**
+     * @throws ReflectionException
+     * @throws FactoryError
+     */
     private function generateList(): void
     {
-        if (isset($this->list[$this->describerClass])) {
+        if (isset($this->list[$this->className])) {
             return;
         }
 
         $methods = [];
 
-        try {
-            $describer = $this->serviceManagerService->get($this->describerClass);
-        } catch (FactoryError) {
-            $this->list[$this->describerClass] = $methods;
+        $reflectionClass = new ReflectionClass($this->className);
 
-            return;
-        }
+        foreach ($reflectionClass->getMethods(ReflectionMethod::IS_PUBLIC) as $reflectionMethod) {
+            $methodAttributes = $reflectionMethod->getAttributes(Method::class, ReflectionAttribute::IS_INSTANCEOF);
 
-        if (!$describer instanceof DescriberInterface) {
-            $this->list[$this->describerClass] = $methods;
+            if (empty($methodAttributes)) {
+                continue;
+            }
 
-            return;
-        }
+            /** @var Method $methodAttribute */
+            $methodAttribute = $methodAttributes[0]->newInstance();
 
-        foreach ($describer->getMethods() as $name => $method) {
-            $methods[$method->getTitle()] = [
-                'method' => $name,
-                'title' => $method->getTitle(),
-                'parameters' => $this->transformParameters($method->getParameters()),
-                'returns' => $this->transformParameters($method->getReturns()),
+            $methods[$methodAttribute->getTitle()] = [
+                'method' => $reflectionMethod->getName(),
+                'title' => $methodAttribute->getTitle(),
+                'parameters' => $this->getParameters($reflectionMethod),
+                'returns' => $this->getReturns($reflectionMethod),
             ];
         }
 
         ksort($methods);
 
-        $this->list[$this->describerClass] = array_values($methods);
+        $this->list[$this->className] = array_values($methods);
     }
 
     /**
-     * @param AbstractParameter[] $parameters
+     * @throws FactoryError
      */
-    private function transformParameters(array $parameters): array
+    private function getParameters(ReflectionMethod $reflectionMethod): array
     {
-        $parametersArray = [];
+        $parameters = [];
 
-        foreach ($parameters as $name => $parameter) {
-            $parametersArray[$name] = [
-                'title' => $parameter->getTitle(),
-                'xtype' => $parameter->getXtype(),
-                'allowedOperators' => $parameter->getAllowedOperators(),
-                'config' => $parameter->getConfig(),
-            ];
+        foreach ($reflectionMethod->getParameters() as $reflectionParameter) {
+            $parameterAttributes = $reflectionParameter->getAttributes(
+                Parameter::class,
+                ReflectionAttribute::IS_INSTANCEOF
+            );
+
+            if (empty($parameterAttributes)) {
+                continue;
+            }
+
+            /** @var Parameter $parameterAttribute */
+            $parameterAttribute = $parameterAttributes[0]->newInstance();
+            $parameters[$reflectionParameter->getName()] = $this->getParameter($parameterAttribute);
         }
 
-        return $parametersArray;
+        return $parameters;
+    }
+
+    /**
+     * @throws FactoryError
+     */
+    private function getReturns(ReflectionMethod $reflectionMethod): array
+    {
+        $returns = [];
+        $returnValueAttributes = $reflectionMethod->getAttributes(ReturnValue::class, ReflectionAttribute::IS_INSTANCEOF);
+
+        foreach ($returnValueAttributes as $returnValueAttribute) {
+            /** @var ReturnValue $returnValue */
+            $returnValue = $returnValueAttribute->newInstance();
+            $returns[$returnValue->getKey() ?? 'value'] = $this->getParameter($returnValue);
+        }
+
+        return $returns;
+    }
+
+    /**
+     * @throws FactoryError
+     * @throws ReflectionException
+     */
+    private function getParameter(ReturnValue|Parameter $object): AbstractParameter
+    {
+        return $this->eventService->getParameter($object->getClassName(), $object->getOptions(), $object->getTitle());
     }
 }

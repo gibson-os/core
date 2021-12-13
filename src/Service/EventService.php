@@ -4,11 +4,13 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Service;
 
 use DateTime;
-use Exception;
+use GibsonOS\Core\Attribute\Event\Trigger;
 use GibsonOS\Core\Command\Event\RunCommand;
+use GibsonOS\Core\Dto\Parameter\AbstractParameter;
 use GibsonOS\Core\Dto\Parameter\AutoCompleteParameter;
-use GibsonOS\Core\Event\Describer\DescriberInterface;
 use GibsonOS\Core\Exception\DateTimeError;
+use GibsonOS\Core\Exception\EventException;
+use GibsonOS\Core\Exception\FactoryError;
 use GibsonOS\Core\Exception\Model\SaveError;
 use GibsonOS\Core\Model\AutoCompleteModelInterface;
 use GibsonOS\Core\Model\Event;
@@ -17,6 +19,10 @@ use GibsonOS\Core\Service\Event\ElementService;
 use GibsonOS\Core\Utility\JsonUtility;
 use JsonException;
 use Psr\Log\LoggerInterface;
+use ReflectionAttribute;
+use ReflectionClass;
+use ReflectionClassConstant;
+use ReflectionException;
 
 class EventService extends AbstractService
 {
@@ -26,6 +32,9 @@ class EventService extends AbstractService
     {
     }
 
+    /**
+     * @param class-string $className
+     */
     public function add(string $className, string $trigger, callable $function): void
     {
         $triggerName = $className . '::' . $trigger;
@@ -39,12 +48,18 @@ class EventService extends AbstractService
     }
 
     /**
+     * @param class-string $className
+     *
      * @throws DateTimeError
-     * @throws Exception
+     * @throws EventException
+     * @throws FactoryError
+     * @throws JsonException
+     * @throws ReflectionException
+     * @throws SaveError
      */
     public function fire(string $className, string $trigger, array $parameters = null): void
     {
-        $triggerName = $className . '::' . $trigger;
+        $triggerName = $this->getTriggerName($className, $trigger);
         $this->logger->info('Fire event ' . $triggerName);
         $events = array_merge(
             $this->events[$triggerName] ?? [],
@@ -64,8 +79,10 @@ class EventService extends AbstractService
 
     /**
      * @throws DateTimeError
+     * @throws FactoryError
      * @throws JsonException
      * @throws SaveError
+     * @throws EventException
      */
     public function runEvent(Event $event, bool $async): void
     {
@@ -82,8 +99,55 @@ class EventService extends AbstractService
     }
 
     /**
-     * @throws DateTimeError
+     * @param class-string $className
+     *
+     * @throws FactoryError
+     * @throws ReflectionException
+     */
+    public function getParameter(string $className, array $options = [], string $title = null): AbstractParameter
+    {
+        $reflectionClass = new ReflectionClass($className);
+        $constructor = $reflectionClass->getConstructor();
+        $constructorParameters = [];
+
+        if ($title !== null) {
+            $options['title'] = [$title];
+        }
+
+        if ($constructor !== null) {
+            foreach ($constructor->getParameters() as $parameter) {
+                $parameterName = $parameter->getName();
+
+                if (!isset($options[$parameterName])) {
+                    continue;
+                }
+
+                $constructorParameters[$parameterName] = $options[$parameterName][0];
+                unset($options[$parameterName]);
+            }
+        }
+
+        /** @var AbstractParameter $parameter */
+        $parameter = $this->serviceManagerService->create(
+            $className,
+            $constructorParameters,
+            AbstractParameter::class
+        );
+
+        foreach ($options as $name => $values) {
+            $parameter->{'set' . ucfirst($name)}(...$values);
+        }
+
+        return $parameter;
+    }
+
+    /**
+     * @param class-string $className
+     *
+     * @throws EventException
+     * @throws FactoryError
      * @throws JsonException
+     * @throws ReflectionException
      */
     private function checkTriggerParameters(Event $event, string $className, string $trigger, array $parameters): bool
     {
@@ -97,21 +161,49 @@ class EventService extends AbstractService
                 continue;
             }
 
-            /** @var DescriberInterface $describer */
-            $describer = $this->serviceManagerService->get($eventTrigger->getClass());
-            $triggers = $describer->getTriggers();
-            $triggerParameters = $triggers[$eventTrigger->getTrigger()]->getParameters();
-            $eventParameters = JsonUtility::decode($eventTrigger->getParameters() ?? '[]');
+            $reflectionClass = new ReflectionClass($className);
 
-            foreach ($triggerParameters as $parameterName => $triggerParameter) {
-                if (!$triggerParameter instanceof AutoCompleteParameter) {
+            foreach ($reflectionClass->getReflectionConstants(ReflectionClassConstant::IS_PUBLIC) as $reflectionClassConstant) {
+                if ($reflectionClassConstant->getValue() !== $eventTrigger->getTrigger()) {
                     continue;
                 }
 
-                if ($parameters[$parameterName] instanceof AutoCompleteModelInterface) {
-                    $parameters[$parameterName] = $parameters[$parameterName]->getAutoCompleteId();
+                $triggerAttributes = $reflectionClassConstant->getAttributes(
+                    Trigger::class,
+                    ReflectionAttribute::IS_INSTANCEOF
+                );
+
+                if (empty($triggerAttributes)) {
+                    throw new EventException(sprintf(
+                        'Constant %s has no %s attribute',
+                        $reflectionClassConstant->getName(),
+                        Trigger::class
+                    ));
+                }
+
+                /** @var Trigger $triggerAttribute */
+                $triggerAttribute = $triggerAttributes[0]->newInstance();
+
+                foreach ($triggerAttribute->getParameters() as $parameter) {
+                    $triggerParameter = $this->serviceManagerService->create(
+                        $parameter['className'],
+                        isset($parameter['title']) ? ['title' => $parameter['title']] : [],
+                        AbstractParameter::class
+                    );
+
+                    if (!$triggerParameter instanceof AutoCompleteParameter) {
+                        continue;
+                    }
+
+                    $parameterName = $parameter['key'];
+
+                    if ($parameters[$parameterName] instanceof AutoCompleteModelInterface) {
+                        $parameters[$parameterName] = $parameters[$parameterName]->getAutoCompleteId();
+                    }
                 }
             }
+
+            $eventParameters = JsonUtility::decode($eventTrigger->getParameters() ?? '[]');
 
             foreach ($eventParameters ?? [] as $parameterName => $eventParameter) {
                 if (!isset($parameters[$parameterName])) {
@@ -138,6 +230,9 @@ class EventService extends AbstractService
         return false;
     }
 
+    /**
+     * @param class-string $className
+     */
     private function getTriggerName(string $className, string $trigger): string
     {
         return $className . '::' . $trigger;

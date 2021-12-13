@@ -3,7 +3,7 @@ Ext.define('GibsonOS.module.core.event.element.className.ComboBox', {
     alias: ['widget.gosModuleCoreEventElementClassNameComboBox'],
     emptyText: 'Bitte auswählen',
     displayField: 'title',
-    valueField: 'describerClass',
+    valueField: 'className',
     requiredPermission: {
         module: 'core',
         task: 'event',

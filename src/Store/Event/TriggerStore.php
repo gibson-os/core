@@ -71,7 +71,7 @@ class TriggerStore extends AbstractDatabaseStore
                 }
             }
 
-            $this->classTriggerStore->setDescriberClass($model->getClass());
+            $this->classTriggerStore->setClassName($model->getClass());
 
             foreach ($this->classTriggerStore->getList() as $trigger) {
                 if ($trigger['trigger'] === $model->getTrigger()) {

@@ -86,7 +86,7 @@ class TimeEvent extends AbstractEvent
     }
 
     #[Event\Method('Wochentag')]
-    #[Event\ReturnValue(OptionParameter::class, 'Wochentag', ['options' => [
+    #[Event\ReturnValue(OptionParameter::class, 'Wochentag', ['options' => [[
         1 => 'Montag',
         2 => 'Dienstag',
         3 => 'Mittwoch',
@@ -94,7 +94,7 @@ class TimeEvent extends AbstractEvent
         5 => 'Freitag',
         6 => 'Sammstag',
         0 => 'Sonntag',
-    ]])]
+    ]]])]
     public function dayOfWeek(): int
     {
         return (int) $this->dateTimeService->get()->format('w');

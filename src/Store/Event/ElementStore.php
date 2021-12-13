@@ -78,7 +78,7 @@ class ElementStore extends AbstractDatabaseStore
                 }
             }
 
-            $this->methodStore->setDescriberClass($element->getClass());
+            $this->methodStore->setClassName($element->getClass());
 
             foreach ($this->methodStore->getList() as $method) {
                 if ($method['method'] === $element->getMethod()) {
