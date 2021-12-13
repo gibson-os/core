@@ -6,23 +6,18 @@ namespace GibsonOS\Core\Event;
 use GibsonOS\Core\Attribute\Event;
 use GibsonOS\Core\Dto\Parameter\BoolParameter;
 use GibsonOS\Core\Dto\Parameter\EventParameter;
-use GibsonOS\Core\Event\Describer\DescriberInterface;
 use GibsonOS\Core\Exception\DateTimeError;
 use GibsonOS\Core\Exception\Model\SaveError;
 use GibsonOS\Core\Model\Event as EventModel;
 use GibsonOS\Core\Service\EventService;
-use GibsonOS\Core\Service\ServiceManagerService;
 use JsonException;
 
 #[Event('Event')]
 class EventEvent extends AbstractEvent
 {
-    public function __construct(
-        DescriberInterface $describer,
-        ServiceManagerService $serviceManagerService,
-        private EventService $eventService
-    ) {
-        parent::__construct($describer, $serviceManagerService);
+    public function __construct(private EventService $eventService)
+    {
+        parent::__construct($this->eventService);
     }
 
     /**

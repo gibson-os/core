@@ -10,11 +10,10 @@ use GibsonOS\Core\Dto\Parameter\FloatParameter;
 use GibsonOS\Core\Dto\Parameter\IntParameter;
 use GibsonOS\Core\Dto\Parameter\StringParameter;
 use GibsonOS\Core\Dto\Parameter\Weather\LocationParameter;
-use GibsonOS\Core\Event\Describer\WeatherDescriber;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\Weather\Location;
 use GibsonOS\Core\Repository\WeatherRepository;
-use GibsonOS\Core\Service\ServiceManagerService;
+use GibsonOS\Core\Service\EventService;
 
 #[Event('Wetter')]
 class WeatherEvent extends AbstractEvent
@@ -48,11 +47,10 @@ class WeatherEvent extends AbstractEvent
     public const TRIGGER_AFTER_LOAD = 'afterLoad';
 
     public function __construct(
-        WeatherDescriber $describer,
-        ServiceManagerService $serviceManagerService,
+        EventService $eventService,
         private WeatherRepository $weatherRepository
     ) {
-        parent::__construct($describer, $serviceManagerService);
+        parent::__construct($eventService);
     }
 
     /**

@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Service\Event;
 
 use GibsonOS\Core\Event\AbstractEvent;
-use GibsonOS\Core\Event\Describer\DescriberInterface;
 use GibsonOS\Core\Exception\DateTimeError;
 use GibsonOS\Core\Exception\EventException;
 use GibsonOS\Core\Exception\FactoryError;
@@ -183,10 +182,8 @@ class ElementService extends AbstractService
      */
     private function runFunction(Element $element)
     {
-        /** @var DescriberInterface $describer */
-        $describer = $this->serviceManagerService->get($element->getClass());
         /** @var AbstractEvent $service */
-        $service = $this->serviceManagerService->get($describer->getEventClassName());
+        $service = $this->serviceManagerService->get($element->getClass());
 
         $this->logger->debug('Run event function ' . $element->getClass() . '::' . $element->getMethod());
 

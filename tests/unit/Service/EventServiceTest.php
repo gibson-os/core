@@ -6,7 +6,6 @@ namespace GibsonOS\Core\Service;
 use Codeception\Test\Unit;
 use DateTime;
 use GibsonOS\Core\Event\AbstractEvent;
-use GibsonOS\Core\Event\Describer\DescriberInterface;
 use GibsonOS\Core\Model\Event\Element;
 use GibsonOS\Core\Repository\EventRepository;
 use GibsonOS\Core\Service\Event\ElementService;
@@ -61,7 +60,7 @@ class EventServiceTest extends Unit
 
         $globalParams = null;
 
-        $this->eventService->add('dent', function ($params) use (&$globalParams) {
+        $this->eventService->add('dent', 'foo', function ($params) use (&$globalParams) {
             $globalParams = $params;
         });
 

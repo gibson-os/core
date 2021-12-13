@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Command\Event;
 
 use GibsonOS\Core\Command\AbstractCommand;
-use GibsonOS\Core\Event\Describer\TimeDescriber;
+use GibsonOS\Core\Event\TimeEvent;
 use GibsonOS\Core\Exception\DateTimeError;
 use GibsonOS\Core\Service\EventService;
 use Psr\Log\LoggerInterface;
@@ -21,7 +21,7 @@ class CronjobCommand extends AbstractCommand
      */
     protected function run(): int
     {
-        $this->eventService->fire(TimeDescriber::class, TimeDescriber::TRIGGER_CRONJOB);
+        $this->eventService->fire(TimeEvent::class, TimeEvent::TRIGGER_CRONJOB);
 
         return 0;
     }

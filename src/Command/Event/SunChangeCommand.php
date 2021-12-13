@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Command\Event;
 
 use GibsonOS\Core\Command\AbstractCommand;
-use GibsonOS\Core\Event\Describer\TimeDescriber;
+use GibsonOS\Core\Event\TimeEvent;
 use GibsonOS\Core\Exception\DateTimeError;
 use GibsonOS\Core\Service\DateTimeService;
 use GibsonOS\Core\Service\EventService;
@@ -27,13 +27,13 @@ class SunChangeCommand extends AbstractCommand
         $sunChangeDateTime->setTimestamp($this->dateTimeService->getSunrise($dateTimeNow));
 
         if ($sunChangeDateTime->format('Y-m-d H:i') === $dateTimeNow->format('Y-m-d H:i')) {
-            $this->eventService->fire(TimeDescriber::class, TimeDescriber::TRIGGER_SUNRISE);
+            $this->eventService->fire(TimeEvent::class, TimeEvent::TRIGGER_SUNRISE);
         }
 
         $sunChangeDateTime->setTimestamp($this->dateTimeService->getSunset($dateTimeNow));
 
         if ($sunChangeDateTime->format('Y-m-d H:i') === $dateTimeNow->format('Y-m-d H:i')) {
-            $this->eventService->fire(TimeDescriber::class, TimeDescriber::TRIGGER_SUNSET);
+            $this->eventService->fire(TimeEvent::class, TimeEvent::TRIGGER_SUNSET);
         }
 
         return 0;

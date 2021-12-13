@@ -9,9 +9,8 @@ use GibsonOS\Core\Dto\Parameter\BoolParameter;
 use GibsonOS\Core\Dto\Parameter\DateParameter;
 use GibsonOS\Core\Dto\Parameter\IntParameter;
 use GibsonOS\Core\Dto\Parameter\OptionParameter;
-use GibsonOS\Core\Event\Describer\TimeDescriber;
 use GibsonOS\Core\Service\DateTimeService;
-use GibsonOS\Core\Service\ServiceManagerService;
+use GibsonOS\Core\Service\EventService;
 
 #[Event('Zeit')]
 class TimeEvent extends AbstractEvent
@@ -25,12 +24,9 @@ class TimeEvent extends AbstractEvent
     #[Event\Trigger('Sonnenuntergang')]
     public const TRIGGER_SUNRISE = 'sunrise';
 
-    public function __construct(
-        TimeDescriber $describer,
-        ServiceManagerService $serviceManagerService,
-        private DateTimeService $dateTimeService
-    ) {
-        parent::__construct($describer, $serviceManagerService);
+    public function __construct(EventService $eventService, private DateTimeService $dateTimeService)
+    {
+        parent::__construct($eventService);
     }
 
     /**

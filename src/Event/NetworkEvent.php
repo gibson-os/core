@@ -7,9 +7,8 @@ use GibsonOS\Core\Attribute\Event;
 use GibsonOS\Core\Dto\Parameter\BoolParameter;
 use GibsonOS\Core\Dto\Parameter\IntParameter;
 use GibsonOS\Core\Dto\Parameter\StringParameter;
-use GibsonOS\Core\Event\Describer\DescriberInterface;
+use GibsonOS\Core\Service\EventService;
 use GibsonOS\Core\Service\NetworkService;
-use GibsonOS\Core\Service\ServiceManagerService;
 
 #[Event('Netzwerk')]
 class NetworkEvent extends AbstractEvent
@@ -27,12 +26,9 @@ class NetworkEvent extends AbstractEvent
     ])]
     public const TRIGGER_AFTER_PING = 'afterPing';
 
-    public function __construct(
-        DescriberInterface $describer,
-        ServiceManagerService $serviceManagerService,
-        private NetworkService $networkService
-    ) {
-        parent::__construct($describer, $serviceManagerService);
+    public function __construct(EventService $eventService, private NetworkService $networkService)
+    {
+        parent::__construct($eventService);
     }
 
     #[Event\Method('Ping')]

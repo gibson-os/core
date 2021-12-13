@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Service;
 
-use GibsonOS\Core\Event\Describer\NetworkDescriber;
 use GibsonOS\Core\Event\NetworkEvent;
 
 class NetworkService extends AbstractService
@@ -33,8 +32,8 @@ class NetworkService extends AbstractService
         socket_close($socket);
 
         $this->eventService->fire(
-            NetworkDescriber::class,
-            NetworkDescriber::TRIGGER_AFTER_PING,
+            NetworkEvent::class,
+            NetworkEvent::TRIGGER_AFTER_PING,
             [
                 'host' => $host,
                 'timeout' => $timeout,

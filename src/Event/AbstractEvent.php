@@ -3,46 +3,89 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Event;
 
+use GibsonOS\Core\Attribute\Event\Method;
+use GibsonOS\Core\Attribute\Event\Parameter;
 use GibsonOS\Core\Dto\Parameter\AutoCompleteParameter;
-use GibsonOS\Core\Event\Describer\DescriberInterface;
+use GibsonOS\Core\Exception\EventException;
 use GibsonOS\Core\Exception\FactoryError;
 use GibsonOS\Core\Model\AutoCompleteModelInterface;
 use GibsonOS\Core\Model\Event\Element;
-use GibsonOS\Core\Service\ServiceManagerService;
+use GibsonOS\Core\Service\EventService;
 use GibsonOS\Core\Utility\JsonUtility;
 use JsonException;
+use ReflectionAttribute;
+use ReflectionClass;
+use ReflectionMethod;
 
 abstract class AbstractEvent
 {
-    public function __construct(private DescriberInterface $describer, private ServiceManagerService $serviceManagerService)
+    public function __construct(private EventService $eventService)
     {
     }
 
     /**
      * @throws FactoryError
      * @throws JsonException
+     * @throws EventException
      */
     public function run(Element $element)
     {
         $method = $element->getMethod();
 
-        if (!isset($this->describer->getMethods()[$method])) {
-            // @todo throw exception
+        $reflectionClass = new ReflectionClass($this);
+
+        foreach ($reflectionClass->getMethods(ReflectionMethod::IS_PUBLIC) as $reflectionMethod) {
+            if ($reflectionMethod->getName() !== $method) {
+                continue;
+            }
+
+            $methodAttributes = $reflectionMethod->getAttributes(
+                Method::class,
+                ReflectionAttribute::IS_INSTANCEOF
+            );
+
+            if (empty($methodAttributes)) {
+                throw new EventException(sprintf(
+                    'Method %s has no %s attribute',
+                    $reflectionMethod->getName(),
+                    Method::class
+                ));
+            }
+
+            return $this->{$method}(...$this->getParameters($reflectionMethod, $element));
         }
 
-        return $this->{$method}(...$this->getParameters($element));
+        throw new EventException(sprintf('Class %s has no %s method', $reflectionClass->getName(), $method));
     }
 
     /**
      * @throws JsonException
      * @throws FactoryError
      */
-    protected function getParameters(Element $element): array
+    protected function getParameters(ReflectionMethod $reflectionMethod, Element $element): array
     {
-        /** @var DescriberInterface $describer */
-        $describer = $this->serviceManagerService->get($element->getClass());
-        $methods = $describer->getMethods();
-        $methodParameters = $methods[$element->getMethod()]->getParameters();
+        $methodParameters = [];
+
+        foreach ($reflectionMethod->getParameters() as $reflectionParameter) {
+            $parameterAttributes = $reflectionParameter->getAttributes(
+                Parameter::class,
+                ReflectionAttribute::IS_INSTANCEOF
+            );
+
+            if (empty($parameterAttributes)) {
+                continue;
+            }
+
+            /** @var Parameter $parameterAttribute */
+            $parameterAttribute = $parameterAttributes[0]->newInstance();
+
+            $methodParameters[$reflectionParameter->getName()] = $this->eventService->getParameter(
+                $parameterAttribute->getClassName(),
+                $parameterAttribute->getOptions(),
+                $parameterAttribute->getTitle()
+            );
+        }
+
         $parameters = JsonUtility::decode($element->getParameters() ?? '[]');
 
         foreach ($methodParameters as $parameterName => $methodParameter) {

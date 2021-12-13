@@ -6,7 +6,7 @@ namespace GibsonOS\Core\Service;
 use DateTimeZone;
 use GibsonOS\Core\Dto\Web\Request;
 use GibsonOS\Core\Dto\Web\Response;
-use GibsonOS\Core\Event\Describer\WeatherDescriber;
+use GibsonOS\Core\Event\WeatherEvent;
 use GibsonOS\Core\Exception\DateTimeError;
 use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\Model\SaveError;
@@ -34,8 +34,8 @@ class WeatherService extends AbstractService
     public function load(Location $location): void
     {
         $this->eventService->fire(
-            WeatherDescriber::class,
-            WeatherDescriber::TRIGGER_BEFORE_LOAD,
+            WeatherEvent::class,
+            WeatherEvent::TRIGGER_BEFORE_LOAD,
             ['location' => $location]
         );
 
@@ -89,8 +89,8 @@ class WeatherService extends AbstractService
         $eventParameters['location'] = $location;
 
         $this->eventService->fire(
-            WeatherDescriber::class,
-            WeatherDescriber::TRIGGER_AFTER_LOAD,
+            WeatherEvent::class,
+            WeatherEvent::TRIGGER_AFTER_LOAD,
             $eventParameters
         );
     }
