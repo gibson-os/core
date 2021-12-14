@@ -25,11 +25,14 @@ class PermissionStore extends AbstractDatabaseStore
     protected function setWheres(): void
     {
         if ($this->moduleId !== null) {
-            $this->addWhere('`module_id`=? AND `task`=? AND `action`=?', [$this->moduleId, '', '']);
+            $this->addWhere(
+                '`module_id`=? AND IFNULL(`task`, ?)=? AND IFNULL(`action`, ?)=?',
+                [$this->moduleId, '', '', '', '']
+            );
         }
 
         if ($this->taskId !== null) {
-            $this->addWhere('`task_id`=? AND `action`=?', [$this->taskId, '']);
+            $this->addWhere('`task_id`=? AND IFNULL(`action`, ?)=?', [$this->taskId, '', '']);
         }
 
         if ($this->actionId !== null) {

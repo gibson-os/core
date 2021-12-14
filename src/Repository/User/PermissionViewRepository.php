@@ -119,22 +119,25 @@ class PermissionViewRepository extends AbstractRepository
     private function getModuleWhere(mysqlTable $table, string $module): string
     {
         $table->addWhereParameter($module);
+        $table->addWhereParameter($module);
 
-        return '`module_name`=?';
+        return 'IFNULL(`module_name`, ?)=?';
     }
 
     private function getTaskWhere(mysqlTable $table, string $task): string
     {
         $table->addWhereParameter($task);
+        $table->addWhereParameter($task);
 
-        return '`task_name`=?';
+        return 'IFNULL(`task_name`, ?)=?';
     }
 
     private function getActionWhere(mysqlTable $table, string $action): string
     {
         $table->addWhereParameter($action);
+        $table->addWhereParameter($action);
 
-        return '`action_name`=?';
+        return 'IFNULL(`action_name`, ?)=?';
     }
 
     private function getUserIdWhere(mysqlTable $table, int $userId = null): string
