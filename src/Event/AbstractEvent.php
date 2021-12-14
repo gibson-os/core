@@ -82,7 +82,7 @@ abstract class AbstractEvent
             $methodParameters[$reflectionParameter->getName()] = $this->eventService->getParameter(
                 $parameterAttribute->getClassName(),
                 $parameterAttribute->getOptions(),
-                $parameterAttribute->getTitle()
+                $parameterAttribute->getTitle(),
             );
         }
 

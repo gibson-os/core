@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Service;
 
 use DateTime;
+use GibsonOS\Core\Attribute\Event\Listener;
 use GibsonOS\Core\Attribute\Event\Trigger;
 use GibsonOS\Core\Command\Event\RunCommand;
 use GibsonOS\Core\Dto\Parameter\AbstractParameter;
@@ -23,6 +24,7 @@ use ReflectionAttribute;
 use ReflectionClass;
 use ReflectionClassConstant;
 use ReflectionException;
+use ReflectionMethod;
 
 class EventService extends AbstractService
 {
@@ -35,8 +37,7 @@ class EventService extends AbstractService
         private CommandService $commandService,
         private DateTimeService $dateTimeService,
         private LoggerInterface $logger
-    )
-    {
+    ) {
     }
 
     /**
@@ -111,8 +112,12 @@ class EventService extends AbstractService
      * @throws FactoryError
      * @throws ReflectionException
      */
-    public function getParameter(string $className, array $options = [], string $title = null): AbstractParameter
-    {
+    public function getParameter(
+        string $className,
+        array $options = [],
+        string $title = null,
+        array $listeners = []
+    ): AbstractParameter {
         $reflectionClass = new ReflectionClass($className);
         $constructor = $reflectionClass->getConstructor();
         $constructorParameters = [];
@@ -141,11 +146,38 @@ class EventService extends AbstractService
             AbstractParameter::class
         );
 
-        foreach ($options as $name => $values) {
-            $parameter->{'set' . ucfirst($name)}(...$values);
+        foreach ($options as $optionName => $values) {
+            $parameter->{'set' . ucfirst($optionName)}(...$values);
+        }
+
+        foreach ($listeners as $field => $listener) {
+            $parameter->setListener($field, $listener);
         }
 
         return $parameter;
+    }
+
+    public function getListeners(
+        ReflectionClass|ReflectionMethod|ReflectionClassConstant $reflectionObject,
+        array $listeners = []
+    ): array {
+        $listenerAttributes = $reflectionObject->getAttributes(
+            Listener::class,
+            ReflectionAttribute::IS_INSTANCEOF
+        );
+
+        foreach ($listenerAttributes as $listenerAttribute) {
+            /** @var Listener $listener */
+            $listener = $listenerAttribute->newInstance();
+
+            if (!isset($listeners[$listener->getForKey()])) {
+                $listeners[$listener->getForKey()] = [];
+            }
+
+            $listeners[$listener->getForKey()][$listener->getToKey()] = $listener->getOptions();
+        }
+
+        return $listeners;
     }
 
     /**

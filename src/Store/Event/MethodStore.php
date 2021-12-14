@@ -74,8 +74,8 @@ class MethodStore extends AbstractStore
         }
 
         $methods = [];
-
         $reflectionClass = new ReflectionClass($this->className);
+        $listeners = $this->eventService->getListeners($reflectionClass);
 
         foreach ($reflectionClass->getMethods(ReflectionMethod::IS_PUBLIC) as $reflectionMethod) {
             $methodAttributes = $reflectionMethod->getAttributes(Method::class, ReflectionAttribute::IS_INSTANCEOF);
@@ -90,7 +90,10 @@ class MethodStore extends AbstractStore
             $methods[$methodAttribute->getTitle()] = [
                 'method' => $reflectionMethod->getName(),
                 'title' => $methodAttribute->getTitle(),
-                'parameters' => $this->getParameters($reflectionMethod),
+                'parameters' => $this->getParameters(
+                    $reflectionMethod,
+                    $this->eventService->getListeners($reflectionMethod, $listeners)
+                ),
                 'returns' => $this->getReturns($reflectionMethod),
             ];
         }
@@ -102,8 +105,9 @@ class MethodStore extends AbstractStore
 
     /**
      * @throws FactoryError
+     * @throws ReflectionException
      */
-    private function getParameters(ReflectionMethod $reflectionMethod): array
+    private function getParameters(ReflectionMethod $reflectionMethod, array $listeners): array
     {
         $parameters = [];
 
@@ -119,7 +123,10 @@ class MethodStore extends AbstractStore
 
             /** @var Parameter $parameterAttribute */
             $parameterAttribute = $parameterAttributes[0]->newInstance();
-            $parameters[$reflectionParameter->getName()] = $this->getParameter($parameterAttribute);
+            $parameters[$reflectionParameter->getName()] = $this->getParameter(
+                $parameterAttribute,
+                $listeners[$reflectionParameter->getName()] ?? []
+            );
         }
 
         return $parameters;
@@ -127,6 +134,7 @@ class MethodStore extends AbstractStore
 
     /**
      * @throws FactoryError
+     * @throws ReflectionException
      */
     private function getReturns(ReflectionMethod $reflectionMethod): array
     {
@@ -146,8 +154,13 @@ class MethodStore extends AbstractStore
      * @throws FactoryError
      * @throws ReflectionException
      */
-    private function getParameter(ReturnValue|Parameter $object): AbstractParameter
+    private function getParameter(ReturnValue|Parameter $object, array $listeners = []): AbstractParameter
     {
-        return $this->eventService->getParameter($object->getClassName(), $object->getOptions(), $object->getTitle());
+        return $this->eventService->getParameter(
+            $object->getClassName(),
+            $object->getOptions(),
+            $object->getTitle(),
+            $listeners
+        );
     }
 }

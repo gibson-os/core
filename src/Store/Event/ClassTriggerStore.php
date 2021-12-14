@@ -73,6 +73,7 @@ class ClassTriggerStore extends AbstractStore
 
         $triggers = [];
         $reflectionClass = new ReflectionClass($this->className);
+        $listeners = $this->eventService->getListeners($reflectionClass);
 
         foreach ($reflectionClass->getReflectionConstants(ReflectionClassConstant::IS_PUBLIC) as $reflectionClassConstant) {
             $triggerAttributes = $reflectionClassConstant->getAttributes(
@@ -89,7 +90,10 @@ class ClassTriggerStore extends AbstractStore
             $triggers[$triggerAttribute->getTitle()] = [
                 'trigger' => $reflectionClassConstant->getValue(),
                 'title' => $triggerAttribute->getTitle(),
-                'parameters' => $this->getParameters($triggerAttribute),
+                'parameters' => $this->getParameters(
+                    $triggerAttribute,
+                    $this->eventService->getListeners($reflectionClassConstant, $listeners)
+                ),
             ];
         }
 
@@ -104,7 +108,7 @@ class ClassTriggerStore extends AbstractStore
      *
      * @return array<string, AbstractParameter>
      */
-    private function getParameters(Trigger $triggerAttribute): array
+    private function getParameters(Trigger $triggerAttribute, array $listeners = []): array
     {
         $parameters = [];
 
@@ -113,7 +117,8 @@ class ClassTriggerStore extends AbstractStore
             $parameters[$parameter['key']] = $this->eventService->getParameter(
                 $parameter['className'],
                 $parameter['options'] ?? [],
-                $parameter['title'] ?? null
+                $parameter['title'] ?? null,
+                $listeners
             );
         }
 

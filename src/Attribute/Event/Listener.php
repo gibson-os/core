@@ -5,7 +5,7 @@ namespace GibsonOS\Core\Attribute\Event;
 
 use Attribute;
 
-#[Attribute(Attribute::TARGET_CLASS | Attribute::TARGET_METHOD | Attribute::IS_REPEATABLE)]
+#[Attribute(Attribute::TARGET_CLASS | Attribute::TARGET_METHOD | Attribute::TARGET_CLASS_CONSTANT | Attribute::IS_REPEATABLE)]
 class Listener
 {
     public function __construct(private string $forKey, private string $toKey, private array $options)
