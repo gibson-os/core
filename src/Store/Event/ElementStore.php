@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Store\Event;
 
+use GibsonOS\Core\Dto\Parameter\AbstractParameter;
 use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\Event\Element;
@@ -103,13 +104,15 @@ class ElementStore extends AbstractDatabaseStore
     }
 
     /**
+     * @param AbstractParameter[] $methodParameters
+     *
      * @throws JsonException
      */
     private function completeParameters(array $methodParameters, ?string $parameters): ?string
     {
         $parameters = $parameters === null ? [] : JsonUtility::decode($parameters);
 
-        foreach ($methodParameters as $parameterName => &$methodParameter) {
+        foreach ($methodParameters as $parameterName => $methodParameter) {
             if (!isset($parameters[$parameterName])) {
                 continue;
             }
@@ -117,12 +120,12 @@ class ElementStore extends AbstractDatabaseStore
             $parameter = $parameters[$parameterName];
 
             if (is_array($parameter)) {
-                $methodParameter = array_merge($methodParameter, $parameter);
+                $methodParameter->setValue(array_merge($methodParameter->getValue(), $parameter));
 
                 continue;
             }
 
-            $methodParameter['value'] = $parameter;
+            $methodParameter->setValue($parameter);
         }
 
         return JsonUtility::encode($methodParameters);
