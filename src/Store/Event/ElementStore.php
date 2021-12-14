@@ -72,7 +72,7 @@ class ElementStore extends AbstractDatabaseStore
             $parentId = $element->getParentId();
 
             foreach ($classNames as $className) {
-                if ($className['describerClass'] === $element->getClass()) {
+                if ($className['className'] === $element->getClass()) {
                     $element->setClassTitle($className['title']);
 
                     break;

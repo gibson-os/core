@@ -64,7 +64,7 @@ class TriggerStore extends AbstractDatabaseStore
             $model->loadFromMysqlTable($this->table);
 
             foreach ($classNames as $className) {
-                if ($className['describerClass'] === $model->getClass()) {
+                if ($className['className'] === $model->getClass()) {
                     $model->setClassTitle($className['title']);
 
                     break;
