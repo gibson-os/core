@@ -5,6 +5,7 @@ namespace GibsonOS\Core\Service;
 
 use DateTime;
 use GibsonOS\Core\Attribute\Event\Listener;
+use GibsonOS\Core\Attribute\Event\ParameterOption;
 use GibsonOS\Core\Attribute\Event\Trigger;
 use GibsonOS\Core\Command\Event\RunCommand;
 use GibsonOS\Core\Dto\Parameter\AbstractParameter;
@@ -155,6 +156,29 @@ class EventService extends AbstractService
         }
 
         return $parameter;
+    }
+
+    public function getParameterOptions(ReflectionClass $reflectionClass, string $name): array
+    {
+        $parameterOptionAttributes = $reflectionClass->getAttributes(
+            ParameterOption::class,
+            ReflectionAttribute::IS_INSTANCEOF
+        );
+
+        $options = [];
+
+        foreach ($parameterOptionAttributes as $parameterOptionAttribute) {
+            /** @var ParameterOption $parameterOption */
+            $parameterOption = $parameterOptionAttribute->newInstance();
+
+            if ($parameterOption->getParameterKey() !== $name) {
+                continue;
+            }
+
+            $options[$parameterOption->getOptionKey()] = [$parameterOption->getOptionValue()];
+        }
+
+        return $options;
     }
 
     public function getListeners(

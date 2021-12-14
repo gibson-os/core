@@ -124,6 +124,8 @@ class MethodStore extends AbstractStore
             /** @var Parameter $parameterAttribute */
             $parameterAttribute = $parameterAttributes[0]->newInstance();
             $parameters[$reflectionParameter->getName()] = $this->getParameter(
+                $reflectionParameter->getName(),
+                $reflectionMethod->getDeclaringClass(),
                 $parameterAttribute,
                 $listeners[$reflectionParameter->getName()] ?? []
             );
@@ -144,7 +146,11 @@ class MethodStore extends AbstractStore
         foreach ($returnValueAttributes as $returnValueAttribute) {
             /** @var ReturnValue $returnValue */
             $returnValue = $returnValueAttribute->newInstance();
-            $returns[$returnValue->getKey() ?? 'value'] = $this->getParameter($returnValue);
+            $returns[$returnValue->getKey() ?? 'return'] = $this->getParameter(
+                $returnValue->getKey() ?? 'return',
+                $reflectionMethod->getDeclaringClass(),
+                $returnValue
+            );
         }
 
         return $returns;
@@ -154,11 +160,15 @@ class MethodStore extends AbstractStore
      * @throws FactoryError
      * @throws ReflectionException
      */
-    private function getParameter(ReturnValue|Parameter $object, array $listeners = []): AbstractParameter
-    {
+    private function getParameter(
+        string $name,
+        ReflectionClass $reflectionClass,
+        ReturnValue|Parameter $object,
+        array $listeners = []
+    ): AbstractParameter {
         return $this->eventService->getParameter(
             $object->getClassName(),
-            $object->getOptions(),
+            array_merge($this->eventService->getParameterOptions($reflectionClass, $name), $object->getOptions()),
             $object->getTitle(),
             $listeners
         );
