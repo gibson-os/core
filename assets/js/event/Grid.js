@@ -79,6 +79,13 @@ Ext.define('GibsonOS.module.core.event.Grid', {
             trueText: 'Ja',
             falseText: 'Nein',
             width: 70
+        },{
+            xtype: 'booleancolumn',
+            header: 'Bei Fehler beenden',
+            dataIndex: 'exitOnError',
+            trueText: 'Ja',
+            falseText: 'Nein',
+            width: 120
         }];
     }
 });

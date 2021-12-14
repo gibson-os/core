@@ -7,6 +7,7 @@ use GibsonOS\Core\Event\AbstractEvent;
 use GibsonOS\Core\Exception\DateTimeError;
 use GibsonOS\Core\Exception\EventException;
 use GibsonOS\Core\Exception\FactoryError;
+use GibsonOS\Core\Model\Event;
 use GibsonOS\Core\Model\Event\Element;
 use GibsonOS\Core\Service\AbstractService;
 use GibsonOS\Core\Service\ServiceManagerService;
@@ -53,12 +54,12 @@ class ElementService extends AbstractService
      * @throws JsonException
      * @throws EventException
      */
-    public function runElements(array $elements, array $variables = []): void
+    public function runElements(array $elements, Event $event, array $variables = []): void
     {
         $previousConditionResult = null;
 
         foreach ($elements as $element) {
-            $previousConditionResult = $this->runElement($element, $previousConditionResult, $variables);
+            $previousConditionResult = $this->runElement($element, $event, $previousConditionResult, $variables);
         }
     }
 
@@ -85,12 +86,12 @@ class ElementService extends AbstractService
      * @throws FactoryError
      * @throws JsonException
      */
-    private function runElement(Element $element, ?bool $previousConditionResult, array &$variables): ?bool
+    private function runElement(Element $element, Event $event, ?bool $previousConditionResult, array &$variables): ?bool
     {
         $command = $element->getCommand();
 
         if ($command === null) {
-            $this->runFunction($element);
+            $this->runFunction($element, $event);
 
             return null;
         }
@@ -100,10 +101,10 @@ class ElementService extends AbstractService
         switch ($command) {
             case self::COMMAND_IF:
                 $this->throwPreviousConditionIsNotNullException($previousConditionResult);
-                $conditionResult = $this->getReturnsConditionResult($element, $variables);
+                $conditionResult = $this->getReturnsConditionResult($element, $event, $variables);
 
                 if ($conditionResult === true) {
-                    $this->runElements($children);
+                    $this->runElements($children, $event);
                 }
 
                 return $conditionResult;
@@ -111,7 +112,7 @@ class ElementService extends AbstractService
                 $this->throwPreviousConditionIsNullException($previousConditionResult);
 
                 if ($previousConditionResult !== true) {
-                    $this->runElements($children);
+                    $this->runElements($children, $event);
                 }
 
                 return null;
@@ -119,10 +120,10 @@ class ElementService extends AbstractService
                 $this->throwPreviousConditionIsNullException($previousConditionResult);
 
                 if ($previousConditionResult === false) {
-                    $conditionResult = $this->getReturnsConditionResult($element, $variables);
+                    $conditionResult = $this->getReturnsConditionResult($element, $event, $variables);
 
                     if ($conditionResult) {
-                        $this->runElements($children);
+                        $this->runElements($children, $event);
                     }
                 }
 
@@ -130,8 +131,8 @@ class ElementService extends AbstractService
             case self::COMMAND_WHILE:
                 $this->throwPreviousConditionIsNotNullException($previousConditionResult);
 
-                while ($this->getReturnsConditionResult($element, $variables)) {
-                    $this->runElements($children);
+                while ($this->getReturnsConditionResult($element, $event, $variables)) {
+                    $this->runElements($children, $event);
                 }
 
                 return null;
@@ -139,8 +140,8 @@ class ElementService extends AbstractService
                 $this->throwPreviousConditionIsNotNullException($previousConditionResult);
 
                 do {
-                    $this->runElements($children);
-                } while ($this->getReturnsConditionResult($element, $variables));
+                    $this->runElements($children, $event);
+                } while ($this->getReturnsConditionResult($element, $event, $variables));
 
                 return null;
         }
@@ -148,11 +149,16 @@ class ElementService extends AbstractService
         return null;
     }
 
-    private function getReturnsConditionResult(Element $element, array &$variables): bool
+    /**
+     * @throws FactoryError
+     * @throws JsonException
+     * @throws EventException
+     */
+    private function getReturnsConditionResult(Element $element, Event $event, array &$variables): bool
     {
         $returns = JsonUtility::decode($element->getReturns() ?? '[]');
         $returnsCount = count($returns);
-        $callReturn = $this->runFunction($element);
+        $callReturn = $this->runFunction($element, $event);
         $this->logger->debug('Returns: ' . var_export($callReturn, true));
 
         if ($returnsCount === 0) {
@@ -175,19 +181,20 @@ class ElementService extends AbstractService
     }
 
     /**
-     * @throws FactoryError
      * @throws JsonException
+     * @throws EventException
+     * @throws FactoryError
      *
      * @return mixed
      */
-    private function runFunction(Element $element)
+    private function runFunction(Element $element, Event $event)
     {
         /** @var AbstractEvent $service */
         $service = $this->serviceManagerService->get($element->getClass());
 
         $this->logger->debug('Run event function ' . $element->getClass() . '::' . $element->getMethod());
 
-        return $service->run($element);
+        return $service->run($element, $event);
     }
 
     /**

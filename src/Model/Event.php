@@ -18,6 +18,8 @@ class Event extends AbstractModel implements JsonSerializable, AutoCompleteModel
 
     private bool $async;
 
+    private bool $exitOnError = true;
+
     private DateTimeInterface $modified;
 
     private ?DateTimeInterface $lastRun = null;
@@ -81,6 +83,18 @@ class Event extends AbstractModel implements JsonSerializable, AutoCompleteModel
     public function setAsync(bool $async): Event
     {
         $this->async = $async;
+
+        return $this;
+    }
+
+    public function isExitOnError(): bool
+    {
+        return $this->exitOnError;
+    }
+
+    public function setExitOnError(bool $exitOnError): Event
+    {
+        $this->exitOnError = $exitOnError;
 
         return $this;
     }
@@ -216,6 +230,7 @@ class Event extends AbstractModel implements JsonSerializable, AutoCompleteModel
             'name' => $this->getName(),
             'active' => $this->isActive(),
             'async' => $this->isAsync(),
+            'exitOnError' => $this->isExitOnError(),
             'lastRun' => $this->getLastRun()?->format('Y-m-d H:i:s'),
         ];
     }

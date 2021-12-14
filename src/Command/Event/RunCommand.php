@@ -6,6 +6,8 @@ namespace GibsonOS\Core\Command\Event;
 use GibsonOS\Core\Command\AbstractCommand;
 use GibsonOS\Core\Exception\ArgumentError;
 use GibsonOS\Core\Exception\DateTimeError;
+use GibsonOS\Core\Exception\EventException;
+use GibsonOS\Core\Exception\FactoryError;
 use GibsonOS\Core\Exception\Model\SaveError;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Repository\EventRepository;
@@ -15,8 +17,11 @@ use Psr\Log\LoggerInterface;
 
 class RunCommand extends AbstractCommand
 {
-    public function __construct(private EventRepository $eventRepository, private EventService $eventService, LoggerInterface $logger)
-    {
+    public function __construct(
+        private EventRepository $eventRepository,
+        private EventService $eventService,
+        LoggerInterface $logger
+    ) {
         parent::__construct($logger);
 
         $this->setArgument('eventId', true);
@@ -25,9 +30,11 @@ class RunCommand extends AbstractCommand
     /**
      * @throws ArgumentError
      * @throws DateTimeError
-     * @throws SelectError
-     * @throws SaveError
      * @throws JsonException
+     * @throws SaveError
+     * @throws SelectError
+     * @throws EventException
+     * @throws FactoryError
      */
     protected function run(): int
     {

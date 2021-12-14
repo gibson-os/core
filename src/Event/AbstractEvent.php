@@ -3,12 +3,14 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Event;
 
+use Exception;
 use GibsonOS\Core\Attribute\Event\Method;
 use GibsonOS\Core\Attribute\Event\Parameter;
 use GibsonOS\Core\Dto\Parameter\AutoCompleteParameter;
 use GibsonOS\Core\Exception\EventException;
 use GibsonOS\Core\Exception\FactoryError;
 use GibsonOS\Core\Model\AutoCompleteModelInterface;
+use GibsonOS\Core\Model\Event;
 use GibsonOS\Core\Model\Event\Element;
 use GibsonOS\Core\Service\EventService;
 use GibsonOS\Core\Utility\JsonUtility;
@@ -28,7 +30,7 @@ abstract class AbstractEvent
      * @throws JsonException
      * @throws EventException
      */
-    public function run(Element $element)
+    public function run(Element $element, Event $event)
     {
         $method = $element->getMethod();
 
@@ -52,7 +54,15 @@ abstract class AbstractEvent
                 ));
             }
 
-            return $this->{$method}(...$this->getParameters($reflectionMethod, $element));
+            try {
+                return $this->{$method}(...$this->getParameters($reflectionMethod, $element));
+            } catch (Exception $exception) {
+                if ($event->isExitOnError()) {
+                    return null;
+                }
+
+                throw $exception;
+            }
         }
 
         throw new EventException(sprintf('Class %s has no %s method', $reflectionClass->getName(), $method));

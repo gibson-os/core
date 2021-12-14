@@ -104,7 +104,7 @@ class EventService extends AbstractService
 
         $this->logger->info('Run event ' . $event->getId());
         $event->setLastRun($this->dateTimeService->get())->save();
-        $this->elementService->runElements($event->getElements() ?? []);
+        $this->elementService->runElements($event->getElements() ?? [], $event);
     }
 
     /**
