@@ -52,7 +52,9 @@ class PermissionViewRepository extends AbstractRepository
         ;
         $table->setWhere(
             $this->getUserIdWhere($table, $userId) . ' AND ' .
-            $this->getModuleWhere($table, $module)
+            $this->getModuleWhere($table, $module) . ' AND ' .
+            '`task_name` IS NULL AND ' .
+            '`action_name` IS NULL'
         );
 
         if (!$table->selectPrepared()) {
@@ -77,7 +79,8 @@ class PermissionViewRepository extends AbstractRepository
         $table->setWhere(
             $this->getUserIdWhere($table, $userId) . ' AND ' .
             $this->getModuleWhere($table, $module) . ' AND ' .
-            $this->getTaskWhere($table, $task)
+            $this->getTaskWhere($table, $task) . ' AND ' .
+            '`action_name` IS NULL'
         );
 
         if (!$table->selectPrepared()) {
@@ -119,25 +122,22 @@ class PermissionViewRepository extends AbstractRepository
     private function getModuleWhere(mysqlTable $table, string $module): string
     {
         $table->addWhereParameter($module);
-        $table->addWhereParameter($module);
 
-        return 'IFNULL(`module_name`, ?)=?';
+        return '`module_name`=?';
     }
 
     private function getTaskWhere(mysqlTable $table, string $task): string
     {
         $table->addWhereParameter($task);
-        $table->addWhereParameter($task);
 
-        return 'IFNULL(`task_name`, ?)=?';
+        return '`task_name`=?';
     }
 
     private function getActionWhere(mysqlTable $table, string $action): string
     {
         $table->addWhereParameter($action);
-        $table->addWhereParameter($action);
 
-        return 'IFNULL(`action_name`, ?)=?';
+        return '`action_name`=?';
     }
 
     private function getUserIdWhere(mysqlTable $table, int $userId = null): string
