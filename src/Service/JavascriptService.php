@@ -68,31 +68,37 @@ class JavascriptService extends AbstractService
 
     /**
      * @throws GetError
+     * @throws SelectError
      */
     public function getByUserIdAndTask(?int $userId, string $module, string $task): string
     {
-        if ($this->permissionService->isDenied($module, null, null, $userId)) {
-            return '';
-        }
-
         $files = $this->getDefaultFiles();
-        $dir =
-            'js' . DIRECTORY_SEPARATOR .
-            'module' . DIRECTORY_SEPARATOR .
-            $module . DIRECTORY_SEPARATOR .
-            $task . DIRECTORY_SEPARATOR
-        ;
-        $files = array_merge($files, $this->getFiles($dir));
+        $oldData = '';
 
-        /** @var Javascript[] $files */
-        $files = array_merge($files, $this->getFiles(
-            $this->vendorPath .
-            'gibson-os' . DIRECTORY_SEPARATOR .
-            $module . DIRECTORY_SEPARATOR .
-            'assets' . DIRECTORY_SEPARATOR .
-            'js' . DIRECTORY_SEPARATOR .
-            $task . DIRECTORY_SEPARATOR
-        ));
+        foreach ($this->permissionViewRepository->getTaskList($userId, $module) as $task) {
+            if ($task !== $task) {
+                continue;
+            }
+
+            $dir =
+                'js' . DIRECTORY_SEPARATOR .
+                'module' . DIRECTORY_SEPARATOR .
+                $task->module . DIRECTORY_SEPARATOR .
+                $task->task . DIRECTORY_SEPARATOR
+            ;
+            /** @var Javascript[] $files */
+            $files = array_merge($files, $this->getFiles($dir));
+
+            /** @var Javascript[] $files */
+            $files = array_merge($files, $this->getFiles(
+                $this->vendorPath .
+                'gibson-os' . DIRECTORY_SEPARATOR .
+                $task->module . DIRECTORY_SEPARATOR .
+                'assets' . DIRECTORY_SEPARATOR .
+                'js' . DIRECTORY_SEPARATOR
+            ));
+            $oldData .= $this->mergeFileContent($dir);
+        }
 
         $content = '';
 
@@ -100,7 +106,7 @@ class JavascriptService extends AbstractService
             $content .= $this->loadFile($file->getNamespace(), $files);
         }
 
-        return $content . $this->mergeFileContent($dir);
+        return $content . $oldData;
     }
 
     /**
