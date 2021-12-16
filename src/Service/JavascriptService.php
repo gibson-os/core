@@ -75,16 +75,16 @@ class JavascriptService extends AbstractService
         $files = $this->getDefaultFiles();
         $oldData = '';
 
-        foreach ($this->permissionViewRepository->getTaskList($userId, $module) as $task) {
-            if ($task !== $task) {
+        foreach ($this->permissionViewRepository->getTaskList($userId, $module) as $permission) {
+            if ($task !== $permission->task) {
                 continue;
             }
 
             $dir =
                 'js' . DIRECTORY_SEPARATOR .
                 'module' . DIRECTORY_SEPARATOR .
-                $task->module . DIRECTORY_SEPARATOR .
-                $task->task . DIRECTORY_SEPARATOR
+                $permission->module . DIRECTORY_SEPARATOR .
+                $permission->task . DIRECTORY_SEPARATOR
             ;
             /** @var Javascript[] $files */
             $files = array_merge($files, $this->getFiles($dir));
@@ -93,7 +93,7 @@ class JavascriptService extends AbstractService
             $files = array_merge($files, $this->getFiles(
                 $this->vendorPath .
                 'gibson-os' . DIRECTORY_SEPARATOR .
-                $task->module . DIRECTORY_SEPARATOR .
+                $permission->module . DIRECTORY_SEPARATOR .
                 'assets' . DIRECTORY_SEPARATOR .
                 'js' . DIRECTORY_SEPARATOR
             ));

@@ -213,14 +213,14 @@ class UserController extends AbstractController
      */
     #[CheckPermission(Permission::MANAGE + Permission::WRITE)]
     public function savePermission(
-        int $id,
+        ?int $id,
         int $permission,
         string $module,
         string $task = '',
         string $action = ''
     ): AjaxResponse {
         (new Permission())
-            ->setUserId($id)
+            ->setUserId($id ?: null)
             ->setPermission($permission)
             ->setModule($module)
             ->setTask($task)

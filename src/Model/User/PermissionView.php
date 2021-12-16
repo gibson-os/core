@@ -8,19 +8,25 @@ use JsonSerializable;
 
 class PermissionView extends AbstractModel implements JsonSerializable
 {
-    private int $userId = 0;
+    private ?int $userId = null;
+
+    private ?string $userName = null;
+
+    private ?string $userHost = null;
+
+    private ?string $userIp = null;
 
     private int $permission = Permission::DENIED;
 
-    private ?string $module = '';
+    private ?string $module = null;
 
-    private ?string $task = '';
+    private ?string $task = null;
 
-    private ?string $action = '';
+    private ?string $action = null;
 
-    private ?int $moduleId = null;
+    private int $moduleId;
 
-    private ?string $moduleName = null;
+    private string $moduleName;
 
     private ?int $taskId = null;
 
@@ -35,14 +41,50 @@ class PermissionView extends AbstractModel implements JsonSerializable
         return 'view_user_permission';
     }
 
-    public function getUserId(): int
+    public function getUserId(): ?int
     {
         return $this->userId;
     }
 
-    public function setUserId(int $userId): PermissionView
+    public function setUserId(?int $userId): PermissionView
     {
         $this->userId = $userId;
+
+        return $this;
+    }
+
+    public function getUserName(): ?string
+    {
+        return $this->userName;
+    }
+
+    public function setUserName(?string $userName): PermissionView
+    {
+        $this->userName = $userName;
+
+        return $this;
+    }
+
+    public function getUserHost(): ?string
+    {
+        return $this->userHost;
+    }
+
+    public function setUserHost(?string $userHost): PermissionView
+    {
+        $this->userHost = $userHost;
+
+        return $this;
+    }
+
+    public function getUserIp(): ?string
+    {
+        return $this->userIp;
+    }
+
+    public function setUserIp(?string $userIp): PermissionView
+    {
+        $this->userIp = $userIp;
 
         return $this;
     }
@@ -95,24 +137,24 @@ class PermissionView extends AbstractModel implements JsonSerializable
         return $this;
     }
 
-    public function getModuleId(): ?int
+    public function getModuleId(): int
     {
         return $this->moduleId;
     }
 
-    public function setModuleId(?int $moduleId): PermissionView
+    public function setModuleId(int $moduleId): PermissionView
     {
         $this->moduleId = $moduleId;
 
         return $this;
     }
 
-    public function getModuleName(): ?string
+    public function getModuleName(): string
     {
         return $this->moduleName;
     }
 
-    public function setModuleName(?string $moduleName): PermissionView
+    public function setModuleName(string $moduleName): PermissionView
     {
         $this->moduleName = $moduleName;
 
@@ -171,6 +213,9 @@ class PermissionView extends AbstractModel implements JsonSerializable
     {
         return [
             'userId' => $this->getUserId(),
+            'userName' => $this->getUserName(),
+            'userHost' => $this->getUserHost(),
+            'userIp' => $this->getUserIp(),
             'permission' => $this->getPermission(),
             'module' => $this->getModule(),
             'task' => $this->getTask(),

@@ -20,11 +20,11 @@ class Permission extends AbstractModel
 
     public const MANAGE = 16;
 
-    private string $module = '';
+    private string $module;
 
-    private string $task = '';
+    private ?string $task = null;
 
-    private string $action = '';
+    private ?string $action = null;
 
     private ?int $userId = null;
 
@@ -49,24 +49,24 @@ class Permission extends AbstractModel
         return $this;
     }
 
-    public function getTask(): string
+    public function getTask(): ?string
     {
         return $this->task;
     }
 
-    public function setTask(string $task): Permission
+    public function setTask(?string $task): Permission
     {
         $this->task = $task;
 
         return $this;
     }
 
-    public function getAction(): string
+    public function getAction(): ?string
     {
         return $this->action;
     }
 
-    public function setAction(string $action): Permission
+    public function setAction(?string $action): Permission
     {
         $this->action = $action;
 

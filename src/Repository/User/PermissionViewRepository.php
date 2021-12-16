@@ -22,19 +22,19 @@ class PermissionViewRepository extends AbstractRepository
         $table = $this->getTable(PermissionView::getTableName());
         $table
             ->setWhere(
-                '(`user_id`=? OR `user_id`=0) AND ' .
+                'IFNULL(`user_id`, ?)=? AND ' .
                 '`permission`>? AND ' .
                 '`task_id` IS NOT NULL' .
-                ($module === null ? '' : ' AND `module`=?')
+                ($module === null ? '' : ' AND `module_name`=?')
             )
-            ->setWhereParameters([$userId ?? 0, Permission::DENIED])
+            ->setWhereParameters([$userId ?? 0, $userId ?? 0, Permission::DENIED])
         ;
 
         if ($module !== null) {
             $table->addWhereParameter($module);
         }
 
-        if (!$table->selectPrepared(false, 'DISTINCT `module`, `task_name` AS `task`')) {
+        if (!$table->selectPrepared(false, 'DISTINCT `module_name` AS `module`, `task_name` AS `task`')) {
             throw (new SelectError())->setTable($table);
         }
 
@@ -142,9 +142,9 @@ class PermissionViewRepository extends AbstractRepository
 
     private function getUserIdWhere(mysqlTable $table, int $userId = null): string
     {
-        $table->addWhereParameter(0);
+        $table->addWhereParameter($userId ?? 0);
         $table->addWhereParameter($userId ?? 0);
 
-        return '(`user_id`=? OR `user_id`=?)';
+        return 'IFNULL(`user_id`, ?)=?';
     }
 }
