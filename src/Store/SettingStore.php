@@ -29,7 +29,7 @@ class SettingStore extends AbstractDatabaseStore
     protected function setWheres(): void
     {
         if ($this->userId !== null) {
-            $this->addWhere('`user_id`=? OR `user_id`=?', [$this->userId, 0]);
+            $this->addWhere('`user_id`=? OR `user_id` IS NULL', [$this->userId]);
         }
 
         if ($this->moduleId !== null) {

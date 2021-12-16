@@ -4,11 +4,12 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Model;
 
 use JsonSerializable;
-use mysqlDatabase;
 
 class Setting extends AbstractModel implements JsonSerializable
 {
-    private int $userId = 0;
+    private ?int $id = null;
+
+    private ?int $userId = null;
 
     private int $moduleId = 0;
 
@@ -16,28 +17,33 @@ class Setting extends AbstractModel implements JsonSerializable
 
     private string $value = '';
 
-    private User $user;
+    private ?User $user = null;
 
     private Module $module;
-
-    public function __construct(mysqlDatabase $database = null)
-    {
-        parent::__construct($database);
-
-        $this->user = new User();
-    }
 
     public static function getTableName(): string
     {
         return 'setting';
     }
 
-    public function getUserId(): int
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    public function setId(int $id): Setting
+    {
+        $this->id = $id;
+
+        return $this;
+    }
+
+    public function getUserId(): ?int
     {
         return $this->userId;
     }
 
-    public function setUserId(int $userId): Setting
+    public function setUserId(?int $userId): Setting
     {
         $this->userId = $userId;
 
@@ -80,17 +86,29 @@ class Setting extends AbstractModel implements JsonSerializable
         return $this;
     }
 
-    public function getUser(): User
+    public function getUser(): ?User
     {
-        $this->loadForeignRecord($this->user, $this->getUserId());
+        $userId = $this->getUserId();
+
+        if ($userId === null) {
+            $this->user = null;
+
+            return null;
+        }
+
+        if ($this->user === null) {
+            $this->user = new User();
+        }
+
+        $this->loadForeignRecord($this->user, $userId);
 
         return $this->user;
     }
 
-    public function setUser(User $user): Setting
+    public function setUser(?User $user): Setting
     {
         $this->user = $user;
-        $this->setUserId($user->getId() ?? 0);
+        $this->setUserId($user?->getId());
 
         return $this;
     }

@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Service;
 
-use GibsonOS\Core\Exception\DateTimeError;
 use GibsonOS\Core\Exception\Model\SaveError;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\Setting;
@@ -25,7 +24,6 @@ class ModuleSettingService extends AbstractService
     }
 
     /**
-     * @throws DateTimeError
      * @throws SelectError
      *
      * @return Setting|Setting[]
@@ -36,7 +34,6 @@ class ModuleSettingService extends AbstractService
     }
 
     /**
-     * @throws DateTimeError
      * @throws SelectError
      *
      * @return Setting|Setting[]
@@ -47,7 +44,6 @@ class ModuleSettingService extends AbstractService
     }
 
     /**
-     * @throws DateTimeError
      * @throws SelectError
      *
      * @return Setting|Setting[]
@@ -74,7 +70,6 @@ class ModuleSettingService extends AbstractService
     }
 
     /**
-     * @throws DateTimeError
      * @throws SaveError
      * @throws SelectError
      */
@@ -84,7 +79,6 @@ class ModuleSettingService extends AbstractService
     }
 
     /**
-     * @throws DateTimeError
      * @throws SaveError
      * @throws SelectError
      */
@@ -94,7 +88,6 @@ class ModuleSettingService extends AbstractService
     }
 
     /**
-     * @throws DateTimeError
      * @throws SaveError
      */
     public function setById(int $moduleId, string $key, string $value, int $userId = null): void
@@ -113,7 +106,6 @@ class ModuleSettingService extends AbstractService
     }
 
     /**
-     * @throws DateTimeError
      * @throws SelectError
      */
     private function getModuleIdByName(string $name): int
@@ -124,7 +116,6 @@ class ModuleSettingService extends AbstractService
     }
 
     /**
-     * @throws DateTimeError
      * @throws SelectError
      *
      * @return Setting[]|Setting
@@ -132,12 +123,8 @@ class ModuleSettingService extends AbstractService
     private function loadSettings(int $moduleId, int $userId = null, string $key = null): array|Setting
     {
         // User ID holen
-        if ($userId === null) {
-            $userId = 0;
-
-            if ($this->sessionService->isLogin()) {
-                $userId = $this->sessionService->getUserId() ?? 0;
-            }
+        if ($userId === null && $this->sessionService->isLogin()) {
+            $userId = $this->sessionService->getUserId() ?? 0;
         }
 
         if ($key === null) {

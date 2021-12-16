@@ -29,7 +29,7 @@ class SettingController extends AbstractController
         try {
             $windowSettings = $settingRepository->getByKeyAndModuleName(
                 $this->requestService->getModuleName(),
-                $this->sessionService->getUserId() ?? 0,
+                $this->sessionService->getUserId(),
                 $id . '_window'
             );
         } catch (SelectError) {
@@ -40,7 +40,7 @@ class SettingController extends AbstractController
             'settings' => JsonUtility::decode($windowSettings === null ? '[]' : $windowSettings->getValue()),
             'permissions' => $permissionService->getRequiredPermissions(
                 $requiredPermissions,
-                $this->sessionService->getUserId() ?? 0
+                $this->sessionService->getUserId()
             ),
         ]);
     }

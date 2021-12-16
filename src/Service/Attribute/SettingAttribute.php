@@ -76,7 +76,7 @@ class SettingAttribute extends AbstractActionAttributeService implements Service
         try {
             $parameters[$key] = $this->settingRepository->getByKeyAndModuleName(
                 $attribute->getModule() ?? $this->requestService->getModuleName(),
-                $this->sessionService->getUserId() ?? 0,
+                $this->sessionService->getUserId(),
                 $attribute->getKey()
             );
         } catch (SelectError $exception) {

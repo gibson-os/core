@@ -85,7 +85,7 @@ class PermissionService
     /**
      * @param array<string, array{permissionRequired: bool, items: array}> $requiredPermissions
      */
-    public function getRequiredPermissions(array $requiredPermissions, int $userId): array
+    public function getRequiredPermissions(array $requiredPermissions, ?int $userId): array
     {
         $permissions = [];
 
@@ -101,7 +101,7 @@ class PermissionService
      */
     private function getRequiredPermissionItem(
         array $permissionItem,
-        int $userId,
+        ?int $userId,
         string $module,
         string $task = null,
         string $action = null,
