@@ -20,6 +20,8 @@ class Permission extends AbstractModel
 
     public const MANAGE = 16;
 
+    private ?int $id = null;
+
     private string $module;
 
     private ?string $task = null;
@@ -35,6 +37,18 @@ class Permission extends AbstractModel
     public static function getTableName(): string
     {
         return 'user_permission';
+    }
+
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    public function setId(?int $id): Permission
+    {
+        $this->id = $id;
+
+        return $this;
     }
 
     public function getModule(): string
