@@ -48,7 +48,7 @@ class PermissionStore extends AbstractDatabaseStore
                 $permissionViewData['permission'] = 0;
             }
 
-            yield $permissionView;
+            yield $permissionViewData;
         }
     }
 
