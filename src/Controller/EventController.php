@@ -7,6 +7,7 @@ use DateTime;
 use Exception;
 use GibsonOS\Core\Attribute\CheckPermission;
 use GibsonOS\Core\Exception\DateTimeError;
+use GibsonOS\Core\Exception\EventException;
 use GibsonOS\Core\Exception\FactoryError;
 use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\Model\DeleteError;
@@ -17,7 +18,6 @@ use GibsonOS\Core\Model\User\Permission;
 use GibsonOS\Core\Repository\EventRepository;
 use GibsonOS\Core\Service\EventService;
 use GibsonOS\Core\Service\Response\AjaxResponse;
-use GibsonOS\Core\Service\Response\ResponseInterface;
 use GibsonOS\Core\Store\Event\ClassNameStore;
 use GibsonOS\Core\Store\Event\ClassTriggerStore;
 use GibsonOS\Core\Store\Event\ElementStore;
@@ -29,13 +29,16 @@ use ReflectionException;
 
 class EventController extends AbstractController
 {
+    /**
+     * @throws SelectError
+     */
     #[CheckPermission(Permission::READ)]
     public function index(
         EventStore $eventStore,
         int $start = 0,
         int $limit = 0,
         array $sort = []
-    ): ResponseInterface {
+    ): AjaxResponse {
         $eventStore->setLimit($limit, $start);
         $eventStore->setSortByExt($sort);
 
@@ -43,7 +46,6 @@ class EventController extends AbstractController
     }
 
     /**
-     * @throws FactoryError
      * @throws GetError
      * @throws JsonException
      * @throws SelectError
@@ -73,13 +75,10 @@ class EventController extends AbstractController
     }
 
     /**
-     * @param MethodStore  $methodStore
      * @param class-string $className
      *
      * @throws FactoryError
      * @throws ReflectionException
-     *
-     * @return AjaxResponse
      */
     #[CheckPermission(Permission::READ)]
     public function methods(MethodStore $methodStore, string $className): AjaxResponse
@@ -93,6 +92,7 @@ class EventController extends AbstractController
      * @param class-string $className
      *
      * @throws FactoryError
+     * @throws ReflectionException
      */
     #[CheckPermission(Permission::READ)]
     public function classTriggers(ClassTriggerStore $classTriggerStore, string $className): AjaxResponse
@@ -163,9 +163,11 @@ class EventController extends AbstractController
 
     /**
      * @throws DateTimeError
+     * @throws FactoryError
      * @throws JsonException
-     * @throws SelectError
      * @throws SaveError
+     * @throws SelectError
+     * @throws EventException
      */
     #[CheckPermission(Permission::WRITE)]
     public function run(EventService $eventService, EventRepository $eventRepository, int $eventId): AjaxResponse
