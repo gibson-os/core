@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Store\Event;
 
 use GibsonOS\Core\Attribute\Event;
+use GibsonOS\Core\Exception\FactoryError;
 use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Service\DirService;
 use GibsonOS\Core\Service\FileService;
@@ -11,6 +12,7 @@ use GibsonOS\Core\Service\ServiceManagerService;
 use GibsonOS\Core\Store\AbstractStore;
 use ReflectionAttribute;
 use ReflectionClass;
+use ReflectionException;
 
 class ClassNameStore extends AbstractStore
 {
@@ -19,8 +21,11 @@ class ClassNameStore extends AbstractStore
      */
     private array $list = [];
 
-    public function __construct(private DirService $dir, private FileService $file, private ServiceManagerService $serviceManagerService)
-    {
+    public function __construct(
+        private DirService $dir,
+        private FileService $file,
+        private ServiceManagerService $serviceManagerService
+    ) {
     }
 
     /**
@@ -45,6 +50,8 @@ class ClassNameStore extends AbstractStore
 
     /**
      * @throws GetError
+     * @throws FactoryError
+     * @throws ReflectionException
      */
     private function generateList(): void
     {
@@ -72,19 +79,10 @@ class ClassNameStore extends AbstractStore
                 'src' . DIRECTORY_SEPARATOR .
                 'Event' . DIRECTORY_SEPARATOR
             ;
-            $moduleName = ucfirst(str_replace($vendorDir, '', $moduleDir));
-            $namespace =
-                'GibsonOS\\' .
-                ($moduleName === 'Core' ? '' : 'Module\\') . $moduleName .
-                '\\Event\\'
-            ;
 
             foreach ($this->dir->getFiles($eventDir, '*.php') as $classPath) {
-                $className = str_replace('.php', '', $this->file->getFilename($classPath));
-                /** @var class-string $classNameWithNamespace */
-                $classNameWithNamespace = $namespace . $className;
-
-                $reflectionClass = new ReflectionClass($classNameWithNamespace);
+                $className = $this->serviceManagerService->getNamespaceByPath($classPath);
+                $reflectionClass = new ReflectionClass($className);
                 $eventAttributes = $reflectionClass->getAttributes(Event::class, ReflectionAttribute::IS_INSTANCEOF);
 
                 if (empty($eventAttributes)) {
@@ -95,7 +93,7 @@ class ClassNameStore extends AbstractStore
                 $eventAttribute = $eventAttributes[0]->newInstance();
 
                 $classNames[$eventAttribute->getTitle()] = [
-                    'className' => $classNameWithNamespace,
+                    'className' => $className,
                     'title' => $eventAttribute->getTitle(),
                 ];
             }
