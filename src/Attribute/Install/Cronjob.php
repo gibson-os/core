@@ -18,8 +18,8 @@ class Cronjob implements AttributeInterface
         private string $daysOfWeek = '*',
         private string $months = '*',
         private string $years = '*',
-        private ?array $arguments = null,
-        private ?array $options = null,
+        private array $arguments = [],
+        private array $options = [],
         private ?string $user = null,
     ) {
     }
@@ -64,12 +64,12 @@ class Cronjob implements AttributeInterface
         return $this->years;
     }
 
-    public function getArguments(): ?array
+    public function getArguments(): array
     {
         return $this->arguments;
     }
 
-    public function getOptions(): ?array
+    public function getOptions(): array
     {
         return $this->options;
     }

@@ -15,8 +15,11 @@ use Psr\Log\LoggerInterface;
 
 class CronjobService
 {
-    public function __construct(private CronjobRepository $cronjobRepository, private CommandService $commandService, private LoggerInterface $logger)
-    {
+    public function __construct(
+        private CronjobRepository $cronjobRepository,
+        private CommandService $commandService,
+        private LoggerInterface $logger
+    ) {
     }
 
     public function add(
@@ -29,13 +32,13 @@ class CronjobService
         string $daysOfWeek,
         string $months,
         string $years,
-        array $arguments = null,
-        array $options = null
+        array $arguments = [],
+        array $options = []
     ): void {
         $cronjob = (new Cronjob())
             ->setCommand($command)
-            ->setArguments($arguments === null ? null : JsonUtility::encode($arguments))
-            ->setOptions($options === null ? null : JsonUtility::encode($options))
+            ->setArguments(JsonUtility::encode($arguments))
+            ->setOptions(JsonUtility::encode($options))
             ->setUser($user)
             ->setActive(true)
         ;
