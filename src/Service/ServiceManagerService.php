@@ -83,12 +83,12 @@ class ServiceManagerService
     /**
      * @template T
      *
-     * @param class-string<T> $instanceOf
+     * @param class-string<T>|null $instanceOf
      *
      * @throws FactoryError
      * @throws GetError
      *
-     * @return T[]|object[]
+     * @return array<T|object>
      */
     public function getAll(string $dir, string $instanceOf = null): array
     {
