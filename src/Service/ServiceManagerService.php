@@ -102,7 +102,11 @@ class ServiceManagerService
                 continue;
             }
 
-            $classes[] = $this->get($this->getNamespaceByPath($file), $instanceOf);
+            try {
+                $classes[] = $this->get($this->getNamespaceByPath($file), $instanceOf);
+            } catch (FactoryError $e) {
+                // do nothing
+            }
         }
 
         return $classes;
@@ -120,15 +124,26 @@ class ServiceManagerService
         $namespace = '';
 
         if (is_file($path)) {
-            $namespace = array_pop($pathParts);
+            $namespace = str_replace('.php', '', array_pop($pathParts));
         }
+
+        $previousPart = null;
 
         while ($lastPart = array_pop($pathParts)) {
             if ($lastPart === 'gibson-os') {
                 break;
             }
 
-            $namespace = $lastPart . '\\' . $namespace;
+            if ($lastPart === 'src') {
+                continue;
+            }
+
+            $namespace = ucfirst($lastPart) . '\\' . $namespace;
+            $previousPart = $lastPart;
+        }
+
+        if ($previousPart !== 'core') {
+            $namespace = 'Module\\' . $namespace;
         }
 
         /** @var class-string $namespace */

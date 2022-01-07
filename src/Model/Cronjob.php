@@ -3,8 +3,10 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Model;
 
+use DateTimeImmutable;
 use DateTimeInterface;
 use JsonSerializable;
+use mysqlDatabase;
 
 class Cronjob extends AbstractModel implements JsonSerializable
 {
@@ -27,6 +29,13 @@ class Cronjob extends AbstractModel implements JsonSerializable
     public static function getTableName(): string
     {
         return 'cronjob';
+    }
+
+    public function __construct(mysqlDatabase $database = null)
+    {
+        parent::__construct($database);
+
+        $this->added = new DateTimeImmutable();
     }
 
     public function getId(): ?int
