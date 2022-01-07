@@ -5,6 +5,7 @@ namespace GibsonOS\Core\Command\Cronjob;
 
 use DateTime;
 use DateTimeZone;
+use GibsonOS\Core\Attribute\Install\Cronjob;
 use GibsonOS\Core\Command\AbstractCommand;
 use GibsonOS\Core\Exception\DateTimeError;
 use GibsonOS\Core\Exception\Flock\LockError;
@@ -20,6 +21,7 @@ use GibsonOS\Core\Service\WeatherService;
 use JsonException;
 use Psr\Log\LoggerInterface;
 
+#[Cronjob(seconds: '40')]
 class WeatherCommand extends AbstractCommand
 {
     public function __construct(

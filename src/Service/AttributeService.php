@@ -6,9 +6,12 @@ namespace GibsonOS\Core\Service;
 use GibsonOS\Core\Attribute\AttributeInterface;
 use GibsonOS\Core\Dto\Attribute;
 use GibsonOS\Core\Exception\FactoryError;
-use GibsonOS\Core\Service\Attribute\AbstractActionAttributeService;
+use GibsonOS\Core\Service\Attribute\AttributeServiceInterface;
 use ReflectionAttribute;
+use ReflectionClass;
+use ReflectionClassConstant;
 use ReflectionMethod;
+use ReflectionParameter;
 
 class AttributeService
 {
@@ -21,9 +24,10 @@ class AttributeService
      *
      * @return Attribute[]
      */
-    public function getMethodAttributes(ReflectionMethod $reflectionMethod): array
-    {
-        return $this->getMethodAttributesByClassName($reflectionMethod, AttributeInterface::class);
+    public function getAttributes(
+        ReflectionMethod|ReflectionClass|ReflectionParameter|ReflectionClassConstant $reflectionObject
+    ): array {
+        return $this->getAttributesByClassName($reflectionObject, AttributeInterface::class);
     }
 
     /**
@@ -33,10 +37,12 @@ class AttributeService
      *
      * @return Attribute[]
      */
-    public function getMethodAttributesByClassName(ReflectionMethod $reflectionMethod, string $attributeClassName): array
-    {
+    public function getAttributesByClassName(
+        ReflectionMethod|ReflectionClass|ReflectionParameter|ReflectionClassConstant $reflectionObject,
+        string $attributeClassName
+    ): array {
         $attributesClasses = [];
-        $attributes = $reflectionMethod->getAttributes(
+        $attributes = $reflectionObject->getAttributes(
             $attributeClassName,
             ReflectionAttribute::IS_INSTANCEOF
         );
@@ -44,10 +50,10 @@ class AttributeService
         foreach ($attributes as $attribute) {
             /** @var AttributeInterface $attributeClass */
             $attributeClass = $attribute->newInstance();
-            /** @var AbstractActionAttributeService $attributeService */
+            /** @var AttributeServiceInterface $attributeService */
             $attributeService = $this->serviceManagerService->get(
                 $attributeClass->getAttributeServiceName(),
-                AbstractActionAttributeService::class
+                AttributeServiceInterface::class
             );
 
             $attributesClasses[] = new Attribute($attributeClass, $attributeService);

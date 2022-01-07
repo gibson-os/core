@@ -6,13 +6,12 @@ namespace GibsonOS\Core\Attribute;
 use Attribute;
 use GibsonOS\Core\Service\Attribute\SettingAttribute;
 
-#[Attribute(Attribute::TARGET_METHOD | Attribute::IS_REPEATABLE)]
+#[Attribute(Attribute::TARGET_PARAMETER | Attribute::TARGET_PROPERTY)]
 class GetSetting implements AttributeInterface
 {
     public function __construct(
         private string $key,
-        private ?string $module = null,
-        private ?string $name = null
+        private ?string $module = null
     ) {
     }
 
@@ -24,11 +23,6 @@ class GetSetting implements AttributeInterface
     public function getKey(): string
     {
         return $this->key;
-    }
-
-    public function getName(): ?string
-    {
-        return $this->name;
     }
 
     public function getModule(): ?string

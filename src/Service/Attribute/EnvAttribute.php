@@ -7,63 +7,28 @@ use GibsonOS\Core\Attribute\AttributeInterface;
 use GibsonOS\Core\Attribute\GetEnv;
 use GibsonOS\Core\Service\EnvService;
 use ReflectionNamedType;
+use ReflectionParameter;
 
-class EnvAttribute extends AbstractActionAttributeService implements ServiceAttributeServiceInterface
+class EnvAttribute implements ParameterAttributeInterface, AttributeServiceInterface
 {
     public function __construct(private EnvService $envService)
     {
     }
 
-    public function preExecute(AttributeInterface $attribute, array $parameters, array $reflectionParameters): array
-    {
-        return $this->getEnv($attribute, $parameters, $reflectionParameters);
-    }
-
-    public function usedParameters(AttributeInterface $attribute): array
+    public function replace(AttributeInterface $attribute, array $parameters, ReflectionParameter $reflectionParameter): mixed
     {
         if (!$attribute instanceof GetEnv) {
-            return [];
-        }
-
-        return [$this->getKey($attribute)];
-    }
-
-    private function getKey(GetEnv $attribute): string
-    {
-        return $attribute->getName() ?? lcfirst(implode(
-            '',
-            array_map(
-                fn (string $part) => ucfirst(mb_strtolower($part)),
-                explode('_', $attribute->getKey())
-            )
-        ));
-    }
-
-    public function beforeConstruct(AttributeInterface $attribute, array $parameters, array $reflectionParameters): array
-    {
-        return $this->getEnv($attribute, $parameters, $reflectionParameters);
-    }
-
-    public function getEnv(AttributeInterface $attribute, array $parameters, array $reflectionParameters): array
-    {
-        if (!$attribute instanceof GetEnv) {
-            return $parameters;
-        }
-
-        $key = $this->getKey($attribute);
-        $reflectionParameter = $this->getReflectionParameter($key, $reflectionParameters);
-
-        if ($reflectionParameter === null) {
-            return $parameters;
+            return null;
         }
 
         $reflectionParameterType = $reflectionParameter->getType();
 
         if ($reflectionParameterType instanceof ReflectionNamedType) {
             $parameterType = ucfirst($reflectionParameterType->getName());
-            $parameters[$key] = $this->envService->{'get' . $parameterType}($attribute->getKey());
+
+            return $this->envService->{'get' . $parameterType}($attribute->getKey());
         }
 
-        return $parameters;
+        return null;
     }
 }

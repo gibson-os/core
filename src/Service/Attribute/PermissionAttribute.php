@@ -7,6 +7,7 @@ use GibsonOS\Core\Attribute\AttributeInterface;
 use GibsonOS\Core\Attribute\CheckPermission;
 use GibsonOS\Core\Exception\LoginRequired;
 use GibsonOS\Core\Exception\PermissionDenied;
+use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Exception\RequestError;
 use GibsonOS\Core\Service\PermissionService;
 use GibsonOS\Core\Service\RequestService;
@@ -24,6 +25,7 @@ class PermissionAttribute extends AbstractActionAttributeService
     /**
      * @throws LoginRequired
      * @throws PermissionDenied
+     * @throws SelectError
      */
     public function preExecute(AttributeInterface $attribute, array $parameters, array $reflectionParameters): array
     {

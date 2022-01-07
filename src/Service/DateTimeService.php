@@ -13,11 +13,11 @@ class DateTimeService extends AbstractService
 {
     private DateTimeZone $timezone;
 
-    #[GetEnv('timezone')]
-    #[GetEnv('date_latitude', 'latitude')]
-    #[GetEnv('date_longitude', 'longitude')]
-    public function __construct(string $timezone, private float $latitude, private float $longitude)
-    {
+    public function __construct(
+        #[GetEnv('timezone')] string $timezone,
+        #[GetEnv('date_latitude')] private float $latitude,
+        #[GetEnv('date_longitude')] private float $longitude
+    ) {
         $this->timezone = new DateTimeZone($timezone);
     }
 

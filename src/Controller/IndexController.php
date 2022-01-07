@@ -13,14 +13,11 @@ class IndexController extends AbstractController
     /**
      * @throws JsonException
      */
-    #[GetSetting(DesktopController::DESKTOP_KEY)]
-    #[GetSetting(DesktopController::APPS_KEY)]
-    #[GetSetting(DesktopController::TOOLS_KEY)]
     public function index(
         DesktopController $desktopController,
-        ?Setting $desktop,
-        ?Setting $apps,
-        ?Setting $tools
+        #[GetSetting(DesktopController::DESKTOP_KEY)] ?Setting $desktop,
+        #[GetSetting(DesktopController::APPS_KEY)] ?Setting $apps,
+        #[GetSetting(DesktopController::TOOLS_KEY)] ?Setting $tools
     ): AjaxResponse {
         if (!$this->sessionService->isLogin()) {
             return $this->returnSuccess();

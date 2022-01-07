@@ -3,9 +3,9 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Service;
 
-use GibsonOS\Core\Dto\Attribute;
 use GibsonOS\Core\Exception\FactoryError;
-use GibsonOS\Core\Service\Attribute\ServiceAttributeServiceInterface;
+use GibsonOS\Core\Exception\GetError;
+use GibsonOS\Core\Service\Attribute\ParameterAttributeInterface;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionMethod;
@@ -83,6 +83,63 @@ class ServiceManagerService
     /**
      * @template T
      *
+     * @param class-string<T> $instanceOf
+     *
+     * @throws FactoryError
+     * @throws GetError
+     *
+     * @return T[]|object[]
+     */
+    public function getAll(string $dir, string $instanceOf = null): array
+    {
+        $dirService = $this->get(DirService::class);
+        $classes = [];
+
+        foreach ($dirService->getFiles($dir) as $file) {
+            if (is_dir($file)) {
+                $classes = array_merge($classes, $this->getAll($file, $instanceOf));
+
+                continue;
+            }
+
+            $classes[] = $this->get($this->getNamespaceByPath($file), $instanceOf);
+        }
+
+        return $classes;
+    }
+
+    /**
+     * @throws FactoryError
+     *
+     * @return class-string
+     */
+    public function getNamespaceByPath(string $path): string
+    {
+        $dirService = $this->get(DirService::class);
+        $pathParts = explode(DIRECTORY_SEPARATOR, $dirService->removeEndSlash($path));
+        $namespace = '';
+
+        if (is_file($path)) {
+            $namespace = array_pop($pathParts);
+        }
+
+        while ($lastPart = array_pop($pathParts)) {
+            if ($lastPart === 'gibson-os') {
+                break;
+            }
+
+            $namespace = $lastPart . '\\' . $namespace;
+        }
+
+        /** @var class-string $namespace */
+        $namespace = 'GibsonOS\\' . $namespace;
+
+        return $namespace;
+    }
+
+    /**
+     * @template T
+     *
      * @param class-string<T>   $classname
      * @param class-string|null $instanceOf
      *
@@ -116,7 +173,7 @@ class ServiceManagerService
             $className !== null &&
             !is_subclass_of($class, $className)
         ) {
-            throw new FactoryError(sprintf('%d is no instance of %d', $class::class, $className));
+            throw new FactoryError(sprintf('%s is no instance of %s', $class::class, $className));
         }
     }
 
@@ -158,17 +215,32 @@ class ServiceManagerService
         $constructor = $reflection->getConstructor();
 
         if ($constructor instanceof ReflectionMethod) {
-            $attributes = $this->attributeService->getMethodAttributes($constructor);
-            $parameters = $this->beforeConstructAttributes($attributes, $parameters, $constructor->getParameters());
+            $attributes = $this->attributeService->getAttributes($constructor);
 
-            foreach ($constructor->getParameters() as $parameter) {
-                $name = $parameter->getName();
+            foreach ($constructor->getParameters() as $reflectionParameter) {
+                $name = $reflectionParameter->getName();
 
                 if (array_key_exists($name, $parameters)) {
                     continue;
                 }
 
-                $parameterType = $parameter->getType();
+                $attributes = $this->attributeService->getAttributes($reflectionParameter);
+
+                if (count($attributes)) {
+                    foreach ($attributes as $attribute) {
+                        /** @var ParameterAttributeInterface $attributeService */
+                        $attributeService = $attribute->getService();
+                        $parameters[$name] = $attributeService->replace(
+                            $attribute->getAttribute(),
+                            $parameters,
+                            $reflectionParameter
+                        );
+                    }
+
+                    continue;
+                }
+
+                $parameterType = $reflectionParameter->getType();
 
                 if (
                     $parameterType instanceof ReflectionNamedType &&
@@ -180,11 +252,11 @@ class ServiceManagerService
                 }
 
                 try {
-                    $parameters[$name] = $parameter->getDefaultValue();
+                    $parameters[$name] = $reflectionParameter->getDefaultValue();
                 } catch (ReflectionException) {
                     throw new FactoryError(sprintf(
                         'Parameter %s of Class %s is no Class',
-                        $parameter->getName(),
+                        $reflectionParameter->getName(),
                         $classname
                     ));
                 }
@@ -264,23 +336,5 @@ class ServiceManagerService
         }
 
         return $newParameters;
-    }
-
-    /**
-     * @param Attribute[] $attributes
-     */
-    private function beforeConstructAttributes(array $attributes, array $parameters, array $reflectionParameters): array
-    {
-        foreach ($attributes as $attribute) {
-            $attributeService = $attribute->getService();
-
-            if (!$attributeService instanceof ServiceAttributeServiceInterface) {
-                continue;
-            }
-
-            $parameters = $attributeService->beforeConstruct($attribute->getAttribute(), $parameters, $reflectionParameters);
-        }
-
-        return $parameters;
     }
 }

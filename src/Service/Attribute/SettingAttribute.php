@@ -12,7 +12,7 @@ use GibsonOS\Core\Service\SessionService;
 use ReflectionException;
 use ReflectionParameter;
 
-class SettingAttribute extends AbstractActionAttributeService implements ServiceAttributeServiceInterface
+class SettingAttribute implements ParameterAttributeInterface, AttributeServiceInterface
 {
     public function __construct(
         private SettingRepository $settingRepository,
@@ -22,79 +22,31 @@ class SettingAttribute extends AbstractActionAttributeService implements Service
     }
 
     /**
-     * @param ReflectionParameter[] $reflectionParameters
-     *
-     * @throws SelectError
-     * @throws ReflectionException
-     */
-    public function preExecute(AttributeInterface $attribute, array $parameters, array $reflectionParameters): array
-    {
-        return $this->getSetting($attribute, $parameters, $reflectionParameters);
-    }
-
-    public function usedParameters(AttributeInterface $attribute): array
-    {
-        if (!$attribute instanceof GetSetting) {
-            return [];
-        }
-
-        return [$this->getKey($attribute)];
-    }
-
-    private function getKey(GetSetting $attribute): string
-    {
-        return $attribute->getName() ?? lcfirst(implode(
-            '',
-            array_map(
-                fn (string $part) => ucfirst(mb_strtolower($part)),
-                explode('_', $attribute->getKey())
-            )
-        ));
-    }
-
-    /**
      * @throws ReflectionException
      * @throws SelectError
      */
-    public function beforeConstruct(AttributeInterface $attribute, array $parameters, array $reflectionParameters): array
-    {
-        return $this->getSetting($attribute, $parameters, $reflectionParameters);
-    }
-
-    /**
-     * @throws ReflectionException
-     * @throws SelectError
-     */
-    public function getSetting(AttributeInterface $attribute, array $parameters, array $reflectionParameters): array
+    public function replace(AttributeInterface $attribute, array $parameters, ReflectionParameter $reflectionParameter): mixed
     {
         if (!$attribute instanceof GetSetting) {
             return $parameters;
         }
 
-        $key = $this->getKey($attribute);
-
         try {
-            $parameters[$key] = $this->settingRepository->getByKeyAndModuleName(
+            return $this->settingRepository->getByKeyAndModuleName(
                 $attribute->getModule() ?? $this->requestService->getModuleName(),
                 $this->sessionService->getUserId(),
                 $attribute->getKey()
             );
         } catch (SelectError $exception) {
-            $reflectionParameter = $this->getReflectionParameter($key, $reflectionParameters);
-
-            if ($reflectionParameter !== null) {
-                if (!$reflectionParameter->isOptional() && !$reflectionParameter->allowsNull()) {
-                    throw $exception;
-                }
-
-                if ($reflectionParameter->isOptional()) {
-                    $parameters[$key] = $reflectionParameter->getDefaultValue();
-                }
-
-                $parameters[$key] = null;
+            if (!$reflectionParameter->isOptional() && !$reflectionParameter->allowsNull()) {
+                throw $exception;
             }
-        }
 
-        return $parameters;
+            if ($reflectionParameter->isOptional()) {
+                return $reflectionParameter->getDefaultValue();
+            }
+
+            return null;
+        }
     }
 }

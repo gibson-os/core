@@ -20,11 +20,10 @@ class IconService
 {
     private string $iconPath;
 
-    #[GetSetting('custom_icon_path', 'core')]
     public function __construct(
         private TagRepository $tagRepository,
         private FileService $fileService,
-        Setting $customIconPath
+        #[GetSetting('custom_icon_path', 'core')] Setting $customIconPath
     ) {
         $this->iconPath = $customIconPath->getValue();
     }

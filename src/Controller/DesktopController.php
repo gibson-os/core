@@ -26,11 +26,11 @@ class DesktopController extends AbstractController
      * @throws JsonException
      */
     #[CheckPermission(Permission::READ)]
-    #[GetSetting(self::DESKTOP_KEY)]
-    #[GetSetting(self::APPS_KEY)]
-    #[GetSetting(self::TOOLS_KEY)]
-    public function index(?Setting $desktop, ?Setting $apps, ?Setting $tools): AjaxResponse
-    {
+    public function index(
+        #[GetSetting(self::DESKTOP_KEY)] ?Setting $desktop,
+        #[GetSetting(self::APPS_KEY)] ?Setting $apps,
+        #[GetSetting(self::TOOLS_KEY)] ?Setting $tools
+    ): AjaxResponse {
         return $this->returnSuccess([
             self::DESKTOP_KEY => JsonUtility::decode($desktop?->getValue() ?: '[]'),
             self::APPS_KEY => JsonUtility::decode($apps?->getValue() ?: '[]'),

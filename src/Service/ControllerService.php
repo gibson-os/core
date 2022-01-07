@@ -10,6 +10,7 @@ use GibsonOS\Core\Exception\FactoryError;
 use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\RequestError;
 use GibsonOS\Core\Service\Attribute\AbstractActionAttributeService;
+use GibsonOS\Core\Service\Attribute\ParameterAttributeInterface;
 use GibsonOS\Core\Service\Response\AjaxResponse;
 use GibsonOS\Core\Service\Response\ExceptionResponse;
 use GibsonOS\Core\Service\Response\ResponseInterface;
@@ -82,7 +83,7 @@ class ControllerService
         }
 
         try {
-            $attributes = $this->attributeService->getMethodAttributes($reflectionMethod);
+            $attributes = $this->attributeService->getAttributes($reflectionMethod);
             $parameters = $this->getParameters($reflectionMethod, $attributes);
             $parameters = $this->preExecuteAttributes($attributes, $parameters, $reflectionMethod->getParameters());
             $parameters = $this->cleanParameters($reflectionMethod, $parameters);
@@ -90,7 +91,7 @@ class ControllerService
             $response = $controller->$action(...$parameters);
             $this->postExecuteAttributes($attributes, $response);
 
-            $alwaysAjaxAttributes = $this->attributeService->getMethodAttributesByClassName(
+            $alwaysAjaxAttributes = $this->attributeService->getAttributesByClassName(
                 $reflectionMethod,
                 AlwaysAjaxResponse::class
             );
@@ -225,14 +226,30 @@ class ControllerService
             );
         }
 
-        foreach ($reflectionMethod->getParameters() as $parameter) {
-            $name = $parameter->getName();
+        foreach ($reflectionMethod->getParameters() as $reflectionParameter) {
+            $name = $reflectionParameter->getName();
 
             if (array_key_exists($name, $parameters)) {
                 continue;
             }
 
-            $parameterType = $parameter->getType();
+            $attributes = $this->attributeService->getAttributes($reflectionParameter);
+
+            if (count($attributes)) {
+                foreach ($attributes as $attribute) {
+                    /** @var ParameterAttributeInterface $attributeService */
+                    $attributeService = $attribute->getService();
+                    $parameters[$name] = $attributeService->replace(
+                        $attribute->getAttribute(),
+                        $parameters,
+                        $reflectionParameter
+                    );
+                }
+
+                continue;
+            }
+
+            $parameterType = $reflectionParameter->getType();
 
             if (
                 $parameterType instanceof ReflectionNamedType &&
@@ -253,7 +270,7 @@ class ControllerService
                 continue;
             }
 
-            $parameters[$name] = $this->getParameterFromRequest($parameter, $attributeParameters);
+            $parameters[$name] = $this->getParameterFromRequest($reflectionParameter, $attributeParameters);
         }
 
         return $parameters;
