@@ -12,6 +12,9 @@ class Cronjob extends AbstractModel implements JsonSerializable
 {
     private ?int $id = null;
 
+    /**
+     * @var class-string
+     */
     private string $command;
 
     private ?string $arguments = null;
@@ -50,11 +53,19 @@ class Cronjob extends AbstractModel implements JsonSerializable
         return $this;
     }
 
+    /**
+     * @return class-string
+     */
     public function getCommand(): string
     {
         return $this->command;
     }
 
+    /**
+     * @param class-string $command
+     *
+     * @return $this
+     */
     public function setCommand(string $command): Cronjob
     {
         $this->command = $command;

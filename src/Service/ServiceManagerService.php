@@ -252,8 +252,6 @@ class ServiceManagerService
         $constructor = $reflection->getConstructor();
 
         if ($constructor instanceof ReflectionMethod) {
-            $attributes = $this->attributeService->getAttributes($constructor);
-
             foreach ($constructor->getParameters() as $reflectionParameter) {
                 $name = $reflectionParameter->getName();
 

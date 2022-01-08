@@ -30,10 +30,12 @@ class CommandService
         return $command->execute();
     }
 
+    /**
+     * @param class-string $commandClassname
+     */
     public function executeAsync(string $commandClassname, array $arguments = [], array $options = []): void
     {
-        $commandName = mb_substr(str_replace('Command\\', '', $commandClassname), 0, -7);
-        $commandName = preg_replace('/^GibsonOS\\\\(Module\\\\)?/', '', $commandName);
+        $commandName = $this->getCommandName($commandClassname);
         $commandPath = realpath(
             dirname(__FILE__) .
                 DIRECTORY_SEPARATOR . '..' .
@@ -52,6 +54,16 @@ class CommandService
                 return escapeshellarg('-' . $item);
             }, $options))
         );
+    }
+
+    /**
+     * @param class-string $className
+     */
+    public function getCommandName(string $className): string
+    {
+        $commandName = mb_substr(str_replace('Command\\', '', $className), 0, -7);
+
+        return preg_replace('/^GibsonOS\\\\(Module\\\\)?/', '', $commandName);
     }
 
     /**

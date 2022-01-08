@@ -12,7 +12,7 @@ class GetServices implements AttributeInterface
     /**
      * @param class-string $instanceOf
      */
-    public function __construct(private array $dirs, private ?string $instanceOf)
+    public function __construct(private array $dirs, private ?string $instanceOf, private bool $runAttributes = true)
     {
     }
 
@@ -32,5 +32,10 @@ class GetServices implements AttributeInterface
     public function getInstanceOf(): ?string
     {
         return $this->instanceOf;
+    }
+
+    public function isRunAttributes(): bool
+    {
+        return $this->runAttributes;
     }
 }

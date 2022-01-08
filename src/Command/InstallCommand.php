@@ -6,6 +6,9 @@ namespace GibsonOS\Core\Command;
 use GibsonOS\Core\Service\InstallService;
 use Psr\Log\LoggerInterface;
 
+/**
+ * @description Install GibsonOS
+ */
 class InstallCommand extends AbstractCommand
 {
     public function __construct(private InstallService $installService, LoggerInterface $logger)

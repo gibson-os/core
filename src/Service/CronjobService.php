@@ -22,6 +22,12 @@ class CronjobService
     ) {
     }
 
+    /**
+     * @param class-string $command
+     *
+     * @throws JsonException
+     * @throws SaveError
+     */
     public function add(
         string $command,
         string $user,

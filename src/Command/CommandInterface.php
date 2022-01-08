@@ -10,6 +10,9 @@ interface CommandInterface
      */
     public function setArguments(array $arguments): CommandInterface;
 
+    /**
+     * @param bool[] $options
+     */
     public function setOptions(array $options): CommandInterface;
 
     public function execute(): int;
