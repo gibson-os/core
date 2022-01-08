@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Command;
 
+use GibsonOS\Core\Attribute\Command\Option;
 use GibsonOS\Core\Exception\ArgumentError;
 use GibsonOS\Core\Service\LoggerService;
 use Psr\Log\LoggerInterface;
@@ -25,6 +26,18 @@ abstract class AbstractCommand implements CommandInterface
      * @var string[]
      */
     private array $options = [];
+
+    #[Option]
+    private bool $v = false;
+
+    #[Option]
+    private bool $vv = false;
+
+    #[Option]
+    private bool $vvv = false;
+
+    #[Option]
+    private bool $debug = false;
 
     public function __construct(protected LoggerInterface $logger)
     {

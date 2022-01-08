@@ -3,12 +3,14 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Dto;
 
+use GibsonOS\Core\Attribute\Install\Cronjob;
 use JsonSerializable;
 
 class Command implements JsonSerializable
 {
     /**
      * @param class-string $classString
+     * @param Cronjob[]    $cronjobs
      */
     public function __construct(
         private string $classString,
@@ -16,6 +18,7 @@ class Command implements JsonSerializable
         private string $description,
         private array $arguments = [],
         private array $options = [],
+        private array $cronjobs = [],
     ) {
     }
 
@@ -45,6 +48,14 @@ class Command implements JsonSerializable
     public function getOptions(): array
     {
         return $this->options;
+    }
+
+    /**
+     * @return Cronjob[]
+     */
+    public function getCronjobs(): array
+    {
+        return $this->cronjobs;
     }
 
     public function jsonSerialize(): array

@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Command\Event;
 
+use GibsonOS\Core\Attribute\Command\Argument;
 use GibsonOS\Core\Command\AbstractCommand;
 use GibsonOS\Core\Exception\ArgumentError;
 use GibsonOS\Core\Exception\DateTimeError;
@@ -20,6 +21,9 @@ use Psr\Log\LoggerInterface;
  */
 class RunCommand extends AbstractCommand
 {
+    #[Argument]
+    private int $eventId;
+
     public function __construct(
         private EventRepository $eventRepository,
         private EventService $eventService,

@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Command;
 
+use GibsonOS\Core\Attribute\Install\Cronjob;
 use GibsonOS\Core\Dto\Command;
 use GibsonOS\Core\Service\Command\TableService;
 use GibsonOS\Core\Store\CommandStore;
@@ -24,9 +25,22 @@ class ListCommand extends AbstractCommand
     protected function run(): int
     {
         echo PHP_EOL . $this->tableService->getTable(
-            ['Command', 'Description'],
+            ['Command', 'Description', 'Cronjobs (h m s DoM DoW mon year)'],
             array_map(
-                fn (Command $command): array => [$command->getCommand(), $command->getDescription()],
+                fn (Command $command): array => [
+                    $command->getCommand(),
+                    $command->getDescription(),
+                    implode(PHP_EOL, array_map(
+                        fn (Cronjob $cronjob): string => $cronjob->getHours() . ' ' .
+                            $cronjob->getMinutes() . ' ' .
+                            $cronjob->getSeconds() . ' ' .
+                            $cronjob->getDaysOfMonth() . ' ' .
+                            $cronjob->getDaysOfWeek() . ' ' .
+                            $cronjob->getMonths() . ' ' .
+                            $cronjob->getYears(),
+                        $command->getCronjobs()
+                    )),
+                ],
                 iterator_to_array($this->commandStore->getList())
             )
         ) . PHP_EOL;

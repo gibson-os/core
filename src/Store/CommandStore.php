@@ -5,9 +5,11 @@ namespace GibsonOS\Core\Store;
 
 use Generator;
 use GibsonOS\Core\Attribute\GetClassNames;
+use GibsonOS\Core\Attribute\Install\Cronjob;
 use GibsonOS\Core\Command\CommandInterface;
 use GibsonOS\Core\Dto\Command;
 use GibsonOS\Core\Service\CommandService;
+use ReflectionAttribute;
 use ReflectionClass;
 use ReflectionException;
 
@@ -50,7 +52,11 @@ class CommandStore extends AbstractStore
                 $this->commandService->getCommandName($classString),
                 $description,
                 [], // @todo auf attribute umbauen. Dann kann das alles per reflektion bgearbeitet werden
-                []
+                [],
+                array_map(
+                    fn (ReflectionAttribute $cronjob) => $cronjob->newInstance(),
+                    $reflectionClass->getAttributes(Cronjob::class, ReflectionAttribute::IS_INSTANCEOF)
+                )
             );
         }
     }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Command\Cronjob;
 
 use DateTime;
+use GibsonOS\Core\Attribute\Command\Argument;
 use GibsonOS\Core\Command\AbstractCommand;
 use GibsonOS\Core\Exception\ArgumentError;
 use GibsonOS\Core\Exception\DateTimeError;
@@ -14,6 +15,7 @@ use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Repository\LockRepository;
 use GibsonOS\Core\Service\CronjobService;
 use GibsonOS\Core\Service\LockService;
+use JsonException;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -24,6 +26,9 @@ class RunCommand extends AbstractCommand
     private const FLOCK_NAME = 'cronjob';
 
     private const FLOCK_NAME_NEW = 'cronjobNew';
+
+    #[Argument]
+    private string $user;
 
     public function __construct(
         private CronjobService $cronjobService,
@@ -43,6 +48,7 @@ class RunCommand extends AbstractCommand
      * @throws UnlockError
      * @throws DateTimeError
      * @throws SaveError
+     * @throws JsonException
      */
     protected function run(): int
     {
