@@ -83,6 +83,6 @@ class WeatherCommand extends AbstractCommand
 
         $this->lockService->unlock();
 
-        return 1;
+        return self::SUCCESS;
     }
 }

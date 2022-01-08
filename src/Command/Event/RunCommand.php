@@ -46,7 +46,7 @@ class RunCommand extends AbstractCommand
             false
         );
 
-        return 0;
+        return self::SUCCESS;
     }
 
     public function setEventId(int $eventId): RunCommand

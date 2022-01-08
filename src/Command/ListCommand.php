@@ -45,6 +45,6 @@ class ListCommand extends AbstractCommand
             )
         ) . PHP_EOL;
 
-        return 0;
+        return self::SUCCESS;
     }
 }

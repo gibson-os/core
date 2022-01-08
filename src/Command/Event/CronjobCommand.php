@@ -28,6 +28,6 @@ class CronjobCommand extends AbstractCommand
     {
         $this->eventService->fire(TimeEvent::class, TimeEvent::TRIGGER_CRONJOB);
 
-        return 0;
+        return self::SUCCESS;
     }
 }

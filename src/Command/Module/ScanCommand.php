@@ -27,6 +27,6 @@ class ScanCommand extends AbstractCommand
     {
         $this->moduleService->scan();
 
-        return 0;
+        return self::SUCCESS;
     }
 }

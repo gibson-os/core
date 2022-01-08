@@ -70,7 +70,7 @@ class RunCommand extends AbstractCommand
 
         $this->lockService->unlock(self::FLOCK_NAME . $this->user);
 
-        return 0;
+        return self::SUCCESS;
     }
 
     public function setUser(string $user): RunCommand

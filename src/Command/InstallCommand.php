@@ -33,6 +33,6 @@ class InstallCommand extends AbstractCommand
     {
         $this->installService->install($this->module, $this->part);
 
-        return 0;
+        return self::SUCCESS;
     }
 }
