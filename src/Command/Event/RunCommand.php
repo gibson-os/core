@@ -20,7 +20,7 @@ use Psr\Log\LoggerInterface;
  */
 class RunCommand extends AbstractCommand
 {
-    #[Argument]
+    #[Argument('Event ID to execute')]
     private int $eventId;
 
     public function __construct(

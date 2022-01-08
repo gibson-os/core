@@ -26,7 +26,7 @@ class RunCommand extends AbstractCommand
 
     private const FLOCK_NAME_NEW = 'cronjobNew';
 
-    #[Argument]
+    #[Argument('Run cronjobs for user')]
     private string $user;
 
     public function __construct(

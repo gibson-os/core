@@ -14,10 +14,10 @@ use Psr\Log\LoggerInterface;
  */
 class InstallCommand extends AbstractCommand
 {
-    #[Argument]
+    #[Argument('Module to install')]
     private ?string $module = null;
 
-    #[Argument]
+    #[Argument('Part to install')]
     private ?string $part = null;
 
     public function __construct(private InstallService $installService, LoggerInterface $logger)
