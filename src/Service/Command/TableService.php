@@ -36,17 +36,7 @@ class TableService
 
         foreach ($content as $contentRow) {
             foreach ($columnsLength as $column => &$columnLength) {
-                $columnLength = max($columnLength, mb_strlen($contentRow[$column]));
-            }
-        }
-
-        foreach ($columnsLength as $column => &$columnLength) {
-            if (!isset($content[$column])) {
-                continue;
-            }
-
-            foreach ($content[$column] as $columnContent) {
-                $columnLength = max($columnLength, mb_strlen($columnContent));
+                $columnLength = max($columnLength, mb_strlen($contentRow[$column] ?? ''));
             }
         }
 
