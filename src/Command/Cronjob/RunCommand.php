@@ -16,6 +16,9 @@ use GibsonOS\Core\Service\CronjobService;
 use GibsonOS\Core\Service\LockService;
 use Psr\Log\LoggerInterface;
 
+/**
+ * @description Run cronjob
+ */
 class RunCommand extends AbstractCommand
 {
     private const FLOCK_NAME = 'cronjob';

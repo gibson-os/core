@@ -5,6 +5,7 @@ namespace GibsonOS\Core\Store;
 
 use Generator;
 use GibsonOS\Core\Attribute\GetClassNames;
+use GibsonOS\Core\Command\CommandInterface;
 use GibsonOS\Core\Dto\Command;
 use GibsonOS\Core\Service\CommandService;
 use ReflectionClass;
@@ -28,6 +29,15 @@ class CommandStore extends AbstractStore
     {
         foreach ($this->classStrings as $classString) {
             $reflectionClass = new ReflectionClass($classString);
+
+            if (
+                $reflectionClass->isAbstract() ||
+                $reflectionClass->isInterface() ||
+                !is_subclass_of($classString, CommandInterface::class)
+            ) {
+                continue;
+            }
+
             $description = '';
             $docComment = $reflectionClass->getDocComment();
 

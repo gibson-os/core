@@ -15,6 +15,9 @@ use GibsonOS\Core\Service\EventService;
 use JsonException;
 use Psr\Log\LoggerInterface;
 
+/**
+ * @description Run event
+ */
 class RunCommand extends AbstractCommand
 {
     public function __construct(

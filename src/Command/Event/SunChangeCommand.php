@@ -11,6 +11,9 @@ use GibsonOS\Core\Service\DateTimeService;
 use GibsonOS\Core\Service\EventService;
 use Psr\Log\LoggerInterface;
 
+/**
+ * @description Run sun changed controlled events
+ */
 #[Cronjob(seconds: '0')]
 class SunChangeCommand extends AbstractCommand
 {

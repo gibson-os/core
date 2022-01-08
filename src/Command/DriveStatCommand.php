@@ -6,6 +6,9 @@ namespace GibsonOS\Core\Command;
 use GibsonOS\Core\Service\ProcessService;
 use Psr\Log\LoggerInterface;
 
+/**
+ * @description Collect SMART information of all hard drives
+ */
 class DriveStatCommand extends AbstractCommand
 {
     public function __construct(private ProcessService $processService, LoggerInterface $logger)

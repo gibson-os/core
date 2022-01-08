@@ -11,7 +11,6 @@ use GibsonOS\Core\Exception\DateTimeError;
 use GibsonOS\Core\Exception\Flock\LockError;
 use GibsonOS\Core\Exception\Flock\UnlockError;
 use GibsonOS\Core\Exception\Model\SaveError;
-use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Exception\WeatherError;
 use GibsonOS\Core\Repository\Weather\LocationRepository;
 use GibsonOS\Core\Repository\WeatherRepository;
@@ -21,6 +20,9 @@ use GibsonOS\Core\Service\WeatherService;
 use JsonException;
 use Psr\Log\LoggerInterface;
 
+/**
+ * @description Collect weather information of required locations
+ */
 #[Cronjob(seconds: '40')]
 class WeatherCommand extends AbstractCommand
 {
@@ -40,7 +42,6 @@ class WeatherCommand extends AbstractCommand
      * @throws JsonException
      * @throws LockError
      * @throws SaveError
-     * @throws SelectError
      * @throws UnlockError
      * @throws WeatherError
      */

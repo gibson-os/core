@@ -9,6 +9,9 @@ use GibsonOS\Core\Exception\Model\SaveError;
 use GibsonOS\Core\Service\ModuleService;
 use Psr\Log\LoggerInterface;
 
+/**
+ * @description Scan GibsonOS modules to find changes on modules/tasks/actions
+ */
 class ScanCommand extends AbstractCommand
 {
     public function __construct(private ModuleService $moduleService, LoggerInterface $logger)

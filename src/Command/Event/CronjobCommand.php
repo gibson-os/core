@@ -10,6 +10,9 @@ use GibsonOS\Core\Exception\DateTimeError;
 use GibsonOS\Core\Service\EventService;
 use Psr\Log\LoggerInterface;
 
+/**
+ * @description Run time controlled events
+ */
 #[Cronjob]
 class CronjobCommand extends AbstractCommand
 {
