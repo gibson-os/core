@@ -92,24 +92,46 @@ class ServiceManagerService
      */
     public function getAll(string $dir, string $instanceOf = null): array
     {
-        $dirService = $this->get(DirService::class);
+        $classNames = $this->getClassNames($dir);
         $classes = [];
 
-        foreach ($dirService->getFiles($dir) as $file) {
-            if (is_dir($file)) {
-                $classes = array_merge($classes, $this->getAll($file, $instanceOf));
-
-                continue;
-            }
-
+        foreach ($classNames as $className) {
             try {
-                $classes[] = $this->get($this->getNamespaceByPath($file), $instanceOf);
+                $classes[] = $this->get($className, $instanceOf);
             } catch (FactoryError $e) {
                 // do nothing
             }
         }
 
         return $classes;
+    }
+
+    /**
+     * @throws FactoryError
+     * @throws GetError
+     *
+     * @return class-string[]
+     */
+    public function getClassNames(string $dir): array
+    {
+        $dirService = $this->get(DirService::class);
+        $classNames = [];
+
+        foreach ($dirService->getFiles($dir) as $file) {
+            if (is_dir($file)) {
+                $classNames = array_merge($classNames, $this->getClassNames($file));
+
+                continue;
+            }
+
+            try {
+                $classNames[] = $this->getNamespaceByPath($file);
+            } catch (FactoryError $e) {
+                // do nothing
+            }
+        }
+
+        return $classNames;
     }
 
     /**

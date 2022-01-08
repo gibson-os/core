@@ -4,11 +4,9 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Store\Event;
 
 use GibsonOS\Core\Attribute\Event;
+use GibsonOS\Core\Attribute\GetClassNames;
 use GibsonOS\Core\Exception\FactoryError;
 use GibsonOS\Core\Exception\GetError;
-use GibsonOS\Core\Service\DirService;
-use GibsonOS\Core\Service\FileService;
-use GibsonOS\Core\Service\ServiceManagerService;
 use GibsonOS\Core\Store\AbstractStore;
 use ReflectionAttribute;
 use ReflectionClass;
@@ -21,11 +19,8 @@ class ClassNameStore extends AbstractStore
      */
     private array $list = [];
 
-    public function __construct(
-        private DirService $dir,
-        private FileService $file,
-        private ServiceManagerService $serviceManagerService
-    ) {
+    public function __construct(#[GetClassNames(['*/src/Event'])] private array $classNames)
+    {
     }
 
     /**
@@ -60,43 +55,22 @@ class ClassNameStore extends AbstractStore
         }
 
         $classNames = [];
-        $vendorDir = realpath(
-            dirname(__FILE__) . DIRECTORY_SEPARATOR .
-            '..' . DIRECTORY_SEPARATOR .
-            '..' . DIRECTORY_SEPARATOR .
-            '..' . DIRECTORY_SEPARATOR .
-            '..' . DIRECTORY_SEPARATOR .
-            '..' . DIRECTORY_SEPARATOR .
-            'gibson-os'
-        ) . DIRECTORY_SEPARATOR;
 
-        foreach ($this->dir->getFiles($vendorDir) as $moduleDir) {
-            if (!is_dir($moduleDir)) {
+        foreach ($this->classNames as $className) {
+            $reflectionClass = new ReflectionClass($className);
+            $eventAttributes = $reflectionClass->getAttributes(Event::class, ReflectionAttribute::IS_INSTANCEOF);
+
+            if (empty($eventAttributes)) {
                 continue;
             }
 
-            $eventDir = $moduleDir . DIRECTORY_SEPARATOR .
-                'src' . DIRECTORY_SEPARATOR .
-                'Event' . DIRECTORY_SEPARATOR
-            ;
+            /** @var Event $eventAttribute */
+            $eventAttribute = $eventAttributes[0]->newInstance();
 
-            foreach ($this->dir->getFiles($eventDir, '*.php') as $classPath) {
-                $className = $this->serviceManagerService->getNamespaceByPath($classPath);
-                $reflectionClass = new ReflectionClass($className);
-                $eventAttributes = $reflectionClass->getAttributes(Event::class, ReflectionAttribute::IS_INSTANCEOF);
-
-                if (empty($eventAttributes)) {
-                    continue;
-                }
-
-                /** @var Event $eventAttribute */
-                $eventAttribute = $eventAttributes[0]->newInstance();
-
-                $classNames[$eventAttribute->getTitle()] = [
-                    'className' => $className,
-                    'title' => $eventAttribute->getTitle(),
-                ];
-            }
+            $classNames[$eventAttribute->getTitle()] = [
+                'className' => $className,
+                'title' => $eventAttribute->getTitle(),
+            ];
         }
 
         ksort($classNames);

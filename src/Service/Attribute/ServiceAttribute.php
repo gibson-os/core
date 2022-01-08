@@ -4,17 +4,21 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Service\Attribute;
 
 use GibsonOS\Core\Attribute\AttributeInterface;
+use GibsonOS\Core\Attribute\GetClassNames;
 use GibsonOS\Core\Attribute\GetServices;
 use GibsonOS\Core\Exception\FactoryError;
 use GibsonOS\Core\Exception\GetError;
+use GibsonOS\Core\Service\DirService;
 use GibsonOS\Core\Service\PriorityInterface;
 use GibsonOS\Core\Service\ServiceManagerService;
 use ReflectionParameter;
 
 class ServiceAttribute implements ParameterAttributeInterface, AttributeServiceInterface
 {
-    public function __construct(private ServiceManagerService $serviceManagerService)
-    {
+    public function __construct(
+        private ServiceManagerService $serviceManagerService,
+        private DirService $dirService
+    ) {
     }
 
     /**
@@ -26,7 +30,10 @@ class ServiceAttribute implements ParameterAttributeInterface, AttributeServiceI
         array $parameters,
         ReflectionParameter $reflectionParameter
     ): array {
-        if (!$attribute instanceof GetServices) {
+        if (
+            !$attribute instanceof GetServices &&
+            !$attribute instanceof GetClassNames
+        ) {
             return [];
         }
 
@@ -40,18 +47,44 @@ class ServiceAttribute implements ParameterAttributeInterface, AttributeServiceI
             'gibson-os'
         ) . DIRECTORY_SEPARATOR;
         $classes = [];
+        $dirs = [];
+        $modules = [];
+
+        foreach ($this->dirService->getFiles($vendorPath) as $modulePath) {
+            if (!is_dir($modulePath)) {
+                continue;
+            }
+
+            $modules[] = str_replace($vendorPath, '', $modulePath);
+        }
 
         foreach ($attribute->getDirs() as $dir) {
+            if (mb_strpos($dir, '*') === 0) {
+                foreach ($modules as $module) {
+                    $dirs[] = $module . mb_substr($dir, 1);
+                }
+
+                continue;
+            }
+
+            $dirs[] = $dir;
+        }
+
+        foreach ($dirs as $dir) {
             $classes = array_merge(
                 $classes,
-                $this->serviceManagerService->getAll($vendorPath . lcfirst($dir), $attribute->getInstanceOf())
+                $attribute instanceof GetServices
+                    ? $this->serviceManagerService->getAll($vendorPath . lcfirst($dir), $attribute->getInstanceOf())
+                    : $this->serviceManagerService->getClassNames($vendorPath . lcfirst($dir))
             );
         }
 
-        usort(
-            $classes,
-            fn (object $a, object $b) => ($a instanceof PriorityInterface ? $a->getPriority() : 0) <=> ($b instanceof PriorityInterface ? $b->getPriority() : 0)
-        );
+        if ($attribute instanceof GetServices) {
+            usort(
+                $classes,
+                fn ($a, $b) => ($a instanceof PriorityInterface ? $a->getPriority() : 0) <=> ($b instanceof PriorityInterface ? $b->getPriority() : 0)
+            );
+        }
 
         return $classes;
     }
