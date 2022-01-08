@@ -48,4 +48,32 @@ abstract class AbstractCommand implements CommandInterface
 
         return $this->run();
     }
+
+    public function setV(bool $v): AbstractCommand
+    {
+        $this->v = $v;
+
+        return $this;
+    }
+
+    public function setVv(bool $vv): AbstractCommand
+    {
+        $this->vv = $vv;
+
+        return $this;
+    }
+
+    public function setVvv(bool $vvv): AbstractCommand
+    {
+        $this->vvv = $vvv;
+
+        return $this;
+    }
+
+    public function setDebug(bool $debug): AbstractCommand
+    {
+        $this->debug = $debug;
+
+        return $this;
+    }
 }
