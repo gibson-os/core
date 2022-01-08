@@ -3,9 +3,14 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Service;
 
+use GibsonOS\Core\Attribute\Command\Argument;
 use GibsonOS\Core\Command\CommandInterface;
+use GibsonOS\Core\Exception\ArgumentError;
 use GibsonOS\Core\Exception\CommandError;
 use GibsonOS\Core\Exception\FactoryError;
+use ReflectionAttribute;
+use ReflectionClass;
+use ReflectionException;
 
 class CommandService
 {
@@ -15,15 +20,21 @@ class CommandService
 
     /**
      * @param class-string $commandClassname
+     * @param string[]     $arguments
+     * @param bool[]       $options
      *
+     * @throws CommandError
      * @throws FactoryError
+     * @throws ReflectionException
+     * @throws ArgumentError
      */
     public function execute(string $commandClassname, array $arguments = [], array $options = []): int
     {
         /** @var CommandInterface $command */
         $command = $this->serviceManager->get($commandClassname);
+        $reflectionClass = new ReflectionClass($commandClassname);
+        $this->setArguments($command, $reflectionClass, $arguments);
         $command
-            ->setArguments($arguments)
             ->setOptions($options)
         ;
 
@@ -120,5 +131,57 @@ class CommandService
         }
 
         return $optionList;
+    }
+
+    /**
+     * @param string[] $arguments
+     *
+     * @throws ArgumentError
+     */
+    private function setArguments(CommandInterface $command, ReflectionClass $reflectionClass, array $arguments): void
+    {
+        $argumentProperties = [];
+
+        foreach ($reflectionClass->getProperties() as $reflectionProperty) {
+            $argumentAttributes = $reflectionProperty->getAttributes(
+                Argument::class,
+                ReflectionAttribute::IS_INSTANCEOF
+            );
+
+            if (count($argumentAttributes) === 0) {
+                continue;
+            }
+
+            $name = $reflectionProperty->getName();
+            $argumentProperties[] = $name;
+
+            if (!isset($arguments[$name])) {
+                if (!$reflectionProperty->hasDefaultValue()) {
+                    throw new ArgumentError(sprintf('Required argument "%s" missing!', $name));
+                }
+
+                continue;
+            }
+
+            /** @psalm-suppress UndefinedMethod */
+            $value = match ($reflectionProperty->getType()?->getName()) {
+                'int' => (int) $arguments[$name],
+                'float' => (float) $arguments[$name],
+                'bool' => $arguments[$name] === 'true' || ((int) $arguments[$name]),
+                default => $arguments[$name],
+            };
+
+            $command->{'set' . ucfirst($name)}($value);
+            unset($arguments[$name]);
+        }
+
+        if (count($arguments) > 0) {
+            throw new ArgumentError(sprintf(
+                '%s "%s" not allowed! Possible arguments: "%s"',
+                count($arguments) > 1 ? 'Arguments' : 'Argument',
+                implode('", "', array_keys($arguments)),
+                implode('", "', $argumentProperties)
+            ));
+        }
     }
 }

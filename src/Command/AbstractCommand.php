@@ -10,17 +10,7 @@ use Psr\Log\LoggerInterface;
 
 abstract class AbstractCommand implements CommandInterface
 {
-    /**
-     * @var string[]
-     */
-    private array $argumentsValues = [];
-
     private array $optionsValues = [];
-
-    /**
-     * @var bool[]
-     */
-    private array $arguments = [];
 
     /**
      * @var string[]
@@ -54,7 +44,6 @@ abstract class AbstractCommand implements CommandInterface
      */
     public function execute(): int
     {
-        $this->validateArguments();
         $this->validateOptions();
 
         if ($this->logger instanceof LoggerService) {
@@ -73,16 +62,6 @@ abstract class AbstractCommand implements CommandInterface
         return $this->run();
     }
 
-    /**
-     * @param string[] $arguments
-     */
-    public function setArguments(array $arguments): CommandInterface
-    {
-        $this->argumentsValues = $arguments;
-
-        return $this;
-    }
-
     public function setOptions(array $options): CommandInterface
     {
         $this->optionsValues = $options;
@@ -90,38 +69,9 @@ abstract class AbstractCommand implements CommandInterface
         return $this;
     }
 
-    protected function setArgument(string $name, bool $required): void
-    {
-        $this->arguments[$name] = $required;
-    }
-
     protected function setOption(string $name): void
     {
         $this->options[$name] = $name;
-    }
-
-    /**
-     * @throws ArgumentError
-     */
-    protected function getArgument(string $name): ?string
-    {
-        return $this->hasArgument($name) ? $this->argumentsValues[$name] : null;
-    }
-
-    /**
-     * @throws ArgumentError
-     */
-    protected function hasArgument(string $name): bool
-    {
-        if (!isset($this->arguments[$name])) {
-            throw new ArgumentError(sprintf(
-                'Argument %s not allowed! Possible arguments: %s',
-                $name,
-                implode(', ', array_keys($this->arguments))
-            ));
-        }
-
-        return isset($this->argumentsValues[$name]);
     }
 
     /**
@@ -138,34 +88,6 @@ abstract class AbstractCommand implements CommandInterface
         }
 
         return isset($this->optionsValues[$name]);
-    }
-
-    /**
-     * @throws ArgumentError
-     */
-    private function validateArguments(): void
-    {
-        $argumentsValues = $this->argumentsValues;
-
-        foreach ($this->arguments as $argument => $required) {
-            if (isset($argumentsValues[$argument])) {
-                unset($argumentsValues[$argument]);
-
-                continue;
-            }
-
-            if ($required) {
-                throw new ArgumentError(sprintf('Required argument %s missing!', $argument));
-            }
-        }
-
-        if (count($argumentsValues) > 0) {
-            throw new ArgumentError(sprintf(
-                'Invalid argument: %s! Possible arguments: %s',
-                implode(', ', $argumentsValues),
-                implode(', ', array_keys($this->arguments))
-            ));
-        }
     }
 
     /**

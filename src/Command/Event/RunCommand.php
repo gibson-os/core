@@ -5,7 +5,6 @@ namespace GibsonOS\Core\Command\Event;
 
 use GibsonOS\Core\Attribute\Command\Argument;
 use GibsonOS\Core\Command\AbstractCommand;
-use GibsonOS\Core\Exception\ArgumentError;
 use GibsonOS\Core\Exception\DateTimeError;
 use GibsonOS\Core\Exception\EventException;
 use GibsonOS\Core\Exception\FactoryError;
@@ -30,12 +29,9 @@ class RunCommand extends AbstractCommand
         LoggerInterface $logger
     ) {
         parent::__construct($logger);
-
-        $this->setArgument('eventId', true);
     }
 
     /**
-     * @throws ArgumentError
      * @throws DateTimeError
      * @throws JsonException
      * @throws SaveError
@@ -46,10 +42,17 @@ class RunCommand extends AbstractCommand
     protected function run(): int
     {
         $this->eventService->runEvent(
-            $this->eventRepository->getById((int) $this->getArgument('eventId')),
+            $this->eventRepository->getById($this->eventId),
             false
         );
 
         return 0;
+    }
+
+    public function setEventId(int $eventId): RunCommand
+    {
+        $this->eventId = $eventId;
+
+        return $this;
     }
 }

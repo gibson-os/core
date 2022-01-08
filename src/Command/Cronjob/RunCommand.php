@@ -6,7 +6,6 @@ namespace GibsonOS\Core\Command\Cronjob;
 use DateTime;
 use GibsonOS\Core\Attribute\Command\Argument;
 use GibsonOS\Core\Command\AbstractCommand;
-use GibsonOS\Core\Exception\ArgumentError;
 use GibsonOS\Core\Exception\DateTimeError;
 use GibsonOS\Core\Exception\Flock\LockError;
 use GibsonOS\Core\Exception\Flock\UnlockError;
@@ -37,12 +36,9 @@ class RunCommand extends AbstractCommand
         LoggerInterface $logger
     ) {
         parent::__construct($logger);
-
-        $this->setArgument('user', true);
     }
 
     /**
-     * @throws ArgumentError
      * @throws LockError
      * @throws SelectError
      * @throws UnlockError
@@ -52,21 +48,19 @@ class RunCommand extends AbstractCommand
      */
     protected function run(): int
     {
-        $user = $this->getArgument('user') ?? '';
-
         try {
-            $this->lockService->unlock(self::FLOCK_NAME_NEW . $user);
+            $this->lockService->unlock(self::FLOCK_NAME_NEW . $this->user);
         } catch (UnlockError) {
             // Lock not exist
         }
 
-        $this->lockService->lock(self::FLOCK_NAME_NEW . $user);
-        $this->lockService->waitUnlockToLock(self::FLOCK_NAME . $user);
+        $this->lockService->lock(self::FLOCK_NAME_NEW . $this->user);
+        $this->lockService->waitUnlockToLock(self::FLOCK_NAME . $this->user);
         $pid = getmypid();
 
-        while ($this->lockRepository->getByName(self::FLOCK_NAME_NEW . $user)->getPid() === $pid) {
+        while ($this->lockRepository->getByName(self::FLOCK_NAME_NEW . $this->user)->getPid() === $pid) {
             $startSecond = (int) (new DateTime())->format('s');
-            $this->cronjobService->run($user);
+            $this->cronjobService->run($this->user);
 
             do {
                 usleep(100000);
@@ -74,8 +68,15 @@ class RunCommand extends AbstractCommand
             } while ($startSecond === $endSecond);
         }
 
-        $this->lockService->unlock(self::FLOCK_NAME . $user);
+        $this->lockService->unlock(self::FLOCK_NAME . $this->user);
 
         return 0;
+    }
+
+    public function setUser(string $user): RunCommand
+    {
+        $this->user = $user;
+
+        return $this;
     }
 }
