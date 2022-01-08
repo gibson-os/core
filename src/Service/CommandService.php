@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Service;
 
 use GibsonOS\Core\Attribute\Command\Argument;
+use GibsonOS\Core\Attribute\Command\Option;
 use GibsonOS\Core\Command\CommandInterface;
 use GibsonOS\Core\Exception\ArgumentError;
 use GibsonOS\Core\Exception\CommandError;
@@ -23,7 +24,6 @@ class CommandService
      * @param string[]     $arguments
      * @param bool[]       $options
      *
-     * @throws CommandError
      * @throws FactoryError
      * @throws ReflectionException
      * @throws ArgumentError
@@ -34,9 +34,7 @@ class CommandService
         $command = $this->serviceManager->get($commandClassname);
         $reflectionClass = new ReflectionClass($commandClassname);
         $this->setArguments($command, $reflectionClass, $arguments);
-        $command
-            ->setOptions($options)
-        ;
+        $this->setOptions($command, $reflectionClass, $options);
 
         return $command->execute();
     }
@@ -117,6 +115,9 @@ class CommandService
         return $argumentList;
     }
 
+    /**
+     * @return bool[]
+     */
     public function getOptions(array $options): array
     {
         $optionList = [];
@@ -127,7 +128,7 @@ class CommandService
             }
 
             $optionName = mb_substr($option, 1);
-            $optionList[$optionName] = $optionName;
+            $optionList[$optionName] = true;
         }
 
         return $optionList;
@@ -181,6 +182,54 @@ class CommandService
                 count($arguments) > 1 ? 'Arguments' : 'Argument',
                 implode('", "', array_keys($arguments)),
                 implode('", "', $argumentProperties)
+            ));
+        }
+    }
+
+    /**
+     * @param bool[] $options
+     *
+     * @throws ArgumentError
+     */
+    private function setOptions(CommandInterface $command, ReflectionClass $reflectionClass, array $options): void
+    {
+        $optionsProperties = [];
+
+        foreach ($reflectionClass->getProperties() as $reflectionProperty) {
+            $optionAttributes = $reflectionProperty->getAttributes(
+                Option::class,
+                ReflectionAttribute::IS_INSTANCEOF
+            );
+
+            if (count($optionAttributes) === 0) {
+                continue;
+            }
+
+            $name = $reflectionProperty->getName();
+
+            /** @psalm-suppress UndefinedMethod */
+            $typeName = $reflectionProperty->getType()?->getName();
+
+            if ($typeName !== 'bool') {
+                throw new ArgumentError(sprintf('Argument "%s" is type "%s" must be "bool"!', $name, $typeName));
+            }
+
+            $optionsProperties[] = $name;
+
+            if (!isset($options[$name])) {
+                $options[$name] = false;
+            }
+
+            $command->{'set' . ucfirst($name)}($options[$name]);
+            unset($options[$name]);
+        }
+
+        if (count($options) > 0) {
+            throw new ArgumentError(sprintf(
+                '%s "%s" not allowed! Possible arguments: "%s"',
+                count($options) > 1 ? 'Options' : 'Option',
+                implode('", "', array_keys($options)),
+                implode('", "', $optionsProperties)
             ));
         }
     }
