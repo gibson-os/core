@@ -1,0 +1,140 @@
+<?php
+declare(strict_types=1);
+
+namespace GibsonOS\Core\Service\Install\Database;
+
+use Generator;
+use GibsonOS\Core\Dto\Install\Input;
+use GibsonOS\Core\Dto\Install\Success;
+use GibsonOS\Core\Exception\GetError;
+use GibsonOS\Core\Exception\InstallException;
+use GibsonOS\Core\Service\DirService;
+use GibsonOS\Core\Service\EnvService;
+use GibsonOS\Core\Service\Install\AbstractInstall;
+use GibsonOS\Core\Service\InstallService;
+use GibsonOS\Core\Service\PriorityInterface;
+use GibsonOS\Core\Service\ServiceManagerService;
+use mysqlDatabase;
+use Psr\Log\LoggerInterface;
+
+class ConnectInstall extends AbstractInstall implements PriorityInterface
+{
+    private bool $installed = false;
+
+    public function __construct(
+        private EnvService $envService,
+        DirService $dirService,
+        ServiceManagerService $serviceManagerService,
+        LoggerInterface $logger
+    ) {
+        parent::__construct($dirService, $serviceManagerService, $logger);
+    }
+
+    /**
+     * @throws InstallException
+     */
+    public function install(string $module): Generator
+    {
+        if ($this->installed) {
+            return;
+        }
+
+        yield $hostInput = $this->getInput('MYSQL_HOST', 'What is the MySQL hostname?');
+        yield $userInput = $this->getInput('MYSQL_USER', 'What is the MySQL username?');
+        yield $passwordInput = $this->getInput('MYSQL_PASS', 'What is the MySQL password?');
+
+        $user = $userInput->getValue() ?? '';
+        $password = $passwordInput->getValue() ?? '';
+
+        yield $installUserInput = new Input('installUser', 'What is the MySQL install username?', $user);
+        yield $installPasswordInput = new Input('installPassword', 'What is the MySQL install password?', $password);
+        yield $databaseInput = $this->getInput('MYSQL_DATABASE', 'What is the MySQL database name?');
+
+        $host = $hostInput->getValue() ?? '';
+        $mysqlDatabase = new mysqlDatabase(
+            $host,
+            $installUserInput->getValue() ?? '',
+            $installPasswordInput->getValue() ?? ''
+        );
+
+        if (!$mysqlDatabase->openDB()) {
+            throw new InstallException(sprintf(
+                'Database connection can not be established! Error: %s',
+                $mysqlDatabase->error()
+            ));
+        }
+
+        $this->serviceManagerService->setService($mysqlDatabase::class, $mysqlDatabase);
+        $database = $databaseInput->getValue() ?? '';
+
+        if (!$mysqlDatabase->useDatabase($database)) {
+            if (!$mysqlDatabase->sendQuery('CREATE DATABASE `' . $database . '` COLLATE utf8_general_ci')) {
+                throw new InstallException(sprintf(
+                    'Database "%s" could not be created! Error: %s',
+                    $database,
+                    $mysqlDatabase->error()
+                ));
+            }
+
+            if (!$mysqlDatabase->useDatabase($database)) {
+                throw new InstallException(sprintf(
+                    'Database "%s" could not be open! Error: %s',
+                    $database,
+                    $mysqlDatabase->error()
+                ));
+            }
+        }
+
+        $mysqlUserDatabase = new mysqlDatabase($host, $user, $password);
+
+        if (
+            !$mysqlUserDatabase->openDB() &&
+            !$mysqlDatabase->sendQuery("CREATE USER '" . $user . "'@'%' IDENTIFIED BY '" . $password . "'") &&
+            !$mysqlDatabase->sendQuery("GRANT USAGE ON *.* TO  '" . $user . "'@'%' IDENTIFIED BY '" . $password . "' WITH MAX_QUERIES_PER_HOUR 0 MAX_CONNECTIONS_PER_HOUR 0 MAX_UPDATES_PER_HOUR 0 MAX_USER_CONNECTIONS 0")
+        ) {
+            throw new InstallException(sprintf(
+                'MySQL User "%s" could not be created! Error: %s',
+                $user,
+                $mysqlDatabase->error()
+            ));
+        }
+
+        if (
+            !$mysqlUserDatabase->useDatabase($database) &&
+            !$mysqlDatabase->sendQuery('GRANT SELECT, INSERT, UPDATE, DELETE ON `' . $database . "`.* TO '" . $user . "'@'%'")
+        ) {
+            throw new InstallException(sprintf(
+                'MySQL User "%s" could not be connected with "%s"! Error: %s',
+                $user,
+                $database,
+                $mysqlDatabase->error()
+            ));
+        }
+
+        $mysqlUserDatabase->closeDB();
+        $this->installed = true;
+
+        yield new Success('Database connection established!');
+    }
+
+    public function getPart(): string
+    {
+        return InstallService::PART_DATABASE;
+    }
+
+    public function getPriority(): int
+    {
+        return 900;
+    }
+
+    private function getInput(string $key, string $message): Input
+    {
+        try {
+            $value = $this->envService->getString($key);
+        } catch (GetError) {
+            $value = null;
+        }
+
+        return new Input($key, $message, $value);
+    }
+}

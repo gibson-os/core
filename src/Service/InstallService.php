@@ -3,7 +3,9 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Service;
 
+use Generator;
 use GibsonOS\Core\Attribute\GetServices;
+use GibsonOS\Core\Dto\Install\InstallDtoInterface;
 use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\InstallException;
 use GibsonOS\Core\Service\Install\InstallInterface;
@@ -39,8 +41,10 @@ class InstallService
     /**
      * @throws InstallException
      * @throws GetError
+     *
+     * @return Generator<InstallDtoInterface>|InstallDtoInterface[]
      */
-    public function install(string $module = null, string $part = null): void
+    public function install(string $module = null, string $part = null): iterable
     {
         $modules = $this->getModules();
         $parts = self::PARTS;
@@ -70,18 +74,21 @@ class InstallService
         }
 
         foreach ($modules as $module) {
-            $this->installModule($module, $parts);
+            yield from $this->installModule($module, $parts);
         }
     }
 
-    private function installModule(string $module, array $parts): void
+    /**
+     * @return Generator<InstallDtoInterface>
+     */
+    private function installModule(string $module, array $parts): Generator
     {
         foreach ($this->installers as $installer) {
             if (!in_array($installer->getPart(), $parts)) {
                 continue;
             }
 
-            $installer->install($module);
+            yield from $installer->install($module);
         }
     }
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Command;
 
 use GibsonOS\Core\Attribute\Command\Argument;
+use GibsonOS\Core\Dto\Install\Input;
 use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\InstallException;
 use GibsonOS\Core\Service\InstallService;
@@ -31,7 +32,22 @@ class InstallCommand extends AbstractCommand
      */
     protected function run(): int
     {
-        $this->installService->install($this->module, $this->part);
+        foreach ($this->installService->install($this->module, $this->part) as $installDto) {
+            echo $installDto->getMessage();
+
+            if ($installDto instanceof Input) {
+                $value = $installDto->getValue();
+
+                if ($value !== null) {
+                    printf(' (Leave empty for: %s)', $value);
+                }
+
+                echo ': ';
+                $installDto->setValue(trim(fgets(STDIN) ?: '') ?: ($value ?? ''));
+            } else {
+                echo PHP_EOL;
+            }
+        }
 
         return self::SUCCESS;
     }
