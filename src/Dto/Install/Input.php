@@ -5,13 +5,8 @@ namespace GibsonOS\Core\Dto\Install;
 
 class Input implements InstallDtoInterface
 {
-    public function __construct(private string $key, private string $message, private ?string $value = null)
+    public function __construct(private string $message, private ?string $value = null)
     {
-    }
-
-    public function getKey(): string
-    {
-        return $this->key;
     }
 
     public function getMessage(): string

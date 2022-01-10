@@ -4,8 +4,8 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Service\Install\Database;
 
 use Generator;
+use GibsonOS\Core\Dto\Install\Configuration;
 use GibsonOS\Core\Dto\Install\Input;
-use GibsonOS\Core\Dto\Install\Success;
 use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\InstallException;
 use GibsonOS\Core\Service\DirService;
@@ -46,8 +46,8 @@ class ConnectInstall extends AbstractInstall implements PriorityInterface
         $user = $userInput->getValue() ?? '';
         $password = $passwordInput->getValue() ?? '';
 
-        yield $installUserInput = new Input('installUser', 'What is the MySQL install username?', $user);
-        yield $installPasswordInput = new Input('installPassword', 'What is the MySQL install password?', $password);
+        yield $installUserInput = new Input('What is the MySQL install username?', $user);
+        yield $installPasswordInput = new Input('What is the MySQL install password?', $password);
         yield $databaseInput = $this->getInput('MYSQL_DATABASE', 'What is the MySQL database name?');
 
         $host = $hostInput->getValue() ?? '';
@@ -114,7 +114,12 @@ class ConnectInstall extends AbstractInstall implements PriorityInterface
         $mysqlUserDatabase->closeDB();
         $this->installed = true;
 
-        yield new Success('Database connection established!');
+        yield (new Configuration('Database connection established!'))
+            ->setValue('MYSQL_HOST', $host)
+            ->setValue('MYSQL_USER', $user)
+            ->setValue('MYSQL_PASS', $password)
+            ->setValue('MYSQL_DATABASE', $database)
+        ;
     }
 
     public function getPart(): string
@@ -135,6 +140,6 @@ class ConnectInstall extends AbstractInstall implements PriorityInterface
             $value = null;
         }
 
-        return new Input($key, $message, $value);
+        return new Input($message, $value);
     }
 }

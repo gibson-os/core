@@ -82,7 +82,7 @@ class ServiceAttribute implements ParameterAttributeInterface, AttributeServiceI
         if ($attribute instanceof GetServices) {
             usort(
                 $classes,
-                fn ($a, $b) => ($a instanceof PriorityInterface ? $a->getPriority() : 0) <=> ($b instanceof PriorityInterface ? $b->getPriority() : 0)
+                fn ($a, $b) => ($b instanceof PriorityInterface ? $b->getPriority() : 0) <=> ($a instanceof PriorityInterface ? $a->getPriority() : 0)
             );
         }
 
