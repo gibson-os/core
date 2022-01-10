@@ -11,6 +11,7 @@ use GibsonOS\Core\Dto\Install\Success;
 use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\InstallException;
 use GibsonOS\Core\Service\Install\InstallInterface;
+use GibsonOS\Core\Service\Install\SingleInstallInterface;
 
 class InstallService
 {
@@ -76,6 +77,7 @@ class InstallService
         }
 
         $configuration = [];
+        $installedSingleInstallers = [];
 
         foreach ($this->installers as $installer) {
             if (!in_array($installer->getPart(), $parts)) {
@@ -83,6 +85,10 @@ class InstallService
             }
 
             foreach ($modules as $module) {
+                if (in_array($installer::class, $installedSingleInstallers)) {
+                    continue;
+                }
+
                 foreach ($installer->install($module) as $installDto) {
                     if ($installDto instanceof Configuration) {
                         $configuration = array_merge($configuration, $installDto->getValues());
@@ -94,6 +100,10 @@ class InstallService
                     }
 
                     yield $installDto;
+                }
+
+                if ($installer instanceof SingleInstallInterface) {
+                    $installedSingleInstallers[] = $installer::class;
                 }
             }
         }

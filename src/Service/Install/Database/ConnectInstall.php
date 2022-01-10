@@ -6,49 +6,30 @@ namespace GibsonOS\Core\Service\Install\Database;
 use Generator;
 use GibsonOS\Core\Dto\Install\Configuration;
 use GibsonOS\Core\Dto\Install\Input;
-use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\InstallException;
-use GibsonOS\Core\Service\DirService;
-use GibsonOS\Core\Service\EnvService;
 use GibsonOS\Core\Service\Install\AbstractInstall;
+use GibsonOS\Core\Service\Install\SingleInstallInterface;
 use GibsonOS\Core\Service\InstallService;
 use GibsonOS\Core\Service\PriorityInterface;
-use GibsonOS\Core\Service\ServiceManagerService;
 use mysqlDatabase;
-use Psr\Log\LoggerInterface;
 
-class ConnectInstall extends AbstractInstall implements PriorityInterface
+class ConnectInstall extends AbstractInstall implements PriorityInterface, SingleInstallInterface
 {
-    private bool $installed = false;
-
-    public function __construct(
-        private EnvService $envService,
-        DirService $dirService,
-        ServiceManagerService $serviceManagerService,
-        LoggerInterface $logger
-    ) {
-        parent::__construct($dirService, $serviceManagerService, $logger);
-    }
-
     /**
      * @throws InstallException
      */
     public function install(string $module): Generator
     {
-        if ($this->installed) {
-            return;
-        }
-
-        yield $hostInput = $this->getInput('MYSQL_HOST', 'What is the MySQL hostname?');
-        yield $userInput = $this->getInput('MYSQL_USER', 'What is the MySQL username?');
-        yield $passwordInput = $this->getInput('MYSQL_PASS', 'What is the MySQL password?');
+        yield $hostInput = $this->getEnvInput('MYSQL_HOST', 'What is the MySQL hostname?');
+        yield $userInput = $this->getEnvInput('MYSQL_USER', 'What is the MySQL username?');
+        yield $passwordInput = $this->getEnvInput('MYSQL_PASS', 'What is the MySQL password?');
 
         $user = $userInput->getValue() ?? '';
         $password = $passwordInput->getValue() ?? '';
 
         yield $installUserInput = new Input('What is the MySQL install username?', $user);
         yield $installPasswordInput = new Input('What is the MySQL install password?', $password);
-        yield $databaseInput = $this->getInput('MYSQL_DATABASE', 'What is the MySQL database name?');
+        yield $databaseInput = $this->getEnvInput('MYSQL_DATABASE', 'What is the MySQL database name?');
 
         $host = $hostInput->getValue() ?? '';
         $mysqlDatabase = new mysqlDatabase(
@@ -112,7 +93,6 @@ class ConnectInstall extends AbstractInstall implements PriorityInterface
         }
 
         $mysqlUserDatabase->closeDB();
-        $this->installed = true;
 
         yield (new Configuration('Database connection established!'))
             ->setValue('MYSQL_HOST', $host)
@@ -130,16 +110,5 @@ class ConnectInstall extends AbstractInstall implements PriorityInterface
     public function getPriority(): int
     {
         return 900;
-    }
-
-    private function getInput(string $key, string $message): Input
-    {
-        try {
-            $value = $this->envService->getString($key);
-        } catch (GetError) {
-            $value = null;
-        }
-
-        return new Input($message, $value);
     }
 }

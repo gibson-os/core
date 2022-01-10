@@ -5,10 +5,13 @@ namespace GibsonOS\Core\Service\Install;
 
 use Generator;
 use GibsonOS\Core\Dto\Install\InstallDtoInterface;
+use GibsonOS\Core\Exception\InstallException;
 
 interface InstallInterface
 {
     /**
+     * @throws InstallException
+     *
      * @return Generator<InstallDtoInterface>
      */
     public function install(string $module): Generator;
