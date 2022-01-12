@@ -3,14 +3,20 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Model;
 
+use GibsonOS\Core\Attribute\Install\Database\Column;
+use GibsonOS\Core\Attribute\Install\Database\Table;
 use JsonSerializable;
 
+#[Table('system_smart_attribute')]
 class SmartAttribute extends AbstractModel implements JsonSerializable
 {
+    #[Column(attributes: [Column::ATTRIBUTE_UNSIGNED], autoIncrement: true)]
     private ?int $id = null;
 
+    #[Column(length: 32)]
     private string $short;
 
+    #[Column(type: Column::TYPE_TEXT)]
     private string $description;
 
     public static function getTableName(): string

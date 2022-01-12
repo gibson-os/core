@@ -5,55 +5,79 @@ namespace GibsonOS\Core\Model;
 
 use DateTimeImmutable;
 use DateTimeInterface;
+use GibsonOS\Core\Attribute\Install\Database\Column;
+use GibsonOS\Core\Attribute\Install\Database\Table;
 use JsonSerializable;
 use mysqlDatabase;
 
+#[Table('system_drive')]
 class Drive extends AbstractModel implements JsonSerializable
 {
     public const LBA_YES = 'yes';
 
     public const LBA_NO = 'no';
 
+    #[Column(attributes: [Column::ATTRIBUTE_UNSIGNED], autoIncrement: true)]
     private ?int $id = null;
 
+    #[Column(length: 32)]
     private string $serial;
 
+    #[Column(length: 64)]
     private string $model;
 
+    #[Column(length: 16)]
     private string $fwRev;
 
+    #[Column(type: Column::TYPE_TINYTEXT)]
     private string $config;
 
+    #[Column(length: 16)]
     private string $rawChs;
 
+    #[Column(type: Column::TYPE_TINYINT, attributes: [Column::ATTRIBUTE_UNSIGNED])]
     private int $trackSize;
 
+    #[Column(type: Column::TYPE_TINYINT, attributes: [Column::ATTRIBUTE_UNSIGNED])]
     private int $sectSize;
 
+    #[Column(type: Column::TYPE_TINYINT, attributes: [Column::ATTRIBUTE_UNSIGNED])]
     private int $eccBytes;
 
+    #[Column(length: 32)]
     private string $buffType;
 
+    #[Column(type: Column::TYPE_TINYINT, attributes: [Column::ATTRIBUTE_UNSIGNED])]
     private int $buffSize;
 
+    #[Column(type: Column::TYPE_TINYINT, attributes: [Column::ATTRIBUTE_UNSIGNED])]
     private int $maxMultSect;
 
+    #[Column(type: Column::TYPE_TINYINT, attributes: [Column::ATTRIBUTE_UNSIGNED])]
     private int $multSect;
 
+    #[Column(length: 16)]
     private string $curChs;
 
+    #[Column(type: Column::TYPE_INT, attributes: [Column::ATTRIBUTE_UNSIGNED])]
     private int $curSects;
 
+    #[Column(type: Column::TYPE_ENUM, values: ['no', 'yes'])]
     private string $lba;
 
+    #[Column(attributes: [Column::ATTRIBUTE_UNSIGNED])]
     private int $lbaSects;
 
+    #[Column(length: 16)]
     private string $ioRdy;
 
+    #[Column(length: 32)]
     private string $tPio;
 
+    #[Column(length: 32)]
     private string $tDma;
 
+    #[Column(default: Column::DEFAULT_CURRENT_TIMESTAMP)]
     private DateTimeInterface $added;
 
     public function __construct(mysqlDatabase $database = null)

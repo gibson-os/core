@@ -8,13 +8,15 @@ use Attribute;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class Column
 {
+    public const DEFAULT_CURRENT_TIMESTAMP = 'CURRENT_TIMESTAMP';
+
     public const ATTRIBUTE_UNSIGNED = 'UNSIGNED';
 
     public const ATTRIBUTE_ZEROFILL = 'ZEROFILL';
 
     public const ATTRIBUTE_BINARY = 'BINARY';
 
-    public const ATTRIBUTE_CURRENT_TIMESTAMP = 'CURRENT_TIMESTAMP';
+    public const ATTRIBUTE_CURRENT_TIMESTAMP = 'ON UPDATE CURRENT_TIMESTAMP';
 
     public const TYPE_TINYINT = 'tinyint';
 
@@ -75,16 +77,19 @@ class Column
     public const TYPE_YEAR = 'year';
 
     public function __construct(
-        private ?string $name,
-        private ?string $type,
+        private ?string $name = null,
+        private ?string $type = null,
         private string $collate = 'utf8_general_ci',
         private string $charset = 'utf8',
         private ?string $default = null,
         private ?int $length = null,
         private array $attributes = [],
-        private bool $nullable = true,
+        private ?bool $nullable = null,
+        private array $values = [],
         private bool $autoIncrement = false,
+        private bool $primary = false,
     ) {
+        $this->primary = $this->autoIncrement || $this->primary;
     }
 
     public function getName(): ?string
@@ -126,6 +131,13 @@ class Column
         return $this->default;
     }
 
+    public function setDefault(?string $default): Column
+    {
+        $this->default = $default;
+
+        return $this;
+    }
+
     public function getLength(): ?int
     {
         return $this->length;
@@ -150,13 +162,30 @@ class Column
         return $this;
     }
 
-    public function isNullable(): bool
+    public function isNullable(): ?bool
     {
         return $this->nullable;
+    }
+
+    public function setNullable(?bool $nullable): Column
+    {
+        $this->nullable = $nullable;
+
+        return $this;
+    }
+
+    public function getValues(): array
+    {
+        return $this->values;
     }
 
     public function isAutoIncrement(): bool
     {
         return $this->autoIncrement;
+    }
+
+    public function isPrimary(): bool
+    {
+        return $this->primary;
     }
 }

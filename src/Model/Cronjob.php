@@ -5,28 +5,39 @@ namespace GibsonOS\Core\Model;
 
 use DateTimeImmutable;
 use DateTimeInterface;
+use GibsonOS\Core\Attribute\Install\Database\Column;
+use GibsonOS\Core\Attribute\Install\Database\Table;
 use JsonSerializable;
 use mysqlDatabase;
 
+#[Table]
 class Cronjob extends AbstractModel implements JsonSerializable
 {
+    #[Column(attributes: [Column::ATTRIBUTE_UNSIGNED], autoIncrement: true)]
     private ?int $id = null;
 
     /**
      * @var class-string
      */
+    #[Column(length: 255)]
     private string $command;
 
-    private ?string $arguments = null;
+    #[Column(length: 255)]
+    private string $arguments = '[]';
 
-    private ?string $options = null;
+    #[Column(length: 255)]
+    private string $options = '[]';
 
+    #[Column(length: 64)]
     private string $user;
 
+    #[Column]
     private ?DateTimeInterface $lastRun = null;
 
-    private bool $active;
+    #[Column]
+    private bool $active = true;
 
+    #[Column]
     private DateTimeInterface $added;
 
     public static function getTableName(): string
@@ -78,7 +89,7 @@ class Cronjob extends AbstractModel implements JsonSerializable
         return $this->arguments;
     }
 
-    public function setArguments(?string $arguments): Cronjob
+    public function setArguments(string $arguments): Cronjob
     {
         $this->arguments = $arguments;
 
@@ -90,7 +101,7 @@ class Cronjob extends AbstractModel implements JsonSerializable
         return $this->options;
     }
 
-    public function setOptions(?string $options): Cronjob
+    public function setOptions(string $options): Cronjob
     {
         $this->options = $options;
 

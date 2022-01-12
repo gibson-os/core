@@ -5,17 +5,24 @@ namespace GibsonOS\Core\Model;
 
 use DateTimeImmutable;
 use DateTimeInterface;
+use GibsonOS\Core\Attribute\Install\Database\Column;
+use GibsonOS\Core\Attribute\Install\Database\Table;
 use JsonSerializable;
 use mysqlDatabase;
 
+#[Table]
 class Icon extends AbstractModel implements JsonSerializable
 {
+    #[Column(attributes: [Column::ATTRIBUTE_UNSIGNED], autoIncrement: true)]
     private ?int $id = null;
 
-    private string $name = '';
+    #[Column(length: 64)]
+    private string $name;
 
-    private string $originalType = '';
+    #[Column(length: 4)]
+    private string $originalType;
 
+    #[Column(default: Column::DEFAULT_CURRENT_TIMESTAMP)]
     private DateTimeInterface $added;
 
     public function __construct(mysqlDatabase $database = null)

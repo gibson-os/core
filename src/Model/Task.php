@@ -3,16 +3,22 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Model;
 
+use GibsonOS\Core\Attribute\Install\Database\Column;
+use GibsonOS\Core\Attribute\Install\Database\Table;
 use JsonSerializable;
 use mysqlDatabase;
 
+#[Table]
 class Task extends AbstractModel implements JsonSerializable
 {
+    #[Column(attributes: [Column::ATTRIBUTE_UNSIGNED], autoIncrement: true)]
     private ?int $id = null;
 
-    private string $name = '';
+    #[Column(length: 32)]
+    private string $name;
 
-    private int $moduleId = 0;
+    #[Column(attributes: [Column::ATTRIBUTE_UNSIGNED])]
+    private int $moduleId;
 
     private Module $module;
 

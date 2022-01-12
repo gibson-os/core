@@ -211,7 +211,7 @@ class CommandService
             $typeName = $reflectionProperty->getType()?->getName();
 
             if ($typeName !== 'bool') {
-                throw new ArgumentError(sprintf('Argument "%s" is type "%s" must be "bool"!', $name, $typeName));
+                throw new ArgumentError(sprintf('Option "%s" is type "%s" must be "bool"!', $name, $typeName));
             }
 
             $optionsProperties[] = $name;
@@ -226,7 +226,7 @@ class CommandService
 
         if (count($options) > 0) {
             throw new ArgumentError(sprintf(
-                '%s "%s" not allowed! Possible arguments: "%s"',
+                '%s "%s" not allowed! Possible options: "%s"',
                 count($options) > 1 ? 'Options' : 'Option',
                 implode('", "', array_keys($options)),
                 implode('", "', $optionsProperties)

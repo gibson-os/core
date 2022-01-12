@@ -3,12 +3,19 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Model;
 
+use GibsonOS\Core\Attribute\Install\Database\Column;
+use GibsonOS\Core\Attribute\Install\Database\Table;
+
+#[Table(engine: 'MEMORY')]
 class Lock extends AbstractModel
 {
+    #[Column(attributes: [Column::ATTRIBUTE_UNSIGNED])]
     private int $pid;
 
+    #[Column(length: 255, primary: true)]
     private string $name;
 
+    #[Column]
     private bool $stop = false;
 
     public static function getTableName(): string

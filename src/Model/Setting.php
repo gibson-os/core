@@ -3,19 +3,27 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Model;
 
+use GibsonOS\Core\Attribute\Install\Database\Column;
+use GibsonOS\Core\Attribute\Install\Database\Table;
 use JsonSerializable;
 
+#[Table]
 class Setting extends AbstractModel implements JsonSerializable
 {
+    #[Column(attributes: [Column::ATTRIBUTE_UNSIGNED], autoIncrement: true)]
     private ?int $id = null;
 
+    #[Column(attributes: [Column::ATTRIBUTE_UNSIGNED])]
     private ?int $userId = null;
 
-    private int $moduleId = 0;
+    #[Column(attributes: [Column::ATTRIBUTE_UNSIGNED])]
+    private int $moduleId;
 
-    private string $key = '';
+    #[Column(length: 64)]
+    private string $key;
 
-    private string $value = '';
+    #[Column(type: Column::TYPE_LONGTEXT)]
+    private string $value;
 
     private ?User $user = null;
 

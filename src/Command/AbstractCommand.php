@@ -14,16 +14,16 @@ abstract class AbstractCommand implements CommandInterface
     protected const ERROR = 255;
 
     #[Option('Set verbose level warning')]
-    private bool $v = false;
+    protected bool $v = false;
 
     #[Option('Set verbose level info')]
-    private bool $vv = false;
+    protected bool $vv = false;
 
     #[Option('Set verbose level debug')]
-    private bool $vvv = false;
+    protected bool $vvv = false;
 
     #[Option('Add debug information to log messages')]
-    private bool $debug = false;
+    protected bool $debug = false;
 
     public function __construct(protected LoggerInterface $logger)
     {

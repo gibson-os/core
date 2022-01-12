@@ -4,24 +4,32 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Model;
 
 use DateTimeInterface;
+use GibsonOS\Core\Attribute\Install\Database\Column;
 use GibsonOS\Core\Model\Event\Element;
 use GibsonOS\Core\Model\Event\Trigger;
 use JsonSerializable;
 
 class Event extends AbstractModel implements JsonSerializable, AutoCompleteModelInterface
 {
+    #[Column(attributes: [Column::ATTRIBUTE_UNSIGNED], autoIncrement: true)]
     private ?int $id = null;
 
+    #[Column(length: 128)]
     private string $name;
 
-    private bool $active;
+    #[Column]
+    private bool $active = true;
 
-    private bool $async;
+    #[Column]
+    private bool $async = true;
 
+    #[Column]
     private bool $exitOnError = true;
 
+    #[Column]
     private DateTimeInterface $modified;
 
+    #[Column]
     private ?DateTimeInterface $lastRun = null;
 
     /**

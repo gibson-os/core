@@ -5,23 +5,31 @@ namespace GibsonOS\Core\Model;
 
 use DateTimeImmutable;
 use DateTimeInterface;
+use GibsonOS\Core\Attribute\Install\Database\Column;
 use JsonSerializable;
 use mysqlDatabase;
 
 class User extends AbstractModel implements JsonSerializable
 {
+    #[Column(attributes: [Column::ATTRIBUTE_UNSIGNED], autoIncrement: true)]
     private ?int $id = null;
 
-    private string $user = '';
+    #[Column(length: 64)]
+    private string $user;
 
+    #[Column(length: 64)]
     private ?string $host = null;
 
+    #[Column(length: 15)]
     private ?string $ip = null;
 
+    #[Column(length: 32)]
     private ?string $password = null;
 
+    #[Column]
     private ?DateTimeInterface $lastLogin = null;
 
+    #[Column(default: Column::DEFAULT_CURRENT_TIMESTAMP)]
     private DateTimeInterface $added;
 
     public function __construct(mysqlDatabase $database = null)

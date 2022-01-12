@@ -5,48 +5,68 @@ namespace GibsonOS\Core\Model;
 
 use DateTime;
 use DateTimeInterface;
+use GibsonOS\Core\Attribute\Install\Database\Column;
 use GibsonOS\Core\Model\Weather\Location;
 use JsonSerializable;
 use mysqlDatabase;
 
 class Weather extends AbstractModel implements JsonSerializable
 {
+    #[Column(attributes: [Column::ATTRIBUTE_UNSIGNED], autoIncrement: true)]
     private ?int $id = null;
 
-    private int $locationId = 0;
+    #[Column(attributes: [Column::ATTRIBUTE_UNSIGNED])]
+    private int $locationId;
 
+    #[Column]
     private DateTimeInterface $date;
 
-    private float $temperature = 0.0;
+    #[Column(attributes: [Column::ATTRIBUTE_UNSIGNED])]
+    private float $temperature;
 
-    private float $feelsLike = 0.0;
+    #[Column(attributes: [Column::ATTRIBUTE_UNSIGNED])]
+    private float $feelsLike;
 
-    private int $pressure = 0;
+    #[Column(type: Column::TYPE_INT, attributes: [Column::ATTRIBUTE_UNSIGNED])]
+    private int $pressure;
 
-    private int $humidity = 0;
+    #[Column(type: Column::TYPE_TINYINT, attributes: [Column::ATTRIBUTE_UNSIGNED])]
+    private int $humidity;
 
-    private float $dewPoint = 0.0;
+    #[Column(attributes: [Column::ATTRIBUTE_UNSIGNED])]
+    private float $dewPoint;
 
-    private int $clouds = 0;
+    #[Column(type: Column::TYPE_TINYINT, attributes: [Column::ATTRIBUTE_UNSIGNED])]
+    private int $clouds;
 
-    private float $uvIndex = 0.0;
+    #[Column(attributes: [Column::ATTRIBUTE_UNSIGNED])]
+    private float $uvIndex;
 
-    private float $windSpeed = 0.0;
+    #[Column(attributes: [Column::ATTRIBUTE_UNSIGNED])]
+    private float $windSpeed;
 
-    private int $windDegree = 0;
+    #[Column(type: Column::TYPE_INT)]
+    private int $windDegree;
 
-    private int $visibility = 0;
+    #[Column(type: Column::TYPE_INT)]
+    private int $visibility;
 
-    private ?float $probabilityOfPrecipitation = 0.0;
+    #[Column(attributes: [Column::ATTRIBUTE_UNSIGNED])]
+    private ?float $probabilityOfPrecipitation;
 
+    #[Column(length: 255)]
     private ?string $description = null;
 
+    #[Column(attributes: [Column::ATTRIBUTE_UNSIGNED])]
     private ?float $rain = null;
 
+    #[Column(attributes: [Column::ATTRIBUTE_UNSIGNED])]
     private ?float $snow = null;
 
+    #[Column(attributes: [Column::ATTRIBUTE_UNSIGNED])]
     private ?float $windGust = null;
 
+    #[Column(length: 255)]
     private ?string $icon = null;
 
     private Location $location;
