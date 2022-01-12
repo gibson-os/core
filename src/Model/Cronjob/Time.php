@@ -3,42 +3,61 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Model\Cronjob;
 
+use GibsonOS\Core\Attribute\Install\Database\Column;
+use GibsonOS\Core\Attribute\Install\Database\Table;
 use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Model\Cronjob;
 
+#[Table]
 class Time extends AbstractModel
 {
+    #[Column(attributes: [Column::ATTRIBUTE_UNSIGNED], autoIncrement: true)]
     private ?int $id = null;
 
+    #[Column(attributes: [Column::ATTRIBUTE_UNSIGNED])]
     private int $cronjobId;
 
-    private ?int $fromHour = null;
+    #[Column(type: Column::TYPE_TINYINT, length: 2, attributes: [Column::ATTRIBUTE_UNSIGNED])]
+    private int $fromHour = 0;
 
-    private ?int $toHour = null;
+    #[Column(type: Column::TYPE_TINYINT, length: 2, attributes: [Column::ATTRIBUTE_UNSIGNED])]
+    private int $toHour = 23;
 
-    private ?int $fromMinute = null;
+    #[Column(type: Column::TYPE_TINYINT, length: 2, attributes: [Column::ATTRIBUTE_UNSIGNED])]
+    private int $fromMinute = 0;
 
-    private ?int $toMinute = null;
+    #[Column(type: Column::TYPE_TINYINT, length: 2, attributes: [Column::ATTRIBUTE_UNSIGNED])]
+    private int $toMinute = 59;
 
-    private ?int $fromSecond = null;
+    #[Column(type: Column::TYPE_TINYINT, length: 2, attributes: [Column::ATTRIBUTE_UNSIGNED])]
+    private int $fromSecond = 0;
 
-    private ?int $toSecond = null;
+    #[Column(type: Column::TYPE_TINYINT, length: 2, attributes: [Column::ATTRIBUTE_UNSIGNED])]
+    private int $toSecond = 59;
 
-    private ?int $fromDayOfMonth = null;
+    #[Column(type: Column::TYPE_TINYINT, length: 2, attributes: [Column::ATTRIBUTE_UNSIGNED])]
+    private int $fromDayOfMonth = 1;
 
-    private ?int $toDayOfMonth = null;
+    #[Column(type: Column::TYPE_TINYINT, length: 2, attributes: [Column::ATTRIBUTE_UNSIGNED])]
+    private int $toDayOfMonth = 31;
 
-    private ?int $fromDayOfWeek = null;
+    #[Column(type: Column::TYPE_TINYINT, length: 1, attributes: [Column::ATTRIBUTE_UNSIGNED])]
+    private int $fromDayOfWeek = 0;
 
-    private ?int $toDayOfWeek = null;
+    #[Column(type: Column::TYPE_TINYINT, length: 1, attributes: [Column::ATTRIBUTE_UNSIGNED])]
+    private int $toDayOfWeek = 6;
 
-    private ?int $fromMonth = null;
+    #[Column(type: Column::TYPE_TINYINT, length: 2, attributes: [Column::ATTRIBUTE_UNSIGNED])]
+    private int $fromMonth = 1;
 
-    private ?int $toMonth = null;
+    #[Column(type: Column::TYPE_TINYINT, length: 2, attributes: [Column::ATTRIBUTE_UNSIGNED])]
+    private int $toMonth = 12;
 
-    private ?int $fromYear = null;
+    #[Column(type: Column::TYPE_SMALLINT, length: 4, attributes: [Column::ATTRIBUTE_UNSIGNED])]
+    private int $fromYear = 0;
 
-    private ?int $toYear = null;
+    #[Column(type: Column::TYPE_SMALLINT, length: 4, attributes: [Column::ATTRIBUTE_UNSIGNED])]
+    private int $toYear = 9999;
 
     private Cronjob $cronjob;
 
@@ -71,168 +90,168 @@ class Time extends AbstractModel
         return $this;
     }
 
-    public function getFromHour(): ?int
+    public function getFromHour(): int
     {
         return $this->fromHour;
     }
 
-    public function setFromHour(?int $fromHour): Time
+    public function setFromHour(int $fromHour): Time
     {
         $this->fromHour = $fromHour;
 
         return $this;
     }
 
-    public function getToHour(): ?int
+    public function getToHour(): int
     {
         return $this->toHour;
     }
 
-    public function setToHour(?int $toHour): Time
+    public function setToHour(int $toHour): Time
     {
         $this->toHour = $toHour;
 
         return $this;
     }
 
-    public function getFromMinute(): ?int
+    public function getFromMinute(): int
     {
         return $this->fromMinute;
     }
 
-    public function setFromMinute(?int $fromMinute): Time
+    public function setFromMinute(int $fromMinute): Time
     {
         $this->fromMinute = $fromMinute;
 
         return $this;
     }
 
-    public function getToMinute(): ?int
+    public function getToMinute(): int
     {
         return $this->toMinute;
     }
 
-    public function setToMinute(?int $toMinute): Time
+    public function setToMinute(int $toMinute): Time
     {
         $this->toMinute = $toMinute;
 
         return $this;
     }
 
-    public function getFromSecond(): ?int
+    public function getFromSecond(): int
     {
         return $this->fromSecond;
     }
 
-    public function setFromSecond(?int $fromSecond): Time
+    public function setFromSecond(int $fromSecond): Time
     {
         $this->fromSecond = $fromSecond;
 
         return $this;
     }
 
-    public function getToSecond(): ?int
+    public function getToSecond(): int
     {
         return $this->toSecond;
     }
 
-    public function setToSecond(?int $toSecond): Time
+    public function setToSecond(int $toSecond): Time
     {
         $this->toSecond = $toSecond;
 
         return $this;
     }
 
-    public function getFromDayOfMonth(): ?int
+    public function getFromDayOfMonth(): int
     {
         return $this->fromDayOfMonth;
     }
 
-    public function setFromDayOfMonth(?int $fromDayOfMonth): Time
+    public function setFromDayOfMonth(int $fromDayOfMonth): Time
     {
         $this->fromDayOfMonth = $fromDayOfMonth;
 
         return $this;
     }
 
-    public function getToDayOfMonth(): ?int
+    public function getToDayOfMonth(): int
     {
         return $this->toDayOfMonth;
     }
 
-    public function setToDayOfMonth(?int $toDayOfMonth): Time
+    public function setToDayOfMonth(int $toDayOfMonth): Time
     {
         $this->toDayOfMonth = $toDayOfMonth;
 
         return $this;
     }
 
-    public function getFromDayOfWeek(): ?int
+    public function getFromDayOfWeek(): int
     {
         return $this->fromDayOfWeek;
     }
 
-    public function setFromDayOfWeek(?int $fromDayOfWeek): Time
+    public function setFromDayOfWeek(int $fromDayOfWeek): Time
     {
         $this->fromDayOfWeek = $fromDayOfWeek;
 
         return $this;
     }
 
-    public function getToDayOfWeek(): ?int
+    public function getToDayOfWeek(): int
     {
         return $this->toDayOfWeek;
     }
 
-    public function setToDayOfWeek(?int $toDayOfWeek): Time
+    public function setToDayOfWeek(int $toDayOfWeek): Time
     {
         $this->toDayOfWeek = $toDayOfWeek;
 
         return $this;
     }
 
-    public function getFromMonth(): ?int
+    public function getFromMonth(): int
     {
         return $this->fromMonth;
     }
 
-    public function setFromMonth(?int $fromMonth): Time
+    public function setFromMonth(int $fromMonth): Time
     {
         $this->fromMonth = $fromMonth;
 
         return $this;
     }
 
-    public function getToMonth(): ?int
+    public function getToMonth(): int
     {
         return $this->toMonth;
     }
 
-    public function setToMonth(?int $toMonth): Time
+    public function setToMonth(int $toMonth): Time
     {
         $this->toMonth = $toMonth;
 
         return $this;
     }
 
-    public function getFromYear(): ?int
+    public function getFromYear(): int
     {
         return $this->fromYear;
     }
 
-    public function setFromYear(?int $fromYear): Time
+    public function setFromYear(int $fromYear): Time
     {
         $this->fromYear = $fromYear;
 
         return $this;
     }
 
-    public function getToYear(): ?int
+    public function getToYear(): int
     {
         return $this->toYear;
     }
 
-    public function setToYear(?int $toYear): Time
+    public function setToYear(int $toYear): Time
     {
         $this->toYear = $toYear;
 
