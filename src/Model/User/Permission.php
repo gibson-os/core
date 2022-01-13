@@ -3,9 +3,12 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Model\User;
 
+use GibsonOS\Core\Attribute\Install\Database\Column;
+use GibsonOS\Core\Attribute\Install\Database\Table;
 use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Model\User;
 
+#[Table]
 class Permission extends AbstractModel
 {
     public const INHERIT = 0; // 00000
@@ -20,16 +23,22 @@ class Permission extends AbstractModel
 
     public const MANAGE = 16;
 
+    #[Column(attributes: [Column::ATTRIBUTE_UNSIGNED], autoIncrement: true)]
     private ?int $id = null;
 
+    #[Column(length: 32)]
     private string $module;
 
+    #[Column(length: 32)]
     private ?string $task = null;
 
+    #[Column(length: 32)]
     private ?string $action = null;
 
+    #[Column(attributes: [Column::ATTRIBUTE_UNSIGNED])]
     private ?int $userId = null;
 
+    #[Column(type: Column::TYPE_TINYINT, length: 2, attributes: [Column::ATTRIBUTE_UNSIGNED])]
     private int $permission = self::DENIED;
 
     private ?User $user;

@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Model\Event;
 
+use GibsonOS\Core\Attribute\Install\Database\Column;
+use GibsonOS\Core\Attribute\Install\Database\Table;
 use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Model\Event;
 use GibsonOS\Core\Utility\JsonUtility;
@@ -10,17 +12,22 @@ use JsonException;
 use JsonSerializable;
 use mysqlDatabase;
 
+#[Table]
 class Trigger extends AbstractModel implements JsonSerializable
 {
+    #[Column(attributes: [Column::ATTRIBUTE_UNSIGNED], autoIncrement: true)]
     private ?int $id = null;
 
+    #[Column]
     private int $eventId;
 
     /**
      * @var class-string
      */
+    #[Column(length: 512)]
     private string $class;
 
+    #[Column(length: 64)]
     private string $trigger;
 
     /**
@@ -33,22 +40,31 @@ class Trigger extends AbstractModel implements JsonSerializable
      */
     private string $triggerTitle;
 
+    #[Column(type: Column::TYPE_JSON)]
     private ?string $parameters = null;
 
+    #[Column(type: Column::TYPE_TINYINT, length: 1, attributes: [Column::ATTRIBUTE_UNSIGNED])]
     private ?int $weekday = null;
 
+    #[Column(type: Column::TYPE_TINYINT, length: 2, attributes: [Column::ATTRIBUTE_UNSIGNED])]
     private ?int $day = null;
 
+    #[Column(type: Column::TYPE_TINYINT, length: 2, attributes: [Column::ATTRIBUTE_UNSIGNED])]
     private ?int $month = null;
 
+    #[Column(type: Column::TYPE_TINYINT, length: 4, attributes: [Column::ATTRIBUTE_UNSIGNED])]
     private ?int $year = null;
 
+    #[Column(type: Column::TYPE_TINYINT, length: 2, attributes: [Column::ATTRIBUTE_UNSIGNED])]
     private ?int $hour = null;
 
+    #[Column(type: Column::TYPE_TINYINT, length: 2, attributes: [Column::ATTRIBUTE_UNSIGNED])]
     private ?int $minute = null;
 
+    #[Column(type: Column::TYPE_TINYINT, length: 2, attributes: [Column::ATTRIBUTE_UNSIGNED])]
     private ?int $second = null;
 
+    #[Column]
     private ?int $priority = null;
 
     private Event $event;

@@ -8,10 +8,14 @@ use GibsonOS\Core\Attribute\GetTable;
 use GibsonOS\Core\Attribute\Install\Database\Table;
 use ReflectionAttribute;
 use ReflectionClass;
+use ReflectionException;
 use ReflectionParameter;
 
 class TableAttribute implements ParameterAttributeInterface, AttributeServiceInterface
 {
+    /**
+     * @throws ReflectionException
+     */
     public function replace(AttributeInterface $attribute, array $parameters, ReflectionParameter $reflectionParameter): mixed
     {
         if (!$attribute instanceof GetTable) {

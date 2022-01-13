@@ -5,18 +5,25 @@ namespace GibsonOS\Core\Model\Drive;
 
 use DateTimeImmutable;
 use DateTimeInterface;
+use GibsonOS\Core\Attribute\Install\Database\Column;
+use GibsonOS\Core\Attribute\Install\Database\Table;
 use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Model\Drive;
 use mysqlDatabase;
 
+#[Table('system_drive_stat')]
 class Stat extends AbstractModel
 {
+    #[Column(attributes: [Column::ATTRIBUTE_UNSIGNED], autoIncrement: true)]
     private ?int $id = null;
 
+    #[Column(attributes: [Column::ATTRIBUTE_UNSIGNED])]
     private int $driveId;
 
+    #[Column(length: 4)]
     private string $disk;
 
+    #[Column]
     private DateTimeInterface $added;
 
     private Drive $drive;

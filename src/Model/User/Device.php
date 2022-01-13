@@ -5,24 +5,32 @@ namespace GibsonOS\Core\Model\User;
 
 use DateTimeImmutable;
 use DateTimeInterface;
+use GibsonOS\Core\Attribute\Install\Database\Column;
 use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Model\User;
 use mysqlDatabase;
 
 class Device extends AbstractModel
 {
-    private string $id = '';
+    #[Column(length: 16, primary: true)]
+    private string $id;
 
-    private int $userId = 0;
+    #[Column(attributes: [Column::ATTRIBUTE_UNSIGNED])]
+    private int $userId;
 
-    private string $model = '';
+    #[Column(length: 32)]
+    private string $model;
 
+    #[Column(length: 255)]
     private ?string $registrationId = null;
 
+    #[Column(length: 64)]
     private ?string $token = null;
 
+    #[Column]
     private ?DateTimeInterface $lastLogin = null;
 
+    #[Column(default: Column::DEFAULT_CURRENT_TIMESTAMP)]
     private DateTimeInterface $added;
 
     private User $user;

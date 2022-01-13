@@ -6,6 +6,7 @@ namespace GibsonOS\Core\Model\User;
 use GibsonOS\Core\Model\AbstractModel;
 use JsonSerializable;
 
+// @todo view installer
 class PermissionView extends AbstractModel implements JsonSerializable
 {
     private ?int $userId = null;

@@ -3,20 +3,29 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Model\Drive;
 
+use GibsonOS\Core\Attribute\Install\Database\Column;
+use GibsonOS\Core\Attribute\Install\Database\Table;
 use GibsonOS\Core\Model\AbstractModel;
 
+#[Table('system_drive_stat_attribute')]
 class StatAttribute extends AbstractModel
 {
+    #[Column(primary: true)]
     private int $statId;
 
+    #[Column(primary: true)]
     private int $attributeId;
 
+    #[Column(type: Column::TYPE_INT)]
     private int $value;
 
+    #[Column(type: Column::TYPE_INT)]
     private int $worst;
 
+    #[Column(type: Column::TYPE_INT)]
     private int $thresh;
 
+    #[Column(type: Column::TYPE_INT)]
     private int $rawValue;
 
     public static function getTableName(): string

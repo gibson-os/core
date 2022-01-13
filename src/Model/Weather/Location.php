@@ -4,28 +4,40 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Model\Weather;
 
 use DateTimeInterface;
+use GibsonOS\Core\Attribute\Install\Database\Column;
+use GibsonOS\Core\Attribute\Install\Database\Table;
 use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Model\AutoCompleteModelInterface;
 use JsonSerializable;
 
+#[Table]
 class Location extends AbstractModel implements JsonSerializable, AutoCompleteModelInterface
 {
+    #[Column(attributes: [Column::ATTRIBUTE_UNSIGNED], autoIncrement: true)]
     private ?int $id = null;
 
-    private string $name = '';
+    #[Column(length: 128)]
+    private string $name;
 
-    private float $latitude = 0.0;
+    #[Column]
+    private float $latitude;
 
-    private float $longitude = 0.0;
+    #[Column]
+    private float $longitude;
 
-    private string $timezone = '';
+    #[Column(length: 128)]
+    private string $timezone;
 
-    private int $interval = 0;
+    #[Column]
+    private int $interval;
 
+    #[Column]
     private bool $active = false;
 
+    #[Column]
     private ?DateTimeInterface $lastRun = null;
 
+    #[Column(length: 255)]
     private ?string $error = null;
 
     public static function getTableName(): string

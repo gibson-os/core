@@ -3,16 +3,21 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Model\Icon;
 
+use GibsonOS\Core\Attribute\Install\Database\Column;
+use GibsonOS\Core\Attribute\Install\Database\Table;
 use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Model\Icon;
 use JsonSerializable;
 use mysqlDatabase;
 
+#[Table]
 class Tag extends AbstractModel implements JsonSerializable
 {
-    private int $iconId = 0;
+    #[Column(primary: true)]
+    private int $iconId;
 
-    private string $tag = '';
+    #[Column(length: 64, primary: true)]
+    private string $tag;
 
     private Icon $icon;
 

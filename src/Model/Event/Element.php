@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Model\Event;
 
+use GibsonOS\Core\Attribute\Install\Database\Column;
+use GibsonOS\Core\Attribute\Install\Database\Table;
 use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Model\Event;
 use GibsonOS\Core\Utility\JsonUtility;
@@ -11,21 +13,28 @@ use JsonSerializable;
 use mysqlDatabase;
 use Serializable;
 
+#[Table]
 class Element extends AbstractModel implements Serializable, JsonSerializable
 {
+    #[Column(attributes: [Column::ATTRIBUTE_UNSIGNED], autoIncrement: true)]
     private ?int $id = null;
 
+    #[Column]
     private int $eventId;
 
+    #[Column]
     private ?int $parentId = null;
 
+    #[Column]
     private int $order = 0;
 
     /**
      * @var class-string
      */
+    #[Column(length: 512)]
     private string $class;
 
+    #[Column(length: 255)]
     private string $method;
 
     /**
@@ -38,10 +47,13 @@ class Element extends AbstractModel implements Serializable, JsonSerializable
      */
     private ?string $methodTitle = null;
 
+    #[Column(type: Column::TYPE_JSON)]
     private ?string $parameters = null;
 
+    #[Column(type: Column::TYPE_ENUM, values: ['if', 'else', 'else_if', 'while', 'do_while'])]
     private ?string $command = null;
 
+    #[Column(type: Column::TYPE_JSON)]
     private ?string $returns = null;
 
     private Event $event;
