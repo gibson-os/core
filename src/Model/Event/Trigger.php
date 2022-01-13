@@ -18,7 +18,7 @@ class Trigger extends AbstractModel implements JsonSerializable
     #[Column(attributes: [Column::ATTRIBUTE_UNSIGNED], autoIncrement: true)]
     private ?int $id = null;
 
-    #[Column]
+    #[Column(attributes: [Column::ATTRIBUTE_UNSIGNED])]
     private int $eventId;
 
     /**
@@ -52,7 +52,7 @@ class Trigger extends AbstractModel implements JsonSerializable
     #[Column(type: Column::TYPE_TINYINT, length: 2, attributes: [Column::ATTRIBUTE_UNSIGNED])]
     private ?int $month = null;
 
-    #[Column(type: Column::TYPE_TINYINT, length: 4, attributes: [Column::ATTRIBUTE_UNSIGNED])]
+    #[Column(type: Column::TYPE_SMALLINT, length: 4, attributes: [Column::ATTRIBUTE_UNSIGNED])]
     private ?int $year = null;
 
     #[Column(type: Column::TYPE_TINYINT, length: 2, attributes: [Column::ATTRIBUTE_UNSIGNED])]
@@ -64,7 +64,7 @@ class Trigger extends AbstractModel implements JsonSerializable
     #[Column(type: Column::TYPE_TINYINT, length: 2, attributes: [Column::ATTRIBUTE_UNSIGNED])]
     private ?int $second = null;
 
-    #[Column]
+    #[Column(attributes: [Column::ATTRIBUTE_UNSIGNED])]
     private ?int $priority = null;
 
     private Event $event;

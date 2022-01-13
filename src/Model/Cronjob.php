@@ -37,7 +37,7 @@ class Cronjob extends AbstractModel implements JsonSerializable
     #[Column]
     private bool $active = true;
 
-    #[Column(default: Column::DEFAULT_CURRENT_TIMESTAMP)]
+    #[Column(type: Column::TYPE_TIMESTAMP, default: Column::DEFAULT_CURRENT_TIMESTAMP)]
     private DateTimeInterface $added;
 
     public static function getTableName(): string

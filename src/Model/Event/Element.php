@@ -19,13 +19,13 @@ class Element extends AbstractModel implements Serializable, JsonSerializable
     #[Column(attributes: [Column::ATTRIBUTE_UNSIGNED], autoIncrement: true)]
     private ?int $id = null;
 
-    #[Column]
+    #[Column(attributes: [Column::ATTRIBUTE_UNSIGNED])]
     private int $eventId;
 
-    #[Column]
+    #[Column(attributes: [Column::ATTRIBUTE_UNSIGNED])]
     private ?int $parentId = null;
 
-    #[Column]
+    #[Column(attributes: [Column::ATTRIBUTE_UNSIGNED])]
     private int $order = 0;
 
     /**
