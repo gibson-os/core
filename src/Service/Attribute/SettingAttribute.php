@@ -28,7 +28,7 @@ class SettingAttribute implements ParameterAttributeInterface, AttributeServiceI
     public function replace(AttributeInterface $attribute, array $parameters, ReflectionParameter $reflectionParameter): mixed
     {
         if (!$attribute instanceof GetSetting) {
-            return $parameters;
+            return null;
         }
 
         try {

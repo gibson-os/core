@@ -6,10 +6,12 @@ namespace GibsonOS\Core\Model;
 use DateTime;
 use DateTimeInterface;
 use GibsonOS\Core\Attribute\Install\Database\Column;
+use GibsonOS\Core\Attribute\Install\Database\Table;
 use GibsonOS\Core\Model\Weather\Location;
 use JsonSerializable;
 use mysqlDatabase;
 
+#[Table]
 class Weather extends AbstractModel implements JsonSerializable
 {
     #[Column(attributes: [Column::ATTRIBUTE_UNSIGNED], autoIncrement: true)]

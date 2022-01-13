@@ -13,6 +13,7 @@ use GibsonOS\Core\Dto\Install\Success;
 use GibsonOS\Core\Exception\FactoryError;
 use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\InstallException;
+use GibsonOS\Core\Service\Attribute\TableAttribute;
 use GibsonOS\Core\Service\DirService;
 use GibsonOS\Core\Service\EnvService;
 use GibsonOS\Core\Service\Install\AbstractInstall;
@@ -78,7 +79,8 @@ class TableInstall extends AbstractInstall implements PriorityInterface
         ServiceManagerService $serviceManagerService,
         EnvService $envService,
         LoggerInterface $logger,
-        private mysqlDatabase $mysqlDatabase
+        private mysqlDatabase $mysqlDatabase,
+        private TableAttribute $tableAttribute
     ) {
         parent::__construct($dirService, $serviceManagerService, $envService, $logger);
     }
@@ -105,11 +107,7 @@ class TableInstall extends AbstractInstall implements PriorityInterface
             $columnsAttributes = [];
             /** @var Table $tableAttribute */
             $tableAttribute = $tableAttributes[0]->newInstance();
-            $tableName = $tableAttribute->getName() ?? $this->transformName(str_replace(
-                DIRECTORY_SEPARATOR,
-                '',
-                str_replace($path . DIRECTORY_SEPARATOR, '', mb_substr($file, 0, -4))
-            ));
+            $tableName = $this->tableAttribute->getTableName($tableAttribute, $className);
             $tableAttribute->setName($tableName);
 
             foreach ($reflectionClass->getProperties() as $reflectionProperty) {
@@ -125,7 +123,7 @@ class TableInstall extends AbstractInstall implements PriorityInterface
                 $columnAttribute = $columnAttributes[0]->newInstance();
                 $defaultValue = $reflectionProperty->getDefaultValue();
                 $columnAttribute
-                    ->setName($columnAttribute->getName() ?? $this->transformName($reflectionProperty->getName()))
+                    ->setName($columnAttribute->getName() ?? $this->tableAttribute->transformName($reflectionProperty->getName()))
                     ->setType($columnAttribute->getType() ?? $this->mapType($type))
                     ->setNullable(
                         $columnAttribute->isAutoIncrement()
@@ -186,14 +184,6 @@ class TableInstall extends AbstractInstall implements PriorityInterface
         return 700;
     }
 
-    private function transformName(string $name): string
-    {
-        $nameParts = explode('\\', $name);
-        $name = lcfirst(end($nameParts));
-
-        return mb_strtolower(preg_replace('/([A-Z])/', '_$1', $name));
-    }
-
     private function mapType(string $type): string
     {
         /** @psalm-suppress UndefinedMethod */
@@ -209,6 +199,9 @@ class TableInstall extends AbstractInstall implements PriorityInterface
 
     /**
      * @param Column[] $columns
+     *
+     * @throws GetError
+     * @throws InstallException
      */
     private function createTable(Table $table, array $columns): void
     {
@@ -271,11 +264,6 @@ class TableInstall extends AbstractInstall implements PriorityInterface
                             ? Column::DEFAULT_CURRENT_TIMESTAMP
                             : ($default === null ? 'NULL' : "'" . $default . "'")
                     )
-//                    : 'DEFAULT ' . (
-//                        $default === Column::DEFAULT_CURRENT_TIMESTAMP
-//                            ? Column::DEFAULT_CURRENT_TIMESTAMP
-//                            : ($default === null ? 'NULL' : "'" . $default . "'")
-//                    )
             )
         ;
     }

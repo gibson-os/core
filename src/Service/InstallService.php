@@ -10,6 +10,7 @@ use GibsonOS\Core\Dto\Install\InstallDtoInterface;
 use GibsonOS\Core\Dto\Install\Success;
 use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\InstallException;
+use GibsonOS\Core\Exception\SetError;
 use GibsonOS\Core\Service\Install\InstallInterface;
 use GibsonOS\Core\Service\Install\SingleInstallInterface;
 
@@ -42,8 +43,9 @@ class InstallService
     }
 
     /**
-     * @throws InstallException
      * @throws GetError
+     * @throws SetError
+     * @throws InstallException
      *
      * @return Generator<InstallDtoInterface>|InstallDtoInterface[]
      */
@@ -122,7 +124,7 @@ class InstallService
                 throw new InstallException(sprintf('Env file "%s" is not writable!', $envFilename));
             }
 
-            $envFile = file_get_contents($envFilename);
+            $envFile = file_exists($envFilename) ? file_get_contents($envFilename) : '';
             $oldEnvEntries = [];
 
             foreach (explode(PHP_EOL, $envFile) as $envEntry) {
