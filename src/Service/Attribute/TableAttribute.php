@@ -43,7 +43,11 @@ class TableAttribute implements ParameterAttributeInterface, AttributeServiceInt
         return $tableAttribute->getName() ?? $this->transformName(str_replace(
             '\\',
             '',
-            preg_replace('/.*Model\\\\/', '', $modelClassName)
+            str_replace(
+                'Core\\',
+                '',
+                preg_replace('/.*\\\\(.+?)\\\\.*Model\\\\/', '$1\\', $modelClassName)
+            )
         ));
     }
 
