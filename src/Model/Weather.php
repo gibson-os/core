@@ -23,10 +23,10 @@ class Weather extends AbstractModel implements JsonSerializable
     #[Column]
     private DateTimeInterface $date;
 
-    #[Column(attributes: [Column::ATTRIBUTE_UNSIGNED])]
+    #[Column]
     private float $temperature;
 
-    #[Column(attributes: [Column::ATTRIBUTE_UNSIGNED])]
+    #[Column]
     private float $feelsLike;
 
     #[Column(type: Column::TYPE_INT, attributes: [Column::ATTRIBUTE_UNSIGNED])]
@@ -35,7 +35,7 @@ class Weather extends AbstractModel implements JsonSerializable
     #[Column(type: Column::TYPE_TINYINT, attributes: [Column::ATTRIBUTE_UNSIGNED])]
     private int $humidity;
 
-    #[Column(attributes: [Column::ATTRIBUTE_UNSIGNED])]
+    #[Column]
     private float $dewPoint;
 
     #[Column(type: Column::TYPE_TINYINT, attributes: [Column::ATTRIBUTE_UNSIGNED])]
@@ -47,10 +47,10 @@ class Weather extends AbstractModel implements JsonSerializable
     #[Column(attributes: [Column::ATTRIBUTE_UNSIGNED])]
     private float $windSpeed;
 
-    #[Column(type: Column::TYPE_INT)]
+    #[Column(type: Column::TYPE_INT, attributes: [Column::ATTRIBUTE_UNSIGNED])]
     private int $windDegree;
 
-    #[Column(type: Column::TYPE_INT)]
+    #[Column(type: Column::TYPE_INT, attributes: [Column::ATTRIBUTE_UNSIGNED])]
     private int $visibility;
 
     #[Column(attributes: [Column::ATTRIBUTE_UNSIGNED])]
@@ -68,8 +68,14 @@ class Weather extends AbstractModel implements JsonSerializable
     #[Column(attributes: [Column::ATTRIBUTE_UNSIGNED])]
     private ?float $windGust = null;
 
-    #[Column(length: 255)]
+    #[Column(length: 512)]
     private ?string $icon = null;
+
+    #[Column]
+    private ?DateTimeInterface $sunset = null;
+
+    #[Column]
+    private ?DateTimeInterface $sunrise = null;
 
     private Location $location;
 
@@ -328,6 +334,30 @@ class Weather extends AbstractModel implements JsonSerializable
         return $this;
     }
 
+    public function getSunset(): ?DateTimeInterface
+    {
+        return $this->sunset;
+    }
+
+    public function setSunset(?DateTimeInterface $sunset): Weather
+    {
+        $this->sunset = $sunset;
+
+        return $this;
+    }
+
+    public function getSunrise(): ?DateTimeInterface
+    {
+        return $this->sunrise;
+    }
+
+    public function setSunrise(?DateTimeInterface $sunrise): Weather
+    {
+        $this->sunrise = $sunrise;
+
+        return $this;
+    }
+
     public function jsonSerialize(): array
     {
         return [
@@ -350,6 +380,8 @@ class Weather extends AbstractModel implements JsonSerializable
             'snow' => $this->getSnow(),
             'windGust' => $this->getWindGust(),
             'icon' => $this->getIcon(),
+            'sunset' => $this->getSunset(),
+            'sunrise' => $this->getSunrise(),
         ];
     }
 }

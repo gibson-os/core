@@ -31,7 +31,7 @@ class User extends AbstractModel implements JsonSerializable
     #[Column]
     private ?DateTimeInterface $lastLogin = null;
 
-    #[Column(default: Column::DEFAULT_CURRENT_TIMESTAMP)]
+    #[Column(type: Column::TYPE_TIMESTAMP, default: Column::DEFAULT_CURRENT_TIMESTAMP)]
     private DateTimeInterface $added;
 
     public function __construct(mysqlDatabase $database = null)
