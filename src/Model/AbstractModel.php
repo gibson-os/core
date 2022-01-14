@@ -96,7 +96,7 @@ abstract class AbstractModel implements ModelInterface
         $parentModelClassName = $constraintAttribute->getParentModelClassName() ?? $propertyTypeName;
         $parentColumn = $constraintAttribute->getParentColumn();
         $fieldName = $this->transformFieldName($parentColumn);
-        $getterName = $name . 'Id';
+        $getterName = 'get' . lcfirst($constraintAttribute->getOwnColumn() ?? $propertyName . 'Id');
         /** @var float|int|string $value */
         $value = $this->{$getterName}();
         /** @var AbstractModel $parentModel */

@@ -17,6 +17,7 @@ class Constraint
         private ?string $onDelete = null,
         private ?string $onUpdate = null,
         private ?string $name = null,
+        private ?string $ownColumn = null,
     ) {
     }
 
@@ -43,5 +44,10 @@ class Constraint
     public function getName(): ?string
     {
         return $this->name;
+    }
+
+    public function getOwnColumn(): ?string
+    {
+        return $this->ownColumn;
     }
 }
