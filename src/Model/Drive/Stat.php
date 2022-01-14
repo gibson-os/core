@@ -23,7 +23,7 @@ class Stat extends AbstractModel
     #[Column(length: 4)]
     private string $disk;
 
-    #[Column]
+    #[Column(type: Column::TYPE_TIMESTAMP, default: Column::DEFAULT_CURRENT_TIMESTAMP)]
     private DateTimeInterface $added;
 
     private Drive $drive;

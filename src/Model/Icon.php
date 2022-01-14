@@ -22,7 +22,7 @@ class Icon extends AbstractModel implements JsonSerializable
     #[Column(length: 4)]
     private string $originalType;
 
-    #[Column(default: Column::DEFAULT_CURRENT_TIMESTAMP)]
+    #[Column(type: Column::TYPE_TIMESTAMP, default: Column::DEFAULT_CURRENT_TIMESTAMP)]
     private DateTimeInterface $added;
 
     public function __construct(mysqlDatabase $database = null)

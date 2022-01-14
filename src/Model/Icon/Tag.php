@@ -13,7 +13,7 @@ use mysqlDatabase;
 #[Table]
 class Tag extends AbstractModel implements JsonSerializable
 {
-    #[Column(primary: true)]
+    #[Column(attributes: [Column::ATTRIBUTE_UNSIGNED], primary: true)]
     private int $iconId;
 
     #[Column(length: 64, primary: true)]

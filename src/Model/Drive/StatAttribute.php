@@ -10,22 +10,22 @@ use GibsonOS\Core\Model\AbstractModel;
 #[Table('system_drive_stat_attribute')]
 class StatAttribute extends AbstractModel
 {
-    #[Column(primary: true)]
+    #[Column(attributes: [Column::ATTRIBUTE_UNSIGNED], primary: true)]
     private int $statId;
 
-    #[Column(primary: true)]
+    #[Column(attributes: [Column::ATTRIBUTE_UNSIGNED], primary: true)]
     private int $attributeId;
 
-    #[Column(type: Column::TYPE_INT)]
+    #[Column(type: Column::TYPE_INT, attributes: [Column::ATTRIBUTE_UNSIGNED])]
     private int $value;
 
-    #[Column(type: Column::TYPE_INT)]
+    #[Column(type: Column::TYPE_INT, attributes: [Column::ATTRIBUTE_UNSIGNED])]
     private int $worst;
 
-    #[Column(type: Column::TYPE_INT)]
+    #[Column(type: Column::TYPE_INT, attributes: [Column::ATTRIBUTE_UNSIGNED])]
     private int $thresh;
 
-    #[Column(type: Column::TYPE_INT)]
+    #[Column(type: Column::TYPE_INT, attributes: [Column::ATTRIBUTE_UNSIGNED])]
     private int $rawValue;
 
     public static function getTableName(): string
