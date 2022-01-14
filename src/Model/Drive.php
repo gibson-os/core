@@ -87,11 +87,6 @@ class Drive extends AbstractModel implements JsonSerializable
         $this->added = new DateTimeImmutable();
     }
 
-    public static function getTableName(): string
-    {
-        return 'system_drive';
-    }
-
     public function getId(): ?int
     {
         return $this->id;

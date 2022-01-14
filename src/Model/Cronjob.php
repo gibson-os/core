@@ -40,11 +40,6 @@ class Cronjob extends AbstractModel implements JsonSerializable
     #[Column(type: Column::TYPE_TIMESTAMP, default: Column::DEFAULT_CURRENT_TIMESTAMP)]
     private DateTimeInterface $added;
 
-    public static function getTableName(): string
-    {
-        return 'cronjob';
-    }
-
     public function __construct(mysqlDatabase $database = null)
     {
         parent::__construct($database);

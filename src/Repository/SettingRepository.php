@@ -3,11 +3,16 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Repository;
 
+use GibsonOS\Core\Attribute\GetTableName;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\Setting;
 
 class SettingRepository extends AbstractRepository
 {
+    public function __construct(#[GetTableName(Setting::class)] private string $settingTableName)
+    {
+    }
+
     /**
      * @throws SelectError
      *
@@ -41,8 +46,8 @@ class SettingRepository extends AbstractRepository
             $parameters[] = $userId;
         }
 
-        $table = $this->getTable(Setting::getTableName())
-            ->appendJoin('module', '`' . Setting::getTableName() . '`.`module_id`=`module`.`id`')
+        $table = $this->getTable($this->settingTableName)
+            ->appendJoin('module', '`' . $this->settingTableName . '`.`module_id`=`module`.`id`')
             ->setWhere(
                 '`module`.`name`=? AND ' .
                 '(`user_id` IS NULL' . ($userId === null ? '' : ' OR `user_id`=?') . ')'
@@ -83,7 +88,7 @@ class SettingRepository extends AbstractRepository
             $parameters[] = $userId;
         }
 
-        $tableName = Setting::getTableName();
+        $tableName = $this->settingTableName;
         $table = $this->getTable($tableName)
             ->appendJoin('module', '`' . $tableName . '`.`module_id`=`module`.`id`')
             ->setWhere(

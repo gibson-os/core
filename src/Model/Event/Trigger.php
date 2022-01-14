@@ -76,11 +76,6 @@ class Trigger extends AbstractModel implements JsonSerializable
         $this->event = new Event();
     }
 
-    public static function getTableName(): string
-    {
-        return 'event_trigger';
-    }
-
     public function getId(): ?int
     {
         return $this->id;

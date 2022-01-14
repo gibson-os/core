@@ -28,11 +28,6 @@ class StatAttribute extends AbstractModel
     #[Column(type: Column::TYPE_INT, attributes: [Column::ATTRIBUTE_UNSIGNED])]
     private int $rawValue;
 
-    public static function getTableName(): string
-    {
-        return 'system_drive_stat_attribute';
-    }
-
     public function getStatId(): int
     {
         return $this->statId;

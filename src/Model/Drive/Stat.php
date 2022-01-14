@@ -36,11 +36,6 @@ class Stat extends AbstractModel
         $this->drive = new Drive();
     }
 
-    public static function getTableName(): string
-    {
-        return 'system_drive_stat';
-    }
-
     public function getId(): ?int
     {
         return $this->id;

@@ -40,11 +40,6 @@ class Location extends AbstractModel implements JsonSerializable, AutoCompleteMo
     #[Column(length: 255)]
     private ?string $error = null;
 
-    public static function getTableName(): string
-    {
-        return 'weather_location';
-    }
-
     public function getId(): ?int
     {
         return $this->id;

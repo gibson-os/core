@@ -43,11 +43,6 @@ class Device extends AbstractModel
         $this->added = new DateTimeImmutable();
     }
 
-    public static function getTableName(): string
-    {
-        return 'user_device';
-    }
-
     public function getId(): string
     {
         return $this->id;

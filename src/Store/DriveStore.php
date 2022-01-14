@@ -4,7 +4,10 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Store;
 
 use DateTimeInterface;
+use GibsonOS\Core\Attribute\GetTableName;
 use GibsonOS\Core\Model\Drive;
+use GibsonOS\Core\Service\AttributeService;
+use mysqlDatabase;
 
 class DriveStore extends AbstractDatabaseStore
 {
@@ -18,6 +21,15 @@ class DriveStore extends AbstractDatabaseStore
 
     private DateTimeInterface $toTime;
 
+    public function __construct(
+        #[GetTableName(Drive\Stat::class)] private $driveStatTableName,
+        #[GetTableName(Drive\StatAttribute::class)] private $driveStatAttributeTableName,
+        AttributeService $attributeService,
+        mysqlDatabase $database = null
+    ) {
+        parent::__construct($attributeService, $database);
+    }
+
     protected function getModelClassName(): string
     {
         return Drive::class;
@@ -28,19 +40,25 @@ class DriveStore extends AbstractDatabaseStore
         parent::initTable();
 
         $this->table
-            ->appendJoin(Drive\Stat::getTableName(), '`system_drive`.`id`=`system_drive_stat`.`drive_id`')
-            ->appendJoin(Drive\StatAttribute::getTableName(), '`system_drive_stat`.`id`=`system_drive_stat_attribute`.`stat_id`')
+            ->appendJoin(
+                $this->driveStatTableName,
+                '`' . $this->tableName . '`.`id`=`' . $this->driveStatTableName . '`.`drive_id`'
+            )
+            ->appendJoin(
+                $this->driveStatAttributeTableName,
+                '`' . $this->driveStatTableName . '`.`id`=`' . $this->driveStatAttributeTableName . '`.`stat_id`'
+            )
         ;
     }
 
     protected function getDefaultOrder(): string
     {
-        return '`system_drive_stat`.`added`';
+        return '`' . $this->driveStatTableName . '`.`added`';
     }
 
     protected function setWheres(): void
     {
-        $this->addWhere('`system_drive_stat_attribute`.`attribute_id`)=?', [$this->attributeId]);
+        $this->addWhere('`' . $this->driveStatAttributeTableName . '`.`attribute_id`)=?', [$this->attributeId]);
 
         $timeRange = $this->toTime->getTimestamp() - $this->fromTime->getTimestamp();
         $timePoint = 900;
@@ -50,20 +68,20 @@ class DriveStore extends AbstractDatabaseStore
             $timePoint += 900;
         }
 
-        $this->addWhere('UNIX_TIMESTAMP(`system_drive_stat`.`added`)%? BETWEEN 0 AND 60', [$timePoint]);
+        $this->addWhere('UNIX_TIMESTAMP(`' . $this->driveStatTableName . '`.`added`)%? BETWEEN 0 AND 60', [$timePoint]);
 
         if ($this->from !== null) {
             $this->addWhere(
-                'UNIX_TIMESTAMP(`system_drive_stat`.`added`)>=UNIX_TIMESTAMP(?)',
+                'UNIX_TIMESTAMP(`' . $this->driveStatTableName . '`.`added`)>=UNIX_TIMESTAMP(?)',
                 [$this->from->format('Y-m-d H:i:s')]
             );
         } else {
-            $this->addWhere('UNIX_TIMESTAMP(`system_drive_stat`.`added`)>=UNIX_TIMESTAMP(NOW())-(3600*4)-840');
+            $this->addWhere('UNIX_TIMESTAMP(`' . $this->driveStatTableName . '`.`added`)>=UNIX_TIMESTAMP(NOW())-(3600*4)-840');
         }
 
         if ($this->to !== null) {
             $this->addWhere(
-                'UNIX_TIMESTAMP(`system_drive_stat`.`added`)<=UNIX_TIMESTAMP(?)+60',
+                'UNIX_TIMESTAMP(`' . $this->driveStatTableName . '`.`added`)<=UNIX_TIMESTAMP(?)+60',
                 [$this->to->format('Y-m-d H:i:s')]
             );
         }
@@ -108,10 +126,10 @@ class DriveStore extends AbstractDatabaseStore
     {
         $this->table->select(
             false,
-            '`system_drive`.`serial`, '
-            . '`system_drive_stat_attribute`.`raw_value`, '
-            . "DATE_FORMAT(`system_drive_stat`.`added`, '%d.%m.%Y %H:%i') AS `date`, "
-            . "UNIX_TIMESTAMP(DATE_FORMAT(`system_drive_stat`.`added`, '%Y-%m-%d %H:%i')) AS `timestamp`"
+            '`' . $this->tableName . '`.`serial`, '
+            . '`' . $this->driveStatAttributeTableName . '`.`raw_value`, '
+            . "DATE_FORMAT(`' . $this->driveStatTableName . '`.`added`, '%d.%m.%Y %H:%i') AS `date`, "
+            . "UNIX_TIMESTAMP(DATE_FORMAT(`' . $this->driveStatTableName . '`.`added`, '%Y-%m-%d %H:%i')) AS `timestamp`"
         );
 
         $data = [];

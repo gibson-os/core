@@ -18,11 +18,6 @@ class Lock extends AbstractModel
     #[Column]
     private bool $stop = false;
 
-    public static function getTableName(): string
-    {
-        return 'lock';
-    }
-
     public function getName(): string
     {
         return $this->name;

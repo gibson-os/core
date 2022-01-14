@@ -16,11 +16,6 @@ class Module extends AbstractModel implements JsonSerializable
     #[Column(length: 32)]
     private string $name;
 
-    public static function getTableName(): string
-    {
-        return 'module';
-    }
-
     public function getId(): ?int
     {
         return $this->id;

@@ -3,11 +3,16 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Repository;
 
+use GibsonOS\Core\Attribute\GetTableName;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\Module;
 
 class ModuleRepository extends AbstractRepository
 {
+    public function __construct(#[GetTableName(Module::class)] private string $moduleTableName)
+    {
+    }
+
     /**
      * @throws SelectError
      */
@@ -18,7 +23,7 @@ class ModuleRepository extends AbstractRepository
 
     public function deleteByIdsNot(array $ids): bool
     {
-        $table = $this->getTable(Module::getTableName());
+        $table = $this->getTable($this->moduleTableName);
 
         return $table
             ->setWhere('`ids` IN (' . $table->getParametersString($ids) . ')')

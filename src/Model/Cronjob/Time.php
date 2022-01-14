@@ -61,11 +61,6 @@ class Time extends AbstractModel
 
     private Cronjob $cronjob;
 
-    public static function getTableName(): string
-    {
-        return 'cronjob_time';
-    }
-
     public function getId(): ?int
     {
         return $this->id;

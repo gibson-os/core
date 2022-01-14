@@ -3,12 +3,17 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Repository\User;
 
+use GibsonOS\Core\Attribute\GetTableName;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\User\Device;
 use GibsonOS\Core\Repository\AbstractRepository;
 
 class DeviceRepository extends AbstractRepository
 {
+    public function __construct(#[GetTableName(Device::class)] private string $deviceTableName)
+    {
+    }
+
     /**
      * @throws SelectError
      */
@@ -45,7 +50,7 @@ class DeviceRepository extends AbstractRepository
 
     public function deleteByIds(array $ids, int $userId = null): void
     {
-        $table = $this->getTable(Device::getTableName());
+        $table = $this->getTable($this->deviceTableName);
         $table
             ->setWhereParameters($ids)
             ->deletePrepared()

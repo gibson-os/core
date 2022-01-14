@@ -72,11 +72,6 @@ class Element extends AbstractModel implements Serializable, JsonSerializable
         $this->event = new Event();
     }
 
-    public static function getTableName(): string
-    {
-        return 'event_element';
-    }
-
     public function getId(): ?int
     {
         return $this->id;

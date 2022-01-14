@@ -7,7 +7,7 @@ use Attribute;
 use GibsonOS\Core\Service\Attribute\TableAttribute;
 
 #[Attribute(Attribute::TARGET_PARAMETER | Attribute::TARGET_PROPERTY)]
-class GetTable implements AttributeInterface
+class GetTableName implements AttributeInterface
 {
     /**
      * @param class-string $modelClassName

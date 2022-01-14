@@ -42,11 +42,6 @@ class Event extends AbstractModel implements JsonSerializable, AutoCompleteModel
      */
     private ?array $triggers = null;
 
-    public static function getTableName(): string
-    {
-        return 'event';
-    }
-
     public function getId(): ?int
     {
         return $this->id;

@@ -29,11 +29,6 @@ class Setting extends AbstractModel implements JsonSerializable
 
     private Module $module;
 
-    public static function getTableName(): string
-    {
-        return 'setting';
-    }
-
     public function getId(): ?int
     {
         return $this->id;

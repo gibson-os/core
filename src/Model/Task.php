@@ -29,11 +29,6 @@ class Task extends AbstractModel implements JsonSerializable
         $this->module = new Module();
     }
 
-    public static function getTableName(): string
-    {
-        return 'task';
-    }
-
     public function getId(): ?int
     {
         return $this->id;

@@ -16,11 +16,6 @@ class Permission extends AbstractModel
     #[Column(type: Column::TYPE_TINYINT, attributes: [Column::ATTRIBUTE_UNSIGNED], primary: true)]
     private int $permission;
 
-    public static function getTableName(): string
-    {
-        return 'action_permission';
-    }
-
     public function getActionId(): int
     {
         return $this->actionId;

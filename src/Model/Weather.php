@@ -86,11 +86,6 @@ class Weather extends AbstractModel implements JsonSerializable
         $this->location = new Location();
     }
 
-    public static function getTableName(): string
-    {
-        return 'weather';
-    }
-
     public function getId(): ?int
     {
         return $this->id;

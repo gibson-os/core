@@ -41,11 +41,6 @@ class User extends AbstractModel implements JsonSerializable
         $this->added = new DateTimeImmutable();
     }
 
-    public static function getTableName(): string
-    {
-        return 'user';
-    }
-
     public function getId(): ?int
     {
         return $this->id;

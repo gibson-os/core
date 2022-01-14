@@ -28,11 +28,6 @@ class Tag extends AbstractModel implements JsonSerializable
         $this->icon = new Icon();
     }
 
-    public static function getTableName(): string
-    {
-        return 'icon_tag';
-    }
-
     public function getIconId(): int
     {
         return $this->iconId;

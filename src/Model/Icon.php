@@ -32,11 +32,6 @@ class Icon extends AbstractModel implements JsonSerializable
         $this->added = new DateTimeImmutable();
     }
 
-    public static function getTableName(): string
-    {
-        return 'icon';
-    }
-
     public function getId(): ?int
     {
         return $this->id;

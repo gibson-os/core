@@ -43,11 +43,6 @@ class Permission extends AbstractModel
 
     private ?User $user;
 
-    public static function getTableName(): string
-    {
-        return 'user_permission';
-    }
-
     public function getId(): ?int
     {
         return $this->id;

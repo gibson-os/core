@@ -3,11 +3,16 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Repository;
 
+use GibsonOS\Core\Attribute\GetTableName;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\Action;
 
 class ActionRepository extends AbstractRepository
 {
+    public function __construct(#[GetTableName(Action::class)] private string $actionTableName)
+    {
+    }
+
     /**
      * @throws SelectError
      */
@@ -18,7 +23,7 @@ class ActionRepository extends AbstractRepository
 
     public function deleteByIdsNot(array $ids): bool
     {
-        $table = $this->getTable(Action::getTableName());
+        $table = $this->getTable($this->actionTableName);
 
         return $table
             ->setWhere('`ids` IN (' . $table->getParametersString($ids) . ')')

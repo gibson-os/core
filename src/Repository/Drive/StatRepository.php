@@ -3,14 +3,17 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Repository\Drive;
 
+use GibsonOS\Core\Attribute\GetTableName;
 use GibsonOS\Core\Model\Drive\Stat;
 use GibsonOS\Core\Repository\AbstractRepository;
 use GibsonOS\Core\Service\DateTimeService;
 
 class StatRepository extends AbstractRepository
 {
-    public function __construct(private DateTimeService $dateTimeService)
-    {
+    public function __construct(
+        private DateTimeService $dateTimeService,
+        #[GetTableName(Stat::class)] private string $statTableName
+    ) {
     }
 
     /**
@@ -18,7 +21,7 @@ class StatRepository extends AbstractRepository
      */
     public function getTimeRange(): array
     {
-        $table = $this->getTable(Stat::getTableName());
+        $table = $this->getTable($this->statTableName);
         $range = $table->selectAggregatePrepared('MIN(`added`) AS `min`, MAX(`added`) AS `max`');
 
         return [

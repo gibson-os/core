@@ -37,11 +37,6 @@ class PermissionView extends AbstractModel implements JsonSerializable
 
     private ?string $actionName = null;
 
-    public static function getTableName(): string
-    {
-        return 'view_user_permission';
-    }
-
     public function getUserId(): ?int
     {
         return $this->userId;

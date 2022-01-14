@@ -5,6 +5,7 @@ namespace GibsonOS\Core\Repository;
 
 use DateTimeInterface;
 use DateTimeZone;
+use GibsonOS\Core\Attribute\GetTableName;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\Weather;
 use GibsonOS\Core\Model\Weather\Location;
@@ -12,8 +13,10 @@ use GibsonOS\Core\Service\DateTimeService;
 
 class WeatherRepository extends AbstractRepository
 {
-    public function __construct(private DateTimeService $dateTimeService)
-    {
+    public function __construct(
+        private DateTimeService $dateTimeService,
+        #[GetTableName(Weather::class)] private string $weatherTableName
+    ) {
     }
 
     /**
@@ -46,7 +49,7 @@ class WeatherRepository extends AbstractRepository
 
     public function deleteBetweenDates(Location $location, DateTimeInterface $from, DateTimeInterface $to): void
     {
-        $this->getTable(Weather::getTableName())
+        $this->getTable($this->weatherTableName)
             ->setWhere('`date` > ? AND `date` < ? AND `location_id`=?')
             ->setWhereParameters([
                 $from->format('Y-m-d H:i:s'),

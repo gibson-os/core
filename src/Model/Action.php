@@ -35,11 +35,6 @@ class Action extends AbstractModel implements JsonSerializable
         $this->task = new Task();
     }
 
-    public static function getTableName(): string
-    {
-        return 'action';
-    }
-
     public function getId(): ?int
     {
         return $this->id;

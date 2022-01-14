@@ -3,12 +3,17 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Repository\Action;
 
+use GibsonOS\Core\Attribute\GetTableName;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\Action\Permission;
 use GibsonOS\Core\Repository\AbstractRepository;
 
 class PermissionRepository extends AbstractRepository
 {
+    public function __construct(#[GetTableName(Permission::class)] private string $permissionTableName)
+    {
+    }
+
     /**
      * @throws SelectError
      *
@@ -21,7 +26,7 @@ class PermissionRepository extends AbstractRepository
 
     public function deleteByAction(string $action): bool
     {
-        $table = $this->getTable(Permission::getTableName())
+        $table = $this->getTable($this->permissionTableName)
             ->setWhere('`action`=?')
             ->addWhereParameter($action)
         ;

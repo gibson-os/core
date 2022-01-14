@@ -3,7 +3,10 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Store;
 
+use GibsonOS\Core\Attribute\GetTableName;
 use GibsonOS\Core\Model\Icon;
+use GibsonOS\Core\Service\AttributeService;
+use mysqlDatabase;
 
 class IconStore extends AbstractDatabaseStore
 {
@@ -11,6 +14,14 @@ class IconStore extends AbstractDatabaseStore
      * @var string[]
      */
     private array $tags = [];
+
+    public function __construct(
+        #[GetTableName(Icon\Tag::class)] private string $iconTagTableName,
+        AttributeService $attributeService,
+        mysqlDatabase $database = null
+    ) {
+        parent::__construct($attributeService, $database);
+    }
 
     protected function getModelClassName(): string
     {
@@ -22,7 +33,10 @@ class IconStore extends AbstractDatabaseStore
         parent::initTable();
 
         if (count($this->tags) > 0) {
-            $this->table->appendJoin(Icon\Tag::getTableName(), '`icon_tag`.`icon_id` = `icon`.`id`');
+            $this->table->appendJoin(
+                $this->iconTagTableName,
+                '`' . $this->iconTagTableName . '`.`icon_id` = `' . $this->tableName . '`.`id`'
+            );
         }
     }
 
@@ -30,7 +44,7 @@ class IconStore extends AbstractDatabaseStore
     {
         if (count($this->tags) > 0) {
             $this->addWhere(
-                '`icon_tag`.`tag` IN (' . $this->table->getParametersString($this->tags) . ')',
+                '`' . $this->iconTagTableName . '`.`tag` IN (' . $this->table->getParametersString($this->tags) . ')',
                 $this->tags
             );
         }

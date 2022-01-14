@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Repository;
 
 use DateTimeInterface;
+use GibsonOS\Core\Attribute\GetTableName;
 use GibsonOS\Core\Exception\Model\SaveError;
 use GibsonOS\Core\Exception\Repository\DeleteError;
 use GibsonOS\Core\Exception\Repository\SelectError;
@@ -18,8 +19,12 @@ use stdClass;
 
 class EventRepository extends AbstractRepository
 {
-    public function __construct(private JsonUtility $jsonUtility, private DateTimeService $dateTimeService)
-    {
+    public function __construct(
+        private JsonUtility $jsonUtility,
+        private DateTimeService $dateTimeService,
+        #[GetTableName(Element::class)] private string $elementTableName,
+        #[GetTableName(Trigger::class)] private string $triggerTableName
+    ) {
     }
 
     /**
@@ -88,7 +93,7 @@ class EventRepository extends AbstractRepository
 
     private function initializeTable(): mysqlTable
     {
-        $table = $this->getTable(Element::getTableName());
+        $table = $this->getTable($this->elementTableName);
         $table->appendJoinLeft('`event`', '`event_element`.`event_id`=`event`.`id`');
         $table->appendJoinLeft('`event_trigger`', '`event_element`.`event_id`=`event_trigger`.`event_id`');
         $table->setOrderBy('`event_trigger`.`priority` DESC, `event_element`.`parent_id`, `event_element`.`order`');
@@ -129,7 +134,7 @@ class EventRepository extends AbstractRepository
      */
     public function deleteElements(Event $event, ?array $notIds): void
     {
-        $table = $this->getTable(Element::getTableName())
+        $table = $this->getTable($this->elementTableName)
             ->setWhere(
                 (
                     empty($notIds)
@@ -191,7 +196,7 @@ class EventRepository extends AbstractRepository
      */
     public function deleteTriggers(Event $event, ?array $notIds): void
     {
-        $table = $this->getTable(Trigger::getTableName())
+        $table = $this->getTable($this->triggerTableName)
             ->setWhere(
                 (
                     empty($notIds)

@@ -4,19 +4,26 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Repository;
 
 use DateTimeInterface;
+use GibsonOS\Core\Attribute\GetTableName;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\Cronjob;
 use mysqlTable;
 
 class CronjobRepository extends AbstractRepository
 {
+    public function __construct(
+        #[GetTableName(Cronjob::class)] private string $cronjobTableName,
+        #[GetTableName(Cronjob\Time::class)] private string $cronjobTimeTableName,
+    ) {
+    }
+
     /**
      * @return Cronjob[]
      */
     public function getRunnableByUser(DateTimeInterface $dateTime, string $user): array
     {
-        $tableName = Cronjob::getTableName();
-        $timeTableName = Cronjob\Time::getTableName();
+        $tableName = $this->cronjobTableName;
+        $timeTableName = $this->cronjobTimeTableName;
 
         $table = $this->getTable($tableName);
         $table
@@ -49,7 +56,7 @@ class CronjobRepository extends AbstractRepository
 
     private function getFirstRunBetweenPart(mysqlTable $table, DateTimeInterface $dateTime): string
     {
-        $tableName = Cronjob::getTableName();
+        $tableName = $this->cronjobTableName;
         $table
             ->addWhereParameter((int) $dateTime->format('w'))
             ->addWhereParameter((int) $dateTime->format('w'))
@@ -84,7 +91,7 @@ class CronjobRepository extends AbstractRepository
 
     private function getTimePart(mysqlTable $table, string $field, int $value): string
     {
-        $tableName = Cronjob\Time::getTableName();
+        $tableName = $this->cronjobTimeTableName;
         $table
             ->addWhereParameter($value)
             ->addWhereParameter($value)

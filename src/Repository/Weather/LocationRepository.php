@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Repository\Weather;
 
+use GibsonOS\Core\Attribute\GetTableName;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\Weather\Location;
 use GibsonOS\Core\Repository\AbstractRepository;
@@ -11,8 +12,11 @@ use Psr\Log\LoggerInterface;
 
 class LocationRepository extends AbstractRepository
 {
-    public function __construct(private DateTimeService $dateTimeService, private LoggerInterface $logger)
-    {
+    public function __construct(
+        private DateTimeService $dateTimeService,
+        private LoggerInterface $logger,
+        #[GetTableName(Location::class)] private string $locationTableName
+    ) {
     }
 
     /**
@@ -20,7 +24,7 @@ class LocationRepository extends AbstractRepository
      */
     public function getById(int $id): Location
     {
-        $table = $this->getTable(Location::getTableName())
+        $table = $this->getTable($this->locationTableName)
             ->setWhere('`id`=?')
             ->addWhereParameter($id)
             ->setLimit(1)
@@ -40,7 +44,7 @@ class LocationRepository extends AbstractRepository
     {
         $this->logger->debug(sprintf('Find weather location with name %d', $name));
 
-        $table = $this->getTable(Location::getTableName());
+        $table = $this->getTable($this->locationTableName);
         $where = '`name` LIKE ?';
 
         if ($onlyActive) {
@@ -72,7 +76,7 @@ class LocationRepository extends AbstractRepository
      */
     public function getToUpdate(): array
     {
-        $table = $this->getTable(Location::getTableName())
+        $table = $this->getTable($this->locationTableName)
             ->setWhere(
                 '`active`=1 AND ' .
                 '(`last_run` IS NULL OR FROM_UNIXTIME(UNIX_TIMESTAMP(`last_run`)+`interval`) <= ?)'

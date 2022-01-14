@@ -19,11 +19,6 @@ class SmartAttribute extends AbstractModel implements JsonSerializable
     #[Column(type: Column::TYPE_TEXT)]
     private string $description;
 
-    public static function getTableName(): string
-    {
-        return 'system_smart_attribute';
-    }
-
     public function getId(): ?int
     {
         return $this->id;

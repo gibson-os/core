@@ -4,22 +4,26 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Store\Event;
 
 use GibsonOS\Core\Dto\Parameter\AbstractParameter;
+use GibsonOS\Core\Exception\FactoryError;
 use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\Event\Element;
+use GibsonOS\Core\Service\AttributeService;
 use GibsonOS\Core\Store\AbstractDatabaseStore;
 use GibsonOS\Core\Utility\JsonUtility;
 use JsonException;
 use mysqlDatabase;
+use ReflectionException;
 
 class ElementStore extends AbstractDatabaseStore
 {
     public function __construct(
         private ClassNameStore $classNameStore,
         private MethodStore $methodStore,
+        AttributeService $attributeService,
         mysqlDatabase $database = null
     ) {
-        parent::__construct($database);
+        parent::__construct($attributeService, $database);
     }
 
     private int $eventId;
@@ -43,6 +47,8 @@ class ElementStore extends AbstractDatabaseStore
      * @throws GetError
      * @throws JsonException
      * @throws SelectError
+     * @throws FactoryError
+     * @throws ReflectionException
      *
      * @return Element[]
      */
