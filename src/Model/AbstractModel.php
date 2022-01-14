@@ -18,6 +18,7 @@ use mysqlTable;
 use ReflectionAttribute;
 use ReflectionClass;
 use ReflectionException;
+use ReflectionProperty;
 use Throwable;
 
 abstract class AbstractModel implements ModelInterface
@@ -55,6 +56,8 @@ abstract class AbstractModel implements ModelInterface
 
     private ?string $tableName = null;
 
+    private array $loadedConstraints = [];
+
     /**
      * @throws GetError
      */
@@ -70,13 +73,16 @@ abstract class AbstractModel implements ModelInterface
     }
 
     /**
+     * @param ModelInterface[] $arguments
+     *
      * @throws ReflectionException
      *
-     * @return ModelInterface|ModelInterface[]|null
+     * @return AbstractModel|AbstractModel[]|null
      */
     public function __call(string $name, array $arguments): mixed
     {
-        $propertyName = lcfirst(str_replace('get', '', $name));
+        $methodType = mb_substr($name, 0, 3);
+        $propertyName = lcfirst(mb_substr($name, 3));
 
         $reflectionClass = new ReflectionClass($this::class);
         $reflectionProperty = $reflectionClass->getProperty($propertyName);
@@ -96,12 +102,50 @@ abstract class AbstractModel implements ModelInterface
         $parentModelClassName = $constraintAttribute->getParentModelClassName() ?? $propertyTypeName;
         $parentColumn = $constraintAttribute->getParentColumn();
         $fieldName = $this->transformFieldName($parentColumn);
-        $getterName = 'get' . lcfirst($constraintAttribute->getOwnColumn() ?? $propertyName . 'Id');
+
+        return match ($methodType) {
+            'get' => $this->getConstraints(
+                $constraintAttribute,
+                $propertyName,
+                $parentModelClassName,
+                $propertyTypeName,
+                $fieldName,
+                $reflectionProperty
+            ),
+            'set' => '',
+            'add' => $this->addConstraint(
+                $constraintAttribute,
+                $propertyName,
+                $parentModelClassName,
+                $propertyTypeName,
+                $fieldName,
+                $reflectionProperty,
+                $arguments[0]
+            ),
+        };
+    }
+
+    /**
+     * @param class-string<AbstractModel> $parentModelClassName
+     *
+     * @return AbstractModel|AbstractModel[]|null
+     */
+    private function getConstraints(
+        Constraint $constraintAttribute,
+        string $propertyName,
+        string $parentModelClassName,
+        string $propertyTypeName,
+        string $fieldName,
+        ReflectionProperty $reflectionProperty
+    ): mixed {
+        $getterName = 'get' . lcfirst($this->transformFieldName(
+            $constraintAttribute->getOwnColumn() ?? $propertyName . 'Id'
+        ));
         /** @var float|int|string $value */
         $value = $this->{$getterName}();
-        /** @var AbstractModel $parentModel */
         $parentModel = new $parentModelClassName();
         $parentTable = $parentModel->getTableName();
+        $parentColumn = $constraintAttribute->getParentColumn();
 
         if ($propertyTypeName === 'array') {
             $this->$propertyName = $this->loadForeignRecords(
@@ -130,6 +174,51 @@ abstract class AbstractModel implements ModelInterface
         }
 
         return $this->$propertyName;
+    }
+
+    /**
+     * @param class-string<AbstractModel> $parentModelClassName
+     *
+     * @return AbstractModel
+     */
+    private function addConstraint(
+        Constraint $constraintAttribute,
+        string $propertyName,
+        string $parentModelClassName,
+        string $propertyTypeName,
+        string $fieldName,
+        ReflectionProperty $reflectionProperty,
+        ModelInterface $model
+    ): self {
+        if ($propertyTypeName !== 'array') {
+            return $this;
+        }
+
+        $this->getConstraints(
+            $constraintAttribute,
+            $propertyName,
+            $parentModelClassName,
+            $propertyTypeName,
+            $fieldName,
+            $reflectionProperty
+        );
+        $this->$propertyName[] = $model;
+
+        return $this;
+    }
+
+    private function setConstraint(
+        Constraint $constraintAttribute,
+        string $propertyName,
+        string $parentModelClassName,
+        string $propertyTypeName,
+        string $fieldName,
+        ReflectionProperty $reflectionProperty,
+        ModelInterface $model
+    ): self {
+        // @todo einbauen
+
+        return $this;
     }
 
     public function getMysqlTable(): mysqlTable
