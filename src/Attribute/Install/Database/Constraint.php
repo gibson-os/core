@@ -12,7 +12,7 @@ class Constraint
      * @param class-string $parentModelClassName
      */
     public function __construct(
-        private string $parentColumn,
+        private string $parentColumn = 'id',
         private ?string $parentModelClassName = null,
         private ?string $onDelete = null,
         private ?string $onUpdate = null,

@@ -4,14 +4,17 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Model\Event;
 
 use GibsonOS\Core\Attribute\Install\Database\Column;
+use GibsonOS\Core\Attribute\Install\Database\Constraint;
 use GibsonOS\Core\Attribute\Install\Database\Table;
 use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Model\Event;
 use GibsonOS\Core\Utility\JsonUtility;
 use JsonException;
 use JsonSerializable;
-use mysqlDatabase;
 
+/**
+ * @method Event getEvent()
+ */
 #[Table]
 class Trigger extends AbstractModel implements JsonSerializable
 {
@@ -67,14 +70,8 @@ class Trigger extends AbstractModel implements JsonSerializable
     #[Column(attributes: [Column::ATTRIBUTE_UNSIGNED])]
     private ?int $priority = null;
 
-    private Event $event;
-
-    public function __construct(mysqlDatabase $database = null)
-    {
-        parent::__construct($database);
-
-        $this->event = new Event();
-    }
+    #[Constraint]
+    protected Event $event;
 
     public function getId(): ?int
     {
@@ -260,13 +257,6 @@ class Trigger extends AbstractModel implements JsonSerializable
         $this->priority = $priority;
 
         return $this;
-    }
-
-    public function getEvent(): Event
-    {
-        $this->loadForeignRecord($this->event, $this->getEventId());
-
-        return $this->event;
     }
 
     public function setEvent(Event $event): Trigger

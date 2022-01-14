@@ -6,11 +6,15 @@ namespace GibsonOS\Core\Model;
 use DateTime;
 use DateTimeInterface;
 use GibsonOS\Core\Attribute\Install\Database\Column;
+use GibsonOS\Core\Attribute\Install\Database\Constraint;
 use GibsonOS\Core\Attribute\Install\Database\Table;
 use GibsonOS\Core\Model\Weather\Location;
 use JsonSerializable;
 use mysqlDatabase;
 
+/**
+ * @method Location getLocation()
+ */
 #[Table]
 class Weather extends AbstractModel implements JsonSerializable
 {
@@ -77,13 +81,14 @@ class Weather extends AbstractModel implements JsonSerializable
     #[Column]
     private ?DateTimeInterface $sunrise = null;
 
-    private Location $location;
+    #[Constraint]
+    protected Location $location;
 
     public function __construct(mysqlDatabase $database = null)
     {
         parent::__construct($database);
+
         $this->date = new DateTime();
-        $this->location = new Location();
     }
 
     public function getId(): ?int
@@ -312,13 +317,6 @@ class Weather extends AbstractModel implements JsonSerializable
         $this->icon = $icon;
 
         return $this;
-    }
-
-    public function getLocation(): Location
-    {
-        $this->loadForeignRecord($this->location, $this->getLocationId());
-
-        return $this->location;
     }
 
     public function setLocation(Location $location): Weather

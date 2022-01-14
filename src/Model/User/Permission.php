@@ -4,10 +4,14 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Model\User;
 
 use GibsonOS\Core\Attribute\Install\Database\Column;
+use GibsonOS\Core\Attribute\Install\Database\Constraint;
 use GibsonOS\Core\Attribute\Install\Database\Table;
 use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Model\User;
 
+/**
+ * @method ?User getUser()
+ */
 #[Table]
 class Permission extends AbstractModel
 {
@@ -41,6 +45,7 @@ class Permission extends AbstractModel
     #[Column(type: Column::TYPE_TINYINT, length: 2, attributes: [Column::ATTRIBUTE_UNSIGNED])]
     private int $permission = self::DENIED;
 
+    #[Constraint]
     private ?User $user;
 
     public function getId(): ?int
@@ -113,19 +118,6 @@ class Permission extends AbstractModel
         $this->permission = $permission;
 
         return $this;
-    }
-
-    public function getUser(): ?User
-    {
-        $userId = $this->getUserId();
-
-        if ($userId === null) {
-            $this->user = null;
-        } else {
-            $this->loadForeignRecord(new User(), $userId);
-        }
-
-        return $this->user;
     }
 
     public function setUser(?User $user): Permission

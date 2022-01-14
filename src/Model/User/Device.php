@@ -6,11 +6,15 @@ namespace GibsonOS\Core\Model\User;
 use DateTimeImmutable;
 use DateTimeInterface;
 use GibsonOS\Core\Attribute\Install\Database\Column;
+use GibsonOS\Core\Attribute\Install\Database\Constraint;
 use GibsonOS\Core\Attribute\Install\Database\Table;
 use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Model\User;
 use mysqlDatabase;
 
+/**
+ * @method User getUser()
+ */
 #[Table]
 class Device extends AbstractModel
 {
@@ -35,13 +39,13 @@ class Device extends AbstractModel
     #[Column(default: Column::DEFAULT_CURRENT_TIMESTAMP)]
     private DateTimeInterface $added;
 
-    private User $user;
+    #[Constraint]
+    protected User $user;
 
     public function __construct(mysqlDatabase $database = null)
     {
         parent::__construct($database);
 
-        $this->user = new User();
         $this->added = new DateTimeImmutable();
     }
 
@@ -127,13 +131,6 @@ class Device extends AbstractModel
         $this->added = $added;
 
         return $this;
-    }
-
-    public function getUser(): User
-    {
-        $this->loadForeignRecord($this->user, $this->getUserId());
-
-        return $this->user;
     }
 
     public function setUser(User $user): Device

@@ -4,10 +4,14 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Model;
 
 use GibsonOS\Core\Attribute\Install\Database\Column;
+use GibsonOS\Core\Attribute\Install\Database\Constraint;
 use GibsonOS\Core\Attribute\Install\Database\Table;
 use JsonSerializable;
-use mysqlDatabase;
 
+/**
+ * @method Module getModule()
+ * @method Task   getTask()
+ */
 #[Table]
 class Action extends AbstractModel implements JsonSerializable
 {
@@ -23,17 +27,11 @@ class Action extends AbstractModel implements JsonSerializable
     #[Column(attributes: [Column::ATTRIBUTE_UNSIGNED])]
     private int $taskId;
 
-    private Module $module;
+    #[Constraint]
+    protected Module $module;
 
-    private Task $task;
-
-    public function __construct(mysqlDatabase $database = null)
-    {
-        parent::__construct($database);
-
-        $this->module = new Module();
-        $this->task = new Task();
-    }
+    #[Constraint]
+    protected Task $task;
 
     public function getId(): ?int
     {
@@ -83,26 +81,12 @@ class Action extends AbstractModel implements JsonSerializable
         return $this;
     }
 
-    public function getModule(): Module
-    {
-        $this->loadForeignRecord($this->module, $this->getModuleId());
-
-        return $this->module;
-    }
-
     public function setModule(Module $module): Action
     {
         $this->module = $module;
         $this->setModuleId($module->getId() ?? 0);
 
         return $this;
-    }
-
-    public function getTask(): Task
-    {
-        $this->loadForeignRecord($this->task, $this->getTaskId());
-
-        return $this->task;
     }
 
     public function setTask(Task $task): Action

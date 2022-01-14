@@ -4,12 +4,15 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Model\Icon;
 
 use GibsonOS\Core\Attribute\Install\Database\Column;
+use GibsonOS\Core\Attribute\Install\Database\Constraint;
 use GibsonOS\Core\Attribute\Install\Database\Table;
 use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Model\Icon;
 use JsonSerializable;
-use mysqlDatabase;
 
+/**
+ * @method Icon getIcon()
+ */
 #[Table]
 class Tag extends AbstractModel implements JsonSerializable
 {
@@ -19,14 +22,8 @@ class Tag extends AbstractModel implements JsonSerializable
     #[Column(length: 64, primary: true)]
     private string $tag;
 
-    private Icon $icon;
-
-    public function __construct(mysqlDatabase $database = null)
-    {
-        parent::__construct($database);
-
-        $this->icon = new Icon();
-    }
+    #[Constraint]
+    protected Icon $icon;
 
     public function getIconId(): int
     {
@@ -50,13 +47,6 @@ class Tag extends AbstractModel implements JsonSerializable
         $this->tag = $tag;
 
         return $this;
-    }
-
-    public function getIcon(): Icon
-    {
-        $this->loadForeignRecord($this->icon, $this->getIconId());
-
-        return $this->icon;
     }
 
     public function setIcon(Icon $icon): Tag

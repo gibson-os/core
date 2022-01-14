@@ -4,10 +4,14 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Model\Cronjob;
 
 use GibsonOS\Core\Attribute\Install\Database\Column;
+use GibsonOS\Core\Attribute\Install\Database\Constraint;
 use GibsonOS\Core\Attribute\Install\Database\Table;
 use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Model\Cronjob;
 
+/**
+ * @method Cronjob getCronjob()
+ */
 #[Table]
 class Time extends AbstractModel
 {
@@ -59,7 +63,8 @@ class Time extends AbstractModel
     #[Column(type: Column::TYPE_SMALLINT, length: 4, attributes: [Column::ATTRIBUTE_UNSIGNED])]
     private int $toYear = 9999;
 
-    private Cronjob $cronjob;
+    #[Constraint]
+    protected Cronjob $cronjob;
 
     public function getId(): ?int
     {
@@ -251,13 +256,6 @@ class Time extends AbstractModel
         $this->toYear = $toYear;
 
         return $this;
-    }
-
-    public function getCronjob(): Cronjob
-    {
-        $this->loadForeignRecord($this->cronjob, $this->getCronjobId());
-
-        return $this->cronjob;
     }
 
     public function setCronjob(Cronjob $cronjob): Time

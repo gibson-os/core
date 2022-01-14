@@ -4,10 +4,14 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Model;
 
 use GibsonOS\Core\Attribute\Install\Database\Column;
+use GibsonOS\Core\Attribute\Install\Database\Constraint;
 use GibsonOS\Core\Attribute\Install\Database\Table;
 use JsonSerializable;
 use mysqlDatabase;
 
+/**
+ * @method Module getModule()
+ */
 #[Table]
 class Task extends AbstractModel implements JsonSerializable
 {
@@ -20,7 +24,8 @@ class Task extends AbstractModel implements JsonSerializable
     #[Column(attributes: [Column::ATTRIBUTE_UNSIGNED])]
     private int $moduleId;
 
-    private Module $module;
+    #[Constraint]
+    protected Module $module;
 
     public function __construct(mysqlDatabase $database = null)
     {
@@ -63,13 +68,6 @@ class Task extends AbstractModel implements JsonSerializable
         $this->moduleId = $moduleId;
 
         return $this;
-    }
-
-    public function getModule(): Module
-    {
-        $this->loadForeignRecord($this->module, $this->getModuleId());
-
-        return $this->module;
     }
 
     public function setModule(Module $module): Task

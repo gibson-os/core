@@ -4,9 +4,14 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Model;
 
 use GibsonOS\Core\Attribute\Install\Database\Column;
+use GibsonOS\Core\Attribute\Install\Database\Constraint;
 use GibsonOS\Core\Attribute\Install\Database\Table;
 use JsonSerializable;
 
+/**
+ * @method ?User  getUser()
+ * @method Module getModule()
+ */
 #[Table]
 class Setting extends AbstractModel implements JsonSerializable
 {
@@ -25,9 +30,11 @@ class Setting extends AbstractModel implements JsonSerializable
     #[Column(type: Column::TYPE_LONGTEXT)]
     private string $value;
 
-    private ?User $user = null;
+    #[Constraint]
+    protected ?User $user = null;
 
-    private Module $module;
+    #[Constraint]
+    protected Module $module;
 
     public function getId(): ?int
     {
@@ -89,38 +96,12 @@ class Setting extends AbstractModel implements JsonSerializable
         return $this;
     }
 
-    public function getUser(): ?User
-    {
-        $userId = $this->getUserId();
-
-        if ($userId === null) {
-            $this->user = null;
-
-            return null;
-        }
-
-        if ($this->user === null) {
-            $this->user = new User();
-        }
-
-        $this->loadForeignRecord($this->user, $userId);
-
-        return $this->user;
-    }
-
     public function setUser(?User $user): Setting
     {
         $this->user = $user;
         $this->setUserId($user?->getId());
 
         return $this;
-    }
-
-    public function getModule(): Module
-    {
-        $this->loadForeignRecord($this->module, $this->getModuleId());
-
-        return $this->module;
     }
 
     public function setModule(Module $module): Setting

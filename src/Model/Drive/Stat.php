@@ -6,11 +6,15 @@ namespace GibsonOS\Core\Model\Drive;
 use DateTimeImmutable;
 use DateTimeInterface;
 use GibsonOS\Core\Attribute\Install\Database\Column;
+use GibsonOS\Core\Attribute\Install\Database\Constraint;
 use GibsonOS\Core\Attribute\Install\Database\Table;
 use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Model\Drive;
 use mysqlDatabase;
 
+/**
+ * @method Drive getDrive()
+ */
 #[Table('system_drive_stat')]
 class Stat extends AbstractModel
 {
@@ -26,14 +30,14 @@ class Stat extends AbstractModel
     #[Column(type: Column::TYPE_TIMESTAMP, default: Column::DEFAULT_CURRENT_TIMESTAMP)]
     private DateTimeInterface $added;
 
-    private Drive $drive;
+    #[Constraint]
+    protected Drive $drive;
 
     public function __construct(mysqlDatabase $database = null)
     {
         parent::__construct($database);
 
         $this->added = new DateTimeImmutable();
-        $this->drive = new Drive();
     }
 
     public function getId(): ?int
@@ -82,13 +86,6 @@ class Stat extends AbstractModel
         $this->added = $added;
 
         return $this;
-    }
-
-    public function getDrive(): Drive
-    {
-        $this->loadForeignRecord($this->drive, $this->getDriveId());
-
-        return $this->drive;
     }
 
     public function setDrive(Drive $drive): Stat

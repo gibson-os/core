@@ -4,15 +4,20 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Model\Event;
 
 use GibsonOS\Core\Attribute\Install\Database\Column;
+use GibsonOS\Core\Attribute\Install\Database\Constraint;
 use GibsonOS\Core\Attribute\Install\Database\Table;
 use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Model\Event;
 use GibsonOS\Core\Utility\JsonUtility;
 use JsonException;
 use JsonSerializable;
-use mysqlDatabase;
 use Serializable;
 
+/**
+ * @method Event     getEvent()
+ * @method ?Element  getParent()
+ * @method Element[] getChildren()
+ */
 #[Table]
 class Element extends AbstractModel implements Serializable, JsonSerializable
 {
@@ -56,21 +61,17 @@ class Element extends AbstractModel implements Serializable, JsonSerializable
     #[Column(type: Column::TYPE_JSON)]
     private ?string $returns = null;
 
-    private Event $event;
+    #[Constraint]
+    protected Event $event;
 
-    private ?Element $parent = null;
+    #[Constraint]
+    protected ?Element $parent = null;
 
     /**
      * @var Element[]|null
      */
-    private ?array $children = null;
-
-    public function __construct(mysqlDatabase $database = null)
-    {
-        parent::__construct($database);
-
-        $this->event = new Event();
-    }
+    #[Constraint('parentId', Element::class)]
+    protected array $children = [];
 
     public function getId(): ?int
     {
@@ -186,13 +187,6 @@ class Element extends AbstractModel implements Serializable, JsonSerializable
         return $this;
     }
 
-    public function getEvent(): Event
-    {
-        $this->loadForeignRecord($this->event, $this->getEventId());
-
-        return $this->event;
-    }
-
     public function setEvent(Event $event): Element
     {
         $this->event = $event;
@@ -201,52 +195,12 @@ class Element extends AbstractModel implements Serializable, JsonSerializable
         return $this;
     }
 
-    public function getParent(): ?Element
-    {
-        $parentId = $this->getParentId();
-
-        if ($parentId != null) {
-            if ($this->parent === null) {
-                $this->parent = new Element();
-            }
-
-            $this->loadForeignRecord($this->parent, $parentId);
-        }
-
-        return $this->parent;
-    }
-
     public function setParent(?Element $parent): Element
     {
         $this->parent = $parent;
         $this->setParentId($parent instanceof Element ? (int) $parent->getId() : null);
 
         return $this;
-    }
-
-    /**
-     * @return Element[]|null
-     */
-    public function getChildren(): ?array
-    {
-        if ($this->children === null) {
-            $this->loadChildren();
-        }
-
-        return $this->children;
-    }
-
-    public function loadChildren(): void
-    {
-        /** @var Element[] $children */
-        $children = $this->loadForeignRecords(
-            Element::class,
-            $this->getId(),
-            Element::getTableName(),
-            'parent_id'
-        );
-
-        $this->setChildren($children);
     }
 
     /**
