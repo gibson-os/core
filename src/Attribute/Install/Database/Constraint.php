@@ -9,20 +9,20 @@ use Attribute;
 class Constraint
 {
     /**
-     * @param class-string $parentTable
+     * @param class-string $parentModelClassName
      */
     public function __construct(
-        private string $parentTable,
         private string $parentColumn,
+        private ?string $parentModelClassName = null,
         private ?string $onDelete = null,
         private ?string $onUpdate = null,
         private ?string $name = null,
     ) {
     }
 
-    public function getParentTable(): string
+    public function getParentModelClassName(): ?string
     {
-        return $this->parentTable;
+        return $this->parentModelClassName;
     }
 
     public function getParentColumn(): string

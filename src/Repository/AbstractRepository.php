@@ -92,9 +92,9 @@ abstract class AbstractRepository
         string $modelClassName,
         string $orderBy = null
     ): ModelInterface {
-        /** @var ModelInterface $modelClassNameCopy */
-        $modelClassNameCopy = $modelClassName;
-        $table = $this->getTable($modelClassNameCopy::getTableName())
+        /** @var ModelInterface $model */
+        $model = new $modelClassName();
+        $table = $this->getTable($model->getTableName())
             ->setWhere($where)
             ->setWhereParameters($parameters)
             ->setLimit(1)
@@ -128,9 +128,9 @@ abstract class AbstractRepository
         int $offset = null,
         string $orderBy = null
     ): array {
-        /** @var ModelInterface $modelClassNameCopy */
-        $modelClassNameCopy = $modelClassName;
-        $table = $this->getTable($modelClassNameCopy::getTableName())
+        /** @var ModelInterface $model */
+        $model = new $modelClassName();
+        $table = $this->getTable($model->getTableName())
             ->setWhere($where)
             ->setWhereParameters($parameters)
             ->setLimit($limit, $offset)
@@ -146,9 +146,9 @@ abstract class AbstractRepository
         array $parameters,
         string $modelClassName = ModelInterface::class
     ): ?array {
-        /** @var ModelInterface $modelClassNameCopy */
-        $modelClassNameCopy = $modelClassName;
-        $table = $this->getTable($modelClassNameCopy::getTableName())
+        /** @var ModelInterface $model */
+        $model = new $modelClassName();
+        $table = $this->getTable($model->getTableName())
             ->setWhere($where)
             ->setWhereParameters($parameters)
         ;

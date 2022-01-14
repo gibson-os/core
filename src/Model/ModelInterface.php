@@ -5,4 +5,5 @@ namespace GibsonOS\Core\Model;
 
 interface ModelInterface
 {
+    public function getTableName(): string;
 }

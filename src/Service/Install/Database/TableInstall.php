@@ -13,6 +13,7 @@ use GibsonOS\Core\Dto\Install\Success;
 use GibsonOS\Core\Exception\FactoryError;
 use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\InstallException;
+use GibsonOS\Core\Model\ModelInterface;
 use GibsonOS\Core\Service\Attribute\TableAttribute;
 use GibsonOS\Core\Service\DirService;
 use GibsonOS\Core\Service\EnvService;
@@ -97,6 +98,10 @@ class TableInstall extends AbstractInstall implements PriorityInterface
 
         foreach ($this->getFiles($path) as $file) {
             $className = $this->serviceManagerService->getNamespaceByPath($file);
+            /** @var ModelInterface $model */
+            $model = new $className();
+            $tableName = $model->getTableName();
+
             $reflectionClass = new ReflectionClass($className);
             $tableAttributes = $reflectionClass->getAttributes(Table::class, ReflectionAttribute::IS_INSTANCEOF);
 
@@ -107,7 +112,6 @@ class TableInstall extends AbstractInstall implements PriorityInterface
             $columnsAttributes = [];
             /** @var Table $tableAttribute */
             $tableAttribute = $tableAttributes[0]->newInstance();
-            $tableName = $this->tableAttribute->getTableName($tableAttribute, $className);
             $tableAttribute->setName($tableName);
 
             foreach ($reflectionClass->getProperties() as $reflectionProperty) {

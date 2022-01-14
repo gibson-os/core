@@ -3,18 +3,16 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Store;
 
-use GibsonOS\Core\Attribute\Install\Database\Table;
 use GibsonOS\Core\Exception\CreateError;
 use GibsonOS\Core\Exception\FactoryError;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\AbstractModel;
-use GibsonOS\Core\Service\Attribute\TableAttribute;
+use GibsonOS\Core\Model\ModelInterface;
 use GibsonOS\Core\Service\AttributeService;
 use JsonSerializable;
 use mysqlDatabase;
 use mysqlRegistry;
 use mysqlTable;
-use ReflectionClass;
 use ReflectionException;
 
 abstract class AbstractDatabaseStore extends AbstractStore
@@ -53,21 +51,10 @@ abstract class AbstractDatabaseStore extends AbstractStore
             throw new CreateError('Kein Datenbank Objekt vorhanden!');
         }
 
-        $attributes = $this->attributeService->getAttributesByClassName(
-            new ReflectionClass($this->getModelClassName()),
-            Table::class
-        );
-
-        if (count($attributes) === 0) {
-            throw new CreateError(sprintf('No table attribute found on "%s"!', $this->getModelClassName()));
-        }
-
-        /** @var Table $tableAttribute */
-        $tableAttribute = $attributes[0]->getAttribute();
-        /** @var TableAttribute $tableService */
-        $tableService = $attributes[0]->getService();
-        $this->tableName = $tableService->getTableName($tableAttribute, $this->getModelClassName());
-        /** @var AbstractModel $modelClassName */
+        $modelClassName = $this->getModelClassName();
+        /** @var ModelInterface $model */
+        $model = new $modelClassName();
+        $this->tableName = $model->getTableName();
         $this->table = new mysqlTable($this->database, $this->tableName);
     }
 

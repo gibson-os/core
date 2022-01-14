@@ -104,7 +104,7 @@ class EventService extends AbstractService
 
         $this->logger->info('Run event ' . $event->getId());
         $event->setLastRun($this->dateTimeService->get())->save();
-        $this->elementService->runElements($event->getElements() ?? [], $event);
+        $this->elementService->runElements($event->getElements(), $event);
     }
 
     /**
@@ -216,7 +216,7 @@ class EventService extends AbstractService
     {
         $triggerName = $this->getTriggerName($className, $trigger);
 
-        foreach ($event->getTriggers() ?? [] as $eventTrigger) {
+        foreach ($event->getTriggers() as $eventTrigger) {
             if (
                 $eventTrigger->getTrigger() !== $trigger &&
                 $eventTrigger->getClass() !== $className

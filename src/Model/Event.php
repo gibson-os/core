@@ -5,10 +5,17 @@ namespace GibsonOS\Core\Model;
 
 use DateTimeInterface;
 use GibsonOS\Core\Attribute\Install\Database\Column;
+use GibsonOS\Core\Attribute\Install\Database\Constraint;
+use GibsonOS\Core\Attribute\Install\Database\Table;
 use GibsonOS\Core\Model\Event\Element;
 use GibsonOS\Core\Model\Event\Trigger;
 use JsonSerializable;
 
+/**
+ * @method Element[] getElements()
+ * @method Trigger[] getTriggers()
+ */
+#[Table]
 class Event extends AbstractModel implements JsonSerializable, AutoCompleteModelInterface
 {
     #[Column(attributes: [Column::ATTRIBUTE_UNSIGNED], autoIncrement: true)]
@@ -33,14 +40,16 @@ class Event extends AbstractModel implements JsonSerializable, AutoCompleteModel
     private ?DateTimeInterface $lastRun = null;
 
     /**
-     * @var Element[]|null
+     * @var Element[]
      */
-    private ?array $elements = null;
+    #[Constraint('eventId', Element::class)]
+    protected array $elements = [];
 
     /**
-     * @var Trigger[]|null
+     * @var Trigger[]
      */
-    private ?array $triggers = null;
+    #[Constraint('eventId', Trigger::class)]
+    protected array $triggers = [];
 
     public function getId(): ?int
     {
@@ -127,21 +136,9 @@ class Event extends AbstractModel implements JsonSerializable, AutoCompleteModel
     }
 
     /**
-     * @return Element[]|null
+     * @param Element[] $elements
      */
-    public function getElements(): ?array
-    {
-        if ($this->elements === null) {
-            $this->loadElements();
-        }
-
-        return $this->elements;
-    }
-
-    /**
-     * @param Element[]|null $elements
-     */
-    public function setElements(?array $elements): Event
+    public function setElements(array $elements): Event
     {
         $this->elements = $elements;
 
@@ -155,51 +152,10 @@ class Event extends AbstractModel implements JsonSerializable, AutoCompleteModel
         return $this;
     }
 
-    public function loadElements()
-    {
-        /** @var Element[] $elements */
-        $elements = $this->loadForeignRecords(
-            Element::class,
-            $this->getId(),
-            Element::getTableName(),
-            'event_id'
-        );
-
-        $groupedElements = [];
-        $indexedElements = [];
-
-        foreach ($elements as $element) {
-            $indexedElements[$element->getId() ?? 0] = $element;
-            $parentId = $element->getParentId();
-
-            if ($parentId === null) {
-                $groupedElements[] = $element;
-
-                continue;
-            }
-
-            $indexedElements[$parentId]->addChildren($element);
-        }
-
-        $this->setElements($groupedElements);
-    }
-
     /**
-     * @return Trigger[]|null
+     * @param Trigger[] $triggers
      */
-    public function getTriggers(): ?array
-    {
-        if ($this->triggers === null) {
-            $this->loadTriggers();
-        }
-
-        return $this->triggers;
-    }
-
-    /**
-     * @param Trigger[]|null $triggers
-     */
-    public function setTriggers(?array $triggers): Event
+    public function setTriggers(array $triggers): Event
     {
         $this->triggers = $triggers;
 
@@ -211,19 +167,6 @@ class Event extends AbstractModel implements JsonSerializable, AutoCompleteModel
         $this->triggers[] = $trigger;
 
         return $this;
-    }
-
-    public function loadTriggers()
-    {
-        /** @var Trigger[] $triggers */
-        $triggers = $this->loadForeignRecords(
-            Trigger::class,
-            $this->getId(),
-            Trigger::getTableName(),
-            'event_id'
-        );
-
-        $this->setTriggers($triggers);
     }
 
     public function jsonSerialize(): array

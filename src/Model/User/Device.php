@@ -6,10 +6,12 @@ namespace GibsonOS\Core\Model\User;
 use DateTimeImmutable;
 use DateTimeInterface;
 use GibsonOS\Core\Attribute\Install\Database\Column;
+use GibsonOS\Core\Attribute\Install\Database\Table;
 use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Model\User;
 use mysqlDatabase;
 
+#[Table]
 class Device extends AbstractModel
 {
     #[Column(length: 16, primary: true)]

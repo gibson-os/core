@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Repository\User;
 
+use GibsonOS\Core\Attribute\GetTableName;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\User\Permission;
 use GibsonOS\Core\Model\User\PermissionView;
@@ -12,6 +13,10 @@ use stdClass;
 
 class PermissionViewRepository extends AbstractRepository
 {
+    public function __construct(#[GetTableName(PermissionView::class)] private string $permissionViewName)
+    {
+    }
+
     /**
      * @throws SelectError
      *
@@ -19,7 +24,7 @@ class PermissionViewRepository extends AbstractRepository
      */
     public function getTaskList(?int $userId, string $module = null): array
     {
-        $table = $this->getTable(PermissionView::getTableName());
+        $table = $this->getTable($this->permissionViewName);
         $table
             ->setWhere(
                 'IFNULL(`user_id`, ?)=? AND ' .
@@ -47,7 +52,7 @@ class PermissionViewRepository extends AbstractRepository
     public function getPermissionByModule(string $module, int $userId = null): PermissionView
     {
         $table = $this
-            ->getTable(PermissionView::getTableName())
+            ->getTable($this->permissionViewName)
             ->setLimit(1)
         ;
         $table->setWhere(
@@ -73,7 +78,7 @@ class PermissionViewRepository extends AbstractRepository
     public function getPermissionByTask(string $module, string $task, int $userId = null): PermissionView
     {
         $table = $this
-            ->getTable(PermissionView::getTableName())
+            ->getTable($this->permissionViewName)
             ->setLimit(1)
         ;
         $table->setWhere(
@@ -99,7 +104,7 @@ class PermissionViewRepository extends AbstractRepository
     public function getPermissionByAction(string $module, string $task, string $action, int $userId = null): PermissionView
     {
         $table = $this
-            ->getTable(PermissionView::getTableName())
+            ->getTable($this->permissionViewName)
             ->setLimit(1)
         ;
         $table->setWhere(

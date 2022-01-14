@@ -4,6 +4,8 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Model;
 
 use Exception;
+use GibsonOS\Core\Attribute\Install\Database\Constraint;
+use GibsonOS\Core\Attribute\Install\Database\Table;
 use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\Model\DeleteError;
 use GibsonOS\Core\Exception\Model\SaveError;
@@ -13,6 +15,9 @@ use mysqlDatabase;
 use mysqlField;
 use mysqlRegistry;
 use mysqlTable;
+use ReflectionAttribute;
+use ReflectionClass;
+use ReflectionException;
 use Throwable;
 
 abstract class AbstractModel implements ModelInterface
@@ -48,6 +53,8 @@ abstract class AbstractModel implements ModelInterface
 
     private DateTimeService $dateTime;
 
+    private ?string $tableName = null;
+
     /**
      * @throws GetError
      */
@@ -62,6 +69,69 @@ abstract class AbstractModel implements ModelInterface
         }
     }
 
+    /**
+     * @throws ReflectionException
+     *
+     * @return ModelInterface|ModelInterface[]|null
+     */
+    public function __call(string $name, array $arguments): mixed
+    {
+        $propertyName = lcfirst(str_replace('get', '', $name));
+
+        $reflectionClass = new ReflectionClass($this::class);
+        $reflectionProperty = $reflectionClass->getProperty($propertyName);
+        /** @psalm-suppress UndefinedMethod */
+        $propertyTypeName = $reflectionProperty->getType()?->getName();
+        $constraintAttributes = $reflectionProperty->getAttributes(
+            Constraint::class,
+            ReflectionAttribute::IS_INSTANCEOF
+        );
+
+        if (count($constraintAttributes) === 0) {
+            return null;
+        }
+
+        /** @var Constraint $constraintAttribute */
+        $constraintAttribute = $constraintAttributes[0]->newInstance();
+        $parentModelClassName = $constraintAttribute->getParentModelClassName() ?? $propertyTypeName;
+        $parentColumn = $constraintAttribute->getParentColumn();
+        $fieldName = $this->transformFieldName($parentColumn);
+        $getterName = $name . 'Id';
+        /** @var float|int|string $value */
+        $value = $this->{$getterName}();
+        /** @var AbstractModel $parentModel */
+        $parentModel = new $parentModelClassName();
+        $parentTable = $parentModel->getTableName();
+
+        if ($propertyTypeName === 'array') {
+            $this->$propertyName = $this->loadForeignRecords(
+                $parentModelClassName,
+                $value,
+                $parentTable,
+                $parentColumn
+            );
+
+            return $this->$propertyName;
+        }
+
+        if ($value === null) {
+            $this->$propertyName = $reflectionProperty->getType()?->allowsNull() ? null : $parentModel;
+
+            return $this->$propertyName;
+        }
+
+        if (
+            !$this->$propertyName instanceof $parentModelClassName ||
+            $parentModel->{'get' . $fieldName}() !== $value
+        ) {
+            $this->$propertyName = $this->loadForeignRecord($parentModel, $value, $parentColumn)
+                ?? ($reflectionProperty->getType()?->allowsNull() ? null : $parentModel)
+            ;
+        }
+
+        return $this->$propertyName;
+    }
+
     public function getMysqlTable(): mysqlTable
     {
         $mysqlTable = new mysqlTable($this->database, $this->getTableName());
@@ -73,6 +143,40 @@ abstract class AbstractModel implements ModelInterface
     public function getDatabase(): mysqlDatabase
     {
         return $this->database;
+    }
+
+    public function getTableName(): string
+    {
+        if ($this->tableName !== null) {
+            return $this->tableName;
+        }
+
+        try {
+            $reflectionClass = new ReflectionClass($this::class);
+            $tableAttributes = $reflectionClass->getAttributes(Table::class, ReflectionAttribute::IS_INSTANCEOF);
+            /** @var Table $tableAttribute */
+            $tableAttribute = $tableAttributes[0]->newInstance();
+            $this->tableName = $tableAttribute->getName() ?? $this->transformName(str_replace(
+                '\\',
+                '',
+                str_replace(
+                    'Core\\',
+                    '',
+                    preg_replace('/.*\\\\(.+?)\\\\.*Model\\\\/', '$1\\', $this::class)
+                )
+            ));
+        } catch (ReflectionException) {
+        }
+
+        return $this->tableName ?? '';
+    }
+
+    private function transformName(string $name): string
+    {
+        $nameParts = explode('\\', $name);
+        $name = lcfirst(end($nameParts));
+
+        return mb_strtolower(preg_replace('/([A-Z])/', '_$1', $name));
     }
 
     public function loadFromMysqlTable(mysqlTable $mysqlTable): void
@@ -202,14 +306,8 @@ abstract class AbstractModel implements ModelInterface
         return str_replace(' ', '', ucwords(str_replace('_', ' ', $fieldName)));
     }
 
-    protected function loadForeignRecord(AbstractModel $model, string|int|float $value, string $foreignField = 'id'): void
+    private function loadForeignRecord(AbstractModel $model, string|int|float $value, string $foreignField = 'id'): ?AbstractModel
     {
-        $fieldName = $this->transformFieldName($foreignField);
-
-        if ($model->{'get' . $fieldName}() === $value) {
-            return;
-        }
-
         $mysqlTable = new mysqlTable($this->database, $model->getTableName());
         $mysqlTable
             ->setWhere('`' . $foreignField . '`=?')
@@ -218,10 +316,12 @@ abstract class AbstractModel implements ModelInterface
         ;
 
         if (!$mysqlTable->selectPrepared()) {
-            return;
+            return null;
         }
 
         $model->loadFromMysqlTable($mysqlTable);
+
+        return $model;
     }
 
     /**
@@ -231,7 +331,7 @@ abstract class AbstractModel implements ModelInterface
      *
      * @return T[]
      */
-    protected function loadForeignRecords(
+    private function loadForeignRecords(
         string $modelClassName,
         string|int|float|null $value,
         string $foreignTable,
@@ -260,22 +360,6 @@ abstract class AbstractModel implements ModelInterface
         } while ($mysqlTable->next());
 
         return $models;
-    }
-
-    protected function setForeignValueByModelOrId(
-        AbstractModel|null $model,
-        null|string|int $id,
-        callable $setModelFunction,
-        callable $setIdFunction
-    ): void {
-        if ($model !== null) {
-            $setModelFunction($model);
-        } elseif ($id !== null) {
-            $setIdFunction($id);
-        } else {
-            $setModelFunction(null);
-            $setIdFunction(null);
-        }
     }
 
     private function getColumnType(string $type): string

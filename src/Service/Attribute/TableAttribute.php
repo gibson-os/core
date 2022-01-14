@@ -6,6 +6,7 @@ namespace GibsonOS\Core\Service\Attribute;
 use GibsonOS\Core\Attribute\AttributeInterface;
 use GibsonOS\Core\Attribute\GetTableName;
 use GibsonOS\Core\Attribute\Install\Database\Table;
+use GibsonOS\Core\Model\ModelInterface;
 use ReflectionAttribute;
 use ReflectionClass;
 use ReflectionException;
@@ -32,23 +33,11 @@ class TableAttribute implements ParameterAttributeInterface, AttributeServiceInt
         /** @var Table $tableAttribute */
         $tableAttribute = $tableAttributes[0]->newInstance();
 
-        return $this->getTableName($tableAttribute, $attribute->getModelClassName());
-    }
+        $modelClassName = $attribute->getModelClassName();
+        /** @var ModelInterface $model */
+        $model = new $modelClassName();
 
-    /**
-     * @param class-string $modelClassName
-     */
-    public function getTableName(Table $tableAttribute, string $modelClassName): string
-    {
-        return $tableAttribute->getName() ?? $this->transformName(str_replace(
-            '\\',
-            '',
-            str_replace(
-                'Core\\',
-                '',
-                preg_replace('/.*\\\\(.+?)\\\\.*Model\\\\/', '$1\\', $modelClassName)
-            )
-        ));
+        return $model->getTableName();
     }
 
     public function transformName(string $name): string
