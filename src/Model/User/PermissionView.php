@@ -3,12 +3,146 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Model\User;
 
+use GibsonOS\Core\Attribute\Install\Database\View;
 use GibsonOS\Core\Model\AbstractModel;
 use JsonSerializable;
 
-// @todo view installer
+#[View(self::QUERY, 'view_user_permission')]
 class PermissionView extends AbstractModel implements JsonSerializable
 {
+    private const QUERY =
+        'WITH `all_users` AS (' .
+            '(' .
+                'SELECT ' .
+                'NULL `id`, ' .
+                '\'Allgemein\' `user`, ' .
+                'NULL `host`, ' .
+                'NULL `ip`, ' .
+                'NULL `password`, ' .
+                'NULL `last_login`, ' .
+                'NULL `added`' .
+            ') UNION ALL (' .
+                'SELECT * ' .
+                'FROM user' .
+            ')' .
+        ') ' .
+        'SELECT ' .
+            'CAST(`p`.`user_id` AS UNSIGNED) `user_id`, ' .
+            '`p`.`user_name`, ' .
+            '`p`.`user_host`, ' .
+            '`p`.`user_ip`, ' .
+            'CAST(`p`.`permission` AS UNSIGNED) `permission`, ' .
+            '`p`.`module`, ' .
+            '`p`.`task`, ' .
+            '`p`.`action`, ' .
+            '`p`.`module_id`, ' .
+            '`p`.`module_name`, ' .
+            'CAST(`p`.`task_id` AS UNSIGNED) `task_id`, ' .
+            '`p`.`task_name`, ' .
+            'CAST(`p`.`action_id` AS UNSIGNED) `action_id`, ' .
+            '`p`.`action_name` ' .
+        'FROM (' .
+            '(' .
+                'SELECT DISTINCT ' .
+                    '`u`.`id` `user_id`, ' .
+                    '`u`.`user` `user_name`, ' .
+                    '`u`.`host` `user_host`, ' .
+                    '`u`.`ip` `user_ip`, ' .
+                    'IFNULL(`upm`.`permission`, ' . Permission::DENIED . ') `permission`, ' .
+                    '`upm`.`module` `module`, ' .
+                    '`upm`.`task` `task`, ' .
+                    '`upm`.`action` `action`, ' .
+                    '`m`.`id` `module_id`, ' .
+                    '`m`.`name` `module_name`, ' .
+                    'NULL `task_id`, ' .
+                    'NULL `task_name`, ' .
+                    'NULL `action_id`, ' .
+                    'NULL `action_name` ' .
+                'FROM `module` `m` ' .
+                'JOIN `all_users` `u` ON 1 ' .
+                'LEFT JOIN `user_permission` `upm` ON ' .
+                    'IFNULL(`u`.`id`, 0)=IFNULL(`upm`.`user_id`, 0) AND ' .
+                    '`upm`.`module`=`m`.`name` AND ' .
+                    '`upm`.`task` IS NULL AND ' .
+                    '`upm`.`action` IS NULL ' .
+            ') UNION ALL (' .
+                'SELECT DISTINCT ' .
+                    '`u`.`id` `user_id`, ' .
+                    '`u`.`user` `user_name`, ' .
+                    '`u`.`host` `user_host`, ' .
+                    '`u`.`ip` `user_ip`, ' .
+                    'IFNULL(' .
+                        '`upt`.`permission`, ' .
+                        'IFNULL(`upm`.`permission`, ' . Permission::DENIED . ')' .
+                    ') `permission`, ' .
+                    'IFNULL(`upt`.`module`, `upm`.`module`) `module`, ' .
+                    'IFNULL(`upt`.`task`, `upm`.`task`) `task`, ' .
+                    'IFNULL(`upt`.`action`, `upm`.`action`) `action`, ' .
+                    '`m`.`id` `module_id`, ' .
+                    '`m`.`name` `module_name`, ' .
+                    '`t`.`id` `task_id`, ' .
+                    '`t`.`name` `task_name`, ' .
+                    'NULL `action_id`, ' .
+                    'NULL `action_name` ' .
+                'FROM `module` `m` ' .
+                'LEFT JOIN `task` `t` ON `m`.`id` = `t`.`module_id` ' .
+                'JOIN `all_users` `u` ON 1 ' .
+                'LEFT JOIN `user_permission` `upm` ON ' .
+                    'IFNULL(`u`.`id`, 0)=IFNULL(`upm`.`user_id`, 0) AND ' .
+                    '`upm`.`module`=`m`.`name` AND ' .
+                    '`upm`.`task` IS NULL AND ' .
+                    '`upm`.`action` IS NULL ' .
+                'LEFT JOIN `user_permission` `upt` ON ' .
+                    'IFNULL(`u`.`id`, 0)=IFNULL(`upt`.`user_id`, 0) AND ' .
+                    '`upt`.`module`=`m`.`name` AND ' .
+                    '`upt`.`task`=`t`.`name` AND ' .
+                    '`upt`.`action` IS NULL ' .
+            ') UNION ALL (' .
+                'SELECT DISTINCT ' .
+                    '`u`.`id` `user_id`, ' .
+                    '`u`.`user` `user_name`, ' .
+                    '`u`.`host` `user_host`, ' .
+                    '`u`.`ip` `user_ip`, ' .
+                    'IFNULL(' .
+                        '`upa`.`permission`, ' .
+                        'IFNULL(' .
+                            '`upt`.`permission`, ' .
+                            'IFNULL(`upm`.`permission`, ' . Permission::DENIED . ')' .
+                        ')' .
+                    ') `permission`, ' .
+                    'IFNULL(`upa`.`module`, IFNULL(`upt`.`module`, `upm`.`module`)) `module`, ' .
+                    'IFNULL(`upa`.`task`, IFNULL(`upt`.`task`, `upm`.`task`)) `task`, ' .
+                    'IFNULL(`upa`.`action`, IFNULL(`upt`.`action`, `upm`.`action`)) `action`, ' .
+                    '`m`.`id` `module_id`, ' .
+                    '`m`.`name` `module_name`, ' .
+                    '`t`.`id` `task_id`, ' .
+                    '`t`.`name` `task_name`, ' .
+                    '`a`.`id` `action_id`, ' .
+                    '`a`.`name` `action_name` ' .
+                'FROM `module` `m` ' .
+                'LEFT JOIN `task` `t` ON `m`.`id` = `t`.`module_id` ' .
+                'LEFT JOIN `action` `a` ON `t`.`id` = `a`.`task_id` ' .
+                'JOIN `all_users` `u` ON 1 ' .
+                'LEFT JOIN `user_permission` `upm` ON ' .
+                    'IFNULL(`u`.`id`, 0)=IFNULL(`upm`.`user_id`, 0) AND ' .
+                    '`upm`.`module`=`m`.`name` AND ' .
+                    '`upm`.`task` IS NULL AND ' .
+                    '`upm`.`action` IS NULL ' .
+                'LEFT JOIN `user_permission` `upt` ON ' .
+                    'IFNULL(`u`.`id`, 0)=IFNULL(`upt`.`user_id`, 0) AND ' .
+                    '`upt`.`module`=`m`.`name` AND ' .
+                    '`upt`.`task`=`t`.`name` AND ' .
+                    '`upt`.`action` IS NULL ' .
+                'LEFT JOIN `user_permission` `upa` ON ' .
+                    'IFNULL(`u`.`id`, 0)=IFNULL(`upa`.`user_id`, 0) AND ' .
+                    '`upa`.`module`=`m`.`name` AND ' .
+                    '`upa`.`task`=`t`.`name` AND ' .
+                    '`upa`.`action`=`a`.`name` ' .
+            ')' .
+        ') `p`' .
+        'ORDER BY `p`.`user_id` DESC'
+    ;
+
     private ?int $userId = null;
 
     private ?string $userName = null;

@@ -99,7 +99,7 @@ class TableInstall extends AbstractInstall implements PriorityInterface
         foreach ($this->getFiles($path) as $file) {
             $className = $this->serviceManagerService->getNamespaceByPath($file);
             $reflectionClass = new ReflectionClass($className);
-            $tableAttributes = $reflectionClass->getAttributes(Table::class, ReflectionAttribute::IS_INSTANCEOF);
+            $tableAttributes = $reflectionClass->getAttributes(Table::class);
 
             if (count($tableAttributes) === 0) {
                 continue;
@@ -214,7 +214,7 @@ class TableInstall extends AbstractInstall implements PriorityInterface
         ));
 
         $query =
-            'CREATE TABLE `' . $this->envService->getString('MYSQL_DATABASE') . '`.`' . $table->getName() . '` ' .
+            'CREATE TABLE `' . $table->getName() . '` ' .
             '(' .
                 implode(
                     ', ',

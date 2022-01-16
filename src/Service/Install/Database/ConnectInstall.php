@@ -32,11 +32,10 @@ class ConnectInstall extends AbstractInstall implements PriorityInterface, Singl
         yield $databaseInput = $this->getEnvInput('MYSQL_DATABASE', 'What is the MySQL database name?');
 
         $host = $hostInput->getValue() ?? '';
-        $mysqlDatabase = new mysqlDatabase(
-            $host,
-            $installUserInput->getValue() ?? '',
-            $installPasswordInput->getValue() ?? ''
-        );
+        $mysqlDatabase = $this->serviceManagerService->get(mysqlDatabase::class);
+        $mysqlDatabase->host = $host;
+        $mysqlDatabase->user = $installUserInput->getValue() ?? '';
+        $mysqlDatabase->pass = $installPasswordInput->getValue() ?? '';
 
         if (!$mysqlDatabase->openDB()) {
             throw new InstallException(sprintf(
