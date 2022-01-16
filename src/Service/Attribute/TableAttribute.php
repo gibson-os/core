@@ -14,30 +14,35 @@ use ReflectionParameter;
 
 class TableAttribute implements ParameterAttributeInterface, AttributeServiceInterface
 {
+    private array $tables = [];
+
     /**
      * @throws ReflectionException
      */
     public function replace(AttributeInterface $attribute, array $parameters, ReflectionParameter $reflectionParameter): mixed
     {
         if (!$attribute instanceof GetTableName) {
-            return $parameters;
+            return null;
         }
 
-        $reflectionClass = new ReflectionClass($attribute->getModelClassName());
+        $modelClassName = $attribute->getModelClassName();
+
+        if (isset($this->tables[$modelClassName])) {
+            return $this->tables[$modelClassName];
+        }
+
+        $reflectionClass = new ReflectionClass($modelClassName);
         $tableAttributes = $reflectionClass->getAttributes(Table::class, ReflectionAttribute::IS_INSTANCEOF);
 
         if (count($tableAttributes) === 0) {
             return null;
         }
 
-        /** @var Table $tableAttribute */
-        $tableAttribute = $tableAttributes[0]->newInstance();
-
-        $modelClassName = $attribute->getModelClassName();
         /** @var ModelInterface $model */
         $model = new $modelClassName();
+        $this->tables[$modelClassName] = $model->getTableName();
 
-        return $model->getTableName();
+        return $this->tables[$modelClassName];
     }
 
     public function transformName(string $name): string

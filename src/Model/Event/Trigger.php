@@ -13,7 +13,8 @@ use JsonException;
 use JsonSerializable;
 
 /**
- * @method Event getEvent()
+ * @method Event   getEvent()
+ * @method Trigger setEvent(Event $event)
  */
 #[Table]
 class Trigger extends AbstractModel implements JsonSerializable
@@ -255,14 +256,6 @@ class Trigger extends AbstractModel implements JsonSerializable
     public function setPriority(?int $priority): Trigger
     {
         $this->priority = $priority;
-
-        return $this;
-    }
-
-    public function setEvent(Event $event): Trigger
-    {
-        $this->event = $event;
-        $this->setEventId((int) $event->getId());
 
         return $this;
     }

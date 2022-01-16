@@ -14,9 +14,13 @@ use JsonSerializable;
 use Serializable;
 
 /**
- * @method Event     getEvent()
- * @method ?Element  getParent()
- * @method Element[] getChildren()
+ * @method Event        getEvent()
+ * @method Element      setEvent(Event $event)
+ * @method Element|null getParent()
+ * @method Element      setParent(?Element $element)
+ * @method Element[]    getChildren()
+ * @method Element      addChildren(Element[] $elements)
+ * @method Element      setChildren(Element[] $elements)
  */
 #[Table]
 class Element extends AbstractModel implements Serializable, JsonSerializable
@@ -70,7 +74,7 @@ class Element extends AbstractModel implements Serializable, JsonSerializable
     /**
      * @var Element[]|null
      */
-    #[Constraint('parentId', Element::class)]
+    #[Constraint('parent', Element::class)]
     protected array $children = [];
 
     public function getId(): ?int
@@ -183,39 +187,6 @@ class Element extends AbstractModel implements Serializable, JsonSerializable
     public function setReturns(?string $returns): Element
     {
         $this->returns = $returns;
-
-        return $this;
-    }
-
-    public function setEvent(Event $event): Element
-    {
-        $this->event = $event;
-        $this->setEventId((int) $event->getId());
-
-        return $this;
-    }
-
-    public function setParent(?Element $parent): Element
-    {
-        $this->parent = $parent;
-        $this->setParentId($parent instanceof Element ? (int) $parent->getId() : null);
-
-        return $this;
-    }
-
-    /**
-     * @param Element[]|null $children
-     */
-    public function setChildren(?array $children): Element
-    {
-        $this->children = $children;
-
-        return $this;
-    }
-
-    public function addChildren(Element $children): Element
-    {
-        $this->children[] = $children;
 
         return $this;
     }

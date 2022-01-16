@@ -10,7 +10,9 @@ use JsonSerializable;
 
 /**
  * @method Module getModule()
+ * @method Action setModule(Module $module)
  * @method Task   getTask()
+ * @method Action setTask(Task $task)
  */
 #[Table]
 class Action extends AbstractModel implements JsonSerializable
@@ -81,23 +83,7 @@ class Action extends AbstractModel implements JsonSerializable
         return $this;
     }
 
-    public function setModule(Module $module): Action
-    {
-        $this->module = $module;
-        $this->setModuleId($module->getId() ?? 0);
-
-        return $this;
-    }
-
-    public function setTask(Task $task): Action
-    {
-        $this->task = $task;
-        $this->setTaskId($task->getId() ?? 0);
-
-        return $this;
-    }
-
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return [
             'id' => $this->getId(),

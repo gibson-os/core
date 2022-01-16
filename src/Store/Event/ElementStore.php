@@ -102,7 +102,7 @@ class ElementStore extends AbstractDatabaseStore
             if ($parentId === null) {
                 $data[] = $element;
             } else {
-                $models[$parentId]->addChildren($element);
+                $models[$parentId]->addChildren([$element]);
             }
         } while ($this->table->next());
 

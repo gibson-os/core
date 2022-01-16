@@ -13,7 +13,8 @@ use GibsonOS\Core\Model\User;
 use mysqlDatabase;
 
 /**
- * @method User getUser()
+ * @method User   getUser()
+ * @method Device setUser(User $user)
  */
 #[Table]
 class Device extends AbstractModel
@@ -129,14 +130,6 @@ class Device extends AbstractModel
     public function setAdded(DateTimeInterface $added): Device
     {
         $this->added = $added;
-
-        return $this;
-    }
-
-    public function setUser(User $user): Device
-    {
-        $this->user = $user;
-        $this->setUserId($user->getId() ?? 0);
 
         return $this;
     }

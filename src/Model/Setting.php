@@ -9,8 +9,10 @@ use GibsonOS\Core\Attribute\Install\Database\Table;
 use JsonSerializable;
 
 /**
- * @method ?User  getUser()
- * @method Module getModule()
+ * @method User|null getUser()
+ * @method Setting   setUser(?User $user)
+ * @method Module    getModule()
+ * @method Setting   setModule(Module $module)
  */
 #[Table]
 class Setting extends AbstractModel implements JsonSerializable
@@ -92,22 +94,6 @@ class Setting extends AbstractModel implements JsonSerializable
     public function setValue(string $value): Setting
     {
         $this->value = $value;
-
-        return $this;
-    }
-
-    public function setUser(?User $user): Setting
-    {
-        $this->user = $user;
-        $this->setUserId($user?->getId());
-
-        return $this;
-    }
-
-    public function setModule(Module $module): Setting
-    {
-        $this->module = $module;
-        $this->setModuleId($module->getId() ?? 0);
 
         return $this;
     }

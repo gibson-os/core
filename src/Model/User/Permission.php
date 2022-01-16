@@ -10,7 +10,8 @@ use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Model\User;
 
 /**
- * @method ?User getUser()
+ * @method User|null  getUser()
+ * @method Permission setUser(?User $user)
  */
 #[Table]
 class Permission extends AbstractModel
@@ -46,7 +47,7 @@ class Permission extends AbstractModel
     private int $permission = self::DENIED;
 
     #[Constraint]
-    private ?User $user;
+    protected ?User $user;
 
     public function getId(): ?int
     {
@@ -116,14 +117,6 @@ class Permission extends AbstractModel
     public function setPermission(int $permission): Permission
     {
         $this->permission = $permission;
-
-        return $this;
-    }
-
-    public function setUser(?User $user): Permission
-    {
-        $this->user = $user;
-        $this->setUserId($user?->getId());
 
         return $this;
     }

@@ -12,6 +12,7 @@ use JsonSerializable;
 
 /**
  * @method Icon getIcon()
+ * @method Tag  setIcon(Icon $icon)
  */
 #[Table]
 class Tag extends AbstractModel implements JsonSerializable
@@ -45,14 +46,6 @@ class Tag extends AbstractModel implements JsonSerializable
     public function setTag(string $tag): Tag
     {
         $this->tag = $tag;
-
-        return $this;
-    }
-
-    public function setIcon(Icon $icon): Tag
-    {
-        $this->icon = $icon;
-        $this->setIconId($icon->getId() ?? 0);
 
         return $this;
     }

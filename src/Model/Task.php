@@ -11,6 +11,7 @@ use mysqlDatabase;
 
 /**
  * @method Module getModule()
+ * @method Task   setModule(Module $module)
  */
 #[Table]
 class Task extends AbstractModel implements JsonSerializable
@@ -66,14 +67,6 @@ class Task extends AbstractModel implements JsonSerializable
     public function setModuleId(int $moduleId): Task
     {
         $this->moduleId = $moduleId;
-
-        return $this;
-    }
-
-    public function setModule(Module $module): Task
-    {
-        $this->module = $module;
-        $this->setModuleId($module->getId() ?? 0);
 
         return $this;
     }

@@ -4,12 +4,13 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Attribute\Install\Database;
 
 use Attribute;
+use GibsonOS\Core\Model\AbstractModel;
 
 #[Attribute(Attribute::TARGET_PROPERTY | Attribute::IS_REPEATABLE)]
 class Constraint
 {
     /**
-     * @param class-string $parentModelClassName
+     * @param class-string<AbstractModel> $parentModelClassName
      */
     public function __construct(
         private string $parentColumn = 'id',
@@ -21,6 +22,9 @@ class Constraint
     ) {
     }
 
+    /**
+     * @return class-string<AbstractModel>|null
+     */
     public function getParentModelClassName(): ?string
     {
         return $this->parentModelClassName;

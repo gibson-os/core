@@ -14,6 +14,7 @@ use mysqlDatabase;
 
 /**
  * @method Location getLocation()
+ * @method Weather  setLocation(Location $location)
  */
 #[Table]
 class Weather extends AbstractModel implements JsonSerializable
@@ -315,14 +316,6 @@ class Weather extends AbstractModel implements JsonSerializable
     public function setIcon(?string $icon): Weather
     {
         $this->icon = $icon;
-
-        return $this;
-    }
-
-    public function setLocation(Location $location): Weather
-    {
-        $this->location = $location;
-        $this->setLocationId($location->getId() ?? 0);
 
         return $this;
     }

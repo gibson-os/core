@@ -14,6 +14,7 @@ use mysqlDatabase;
 
 /**
  * @method Drive getDrive()
+ * @method Stat  setDrive(Drive $drive)
  */
 #[Table('system_drive_stat')]
 class Stat extends AbstractModel
@@ -84,14 +85,6 @@ class Stat extends AbstractModel
     public function setAdded(DateTimeImmutable|DateTimeInterface $added): Stat
     {
         $this->added = $added;
-
-        return $this;
-    }
-
-    public function setDrive(Drive $drive): Stat
-    {
-        $this->drive = $drive;
-        $this->setDriveId($drive->getId() ?? 0);
 
         return $this;
     }

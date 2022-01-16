@@ -290,7 +290,7 @@ class EventRepository extends AbstractRepository
                     ->setMinute((int) $event->triggerMinute ?: null)
                     ->setPriority((int) $event->triggerPriority ?: null)
                 ;
-                $models[$event->id]->addTrigger($triggerModel);
+                $models[$event->id]->addTriggers([$triggerModel]);
                 $triggerModels[$event->triggerId] = $triggerModel;
             }
 
@@ -307,9 +307,9 @@ class EventRepository extends AbstractRepository
             ;
 
             if ($event->elementParentId === null) {
-                $models[$event->id]->addElement($elementModel);
+                $models[$event->id]->addElements([$elementModel]);
             } else {
-                $elementModels[$event->elementParentId]->addChildren($elementModel);
+                $elementModels[$event->elementParentId]->addChildren([$elementModel]);
             }
 
             $elementModels[$event->elementId] = $elementModel;

@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Model;
 
+use DateTimeImmutable;
 use DateTimeInterface;
 use GibsonOS\Core\Attribute\Install\Database\Column;
 use GibsonOS\Core\Attribute\Install\Database\Constraint;
@@ -10,10 +11,15 @@ use GibsonOS\Core\Attribute\Install\Database\Table;
 use GibsonOS\Core\Model\Event\Element;
 use GibsonOS\Core\Model\Event\Trigger;
 use JsonSerializable;
+use mysqlDatabase;
 
 /**
  * @method Element[] getElements()
+ * @method Event     addElements(Element[] $elements)
+ * @method Event     setElements(Element[] $elements)
  * @method Trigger[] getTriggers()
+ * @method Event     addTriggers(Trigger[] $triggers)
+ * @method Event     setTriggers(Trigger[] $triggers)
  */
 #[Table]
 class Event extends AbstractModel implements JsonSerializable, AutoCompleteModelInterface
@@ -42,14 +48,21 @@ class Event extends AbstractModel implements JsonSerializable, AutoCompleteModel
     /**
      * @var Element[]
      */
-    #[Constraint('eventId', Element::class)]
+    #[Constraint('event', Element::class)]
     protected array $elements = [];
 
     /**
      * @var Trigger[]
      */
-    #[Constraint('eventId', Trigger::class)]
+    #[Constraint('event', Trigger::class)]
     protected array $triggers = [];
+
+    public function __construct(mysqlDatabase $database = null)
+    {
+        parent::__construct($database);
+
+        $this->modified = new DateTimeImmutable();
+    }
 
     public function getId(): ?int
     {
@@ -131,40 +144,6 @@ class Event extends AbstractModel implements JsonSerializable, AutoCompleteModel
     public function setLastRun(?DateTimeInterface $lastRun): Event
     {
         $this->lastRun = $lastRun;
-
-        return $this;
-    }
-
-    /**
-     * @param Element[] $elements
-     */
-    public function setElements(array $elements): Event
-    {
-        $this->elements = $elements;
-
-        return $this;
-    }
-
-    public function addElement(Element $element): Event
-    {
-        $this->elements[] = $element;
-
-        return $this;
-    }
-
-    /**
-     * @param Trigger[] $triggers
-     */
-    public function setTriggers(array $triggers): Event
-    {
-        $this->triggers = $triggers;
-
-        return $this;
-    }
-
-    public function addTrigger(Trigger $trigger): Event
-    {
-        $this->triggers[] = $trigger;
 
         return $this;
     }

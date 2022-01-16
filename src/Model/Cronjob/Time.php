@@ -11,6 +11,7 @@ use GibsonOS\Core\Model\Cronjob;
 
 /**
  * @method Cronjob getCronjob()
+ * @method Time    setCronjob(Cronjob $cronjob)
  */
 #[Table]
 class Time extends AbstractModel
@@ -254,14 +255,6 @@ class Time extends AbstractModel
     public function setToYear(int $toYear): Time
     {
         $this->toYear = $toYear;
-
-        return $this;
-    }
-
-    public function setCronjob(Cronjob $cronjob): Time
-    {
-        $this->cronjob = $cronjob;
-        $this->setCronjobId((int) $cronjob->getId());
 
         return $this;
     }

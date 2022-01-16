@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Model;
 
 use Exception;
-use GibsonOS\Core\Attribute\Install\Database\Constraint;
 use GibsonOS\Core\Attribute\Install\Database\Table;
 use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\Model\DeleteError;
@@ -18,11 +17,12 @@ use mysqlTable;
 use ReflectionAttribute;
 use ReflectionClass;
 use ReflectionException;
-use ReflectionProperty;
 use Throwable;
 
 abstract class AbstractModel implements ModelInterface
 {
+    use ConstraintTrait;
+
     private mysqlDatabase $database;
 
     private const TYPE_INT = 'int';
@@ -56,8 +56,6 @@ abstract class AbstractModel implements ModelInterface
 
     private ?string $tableName = null;
 
-    private array $loadedConstraints = [];
-
     /**
      * @throws GetError
      */
@@ -70,155 +68,6 @@ abstract class AbstractModel implements ModelInterface
         } else {
             $this->database = $database;
         }
-    }
-
-    /**
-     * @param ModelInterface[] $arguments
-     *
-     * @throws ReflectionException
-     *
-     * @return AbstractModel|AbstractModel[]|null
-     */
-    public function __call(string $name, array $arguments): mixed
-    {
-        $methodType = mb_substr($name, 0, 3);
-        $propertyName = lcfirst(mb_substr($name, 3));
-
-        $reflectionClass = new ReflectionClass($this::class);
-        $reflectionProperty = $reflectionClass->getProperty($propertyName);
-        /** @psalm-suppress UndefinedMethod */
-        $propertyTypeName = $reflectionProperty->getType()?->getName();
-        $constraintAttributes = $reflectionProperty->getAttributes(
-            Constraint::class,
-            ReflectionAttribute::IS_INSTANCEOF
-        );
-
-        if (count($constraintAttributes) === 0) {
-            return null;
-        }
-
-        /** @var Constraint $constraintAttribute */
-        $constraintAttribute = $constraintAttributes[0]->newInstance();
-        $parentModelClassName = $constraintAttribute->getParentModelClassName() ?? $propertyTypeName;
-        $parentColumn = $constraintAttribute->getParentColumn();
-        $fieldName = $this->transformFieldName($parentColumn);
-
-        return match ($methodType) {
-            'get' => $this->getConstraints(
-                $constraintAttribute,
-                $propertyName,
-                $parentModelClassName,
-                $propertyTypeName,
-                $fieldName,
-                $reflectionProperty
-            ),
-            'set' => '',
-            'add' => $this->addConstraint(
-                $constraintAttribute,
-                $propertyName,
-                $parentModelClassName,
-                $propertyTypeName,
-                $fieldName,
-                $reflectionProperty,
-                $arguments[0]
-            ),
-        };
-    }
-
-    /**
-     * @param class-string<AbstractModel> $parentModelClassName
-     *
-     * @return AbstractModel|AbstractModel[]|null
-     */
-    private function getConstraints(
-        Constraint $constraintAttribute,
-        string $propertyName,
-        string $parentModelClassName,
-        string $propertyTypeName,
-        string $fieldName,
-        ReflectionProperty $reflectionProperty
-    ): mixed {
-        $getterName = 'get' . lcfirst($this->transformFieldName(
-            $constraintAttribute->getOwnColumn() ?? $propertyName . 'Id'
-        ));
-        /** @var float|int|string $value */
-        $value = $this->{$getterName}();
-        $parentModel = new $parentModelClassName();
-        $parentTable = $parentModel->getTableName();
-        $parentColumn = $constraintAttribute->getParentColumn();
-
-        if ($propertyTypeName === 'array') {
-            $this->$propertyName = $this->loadForeignRecords(
-                $parentModelClassName,
-                $value,
-                $parentTable,
-                $parentColumn
-            );
-
-            return $this->$propertyName;
-        }
-
-        if ($value === null) {
-            $this->$propertyName = $reflectionProperty->getType()?->allowsNull() ? null : $parentModel;
-
-            return $this->$propertyName;
-        }
-
-        if (
-            !$this->$propertyName instanceof $parentModelClassName ||
-            $parentModel->{'get' . $fieldName}() !== $value
-        ) {
-            $this->$propertyName = $this->loadForeignRecord($parentModel, $value, $parentColumn)
-                ?? ($reflectionProperty->getType()?->allowsNull() ? null : $parentModel)
-            ;
-        }
-
-        return $this->$propertyName;
-    }
-
-    /**
-     * @param class-string<AbstractModel> $parentModelClassName
-     *
-     * @return AbstractModel
-     */
-    private function addConstraint(
-        Constraint $constraintAttribute,
-        string $propertyName,
-        string $parentModelClassName,
-        string $propertyTypeName,
-        string $fieldName,
-        ReflectionProperty $reflectionProperty,
-        ModelInterface $model
-    ): self {
-        if ($propertyTypeName !== 'array') {
-            return $this;
-        }
-
-        $this->getConstraints(
-            $constraintAttribute,
-            $propertyName,
-            $parentModelClassName,
-            $propertyTypeName,
-            $fieldName,
-            $reflectionProperty
-        );
-        $this->$propertyName[] = $model;
-
-        return $this;
-    }
-
-    private function setConstraint(
-        Constraint $constraintAttribute,
-        string $propertyName,
-        string $parentModelClassName,
-        string $propertyTypeName,
-        string $fieldName,
-        ReflectionProperty $reflectionProperty,
-        ModelInterface $model
-    ): self {
-        // @todo einbauen
-
-        return $this;
     }
 
     public function getMysqlTable(): mysqlTable
@@ -393,62 +242,6 @@ abstract class AbstractModel implements ModelInterface
     private function transformFieldName(string $fieldName): string
     {
         return str_replace(' ', '', ucwords(str_replace('_', ' ', $fieldName)));
-    }
-
-    private function loadForeignRecord(AbstractModel $model, string|int|float $value, string $foreignField = 'id'): ?AbstractModel
-    {
-        $mysqlTable = new mysqlTable($this->database, $model->getTableName());
-        $mysqlTable
-            ->setWhere('`' . $foreignField . '`=?')
-            ->addWhereParameter($value)
-            ->setLimit(1)
-        ;
-
-        if (!$mysqlTable->selectPrepared()) {
-            return null;
-        }
-
-        $model->loadFromMysqlTable($mysqlTable);
-
-        return $model;
-    }
-
-    /**
-     * @template T of AbstractModel
-     *
-     * @param class-string<T> $modelClassName
-     *
-     * @return T[]
-     */
-    private function loadForeignRecords(
-        string $modelClassName,
-        string|int|float|null $value,
-        string $foreignTable,
-        string $foreignField
-    ): array {
-        $models = [];
-
-        if ($value === null) {
-            return $models;
-        }
-
-        $mysqlTable = new mysqlTable($this->database, $foreignTable);
-        $mysqlTable
-            ->setWhere('`' . $foreignField . '`=?')
-            ->addWhereParameter($value)
-        ;
-
-        if (!$mysqlTable->selectPrepared()) {
-            return $models;
-        }
-
-        do {
-            $model = new $modelClassName();
-            $model->loadFromMysqlTable($mysqlTable);
-            $models[] = $model;
-        } while ($mysqlTable->next());
-
-        return $models;
     }
 
     private function getColumnType(string $type): string
