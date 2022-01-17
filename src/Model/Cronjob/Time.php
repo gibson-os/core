@@ -5,6 +5,7 @@ namespace GibsonOS\Core\Model\Cronjob;
 
 use GibsonOS\Core\Attribute\Install\Database\Column;
 use GibsonOS\Core\Attribute\Install\Database\Constraint;
+use GibsonOS\Core\Attribute\Install\Database\Key;
 use GibsonOS\Core\Attribute\Install\Database\Table;
 use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Model\Cronjob;
@@ -14,6 +15,7 @@ use GibsonOS\Core\Model\Cronjob;
  * @method Time    setCronjob(Cronjob $cronjob)
  */
 #[Table]
+#[Key(columns: ['from_hour', 'to_hour', 'from_minute', 'to_minute', 'from_second', 'to_second', 'from_day_of_week', 'to_day_of_week', 'from_day_of_month', 'to_day_of_month', 'from_month', 'to_month', 'from_year', 'to_year'])]
 class Time extends AbstractModel
 {
     #[Column(attributes: [Column::ATTRIBUTE_UNSIGNED], autoIncrement: true)]

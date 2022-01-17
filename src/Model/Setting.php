@@ -5,6 +5,7 @@ namespace GibsonOS\Core\Model;
 
 use GibsonOS\Core\Attribute\Install\Database\Column;
 use GibsonOS\Core\Attribute\Install\Database\Constraint;
+use GibsonOS\Core\Attribute\Install\Database\Key;
 use GibsonOS\Core\Attribute\Install\Database\Table;
 use JsonSerializable;
 
@@ -15,6 +16,7 @@ use JsonSerializable;
  * @method Setting   setModule(Module $module)
  */
 #[Table]
+#[Key(unique: true, columns: ['user_id', 'module_id', 'key'])]
 class Setting extends AbstractModel implements JsonSerializable
 {
     #[Column(attributes: [Column::ATTRIBUTE_UNSIGNED], autoIncrement: true)]

@@ -5,6 +5,7 @@ namespace GibsonOS\Core\Model\Event;
 
 use GibsonOS\Core\Attribute\Install\Database\Column;
 use GibsonOS\Core\Attribute\Install\Database\Constraint;
+use GibsonOS\Core\Attribute\Install\Database\Key;
 use GibsonOS\Core\Attribute\Install\Database\Table;
 use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Model\Event;
@@ -17,6 +18,7 @@ use JsonSerializable;
  * @method Trigger setEvent(Event $event)
  */
 #[Table]
+#[Key(unique: true, columns: ['event_id', 'trigger', 'weekday', 'day', 'month', 'year', 'hour', 'minute', 'second'])]
 class Trigger extends AbstractModel implements JsonSerializable
 {
     #[Column(attributes: [Column::ATTRIBUTE_UNSIGNED], autoIncrement: true)]
@@ -32,6 +34,7 @@ class Trigger extends AbstractModel implements JsonSerializable
     private string $class;
 
     #[Column(length: 64)]
+    #[Key]
     private string $trigger;
 
     /**
@@ -69,6 +72,7 @@ class Trigger extends AbstractModel implements JsonSerializable
     private ?int $second = null;
 
     #[Column(attributes: [Column::ATTRIBUTE_UNSIGNED])]
+    #[Key]
     private ?int $priority = null;
 
     #[Constraint]

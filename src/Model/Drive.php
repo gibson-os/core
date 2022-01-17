@@ -6,6 +6,7 @@ namespace GibsonOS\Core\Model;
 use DateTimeImmutable;
 use DateTimeInterface;
 use GibsonOS\Core\Attribute\Install\Database\Column;
+use GibsonOS\Core\Attribute\Install\Database\Key;
 use GibsonOS\Core\Attribute\Install\Database\Table;
 use JsonSerializable;
 use mysqlDatabase;
@@ -21,6 +22,7 @@ class Drive extends AbstractModel implements JsonSerializable
     private ?int $id = null;
 
     #[Column(length: 32)]
+    #[Key(true)]
     private string $serial;
 
     #[Column(length: 64)]

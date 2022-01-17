@@ -6,11 +6,13 @@ namespace GibsonOS\Core\Model;
 use DateTimeImmutable;
 use DateTimeInterface;
 use GibsonOS\Core\Attribute\Install\Database\Column;
+use GibsonOS\Core\Attribute\Install\Database\Key;
 use GibsonOS\Core\Attribute\Install\Database\Table;
 use JsonSerializable;
 use mysqlDatabase;
 
 #[Table]
+#[Key(unique: true, columns: ['command', 'arguments', 'options', 'user'])]
 class Cronjob extends AbstractModel implements JsonSerializable
 {
     #[Column(attributes: [Column::ATTRIBUTE_UNSIGNED], autoIncrement: true)]

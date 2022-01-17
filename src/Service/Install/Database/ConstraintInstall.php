@@ -133,6 +133,6 @@ class ConstraintInstall extends AbstractInstall implements PriorityInterface
 
     public function getPriority(): int
     {
-        return 699;
+        return 698;
     }
 }

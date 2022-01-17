@@ -6,6 +6,7 @@ namespace GibsonOS\Core\Model;
 use DateTimeImmutable;
 use DateTimeInterface;
 use GibsonOS\Core\Attribute\Install\Database\Column;
+use GibsonOS\Core\Attribute\Install\Database\Key;
 use GibsonOS\Core\Attribute\Install\Database\Table;
 use JsonSerializable;
 use mysqlDatabase;
@@ -17,6 +18,7 @@ class User extends AbstractModel implements JsonSerializable
     private ?int $id = null;
 
     #[Column(length: 64)]
+    #[Key(true)]
     private string $user;
 
     #[Column(length: 64)]

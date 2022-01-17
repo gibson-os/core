@@ -7,6 +7,7 @@ use DateTime;
 use DateTimeInterface;
 use GibsonOS\Core\Attribute\Install\Database\Column;
 use GibsonOS\Core\Attribute\Install\Database\Constraint;
+use GibsonOS\Core\Attribute\Install\Database\Key;
 use GibsonOS\Core\Attribute\Install\Database\Table;
 use GibsonOS\Core\Model\Weather\Location;
 use JsonSerializable;
@@ -17,6 +18,7 @@ use mysqlDatabase;
  * @method Weather  setLocation(Location $location)
  */
 #[Table]
+#[Key(unique: true, columns: ['location_id', 'date'])]
 class Weather extends AbstractModel implements JsonSerializable
 {
     #[Column(attributes: [Column::ATTRIBUTE_UNSIGNED], autoIncrement: true)]

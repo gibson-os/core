@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Model;
 
 use GibsonOS\Core\Attribute\Install\Database\Column;
+use GibsonOS\Core\Attribute\Install\Database\Key;
 use GibsonOS\Core\Attribute\Install\Database\Table;
 use JsonSerializable;
 
@@ -14,6 +15,7 @@ class Module extends AbstractModel implements JsonSerializable
     private ?int $id = null;
 
     #[Column(length: 32)]
+    #[Key(true)]
     private string $name;
 
     public function getId(): ?int

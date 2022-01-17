@@ -91,6 +91,6 @@ class ViewInstall extends AbstractInstall implements PriorityInterface
 
     public function getPriority(): int
     {
-        return 698;
+        return 697;
     }
 }

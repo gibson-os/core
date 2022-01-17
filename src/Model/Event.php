@@ -7,6 +7,7 @@ use DateTimeImmutable;
 use DateTimeInterface;
 use GibsonOS\Core\Attribute\Install\Database\Column;
 use GibsonOS\Core\Attribute\Install\Database\Constraint;
+use GibsonOS\Core\Attribute\Install\Database\Key;
 use GibsonOS\Core\Attribute\Install\Database\Table;
 use GibsonOS\Core\Model\Event\Element;
 use GibsonOS\Core\Model\Event\Trigger;
@@ -28,6 +29,7 @@ class Event extends AbstractModel implements JsonSerializable, AutoCompleteModel
     private ?int $id = null;
 
     #[Column(length: 128)]
+    #[Key(true)]
     private string $name;
 
     #[Column]

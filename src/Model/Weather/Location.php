@@ -5,18 +5,21 @@ namespace GibsonOS\Core\Model\Weather;
 
 use DateTimeInterface;
 use GibsonOS\Core\Attribute\Install\Database\Column;
+use GibsonOS\Core\Attribute\Install\Database\Key;
 use GibsonOS\Core\Attribute\Install\Database\Table;
 use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Model\AutoCompleteModelInterface;
 use JsonSerializable;
 
 #[Table]
+#[Key(unique: true, columns: ['latitude', 'longitude'])]
 class Location extends AbstractModel implements JsonSerializable, AutoCompleteModelInterface
 {
     #[Column(attributes: [Column::ATTRIBUTE_UNSIGNED], autoIncrement: true)]
     private ?int $id = null;
 
     #[Column(length: 128)]
+    #[Key(true)]
     private string $name;
 
     #[Column]

@@ -9,15 +9,15 @@ use Attribute;
 class Key
 {
     public function __construct(
-        private string $type,
-        private ?string $name = null,
+        private bool $unique = false,
         private array $columns = [],
+        private ?string $name = null,
     ) {
     }
 
-    public function getType(): string
+    public function isUnique(): bool
     {
-        return $this->type;
+        return $this->unique;
     }
 
     public function getName(): ?string
@@ -25,7 +25,7 @@ class Key
         return $this->name;
     }
 
-    public function getColumns(): ?array
+    public function getColumns(): array
     {
         return $this->columns;
     }
