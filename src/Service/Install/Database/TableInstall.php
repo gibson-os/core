@@ -157,11 +157,12 @@ class TableInstall extends AbstractInstall implements PriorityInterface
             $tableExistsQuery =
                 'SELECT `TABLE_NAME` ' .
                 'FROM `information_schema`.`TABLES` ' .
-                "WHERE `TABLE_NAME`='" . $tableName . "' " .
-                "AND `TABLE_SCHEMA`='" . $this->envService->getString('MYSQL_DATABASE') . "'"
+                'WHERE `TABLE_NAME`=? ' .
+                'AND `TABLE_SCHEMA`=?'
             ;
+            $parameters = [$tableName, $this->envService->getString('MYSQL_DATABASE')];
 
-            if ($this->mysqlDatabase->sendQuery($tableExistsQuery) === false) {
+            if ($this->mysqlDatabase->execute($tableExistsQuery, $parameters) === false) {
                 throw new InstallException(sprintf(
                     'Show table "%s" failed! Error: %s',
                     $tableName,

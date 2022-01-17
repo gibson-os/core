@@ -5,15 +5,26 @@ namespace GibsonOS\Core\Model\User;
 
 use GibsonOS\Core\Attribute\Install\Database\Column;
 use GibsonOS\Core\Attribute\Install\Database\Constraint;
+use GibsonOS\Core\Attribute\Install\Database\Key;
 use GibsonOS\Core\Attribute\Install\Database\Table;
 use GibsonOS\Core\Model\AbstractModel;
+use GibsonOS\Core\Model\Action;
+use GibsonOS\Core\Model\Module;
+use GibsonOS\Core\Model\Task;
 use GibsonOS\Core\Model\User;
 
 /**
- * @method User|null  getUser()
- * @method Permission setUser(?User $user)
+ * @method User|null   getUser()
+ * @method Permission  setUser(?User $user)
+ * @method Module      getModuleModel()
+ * @method Permission  setModuleModel(Module $module)
+ * @method Task|null   getTaskModel()
+ * @method Permission  setTaskModel(?Task $task)
+ * @method Action|null getActionModel()
+ * @method Permission  setActionModel(?Action $action)
  */
 #[Table]
+#[Key(unique: true, columns: ['module', 'task', 'action', 'user_id'])]
 class Permission extends AbstractModel
 {
     public const INHERIT = 0; // 00000
@@ -48,6 +59,15 @@ class Permission extends AbstractModel
 
     #[Constraint]
     protected ?User $user;
+
+    #[Constraint(parentColumn: 'name', ownColumn: 'module')]
+    protected Module $moduleModel;
+
+    #[Constraint(parentColumn: 'name', ownColumn: 'task')]
+    protected ?Task $taskModel;
+
+    #[Constraint(parentColumn: 'name', ownColumn: 'action')]
+    protected ?Action $actionModel;
 
     public function getId(): ?int
     {

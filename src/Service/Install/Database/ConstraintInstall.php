@@ -80,12 +80,20 @@ class ConstraintInstall extends AbstractInstall implements PriorityInterface
                     'SELECT COUNT(`CONSTRAINT_NAME`) ' .
                     'FROM `information_schema`.`KEY_COLUMN_USAGE` ' .
                     'WHERE `TABLE_NAME`=? ' .
+                    'AND `CONSTRAINT_SCHEMA`=? ' .
                     'AND `COLUMN_NAME`=? ' .
                     'AND `REFERENCED_TABLE_NAME`=? ' .
                     'AND `REFERENCED_COLUMN_NAME`=?'
                 ;
+                $parameters = [
+                    $tableName,
+                    $this->envService->getString('MYSQL_DATABASE'),
+                    $foreignKey,
+                    $parentTableName,
+                    $parentColumn,
+                ];
 
-                if (!$this->mysqlDatabase->execute($query, [$tableName, $foreignKey, $parentTableName, $parentColumn])) {
+                if (!$this->mysqlDatabase->execute($query, $parameters)) {
                     throw new InstallException(sprintf(
                         'Get constraints for table "%s" failed! Error: %s',
                         $tableName,

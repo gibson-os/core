@@ -4,9 +4,17 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Model\Drive;
 
 use GibsonOS\Core\Attribute\Install\Database\Column;
+use GibsonOS\Core\Attribute\Install\Database\Constraint;
 use GibsonOS\Core\Attribute\Install\Database\Table;
 use GibsonOS\Core\Model\AbstractModel;
+use GibsonOS\Core\Model\SmartAttribute;
 
+/**
+ * @method Stat           getStat()
+ * @method StatAttribute  setStat(Stat $stat)
+ * @method SmartAttribute getAttribute()
+ * @method StatAttribute  setAttribute(SmartAttribute $attribute)
+ */
 #[Table('system_drive_stat_attribute')]
 class StatAttribute extends AbstractModel
 {
@@ -27,6 +35,12 @@ class StatAttribute extends AbstractModel
 
     #[Column(type: Column::TYPE_INT, attributes: [Column::ATTRIBUTE_UNSIGNED])]
     private int $rawValue;
+
+    #[Constraint]
+    protected Stat $stat;
+
+    #[Constraint]
+    protected SmartAttribute $attribute;
 
     public function getStatId(): int
     {
