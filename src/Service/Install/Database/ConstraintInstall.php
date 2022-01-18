@@ -105,13 +105,15 @@ class ConstraintInstall extends AbstractInstall implements PriorityInterface
                     continue;
                 }
 
+                $onUpdate = $constraintAttribute->getOnUpdate();
+                $onDelete = $constraintAttribute->getOnDelete();
                 $constraints[] =
                     'ADD CONSTRAINT `' . $constraintName . '` ' .
                     'FOREIGN KEY (`' . $foreignKey . '`) ' .
                     'REFERENCES `' . $parentTableName . '` ' .
                     '(`' . $parentColumn . '`) ' .
-                    'ON UPDATE ' . $constraintAttribute->getOnUpdate() . ' ' .
-                    'ON DELETE ' . $constraintAttribute->getOnDelete()
+                    ($onUpdate === null ? '' : 'ON UPDATE ' . $onUpdate . ' ') .
+                    ($onDelete === null ? '' : 'ON DELETE ' . $onDelete)
                 ;
             }
 
