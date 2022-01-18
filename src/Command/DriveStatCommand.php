@@ -10,7 +10,7 @@ use Psr\Log\LoggerInterface;
 /**
  * @description Collect SMART information of all hard drives
  */
-#[Cronjob(minutes: '0,15,30,45')]
+#[Cronjob(minutes: '0,15,30,45', seconds: '0')]
 class DriveStatCommand extends AbstractCommand
 {
     public function __construct(private ProcessService $processService, LoggerInterface $logger)
