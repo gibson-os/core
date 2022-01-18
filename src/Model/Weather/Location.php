@@ -13,6 +13,7 @@ use JsonSerializable;
 
 #[Table]
 #[Key(unique: true, columns: ['latitude', 'longitude'])]
+#[Key(columns: ['interval', 'active'])]
 class Location extends AbstractModel implements JsonSerializable, AutoCompleteModelInterface
 {
     #[Column(attributes: [Column::ATTRIBUTE_UNSIGNED], autoIncrement: true)]

@@ -34,7 +34,7 @@ class DevicePush extends AbstractModel
     #[Column]
     private bool $registered = false;
 
-    #[Column(default: Column::DEFAULT_CURRENT_TIMESTAMP, attributes: [Column::ATTRIBUTE_CURRENT_TIMESTAMP])]
+    #[Column(type: Column::TYPE_TIMESTAMP, default: Column::DEFAULT_CURRENT_TIMESTAMP, attributes: [Column::ATTRIBUTE_CURRENT_TIMESTAMP])]
     private DateTimeInterface $modified;
 
     #[Constraint]

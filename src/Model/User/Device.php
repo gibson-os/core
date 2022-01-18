@@ -39,7 +39,7 @@ class Device extends AbstractModel
     #[Column]
     private ?DateTimeInterface $lastLogin = null;
 
-    #[Column(default: Column::DEFAULT_CURRENT_TIMESTAMP)]
+    #[Column(type: Column::TYPE_TIMESTAMP, default: Column::DEFAULT_CURRENT_TIMESTAMP)]
     private DateTimeInterface $added;
 
     #[Constraint]

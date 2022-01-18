@@ -31,6 +31,7 @@ class Cronjob extends AbstractModel implements JsonSerializable
     private string $options = '[]';
 
     #[Column(length: 64)]
+    #[Key]
     private string $user;
 
     #[Column]

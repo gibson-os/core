@@ -41,7 +41,7 @@ class Event extends AbstractModel implements JsonSerializable, AutoCompleteModel
     #[Column]
     private bool $exitOnError = true;
 
-    #[Column]
+    #[Column(type: Column::TYPE_TIMESTAMP, default: Column::DEFAULT_CURRENT_TIMESTAMP)]
     private DateTimeInterface $modified;
 
     #[Column]

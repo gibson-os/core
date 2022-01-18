@@ -10,7 +10,7 @@ use JsonSerializable;
 #[Table('system_smart_attribute')]
 class SmartAttribute extends AbstractModel implements JsonSerializable
 {
-    #[Column(attributes: [Column::ATTRIBUTE_UNSIGNED], autoIncrement: true)]
+    #[Column(attributes: [Column::ATTRIBUTE_UNSIGNED], primary: true)]
     private ?int $id = null;
 
     #[Column(length: 32)]

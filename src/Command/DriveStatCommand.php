@@ -3,12 +3,14 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Command;
 
+use GibsonOS\Core\Attribute\Install\Cronjob;
 use GibsonOS\Core\Service\ProcessService;
 use Psr\Log\LoggerInterface;
 
 /**
  * @description Collect SMART information of all hard drives
  */
+#[Cronjob(minutes: '0,15,30,45')]
 class DriveStatCommand extends AbstractCommand
 {
     public function __construct(private ProcessService $processService, LoggerInterface $logger)
