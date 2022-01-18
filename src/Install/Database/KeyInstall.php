@@ -1,21 +1,25 @@
 <?php
 declare(strict_types=1);
 
-namespace GibsonOS\Core\Service\Install\Database;
+namespace GibsonOS\Core\Install\Database;
 
 use Generator;
 use GibsonOS\Core\Attribute\Install\Database\Key;
 use GibsonOS\Core\Attribute\Install\Database\Table;
 use GibsonOS\Core\Dto\Install\Success;
+use GibsonOS\Core\Exception\FactoryError;
+use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\InstallException;
+use GibsonOS\Core\Install\AbstractInstall;
 use GibsonOS\Core\Model\ModelInterface;
 use GibsonOS\Core\Service\Attribute\TableAttribute;
-use GibsonOS\Core\Service\Install\AbstractInstall;
 use GibsonOS\Core\Service\InstallService;
 use GibsonOS\Core\Service\PriorityInterface;
 use GibsonOS\Core\Service\ServiceManagerService;
+use function mb_substr;
 use mysqlDatabase;
 use ReflectionClass;
+use ReflectionException;
 
 class KeyInstall extends AbstractInstall implements PriorityInterface
 {
@@ -27,6 +31,12 @@ class KeyInstall extends AbstractInstall implements PriorityInterface
         parent::__construct($serviceManagerService);
     }
 
+    /**
+     * @throws InstallException
+     * @throws FactoryError
+     * @throws GetError
+     * @throws ReflectionException
+     */
     public function install(string $module): Generator
     {
         $path = $this->dirService->addEndSlash($module) . 'src' . DIRECTORY_SEPARATOR . 'Model';

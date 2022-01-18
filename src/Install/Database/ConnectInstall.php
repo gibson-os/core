@@ -1,14 +1,14 @@
 <?php
 declare(strict_types=1);
 
-namespace GibsonOS\Core\Service\Install\Database;
+namespace GibsonOS\Core\Install\Database;
 
 use Generator;
 use GibsonOS\Core\Dto\Install\Configuration;
 use GibsonOS\Core\Dto\Install\Input;
 use GibsonOS\Core\Exception\InstallException;
-use GibsonOS\Core\Service\Install\AbstractInstall;
-use GibsonOS\Core\Service\Install\SingleInstallInterface;
+use GibsonOS\Core\Install\AbstractInstall;
+use GibsonOS\Core\Install\SingleInstallInterface;
 use GibsonOS\Core\Service\InstallService;
 use GibsonOS\Core\Service\PriorityInterface;
 use mysqlDatabase;

@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace GibsonOS\Core\Service\Install;
+namespace GibsonOS\Core\Install;
 
 use Generator;
 use GibsonOS\Core\Attribute\Install\Cronjob;

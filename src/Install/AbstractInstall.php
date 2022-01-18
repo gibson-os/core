@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace GibsonOS\Core\Service\Install;
+namespace GibsonOS\Core\Install;
 
 use Generator;
 use GibsonOS\Core\Dto\Install\Input;
@@ -98,5 +98,10 @@ abstract class AbstractInstall implements InstallInterface
             ->setValue($value)
             ->save()
         ;
+    }
+
+    public function getModule(): ?string
+    {
+        return null;
     }
 }

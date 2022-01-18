@@ -1,10 +1,11 @@
 <?php
 declare(strict_types=1);
 
-namespace GibsonOS\Core\Service\Install;
+namespace GibsonOS\Core\Install;
 
 use Generator;
 use GibsonOS\Core\Exception\Model\SaveError;
+use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Service\InstallService;
 use GibsonOS\Core\Service\PriorityInterface;
 
@@ -12,6 +13,7 @@ class C2dmInstall extends AbstractInstall implements PriorityInterface, SingleIn
 {
     /**
      * @throws SaveError
+     * @throws SelectError
      */
     public function install(string $module): Generator
     {

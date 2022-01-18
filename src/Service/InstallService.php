@@ -11,8 +11,8 @@ use GibsonOS\Core\Dto\Install\Success;
 use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\InstallException;
 use GibsonOS\Core\Exception\SetError;
-use GibsonOS\Core\Service\Install\InstallInterface;
-use GibsonOS\Core\Service\Install\SingleInstallInterface;
+use GibsonOS\Core\Install\InstallInterface;
+use GibsonOS\Core\Install\SingleInstallInterface;
 
 class InstallService
 {
@@ -38,7 +38,7 @@ class InstallService
         private DirService $dirService,
         private FileService $fileService,
         private EnvService $envService,
-        #[GetServices(['Core/src/Service/Install'], InstallInterface::class)] private array $installers
+        #[GetServices(['*/src/Install'], InstallInterface::class)] private array $installers
     ) {
     }
 
@@ -87,7 +87,10 @@ class InstallService
             }
 
             foreach ($modules as $module) {
-                if (in_array($installer::class, $installedSingleInstallers)) {
+                if (
+                    ($installer->getModule() !== null && $installer->getModule() !== $module) ||
+                    in_array($installer::class, $installedSingleInstallers)
+                ) {
                     continue;
                 }
 
