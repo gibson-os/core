@@ -5,7 +5,13 @@ namespace GibsonOS\Core\Service\Install;
 
 use Generator;
 use GibsonOS\Core\Dto\Install\Input;
+use GibsonOS\Core\Exception\FactoryError;
 use GibsonOS\Core\Exception\GetError;
+use GibsonOS\Core\Exception\Model\SaveError;
+use GibsonOS\Core\Exception\Repository\SelectError;
+use GibsonOS\Core\Model\Setting;
+use GibsonOS\Core\Repository\ModuleRepository;
+use GibsonOS\Core\Repository\SettingRepository;
 use GibsonOS\Core\Service\DirService;
 use GibsonOS\Core\Service\EnvService;
 use GibsonOS\Core\Service\ServiceManagerService;
@@ -13,12 +19,28 @@ use Psr\Log\LoggerInterface;
 
 abstract class AbstractInstall implements InstallInterface
 {
-    public function __construct(
-        protected DirService $dirService,
-        protected ServiceManagerService $serviceManagerService,
-        protected EnvService $envService,
-        protected LoggerInterface $logger
-    ) {
+    protected DirService $dirService;
+
+    protected EnvService $envService;
+
+    protected SettingRepository $settingRepository;
+
+    protected ModuleRepository $moduleRepository;
+
+    protected LoggerInterface $logger;
+
+    /**
+     * @param ServiceManagerService $serviceManagerService
+     *
+     * @throws FactoryError
+     */
+    public function __construct(protected ServiceManagerService $serviceManagerService)
+    {
+        $this->dirService = $this->serviceManagerService->get(DirService::class);
+        $this->envService = $this->serviceManagerService->get(EnvService::class);
+        $this->settingRepository = $this->serviceManagerService->get(SettingRepository::class);
+        $this->moduleRepository = $this->serviceManagerService->get(ModuleRepository::class);
+        $this->logger = $this->serviceManagerService->get(LoggerInterface::class);
     }
 
     /**
@@ -48,5 +70,33 @@ abstract class AbstractInstall implements InstallInterface
         }
 
         return new Input($message, $value);
+    }
+
+    protected function getSettingInput(string $moduleName, string $key, string $message): Input
+    {
+        try {
+            $setting = $this->settingRepository->getByKeyAndModuleName($moduleName, null, $key);
+            $value = $setting->getValue();
+        } catch (SelectError) {
+            $value = null;
+        }
+
+        return new Input($message, $value);
+    }
+
+    /**
+     * @throws SaveError
+     * @throws SelectError
+     */
+    protected function setSetting(string $moduleName, string $key, string $value): void
+    {
+        $module = $this->moduleRepository->getByName($moduleName);
+
+        (new Setting())
+            ->setModuleId($module->getId() ?? 0)
+            ->setKey($key)
+            ->setValue($value)
+            ->save()
+        ;
     }
 }

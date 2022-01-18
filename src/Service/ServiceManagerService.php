@@ -46,7 +46,7 @@ class ServiceManagerService
      *
      * @throws FactoryError
      *
-     * @return T|object
+     * @return T
      */
     public function get(string $classname, string $instanceOf = null): object
     {
@@ -63,8 +63,10 @@ class ServiceManagerService
 
         if (isset($this->services[$classname])) {
             $this->checkInstanceOf($this->services[$classname], $instanceOf);
+            /** @var T $class */
+            $class = $this->services[$classname];
 
-            return $this->services[$classname];
+            return $class;
         }
 
         $class = $this->getByCreate($classname);
@@ -98,8 +100,7 @@ class ServiceManagerService
         foreach ($classNames as $className) {
             try {
                 $classes[] = $this->get($className, $instanceOf);
-            } catch (FactoryError $e) {
-                // do nothing
+            } catch (FactoryError) {
             }
         }
 
@@ -126,8 +127,7 @@ class ServiceManagerService
 
             try {
                 $classNames[] = $this->getNamespaceByPath($file);
-            } catch (FactoryError $e) {
-                // do nothing
+            } catch (FactoryError) {
             }
         }
 

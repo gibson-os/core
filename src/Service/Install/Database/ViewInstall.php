@@ -10,27 +10,21 @@ use GibsonOS\Core\Exception\FactoryError;
 use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\InstallException;
 use GibsonOS\Core\Model\ModelInterface;
-use GibsonOS\Core\Service\DirService;
-use GibsonOS\Core\Service\EnvService;
 use GibsonOS\Core\Service\Install\AbstractInstall;
 use GibsonOS\Core\Service\InstallService;
 use GibsonOS\Core\Service\PriorityInterface;
 use GibsonOS\Core\Service\ServiceManagerService;
 use mysqlDatabase;
-use Psr\Log\LoggerInterface;
 use ReflectionClass;
 use ReflectionException;
 
 class ViewInstall extends AbstractInstall implements PriorityInterface
 {
     public function __construct(
-        DirService $dirService,
         ServiceManagerService $serviceManagerService,
-        EnvService $envService,
-        LoggerInterface $logger,
         private mysqlDatabase $mysqlDatabase,
     ) {
-        parent::__construct($dirService, $serviceManagerService, $envService, $logger);
+        parent::__construct($serviceManagerService);
     }
 
     /**
