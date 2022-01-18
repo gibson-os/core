@@ -43,6 +43,11 @@ class C2dmInstall extends AbstractInstall implements PriorityInterface, SingleIn
         return InstallService::PART_CONFIG;
     }
 
+    public function getModule(): ?string
+    {
+        return 'core';
+    }
+
     public function getPriority(): int
     {
         return 500;

@@ -87,8 +87,10 @@ class InstallService
             }
 
             foreach ($modules as $module) {
+                $moduleName = preg_replace('/.*\/(.*)/', '$1', $module);
+
                 if (
-                    ($installer->getModule() !== null && $installer->getModule() !== $module) ||
+                    ($installer->getModule() !== null && $installer->getModule() !== $moduleName) ||
                     in_array($installer::class, $installedSingleInstallers)
                 ) {
                     continue;
