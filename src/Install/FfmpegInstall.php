@@ -13,7 +13,7 @@ class FfmpegInstall extends AbstractInstall implements PriorityInterface, Single
     public function install(string $module): Generator
     {
         yield $ffmpegPathInput = $this->getEnvInput('FFMPEG_PATH', 'What is the ffmpeg path?');
-        yield $ffprobePathInput = $this->getEnvInput('FFMPEG_PATH', 'What is the ffprobe path?');
+        yield $ffprobePathInput = $this->getEnvInput('FFPROBE_PATH', 'What is the ffprobe path?');
 
         yield (new Configuration('FFMPEG configuration generated!'))
             ->setValue('FFMPEG_PATH', $ffmpegPathInput->getValue() ?? '')
