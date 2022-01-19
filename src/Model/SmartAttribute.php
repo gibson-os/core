@@ -11,7 +11,7 @@ use JsonSerializable;
 class SmartAttribute extends AbstractModel implements JsonSerializable
 {
     #[Column(attributes: [Column::ATTRIBUTE_UNSIGNED], primary: true)]
-    private ?int $id = null;
+    private int $id;
 
     #[Column(length: 32)]
     private string $short;
@@ -19,12 +19,12 @@ class SmartAttribute extends AbstractModel implements JsonSerializable
     #[Column(type: Column::TYPE_TEXT)]
     private string $description;
 
-    public function getId(): ?int
+    public function getId(): int
     {
         return $this->id;
     }
 
-    public function setId(?int $id): SmartAttribute
+    public function setId(int $id): SmartAttribute
     {
         $this->id = $id;
 
