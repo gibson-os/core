@@ -43,7 +43,9 @@ class InstallCommand extends AbstractCommand
                 }
 
                 echo ': ';
-                $installDto->setValue(trim(fgets(STDIN) ?: '') ?: ($value ?? ''));
+                $input = fgets(STDIN);
+                $trimmedInput = trim($input === false ? '' : $input);
+                $installDto->setValue($trimmedInput === '' ? $value : $trimmedInput);
             } else {
                 echo PHP_EOL;
             }

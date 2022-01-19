@@ -100,6 +100,11 @@ class SmartAttributeData extends AbstractInstall implements PriorityInterface
         return InstallService::PART_DATA;
     }
 
+    public function getModule(): ?string
+    {
+        return 'core';
+    }
+
     public function getPriority(): int
     {
         return 0;
