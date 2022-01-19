@@ -7,6 +7,7 @@ use Generator;
 use GibsonOS\Core\Dto\Install\Input;
 use GibsonOS\Core\Exception\FactoryError;
 use GibsonOS\Core\Exception\GetError;
+use GibsonOS\Core\Exception\InstallException;
 use GibsonOS\Core\Exception\Model\SaveError;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\Setting;
@@ -98,6 +99,37 @@ abstract class AbstractInstall implements InstallInterface
             ->setValue($value)
             ->save()
         ;
+    }
+
+    /**
+     * @throws InstallException
+     */
+    protected function transformSize(Input $input): string
+    {
+        $value = $input->getValue() ?? '';
+        preg_match('/(\d+)(\w*)/', $value, $hits);
+
+        if (
+            count($hits) < 2 ||
+            !is_numeric($hits[1])
+        ) {
+            throw new InstallException(sprintf('Value "%s" is no number!', $hits[1]));
+        }
+
+        $types = ['k', 'kb', 'm', 'mb', 'g', 'gb'];
+
+        if (
+            array_key_exists(2, $hits) &&
+            !in_array($hits[2], $types)
+        ) {
+            return throw new InstallException(sprintf(
+                '"%s" is no valid value! Possible: %s',
+                $hits[2],
+                implode(', ', $types)
+            ));
+        }
+
+        return $value;
     }
 
     public function getModule(): ?string
