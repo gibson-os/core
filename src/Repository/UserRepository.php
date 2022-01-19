@@ -3,11 +3,16 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Repository;
 
+use GibsonOS\Core\Attribute\GetTableName;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\User;
 
 class UserRepository extends AbstractRepository
 {
+    public function __construct(#[GetTableName(User::class)] private string $userTableName)
+    {
+    }
+
     /**
      * @throws SelectError
      */
@@ -30,5 +35,13 @@ class UserRepository extends AbstractRepository
     public function getByUsernameAndPassword(string $username, string $passwordHash): User
     {
         return $this->fetchOne('`user`=? AND `password`=MD5(?)', [$username, $passwordHash], User::class);
+    }
+
+    public function getCount(): int
+    {
+        $table = $this->getTable($this->userTableName);
+        $table->selectPrepared(false, 'COUNT(`id`)');
+
+        return (int) $table->connection->fetchResult();
     }
 }

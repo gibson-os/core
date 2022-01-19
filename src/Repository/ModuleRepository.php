@@ -21,6 +21,16 @@ class ModuleRepository extends AbstractRepository
         return $this->fetchOne('`name`=?', [$name], Module::class);
     }
 
+    /**
+     * @throws SelectError
+     *
+     * @return Module[]
+     */
+    public function getAll(): array
+    {
+        return $this->fetchAll('', [], Module::class);
+    }
+
     public function deleteByIdsNot(array $ids): bool
     {
         $table = $this->getTable($this->moduleTableName);

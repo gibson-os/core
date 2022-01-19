@@ -86,7 +86,6 @@ class UserService
     }
 
     /**
-     * @throws DateTimeError
      * @throws SaveError
      * @throws UserError
      */
@@ -95,8 +94,8 @@ class UserService
         string $username,
         string $password,
         string $passwordRepeat,
-        ?string $host,
-        ?string $ip
+        string $host = null,
+        string $ip = null
     ): User {
         if (empty($username)) {
             throw new UserError('Username is empty');
