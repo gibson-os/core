@@ -104,7 +104,7 @@ abstract class AbstractInstall implements InstallInterface
     /**
      * @throws InstallException
      */
-    protected function transformSize(Input $input): string
+    protected function checkSizeInput(Input $input): string
     {
         $value = $input->getValue() ?? '';
         preg_match('/(\d+)(\w*)/', $value, $hits);
