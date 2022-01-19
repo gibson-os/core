@@ -4,38 +4,23 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Install;
 
 use Generator;
-use GibsonOS\Core\Exception\Model\SaveError;
-use GibsonOS\Core\Exception\Repository\SelectError;
+use GibsonOS\Core\Dto\Install\Configuration;
 use GibsonOS\Core\Service\InstallService;
 use GibsonOS\Core\Service\PriorityInterface;
 
 class C2dmInstall extends AbstractInstall implements PriorityInterface, SingleInstallInterface
 {
-    /**
-     * @throws SaveError
-     * @throws SelectError
-     */
     public function install(string $module): Generator
     {
-        yield $emailInput = $this->getSettingInput(
-            'core',
-            'c2dm_email',
-            'What is the c2dm email address?'
-        );
-        yield $passwordInput = $this->getSettingInput(
-            'core',
-            'c2dm_password',
-            'What is the c2dm password?'
-        );
-        yield $tokenInput = $this->getSettingInput(
-            'core',
-            'c2dm_auth',
-            'What is the c2dm access token?'
-        );
+        yield $emailInput = $this->getEnvInput('C2DM_EMAIL', 'What is the c2dm email address?');
+        yield $passwordInput = $this->getEnvInput('C2DM_PASSWORD', 'What is the c2dm password?');
+        yield $tokenInput = $this->getEnvInput('C2DM_AUTH', 'What is the c2dm access token?');
 
-        $this->setSetting('core', 'c2dm_email', $emailInput->getValue() ?? '');
-        $this->setSetting('core', 'c2dm_password', $passwordInput->getValue() ?? '');
-        $this->setSetting('core', 'c2dm_auth', $tokenInput->getValue() ?? '');
+        yield (new Configuration('C2dm settings saved!'))
+            ->setValue('C2DM_EMAIL', $emailInput->getValue() ?? '')
+            ->setValue('C2DM_PASSWORD', $passwordInput->getValue() ?? '')
+            ->setValue('C2DM_AUTH', $tokenInput->getValue() ?? '')
+        ;
     }
 
     public function getPart(): string
@@ -43,13 +28,8 @@ class C2dmInstall extends AbstractInstall implements PriorityInterface, SingleIn
         return InstallService::PART_CONFIG;
     }
 
-    public function getModule(): ?string
-    {
-        return 'core';
-    }
-
     public function getPriority(): int
     {
-        return 500;
+        return 800;
     }
 }
