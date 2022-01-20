@@ -107,6 +107,11 @@ abstract class AbstractInstall implements InstallInterface
     protected function checkSizeInput(Input $input): string
     {
         $value = $input->getValue() ?? '';
+
+        if ($value === '0') {
+            return $value;
+        }
+
         preg_match('/(\d+)(\w*)/', $value, $hits);
 
         if (
