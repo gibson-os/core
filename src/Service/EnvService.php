@@ -43,41 +43,78 @@ class EnvService extends AbstractService
     /**
      * @throws SetError
      */
-    public function setInt(string $name, int $value): void
+    public function setInt(string $name, int $value): EnvService
     {
         $this->set($name, (string) $value);
+
+        return $this;
     }
 
     /**
      * @throws SetError
      */
-    public function setString(string $name, string $value): void
+    public function setString(string $name, string $value): EnvService
     {
         $this->set($name, $value);
+
+        return $this;
     }
 
     /**
      * @throws SetError
      */
-    public function setFloat(string $name, float $value): void
+    public function setFloat(string $name, float $value): EnvService
     {
         $this->set($name, (string) $value);
+
+        return $this;
     }
 
     /**
      * @throws SetError
      */
-    public function setBool(string $name, bool $value): void
+    public function setBool(string $name, bool $value): EnvService
     {
         $this->set($name, $value === true ? 'true' : 'false');
+
+        return $this;
     }
 
     /**
      * @throws SetError
      */
-    public function setEmpty(string $name): void
+    public function setEmpty(string $name): EnvService
     {
         $this->set($name, '');
+
+        return $this;
+    }
+
+    /**
+     * @throws SetError
+     *
+     * @return $this
+     */
+    public function loadFile(string $filename): EnvService
+    {
+        $file = file_get_contents($filename);
+        $rows = explode(PHP_EOL, $file);
+
+        foreach ($rows as $row) {
+            if (mb_strpos($row, '#') === 0) {
+                continue;
+            }
+
+            if (!putenv($row)) {
+                throw new SetError(sprintf(
+                    'Environment variable ("%s") from file "%s" could not be set!',
+                    $row,
+                    $filename
+                ));
+            }
+        }
+
+        return $this;
     }
 
     /**
