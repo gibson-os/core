@@ -52,14 +52,18 @@ class InstallService
     public function install(string $module = null, string $part = null): iterable
     {
         $modules = $this->getModules();
+        $moduleNames = array_map(
+            static fn (string $module): string => preg_replace('/.*\/(.*)/', '$1', $module),
+            $modules
+        );
         $parts = self::PARTS;
 
         if ($module !== null) {
-            if (!in_array($module, $modules)) {
+            if (!in_array($module, $moduleNames)) {
                 throw new InstallException(sprintf(
                     'Module "%s" not exists. Existing modules: %s!',
                     $module,
-                    implode(', ', $modules)
+                    implode(', ', $moduleNames)
                 ));
             }
 

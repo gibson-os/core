@@ -7,6 +7,7 @@ use GibsonOS\Core\Attribute\Command\Argument;
 use GibsonOS\Core\Dto\Install\Input;
 use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\InstallException;
+use GibsonOS\Core\Exception\SetError;
 use GibsonOS\Core\Service\InstallService;
 use Psr\Log\LoggerInterface;
 
@@ -29,6 +30,7 @@ class InstallCommand extends AbstractCommand
     /**
      * @throws GetError
      * @throws InstallException
+     * @throws SetError
      */
     protected function run(): int
     {
@@ -52,5 +54,19 @@ class InstallCommand extends AbstractCommand
         }
 
         return self::SUCCESS;
+    }
+
+    public function setModule(?string $module): InstallCommand
+    {
+        $this->module = $module;
+
+        return $this;
+    }
+
+    public function setPart(?string $part): InstallCommand
+    {
+        $this->part = $part;
+
+        return $this;
     }
 }
