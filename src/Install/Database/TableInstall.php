@@ -330,6 +330,12 @@ class TableInstall extends AbstractInstall implements PriorityInterface
             return true;
         }
 
+        $default = $columnAttribute->getDefault();
+
+        if ($column->Default !== ($default === Column::DEFAULT_CURRENT_TIMESTAMP ? 'current_timestamp()' : $default)) {
+            return true;
+        }
+
         $columnType = $this->getColumnType($columnAttribute);
         $existingColumnType = $column->Type;
 
@@ -339,6 +345,8 @@ class TableInstall extends AbstractInstall implements PriorityInterface
 
         if ($columnAttribute->getType() !== Column::TYPE_TIMESTAMP) {
             $columnType = trim($columnType . ' ' . implode(' ', $columnAttribute->getAttributes()));
+        } elseif (mb_strtolower($column->Extra) !== mb_strtolower(implode(' ', $columnAttribute->getAttributes()))) {
+            return true;
         }
 
         $columnType = mb_strtolower($columnType);
