@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Install;
 
 use Generator;
-use GibsonOS\Core\Dto\Install\App;
 use GibsonOS\Core\Dto\Install\Input;
 use GibsonOS\Core\Exception\FactoryError;
 use GibsonOS\Core\Exception\GetError;
@@ -153,7 +152,7 @@ abstract class AbstractInstall implements InstallInterface
      *
      * @return $this
      */
-    protected function addApp(App $app): self
+    protected function addApp(string $module, string $task, string $action, string $icon): self
     {
         try {
             $appsSetting = $this->settingRepository->getByKeyAndModuleName('core', null, 'apps');
@@ -169,15 +168,20 @@ abstract class AbstractInstall implements InstallInterface
 
         foreach ($apps as $existingApp) {
             if (
-                $app->getModule() === $existingApp['module'] &&
-                $app->getTask() === $existingApp['task'] &&
-                $app->getAction() === $existingApp['action']
+                $module === $existingApp['module'] &&
+                $task === $existingApp['task'] &&
+                $action === $existingApp['action']
             ) {
                 return $this;
             }
         }
 
-        $apps[] = $app->jsonSerialize();
+        $apps[] = [
+            'module' => $module,
+            'task' => $task,
+            'action' => $action,
+            'icon' => $icon,
+        ];
         $appsSetting->setValue(JsonUtility::encode($apps))->save();
 
         return $this;
