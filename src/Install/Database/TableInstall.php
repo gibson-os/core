@@ -145,7 +145,7 @@ class TableInstall extends AbstractInstall implements PriorityInterface
                     ;
                 }
 
-                $columnsAttributes[] = $columnAttribute;
+                $columnsAttributes[$columnAttribute->getName() ?? ''] = $columnAttribute;
             }
 
             $tableExistsQuery =
@@ -168,7 +168,51 @@ class TableInstall extends AbstractInstall implements PriorityInterface
                 $this->createTable($tableAttribute, $columnsAttributes);
 
                 yield new Success(sprintf('Table "%s" installed!', $tableName));
+
+                continue;
             }
+
+            if ($this->mysqlDatabase->sendQuery('SHOW FIELDS FROM `' . $tableName . '`') === false) {
+                throw new InstallException(sprintf(
+                    'Show field from table "%s" failed! Error: %s',
+                    $tableName,
+                    $this->mysqlDatabase->error()
+                ));
+            }
+
+            $updates = [];
+
+            foreach ($this->mysqlDatabase->fetchObjectList() as $column) {
+                if (isset($columnsAttributes[$column->Field])) {
+                    // @check for changes
+                    unset($columnsAttributes[$column->Field]);
+
+                    continue;
+                }
+
+                $updates[] = 'DROP COLUMN `' . $column->Field . '`';
+            }
+
+            foreach ($columnsAttributes as $columnAttribute) {
+                $updates[] = 'ADD ' . $this->getColumnString($columnAttribute);
+            }
+
+            if (count($updates) === 0) {
+                continue;
+            }
+
+            $alterTableQuery = 'ALTER TABLE `' . $tableName . '` ' . implode(', ', $updates);
+            $this->logger->debug($alterTableQuery);
+
+            if ($this->mysqlDatabase->sendQuery($alterTableQuery) === false) {
+                throw new InstallException(sprintf(
+                    'Modify table table "%s" failed! Error: %s',
+                    $tableName,
+                    $this->mysqlDatabase->error()
+                ));
+            }
+
+            yield new Success(sprintf('Table "%s" modified!', $tableName));
         }
     }
 
@@ -198,7 +242,6 @@ class TableInstall extends AbstractInstall implements PriorityInterface
     /**
      * @param Column[] $columns
      *
-     * @throws GetError
      * @throws InstallException
      */
     private function createTable(Table $table, array $columns): void
@@ -214,7 +257,7 @@ class TableInstall extends AbstractInstall implements PriorityInterface
                 implode(
                     ', ',
                     array_map(
-                        fn (Column $column) => $this->getCreateColumn($column),
+                        fn (Column $column) => $this->getColumnString($column),
                         $columns
                     )
                 ) .
@@ -234,7 +277,7 @@ class TableInstall extends AbstractInstall implements PriorityInterface
         }
     }
 
-    private function getCreateColumn(Column $column): string
+    private function getColumnString(Column $column): string
     {
         $type = $column->getType();
         $default = $column->getDefault();
