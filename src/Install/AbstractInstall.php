@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Install;
 
 use Generator;
+use GibsonOS\Core\Dto\Install\App;
 use GibsonOS\Core\Dto\Install\Input;
 use GibsonOS\Core\Exception\FactoryError;
 use GibsonOS\Core\Exception\GetError;
@@ -16,6 +17,8 @@ use GibsonOS\Core\Repository\SettingRepository;
 use GibsonOS\Core\Service\DirService;
 use GibsonOS\Core\Service\EnvService;
 use GibsonOS\Core\Service\ServiceManagerService;
+use GibsonOS\Core\Utility\JsonUtility;
+use JsonException;
 use Psr\Log\LoggerInterface;
 
 abstract class AbstractInstall implements InstallInterface
@@ -141,6 +144,43 @@ abstract class AbstractInstall implements InstallInterface
         }
 
         return $value;
+    }
+
+    /**
+     * @throws SaveError
+     * @throws SelectError
+     * @throws JsonException
+     *
+     * @return $this
+     */
+    protected function addApp(App $app): self
+    {
+        try {
+            $appsSetting = $this->settingRepository->getByKeyAndModuleName('core', null, 'apps');
+            $apps = JsonUtility::decode($appsSetting->getValue());
+        } catch (SelectError) {
+            $module = $this->moduleRepository->getByName('core');
+            $appsSetting = (new Setting())
+                ->setModule($module)
+                ->setKey('apps')
+            ;
+            $apps = [];
+        }
+
+        foreach ($apps as $existingApp) {
+            if (
+                $app->getModule() === $existingApp['module'] &&
+                $app->getTask() === $existingApp['task'] &&
+                $app->getAction() === $existingApp['action']
+            ) {
+                return $this;
+            }
+        }
+
+        $apps[] = $app->jsonSerialize();
+        $appsSetting->setValue(JsonUtility::encode($apps))->save();
+
+        return $this;
     }
 
     public function getModule(): ?string
