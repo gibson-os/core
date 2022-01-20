@@ -93,7 +93,13 @@ abstract class AbstractInstall implements InstallInterface
     {
         $module = $this->moduleRepository->getByName($moduleName);
 
-        (new Setting())
+        try {
+            $setting = $this->settingRepository->getByKeyAndModuleName($moduleName, null, $key);
+        } catch (SelectError) {
+            $setting = new Setting();
+        }
+
+        $setting
             ->setModuleId($module->getId() ?? 0)
             ->setKey($key)
             ->setValue($value)
