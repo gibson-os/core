@@ -100,7 +100,7 @@ class KeyInstall extends AbstractInstall implements PriorityInterface
                     'AND `POSITION_IN_UNIQUE_CONSTRAINT` IS NOT NULL' .
                 ') AND `Key_name` NOT IN (' .
                     implode(', ', array_fill(0, count($installedKeys), '?')) .
-                ')'
+                ') AND `Seq_in_index`=1'
             ;
             $parameters = array_merge(
                 [$this->envService->getString('MYSQL_DATABASE'), $tableName],
