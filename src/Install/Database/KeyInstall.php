@@ -45,6 +45,7 @@ class KeyInstall extends AbstractInstall implements PriorityInterface
             $className = $this->serviceManagerService->getNamespaceByPath($file);
             $reflectionClass = new ReflectionClass($className);
             $tableAttributes = $reflectionClass->getAttributes(Table::class);
+            $installedKeys = ['PRIMARY'];
 
             if (count($tableAttributes) === 0) {
                 continue;
@@ -66,7 +67,7 @@ class KeyInstall extends AbstractInstall implements PriorityInterface
                     ));
                 }
 
-                $this->installKey($tableName, $keyAttribute);
+                $installedKeys[] = $this->installKey($tableName, $keyAttribute);
             }
 
             foreach ($reflectionClass->getProperties() as $reflectionProperty) {
@@ -85,7 +86,46 @@ class KeyInstall extends AbstractInstall implements PriorityInterface
                     }
 
                     $keyAttribute->setColumns([$this->tableAttribute->transformName($reflectionProperty->getName())]);
-                    $this->installKey($tableName, $keyAttribute);
+                    $installedKeys[] = $this->installKey($tableName, $keyAttribute);
+                }
+            }
+
+            $installedKeys = array_filter($installedKeys);
+            $query =
+                'SHOW INDEX FROM `' . $tableName . '` WHERE `Key_name` NOT IN (' .
+                    'SELECT `CONSTRAINT_NAME` ' .
+                    'FROM `information_schema`.`KEY_COLUMN_USAGE` ' .
+                    'WHERE `TABLE_SCHEMA`=? ' .
+                    'AND `TABLE_NAME`=? ' .
+                    'AND `POSITION_IN_UNIQUE_CONSTRAINT` IS NOT NULL' .
+                ') AND `Key_name` NOT IN (' .
+                    implode(', ', array_fill(0, count($installedKeys), '?')) .
+                ')'
+            ;
+            $parameters = array_merge(
+                [$this->envService->getString('MYSQL_DATABASE'), $tableName],
+                $installedKeys
+            );
+
+            if (!$this->mysqlDatabase->execute($query, $parameters)) {
+                throw new InstallException(sprintf(
+                    'Show indexes from table "%s" failed! Error: %s',
+                    $tableName,
+                    $this->mysqlDatabase->error()
+                ));
+            }
+
+            foreach ($this->mysqlDatabase->fetchObjectList() as $index) {
+                $query = 'DROP INDEX `' . $index->Key_name . '` ON `' . $tableName . '`';
+                $this->logger->debug($query);
+
+                if (!$this->mysqlDatabase->sendQuery($query)) {
+                    throw new InstallException(sprintf(
+                        'Drop index "%s" from table "%s" failed! Error: %s',
+                        $index->Key_name,
+                        $tableName,
+                        $this->mysqlDatabase->error()
+                    ));
                 }
             }
 
@@ -93,7 +133,7 @@ class KeyInstall extends AbstractInstall implements PriorityInterface
         }
     }
 
-    private function installKey(string $tableName, Key $key): void
+    private function installKey(string $tableName, Key $key): string
     {
         $name = mb_substr($key->getName() ?? ($key->isUnique() ? 'unique' : '') . implode('', array_map(
             static fn (string $column): string => ucfirst($column),
@@ -112,7 +152,7 @@ class KeyInstall extends AbstractInstall implements PriorityInterface
         //@todo hier muss geprüft werden ob die richtigen columns im key sind. Er noch/nicht mehr unique ist usw.
 
         if (count($keyFields) === count($key->getColumns())) {
-            return;
+            return $name;
         }
 
         $query =
@@ -129,6 +169,8 @@ class KeyInstall extends AbstractInstall implements PriorityInterface
                 $this->mysqlDatabase->error()
             ));
         }
+
+        return $name;
     }
 
     public function getPart(): string
