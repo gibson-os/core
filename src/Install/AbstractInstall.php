@@ -152,7 +152,7 @@ abstract class AbstractInstall implements InstallInterface
      *
      * @return $this
      */
-    protected function addApp(string $module, string $task, string $action, string $icon): self
+    protected function addApp(string $text, string $module, string $task, string $action, string $icon): self
     {
         try {
             $appsSetting = $this->settingRepository->getByKeyAndModuleName('core', null, 'apps');
@@ -177,6 +177,7 @@ abstract class AbstractInstall implements InstallInterface
         }
 
         $apps[] = [
+            'text' => $text,
             'module' => $module,
             'task' => $task,
             'action' => $action,
