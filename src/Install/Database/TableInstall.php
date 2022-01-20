@@ -23,6 +23,7 @@ use mysqlDatabase;
 use ReflectionAttribute;
 use ReflectionClass;
 use ReflectionException;
+use stdClass;
 
 class TableInstall extends AbstractInstall implements PriorityInterface
 {
@@ -184,7 +185,12 @@ class TableInstall extends AbstractInstall implements PriorityInterface
 
             foreach ($this->mysqlDatabase->fetchObjectList() as $column) {
                 if (isset($columnsAttributes[$column->Field])) {
-                    // @check for changes
+                    $columnAttribute = $columnsAttributes[$column->Field];
+
+                    if ($this->isColumnModified($columnAttribute, $column)) {
+                        $updates[] = 'MODIFY ' . $this->getColumnString($columnAttribute);
+                    }
+
                     unset($columnsAttributes[$column->Field]);
 
                     continue;
@@ -277,18 +283,27 @@ class TableInstall extends AbstractInstall implements PriorityInterface
         }
     }
 
+    private function getColumnType(Column $column): string
+    {
+        $type = $column->getType();
+
+        return trim(
+            $type .
+            (
+                $type === Column::TYPE_ENUM
+                ? "('" . implode("','", $column->getValues()) . "')"
+                : ($column->getLength() === null ? ' ' : '(' . $column->getLength() . ')')
+            )
+        );
+    }
+
     private function getColumnString(Column $column): string
     {
         $type = $column->getType();
         $default = $column->getDefault();
 
         return
-            '`' . $column->getName() . '` ' . $type . ' ' .
-            (
-                $type === Column::TYPE_ENUM
-                    ? "('" . implode("', '", $column->getValues()) . "') "
-                    : ($column->getLength() === null ? '' : '(' . $column->getLength() . ') ')
-            ) .
+            '`' . $column->getName() . '` ' . $this->getColumnType($column) . ' ' .
             implode(' ', $column->getAttributes()) . ' ' .
             (
                 in_array($type, self::STRING_TYPES)
@@ -307,5 +322,36 @@ class TableInstall extends AbstractInstall implements PriorityInterface
                     )
             )
         ;
+    }
+
+    private function isColumnModified(Column $columnAttribute, stdClass $column): bool
+    {
+        if (($column->Null === 'YES') !== $columnAttribute->isNullable()) {
+            return true;
+        }
+
+        $columnType = $this->getColumnType($columnAttribute);
+        $existingColumnType = $column->Type;
+
+        if ($columnAttribute->getLength() === null) {
+            $existingColumnType = preg_replace('/\(\d*\)/', '', $existingColumnType);
+        }
+
+        if ($columnAttribute->getType() !== Column::TYPE_TIMESTAMP) {
+            $columnType = trim($columnType . ' ' . implode(' ', $columnAttribute->getAttributes()));
+        }
+
+        $columnType = mb_strtolower($columnType);
+        $existingColumnType = mb_strtolower($existingColumnType);
+
+        if ($columnType !== $existingColumnType) {
+            if ($columnType === 'json' && $existingColumnType === 'longtext') {
+                return false;
+            }
+
+            return true;
+        }
+
+        return false;
     }
 }
