@@ -158,9 +158,9 @@ abstract class AbstractInstall implements InstallInterface
             $appsSetting = $this->settingRepository->getByKeyAndModuleName('core', null, 'apps');
             $apps = JsonUtility::decode($appsSetting->getValue());
         } catch (SelectError) {
-            $module = $this->moduleRepository->getByName('core');
+            $coreModule = $this->moduleRepository->getByName('core');
             $appsSetting = (new Setting())
-                ->setModule($module)
+                ->setModule($coreModule)
                 ->setKey('apps')
             ;
             $apps = [];
