@@ -101,7 +101,7 @@ class EnvService extends AbstractService
         $rows = explode(PHP_EOL, $file);
 
         foreach ($rows as $row) {
-            if (mb_strpos($row, '#') === 0) {
+            if (mb_strpos($row, '#') === 0 || empty($row)) {
                 continue;
             }
 
