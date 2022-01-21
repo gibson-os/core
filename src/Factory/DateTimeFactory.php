@@ -19,11 +19,25 @@ class DateTimeFactory
         if (self::$instance === null) {
             $env = new EnvService();
 
-            self::$instance = new DateTimeService(
-                $env->getString('timezone'),
-                $env->getFloat('date_latitude'),
-                $env->getFloat('date_longitude')
-            );
+            try {
+                $timezone = $env->getString('timezone');
+            } catch (GetError) {
+                $timezone = null;
+            }
+
+            try {
+                $latitude = $env->getFloat('date_latitude');
+            } catch (GetError) {
+                $latitude = null;
+            }
+
+            try {
+                $longitude = $env->getFloat('date_longitude');
+            } catch (GetError) {
+                $longitude = null;
+            }
+
+            self::$instance = new DateTimeService($timezone, $latitude, $longitude);
         }
 
         return self::$instance;

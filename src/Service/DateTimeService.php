@@ -11,14 +11,14 @@ use GibsonOS\Core\Attribute\GetEnv;
 
 class DateTimeService extends AbstractService
 {
-    private DateTimeZone $timezone;
+    private ?DateTimeZone $timezone;
 
     public function __construct(
-        #[GetEnv('timezone')] string $timezone,
-        #[GetEnv('date_latitude')] private float $latitude,
-        #[GetEnv('date_longitude')] private float $longitude
+        #[GetEnv('timezone')] ?string $timezone,
+        #[GetEnv('date_latitude')] private ?float $latitude,
+        #[GetEnv('date_longitude')] private ?float $longitude
     ) {
-        $this->timezone = new DateTimeZone($timezone);
+        $this->timezone = $timezone === null ? null : new DateTimeZone($timezone);
     }
 
     /**
