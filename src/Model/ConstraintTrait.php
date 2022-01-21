@@ -59,7 +59,7 @@ trait ConstraintTrait
             'set' => $this->setConstraint(
                 $constraintAttribute,
                 $reflectionProperty,
-                $arguments[0] instanceof AbstractModel
+                $arguments[0] instanceof AbstractModel || ($reflectionProperty->getType()?->allowsNull() && $arguments[0] === null)
                     ? $arguments[0]
                     : throw new InvalidArgumentException(sprintf(
                         'Argument for "set%s" is no instance of "%s"',
@@ -184,14 +184,14 @@ trait ConstraintTrait
     private function setConstraint(
         Constraint $constraintAttribute,
         ReflectionProperty $reflectionProperty,
-        AbstractModel $model
+        ?AbstractModel $model
     ): AbstractModel {
         $propertyName = $reflectionProperty->getName();
         $ownColumn = ucfirst(
             $this->transformFieldName($constraintAttribute->getOwnColumn() ?? $propertyName . 'Id')
         );
         $fieldName = $this->transformFieldName($constraintAttribute->getParentColumn());
-        $value = $model->{'get' . ucfirst($fieldName)}();
+        $value = $model?->{'get' . ucfirst($fieldName)}();
         $this->{'set' . ucfirst($ownColumn)}($value);
         $this->$propertyName = $model;
         $this->loadedConstraints[$propertyName] = $value;
