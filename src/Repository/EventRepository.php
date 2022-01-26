@@ -306,6 +306,7 @@ class EventRepository extends AbstractRepository
                 ->setParameters($event->elementParameters)
                 ->setCommand($event->elementCommand)
                 ->setReturns($event->elementReturns)
+                ->setChildren([])
             ;
 
             if ($event->elementParentId === null) {
