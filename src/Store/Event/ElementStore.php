@@ -74,6 +74,7 @@ class ElementStore extends AbstractDatabaseStore
         do {
             $element = new Element();
             $element->loadFromMysqlTable($this->table);
+            $element->setChildren([]);
             $models[$element->getId() ?? 0] = $element;
             $parentId = $element->getParentId();
 
