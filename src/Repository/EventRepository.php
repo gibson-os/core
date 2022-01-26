@@ -272,6 +272,8 @@ class EventRepository extends AbstractRepository
                     ->setActive((bool) $event->active)
                     ->setAsync((bool) $event->async)
                     ->setModified($this->dateTimeService->get($event->modified))
+                    ->setTriggers([])
+                    ->setElements([])
                 ;
             }
 
