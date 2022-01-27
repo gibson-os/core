@@ -32,8 +32,10 @@ class DateTimeService extends AbstractService
             error_log(sprintf(
                 'Es kann keine Datums Objekt mit "%s" für die Zeitzone "%s" angelegt werden',
                 $time,
-                $this->timezone->getName()
+                $this->timezone?->getName() ?? 'none'
             ));
+
+            return new DateTime();
         }
     }
 
@@ -49,8 +51,8 @@ class DateTimeService extends AbstractService
         return (int) date_sunset(
             $dateTime->getTimestamp(),
             SUNFUNCS_RET_TIMESTAMP,
-            $this->latitude,
-            $this->longitude
+            $this->latitude ?? 0.0,
+            $this->longitude ?? 0.0
         );
     }
 
@@ -59,8 +61,8 @@ class DateTimeService extends AbstractService
         return (int) date_sunrise(
             $dateTime->getTimestamp(),
             SUNFUNCS_RET_TIMESTAMP,
-            $this->latitude,
-            $this->longitude
+            $this->latitude ?? 0.0,
+            $this->longitude ?? 0.0
         );
     }
 }
