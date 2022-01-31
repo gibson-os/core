@@ -175,7 +175,7 @@ abstract class AbstractDatabaseStore extends AbstractStore
                 continue;
             }
 
-            $order = $sortItem['property'];
+            $order = $mapping[$sortItem['property']];
 
             if (array_key_exists('direction', $sortItem)) {
                 $order .= ' ' . (mb_strtolower($sortItem['direction']) === 'asc' ? 'ASC' : 'DESC');
