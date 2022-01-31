@@ -6,7 +6,6 @@ namespace GibsonOS\Core\Store;
 use DateTimeInterface;
 use GibsonOS\Core\Attribute\GetTableName;
 use GibsonOS\Core\Model\Drive;
-use GibsonOS\Core\Service\AttributeService;
 use mysqlDatabase;
 
 class DriveStore extends AbstractDatabaseStore
@@ -22,12 +21,11 @@ class DriveStore extends AbstractDatabaseStore
     private DateTimeInterface $toTime;
 
     public function __construct(
-        #[GetTableName(Drive\Stat::class)] private $driveStatTableName,
-        #[GetTableName(Drive\StatAttribute::class)] private $driveStatAttributeTableName,
-        AttributeService $attributeService,
+        #[GetTableName(Drive\Stat::class)] private string $driveStatTableName,
+        #[GetTableName(Drive\StatAttribute::class)] private string $driveStatAttributeTableName,
         mysqlDatabase $database = null
     ) {
-        parent::__construct($attributeService, $database);
+        parent::__construct($database);
     }
 
     protected function getModelClassName(): string

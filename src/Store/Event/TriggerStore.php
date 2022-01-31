@@ -8,7 +8,6 @@ use GibsonOS\Core\Exception\FactoryError;
 use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\Event\Trigger;
-use GibsonOS\Core\Service\AttributeService;
 use GibsonOS\Core\Store\AbstractDatabaseStore;
 use GibsonOS\Core\Utility\JsonUtility;
 use JsonException;
@@ -22,10 +21,9 @@ class TriggerStore extends AbstractDatabaseStore
     public function __construct(
         private ClassTriggerStore $classTriggerStore,
         private ClassNameStore $classNameStore,
-        AttributeService $attributeService,
         mysqlDatabase $database = null
     ) {
-        parent::__construct($attributeService, $database);
+        parent::__construct($database);
     }
 
     protected function getModelClassName(): string

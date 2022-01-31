@@ -3,17 +3,13 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Store;
 
-use GibsonOS\Core\Exception\CreateError;
-use GibsonOS\Core\Exception\FactoryError;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Model\ModelInterface;
-use GibsonOS\Core\Service\AttributeService;
 use JsonSerializable;
 use mysqlDatabase;
 use mysqlRegistry;
 use mysqlTable;
-use ReflectionException;
 
 abstract class AbstractDatabaseStore extends AbstractStore
 {
@@ -34,21 +30,12 @@ abstract class AbstractDatabaseStore extends AbstractStore
      */
     abstract protected function getModelClassName(): string;
 
-    /**
-     * @throws CreateError
-     * @throws FactoryError
-     * @throws ReflectionException
-     */
-    public function __construct(private AttributeService $attributeService, mysqlDatabase $database = null)
+    public function __construct(mysqlDatabase $database = null)
     {
         if ($database === null) {
             $this->database = mysqlRegistry::getInstance()->get('database');
         } else {
             $this->database = $database;
-        }
-
-        if (!$this->database instanceof mysqlDatabase) {
-            throw new CreateError('Kein Datenbank Objekt vorhanden!');
         }
 
         $modelClassName = $this->getModelClassName();
@@ -188,7 +175,7 @@ abstract class AbstractDatabaseStore extends AbstractStore
                 continue;
             }
 
-            $order = '`' . $sortItem['property'] . '`';
+            $order = $sortItem['property'];
 
             if (array_key_exists('direction', $sortItem)) {
                 $order .= ' ' . (mb_strtolower($sortItem['direction']) === 'asc' ? 'ASC' : 'DESC');

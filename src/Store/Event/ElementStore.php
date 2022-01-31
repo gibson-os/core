@@ -8,7 +8,6 @@ use GibsonOS\Core\Exception\FactoryError;
 use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\Event\Element;
-use GibsonOS\Core\Service\AttributeService;
 use GibsonOS\Core\Store\AbstractDatabaseStore;
 use GibsonOS\Core\Utility\JsonUtility;
 use JsonException;
@@ -20,10 +19,9 @@ class ElementStore extends AbstractDatabaseStore
     public function __construct(
         private ClassNameStore $classNameStore,
         private MethodStore $methodStore,
-        AttributeService $attributeService,
         mysqlDatabase $database = null
     ) {
-        parent::__construct($attributeService, $database);
+        parent::__construct($database);
     }
 
     private int $eventId;
