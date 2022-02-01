@@ -91,7 +91,7 @@ class ElementStore extends AbstractDatabaseStore
                     $element
                         ->setMethodTitle($method['title'])
                         ->setParameters($this->completeParameters($method['parameters'], $element->getParameters()))
-                        ->setReturns($this->completeParameters($method['returns'], $element->getReturns()))
+                        ->setReturns($this->completeReturns($method['returns'], $element->getReturns()))
                     ;
 
                     break;
@@ -125,7 +125,7 @@ class ElementStore extends AbstractDatabaseStore
             $parameter = $parameters[$parameterName];
 
             if (is_array($parameter)) {
-                $methodParameter->setValue(array_merge($methodParameter->getValue(), $parameter));
+                $methodParameter->setValue(array_merge($methodParameter->getValue() ?? [], $parameter));
 
                 continue;
             }
@@ -134,5 +134,29 @@ class ElementStore extends AbstractDatabaseStore
         }
 
         return JsonUtility::encode($methodParameters);
+    }
+
+    /**
+     * @param AbstractParameter[] $methodReturns
+     *
+     * @throws JsonException
+     */
+    private function completeReturns(array $methodReturns, ?string $returns): ?string
+    {
+        $returns = $returns === null ? [] : JsonUtility::decode($returns);
+
+        foreach ($methodReturns as $parameterName => $methodReturn) {
+            if (!isset($returns[$parameterName])) {
+                continue;
+            }
+
+            $parameter = $returns[$parameterName];
+            $methodReturn
+                ->setValue($parameter['value'])
+                ->setOperator($parameter['operator'])
+            ;
+        }
+
+        return JsonUtility::encode($methodReturns);
     }
 }
