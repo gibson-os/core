@@ -133,8 +133,13 @@ trait ConstraintTrait
             !$propertyValue instanceof $parentModelClassName ||
             $parentModel->{'get' . $fieldName}() !== $value
         ) {
-            $this->$propertyName = $this->loadForeignRecord($parentModel, $value, $parentColumn)
-                ?? ($reflectionProperty->getType()?->allowsNull() ? null : $parentModel);
+            $this->$propertyName = $this->loadForeignRecord(
+                $parentModel,
+                $value,
+                $parentColumn,
+                $constraintAttribute->getWhere(),
+                $constraintAttribute->getWhereParameters()
+            ) ?? ($reflectionProperty->getType()?->allowsNull() ? null : $parentModel);
         }
 
         $this->loadedConstraints[$propertyName] = $value;
@@ -175,7 +180,9 @@ trait ConstraintTrait
             $parentModelClassName,
             $value,
             $parentModel->getTableName(),
-            $constraintAttribute->getParentColumn() . '_id'
+            $constraintAttribute->getParentColumn() . '_id',
+            $constraintAttribute->getWhere(),
+            $constraintAttribute->getWhereParameters()
         ));
 
         return $this->$propertyName;
@@ -278,12 +285,14 @@ trait ConstraintTrait
     private function loadForeignRecord(
         AbstractModel $model,
         string|int|float $value,
-        string $foreignField = 'id'
+        string $foreignField = 'id',
+        string $where = null,
+        array $whereParameters = []
     ): ?AbstractModel {
         $mysqlTable = new mysqlTable($this->database, $model->getTableName());
         $mysqlTable
-            ->setWhere('`' . $foreignField . '`=?')
-            ->addWhereParameter($value)
+            ->setWhere('`' . $foreignField . '`=?' . ($where === null ? '' : ' AND (' . $where . ')'))
+            ->setWhereParameters(array_merge([$value], $whereParameters))
             ->setLimit(1)
         ;
 
@@ -305,7 +314,9 @@ trait ConstraintTrait
         string $modelClassName,
         string|int|float|null $value,
         string $foreignTable,
-        string $foreignField
+        string $foreignField,
+        string $where = null,
+        array $whereParameters = []
     ): array {
         $models = [];
 
@@ -315,8 +326,8 @@ trait ConstraintTrait
 
         $mysqlTable = new mysqlTable($this->database, $foreignTable);
         $mysqlTable
-            ->setWhere('`' . $foreignField . '`=?')
-            ->addWhereParameter($value)
+            ->setWhere('`' . $foreignField . '`=?' . ($where === null ? '' : ' AND (' . $where . ')'))
+            ->setWhereParameters(array_merge([$value], $whereParameters))
         ;
 
         if (!$mysqlTable->selectPrepared()) {

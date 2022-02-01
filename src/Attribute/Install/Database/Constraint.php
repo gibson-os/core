@@ -25,6 +25,8 @@ class Constraint
         private ?string $onUpdate = null,
         private ?string $name = null,
         private ?string $ownColumn = null,
+        private ?string $where = null,
+        private array $whereParameters = []
     ) {
     }
 
@@ -59,5 +61,15 @@ class Constraint
     public function getOwnColumn(): ?string
     {
         return $this->ownColumn;
+    }
+
+    public function getWhere(): ?string
+    {
+        return $this->where;
+    }
+
+    public function getWhereParameters(): array
+    {
+        return $this->whereParameters;
     }
 }

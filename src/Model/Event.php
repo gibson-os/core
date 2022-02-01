@@ -50,7 +50,7 @@ class Event extends AbstractModel implements JsonSerializable, AutoCompleteModel
     /**
      * @var Element[]
      */
-    #[Constraint('event', Element::class)]
+    #[Constraint('event', Element::class, where: '`parent_id` IS NULL')]
     protected array $elements = [];
 
     /**
