@@ -7,7 +7,7 @@ Ext.define('GibsonOS.module.core.parameter.type.AutoComplete', {
 
         me.url = baseDir + 'core/autoComplete/autoComplete';
         me.model = config.model;
-        me.params = config.parameters;
+        me.params = config.parameters ?? [];
         me.params.autoCompleteClassname = config.autoCompleteClassname;
 
         me.callParent();
