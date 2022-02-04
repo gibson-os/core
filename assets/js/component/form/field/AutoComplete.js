@@ -5,7 +5,7 @@ Ext.define('GibsonOS.module.core.component.form.field.AutoComplete', {
     queryMode: 'remote',
     queryParam: 'name',
     queryParamId: 'id',
-    minChars: 2,
+    minChars: 0,
     isSetting: false,
     store: {
         xtype: 'gosDataStore',
@@ -17,7 +17,7 @@ Ext.define('GibsonOS.module.core.component.form.field.AutoComplete', {
             }
         }
     },
-    initComponent: function() {
+    initComponent() {
         const me = this;
         me.store.model = this.model;
         me.store.proxy.url = this.url;
@@ -32,7 +32,7 @@ Ext.define('GibsonOS.module.core.component.form.field.AutoComplete', {
             me.setValueById(this.value);
         }
     },
-    setValue: function(value, doSelect) {
+    setValue(value, doSelect) {
         const me = this;
 
         if (
@@ -53,7 +53,7 @@ Ext.define('GibsonOS.module.core.component.form.field.AutoComplete', {
             me.callParent(value, !!doSelect);
         }
     },
-    setValueById: function(value) {
+    setValueById(value) {
         const me = this;
         let params = {};
         me.isSetting = true;
@@ -72,7 +72,7 @@ Ext.define('GibsonOS.module.core.component.form.field.AutoComplete', {
         params[me.queryParamId] = value;
 
         me.getStore().getProxy().extraParams = params;
-        me.getStore().load(function(records) {
+        me.getStore().load((records) => {
             me.select(records[0]);
 
             delete params[me.queryParamId];
