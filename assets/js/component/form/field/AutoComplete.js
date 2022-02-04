@@ -73,7 +73,9 @@ Ext.define('GibsonOS.module.core.component.form.field.AutoComplete', {
 
         me.getStore().getProxy().extraParams = params;
         me.getStore().load((records) => {
-            me.select(records[0]);
+            if (records.length) {
+                me.select(records[0]);
+            }
 
             delete params[me.queryParamId];
             me.isSetting = false;
