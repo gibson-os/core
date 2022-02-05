@@ -17,7 +17,7 @@ trait ConstraintTrait
     private array $loadedConstraints = [];
 
     /**
-     * @param AbstractModel[]|AbstractModel[][] $arguments
+     * @param array<AbstractModel|AbstractModel[]|null> $arguments
      *
      * @throws ReflectionException
      *
