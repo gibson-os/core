@@ -182,7 +182,8 @@ trait ConstraintTrait
             $parentModel->getTableName(),
             $constraintAttribute->getParentColumn() . '_id',
             $constraintAttribute->getWhere(),
-            $constraintAttribute->getWhereParameters()
+            $constraintAttribute->getWhereParameters(),
+            $constraintAttribute->getOrderBy()
         ));
 
         return $this->$propertyName;
@@ -287,7 +288,8 @@ trait ConstraintTrait
         string|int|float $value,
         string $foreignField = 'id',
         string $where = null,
-        array $whereParameters = []
+        array $whereParameters = [],
+        string $orderBy = null
     ): ?AbstractModel {
         $mysqlTable = new mysqlTable($this->database, $model->getTableName());
         $mysqlTable
@@ -316,7 +318,8 @@ trait ConstraintTrait
         string $foreignTable,
         string $foreignField,
         string $where = null,
-        array $whereParameters = []
+        array $whereParameters = [],
+        string $orderBy = null
     ): array {
         $models = [];
 
@@ -328,6 +331,7 @@ trait ConstraintTrait
         $mysqlTable
             ->setWhere('`' . $foreignField . '`=?' . ($where === null ? '' : ' AND (' . $where . ')'))
             ->setWhereParameters(array_merge([$value], $whereParameters))
+            ->setOrderBy($orderBy)
         ;
 
         if (!$mysqlTable->selectPrepared()) {

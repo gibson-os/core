@@ -26,7 +26,8 @@ class Constraint
         private ?string $name = null,
         private ?string $ownColumn = null,
         private ?string $where = null,
-        private array $whereParameters = []
+        private array $whereParameters = [],
+        private ?string $orderBy = null
     ) {
     }
 
@@ -71,5 +72,10 @@ class Constraint
     public function getWhereParameters(): array
     {
         return $this->whereParameters;
+    }
+
+    public function getOrderBy(): ?string
+    {
+        return $this->orderBy;
     }
 }
