@@ -8,7 +8,6 @@ Ext.define('GibsonOS.module.core.component.form.field.AutoComplete', {
     minChars: 0,
     isSetting: false,
     store: {
-        xtype: 'gosDataStore',
         autoLoad: false,
         proxy: {
             type: 'gosDataProxyAjax',
@@ -20,11 +19,14 @@ Ext.define('GibsonOS.module.core.component.form.field.AutoComplete', {
     initComponent() {
         const me = this;
         me.store.model = this.model;
+        me.store.proxy.model = this.model;
         me.store.proxy.url = this.url;
 
         if (me.params) {
             me.store.proxy.extraParams = this.params;
         }
+
+        me.store = new GibsonOS.data.Store(me.store);
 
         me.callParent();
 
