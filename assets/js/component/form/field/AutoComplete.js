@@ -26,8 +26,6 @@ Ext.define('GibsonOS.module.core.component.form.field.AutoComplete', {
             me.store.proxy.extraParams = this.params;
         }
 
-        me.store = new GibsonOS.data.Store(me.store);
-
         me.callParent();
 
         if (me.value) {
