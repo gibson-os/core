@@ -6,8 +6,10 @@ namespace GibsonOS\Core\Service\Attribute;
 use GibsonOS\Core\Attribute\AttributeInterface;
 use GibsonOS\Core\Attribute\GetModel;
 use GibsonOS\Core\Exception\Repository\SelectError;
+use GibsonOS\Core\Exception\RequestError;
 use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Model\ModelInterface;
+use GibsonOS\Core\Service\RequestService;
 use InvalidArgumentException;
 use mysqlDatabase;
 use mysqlTable;
@@ -15,12 +17,13 @@ use ReflectionParameter;
 
 class ModelFetcherAttribute implements AttributeServiceInterface, ParameterAttributeInterface
 {
-    public function __construct(private mysqlDatabase $mysqlDatabase)
+    public function __construct(private mysqlDatabase $mysqlDatabase, private RequestService $requestService)
     {
     }
 
     /**
      * @throws SelectError
+     * @throws RequestError
      */
     public function replace(AttributeInterface $attribute, array $parameters, ReflectionParameter $reflectionParameter): ?AbstractModel
     {
@@ -46,9 +49,12 @@ class ModelFetcherAttribute implements AttributeServiceInterface, ParameterAttri
         }
 
         $table = (new mysqlTable($this->mysqlDatabase, $model->getTableName()))
-            ->setWhereParameters(array_values($attribute->getConditions()))
+            ->setWhereParameters(array_map(
+                fn (string $key) => $this->requestService->getRequestValue($key),
+                array_values($attribute->getConditions())
+            ))
             ->setWhere(implode(' AND ', array_map(
-                fn (string $field) => '`' . $field . '`=?',
+                fn (string $field): string => '`' . $field . '`=?',
                 array_keys($attribute->getConditions())
             )))
             ->setLimit(1)
