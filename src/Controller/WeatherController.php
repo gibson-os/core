@@ -5,9 +5,10 @@ namespace GibsonOS\Core\Controller;
 
 use DateTimeZone;
 use GibsonOS\Core\Attribute\CheckPermission;
+use GibsonOS\Core\Attribute\GetModel;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\User\Permission;
-use GibsonOS\Core\Repository\Weather\LocationRepository;
+use GibsonOS\Core\Model\Weather\Location;
 use GibsonOS\Core\Service\DateTimeService;
 use GibsonOS\Core\Service\Response\AjaxResponse;
 use GibsonOS\Core\Store\WeatherStore;
@@ -24,14 +25,12 @@ class WeatherController extends AbstractController
      */
     #[CheckPermission(Permission::READ)]
     public function weather(
-        LocationRepository $locationRepository,
         WeatherStore $weatherStore,
         DateTimeService $dateTimeService,
-        int $locationId
+        #[GetModel(['id' => 'locationId'])] Location $location
     ): AjaxResponse {
-        $location = $locationRepository->getById($locationId);
         $weatherStore
-            ->setLocationId($locationId)
+            ->setLocationId($location->getId() ?? 0)
             ->setDate($dateTimeService->get('now', new DateTimeZone($location->getTimezone())))
         ;
 

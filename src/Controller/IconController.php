@@ -7,6 +7,7 @@ use Exception;
 use Generator;
 use GibsonOS\Core\Attribute\AlwaysAjaxResponse;
 use GibsonOS\Core\Attribute\CheckPermission;
+use GibsonOS\Core\Attribute\GetModel;
 use GibsonOS\Core\Exception\CreateError;
 use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\Model\SaveError;
@@ -56,7 +57,6 @@ class IconController extends AbstractController
     #[CheckPermission(Permission::WRITE)]
     #[AlwaysAjaxResponse]
     public function save(
-        IconRepository $iconRepository,
         ImageService $imageService,
         IconService $iconService,
         IconStore $iconStore,
@@ -65,16 +65,12 @@ class IconController extends AbstractController
         string $tags,
         array $icon,
         array $iconIco = null,
-        int $id = null
+        #[GetModel] Icon $iconModel = null
     ): AjaxResponse {
-        if ($id !== null) {
-            $iconModel = $iconRepository->getById($id);
-        } else {
-            $iconModel = (new Icon())
-                ->setName($name)
-                ->setOriginalType($imageService->getImageTypeByMimeType($icon['type']))
-            ;
-        }
+        $iconModel ??= (new Icon())
+            ->setName($name)
+            ->setOriginalType($imageService->getImageTypeByMimeType($icon['type']))
+        ;
 
         $iconService->save(
             $iconModel,

@@ -6,6 +6,7 @@ namespace GibsonOS\Core\Controller;
 use DateTime;
 use Exception;
 use GibsonOS\Core\Attribute\CheckPermission;
+use GibsonOS\Core\Attribute\GetModel;
 use GibsonOS\Core\Exception\DateTimeError;
 use GibsonOS\Core\Exception\EventException;
 use GibsonOS\Core\Exception\FactoryError;
@@ -48,7 +49,6 @@ class EventController extends AbstractController
     /**
      * @throws GetError
      * @throws JsonException
-     * @throws SelectError
      */
     #[CheckPermission(Permission::READ)]
     public function elements(ElementStore $elementStore, int $eventId = null, string $node = null): AjaxResponse
@@ -166,13 +166,12 @@ class EventController extends AbstractController
      * @throws FactoryError
      * @throws JsonException
      * @throws SaveError
-     * @throws SelectError
      * @throws EventException
      */
     #[CheckPermission(Permission::WRITE)]
-    public function run(EventService $eventService, EventRepository $eventRepository, int $eventId): AjaxResponse
+    public function run(EventService $eventService, #[GetModel(['id' => 'eventId'])] $event): AjaxResponse
     {
-        $eventService->runEvent($eventRepository->getById($eventId), true);
+        $eventService->runEvent($event, true);
 
         return $this->returnSuccess();
     }
@@ -182,9 +181,8 @@ class EventController extends AbstractController
      * @throws DeleteError
      */
     #[CheckPermission(Permission::DELETE)]
-    public function delete(EventRepository $eventRepository, int $eventId): AjaxResponse
+    public function delete(EventRepository $eventRepository, #[GetModel(['id' => 'eventId'])] $event): AjaxResponse
     {
-        $event = $eventRepository->getById($eventId);
         $event->delete();
 
         return $this->returnSuccess();

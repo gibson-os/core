@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Controller;
 
 use GibsonOS\Core\Attribute\CheckPermission;
+use GibsonOS\Core\Attribute\GetModel;
 use GibsonOS\Core\Exception\DateTimeError;
 use GibsonOS\Core\Exception\Model\DeleteError;
 use GibsonOS\Core\Exception\Model\SaveError;
@@ -129,7 +130,6 @@ class UserController extends AbstractController
     }
 
     /**
-     * @throws DateTimeError
      * @throws PermissionDenied
      * @throws SaveError
      * @throws SelectError
@@ -232,13 +232,12 @@ class UserController extends AbstractController
     }
 
     /**
-     * @throws SelectError
      * @throws DeleteError
      */
     #[CheckPermission(Permission::MANAGE + Permission::DELETE)]
-    public function delete(UserRepository $userRepository, int $id): AjaxResponse
+    public function delete(#[GetModel] User $user): AjaxResponse
     {
-        $userRepository->getById($id)->delete();
+        $user->delete();
 
         return $this->returnSuccess();
     }
