@@ -28,7 +28,7 @@ class ObjectMapper
 
         if ($reflectionConstructor !== null) {
             foreach ($reflectionConstructor->getParameters() as $reflectionParameter) {
-                if (!isset($properties[$reflectionParameter->getName()])) {
+                if (array_key_exists($reflectionParameter->getName(), $properties)) {
                     if (!$reflectionParameter->isDefaultValueAvailable()) {
                         throw new MapperException(sprintf(
                             'Value for constructor parameter "%s" of class "%s" is missing!',
