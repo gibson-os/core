@@ -41,8 +41,8 @@ class ServiceManagerService
     /**
      * @template T
      *
-     * @param class-string<T>   $classname
-     * @param class-string|null $instanceOf
+     * @param class-string<T>      $classname
+     * @param class-string<T>|null $instanceOf
      *
      * @throws FactoryError
      *

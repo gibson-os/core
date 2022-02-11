@@ -68,6 +68,6 @@ class ObjectMapperAttribute implements AttributeServiceInterface, ParameterAttri
             }
         }
 
-        return $this->objectMapper->map($objectClassName, $objectParameters);
+        return $this->objectMapper->mapToObject($objectClassName, $objectParameters);
     }
 }
