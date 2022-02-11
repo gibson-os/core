@@ -44,7 +44,7 @@ class ObjectMapperAttribute implements AttributeServiceInterface, ParameterAttri
 
         $objectParameters = [];
 
-        foreach ($reflectionClass->getConstructor()->getParameters() as $reflectionParameter) {
+        foreach ($reflectionClass->getConstructor()?->getParameters() ?? [] as $reflectionParameter) {
             $parameterName = $reflectionParameter->getName();
             $requestKey = $attribute->getMapping()[$parameterName] ?? $parameterName;
 

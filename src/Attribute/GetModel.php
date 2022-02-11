@@ -10,7 +10,7 @@ use GibsonOS\Core\Service\Attribute\ModelFetcherAttribute;
 class GetModel implements AttributeInterface
 {
     /**
-     * @param array $conditions
+     * @param array<string, string> $conditions
      */
     public function __construct(private array $conditions = ['id' => 'id'])
     {
