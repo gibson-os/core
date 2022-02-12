@@ -7,6 +7,7 @@ use GibsonOS\Core\Attribute\CheckPermission;
 use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\Model\SaveError;
 use GibsonOS\Core\Exception\Repository\SelectError;
+use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Model\Action;
 use GibsonOS\Core\Model\Module;
 use GibsonOS\Core\Model\Task;
@@ -34,6 +35,7 @@ class ModuleService
         private ActionRepository $actionRepository,
         private PermissionRepository $permissionRepository,
         private DirService $dirService,
+        private ReflectionManager $reflectionManager,
         private LoggerInterface $logger
     ) {
         $this->vendorPath = realpath(
@@ -152,11 +154,11 @@ class ModuleService
             $fqClassname = 'GibsonOS\\Module\\' . $classname;
 
             try {
-                $reflectionClass = new ReflectionClass($fqClassname);
+                $reflectionClass = $this->reflectionManager->getReflectionClass($fqClassname);
             } catch (ReflectionException) {
                 /** @var class-string $fqClassname */
                 $fqClassname = 'GibsonOS\\' . $classname;
-                $reflectionClass = new ReflectionClass($fqClassname);
+                $reflectionClass = $this->reflectionManager->getReflectionClass($fqClassname);
             }
 
             if (

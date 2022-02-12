@@ -7,6 +7,7 @@ use GibsonOS\Core\Attribute\Event\Parameter;
 use GibsonOS\Core\Attribute\Event\Trigger;
 use GibsonOS\Core\Dto\Parameter\AbstractParameter;
 use GibsonOS\Core\Exception\FactoryError;
+use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Service\EventService;
 use GibsonOS\Core\Store\AbstractStore;
 use ReflectionAttribute;
@@ -26,7 +27,7 @@ class ClassTriggerStore extends AbstractStore
      */
     private array $list = [];
 
-    public function __construct(private EventService $eventService)
+    public function __construct(private EventService $eventService, private ReflectionManager $reflectionManager)
     {
     }
 
@@ -72,7 +73,7 @@ class ClassTriggerStore extends AbstractStore
         }
 
         $triggers = [];
-        $reflectionClass = new ReflectionClass($this->className);
+        $reflectionClass = $this->reflectionManager->getReflectionClass($this->className);
         $listeners = $this->eventService->getListeners($reflectionClass);
 
         foreach ($reflectionClass->getReflectionConstants(ReflectionClassConstant::IS_PUBLIC) as $reflectionClassConstant) {

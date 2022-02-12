@@ -7,20 +7,23 @@ use GibsonOS\Core\Attribute\AttributeInterface;
 use GibsonOS\Core\Attribute\GetObject;
 use GibsonOS\Core\Exception\MapperException;
 use GibsonOS\Core\Exception\RequestError;
+use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Mapper\ObjectMapper;
 use GibsonOS\Core\Service\RequestService;
 use GibsonOS\Core\Utility\JsonUtility;
 use GibsonOS\Core\Utility\StatusCode;
 use JsonException;
-use ReflectionClass;
 use ReflectionException;
 use ReflectionMethod;
 use ReflectionParameter;
 
 class ObjectMapperAttribute implements AttributeServiceInterface, ParameterAttributeInterface
 {
-    public function __construct(private ObjectMapper $objectMapper, private RequestService $requestService)
-    {
+    public function __construct(
+        private ObjectMapper $objectMapper,
+        private RequestService $requestService,
+        private ReflectionManager $reflectionManager
+    ) {
     }
 
     /**
@@ -34,14 +37,18 @@ class ObjectMapperAttribute implements AttributeServiceInterface, ParameterAttri
             return null;
         }
 
-        /** @psalm-suppress UndefinedMethod */
+        /**
+         * @psalm-suppress UndefinedMethod
+         *
+         * @var class-string $objectClassName
+         */
         $objectClassName = $reflectionParameter->getType()?->getName();
 
         if ($objectClassName === null) {
             return null;
         }
 
-        $reflectionClass = new ReflectionClass($objectClassName);
+        $reflectionClass = $this->reflectionManager->getReflectionClass($objectClassName);
         $objectParameters = [];
 
         foreach ($reflectionClass->getConstructor()?->getParameters() ?? [] as $reflectionParameter) {

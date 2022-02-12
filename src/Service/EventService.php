@@ -14,6 +14,7 @@ use GibsonOS\Core\Exception\DateTimeError;
 use GibsonOS\Core\Exception\EventException;
 use GibsonOS\Core\Exception\FactoryError;
 use GibsonOS\Core\Exception\Model\SaveError;
+use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Model\AutoCompleteModelInterface;
 use GibsonOS\Core\Model\Event;
 use GibsonOS\Core\Repository\EventRepository;
@@ -37,6 +38,7 @@ class EventService extends AbstractService
         private ElementService $elementService,
         private CommandService $commandService,
         private DateTimeService $dateTimeService,
+        private ReflectionManager $reflectionManager,
         private LoggerInterface $logger
     ) {
     }
@@ -119,7 +121,7 @@ class EventService extends AbstractService
         string $title = null,
         array $listeners = []
     ): AbstractParameter {
-        $reflectionClass = new ReflectionClass($className);
+        $reflectionClass = $this->reflectionManager->getReflectionClass($className);
         $constructor = $reflectionClass->getConstructor();
         $constructorParameters = [];
 
@@ -224,7 +226,7 @@ class EventService extends AbstractService
                 continue;
             }
 
-            $reflectionClass = new ReflectionClass($className);
+            $reflectionClass = $this->reflectionManager->getReflectionClass($className);
 
             foreach ($reflectionClass->getReflectionConstants(ReflectionClassConstant::IS_PUBLIC) as $reflectionClassConstant) {
                 if ($reflectionClassConstant->getValue() !== $eventTrigger->getTrigger()) {

@@ -6,16 +6,18 @@ namespace GibsonOS\Core\Mapper;
 use GibsonOS\Core\Attribute\ObjectMapper as ObjectMapperAttribute;
 use GibsonOS\Core\Exception\FactoryError;
 use GibsonOS\Core\Exception\MapperException;
+use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Service\ServiceManagerService;
 use GibsonOS\Core\Utility\JsonUtility;
-use ReflectionClass;
 use ReflectionException;
 use ReflectionParameter;
 
 class ObjectMapper implements ObjectMapperInterface
 {
-    public function __construct(private ServiceManagerService $serviceManagerService)
-    {
+    public function __construct(
+        private ServiceManagerService $serviceManagerService,
+        private ReflectionManager $reflectionManager
+    ) {
     }
 
     /**
@@ -25,7 +27,7 @@ class ObjectMapper implements ObjectMapperInterface
      */
     public function mapToObject(string $className, array $properties): object
     {
-        $reflectionClass = new ReflectionClass($className);
+        $reflectionClass = $this->reflectionManager->getReflectionClass($className);
         $constructorParameters = [];
 
         foreach ($reflectionClass->getConstructor()?->getParameters() ?? [] as $reflectionParameter) {
@@ -110,6 +112,13 @@ class ObjectMapper implements ObjectMapperInterface
             if ($parameterTypeName === 'array' && $objectClassName !== null) {
                 if (is_string($values)) {
                     $values = JsonUtility::decode($values);
+                }
+
+                if (!is_array($values)) {
+                    throw new MapperException(sprintf(
+                        'Parameter for object "%s" is no array!',
+                        $objectClassName
+                    ));
                 }
 
                 return array_map(

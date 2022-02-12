@@ -8,9 +8,9 @@ use GibsonOS\Core\Attribute\GetClassNames;
 use GibsonOS\Core\Attribute\Install\Cronjob;
 use GibsonOS\Core\Command\CommandInterface;
 use GibsonOS\Core\Dto\Command;
+use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Service\CommandService;
 use ReflectionAttribute;
-use ReflectionClass;
 use ReflectionException;
 
 class CommandStore extends AbstractStore
@@ -20,6 +20,7 @@ class CommandStore extends AbstractStore
      */
     public function __construct(
         private CommandService $commandService,
+        private ReflectionManager $reflectionManager,
         #[GetClassNames(['*/src/Command'])] private array $classStrings
     ) {
     }
@@ -30,7 +31,7 @@ class CommandStore extends AbstractStore
     public function getList(): Generator
     {
         foreach ($this->classStrings as $classString) {
-            $reflectionClass = new ReflectionClass($classString);
+            $reflectionClass = $this->reflectionManager->getReflectionClass($classString);
 
             if (
                 $reflectionClass->isAbstract() ||

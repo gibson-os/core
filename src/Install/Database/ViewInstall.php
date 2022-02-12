@@ -10,12 +10,12 @@ use GibsonOS\Core\Exception\FactoryError;
 use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\InstallException;
 use GibsonOS\Core\Install\AbstractInstall;
+use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Model\ModelInterface;
 use GibsonOS\Core\Service\InstallService;
 use GibsonOS\Core\Service\PriorityInterface;
 use GibsonOS\Core\Service\ServiceManagerService;
 use mysqlDatabase;
-use ReflectionClass;
 use ReflectionException;
 
 class ViewInstall extends AbstractInstall implements PriorityInterface
@@ -23,6 +23,7 @@ class ViewInstall extends AbstractInstall implements PriorityInterface
     public function __construct(
         ServiceManagerService $serviceManagerService,
         private mysqlDatabase $mysqlDatabase,
+        private ReflectionManager $reflectionManager
     ) {
         parent::__construct($serviceManagerService);
     }
@@ -39,7 +40,7 @@ class ViewInstall extends AbstractInstall implements PriorityInterface
 
         foreach ($this->getFiles($path) as $file) {
             $className = $this->serviceManagerService->getNamespaceByPath($file);
-            $reflectionClass = new ReflectionClass($className);
+            $reflectionClass = $this->reflectionManager->getReflectionClass($className);
             $viewAttributes = $reflectionClass->getAttributes(View::class);
 
             if (count($viewAttributes) === 0) {

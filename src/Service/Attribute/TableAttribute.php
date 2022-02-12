@@ -6,15 +6,19 @@ namespace GibsonOS\Core\Service\Attribute;
 use GibsonOS\Core\Attribute\AttributeInterface;
 use GibsonOS\Core\Attribute\GetTableName;
 use GibsonOS\Core\Attribute\Install\Database\Table;
+use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Model\ModelInterface;
 use ReflectionAttribute;
-use ReflectionClass;
 use ReflectionException;
 use ReflectionParameter;
 
 class TableAttribute implements ParameterAttributeInterface, AttributeServiceInterface
 {
     private array $tables = [];
+
+    public function __construct(private ReflectionManager $reflectionManager)
+    {
+    }
 
     /**
      * @throws ReflectionException
@@ -31,7 +35,7 @@ class TableAttribute implements ParameterAttributeInterface, AttributeServiceInt
             return $this->tables[$modelClassName];
         }
 
-        $reflectionClass = new ReflectionClass($modelClassName);
+        $reflectionClass = $this->reflectionManager->getReflectionClass($modelClassName);
         $tableAttributes = $reflectionClass->getAttributes(Table::class, ReflectionAttribute::IS_INSTANCEOF);
 
         if (count($tableAttributes) === 0) {

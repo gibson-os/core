@@ -9,20 +9,21 @@ use GibsonOS\Core\Dto\Install\Success;
 use GibsonOS\Core\Exception\FactoryError;
 use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\Model\SaveError;
+use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Service\Attribute\Install\CronjobInstallAttribute;
 use GibsonOS\Core\Service\AttributeService;
 use GibsonOS\Core\Service\InstallService;
 use GibsonOS\Core\Service\PriorityInterface;
 use GibsonOS\Core\Service\ServiceManagerService;
 use JsonException;
-use ReflectionClass;
 use ReflectionException;
 
 class CronjobInstall extends AbstractInstall implements PriorityInterface
 {
     public function __construct(
         ServiceManagerService $serviceManagerService,
-        private AttributeService $attributeService
+        private AttributeService $attributeService,
+        private ReflectionManager $reflectionManager
     ) {
         parent::__construct($serviceManagerService);
     }
@@ -39,7 +40,7 @@ class CronjobInstall extends AbstractInstall implements PriorityInterface
         foreach ($this->getFiles($this->dirService->addEndSlash($module) . 'src' . DIRECTORY_SEPARATOR . 'Command') as $file) {
             $className = $this->serviceManagerService->getNamespaceByPath($file);
             $attributes = $this->attributeService->getAttributesByClassName(
-                new ReflectionClass($className),
+                $this->reflectionManager->getReflectionClass($className),
                 Cronjob::class
             );
 

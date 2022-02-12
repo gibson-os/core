@@ -10,6 +10,7 @@ use GibsonOS\Core\Exception\FactoryError;
 use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\MapperException;
 use GibsonOS\Core\Exception\RequestError;
+use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Service\Attribute\AbstractActionAttributeService;
 use GibsonOS\Core\Service\Attribute\ObjectMapperAttribute;
 use GibsonOS\Core\Service\Attribute\ParameterAttributeInterface;
@@ -20,7 +21,6 @@ use GibsonOS\Core\Service\Response\TwigResponse;
 use GibsonOS\Core\Utility\StatusCode;
 use JsonException;
 use OutOfBoundsException;
-use ReflectionClass;
 use ReflectionException;
 use ReflectionMethod;
 use ReflectionNamedType;
@@ -35,7 +35,8 @@ class ControllerService
         private TwigService $twigService,
         private EnvService $envService,
         private AttributeService $attributeService,
-        private ObjectMapperAttribute $objectMapperAttribute
+        private ObjectMapperAttribute $objectMapperAttribute,
+        private ReflectionManager $reflectionManager
     ) {
     }
 
@@ -47,7 +48,7 @@ class ControllerService
         try {
             $controller = $this->serviceManagerService->get($controllerName);
             /** @psalm-suppress ArgumentTypeCoercion */
-            $reflectionClass = new ReflectionClass($controllerName);
+            $reflectionClass = $this->reflectionManager->getReflectionClass($controllerName);
         } catch (ReflectionException|FactoryError $e) {
             $this->outputResponse(new ExceptionResponse(
                 new ControllerError(sprintf('Controller %s not found!', $controllerName), 404, $e),

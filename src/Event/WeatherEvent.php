@@ -11,6 +11,7 @@ use GibsonOS\Core\Dto\Parameter\IntParameter;
 use GibsonOS\Core\Dto\Parameter\StringParameter;
 use GibsonOS\Core\Dto\Parameter\Weather\LocationParameter;
 use GibsonOS\Core\Exception\Repository\SelectError;
+use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Model\Weather\Location;
 use GibsonOS\Core\Repository\WeatherRepository;
 use GibsonOS\Core\Service\EventService;
@@ -48,9 +49,10 @@ class WeatherEvent extends AbstractEvent
 
     public function __construct(
         EventService $eventService,
+        ReflectionManager $reflectionManager,
         private WeatherRepository $weatherRepository
     ) {
-        parent::__construct($eventService);
+        parent::__construct($eventService, $reflectionManager);
     }
 
     /**

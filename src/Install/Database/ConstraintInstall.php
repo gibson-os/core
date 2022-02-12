@@ -7,8 +7,11 @@ use Generator;
 use GibsonOS\Core\Attribute\Install\Database\Constraint;
 use GibsonOS\Core\Attribute\Install\Database\Table;
 use GibsonOS\Core\Dto\Install\Success;
+use GibsonOS\Core\Exception\FactoryError;
+use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\InstallException;
 use GibsonOS\Core\Install\AbstractInstall;
+use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Model\ModelInterface;
 use GibsonOS\Core\Service\Attribute\TableAttribute;
 use GibsonOS\Core\Service\InstallService;
@@ -16,25 +19,32 @@ use GibsonOS\Core\Service\PriorityInterface;
 use GibsonOS\Core\Service\ServiceManagerService;
 use mysqlDatabase;
 use ReflectionAttribute;
-use ReflectionClass;
+use ReflectionException;
 
 class ConstraintInstall extends AbstractInstall implements PriorityInterface
 {
     public function __construct(
         ServiceManagerService $serviceManagerService,
         private mysqlDatabase $mysqlDatabase,
-        private TableAttribute $tableAttribute
+        private TableAttribute $tableAttribute,
+        private ReflectionManager $reflectionManager
     ) {
         parent::__construct($serviceManagerService);
     }
 
+    /**
+     * @throws InstallException
+     * @throws FactoryError
+     * @throws GetError
+     * @throws ReflectionException
+     */
     public function install(string $module): Generator
     {
         $path = $this->dirService->addEndSlash($module) . 'src' . DIRECTORY_SEPARATOR . 'Model';
 
         foreach ($this->getFiles($path) as $file) {
             $className = $this->serviceManagerService->getNamespaceByPath($file);
-            $reflectionClass = new ReflectionClass($className);
+            $reflectionClass = $this->reflectionManager->getReflectionClass($className);
             $tableAttributes = $reflectionClass->getAttributes(Table::class);
 
             if (count($tableAttributes) === 0) {

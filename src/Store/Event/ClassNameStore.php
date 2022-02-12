@@ -5,11 +5,10 @@ namespace GibsonOS\Core\Store\Event;
 
 use GibsonOS\Core\Attribute\Event;
 use GibsonOS\Core\Attribute\GetClassNames;
-use GibsonOS\Core\Exception\FactoryError;
 use GibsonOS\Core\Exception\GetError;
+use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Store\AbstractStore;
 use ReflectionAttribute;
-use ReflectionClass;
 use ReflectionException;
 
 class ClassNameStore extends AbstractStore
@@ -19,8 +18,10 @@ class ClassNameStore extends AbstractStore
      */
     private array $list = [];
 
-    public function __construct(#[GetClassNames(['*/src/Event'])] private array $classNames)
-    {
+    public function __construct(
+        private ReflectionManager $reflectionManager,
+        #[GetClassNames(['*/src/Event'])] private array $classNames
+    ) {
     }
 
     /**
@@ -44,8 +45,6 @@ class ClassNameStore extends AbstractStore
     }
 
     /**
-     * @throws GetError
-     * @throws FactoryError
      * @throws ReflectionException
      */
     private function generateList(): void
@@ -57,7 +56,7 @@ class ClassNameStore extends AbstractStore
         $classNames = [];
 
         foreach ($this->classNames as $className) {
-            $reflectionClass = new ReflectionClass($className);
+            $reflectionClass = $this->reflectionManager->getReflectionClass($className);
             $eventAttributes = $reflectionClass->getAttributes(Event::class, ReflectionAttribute::IS_INSTANCEOF);
 
             if (empty($eventAttributes)) {

@@ -8,6 +8,7 @@ use GibsonOS\Core\Dto\Parameter\BoolParameter;
 use GibsonOS\Core\Dto\Parameter\EventParameter;
 use GibsonOS\Core\Exception\DateTimeError;
 use GibsonOS\Core\Exception\Model\SaveError;
+use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Model\Event as EventModel;
 use GibsonOS\Core\Service\EventService;
 use JsonException;
@@ -15,9 +16,9 @@ use JsonException;
 #[Event('Event')]
 class EventEvent extends AbstractEvent
 {
-    public function __construct(private EventService $eventService)
+    public function __construct(EventService $eventService, ReflectionManager $reflectionManager)
     {
-        parent::__construct($this->eventService);
+        parent::__construct($eventService, $reflectionManager);
     }
 
     /**

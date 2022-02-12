@@ -9,14 +9,18 @@ use GibsonOS\Core\Command\CommandInterface;
 use GibsonOS\Core\Exception\ArgumentError;
 use GibsonOS\Core\Exception\CommandError;
 use GibsonOS\Core\Exception\FactoryError;
+use GibsonOS\Core\Manager\ReflectionManager;
 use ReflectionAttribute;
 use ReflectionClass;
 use ReflectionException;
 
 class CommandService
 {
-    public function __construct(private ServiceManagerService $serviceManager, private ProcessService $processService)
-    {
+    public function __construct(
+        private ServiceManagerService $serviceManager,
+        private ProcessService $processService,
+        private ReflectionManager $reflectionManager
+    ) {
     }
 
     /**
@@ -32,7 +36,7 @@ class CommandService
     {
         /** @var CommandInterface $command */
         $command = $this->serviceManager->get($commandClassname);
-        $reflectionClass = new ReflectionClass($commandClassname);
+        $reflectionClass = $this->reflectionManager->getReflectionClass($commandClassname);
         $this->setArguments($command, $reflectionClass, $arguments);
         $this->setOptions($command, $reflectionClass, $options);
 

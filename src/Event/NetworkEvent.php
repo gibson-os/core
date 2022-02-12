@@ -7,6 +7,7 @@ use GibsonOS\Core\Attribute\Event;
 use GibsonOS\Core\Dto\Parameter\BoolParameter;
 use GibsonOS\Core\Dto\Parameter\IntParameter;
 use GibsonOS\Core\Dto\Parameter\StringParameter;
+use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Service\EventService;
 use GibsonOS\Core\Service\NetworkService;
 
@@ -26,9 +27,12 @@ class NetworkEvent extends AbstractEvent
     ])]
     public const TRIGGER_AFTER_PING = 'afterPing';
 
-    public function __construct(EventService $eventService, private NetworkService $networkService)
-    {
-        parent::__construct($eventService);
+    public function __construct(
+        EventService $eventService,
+        ReflectionManager $reflectionManager,
+        private NetworkService $networkService
+    ) {
+        parent::__construct($eventService, $reflectionManager);
     }
 
     #[Event\Method('Ping')]

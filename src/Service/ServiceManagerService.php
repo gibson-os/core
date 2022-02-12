@@ -5,6 +5,7 @@ namespace GibsonOS\Core\Service;
 
 use GibsonOS\Core\Exception\FactoryError;
 use GibsonOS\Core\Exception\GetError;
+use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Service\Attribute\ParameterAttributeInterface;
 use ReflectionClass;
 use ReflectionException;
@@ -316,7 +317,7 @@ class ServiceManagerService
     {
         try {
             /** @psalm-suppress ArgumentTypeCoercion */
-            return new ReflectionClass($classname);
+            return $this->get(ReflectionManager::class)->getReflectionClass($classname);
         } catch (ReflectionException $e) {
             throw new FactoryError(sprintf('Reflection class for %s could not be created', $classname), 0, $e);
         }

@@ -9,6 +9,7 @@ use GibsonOS\Core\Attribute\Event\Parameter;
 use GibsonOS\Core\Dto\Parameter\AutoCompleteParameter;
 use GibsonOS\Core\Exception\EventException;
 use GibsonOS\Core\Exception\FactoryError;
+use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Model\AutoCompleteModelInterface;
 use GibsonOS\Core\Model\Event;
 use GibsonOS\Core\Model\Event\Element;
@@ -16,12 +17,12 @@ use GibsonOS\Core\Service\EventService;
 use GibsonOS\Core\Utility\JsonUtility;
 use JsonException;
 use ReflectionAttribute;
-use ReflectionClass;
+use ReflectionException;
 use ReflectionMethod;
 
 abstract class AbstractEvent
 {
-    public function __construct(private EventService $eventService)
+    public function __construct(protected EventService $eventService, private ReflectionManager $reflectionManager)
     {
     }
 
@@ -29,12 +30,13 @@ abstract class AbstractEvent
      * @throws FactoryError
      * @throws JsonException
      * @throws EventException
+     * @throws ReflectionException
      */
     public function run(Element $element, Event $event)
     {
         $method = $element->getMethod();
 
-        $reflectionClass = new ReflectionClass($this);
+        $reflectionClass = $this->reflectionManager->getReflectionClass($this);
 
         foreach ($reflectionClass->getMethods(ReflectionMethod::IS_PUBLIC) as $reflectionMethod) {
             if ($reflectionMethod->getName() !== $method) {
