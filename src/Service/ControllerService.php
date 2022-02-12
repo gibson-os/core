@@ -8,14 +8,15 @@ use GibsonOS\Core\Dto\Attribute;
 use GibsonOS\Core\Exception\ControllerError;
 use GibsonOS\Core\Exception\FactoryError;
 use GibsonOS\Core\Exception\GetError;
+use GibsonOS\Core\Exception\MapperException;
 use GibsonOS\Core\Exception\RequestError;
 use GibsonOS\Core\Service\Attribute\AbstractActionAttributeService;
+use GibsonOS\Core\Service\Attribute\ObjectMapperAttribute;
 use GibsonOS\Core\Service\Attribute\ParameterAttributeInterface;
 use GibsonOS\Core\Service\Response\AjaxResponse;
 use GibsonOS\Core\Service\Response\ExceptionResponse;
 use GibsonOS\Core\Service\Response\ResponseInterface;
 use GibsonOS\Core\Service\Response\TwigResponse;
-use GibsonOS\Core\Utility\JsonUtility;
 use GibsonOS\Core\Utility\StatusCode;
 use JsonException;
 use OutOfBoundsException;
@@ -23,7 +24,6 @@ use ReflectionClass;
 use ReflectionException;
 use ReflectionMethod;
 use ReflectionNamedType;
-use ReflectionParameter;
 use Throwable;
 
 class ControllerService
@@ -34,7 +34,8 @@ class ControllerService
         private StatusCode $statusCode,
         private TwigService $twigService,
         private EnvService $envService,
-        private AttributeService $attributeService
+        private AttributeService $attributeService,
+        private ObjectMapperAttribute $objectMapperAttribute
     ) {
     }
 
@@ -205,8 +206,10 @@ class ControllerService
      * @param Attribute[] $attributes
      *
      * @throws ControllerError
+     * @throws FactoryError
      * @throws JsonException
      * @throws ReflectionException
+     * @throws MapperException
      */
     private function getParameters(ReflectionMethod $reflectionMethod, array $attributes): array
     {
@@ -270,7 +273,10 @@ class ControllerService
                 continue;
             }
 
-            $parameters[$name] = $this->getParameterFromRequest($reflectionParameter, $attributeParameters);
+            $parameters[$name] = in_array($name, $attributeParameters)
+                ? null
+                : $this->objectMapperAttribute->getParameterFromRequest($reflectionParameter)
+            ;
         }
 
         return $parameters;
@@ -322,84 +328,6 @@ class ControllerService
             }
 
             $attributeService->postExecute($attribute->getAttribute(), $response);
-        }
-    }
-
-    /**
-     * @throws ControllerError
-     * @throws JsonException
-     * @throws ReflectionException
-     */
-    private function getParameterFromRequest(
-        ReflectionParameter $parameter,
-        array $attributeParameters
-    ): array|bool|float|int|string|null {
-        try {
-            $value = $this->requestService->getRequestValue($parameter->getName());
-        } catch (RequestError $e) {
-            if ($parameter->isOptional()) {
-                try {
-                    return $parameter->getDefaultValue();
-                } catch (ReflectionException $e) {
-                    throw new ControllerError($e->getMessage(), StatusCode::BAD_REQUEST, $e);
-                }
-            }
-
-            if ($parameter->allowsNull()) {
-                return null;
-            }
-
-            if (in_array($parameter->getName(), $attributeParameters)) {
-                return null;
-            }
-
-            throw new ControllerError(sprintf(
-                'Parameter %s is not in request!',
-                $parameter->getName()
-            ), 0, $e);
-        }
-
-        if ($value === null || $value === '') {
-            if ($parameter->allowsNull()) {
-                return null;
-            }
-
-            if ($parameter->isOptional()) {
-                return $parameter->getDefaultValue();
-            }
-
-            throw new ControllerError(sprintf(
-                'Parameter %s doesnt allows null!',
-                $parameter->getName()
-            ));
-        }
-
-        /** @psalm-suppress UndefinedMethod */
-        switch ($parameter->getType()?->getName()) {
-            case 'int':
-                return (int) $value;
-            case 'float':
-                return (float) $value;
-            case 'bool':
-                return $value === 'true' || ((int) $value);
-            case 'string':
-                return (string) $value;
-            case 'array':
-                if (!is_array($value)) {
-                    return (array) JsonUtility::decode($value);
-                }
-
-                return $value;
-            default:
-                $declaringClass = $parameter->getDeclaringClass();
-
-                throw new ControllerError(sprintf(
-                    'Type %s of parameter %s for %s::%s is not allowed!',
-                    (string) $parameter->getType(),
-                    $parameter->getName(),
-                    $declaringClass === null ? '' : $declaringClass->getName(),
-                    $parameter->getDeclaringFunction()->getName()
-                ));
         }
     }
 

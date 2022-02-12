@@ -7,6 +7,7 @@ use GibsonOS\Core\Attribute\ObjectMapper as ObjectMapperAttribute;
 use GibsonOS\Core\Exception\FactoryError;
 use GibsonOS\Core\Exception\MapperException;
 use GibsonOS\Core\Service\ServiceManagerService;
+use GibsonOS\Core\Utility\JsonUtility;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionParameter;
@@ -96,10 +97,6 @@ class ObjectMapper implements ObjectMapperInterface
 
         /** @psalm-suppress UndefinedMethod */
         if (count($attributes) === 1 || !$reflectionParameter->getType()?->isBuiltin()) {
-            if (!is_array($values)) {
-                $values = [$values];
-            }
-
             $mapper = $this;
             $objectClassName = null;
 
@@ -111,10 +108,20 @@ class ObjectMapper implements ObjectMapperInterface
             }
 
             if ($parameterTypeName === 'array' && $objectClassName !== null) {
+                if (is_string($values)) {
+                    $values = JsonUtility::decode($values);
+                }
+
                 return array_map(
-                    fn ($value) => $mapper->mapToObject($objectClassName, is_array($value) ? $value : [$value]),
+                    fn ($value) => $mapper->mapToObject($objectClassName, is_array($value)
+                        ? $value
+                        : [$reflectionParameter->getName() => $value]),
                     $values
                 );
+            }
+
+            if (!is_array($values)) {
+                $values = [$reflectionParameter->getName() => $values];
             }
 
             return $mapper->mapToObject(
