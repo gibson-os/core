@@ -31,12 +31,17 @@ class ServiceManagerService
 
     private AttributeService $attributeService;
 
+    private ReflectionManager $reflectionManager;
+
     public function __construct()
     {
         $this->services[self::class] = $this;
-        $attributeService = new AttributeService($this);
-        $this->services[AttributeService::class] = $attributeService;
-        $this->attributeService = $attributeService;
+
+        $this->attributeService = new AttributeService($this);
+        $this->services[AttributeService::class] = $this->attributeService;
+
+        $this->reflectionManager = new ReflectionManager();
+        $this->services[ReflectionManager::class] = $this->reflectionManager;
     }
 
     /**
@@ -305,19 +310,14 @@ class ServiceManagerService
     }
 
     /**
-     * @template T
-     *
-     * @param class-string<T> $classname
+     * @param class-string $classname
      *
      * @throws FactoryError
-     *
-     * @return ReflectionClass<T>
      */
     private function getReflectionsClass(string $classname): ReflectionClass
     {
         try {
-            /** @psalm-suppress ArgumentTypeCoercion */
-            return $this->get(ReflectionManager::class)->getReflectionClass($classname);
+            return $this->reflectionManager->getReflectionClass($classname);
         } catch (ReflectionException $e) {
             throw new FactoryError(sprintf('Reflection class for %s could not be created', $classname), 0, $e);
         }

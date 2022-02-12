@@ -9,19 +9,25 @@ use ReflectionException;
 class ReflectionManager
 {
     /**
-     * @var ReflectionClass[]
+     * @var array<class-string, ReflectionClass>
      */
     private array $classes = [];
 
     /**
-     * @param class-string|object $className
+     * @param class-string|object $objectOrClass
      *
      * @throws ReflectionException
      */
-    public function getReflectionClass(string|object $className): ReflectionClass
+    public function getReflectionClass(string|object $objectOrClass): ReflectionClass
     {
+        $className = $objectOrClass;
+
+        if (is_object($className)) {
+            $className = $className::class;
+        }
+
         if (!isset($this->classes[$className])) {
-            $this->classes[$className] = new ReflectionClass($className);
+            $this->classes[$className] = new ReflectionClass($objectOrClass);
         }
 
         return $this->classes[$className];
