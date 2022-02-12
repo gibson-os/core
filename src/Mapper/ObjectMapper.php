@@ -112,7 +112,7 @@ class ObjectMapper implements ObjectMapperInterface
 
             if ($parameterTypeName === 'array' && $objectClassName !== null) {
                 return array_map(
-                    fn ($value) => $mapper->mapToObject($objectClassName, $value),
+                    fn ($value) => $mapper->mapToObject($objectClassName, is_array($value) ? $value : [$value]),
                     $values
                 );
             }
