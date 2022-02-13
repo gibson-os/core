@@ -13,7 +13,7 @@ interface ObjectMapperInterface
      *
      * @return T
      */
-    public function mapToObject(string $className, array $properties): object;
+    public function mapToObject(string $className, array $properties): int|float|string|bool|array|object|null;
 
     public function mapFromObject(object $object): int|float|string|bool|array|object|null;
 }
