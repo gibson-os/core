@@ -54,9 +54,10 @@ class CommandStore extends AbstractStore
                 $description,
                 [], // @todo auf attribute umbauen. Dann kann das alles per reflektion bgearbeitet werden
                 [],
-                array_map(
-                    fn (ReflectionAttribute $cronjob) => $cronjob->newInstance(),
-                    $reflectionClass->getAttributes(Cronjob::class, ReflectionAttribute::IS_INSTANCEOF)
+                $this->reflectionManager->getAttributes(
+                    $reflectionClass,
+                    Cronjob::class,
+                    ReflectionAttribute::IS_INSTANCEOF
                 )
             );
         }

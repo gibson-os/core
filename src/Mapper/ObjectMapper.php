@@ -93,18 +93,16 @@ class ObjectMapper implements ObjectMapperInterface
         ReflectionParameter $reflectionParameter,
         int|float|string|bool|array|object|null $values
     ): int|float|string|bool|array|object|null {
-        $attributes = $reflectionParameter->getAttributes(ObjectMapperAttribute::class);
+        $attribute = $this->reflectionManager->getAttribute($reflectionParameter, ObjectMapperAttribute::class);
         /** @psalm-suppress UndefinedMethod */
         $parameterTypeName = $reflectionParameter->getType()?->getName();
 
         /** @psalm-suppress UndefinedMethod */
-        if (count($attributes) === 1 || !$reflectionParameter->getType()?->isBuiltin()) {
+        if ($attribute !== null || !$reflectionParameter->getType()?->isBuiltin()) {
             $mapper = $this;
             $objectClassName = null;
 
-            if (count($attributes) === 1) {
-                /** @var ObjectMapperAttribute $attribute */
-                $attribute = $attributes[0]->newInstance();
+            if ($attribute !== null) {
                 $objectClassName = $attribute->getObjectClassName();
                 $mapper = $this->serviceManagerService->get($attribute->getMapperClassName(), ObjectMapperInterface::class);
             }

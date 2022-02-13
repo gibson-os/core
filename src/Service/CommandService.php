@@ -148,12 +148,11 @@ class CommandService
         $argumentProperties = [];
 
         foreach ($reflectionClass->getProperties() as $reflectionProperty) {
-            $argumentAttributes = $reflectionProperty->getAttributes(
+            if (!$this->reflectionManager->hasAttribute(
+                $reflectionProperty,
                 Argument::class,
                 ReflectionAttribute::IS_INSTANCEOF
-            );
-
-            if (count($argumentAttributes) === 0) {
+            )) {
                 continue;
             }
 
@@ -200,17 +199,15 @@ class CommandService
         $optionsProperties = [];
 
         foreach ($reflectionClass->getProperties() as $reflectionProperty) {
-            $optionAttributes = $reflectionProperty->getAttributes(
+            if (!$this->reflectionManager->hasAttribute(
+                $reflectionProperty,
                 Option::class,
                 ReflectionAttribute::IS_INSTANCEOF
-            );
-
-            if (count($optionAttributes) === 0) {
+            )) {
                 continue;
             }
 
             $name = $reflectionProperty->getName();
-
             /** @psalm-suppress UndefinedMethod */
             $typeName = $reflectionProperty->getType()?->getName();
 

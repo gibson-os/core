@@ -41,17 +41,15 @@ class ViewInstall extends AbstractInstall implements PriorityInterface
         foreach ($this->getFiles($path) as $file) {
             $className = $this->serviceManagerService->getNamespaceByPath($file);
             $reflectionClass = $this->reflectionManager->getReflectionClass($className);
-            $viewAttributes = $reflectionClass->getAttributes(View::class);
+            $viewAttribute = $this->reflectionManager->getAttribute($reflectionClass, View::class);
 
-            if (count($viewAttributes) === 0) {
+            if ($viewAttribute === null) {
                 continue;
             }
 
             /** @var ModelInterface $model */
             $model = new $className();
             $viewName = $model->getTableName();
-            /** @var View $viewAttribute */
-            $viewAttribute = $viewAttributes[0]->newInstance();
             $viewAttribute->setName($viewName);
             $query = 'DROP VIEW IF EXISTS `' . $viewName . '`';
             $this->logger->debug($query);

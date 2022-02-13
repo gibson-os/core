@@ -6,6 +6,7 @@ namespace GibsonOS\Core\Service;
 use GibsonOS\Core\Attribute\AttributeInterface;
 use GibsonOS\Core\Dto\Attribute;
 use GibsonOS\Core\Exception\FactoryError;
+use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Service\Attribute\AttributeServiceInterface;
 use ReflectionAttribute;
 use ReflectionClass;
@@ -15,8 +16,10 @@ use ReflectionParameter;
 
 class AttributeService
 {
-    public function __construct(private ServiceManagerService $serviceManagerService)
-    {
+    public function __construct(
+        private ServiceManagerService $serviceManagerService,
+        private ReflectionManager $reflectionManager
+    ) {
     }
 
     /**
@@ -31,7 +34,7 @@ class AttributeService
     }
 
     /**
-     * @param class-string $attributeClassName
+     * @param class-string<AttributeInterface> $attributeClassName
      *
      * @throws FactoryError
      *
@@ -42,21 +45,20 @@ class AttributeService
         string $attributeClassName
     ): array {
         $attributesClasses = [];
-        $attributes = $reflectionObject->getAttributes(
+        $attributes = $this->reflectionManager->getAttributes(
+            $reflectionObject,
             $attributeClassName,
             ReflectionAttribute::IS_INSTANCEOF
         );
 
         foreach ($attributes as $attribute) {
-            /** @var AttributeInterface $attributeClass */
-            $attributeClass = $attribute->newInstance();
             /** @var AttributeServiceInterface $attributeService */
             $attributeService = $this->serviceManagerService->get(
-                $attributeClass->getAttributeServiceName(),
+                $attribute->getAttributeServiceName(),
                 AttributeServiceInterface::class
             );
 
-            $attributesClasses[] = new Attribute($attributeClass, $attributeService);
+            $attributesClasses[] = new Attribute($attribute, $attributeService);
         }
 
         return $attributesClasses;

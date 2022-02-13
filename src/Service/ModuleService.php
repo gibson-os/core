@@ -199,17 +199,17 @@ class ModuleService
         $this->logger->info(sprintf('Scan actions for task %s in module %s...', $task->getName(), $module->getName()));
         $actionIds = [];
 
-        foreach ($reflectionClass->getMethods(ReflectionMethod::IS_PUBLIC) as $method) {
-            if (mb_strpos($method->getName(), '__') === 0) {
+        foreach ($reflectionClass->getMethods(ReflectionMethod::IS_PUBLIC) as $reflectionMethod) {
+            if (mb_strpos($reflectionMethod->getName(), '__') === 0) {
                 continue;
             }
 
             try {
-                $action = $this->actionRepository->getByNameAndTaskId($method->getName(), $task->getId() ?? 0);
+                $action = $this->actionRepository->getByNameAndTaskId($reflectionMethod->getName(), $task->getId() ?? 0);
             } catch (SelectError) {
-                $this->logger->info(sprintf('New action %s', $method->getName()));
+                $this->logger->info(sprintf('New action %s', $reflectionMethod->getName()));
                 $action = (new Action())
-                    ->setName($method->getName())
+                    ->setName($reflectionMethod->getName())
                     ->setModule($module)
                     ->setTask($task)
                 ;
@@ -220,10 +220,7 @@ class ModuleService
 
             $this->permissionRepository->deleteByAction($action->getName());
 
-            foreach ($method->getAttributes(CheckPermission::class) as $attribute) {
-                /** @var CheckPermission $checkPermission */
-                $checkPermission = $attribute->newInstance();
-
+            foreach ($this->reflectionManager->getAttributes($reflectionMethod, CheckPermission::class) as $checkPermission) {
                 (new Action\Permission())
                     ->setActionId($action->getId() ?? 0)
                     ->setPermission($checkPermission->getPermission())

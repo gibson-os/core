@@ -37,11 +37,11 @@ class ServiceManagerService
     {
         $this->services[self::class] = $this;
 
-        $this->attributeService = new AttributeService($this);
-        $this->services[AttributeService::class] = $this->attributeService;
-
         $this->reflectionManager = new ReflectionManager();
         $this->services[ReflectionManager::class] = $this->reflectionManager;
+
+        $this->attributeService = new AttributeService($this, $this->reflectionManager);
+        $this->services[AttributeService::class] = $this->attributeService;
     }
 
     /**

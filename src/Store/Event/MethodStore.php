@@ -79,14 +79,15 @@ class MethodStore extends AbstractStore
         $listeners = $this->eventService->getListeners($reflectionClass);
 
         foreach ($reflectionClass->getMethods(ReflectionMethod::IS_PUBLIC) as $reflectionMethod) {
-            $methodAttributes = $reflectionMethod->getAttributes(Method::class, ReflectionAttribute::IS_INSTANCEOF);
+            $methodAttribute = $this->reflectionManager->getAttribute(
+                $reflectionMethod,
+                Method::class,
+                ReflectionAttribute::IS_INSTANCEOF
+            );
 
-            if (empty($methodAttributes)) {
+            if ($methodAttribute === null) {
                 continue;
             }
-
-            /** @var Method $methodAttribute */
-            $methodAttribute = $methodAttributes[0]->newInstance();
 
             $methods[$methodAttribute->getTitle()] = [
                 'method' => $reflectionMethod->getName(),
@@ -113,17 +114,16 @@ class MethodStore extends AbstractStore
         $parameters = [];
 
         foreach ($reflectionMethod->getParameters() as $reflectionParameter) {
-            $parameterAttributes = $reflectionParameter->getAttributes(
+            $parameterAttribute = $this->reflectionManager->getAttribute(
+                $reflectionParameter,
                 Parameter::class,
                 ReflectionAttribute::IS_INSTANCEOF
             );
 
-            if (empty($parameterAttributes)) {
+            if ($parameterAttribute === null) {
                 continue;
             }
 
-            /** @var Parameter $parameterAttribute */
-            $parameterAttribute = $parameterAttributes[0]->newInstance();
             $parameters[$reflectionParameter->getName()] = $this->getParameter(
                 $reflectionParameter->getName(),
                 $reflectionMethod->getDeclaringClass(),
@@ -142,11 +142,13 @@ class MethodStore extends AbstractStore
     private function getReturns(ReflectionMethod $reflectionMethod): array
     {
         $returns = [];
-        $returnValueAttributes = $reflectionMethod->getAttributes(ReturnValue::class, ReflectionAttribute::IS_INSTANCEOF);
+        $returnValueAttributes = $this->reflectionManager->getAttributes(
+            $reflectionMethod,
+            ReturnValue::class,
+            ReflectionAttribute::IS_INSTANCEOF
+        );
 
-        foreach ($returnValueAttributes as $returnValueAttribute) {
-            /** @var ReturnValue $returnValue */
-            $returnValue = $returnValueAttribute->newInstance();
+        foreach ($returnValueAttributes as $returnValue) {
             $returns[$returnValue->getKey() ?? 'return'] = $this->getParameter(
                 $returnValue->getKey() ?? 'return',
                 $reflectionMethod->getDeclaringClass(),

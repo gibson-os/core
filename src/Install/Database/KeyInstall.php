@@ -45,22 +45,18 @@ class KeyInstall extends AbstractInstall implements PriorityInterface
         foreach ($this->getFiles($path) as $file) {
             $className = $this->serviceManagerService->getNamespaceByPath($file);
             $reflectionClass = $this->reflectionManager->getReflectionClass($className);
-            $tableAttributes = $reflectionClass->getAttributes(Table::class);
-            $installedKeys = ['PRIMARY'];
 
-            if (count($tableAttributes) === 0) {
+            if (!$this->reflectionManager->hasAttribute($reflectionClass, Table::class)) {
                 continue;
             }
 
+            $installedKeys = ['PRIMARY'];
             /** @var ModelInterface $model */
             $model = new $className();
             $tableName = $model->getTableName();
-            $keyAttributes = $reflectionClass->getAttributes(Key::class);
+            $keyAttributes = $this->reflectionManager->getAttributes($reflectionClass, Key::class);
 
-            foreach ($keyAttributes as $keyAttributeItem) {
-                /** @var Key $keyAttribute */
-                $keyAttribute = $keyAttributeItem->newInstance();
-
+            foreach ($keyAttributes as $keyAttribute) {
                 if (count($keyAttribute->getColumns()) === 0) {
                     throw new InstallException(sprintf(
                         'Key attribute for model "%s" has no columns defined!',
@@ -72,12 +68,7 @@ class KeyInstall extends AbstractInstall implements PriorityInterface
             }
 
             foreach ($reflectionClass->getProperties() as $reflectionProperty) {
-                $keyAttributes = $reflectionProperty->getAttributes(Key::class);
-
-                foreach ($keyAttributes as $keyAttributeItem) {
-                    /** @var Key $keyAttribute */
-                    $keyAttribute = $keyAttributeItem->newInstance();
-
+                foreach ($this->reflectionManager->getAttributes($reflectionProperty, Key::class) as $keyAttribute) {
                     if (count($keyAttribute->getColumns()) !== 0) {
                         throw new InstallException(sprintf(
                             'Key attribute for property "%s::%s" is not empty!',

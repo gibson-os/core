@@ -77,17 +77,16 @@ class ClassTriggerStore extends AbstractStore
         $listeners = $this->eventService->getListeners($reflectionClass);
 
         foreach ($reflectionClass->getReflectionConstants(ReflectionClassConstant::IS_PUBLIC) as $reflectionClassConstant) {
-            $triggerAttributes = $reflectionClassConstant->getAttributes(
+            $triggerAttribute = $this->reflectionManager->getAttribute(
+                $reflectionClassConstant,
                 Trigger::class,
                 ReflectionAttribute::IS_INSTANCEOF
             );
 
-            if (empty($triggerAttributes)) {
+            if ($triggerAttribute === null) {
                 continue;
             }
 
-            /** @var Trigger $triggerAttribute */
-            $triggerAttribute = $triggerAttributes[0]->newInstance();
             $triggers[$triggerAttribute->getTitle()] = [
                 'trigger' => $reflectionClassConstant->getValue(),
                 'title' => $triggerAttribute->getTitle(),

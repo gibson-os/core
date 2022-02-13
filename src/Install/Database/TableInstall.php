@@ -95,9 +95,9 @@ class TableInstall extends AbstractInstall implements PriorityInterface
         foreach ($this->getFiles($path) as $file) {
             $className = $this->serviceManagerService->getNamespaceByPath($file);
             $reflectionClass = $this->reflectionManager->getReflectionClass($className);
-            $tableAttributes = $reflectionClass->getAttributes(Table::class);
+            $tableAttribute = $this->reflectionManager->getAttribute($reflectionClass, Table::class);
 
-            if (count($tableAttributes) === 0) {
+            if ($tableAttribute === null) {
                 continue;
             }
 
@@ -105,21 +105,21 @@ class TableInstall extends AbstractInstall implements PriorityInterface
             /** @var ModelInterface $model */
             $model = new $className();
             $tableName = $model->getTableName();
-            /** @var Table $tableAttribute */
-            $tableAttribute = $tableAttributes[0]->newInstance();
             $tableAttribute->setName($tableName);
 
             foreach ($reflectionClass->getProperties() as $reflectionProperty) {
-                $columnAttributes = $reflectionProperty->getAttributes(Column::class, ReflectionAttribute::IS_INSTANCEOF);
+                $columnAttribute = $this->reflectionManager->getAttribute(
+                    $reflectionProperty,
+                    Column::class,
+                    ReflectionAttribute::IS_INSTANCEOF
+                );
 
-                if (count($columnAttributes) === 0) {
+                if ($columnAttribute === null) {
                     continue;
                 }
 
                 /** @psalm-suppress UndefinedMethod */
                 $type = $reflectionProperty->getType()?->getName() ?? '';
-                /** @var Column $columnAttribute */
-                $columnAttribute = $columnAttributes[0]->newInstance();
                 $defaultValue = $reflectionProperty->getDefaultValue();
                 $columnAttribute
                     ->setName($columnAttribute->getName() ?? $this->tableAttribute->transformName($reflectionProperty->getName()))

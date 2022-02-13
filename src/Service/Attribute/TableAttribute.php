@@ -36,9 +36,8 @@ class TableAttribute implements ParameterAttributeInterface, AttributeServiceInt
         }
 
         $reflectionClass = $this->reflectionManager->getReflectionClass($modelClassName);
-        $tableAttributes = $reflectionClass->getAttributes(Table::class, ReflectionAttribute::IS_INSTANCEOF);
 
-        if (count($tableAttributes) === 0) {
+        if (!$this->reflectionManager->hasAttribute($reflectionClass, Table::class, ReflectionAttribute::IS_INSTANCEOF)) {
             return null;
         }
 

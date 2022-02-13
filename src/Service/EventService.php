@@ -162,7 +162,8 @@ class EventService extends AbstractService
 
     public function getParameterOptions(ReflectionClass $reflectionClass, string $name): array
     {
-        $parameterOptionAttributes = $reflectionClass->getAttributes(
+        $parameterOptionAttributes = $this->reflectionManager->getAttributes(
+            $reflectionClass,
             ParameterOption::class,
             ReflectionAttribute::IS_INSTANCEOF
         );
@@ -170,14 +171,11 @@ class EventService extends AbstractService
         $options = [];
 
         foreach ($parameterOptionAttributes as $parameterOptionAttribute) {
-            /** @var ParameterOption $parameterOption */
-            $parameterOption = $parameterOptionAttribute->newInstance();
-
-            if ($parameterOption->getParameterKey() !== $name) {
+            if ($parameterOptionAttribute->getParameterKey() !== $name) {
                 continue;
             }
 
-            $options[$parameterOption->getOptionKey()] = [$parameterOption->getOptionValue()];
+            $options[$parameterOptionAttribute->getOptionKey()] = [$parameterOptionAttribute->getOptionValue()];
         }
 
         return $options;
@@ -187,15 +185,13 @@ class EventService extends AbstractService
         ReflectionClass|ReflectionMethod|ReflectionClassConstant $reflectionObject,
         array $listeners = []
     ): array {
-        $listenerAttributes = $reflectionObject->getAttributes(
+        $listenerAttributes = $this->reflectionManager->getAttributes(
+            $reflectionObject,
             Listener::class,
             ReflectionAttribute::IS_INSTANCEOF
         );
 
-        foreach ($listenerAttributes as $listenerAttribute) {
-            /** @var Listener $listener */
-            $listener = $listenerAttribute->newInstance();
-
+        foreach ($listenerAttributes as $listener) {
             if (!isset($listeners[$listener->getForKey()])) {
                 $listeners[$listener->getForKey()] = [];
             }
@@ -233,21 +229,19 @@ class EventService extends AbstractService
                     continue;
                 }
 
-                $triggerAttributes = $reflectionClassConstant->getAttributes(
+                $triggerAttribute = $this->reflectionManager->getAttribute(
+                    $reflectionClassConstant,
                     Trigger::class,
                     ReflectionAttribute::IS_INSTANCEOF
                 );
 
-                if (empty($triggerAttributes)) {
+                if ($triggerAttribute === null) {
                     throw new EventException(sprintf(
                         'Constant %s has no %s attribute',
                         $reflectionClassConstant->getName(),
                         Trigger::class
                     ));
                 }
-
-                /** @var Trigger $triggerAttribute */
-                $triggerAttribute = $triggerAttributes[0]->newInstance();
 
                 foreach ($triggerAttribute->getParameters() as $parameter) {
                     $triggerParameter = $this->serviceManagerService->create(

@@ -45,9 +45,8 @@ class ConstraintInstall extends AbstractInstall implements PriorityInterface
         foreach ($this->getFiles($path) as $file) {
             $className = $this->serviceManagerService->getNamespaceByPath($file);
             $reflectionClass = $this->reflectionManager->getReflectionClass($className);
-            $tableAttributes = $reflectionClass->getAttributes(Table::class);
 
-            if (count($tableAttributes) === 0) {
+            if (!$this->reflectionManager->getAttribute($reflectionClass, Table::class)) {
                 continue;
             }
 
@@ -62,14 +61,16 @@ class ConstraintInstall extends AbstractInstall implements PriorityInterface
                     continue;
                 }
 
-                $constraintAttributes = $reflectionProperty->getAttributes(Constraint::class, ReflectionAttribute::IS_INSTANCEOF);
+                $constraintAttribute = $this->reflectionManager->getAttribute(
+                    $reflectionProperty,
+                    Constraint::class,
+                    ReflectionAttribute::IS_INSTANCEOF
+                );
 
-                if (count($constraintAttributes) === 0) {
+                if ($constraintAttribute === null) {
                     continue;
                 }
 
-                /** @var Constraint $constraintAttribute */
-                $constraintAttribute = $constraintAttributes[0]->newInstance();
                 /** @psalm-suppress UndefinedMethod */
                 $parentClassName = $reflectionProperty->getType()?->getName();
                 /** @var ModelInterface $parentModel */

@@ -43,12 +43,11 @@ abstract class AbstractEvent
                 continue;
             }
 
-            $methodAttributes = $reflectionMethod->getAttributes(
+            if (!$this->reflectionManager->hasAttribute(
+                $reflectionMethod,
                 Method::class,
                 ReflectionAttribute::IS_INSTANCEOF
-            );
-
-            if (empty($methodAttributes)) {
+            )) {
                 throw new EventException(sprintf(
                     'Method %s has no %s attribute',
                     $reflectionMethod->getName(),
@@ -73,23 +72,22 @@ abstract class AbstractEvent
     /**
      * @throws JsonException
      * @throws FactoryError
+     * @throws ReflectionException
      */
     protected function getParameters(ReflectionMethod $reflectionMethod, Element $element): array
     {
         $methodParameters = [];
 
         foreach ($reflectionMethod->getParameters() as $reflectionParameter) {
-            $parameterAttributes = $reflectionParameter->getAttributes(
+            $parameterAttribute = $this->reflectionManager->getAttribute(
+                $reflectionParameter,
                 Parameter::class,
                 ReflectionAttribute::IS_INSTANCEOF
             );
 
-            if (empty($parameterAttributes)) {
+            if ($parameterAttribute === null) {
                 continue;
             }
-
-            /** @var Parameter $parameterAttribute */
-            $parameterAttribute = $parameterAttributes[0]->newInstance();
 
             $methodParameters[$reflectionParameter->getName()] = $this->eventService->getParameter(
                 $parameterAttribute->getClassName(),

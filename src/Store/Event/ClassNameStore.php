@@ -57,14 +57,15 @@ class ClassNameStore extends AbstractStore
 
         foreach ($this->classNames as $className) {
             $reflectionClass = $this->reflectionManager->getReflectionClass($className);
-            $eventAttributes = $reflectionClass->getAttributes(Event::class, ReflectionAttribute::IS_INSTANCEOF);
+            $eventAttribute = $this->reflectionManager->getAttribute(
+                $reflectionClass,
+                Event::class,
+                ReflectionAttribute::IS_INSTANCEOF
+            );
 
-            if (empty($eventAttributes)) {
+            if ($eventAttribute === null) {
                 continue;
             }
-
-            /** @var Event $eventAttribute */
-            $eventAttribute = $eventAttributes[0]->newInstance();
 
             $classNames[$eventAttribute->getTitle()] = [
                 'className' => $className,
