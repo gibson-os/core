@@ -12,6 +12,8 @@ use ReflectionProperty;
 
 class ReflectionManager
 {
+    private const GETTER_PREFIXES = ['get', 'is', 'has'];
+
     /**
      * @var array<class-string, ReflectionClass>
      */
@@ -90,5 +92,53 @@ class ReflectionManager
         int $flags = 0
     ): bool {
         return count($reflectionObject->getAttributes($attributeClassName, $flags)) > 0;
+    }
+
+    public function setProperty(
+        ReflectionProperty $reflectionProperty,
+        object $object,
+        string|int|float|bool|null|array|object $value
+    ): bool {
+        $propertyName = $reflectionProperty->getName();
+        $setter = 'set' . ucfirst($propertyName);
+
+        if ($reflectionProperty->getDeclaringClass()->hasMethod($setter)) {
+            $object->$setter($value);
+
+            return true;
+        }
+
+        if ($reflectionProperty->isPublic()) {
+            $object->$propertyName = $value;
+
+            return true;
+        }
+
+        return false;
+    }
+
+    public function getProperty(
+        ReflectionProperty $reflectionProperty,
+        object $object
+    ): string|int|float|bool|null|array|object {
+        $propertyName = $reflectionProperty->getName();
+
+        foreach (self::GETTER_PREFIXES as $getterPrefix) {
+            $getter = $getterPrefix . lcfirst($propertyName);
+
+            if ($reflectionProperty->getDeclaringClass()->hasMethod($getter)) {
+                return $object->$getter();
+            }
+        }
+
+        if ($reflectionProperty->isPublic()) {
+            return $object->$propertyName;
+        }
+
+        throw new ReflectionException(sprintf(
+            'Property "%s" of class "%s" has no getter or is not public!',
+            $propertyName,
+            $reflectionProperty->getDeclaringClass()->getName()
+        ));
     }
 }
