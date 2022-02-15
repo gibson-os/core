@@ -35,38 +35,35 @@ abstract class AbstractEvent
     public function run(Element $element, Event $event)
     {
         $method = $element->getMethod();
-
         $reflectionClass = $this->reflectionManager->getReflectionClass($this);
 
-        foreach ($reflectionClass->getMethods(ReflectionMethod::IS_PUBLIC) as $reflectionMethod) {
-            if ($reflectionMethod->getName() !== $method) {
-                continue;
-            }
-
-            if (!$this->reflectionManager->hasAttribute(
-                $reflectionMethod,
-                Method::class,
-                ReflectionAttribute::IS_INSTANCEOF
-            )) {
-                throw new EventException(sprintf(
-                    'Method %s has no %s attribute',
-                    $reflectionMethod->getName(),
-                    Method::class
-                ));
-            }
-
-            try {
-                return $this->{$method}(...$this->getParameters($reflectionMethod, $element));
-            } catch (Exception $exception) {
-                if ($event->isExitOnError()) {
-                    return null;
-                }
-
-                throw $exception;
-            }
+        try {
+            $reflectionMethod = $reflectionClass->getMethod($method);
+        } catch (ReflectionException) {
+            throw new EventException(sprintf('Class "%s" has no "%s" method', $reflectionClass->getName(), $method));
         }
 
-        throw new EventException(sprintf('Class %s has no %s method', $reflectionClass->getName(), $method));
+        if (!$this->reflectionManager->hasAttribute(
+            $reflectionMethod,
+            Method::class,
+            ReflectionAttribute::IS_INSTANCEOF
+        )) {
+            throw new EventException(sprintf(
+                'Method "%s" has no "%s" attribute',
+                $reflectionMethod->getName(),
+                Method::class
+            ));
+        }
+
+        try {
+            return $this->{$method}(...$this->getParameters($reflectionMethod, $element));
+        } catch (Exception $exception) {
+            if ($event->isExitOnError()) {
+                return null;
+            }
+
+            throw $exception;
+        }
     }
 
     /**
