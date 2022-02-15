@@ -6,6 +6,7 @@ namespace GibsonOS\Core\Service\Attribute;
 use GibsonOS\Core\Attribute\AttributeInterface;
 use GibsonOS\Core\Attribute\GetSetting;
 use GibsonOS\Core\Exception\Repository\SelectError;
+use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Repository\SettingRepository;
 use GibsonOS\Core\Service\RequestService;
 use GibsonOS\Core\Service\SessionService;
@@ -18,15 +19,18 @@ class SettingAttribute implements ParameterAttributeInterface, AttributeServiceI
         private SettingRepository $settingRepository,
         private RequestService $requestService,
         private SessionService $sessionService,
+        private ReflectionManager $reflectionManager
     ) {
     }
 
     /**
      * @throws ReflectionException
-     * @throws SelectError
      */
-    public function replace(AttributeInterface $attribute, array $parameters, ReflectionParameter $reflectionParameter): mixed
-    {
+    public function replace(
+        AttributeInterface $attribute,
+        array $parameters,
+        ReflectionParameter $reflectionParameter
+    ): string|int|float|bool|null|array|object {
         if (!$attribute instanceof GetSetting) {
             return null;
         }
@@ -37,16 +41,8 @@ class SettingAttribute implements ParameterAttributeInterface, AttributeServiceI
                 $this->sessionService->getUserId(),
                 $attribute->getKey()
             );
-        } catch (SelectError $exception) {
-            if (!$reflectionParameter->isOptional() && !$reflectionParameter->allowsNull()) {
-                throw $exception;
-            }
-
-            if ($reflectionParameter->isOptional()) {
-                return $reflectionParameter->getDefaultValue();
-            }
-
-            return null;
+        } catch (SelectError) {
+            return $this->reflectionManager->getDefaultValue($reflectionParameter);
         }
     }
 }

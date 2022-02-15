@@ -80,16 +80,12 @@ class ObjectMapperAttribute implements AttributeServiceInterface, ParameterAttri
     public function getParameterFromRequest(
         ReflectionParameter $reflectionParameter,
         string $requestKey = null
-    ): array|bool|float|int|string|null {
+    ): string|int|float|bool|null|array|object {
         try {
             $value = $this->requestService->getRequestValue($requestKey ?? $reflectionParameter->getName());
         } catch (RequestError) {
-            if ($reflectionParameter->allowsNull()) {
-                return null;
-            }
-
             try {
-                return $reflectionParameter->getDefaultValue();
+                return $this->reflectionManager->getDefaultValue($reflectionParameter);
             } catch (ReflectionException $e) {
                 try {
                     $reflectionProperty = $reflectionParameter->getDeclaringClass()?->getProperty($reflectionParameter->getName());
@@ -109,18 +105,11 @@ class ObjectMapperAttribute implements AttributeServiceInterface, ParameterAttri
         }
 
         if ($value === null || $value === '') {
-            if ($reflectionParameter->allowsNull()) {
-                return null;
+            try {
+                return $this->reflectionManager->getDefaultValue($reflectionParameter);
+            } catch (ReflectionException $e) {
+                throw new MapperException($e->getMessage());
             }
-
-            if ($reflectionParameter->isOptional()) {
-                return $reflectionParameter->getDefaultValue();
-            }
-
-            throw new MapperException(sprintf(
-                'Parameter "%s" doesnt allows null!',
-                $reflectionParameter->getName()
-            ));
         }
 
         /** @psalm-suppress UndefinedMethod */

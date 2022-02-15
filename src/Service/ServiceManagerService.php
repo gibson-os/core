@@ -293,7 +293,7 @@ class ServiceManagerService
                 }
 
                 try {
-                    $parameters[$name] = $reflectionParameter->getDefaultValue();
+                    $parameters[$name] = $this->reflectionManager->getDefaultValue($reflectionParameter);
                 } catch (ReflectionException) {
                     throw new FactoryError(sprintf(
                         'Parameter %s of Class %s is no Class',

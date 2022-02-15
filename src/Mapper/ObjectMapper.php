@@ -34,23 +34,7 @@ class ObjectMapper implements ObjectMapperInterface
 
         foreach ($reflectionClass->getConstructor()?->getParameters() ?? [] as $reflectionParameter) {
             if (!array_key_exists($reflectionParameter->getName(), $properties)) {
-                if (!$reflectionParameter->isDefaultValueAvailable()) {
-                    $reflectionProperty = $reflectionClass->getProperty($reflectionParameter->getName());
-
-                    if (!$reflectionProperty->hasDefaultValue()) {
-                        throw new MapperException(sprintf(
-                            'Value for constructor parameter "%s" of class "%s" is missing!',
-                            $reflectionParameter->getName(),
-                            $className
-                        ));
-                    }
-
-                    $constructorParameters[] = $reflectionProperty->getDefaultValue();
-
-                    continue;
-                }
-
-                $constructorParameters[] = $reflectionParameter->getDefaultValue();
+                $constructorParameters[] = $this->reflectionManager->getDefaultValue($reflectionParameter);
 
                 continue;
             }
@@ -118,7 +102,11 @@ class ObjectMapper implements ObjectMapperInterface
                 $mapper = $this->serviceManagerService->get($attribute->getMapperClassName(), ObjectMapperInterface::class);
             }
 
-            if ($parameterTypeName === 'array' && $objectClassName !== null && $values !== null) {
+            if ($values === null) {
+                return $this->reflectionManager->getDefaultValue($reflectionParameter);
+            }
+
+            if ($parameterTypeName === 'array' && $objectClassName !== null) {
                 if (is_string($values)) {
                     $values = JsonUtility::decode($values);
                 }

@@ -141,4 +141,42 @@ class ReflectionManager
             $reflectionProperty->getDeclaringClass()->getName()
         ));
     }
+
+    /**
+     * @throws ReflectionException
+     */
+    public function getDefaultValue(ReflectionParameter $reflectionParameter): string|int|float|bool|null|array|object
+    {
+        if ($reflectionParameter->isDefaultValueAvailable()) {
+            return $reflectionParameter->getDefaultValue();
+        }
+
+        if ($reflectionParameter->allowsNull()) {
+            return null;
+        }
+
+        $reflectionClass = $reflectionParameter->getDeclaringClass();
+
+        if (!$reflectionClass) {
+            throw new ReflectionException(sprintf(
+                'Parameter "%s" has no class!',
+                $reflectionParameter->getName()
+            ));
+        }
+
+        try {
+            $reflectionProperty = $reflectionClass->getProperty($reflectionParameter->getName());
+
+            if ($reflectionProperty->hasDefaultValue()) {
+                return $reflectionProperty->getDefaultValue();
+            }
+        } catch (ReflectionException) {
+        }
+
+        throw new ReflectionException(sprintf(
+            'Parameter "%s" of class "%s" has no default value!',
+            $reflectionParameter->getName(),
+            $reflectionClass->getName()
+        ));
+    }
 }
