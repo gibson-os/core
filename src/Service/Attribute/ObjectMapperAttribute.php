@@ -83,23 +83,29 @@ class ObjectMapperAttribute implements AttributeServiceInterface, ParameterAttri
     ): array|bool|float|int|string|null {
         try {
             $value = $this->requestService->getRequestValue($requestKey ?? $reflectionParameter->getName());
-        } catch (RequestError $e) {
-            if ($reflectionParameter->isOptional()) {
-                try {
-                    return $reflectionParameter->getDefaultValue();
-                } catch (ReflectionException $e) {
-                    throw new MapperException($e->getMessage(), StatusCode::BAD_REQUEST, $e);
-                }
-            }
-
+        } catch (RequestError) {
             if ($reflectionParameter->allowsNull()) {
                 return null;
             }
 
-            throw new MapperException(sprintf(
-                'Parameter %s is not in request!',
-                $requestKey ?? $reflectionParameter->getName()
-            ), 0, $e);
+            try {
+                return $reflectionParameter->getDefaultValue();
+            } catch (ReflectionException $e) {
+                try {
+                    $reflectionProperty = $reflectionParameter->getDeclaringClass()?->getProperty($reflectionParameter->getName());
+
+                    if ($reflectionProperty === null || $reflectionProperty->hasDefaultValue()) {
+                        throw new MapperException(sprintf(
+                            'Parameter "%s" is not in request!',
+                            $requestKey ?? $reflectionParameter->getName()
+                        ), 0, $e);
+                    }
+
+                    return $reflectionProperty->getDefaultValue();
+                } catch (ReflectionException) {
+                    throw new MapperException($e->getMessage(), StatusCode::BAD_REQUEST, $e);
+                }
+            }
         }
 
         if ($value === null || $value === '') {
@@ -112,7 +118,7 @@ class ObjectMapperAttribute implements AttributeServiceInterface, ParameterAttri
             }
 
             throw new MapperException(sprintf(
-                'Parameter %s doesnt allows null!',
+                'Parameter "%s" doesnt allows null!',
                 $reflectionParameter->getName()
             ));
         }

@@ -9,6 +9,7 @@ use GibsonOS\Core\Exception\MapperException;
 use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Service\ServiceManagerService;
 use GibsonOS\Core\Utility\JsonUtility;
+use JsonException;
 use ReflectionException;
 use ReflectionParameter;
 
@@ -24,6 +25,7 @@ class ObjectMapper implements ObjectMapperInterface
      * @throws ReflectionException
      * @throws FactoryError
      * @throws MapperException
+     * @throws JsonException
      */
     public function mapToObject(string $className, array $properties): object
     {
@@ -33,11 +35,19 @@ class ObjectMapper implements ObjectMapperInterface
         foreach ($reflectionClass->getConstructor()?->getParameters() ?? [] as $reflectionParameter) {
             if (!array_key_exists($reflectionParameter->getName(), $properties)) {
                 if (!$reflectionParameter->isDefaultValueAvailable()) {
-                    throw new MapperException(sprintf(
-                        'Value for constructor parameter "%s" of class "%s" is missing!',
-                        $reflectionParameter->getName(),
-                        $className
-                    ));
+                    $reflectionProperty = $reflectionClass->getProperty($reflectionParameter->getName());
+
+                    if (!$reflectionProperty->hasDefaultValue()) {
+                        throw new MapperException(sprintf(
+                            'Value for constructor parameter "%s" of class "%s" is missing!',
+                            $reflectionParameter->getName(),
+                            $className
+                        ));
+                    }
+
+                    $constructorParameters[] = $reflectionProperty->getDefaultValue();
+
+                    continue;
                 }
 
                 $constructorParameters[] = $reflectionParameter->getDefaultValue();
@@ -88,6 +98,7 @@ class ObjectMapper implements ObjectMapperInterface
      * @throws MapperException
      * @throws ReflectionException
      * @throws FactoryError
+     * @throws JsonException
      */
     private function mapValueToObject(
         ReflectionParameter $reflectionParameter,
@@ -107,7 +118,7 @@ class ObjectMapper implements ObjectMapperInterface
                 $mapper = $this->serviceManagerService->get($attribute->getMapperClassName(), ObjectMapperInterface::class);
             }
 
-            if ($parameterTypeName === 'array' && $objectClassName !== null) {
+            if ($parameterTypeName === 'array' && $objectClassName !== null && $values !== null) {
                 if (is_string($values)) {
                     $values = JsonUtility::decode($values);
                 }
