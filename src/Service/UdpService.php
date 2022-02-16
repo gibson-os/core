@@ -11,7 +11,7 @@ use GibsonOS\Core\Exception\SetError;
 use Psr\Log\LoggerInterface;
 use Socket;
 
-class UdpService extends AbstractService
+class UdpService
 {
     private const MAX_CREATE_RETRY = 100;
 

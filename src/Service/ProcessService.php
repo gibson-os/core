@@ -6,7 +6,7 @@ namespace GibsonOS\Core\Service;
 use GibsonOS\Core\Exception\ProcessError;
 use Psr\Log\LoggerInterface;
 
-class ProcessService extends AbstractService
+class ProcessService
 {
     public function __construct(private LoggerInterface $logger)
     {

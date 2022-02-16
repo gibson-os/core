@@ -29,7 +29,7 @@ use ReflectionClassConstant;
 use ReflectionException;
 use ReflectionMethod;
 
-class EventService extends AbstractService
+class EventService
 {
     private array $events = [];
 

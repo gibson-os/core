@@ -8,7 +8,7 @@ use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Repository\User\PermissionViewRepository;
 
-class JavascriptService extends AbstractService
+class JavascriptService
 {
     private string $vendorPath;
 

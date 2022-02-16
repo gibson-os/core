@@ -5,7 +5,7 @@ namespace GibsonOS\Core\Service;
 
 use GibsonOS\Core\Event\NetworkEvent;
 
-class NetworkService extends AbstractService
+class NetworkService
 {
     public function __construct(private EventService $eventService)
     {

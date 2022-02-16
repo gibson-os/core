@@ -11,7 +11,7 @@ use GibsonOS\Core\Exception\FileNotFound;
 use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\SetError;
 
-class FileService extends AbstractService
+class FileService
 {
     public function __construct(private DirService $dir)
     {

@@ -10,13 +10,12 @@ use GibsonOS\Core\Exception\FactoryError;
 use GibsonOS\Core\Manager\ServiceManager;
 use GibsonOS\Core\Model\Event;
 use GibsonOS\Core\Model\Event\Element;
-use GibsonOS\Core\Service\AbstractService;
 use GibsonOS\Core\Utility\JsonUtility;
 use InvalidArgumentException;
 use JsonException;
 use Psr\Log\LoggerInterface;
 
-class ElementService extends AbstractService
+class ElementService
 {
     private const COMMAND_IF = 'if';
 

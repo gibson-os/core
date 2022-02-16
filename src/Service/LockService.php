@@ -13,7 +13,7 @@ use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\Lock;
 use GibsonOS\Core\Repository\LockRepository;
 
-class LockService extends AbstractService
+class LockService
 {
     public function __construct(private LockRepository $lockRepository, private ProcessService $processService)
     {

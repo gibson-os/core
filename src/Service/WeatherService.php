@@ -19,7 +19,7 @@ use GibsonOS\Core\Repository\WeatherRepository;
 use GibsonOS\Core\Utility\JsonUtility;
 use JsonException;
 
-class WeatherService extends AbstractService
+class WeatherService
 {
     public function __construct(private WebService $webService, private EnvService $envService, private WeatherMapper $weatherMapper, private DateTimeService $dateTimeService, private EventService $eventService, private WeatherRepository $weatherRepository)
     {

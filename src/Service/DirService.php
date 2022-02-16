@@ -6,7 +6,7 @@ namespace GibsonOS\Core\Service;
 use GibsonOS\Core\Exception\CreateError;
 use GibsonOS\Core\Exception\GetError;
 
-class DirService extends AbstractService
+class DirService
 {
     /**
      * @throws CreateError

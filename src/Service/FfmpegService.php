@@ -15,7 +15,7 @@ use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\Image\LoadError;
 use GibsonOS\Core\Exception\ProcessError;
 
-class FfmpegService extends AbstractService
+class FfmpegService
 {
     public string $ffpmegPath;
 

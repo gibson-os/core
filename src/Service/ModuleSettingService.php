@@ -12,7 +12,7 @@ use GibsonOS\Core\Repository\SettingRepository;
 /**
  * @deprecated
  */
-class ModuleSettingService extends AbstractService
+class ModuleSettingService
 {
     /**
      * @var Setting[][]|Setting[][][]

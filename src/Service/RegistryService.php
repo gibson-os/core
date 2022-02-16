@@ -8,7 +8,7 @@ use GibsonOS\Core\Exception\GetError;
 /**
  * @deprecated
  */
-class RegistryService extends AbstractService
+class RegistryService
 {
     private array $registry = [];
 

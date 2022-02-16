@@ -9,7 +9,7 @@ use GibsonOS\Core\Dto\Web\Response;
 use GibsonOS\Core\Exception\WebException;
 use Psr\Log\LoggerInterface;
 
-class WebService extends AbstractService
+class WebService
 {
     private const METHOD_GET = 'GET';
 

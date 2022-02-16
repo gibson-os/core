@@ -9,7 +9,7 @@ use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Repository\User\PermissionViewRepository;
 
-class CssService extends AbstractService
+class CssService
 {
     private string $vendorPath;
 

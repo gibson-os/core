@@ -9,7 +9,7 @@ use SQLite3;
 use SQLite3Result;
 use SQLite3Stmt;
 
-class SqLiteService extends AbstractService
+class SqLiteService
 {
     private SQLite3 $database;
 

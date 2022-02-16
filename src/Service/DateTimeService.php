@@ -9,7 +9,7 @@ use DateTimeZone;
 use Exception;
 use GibsonOS\Core\Attribute\GetEnv;
 
-class DateTimeService extends AbstractService
+class DateTimeService
 {
     private ?DateTimeZone $timezone;
 

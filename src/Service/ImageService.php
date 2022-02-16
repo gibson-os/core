@@ -11,7 +11,7 @@ use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\Image\CreateError;
 use GibsonOS\Core\Exception\Image\LoadError;
 
-class ImageService extends AbstractService
+class ImageService
 {
     public function __construct(private FileService $file)
     {

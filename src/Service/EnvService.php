@@ -6,7 +6,7 @@ namespace GibsonOS\Core\Service;
 use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\SetError;
 
-class EnvService extends AbstractService
+class EnvService
 {
     /**
      * @throws GetError
