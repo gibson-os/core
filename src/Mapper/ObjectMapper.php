@@ -7,7 +7,7 @@ use GibsonOS\Core\Attribute\ObjectMapper as ObjectMapperAttribute;
 use GibsonOS\Core\Exception\FactoryError;
 use GibsonOS\Core\Exception\MapperException;
 use GibsonOS\Core\Manager\ReflectionManager;
-use GibsonOS\Core\Service\ServiceManagerService;
+use GibsonOS\Core\Manager\ServiceManager;
 use GibsonOS\Core\Utility\JsonUtility;
 use JsonException;
 use ReflectionException;
@@ -16,7 +16,7 @@ use ReflectionParameter;
 class ObjectMapper implements ObjectMapperInterface
 {
     public function __construct(
-        private ServiceManagerService $serviceManagerService,
+        private ServiceManager $serviceManagerService,
         private ReflectionManager $reflectionManager
     ) {
     }

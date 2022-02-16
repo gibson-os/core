@@ -11,6 +11,7 @@ use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\MapperException;
 use GibsonOS\Core\Exception\RequestError;
 use GibsonOS\Core\Manager\ReflectionManager;
+use GibsonOS\Core\Manager\ServiceManager;
 use GibsonOS\Core\Service\Attribute\AbstractActionAttributeService;
 use GibsonOS\Core\Service\Attribute\ObjectMapperAttribute;
 use GibsonOS\Core\Service\Attribute\ParameterAttributeInterface;
@@ -29,7 +30,7 @@ use Throwable;
 class ControllerService
 {
     public function __construct(
-        private ServiceManagerService $serviceManagerService,
+        private ServiceManager $serviceManagerService,
         private RequestService $requestService,
         private StatusCode $statusCode,
         private TwigService $twigService,

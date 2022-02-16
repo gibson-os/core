@@ -10,12 +10,12 @@ use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\InstallException;
 use GibsonOS\Core\Exception\Model\SaveError;
 use GibsonOS\Core\Exception\Repository\SelectError;
+use GibsonOS\Core\Manager\ServiceManager;
 use GibsonOS\Core\Model\Setting;
 use GibsonOS\Core\Repository\ModuleRepository;
 use GibsonOS\Core\Repository\SettingRepository;
 use GibsonOS\Core\Service\DirService;
 use GibsonOS\Core\Service\EnvService;
-use GibsonOS\Core\Service\ServiceManagerService;
 use GibsonOS\Core\Utility\JsonUtility;
 use JsonException;
 use Psr\Log\LoggerInterface;
@@ -33,11 +33,11 @@ abstract class AbstractInstall implements InstallInterface
     protected LoggerInterface $logger;
 
     /**
-     * @param ServiceManagerService $serviceManagerService
+     * @param ServiceManager $serviceManagerService
      *
      * @throws FactoryError
      */
-    public function __construct(protected ServiceManagerService $serviceManagerService)
+    public function __construct(protected ServiceManager $serviceManagerService)
     {
         $this->dirService = $this->serviceManagerService->get(DirService::class);
         $this->envService = $this->serviceManagerService->get(EnvService::class);

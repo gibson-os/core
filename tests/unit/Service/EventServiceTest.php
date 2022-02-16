@@ -6,6 +6,7 @@ namespace GibsonOS\Core\Service;
 use Codeception\Test\Unit;
 use DateTime;
 use GibsonOS\Core\Event\AbstractEvent;
+use GibsonOS\Core\Manager\ServiceManager;
 use GibsonOS\Core\Model\Event\Element;
 use GibsonOS\Core\Repository\EventRepository;
 use GibsonOS\Core\Service\Event\ElementService;
@@ -23,7 +24,7 @@ class EventServiceTest extends Unit
     private $eventService;
 
     /**
-     * @var ServiceManagerService
+     * @var ServiceManager
      */
     private $serviceManagerService;
 
@@ -37,7 +38,7 @@ class EventServiceTest extends Unit
         putenv('TIMEZONE=Europe/Berlin');
         putenv('DATE_LATITUDE=51.2642156');
         putenv('DATE_LONGITUDE=6.8001438');
-        $this->serviceManagerService = new ServiceManagerService();
+        $this->serviceManagerService = new ServiceManager();
         $this->eventServiceRepository = $this->prophesize(EventRepository::class);
         $this->eventService = new EventService(
             $this->serviceManagerService,
@@ -85,7 +86,7 @@ class Marvin extends AbstractEvent
 {
     public function __construct(MarvinDescriber $describer)
     {
-        parent::__construct($describer, new ServiceManagerService());
+        parent::__construct($describer, new ServiceManager());
     }
 
     public function tears(): string

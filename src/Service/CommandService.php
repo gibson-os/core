@@ -10,6 +10,7 @@ use GibsonOS\Core\Exception\ArgumentError;
 use GibsonOS\Core\Exception\CommandError;
 use GibsonOS\Core\Exception\FactoryError;
 use GibsonOS\Core\Manager\ReflectionManager;
+use GibsonOS\Core\Manager\ServiceManager;
 use ReflectionAttribute;
 use ReflectionClass;
 use ReflectionException;
@@ -17,7 +18,7 @@ use ReflectionException;
 class CommandService
 {
     public function __construct(
-        private ServiceManagerService $serviceManager,
+        private ServiceManager $serviceManager,
         private ProcessService $processService,
         private ReflectionManager $reflectionManager
     ) {

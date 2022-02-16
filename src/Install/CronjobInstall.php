@@ -10,18 +10,18 @@ use GibsonOS\Core\Exception\FactoryError;
 use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\Model\SaveError;
 use GibsonOS\Core\Manager\ReflectionManager;
+use GibsonOS\Core\Manager\ServiceManager;
 use GibsonOS\Core\Service\Attribute\Install\CronjobInstallAttribute;
 use GibsonOS\Core\Service\AttributeService;
 use GibsonOS\Core\Service\InstallService;
 use GibsonOS\Core\Service\PriorityInterface;
-use GibsonOS\Core\Service\ServiceManagerService;
 use JsonException;
 use ReflectionException;
 
 class CronjobInstall extends AbstractInstall implements PriorityInterface
 {
     public function __construct(
-        ServiceManagerService $serviceManagerService,
+        ServiceManager $serviceManagerService,
         private AttributeService $attributeService,
         private ReflectionManager $reflectionManager
     ) {

@@ -7,15 +7,15 @@ use Generator;
 use GibsonOS\Core\Dto\Install\Success;
 use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\Model\SaveError;
+use GibsonOS\Core\Manager\ServiceManager;
 use GibsonOS\Core\Service\InstallService;
 use GibsonOS\Core\Service\ModuleService;
 use GibsonOS\Core\Service\PriorityInterface;
-use GibsonOS\Core\Service\ServiceManagerService;
 
 class ModuleInstall extends AbstractInstall implements PriorityInterface, SingleInstallInterface
 {
     public function __construct(
-        ServiceManagerService $serviceManagerService,
+        ServiceManager $serviceManagerService,
         private ModuleService $moduleService
     ) {
         parent::__construct($serviceManagerService);

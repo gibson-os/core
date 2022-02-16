@@ -12,11 +12,11 @@ use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\InstallException;
 use GibsonOS\Core\Install\AbstractInstall;
 use GibsonOS\Core\Manager\ReflectionManager;
+use GibsonOS\Core\Manager\ServiceManager;
 use GibsonOS\Core\Model\ModelInterface;
 use GibsonOS\Core\Service\Attribute\TableAttribute;
 use GibsonOS\Core\Service\InstallService;
 use GibsonOS\Core\Service\PriorityInterface;
-use GibsonOS\Core\Service\ServiceManagerService;
 use function mb_substr;
 use mysqlDatabase;
 use ReflectionException;
@@ -24,7 +24,7 @@ use ReflectionException;
 class KeyInstall extends AbstractInstall implements PriorityInterface
 {
     public function __construct(
-        ServiceManagerService $serviceManagerService,
+        ServiceManager $serviceManagerService,
         private mysqlDatabase $mysqlDatabase,
         private TableAttribute $tableAttribute,
         private ReflectionManager $reflectionManager

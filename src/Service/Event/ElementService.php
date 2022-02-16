@@ -7,10 +7,10 @@ use GibsonOS\Core\Event\AbstractEvent;
 use GibsonOS\Core\Exception\DateTimeError;
 use GibsonOS\Core\Exception\EventException;
 use GibsonOS\Core\Exception\FactoryError;
+use GibsonOS\Core\Manager\ServiceManager;
 use GibsonOS\Core\Model\Event;
 use GibsonOS\Core\Model\Event\Element;
 use GibsonOS\Core\Service\AbstractService;
-use GibsonOS\Core\Service\ServiceManagerService;
 use GibsonOS\Core\Utility\JsonUtility;
 use InvalidArgumentException;
 use JsonException;
@@ -42,7 +42,7 @@ class ElementService extends AbstractService
 
     private const OPERATOR_SET = '=';
 
-    public function __construct(private LoggerInterface $logger, private ServiceManagerService $serviceManagerService)
+    public function __construct(private LoggerInterface $logger, private ServiceManager $serviceManagerService)
     {
     }
 

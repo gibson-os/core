@@ -1,18 +1,20 @@
 <?php
 declare(strict_types=1);
 
-namespace GibsonOS\Core\Service;
+namespace GibsonOS\Core\Manager;
 
 use GibsonOS\Core\Exception\FactoryError;
 use GibsonOS\Core\Exception\GetError;
-use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Service\Attribute\ParameterAttributeInterface;
+use GibsonOS\Core\Service\AttributeService;
+use GibsonOS\Core\Service\DirService;
+use function mb_strpos;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionMethod;
 use ReflectionNamedType;
 
-class ServiceManagerService
+class ServiceManager
 {
     /**
      * @var array<class-string, object>

@@ -15,6 +15,7 @@ use GibsonOS\Core\Exception\EventException;
 use GibsonOS\Core\Exception\FactoryError;
 use GibsonOS\Core\Exception\Model\SaveError;
 use GibsonOS\Core\Manager\ReflectionManager;
+use GibsonOS\Core\Manager\ServiceManager;
 use GibsonOS\Core\Model\AutoCompleteModelInterface;
 use GibsonOS\Core\Model\Event;
 use GibsonOS\Core\Repository\EventRepository;
@@ -33,7 +34,7 @@ class EventService extends AbstractService
     private array $events = [];
 
     public function __construct(
-        private ServiceManagerService $serviceManagerService,
+        private ServiceManager $serviceManagerService,
         private EventRepository $eventRepository,
         private ElementService $elementService,
         private CommandService $commandService,

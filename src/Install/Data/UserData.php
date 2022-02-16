@@ -10,17 +10,17 @@ use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Exception\UserError;
 use GibsonOS\Core\Install\AbstractInstall;
 use GibsonOS\Core\Install\SingleInstallInterface;
+use GibsonOS\Core\Manager\ServiceManager;
 use GibsonOS\Core\Model\User;
 use GibsonOS\Core\Repository\UserRepository;
 use GibsonOS\Core\Service\InstallService;
 use GibsonOS\Core\Service\PriorityInterface;
-use GibsonOS\Core\Service\ServiceManagerService;
 use GibsonOS\Core\Service\UserService;
 
 class UserData extends AbstractInstall implements PriorityInterface, SingleInstallInterface
 {
     public function __construct(
-        ServiceManagerService $serviceManagerService,
+        ServiceManager $serviceManagerService,
         private UserRepository $userRepository,
         private UserService $userService
     ) {

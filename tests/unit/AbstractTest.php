@@ -4,12 +4,12 @@ declare(strict_types=1);
 namespace GibsonOS\UnitTest;
 
 use Codeception\Test\Unit;
-use GibsonOS\Core\Service\ServiceManagerService;
+use GibsonOS\Core\Manager\ServiceManager;
 
 class AbstractTest extends Unit
 {
     /**
-     * @var ServiceManagerService
+     * @var ServiceManager
      */
     protected $serviceManagerService;
 
@@ -17,7 +17,7 @@ class AbstractTest extends Unit
     {
         parent::__construct($name, $data, $dataName);
 
-        $this->serviceManagerService = new ServiceManagerService();
+        $this->serviceManagerService = new ServiceManager();
         putenv('TIMEZONE=Europe/Berlin');
         putenv('MYSQL_HOST=gos_mysql');
         putenv('MYSQL_DATABASE=gibson_os_test');

@@ -8,15 +8,15 @@ use GibsonOS\Core\Attribute\GetClassNames;
 use GibsonOS\Core\Attribute\GetServices;
 use GibsonOS\Core\Exception\FactoryError;
 use GibsonOS\Core\Exception\GetError;
+use GibsonOS\Core\Manager\ServiceManager;
 use GibsonOS\Core\Service\DirService;
 use GibsonOS\Core\Service\PriorityInterface;
-use GibsonOS\Core\Service\ServiceManagerService;
 use ReflectionParameter;
 
 class ServiceAttribute implements ParameterAttributeInterface, AttributeServiceInterface
 {
     public function __construct(
-        private ServiceManagerService $serviceManagerService,
+        private ServiceManager $serviceManagerService,
         private DirService $dirService
     ) {
     }
