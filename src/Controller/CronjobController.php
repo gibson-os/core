@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Controller;
 
 use GibsonOS\Core\Attribute\CheckPermission;
-use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\User\Permission;
 use GibsonOS\Core\Service\Response\AjaxResponse;
@@ -14,7 +13,6 @@ use GibsonOS\Core\Store\CronjobStore;
 class CronjobController extends AbstractController
 {
     /**
-     * @throws GetError
      * @throws SelectError
      */
     #[CheckPermission(Permission::READ)]
@@ -26,6 +24,9 @@ class CronjobController extends AbstractController
         return $this->returnSuccess($cronjobStore->getList(), $cronjobStore->getCount());
     }
 
+    /**
+     * @throws SelectError
+     */
     #[CheckPermission(Permission::READ)]
     public function times(TimeStore $timeStore): AjaxResponse
     {

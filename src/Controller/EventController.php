@@ -124,15 +124,13 @@ class EventController extends AbstractController
         bool $async,
         array $elements,
         array $triggers,
-        int $eventId = null
+        #[GetModel(['id' => 'eventId'])] Event $event = null
     ): AjaxResponse {
         $eventRepository->startTransaction();
 
         try {
-            $event = new Event();
-
-            if (!empty($eventId)) {
-                $event = $eventRepository->getById($eventId);
+            if ($event === null) {
+                $event = new Event();
             }
 
             $event
@@ -181,7 +179,7 @@ class EventController extends AbstractController
      * @throws DeleteError
      */
     #[CheckPermission(Permission::DELETE)]
-    public function delete(EventRepository $eventRepository, #[GetModel(['id' => 'eventId'])] $event): AjaxResponse
+    public function delete(#[GetModel(['id' => 'eventId'])] $event): AjaxResponse
     {
         $event->delete();
 
