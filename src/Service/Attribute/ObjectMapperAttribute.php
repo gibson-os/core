@@ -5,6 +5,7 @@ namespace GibsonOS\Core\Service\Attribute;
 
 use GibsonOS\Core\Attribute\AttributeInterface;
 use GibsonOS\Core\Attribute\GetObject;
+use GibsonOS\Core\Exception\FactoryError;
 use GibsonOS\Core\Exception\MapperException;
 use GibsonOS\Core\Exception\RequestError;
 use GibsonOS\Core\Manager\ReflectionManager;
@@ -30,8 +31,9 @@ class ObjectMapperAttribute implements AttributeServiceInterface, ParameterAttri
      * @throws MapperException
      * @throws ReflectionException
      * @throws JsonException
+     * @throws FactoryError
      */
-    public function replace(AttributeInterface $attribute, array $parameters, ReflectionParameter $reflectionParameter): mixed
+    public function replace(AttributeInterface $attribute, array $parameters, ReflectionParameter $reflectionParameter): ?object
     {
         if (!$attribute instanceof GetObject) {
             return null;
@@ -50,15 +52,20 @@ class ObjectMapperAttribute implements AttributeServiceInterface, ParameterAttri
 
         $reflectionClass = $this->reflectionManager->getReflectionClass($objectClassName);
         $objectParameters = [];
+        $constructorProperties = [];
 
         foreach ($reflectionClass->getConstructor()?->getParameters() ?? [] as $reflectionParameter) {
             $parameterName = $reflectionParameter->getName();
             $requestKey = $attribute->getMapping()[$parameterName] ?? $parameterName;
             $objectParameters[$parameterName] = $this->getParameterFromRequest($reflectionParameter, $requestKey);
+            $constructorProperties[] = $parameterName;
         }
 
         foreach ($reflectionClass->getMethods(ReflectionMethod::IS_PUBLIC) as $reflectionMethod) {
-            if (mb_strpos($reflectionMethod->getName(), 'set') !== 0) {
+            if (
+                mb_strpos($reflectionMethod->getName(), 'set') !== 0 &&
+                !in_array(lcfirst($reflectionMethod->getName()), $constructorProperties)
+            ) {
                 continue;
             }
 
@@ -75,7 +82,6 @@ class ObjectMapperAttribute implements AttributeServiceInterface, ParameterAttri
     /**
      * @throws JsonException
      * @throws MapperException
-     * @throws ReflectionException
      */
     public function getParameterFromRequest(
         ReflectionParameter $reflectionParameter,
@@ -121,7 +127,7 @@ class ObjectMapperAttribute implements AttributeServiceInterface, ParameterAttri
             'array' => !is_array($value) ? (array) JsonUtility::decode($value) : $value,
             default => throw new MapperException(sprintf(
                 'Type %s of parameter %s for %s::%s is not allowed!',
-                (string) $reflectionParameter->getType(),
+                $reflectionParameter->getType()?->getName() ?? 'null',
                 $reflectionParameter->getName(),
                 $reflectionParameter->getDeclaringClass() === null ? '' : $reflectionParameter->getDeclaringClass()->getName(),
                 $reflectionParameter->getDeclaringFunction()->getName()
