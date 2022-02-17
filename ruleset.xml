@@ -38,5 +38,5 @@
         <properties>
             <property name="maximum" description="The variable length reporting threshold" value="40" />
         </properties>
-    </rule>s
+    </rule>
 </ruleset>

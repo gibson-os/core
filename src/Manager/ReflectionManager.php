@@ -12,7 +12,7 @@ use ReflectionProperty;
 
 class ReflectionManager
 {
-    private const GETTER_PREFIXES = ['get', 'is', 'has'];
+    private const GETTER_PREFIXES = ['get', 'is', 'has', 'should'];
 
     /**
      * @var array<class-string, ReflectionClass>
