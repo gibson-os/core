@@ -92,6 +92,10 @@ class ObjectMapper implements ObjectMapperInterface
         /** @psalm-suppress UndefinedMethod */
         $parameterTypeName = $reflectionParameter->getType()?->getName();
 
+        if (is_object($values)) {
+            return $values;
+        }
+
         /** @psalm-suppress UndefinedMethod */
         if ($attribute !== null || !$reflectionParameter->getType()?->isBuiltin()) {
             $mapper = $this;

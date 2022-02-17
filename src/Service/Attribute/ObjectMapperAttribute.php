@@ -57,14 +57,16 @@ class ObjectMapperAttribute implements AttributeServiceInterface, ParameterAttri
         foreach ($reflectionClass->getConstructor()?->getParameters() ?? [] as $reflectionParameter) {
             $parameterName = $reflectionParameter->getName();
             $requestKey = $attribute->getMapping()[$parameterName] ?? $parameterName;
-            $objectParameters[$parameterName] = $this->getParameterFromRequest($reflectionParameter, $requestKey);
+            $objectParameters[$parameterName] = $parameters[$requestKey]
+                ?? $this->getParameterFromRequest($reflectionParameter, $requestKey)
+            ;
             $constructorProperties[] = $parameterName;
         }
 
         foreach ($reflectionClass->getMethods(ReflectionMethod::IS_PUBLIC) as $reflectionMethod) {
             if (
                 mb_strpos($reflectionMethod->getName(), 'set') !== 0 &&
-                !in_array(lcfirst($reflectionMethod->getName()), $constructorProperties)
+                !in_array(lcfirst(mb_substr($reflectionMethod->getName(), 3)), $constructorProperties)
             ) {
                 continue;
             }
@@ -72,7 +74,9 @@ class ObjectMapperAttribute implements AttributeServiceInterface, ParameterAttri
             foreach ($reflectionMethod->getParameters() as $reflectionParameter) {
                 $parameterName = $reflectionParameter->getName();
                 $requestKey = $attribute->getMapping()[$parameterName] ?? $parameterName;
-                $objectParameters[$parameterName] = $this->getParameterFromRequest($reflectionParameter, $requestKey);
+                $objectParameters[$parameterName] = $parameters[$requestKey]
+                    ?? $this->getParameterFromRequest($reflectionParameter, $requestKey)
+                ;
             }
         }
 
