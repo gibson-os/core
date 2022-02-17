@@ -149,7 +149,7 @@ class UserController extends AbstractController
         $this->checkUserPermission($id, Permission::WRITE, $userPermission);
 
         if (empty($username)) {
-            return $this->returnFailure(['msg' => 'Benutzername ist leer.']);
+            return $this->returnFailure('Benutzername ist leer.');
         }
 
         $user = new User();
