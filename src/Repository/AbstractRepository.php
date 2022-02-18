@@ -31,6 +31,13 @@ abstract class AbstractRepository
         $database->rollback();
     }
 
+    public function isTransaction(mysqlDatabase $database = null): bool
+    {
+        $database = $this->getDatabase($database);
+
+        return $database->isTransaction();
+    }
+
     /**
      * @template T of AbstractModel
      *

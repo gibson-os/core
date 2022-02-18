@@ -140,6 +140,10 @@ class ObjectMapper implements ObjectMapperInterface
             );
         }
 
+        if ($values === null && !$reflectionParameter->allowsNull()) {
+            return $this->reflectionManager->getDefaultValue($reflectionParameter);
+        }
+
         return $values;
     }
 }
