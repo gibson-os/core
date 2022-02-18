@@ -66,27 +66,11 @@ class ObjectMapper implements ObjectMapperInterface
         $reflectionClass = $this->reflectionManager->getReflectionClass($object);
 
         foreach ($properties as $key => $value) {
-            $setter = 'set' . ucfirst($key);
-
-            try {
-                $reflectionMethod = $reflectionClass->getMethod($setter);
-            } catch (ReflectionException) {
-                throw new MapperException(sprintf(
-                    'Setter for property "%s" of class "%s" not found!',
-                    $key,
-                    $object::class
-                ));
-            }
-
-            if (count($reflectionMethod->getParameters()) === 0) {
-                throw new MapperException(sprintf(
-                    'Setter for property "%s" of class "%s" has nor parameters!',
-                    $key,
-                    $object::class
-                ));
-            }
-
-            $object->$setter($this->mapValueToObject($reflectionMethod->getParameters()[0], $value));
+            $this->reflectionManager->setProperty(
+                $reflectionClass->getProperty($key),
+                $object,
+                $this->mapValueToObject($reflectionClass->getMethod('set' . ucfirst($key))->getParameters()[0], $value)
+            );
         }
 
         return $object;
