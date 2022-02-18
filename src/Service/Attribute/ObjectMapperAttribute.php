@@ -21,7 +21,7 @@ use ReflectionParameter;
 class ObjectMapperAttribute implements AttributeServiceInterface, ParameterAttributeInterface
 {
     public function __construct(
-        private ObjectMapper $objectMapper,
+        protected ObjectMapper $objectMapper,
         private RequestService $requestService,
         private ReflectionManager $reflectionManager
     ) {

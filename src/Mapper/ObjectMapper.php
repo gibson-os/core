@@ -45,6 +45,25 @@ class ObjectMapper implements ObjectMapperInterface
         }
 
         $object = new $className(...$constructorParameters);
+        $this->setObjectValues($object, $properties);
+
+        return $object;
+    }
+
+    public function mapFromObject(object $object): array
+    {
+        return [];
+    }
+
+    /**
+     * @throws FactoryError
+     * @throws JsonException
+     * @throws MapperException
+     * @throws ReflectionException
+     */
+    public function setObjectValues(object $object, array $properties): object
+    {
+        $reflectionClass = $this->reflectionManager->getReflectionClass($object);
 
         foreach ($properties as $key => $value) {
             $setter = 'set' . ucfirst($key);
@@ -55,7 +74,7 @@ class ObjectMapper implements ObjectMapperInterface
                 throw new MapperException(sprintf(
                     'Setter for property "%s" of class "%s" not found!',
                     $key,
-                    $className
+                    $object::class
                 ));
             }
 
@@ -63,7 +82,7 @@ class ObjectMapper implements ObjectMapperInterface
                 throw new MapperException(sprintf(
                     'Setter for property "%s" of class "%s" has nor parameters!',
                     $key,
-                    $className
+                    $object::class
                 ));
             }
 
@@ -71,11 +90,6 @@ class ObjectMapper implements ObjectMapperInterface
         }
 
         return $object;
-    }
-
-    public function mapFromObject(object $object): array
-    {
-        return [];
     }
 
     /**
