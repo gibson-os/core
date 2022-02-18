@@ -24,6 +24,7 @@ use mysqlDatabase;
 use ReflectionAttribute;
 use ReflectionException;
 use stdClass;
+use UnitEnum;
 
 class TableInstall extends AbstractInstall implements PriorityInterface
 {
@@ -147,6 +148,17 @@ class TableInstall extends AbstractInstall implements PriorityInterface
                     ;
                 }
 
+                if (
+                    $columnAttribute->getType() === Column::TYPE_ENUM &&
+                    count($columnAttribute->getValues()) === 0
+                ) {
+                    $reflectionEnum = $this->reflectionManager->getReflectionEnum($type);
+                    $columnAttribute->setValues(array_map(
+                        fn (UnitEnum $enum): string => (string) $enum->value,
+                        $type::cases()
+                    ));
+                }
+
                 $columnsAttributes[$columnAttribute->getName() ?? ''] = $columnAttribute;
             }
 
@@ -235,14 +247,14 @@ class TableInstall extends AbstractInstall implements PriorityInterface
 
     private function mapType(string $type): string
     {
-        /** @psalm-suppress UndefinedMethod */
         return match ($type) {
             'int' => Column::TYPE_BIGINT,
-            'float' => Column::TYPE_FLOAT,
-            'bool' => Column::TYPE_TINYINT,
-            'array' => Column::TYPE_JSON,
-            'string' => Column::TYPE_VARCHAR,
-            DateTimeInterface::class, DateTime::class, DateTimeImmutable::class => Column::TYPE_DATETIME,
+                'float' => Column::TYPE_FLOAT,
+                'bool' => Column::TYPE_TINYINT,
+                'array' => Column::TYPE_JSON,
+                'string' => Column::TYPE_VARCHAR,
+                DateTimeInterface::class, DateTime::class, DateTimeImmutable::class => Column::TYPE_DATETIME,
+                default => enum_exists($type) ? Column::TYPE_ENUM : Column::TYPE_VARCHAR
         };
     }
 

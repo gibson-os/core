@@ -7,6 +7,7 @@ use GibsonOS\Core\Attribute\Install\Database\Column;
 use GibsonOS\Core\Attribute\Install\Database\Constraint;
 use GibsonOS\Core\Attribute\Install\Database\Key;
 use GibsonOS\Core\Attribute\Install\Database\Table;
+use GibsonOS\Core\Dto\Event\Command;
 use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Model\Event;
 use GibsonOS\Core\Utility\JsonUtility;
@@ -61,8 +62,8 @@ class Element extends AbstractModel implements Serializable, JsonSerializable
     #[Column(type: Column::TYPE_JSON)]
     private ?string $parameters = null;
 
-    #[Column(type: Column::TYPE_ENUM, values: ['if', 'else', 'else_if', 'while', 'do_while'])]
-    private ?string $command = null;
+    #[Column]
+    private ?Command $command = null;
 
     #[Column(type: Column::TYPE_JSON)]
     private ?string $returns = null;
@@ -169,12 +170,12 @@ class Element extends AbstractModel implements Serializable, JsonSerializable
         return $this;
     }
 
-    public function getCommand(): ?string
+    public function getCommand(): ?Command
     {
         return $this->command;
     }
 
-    public function setCommand(?string $command): Element
+    public function setCommand(?Command $command): Element
     {
         $this->command = $command;
 

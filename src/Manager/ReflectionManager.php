@@ -5,6 +5,7 @@ namespace GibsonOS\Core\Manager;
 
 use ReflectionClass;
 use ReflectionClassConstant;
+use ReflectionEnum;
 use ReflectionException;
 use ReflectionMethod;
 use ReflectionParameter;
@@ -18,6 +19,11 @@ class ReflectionManager
      * @var array<class-string, ReflectionClass>
      */
     private array $classes = [];
+
+    /**
+     * @var array<class-string, ReflectionEnum>
+     */
+    private array $enums = [];
 
     /**
      * @param class-string|object $objectOrClass
@@ -37,6 +43,26 @@ class ReflectionManager
         }
 
         return $this->classes[$className];
+    }
+
+    /**
+     * @param class-string|object $objectOrClass
+     *
+     * @throws ReflectionException
+     */
+    public function getReflectionEnum(string|object $objectOrClass): ReflectionEnum
+    {
+        $className = $objectOrClass;
+
+        if (is_object($className)) {
+            $className = $className::class;
+        }
+
+        if (!isset($this->enums[$className])) {
+            $this->enums[$className] = new ReflectionEnum($objectOrClass);
+        }
+
+        return $this->enums[$className];
     }
 
     /**

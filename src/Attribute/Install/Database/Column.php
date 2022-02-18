@@ -179,6 +179,13 @@ class Column
         return $this->values;
     }
 
+    public function setValues(array $values): Column
+    {
+        $this->values = $values;
+
+        return $this;
+    }
+
     public function isAutoIncrement(): bool
     {
         return $this->autoIncrement;
