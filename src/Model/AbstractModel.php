@@ -117,12 +117,17 @@ abstract class AbstractModel implements ModelInterface
         return mb_strtolower(preg_replace('/([A-Z])/', '_$1', $name));
     }
 
+    /**
+     * @throws ReflectionException
+     */
     public function loadFromMysqlTable(mysqlTable $mysqlTable): void
     {
         foreach ($mysqlTable->fields as $field) {
             $fieldName = $this->transformFieldName($field);
 
-            if (!method_exists($this, 'set' . $fieldName)) {
+            $setter = 'set' . $fieldName;
+
+            if (!method_exists($this, $setter)) {
                 continue;
             }
 
@@ -130,29 +135,44 @@ abstract class AbstractModel implements ModelInterface
             $fieldObject = $mysqlTable->{$field};
 
             if ($fieldObject->getValue() === null) {
-                $this->{'set' . $fieldName}($fieldObject->getValue());
+                $this->$setter($fieldObject->getValue());
             } else {
                 switch ($this->getColumnType($fieldObject->getType())) {
                     case self::TYPE_INT:
                         try {
-                            $this->{'set' . $fieldName}((int) $fieldObject->getValue());
+                            $this->$setter((int) $fieldObject->getValue());
                         } catch (Throwable) {
-                            $this->{'set' . $fieldName}((bool) $fieldObject->getValue());
+                            $this->$setter((bool) $fieldObject->getValue());
                         }
 
                         break;
                     case self::TYPE_FLOAT:
-                        $this->{'set' . $fieldName}((float) $fieldObject->getValue());
+                        $this->$setter((float) $fieldObject->getValue());
 
                         break;
                     case self::TYPE_DATE_TIME:
-                        $this->{'set' . $fieldName}($this->dateTime->get(
+                        $this->$setter($this->dateTime->get(
                             strtoupper((string) $fieldObject->getValue()) === 'CURRENT_TIMESTAMP()' ? 'now' : (string) $fieldObject->getValue()
                         ));
 
                         break;
                     default:
-                        $this->{'set' . $fieldName}($fieldObject->getValue());
+                        if (mb_strpos(mb_strtolower($fieldObject->getType()), 'enum') === 0) {
+                            $reflectionParameter = (new ReflectionClass($this::class))
+                                ->getMethod($setter)
+                                ->getParameters()[0]
+                            ;
+                            /** @psalm-suppress UndefinedMethod */
+                            $enumClassName = $reflectionParameter->getType()?->getName();
+
+                            if (enum_exists($enumClassName)) {
+                                $this->$setter($enumClassName::from($fieldObject->getValue()));
+
+                                return;
+                            }
+                        }
+
+                        $this->$setter($fieldObject->getValue());
 
                         break;
                 }
@@ -191,6 +211,8 @@ abstract class AbstractModel implements ModelInterface
             if ($this->getColumnType($fieldObject->getType()) === self::TYPE_DATE_TIME) {
                 $fieldObject->setValue($value->format('Y-m-d H:i:s'));
                 $this->{'set' . $fieldName}($this->dateTime->get((string) $fieldObject->getValue()));
+            } elseif (enum_exists($value)) {
+                $fieldObject->setValue($value->value);
             } else {
                 $fieldObject->setValue(is_bool($value) ? (int) $value : $value);
             }

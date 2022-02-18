@@ -245,6 +245,9 @@ class TableInstall extends AbstractInstall implements PriorityInterface
         return 700;
     }
 
+    /**
+     * @param class-string $type
+     */
     private function mapType(string $type): string
     {
         return match ($type) {

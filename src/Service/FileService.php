@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Service;
 
+use finfo;
 use GibsonOS\Core\Exception\CreateError;
 use GibsonOS\Core\Exception\DeleteError;
 use GibsonOS\Core\Exception\File\OpenError;
@@ -293,7 +294,7 @@ class FileService
     {
         $fileInfo = finfo_open(FILEINFO_MIME_TYPE);
 
-        if (!is_resource($fileInfo)) {
+        if (!$fileInfo instanceof finfo) {
             throw new GetError(sprintf('Content Type für %s konnte nicht ermittelt werden!', $filename));
         }
 
