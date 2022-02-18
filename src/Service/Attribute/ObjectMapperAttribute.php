@@ -50,6 +50,21 @@ class ObjectMapperAttribute implements AttributeServiceInterface, ParameterAttri
             return null;
         }
 
+        return $this->objectMapper->mapToObject(
+            $objectClassName,
+            $this->getObjectParameters($attribute, $objectClassName, $parameters)
+        );
+    }
+
+    /**
+     * @param class-string $objectClassName
+     *
+     * @throws JsonException
+     * @throws MapperException
+     * @throws ReflectionException
+     */
+    protected function getObjectParameters(GetObject $attribute, string $objectClassName, array $parameters): array
+    {
         $reflectionClass = $this->reflectionManager->getReflectionClass($objectClassName);
         $objectParameters = [];
         $constructorProperties = [];
@@ -80,7 +95,7 @@ class ObjectMapperAttribute implements AttributeServiceInterface, ParameterAttri
             }
         }
 
-        return $this->objectMapper->mapToObject($objectClassName, $objectParameters);
+        return $objectParameters;
     }
 
     /**
