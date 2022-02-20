@@ -211,7 +211,7 @@ abstract class AbstractModel implements ModelInterface
             if ($this->getColumnType($fieldObject->getType()) === self::TYPE_DATE_TIME) {
                 $fieldObject->setValue($value->format('Y-m-d H:i:s'));
                 $this->{'set' . $fieldName}($this->dateTime->get((string) $fieldObject->getValue()));
-            } elseif (enum_exists($value)) {
+            } elseif (is_object($value) && enum_exists($value::class)) {
                 $fieldObject->setValue($value->value);
             } else {
                 $fieldObject->setValue(is_bool($value) ? (int) $value : $value);
