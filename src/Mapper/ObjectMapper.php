@@ -91,6 +91,10 @@ class ObjectMapper implements ObjectMapperInterface
         $parameterTypeName = $reflectionParameter->getType()?->getName();
 
         if (is_object($values)) {
+            if (enum_exists($values::class)) {
+                return $values->value;
+            }
+
             return $values;
         }
 
