@@ -175,7 +175,7 @@ class EventRepository extends AbstractRepository
                 ->setParentId($parentId)
                 ->setClass($element['className'])
                 ->setMethod($element['method'])
-                ->setCommand($element['command'] ? Command::from($element['command']) : null)
+                ->setCommand($element['command'] === null ? null : Command::from($element['command']))
                 ->setParameters(
                     empty($element['parameters']) ? null : $this->jsonUtility->encode($element['parameters'])
                 )
@@ -305,7 +305,7 @@ class EventRepository extends AbstractRepository
                 ->setClass($event->elementClass)
                 ->setMethod($event->elementMethod)
                 ->setParameters($event->elementParameters)
-                ->setCommand(Command::from($event->elementCommand))
+                ->setCommand($event->elementCommand === null ? null : Command::from($event->elementCommand))
                 ->setReturns($event->elementReturns)
                 ->setChildren([])
             ;
