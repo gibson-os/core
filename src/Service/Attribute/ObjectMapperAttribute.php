@@ -89,9 +89,14 @@ class ObjectMapperAttribute implements AttributeServiceInterface, ParameterAttri
             foreach ($reflectionMethod->getParameters() as $reflectionParameter) {
                 $parameterName = $reflectionParameter->getName();
                 $requestKey = $attribute->getMapping()[$parameterName] ?? $parameterName;
-                $objectParameters[$parameterName] = $parameters[$requestKey]
-                    ?? $this->getParameterFromRequest($reflectionParameter, $requestKey)
-                ;
+
+                try {
+                    $this->requestService->getRequestValue($requestKey);
+                    $objectParameters[$parameterName] = $parameters[$requestKey]
+                        ?? $this->getParameterFromRequest($reflectionParameter, $requestKey)
+                    ;
+                } catch (RequestError) {
+                }
             }
         }
 
@@ -115,7 +120,7 @@ class ObjectMapperAttribute implements AttributeServiceInterface, ParameterAttri
                 try {
                     $reflectionProperty = $reflectionParameter->getDeclaringClass()?->getProperty($reflectionParameter->getName());
 
-                    if ($reflectionProperty === null || $reflectionProperty->hasDefaultValue()) {
+                    if ($reflectionProperty === null || !$reflectionProperty->hasDefaultValue()) {
                         throw new MapperException(sprintf(
                             'Parameter "%s" is not in request!',
                             $requestKey ?? $reflectionParameter->getName()

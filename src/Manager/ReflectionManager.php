@@ -190,13 +190,14 @@ class ReflectionManager
             ));
         }
 
-        try {
-            $reflectionProperty = $reflectionClass->getProperty($reflectionParameter->getName());
+        foreach ($reflectionClass->getProperties() as $reflectionProperty) {
+            if ((string) $reflectionProperty->getType() !== (string) $reflectionParameter->getType()) {
+                continue;
+            }
 
-            if ($reflectionProperty->hasDefaultValue()) {
+            if ($reflectionProperty->isPromoted() && $reflectionProperty->hasDefaultValue()) {
                 return $reflectionProperty->getDefaultValue();
             }
-        } catch (ReflectionException) {
         }
 
         throw new ReflectionException(sprintf(
