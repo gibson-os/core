@@ -11,7 +11,7 @@ class RequestService
 
     public const METHOD_POST = 'POST';
 
-    private array $requestValues = [];
+    private array $requestValues;
 
     private string $moduleName;
 
@@ -112,7 +112,7 @@ class RequestService
     public function getRequestValue(string $key)
     {
         if (!isset($this->requestValues[$key])) {
-            throw new RequestError(sprintf('Request key %d not exists!', $key));
+            throw new RequestError(sprintf('Request key "%s" not exists!', $key));
         }
 
         return $this->requestValues[$key];

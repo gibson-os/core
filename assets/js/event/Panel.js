@@ -43,7 +43,7 @@ Ext.define('GibsonOS.module.core.event.Panel', {
             let data = {
                 id: element.get('id'),
                 command: element.get('command'),
-                className: element.get('className'),
+                'class': element.get('className'),
                 method: element.get('method'),
                 parameters: {},
                 returns: {},
@@ -78,7 +78,7 @@ Ext.define('GibsonOS.module.core.event.Panel', {
         const getTriggerAjaxData = (trigger) => {
             let data = {
                 id: trigger.get('id'),
-                className: trigger.get('className'),
+                'class': trigger.get('className'),
                 trigger: trigger.get('trigger'),
                 parameters: {},
                 weekday: trigger.get('weekday'),

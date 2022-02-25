@@ -14,7 +14,6 @@ use GibsonOS\Core\Model\AutoCompleteModelInterface;
 use GibsonOS\Core\Model\Event;
 use GibsonOS\Core\Model\Event\Element;
 use GibsonOS\Core\Service\EventService;
-use GibsonOS\Core\Utility\JsonUtility;
 use JsonException;
 use ReflectionAttribute;
 use ReflectionException;
@@ -93,7 +92,7 @@ abstract class AbstractEvent
             );
         }
 
-        $parameters = JsonUtility::decode($element->getParameters() ?? '[]');
+        $parameters = $element->getParameters();
 
         foreach ($methodParameters as $parameterName => $methodParameter) {
             if (

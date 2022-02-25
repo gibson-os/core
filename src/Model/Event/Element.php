@@ -10,7 +10,6 @@ use GibsonOS\Core\Attribute\Install\Database\Table;
 use GibsonOS\Core\Dto\Event\Command;
 use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Model\Event;
-use GibsonOS\Core\Utility\JsonUtility;
 use JsonException;
 use JsonSerializable;
 use Serializable;
@@ -59,14 +58,14 @@ class Element extends AbstractModel implements Serializable, JsonSerializable
      */
     private ?string $methodTitle = null;
 
-    #[Column(type: Column::TYPE_JSON)]
-    private ?string $parameters = null;
+    #[Column]
+    private array $parameters = [];
 
     #[Column]
     private ?Command $command = null;
 
-    #[Column(type: Column::TYPE_JSON)]
-    private ?string $returns = null;
+    #[Column]
+    private array $returns = [];
 
     #[Constraint]
     protected Event $event;
@@ -158,12 +157,12 @@ class Element extends AbstractModel implements Serializable, JsonSerializable
         return $this;
     }
 
-    public function getParameters(): ?string
+    public function getParameters(): array
     {
         return $this->parameters;
     }
 
-    public function setParameters(?string $parameters): Element
+    public function setParameters(array $parameters): Element
     {
         $this->parameters = $parameters;
 
@@ -182,12 +181,12 @@ class Element extends AbstractModel implements Serializable, JsonSerializable
         return $this;
     }
 
-    public function getReturns(): ?string
+    public function getReturns(): array
     {
         return $this->returns;
     }
 
-    public function setReturns(?string $returns): Element
+    public function setReturns(array $returns): Element
     {
         $this->returns = $returns;
 
@@ -220,37 +219,12 @@ class Element extends AbstractModel implements Serializable, JsonSerializable
 
     public function serialize(): string
     {
-        return serialize([
-            'id' => $this->getId(),
-            'eventId' => $this->getEventId(),
-            'parentId' => $this->getParentId(),
-            'order' => $this->getOrder(),
-            'command' => $this->getCommand(),
-            'class' => $this->getClass(),
-            'method' => $this->getMethod(),
-            'params' => $this->getParameters(),
-            'value' => $this->getReturns(),
-        ]);
+        return serialize($this->__serialize());
     }
 
-    /**
-     * @param string $data
-     */
-    public function unserialize($data): void
+    public function unserialize(string $data): void
     {
-        $unserialized = unserialize($data);
-
-        $this
-            ->setId($unserialized['id'])
-            ->setEventId($unserialized['eventId'])
-            ->setParentId($unserialized['parentId'])
-            ->setOrder($unserialized['order'])
-            ->setCommand($unserialized['command'])
-            ->setClass($unserialized['class'])
-            ->setMethod($unserialized['method'])
-            ->setParameters($unserialized['params'])
-            ->setReturns($unserialized['value'])
-        ;
+        $this->__unserialize(unserialize($data));
     }
 
     /**
@@ -266,8 +240,8 @@ class Element extends AbstractModel implements Serializable, JsonSerializable
             'method' => $this->getMethod(),
             'methodTitle' => $this->getMethodTitle(),
             'command' => $this->getCommand(),
-            'returns' => JsonUtility::decode($this->getReturns() ?? 'null'),
-            'parameters' => JsonUtility::decode($this->getParameters() ?? 'null'),
+            'returns' => $this->getReturns(),
+            'parameters' => $this->getParameters(),
             'leaf' => true,
         ];
 
@@ -277,5 +251,35 @@ class Element extends AbstractModel implements Serializable, JsonSerializable
         }
 
         return $data;
+    }
+
+    public function __serialize(): array
+    {
+        return [
+            'id' => $this->getId(),
+            'eventId' => $this->getEventId(),
+            'parentId' => $this->getParentId(),
+            'order' => $this->getOrder(),
+            'command' => $this->getCommand(),
+            'class' => $this->getClass(),
+            'method' => $this->getMethod(),
+            'params' => $this->getParameters(),
+            'value' => $this->getReturns(),
+        ];
+    }
+
+    public function __unserialize(array $data): void
+    {
+        $this
+            ->setId($data['id'])
+            ->setEventId($data['eventId'])
+            ->setParentId($data['parentId'])
+            ->setOrder($data['order'])
+            ->setCommand($data['command'])
+            ->setClass($data['class'])
+            ->setMethod($data['method'])
+            ->setParameters($data['params'])
+            ->setReturns($data['value'])
+        ;
     }
 }

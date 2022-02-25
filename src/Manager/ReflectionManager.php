@@ -267,6 +267,6 @@ class ReflectionManager
 
     public function allowsNul(ReflectionProperty|ReflectionParameter $reflectionObject): bool
     {
-        $type = $reflectionObject->getType()?->allowsNull() ?? false;
+        return $reflectionObject->getType()?->allowsNull() ?? false;
     }
 }

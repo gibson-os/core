@@ -176,10 +176,8 @@ class EventRepository extends AbstractRepository
                 ->setClass($element['className'])
                 ->setMethod($element['method'])
                 ->setCommand($element['command'] === null ? null : Command::from($element['command']))
-                ->setParameters(
-                    empty($element['parameters']) ? null : $this->jsonUtility->encode($element['parameters'])
-                )
-                ->setReturns(empty($element['returns']) ? null : $this->jsonUtility->encode($element['returns']))
+                ->setParameters($element['parameters'] ?? [])
+                ->setReturns($element['returns'] ?? [])
                 ->setOrder($order++)
             ;
             $elementModel->save();

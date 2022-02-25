@@ -28,7 +28,7 @@ Ext.define('GibsonOS.module.core.event.Form', {
             uncheckedValue: false
         },{
             xtype: 'gosFormCheckbox',
-            name: 'async',
+            name: 'exitOnError',
             margins: '0 5px',
             boxLabel: 'Bei Fehler beenden',
             uncheckedValue: false

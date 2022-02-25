@@ -9,7 +9,6 @@ use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\Event\Element;
 use GibsonOS\Core\Store\AbstractDatabaseStore;
-use GibsonOS\Core\Utility\JsonUtility;
 use JsonException;
 use mysqlDatabase;
 use ReflectionException;
@@ -112,11 +111,11 @@ class ElementStore extends AbstractDatabaseStore
      * @param AbstractParameter[] $methodParameters
      *
      * @throws JsonException
+     *
+     * @return AbstractParameter[]
      */
-    private function completeParameters(array $methodParameters, ?string $parameters): ?string
+    private function completeParameters(array $methodParameters, array $parameters): array
     {
-        $parameters = $parameters === null ? [] : JsonUtility::decode($parameters);
-
         foreach ($methodParameters as $parameterName => $methodParameter) {
             if (!isset($parameters[$parameterName])) {
                 continue;
@@ -133,18 +132,18 @@ class ElementStore extends AbstractDatabaseStore
             $methodParameter->setValue($parameter);
         }
 
-        return JsonUtility::encode($methodParameters);
+        return $methodParameters;
     }
 
     /**
      * @param AbstractParameter[] $methodReturns
      *
      * @throws JsonException
+     *
+     * @return AbstractParameter[]
      */
-    private function completeReturns(array $methodReturns, ?string $returns): ?string
+    private function completeReturns(array $methodReturns, array $returns): array
     {
-        $returns = $returns === null ? [] : JsonUtility::decode($returns);
-
         foreach ($methodReturns as $parameterName => $methodReturn) {
             if (!isset($returns[$parameterName])) {
                 continue;
@@ -157,6 +156,6 @@ class ElementStore extends AbstractDatabaseStore
             ;
         }
 
-        return JsonUtility::encode($methodReturns);
+        return $methodReturns;
     }
 }

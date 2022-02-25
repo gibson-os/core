@@ -10,7 +10,6 @@ use GibsonOS\Core\Exception\FactoryError;
 use GibsonOS\Core\Manager\ServiceManager;
 use GibsonOS\Core\Model\Event;
 use GibsonOS\Core\Model\Event\Element;
-use GibsonOS\Core\Utility\JsonUtility;
 use InvalidArgumentException;
 use JsonException;
 use Psr\Log\LoggerInterface;
@@ -155,7 +154,7 @@ class ElementService
      */
     private function getReturnsConditionResult(Element $element, Event $event, array &$variables): bool
     {
-        $returns = JsonUtility::decode($element->getReturns() ?? '[]');
+        $returns = $element->getReturns();
         $returnsCount = count($returns);
         $callReturn = $this->runFunction($element, $event);
         $this->logger->debug('Returns: ' . var_export($callReturn, true));

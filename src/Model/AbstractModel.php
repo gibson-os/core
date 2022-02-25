@@ -10,6 +10,8 @@ use GibsonOS\Core\Exception\Model\DeleteError;
 use GibsonOS\Core\Exception\Model\SaveError;
 use GibsonOS\Core\Factory\DateTimeFactory;
 use GibsonOS\Core\Service\DateTimeService;
+use GibsonOS\Core\Utility\JsonUtility;
+use JsonException;
 use mysqlDatabase;
 use mysqlField;
 use mysqlRegistry;
@@ -119,12 +121,12 @@ abstract class AbstractModel implements ModelInterface
 
     /**
      * @throws ReflectionException
+     * @throws JsonException
      */
     public function loadFromMysqlTable(mysqlTable $mysqlTable): void
     {
         foreach ($mysqlTable->fields as $field) {
             $fieldName = $this->transformFieldName($field);
-
             $setter = 'set' . $fieldName;
 
             if (!method_exists($this, $setter)) {
@@ -157,19 +159,23 @@ abstract class AbstractModel implements ModelInterface
 
                         break;
                     default:
-                        if (mb_strpos(mb_strtolower($fieldObject->getType()), 'enum') === 0) {
-                            $reflectionParameter = (new ReflectionClass($this::class))
-                                ->getMethod($setter)
-                                ->getParameters()[0]
-                            ;
-                            /** @psalm-suppress UndefinedMethod */
-                            $enumClassName = $reflectionParameter->getType()?->getName();
+                        $reflectionParameter = (new ReflectionClass($this::class))
+                            ->getMethod($setter)
+                            ->getParameters()[0]
+                        ;
+                        /** @psalm-suppress UndefinedMethod */
+                        $typeName = $reflectionParameter->getType()?->getName();
 
-                            if (enum_exists($enumClassName)) {
-                                $this->$setter($enumClassName::from($fieldObject->getValue()));
+                        if ($typeName === 'array') {
+                            $this->$setter(JsonUtility::decode((string) $fieldObject->getValue()));
 
-                                return;
-                            }
+                            break;
+                        }
+
+                        if (enum_exists($typeName)) {
+                            $this->$setter($typeName::from($fieldObject->getValue()));
+
+                            break;
                         }
 
                         $this->$setter($fieldObject->getValue());
@@ -180,6 +186,9 @@ abstract class AbstractModel implements ModelInterface
         }
     }
 
+    /**
+     * @throws JsonException
+     */
     public function setToMysqlTable(mysqlTable $mysqlTable): void
     {
         foreach ($mysqlTable->fields as $field) {
@@ -213,6 +222,8 @@ abstract class AbstractModel implements ModelInterface
                 $this->{'set' . $fieldName}($this->dateTime->get((string) $fieldObject->getValue()));
             } elseif (is_object($value) && enum_exists($value::class)) {
                 $fieldObject->setValue($value->value);
+            } elseif (is_array($value)) {
+                $fieldObject->setValue(JsonUtility::encode($value));
             } else {
                 $fieldObject->setValue(is_bool($value) ? (int) $value : $value);
             }

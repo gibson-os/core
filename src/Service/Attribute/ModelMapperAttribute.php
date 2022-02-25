@@ -89,18 +89,19 @@ class ModelMapperAttribute extends ObjectMapperAttribute
                 ?? $this->reflectionManager->getNonBuiltinTypeName($reflectionProperty)
             ;
 
-            if ($parentModelClassName === null || !class_exists($parentModelClassName)) {
-                throw new MapperException(sprintf('"%s"" is no class!', $parentModelClassName ?? 'null'));
+            if (!class_exists($parentModelClassName)) {
+                throw new MapperException(sprintf('"%s" is no class!', $parentModelClassName ?? 'null'));
             }
 
-            $this->reflectionManager->setProperty(
-                $reflectionProperty,
-                $model,
-                $this->objectMapper->mapToObject(
-                    $parentModelClassName,
-                    JsonUtility::decode($this->requestService->getRequestValue($this->getRequestKey($attribute, $reflectionProperty)))
-                )
+            $values = JsonUtility::decode($this->requestService->getRequestValue($this->getRequestKey($attribute, $reflectionProperty)));
+            $typeName = $this->reflectionManager->getTypeName($reflectionProperty);
+            $values = array_map(
+                fn ($value): object => $this->objectMapper->mapToObject($parentModelClassName, $value),
+                $typeName === 'array' ? $values : [$reflectionProperty->getName() => $values]
             );
+
+            $setter = 'set' . ucfirst($reflectionProperty->getName());
+            $model->$setter($typeName === 'array' ? $values : reset($values));
         }
 
         return $model;

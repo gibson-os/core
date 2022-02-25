@@ -66,8 +66,14 @@ class ObjectMapper implements ObjectMapperInterface
         $reflectionClass = $this->reflectionManager->getReflectionClass($object);
 
         foreach ($properties as $key => $value) {
+            try {
+                $reflectionProperty = $reflectionClass->getProperty($key);
+            } catch (ReflectionException) {
+                continue;
+            }
+
             $this->reflectionManager->setProperty(
-                $reflectionClass->getProperty($key),
+                $reflectionProperty,
                 $object,
                 $this->mapValueToObject($reflectionClass->getMethod('set' . ucfirst($key))->getParameters()[0], $value)
             );
@@ -96,7 +102,7 @@ class ObjectMapper implements ObjectMapperInterface
             return $values;
         }
 
-        if ($attribute !== null || $this->reflectionManager->isBuiltin($reflectionParameter)) {
+        if ($attribute !== null || !$this->reflectionManager->isBuiltin($reflectionParameter)) {
             $mapper = $this;
             $objectClassName = null;
 
@@ -129,19 +135,30 @@ class ObjectMapper implements ObjectMapperInterface
                 );
             }
 
-            if (!is_array($values)) {
-                $values = [$reflectionParameter->getName() => $values];
+            $typeName = $this->reflectionManager->getNonBuiltinTypeName($reflectionParameter);
+
+            if (enum_exists($typeName)) {
+                return empty($values) ? null : $typeName::from($values);
             }
 
             return $mapper->mapToObject(
                 $objectClassName ?? $this->reflectionManager->getNonBuiltinTypeName($reflectionParameter),
-                $values
+                is_array($values) ? $values : [$reflectionParameter->getName() => $values]
             );
         }
 
         if ($values === null && !$reflectionParameter->allowsNull()) {
             return $this->reflectionManager->getDefaultValue($reflectionParameter);
         }
+
+//        try {
+//            $typeName = $this->reflectionManager->getNonBuiltinTypeName($reflectionParameter);
+//
+//            if (enum_exists($typeName)) {
+//                return empty($values) ? null : $typeName::from($values);
+//            }
+//        } catch (ReflectionException) {
+//        }
 
         return $values;
     }
