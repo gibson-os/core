@@ -25,7 +25,6 @@ use GibsonOS\Core\Store\Event\ElementStore;
 use GibsonOS\Core\Store\Event\MethodStore;
 use GibsonOS\Core\Store\Event\TriggerStore;
 use GibsonOS\Core\Store\EventStore;
-use GibsonOS\Core\Utility\JsonUtility;
 use JsonException;
 use ReflectionException;
 
@@ -123,10 +122,6 @@ class EventController extends AbstractController
         #[GetMappedModel] Event $event
     ): AjaxResponse {
         $eventRepository->startTransaction();
-
-//        errlog(JsonUtility::encode($event->getElements()));
-//
-//        return $this->returnSuccess(['id' => $event->getId(), 'event' => $event]);
 
         try {
             $event->save();

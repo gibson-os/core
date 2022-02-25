@@ -12,18 +12,19 @@ use GibsonOS\Core\Exception\MapperException;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Exception\RequestError;
 use GibsonOS\Core\Manager\ReflectionManager;
-use GibsonOS\Core\Mapper\ObjectMapper;
+use GibsonOS\Core\Mapper\ModelMapper;
 use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Service\RequestService;
 use GibsonOS\Core\Utility\JsonUtility;
 use JsonException;
+use ReflectionAttribute;
 use ReflectionException;
 use ReflectionParameter;
 
 class ModelMapperAttribute extends ObjectMapperAttribute
 {
     public function __construct(
-        ObjectMapper $objectMapper,
+        ModelMapper $objectMapper,
         RequestService $requestService,
         ReflectionManager $reflectionManager,
         private ModelFetcherAttribute $modelFetcherAttribute
@@ -49,13 +50,13 @@ class ModelMapperAttribute extends ObjectMapperAttribute
             ));
         }
 
-        $model = $this->modelFetcherAttribute->replace(
-            new GetModel($attribute->getConditions()),
-            $parameters,
-            $reflectionParameter
-        );
-
-        if ($model === null) {
+        try {
+            $model = $this->modelFetcherAttribute->replace(
+                new GetModel($attribute->getConditions()),
+                $parameters,
+                $reflectionParameter
+            );
+        } catch (SelectError) {
             $modelClassName = $this->reflectionManager->getNonBuiltinTypeName($reflectionParameter);
             $model = new $modelClassName();
         }
@@ -78,7 +79,8 @@ class ModelMapperAttribute extends ObjectMapperAttribute
         foreach ($reflectionClass->getProperties() as $reflectionProperty) {
             $constraintAttribute = $this->reflectionManager->getAttribute(
                 $reflectionProperty,
-                Constraint::class
+                Constraint::class,
+                ReflectionAttribute::IS_INSTANCEOF
             );
 
             if ($constraintAttribute === null) {

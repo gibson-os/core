@@ -12,6 +12,7 @@ use GibsonOS\Core\Utility\JsonUtility;
 use JsonException;
 use ReflectionException;
 use ReflectionParameter;
+use ReflectionProperty;
 
 class ObjectMapper implements ObjectMapperInterface
 {
@@ -88,11 +89,11 @@ class ObjectMapper implements ObjectMapperInterface
      * @throws FactoryError
      * @throws JsonException
      */
-    private function mapValueToObject(
-        ReflectionParameter $reflectionParameter,
+    protected function mapValueToObject(
+        ReflectionParameter|ReflectionProperty $reflectionObject,
         int|float|string|bool|array|object|null $values
     ): int|float|string|bool|array|object|null {
-        $attribute = $this->reflectionManager->getAttribute($reflectionParameter, ObjectMapperAttribute::class);
+        $attribute = $this->reflectionManager->getAttribute($reflectionObject, ObjectMapperAttribute::class);
 
         if (is_object($values)) {
             if (enum_exists($values::class)) {
@@ -102,7 +103,7 @@ class ObjectMapper implements ObjectMapperInterface
             return $values;
         }
 
-        if ($attribute !== null || !$this->reflectionManager->isBuiltin($reflectionParameter)) {
+        if ($attribute !== null || !$this->reflectionManager->isBuiltin($reflectionObject)) {
             $mapper = $this;
             $objectClassName = null;
 
@@ -111,11 +112,11 @@ class ObjectMapper implements ObjectMapperInterface
                 $mapper = $this->serviceManagerService->get($attribute->getMapperClassName(), ObjectMapperInterface::class);
             }
 
-            if ($values === null) {
-                return $this->reflectionManager->getDefaultValue($reflectionParameter);
+            if ($values === null && $reflectionObject instanceof ReflectionParameter) {
+                return $this->reflectionManager->getDefaultValue($reflectionObject);
             }
 
-            if ($this->reflectionManager->getTypeName($reflectionParameter) === 'array' && $objectClassName !== null) {
+            if ($this->reflectionManager->getTypeName($reflectionObject) === 'array' && $objectClassName !== null) {
                 if (is_string($values)) {
                     $values = JsonUtility::decode($values);
                 }
@@ -130,35 +131,30 @@ class ObjectMapper implements ObjectMapperInterface
                 return array_map(
                     fn ($value) => $mapper->mapToObject($objectClassName, is_array($value)
                         ? $value
-                        : [$reflectionParameter->getName() => $value]),
+                        : [$reflectionObject->getName() => $value]),
                     $values
                 );
             }
 
-            $typeName = $this->reflectionManager->getNonBuiltinTypeName($reflectionParameter);
+            $typeName = $this->reflectionManager->getNonBuiltinTypeName($reflectionObject);
 
             if (enum_exists($typeName)) {
                 return empty($values) ? null : $typeName::from($values);
             }
 
             return $mapper->mapToObject(
-                $objectClassName ?? $this->reflectionManager->getNonBuiltinTypeName($reflectionParameter),
-                is_array($values) ? $values : [$reflectionParameter->getName() => $values]
+                $objectClassName ?? $this->reflectionManager->getNonBuiltinTypeName($reflectionObject),
+                is_array($values) ? $values : [$reflectionObject->getName() => $values]
             );
         }
 
-        if ($values === null && !$reflectionParameter->allowsNull()) {
-            return $this->reflectionManager->getDefaultValue($reflectionParameter);
+        if (
+            $values === null &&
+            $reflectionObject instanceof ReflectionParameter &&
+            !$reflectionObject->allowsNull()
+        ) {
+            return $this->reflectionManager->getDefaultValue($reflectionObject);
         }
-
-//        try {
-//            $typeName = $this->reflectionManager->getNonBuiltinTypeName($reflectionParameter);
-//
-//            if (enum_exists($typeName)) {
-//                return empty($values) ? null : $typeName::from($values);
-//            }
-//        } catch (ReflectionException) {
-//        }
 
         return $values;
     }

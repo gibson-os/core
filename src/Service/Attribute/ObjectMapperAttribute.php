@@ -87,7 +87,7 @@ class ObjectMapperAttribute implements AttributeServiceInterface, ParameterAttri
                     $objectParameters[$parameterName] = $parameters[$requestKey]
                         ?? $this->getParameterFromRequest($reflectionParameter, $requestKey)
                     ;
-                } catch (RequestError) {
+                } catch (RequestError|MapperException) {
                 }
             }
         }
