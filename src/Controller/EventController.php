@@ -3,9 +3,9 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Controller;
 
-use DateTime;
 use Exception;
 use GibsonOS\Core\Attribute\CheckPermission;
+use GibsonOS\Core\Attribute\GetMappedModel;
 use GibsonOS\Core\Attribute\GetModel;
 use GibsonOS\Core\Exception\DateTimeError;
 use GibsonOS\Core\Exception\EventException;
@@ -119,35 +119,12 @@ class EventController extends AbstractController
     #[CheckPermission(Permission::WRITE)]
     public function save(
         EventRepository $eventRepository,
-        string $name,
-        bool $active,
-        bool $async,
-        array $elements,
-        array $triggers,
-        #[GetModel(['id' => 'eventId'])] Event $event = null
+        #[GetMappedModel(['id' => 'eventId'])] Event $event
     ): AjaxResponse {
         $eventRepository->startTransaction();
 
         try {
-            if ($event === null) {
-                $event = new Event();
-            }
-
-            $event
-                ->setName($name)
-                ->setActive($active)
-                ->setAsync($async)
-                ->setModified(new DateTime())
-            ;
             $event->save();
-            $eventRepository->deleteElements(
-                $event,
-                $eventRepository->saveElements($event, $elements)
-            );
-            $eventRepository->deleteTriggers(
-                $event,
-                $eventRepository->saveTriggers($event, $triggers)
-            );
         } catch (Exception $e) {
             $eventRepository->rollback();
 

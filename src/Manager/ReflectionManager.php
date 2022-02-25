@@ -8,6 +8,7 @@ use ReflectionClassConstant;
 use ReflectionEnum;
 use ReflectionException;
 use ReflectionMethod;
+use ReflectionNamedType;
 use ReflectionParameter;
 use ReflectionProperty;
 
@@ -205,5 +206,67 @@ class ReflectionManager
             $reflectionParameter->getName(),
             $reflectionClass->getName()
         ));
+    }
+
+    public function getTypeName(ReflectionProperty|ReflectionParameter $reflectionObject): ?string
+    {
+        $type = $reflectionObject->getType();
+
+        if ($type instanceof ReflectionNamedType) {
+            return $type->getName();
+        }
+
+        return null;
+    }
+
+    /**
+     * @throws ReflectionException
+     *
+     * @return class-string
+     */
+    public function getNonBuiltinTypeName(ReflectionProperty|ReflectionParameter $reflectionObject): string
+    {
+        $typeName = $this->getTypeName($reflectionObject);
+
+        if ($typeName === null) {
+            throw new ReflectionException(sprintf(
+                'Type for "%s" does not exists!',
+                $reflectionObject->getName()
+            ));
+        }
+
+        if ($this->isBuiltin($reflectionObject)) {
+            throw new ReflectionException(sprintf(
+                'Type "%s" for "%s" is build in!',
+                $typeName,
+                $reflectionObject->getName()
+            ));
+        }
+
+        if (!class_exists($typeName)) {
+            throw new ReflectionException(sprintf(
+                'Class "%s" for "%s" does not exists!',
+                $typeName,
+                $reflectionObject->getName()
+            ));
+        }
+
+        return $typeName;
+    }
+
+    public function isBuiltin(ReflectionProperty|ReflectionParameter $reflectionObject): bool
+    {
+        $type = $reflectionObject->getType();
+
+        if ($type instanceof ReflectionNamedType) {
+            return $type->isBuiltin();
+        }
+
+        return false;
+    }
+
+    public function allowsNul(ReflectionProperty|ReflectionParameter $reflectionObject): bool
+    {
+        $type = $reflectionObject->getType()?->allowsNull() ?? false;
     }
 }

@@ -56,8 +56,7 @@ class ConstraintInstall extends AbstractInstall implements PriorityInterface
             $constraints = [];
 
             foreach ($reflectionClass->getProperties() as $reflectionProperty) {
-                /** @psalm-suppress UndefinedMethod */
-                if ($reflectionProperty->getType()?->isBuiltin() ?? false) {
+                if ($this->reflectionManager->isBuiltin($reflectionProperty)) {
                     continue;
                 }
 
@@ -71,8 +70,7 @@ class ConstraintInstall extends AbstractInstall implements PriorityInterface
                     continue;
                 }
 
-                /** @psalm-suppress UndefinedMethod */
-                $parentClassName = $reflectionProperty->getType()?->getName();
+                $parentClassName = $this->reflectionManager->getNonBuiltinTypeName($reflectionProperty);
                 /** @var ModelInterface $parentModel */
                 $parentModel = new $parentClassName();
                 $parentTableName = $parentModel->getTableName();

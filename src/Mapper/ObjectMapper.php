@@ -87,8 +87,6 @@ class ObjectMapper implements ObjectMapperInterface
         int|float|string|bool|array|object|null $values
     ): int|float|string|bool|array|object|null {
         $attribute = $this->reflectionManager->getAttribute($reflectionParameter, ObjectMapperAttribute::class);
-        /** @psalm-suppress UndefinedMethod */
-        $parameterTypeName = $reflectionParameter->getType()?->getName();
 
         if (is_object($values)) {
             if (enum_exists($values::class)) {
@@ -98,8 +96,7 @@ class ObjectMapper implements ObjectMapperInterface
             return $values;
         }
 
-        /** @psalm-suppress UndefinedMethod */
-        if ($attribute !== null || !$reflectionParameter->getType()?->isBuiltin()) {
+        if ($attribute !== null || $this->reflectionManager->isBuiltin($reflectionParameter)) {
             $mapper = $this;
             $objectClassName = null;
 
@@ -112,7 +109,7 @@ class ObjectMapper implements ObjectMapperInterface
                 return $this->reflectionManager->getDefaultValue($reflectionParameter);
             }
 
-            if ($parameterTypeName === 'array' && $objectClassName !== null) {
+            if ($this->reflectionManager->getTypeName($reflectionParameter) === 'array' && $objectClassName !== null) {
                 if (is_string($values)) {
                     $values = JsonUtility::decode($values);
                 }
@@ -137,7 +134,7 @@ class ObjectMapper implements ObjectMapperInterface
             }
 
             return $mapper->mapToObject(
-                $objectClassName ?? $parameterTypeName,
+                $objectClassName ?? $this->reflectionManager->getNonBuiltinTypeName($reflectionParameter),
                 $values
             );
         }

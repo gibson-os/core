@@ -168,8 +168,7 @@ class CommandService
                 continue;
             }
 
-            /** @psalm-suppress UndefinedMethod */
-            $value = match ($reflectionProperty->getType()?->getName()) {
+            $value = match ($this->reflectionManager->getTypeName($reflectionProperty)) {
                 'int' => (int) $arguments[$name],
                 'float' => (float) $arguments[$name],
                 'bool' => $arguments[$name] === 'true' || ((int) $arguments[$name]),
@@ -209,11 +208,14 @@ class CommandService
             }
 
             $name = $reflectionProperty->getName();
-            /** @psalm-suppress UndefinedMethod */
-            $typeName = $reflectionProperty->getType()?->getName();
+            $typeName = $this->reflectionManager->getTypeName($reflectionProperty);
 
             if ($typeName !== 'bool') {
-                throw new ArgumentError(sprintf('Option "%s" is type "%s" must be "bool"!', $name, $typeName));
+                throw new ArgumentError(sprintf(
+                    'Option "%s" is type "%s" must be "bool"!',
+                    $name,
+                    $typeName ?? 'null'
+                ));
             }
 
             $optionsProperties[] = $name;

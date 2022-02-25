@@ -119,8 +119,7 @@ class TableInstall extends AbstractInstall implements PriorityInterface
                     continue;
                 }
 
-                /** @psalm-suppress UndefinedMethod */
-                $type = $reflectionProperty->getType()?->getName() ?? '';
+                $type = $this->reflectionManager->getNonBuiltinTypeName($reflectionProperty);
                 $defaultValue = $reflectionProperty->getDefaultValue();
                 $columnAttribute
                     ->setName($columnAttribute->getName() ?? $this->tableAttribute->transformName($reflectionProperty->getName()))
@@ -129,7 +128,7 @@ class TableInstall extends AbstractInstall implements PriorityInterface
                         $columnAttribute->isAutoIncrement()
                             ? false
                             : ($columnAttribute->isNullable() === null
-                                ? ($reflectionProperty->getType()?->allowsNull() ?? false)
+                                ? $this->reflectionManager->allowsNul($reflectionProperty)
                                 : $columnAttribute->isNullable())
                     )
                     ->setDefault(

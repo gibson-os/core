@@ -17,13 +17,14 @@ use JsonException;
 use ReflectionException;
 use ReflectionMethod;
 use ReflectionParameter;
+use ReflectionProperty;
 
 class ObjectMapperAttribute implements AttributeServiceInterface, ParameterAttributeInterface
 {
     public function __construct(
         protected ObjectMapper $objectMapper,
-        private RequestService $requestService,
-        private ReflectionManager $reflectionManager
+        protected RequestService $requestService,
+        protected ReflectionManager $reflectionManager
     ) {
     }
 
@@ -39,16 +40,7 @@ class ObjectMapperAttribute implements AttributeServiceInterface, ParameterAttri
             return null;
         }
 
-        /**
-         * @psalm-suppress UndefinedMethod
-         *
-         * @var class-string $objectClassName
-         */
-        $objectClassName = $reflectionParameter->getType()?->getName();
-
-        if ($objectClassName === null) {
-            return null;
-        }
+        $objectClassName = $this->reflectionManager->getNonBuiltinTypeName($reflectionParameter);
 
         return $this->objectMapper->mapToObject(
             $objectClassName,
@@ -71,7 +63,7 @@ class ObjectMapperAttribute implements AttributeServiceInterface, ParameterAttri
 
         foreach ($reflectionClass->getConstructor()?->getParameters() ?? [] as $reflectionParameter) {
             $parameterName = $reflectionParameter->getName();
-            $requestKey = $attribute->getMapping()[$parameterName] ?? $parameterName;
+            $requestKey = $this->getRequestKey($attribute, $reflectionParameter);
             $objectParameters[$parameterName] = $parameters[$requestKey]
                 ?? $this->getParameterFromRequest($reflectionParameter, $requestKey)
             ;
@@ -88,7 +80,7 @@ class ObjectMapperAttribute implements AttributeServiceInterface, ParameterAttri
 
             foreach ($reflectionMethod->getParameters() as $reflectionParameter) {
                 $parameterName = $reflectionParameter->getName();
-                $requestKey = $attribute->getMapping()[$parameterName] ?? $parameterName;
+                $requestKey = $this->getRequestKey($attribute, $reflectionParameter);
 
                 try {
                     $this->requestService->getRequestValue($requestKey);
@@ -101,6 +93,15 @@ class ObjectMapperAttribute implements AttributeServiceInterface, ParameterAttri
         }
 
         return $objectParameters;
+    }
+
+    protected function getRequestKey(
+        GetObject $attribute,
+        ReflectionParameter|ReflectionProperty $reflectionObject
+    ): string {
+        $parameterName = $reflectionObject->getName();
+
+        return $attribute->getMapping()[$parameterName] ?? $parameterName;
     }
 
     /**
@@ -142,8 +143,7 @@ class ObjectMapperAttribute implements AttributeServiceInterface, ParameterAttri
             }
         }
 
-        /** @psalm-suppress UndefinedMethod */
-        return match ($reflectionParameter->getType()?->getName()) {
+        return match ($this->reflectionManager->getTypeName($reflectionParameter)) {
             'int' => (int) $value,
             'float' => (float) $value,
             'bool' => $value === 'true' || ((int) $value),
@@ -151,7 +151,7 @@ class ObjectMapperAttribute implements AttributeServiceInterface, ParameterAttri
             'array' => !is_array($value) ? (array) JsonUtility::decode($value) : $value,
             default => throw new MapperException(sprintf(
                 'Type %s of parameter %s for %s::%s is not allowed!',
-                $reflectionParameter->getType()?->getName() ?? 'null',
+                $this->reflectionManager->getTypeName($reflectionParameter) ?? 'null',
                 $reflectionParameter->getName(),
                 $reflectionParameter->getDeclaringClass() === null ? '' : $reflectionParameter->getDeclaringClass()->getName(),
                 $reflectionParameter->getDeclaringFunction()->getName()

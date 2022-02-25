@@ -7,23 +7,29 @@ use GibsonOS\Core\Attribute\AttributeInterface;
 use GibsonOS\Core\Attribute\GetModel;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Exception\RequestError;
+use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Model\ModelInterface;
 use GibsonOS\Core\Service\RequestService;
 use InvalidArgumentException;
 use mysqlDatabase;
 use mysqlTable;
+use ReflectionException;
 use ReflectionParameter;
 
 class ModelFetcherAttribute implements AttributeServiceInterface, ParameterAttributeInterface
 {
-    public function __construct(private mysqlDatabase $mysqlDatabase, private RequestService $requestService)
-    {
+    public function __construct(
+        private mysqlDatabase $mysqlDatabase,
+        private RequestService $requestService,
+        private ReflectionManager $reflectionManager
+    ) {
     }
 
     /**
      * @throws SelectError
      * @throws RequestError
+     * @throws ReflectionException
      */
     public function replace(AttributeInterface $attribute, array $parameters, ReflectionParameter $reflectionParameter): ?AbstractModel
     {
@@ -31,13 +37,7 @@ class ModelFetcherAttribute implements AttributeServiceInterface, ParameterAttri
             return null;
         }
 
-        /** @psalm-suppress UndefinedMethod */
-        $modelClassName = $reflectionParameter->getType()?->getName();
-
-        if ($modelClassName === null) {
-            return null;
-        }
-
+        $modelClassName = $this->reflectionManager->getNonBuiltinTypeName($reflectionParameter);
         $model = new $modelClassName();
 
         if (!$model instanceof AbstractModel) {
