@@ -120,6 +120,8 @@ abstract class AbstractModel implements ModelInterface
     }
 
     /**
+     * @deprecated
+     *
      * @throws ReflectionException
      * @throws JsonException
      */
@@ -187,6 +189,8 @@ abstract class AbstractModel implements ModelInterface
     }
 
     /**
+     * @deprecated
+     *
      * @throws JsonException
      */
     public function setToMysqlTable(mysqlTable $mysqlTable): void
@@ -231,6 +235,8 @@ abstract class AbstractModel implements ModelInterface
     }
 
     /**
+     * @deprecated
+     *
      * @throws SaveError
      * @throws Exception
      */
@@ -255,6 +261,9 @@ abstract class AbstractModel implements ModelInterface
 
     /**
      * @throws DeleteError
+     * @throws JsonException
+     *
+     * @deprecated
      */
     public function delete(mysqlTable $mysqlTable = null): void
     {

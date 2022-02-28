@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Manager;
 
 use Exception;
+use GibsonOS\Core\Attribute\Install\Database\Constraint;
 use GibsonOS\Core\Exception\Model\DeleteError;
 use GibsonOS\Core\Exception\Model\SaveError;
 use GibsonOS\Core\Model\ModelInterface;
@@ -13,6 +14,7 @@ use JsonException;
 use mysqlDatabase;
 use mysqlField;
 use mysqlTable;
+use ReflectionAttribute;
 use ReflectionException;
 use Throwable;
 
@@ -60,6 +62,33 @@ class ModelManager
      */
     public function save(ModelInterface $model): void
     {
+        $reflectionClass = $this->reflectionManager->getReflectionClass($model);
+        $postSaves = [];
+
+        foreach ($reflectionClass->getProperties() as $reflectionProperty) {
+            $constraintAttribute = $this->reflectionManager->getAttribute(
+                $reflectionProperty,
+                Constraint::class,
+                ReflectionAttribute::IS_INSTANCEOF
+            );
+
+            if ($constraintAttribute === null) {
+                continue;
+            }
+
+            $value = $model->{'get' . ucfirst($reflectionProperty->getName())}();
+
+            if ($this->reflectionManager->getTypeName($reflectionProperty) === 'array') {
+                array_push($postSaves, ...((array) $value));
+
+                continue;
+            }
+
+            $setter = 'set' . $this->transformFieldName($constraintAttribute->getOwnColumn() ?? $reflectionProperty->getName() . 'Id');
+            $getter = 'get' . $this->transformFieldName($constraintAttribute->getParentColumn());
+            $model->$setter($value?->$getter());
+        }
+
         $mysqlTable = $this->setToMysqlTable($model);
 
         try {
@@ -73,6 +102,10 @@ class ModelManager
 
         $mysqlTable->getReplacedRecord();
         $this->loadFromMysqlTable($mysqlTable, $model);
+
+        foreach ($postSaves as $postSave) {
+            $this->save($postSave);
+        }
     }
 
     /**

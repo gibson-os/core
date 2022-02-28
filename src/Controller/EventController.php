@@ -14,6 +14,7 @@ use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\Model\DeleteError;
 use GibsonOS\Core\Exception\Model\SaveError;
 use GibsonOS\Core\Exception\Repository\SelectError;
+use GibsonOS\Core\Manager\ModelManager;
 use GibsonOS\Core\Model\Event;
 use GibsonOS\Core\Model\User\Permission;
 use GibsonOS\Core\Repository\EventRepository;
@@ -119,12 +120,13 @@ class EventController extends AbstractController
     #[CheckPermission(Permission::WRITE)]
     public function save(
         EventRepository $eventRepository,
+        ModelManager $modelManager,
         #[GetMappedModel] Event $event
     ): AjaxResponse {
         $eventRepository->startTransaction();
 
         try {
-            $event->save();
+            $modelManager->save($event);
         } catch (Exception $e) {
             $eventRepository->rollback();
 

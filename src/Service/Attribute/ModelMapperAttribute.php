@@ -101,7 +101,6 @@ class ModelMapperAttribute extends ObjectMapperAttribute
                 fn ($value): object => $this->objectMapper->mapToObject($parentModelClassName, $value),
                 $typeName === 'array' ? $values : [$reflectionProperty->getName() => $values]
             );
-
             $setter = 'set' . ucfirst($reflectionProperty->getName());
             $model->$setter($typeName === 'array' ? $values : reset($values));
         }

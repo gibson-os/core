@@ -12,10 +12,10 @@ use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Model\Event;
 use JsonException;
 use JsonSerializable;
+use ReflectionException;
 use Serializable;
 
 /**
- * @method Event        getEvent()
  * @method Element      setEvent(Event $event)
  * @method Element|null getParent()
  * @method Element      setParent(?Element $element)
@@ -93,7 +93,20 @@ class Element extends AbstractModel implements Serializable, JsonSerializable
 
     public function getEventId(): int
     {
-        return $this->eventId;
+        $parent = $this->getParent();
+
+        return $parent === null ? $this->eventId : $parent->getEventId();
+    }
+
+    /**
+     * @throws ReflectionException
+     */
+    public function getEvent(): Event
+    {
+        /** @var Event $event */
+        $event = $this->getParent()?->getEvent() ?? $this->__call('getEvent', []);
+
+        return $event;
     }
 
     public function setEventId(int $eventId): Element

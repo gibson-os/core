@@ -108,7 +108,7 @@ trait ConstraintTrait
         $ownColumn = $this->transformFieldName($constraintAttribute->getOwnColumn() ?? $propertyName . 'Id');
         $value = $this->getConstraintValue($reflectionProperty, 'get' . ucfirst($ownColumn));
 
-        if (isset($this->loadedConstraints[$propertyName]) && $this->loadedConstraints[$propertyName] === $value) {
+        if (array_key_exists($propertyName, $this->loadedConstraints) && $this->loadedConstraints[$propertyName] === $value) {
             return $this->$propertyName;
         }
 
@@ -158,7 +158,7 @@ trait ConstraintTrait
         $value = $this->{'get' . ucfirst($ownColumn)}();
         $propertyName = $reflectionProperty->getName();
 
-        if (isset($this->loadedConstraints[$propertyName]) && $this->loadedConstraints[$propertyName] === $value) {
+        if (array_key_exists($propertyName, $this->loadedConstraints) && $this->loadedConstraints[$propertyName] === $value) {
             return $this->$propertyName;
         }
 
@@ -176,19 +176,25 @@ trait ConstraintTrait
         $parentModel = new $parentModelClassName($this->database);
         $this->$propertyName = [];
         $this->loadedConstraints[$propertyName] = $value;
-        $this->addConstraints($constraintAttribute, $reflectionProperty, $this->loadForeignRecords(
-            $parentModelClassName,
-            $value,
-            $parentModel->getTableName(),
-            $constraintAttribute->getParentColumn() . '_id',
-            $constraintAttribute->getWhere(),
-            $constraintAttribute->getWhereParameters(),
-            $constraintAttribute->getOrderBy()
-        ));
+
+        if ($value !== null) {
+            $this->addConstraints($constraintAttribute, $reflectionProperty, $this->loadForeignRecords(
+                $parentModelClassName,
+                $value,
+                $parentModel->getTableName(),
+                $constraintAttribute->getParentColumn() . '_id',
+                $constraintAttribute->getWhere(),
+                $constraintAttribute->getWhereParameters(),
+                $constraintAttribute->getOrderBy()
+            ));
+        }
 
         return $this->$propertyName;
     }
 
+    /**
+     * @throws Throwable
+     */
     private function setConstraint(
         Constraint $constraintAttribute,
         ReflectionProperty $reflectionProperty,
@@ -200,7 +206,17 @@ trait ConstraintTrait
         );
         $fieldName = $this->transformFieldName($constraintAttribute->getParentColumn());
         $value = $model?->{'get' . ucfirst($fieldName)}();
-        $this->{'set' . ucfirst($ownColumn)}($value);
+
+        try {
+            $this->{'set' . ucfirst($ownColumn)}($value);
+        } catch (Throwable $exception) {
+            if ($value !== null) {
+                throw $exception;
+            }
+
+            unset($this->$ownColumn);
+        }
+
         $this->$propertyName = $model;
         $this->loadedConstraints[$propertyName] = $value;
 
@@ -224,8 +240,27 @@ trait ConstraintTrait
         );
 
         foreach ($models as $model) {
-            $model->{'set' . $fieldName . 'Id'}($value);
             $model->{'set' . $fieldName}($this);
+            $reflectionClass = new ReflectionClass($model);
+            $reflectionIdProperty = $reflectionClass->getProperty(lcfirst($fieldName) . 'Id');
+
+            if ($value === null) {
+                if (!$reflectionIdProperty->isInitialized($model)) {
+                    continue;
+                }
+
+                if (!$reflectionIdProperty->hasDefaultValue()) {
+                    throw new ReflectionException(sprintf(
+                        'Property "%s" of class "%s" is initialized an has no default value!',
+                        $reflectionIdProperty->getName(),
+                        $model::class
+                    ));
+                }
+
+                $value = $reflectionIdProperty->getDefaultValue();
+            }
+
+            $model->{'set' . $fieldName . 'Id'}($value);
         }
 
         $propertyName = $reflectionProperty->getName();

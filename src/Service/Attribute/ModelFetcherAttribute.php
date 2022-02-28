@@ -12,6 +12,7 @@ use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Model\ModelInterface;
 use GibsonOS\Core\Service\RequestService;
 use InvalidArgumentException;
+use JsonException;
 use mysqlDatabase;
 use mysqlTable;
 use ReflectionException;
@@ -30,9 +31,13 @@ class ModelFetcherAttribute implements AttributeServiceInterface, ParameterAttri
      * @throws SelectError
      * @throws RequestError
      * @throws ReflectionException
+     * @throws JsonException
      */
-    public function replace(AttributeInterface $attribute, array $parameters, ReflectionParameter $reflectionParameter): ?AbstractModel
-    {
+    public function replace(
+        AttributeInterface $attribute,
+        array $parameters,
+        ReflectionParameter $reflectionParameter
+    ): ?AbstractModel {
         if (!$attribute instanceof GetModel) {
             return null;
         }

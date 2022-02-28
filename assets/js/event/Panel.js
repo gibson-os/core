@@ -121,10 +121,11 @@ Ext.define('GibsonOS.module.core.event.Panel', {
                 elements: Ext.encode(elements),
                 triggers: Ext.encode(triggers)
             },
-            callback: function() {
+            failure() {
                 me.setLoading(false);
             },
-            success: function(form, action) {
+            success(form, action) {
+                me.setLoading(false);
                 form.findField('id').setValue(Ext.decode(action.response.responseText).data.id);
                 me.up('window').close();
             }
