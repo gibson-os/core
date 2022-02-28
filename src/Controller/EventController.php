@@ -158,7 +158,7 @@ class EventController extends AbstractController
      * @throws DeleteError
      */
     #[CheckPermission(Permission::DELETE)]
-    public function delete(#[GetModel(['id' => 'eventId'])] $event): AjaxResponse
+    public function delete(#[GetModel(['id' => 'eventId'])] Event $event): AjaxResponse
     {
         $event->delete();
 
