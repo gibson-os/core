@@ -16,6 +16,8 @@ use GibsonOS\Core\Repository\UserRepository;
 use GibsonOS\Core\Service\InstallService;
 use GibsonOS\Core\Service\PriorityInterface;
 use GibsonOS\Core\Service\UserService;
+use JsonException;
+use ReflectionException;
 
 class UserData extends AbstractInstall implements PriorityInterface, SingleInstallInterface
 {
@@ -31,6 +33,8 @@ class UserData extends AbstractInstall implements PriorityInterface, SingleInsta
      * @throws SaveError
      * @throws SelectError
      * @throws UserError
+     * @throws JsonException
+     * @throws ReflectionException
      */
     public function install(string $module): Generator
     {
@@ -51,12 +55,12 @@ class UserData extends AbstractInstall implements PriorityInterface, SingleInsta
         );
 
         foreach ($this->moduleRepository->getAll() as $module) {
-            (new User\Permission())
-                ->setUser($user)
-                ->setModuleModel($module)
-                ->setPermission($permissionAll)
-                ->save()
-            ;
+            $this->modelManager->save(
+                (new User\Permission())
+                    ->setUser($user)
+                    ->setModuleModel($module)
+                    ->setPermission($permissionAll)
+            );
         }
     }
 

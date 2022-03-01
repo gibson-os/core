@@ -7,12 +7,14 @@ use GibsonOS\Core\Attribute\CheckPermission;
 use GibsonOS\Core\Attribute\GetSetting;
 use GibsonOS\Core\Exception\Model\SaveError;
 use GibsonOS\Core\Exception\Repository\SelectError;
+use GibsonOS\Core\Manager\ModelManager;
 use GibsonOS\Core\Model\Setting;
 use GibsonOS\Core\Model\User\Permission;
 use GibsonOS\Core\Repository\ModuleRepository;
 use GibsonOS\Core\Service\Response\AjaxResponse;
 use GibsonOS\Core\Utility\JsonUtility;
 use JsonException;
+use ReflectionException;
 
 class DesktopController extends AbstractController
 {
@@ -42,9 +44,10 @@ class DesktopController extends AbstractController
      * @throws SaveError
      * @throws SelectError
      * @throws JsonException
+     * @throws ReflectionException
      */
     #[CheckPermission(Permission::WRITE)]
-    public function save(ModuleRepository $moduleRepository, array $items): AjaxResponse
+    public function save(ModelManager $modelManager, ModuleRepository $moduleRepository, array $items): AjaxResponse
     {
         $module = $moduleRepository->getByName($this->requestService->getModuleName());
 
@@ -54,13 +57,13 @@ class DesktopController extends AbstractController
             }
         }
 
-        (new Setting())
-            ->setUserId($this->sessionService->getUserId() ?? 0)
-            ->setModule($module)
-            ->setKey(self::DESKTOP_KEY)
-            ->setValue(JsonUtility::encode($items))
-            ->save()
-        ;
+        $modelManager->save(
+            (new Setting())
+                ->setUserId($this->sessionService->getUserId() ?? 0)
+                ->setModule($module)
+                ->setKey(self::DESKTOP_KEY)
+                ->setValue(JsonUtility::encode($items))
+        );
 
         return $this->returnSuccess();
     }

@@ -48,20 +48,32 @@ class EventController extends AbstractController
     }
 
     /**
+     * @param ElementStore $elementStore
+     * @param Event|null   $event
+     * @param string|null  $node
+     *
+     * @throws FactoryError
      * @throws GetError
      * @throws JsonException
+     * @throws ReflectionException
+     * @throws SelectError
+     *
+     * @return AjaxResponse
      */
     #[CheckPermission(Permission::READ)]
-    public function elements(ElementStore $elementStore, int $eventId = null, string $node = null): AjaxResponse
-    {
+    public function elements(
+        ElementStore $elementStore,
+        #[GetModel(['id' => 'eventId'])] Event $event = null,
+        string $node = null
+    ): AjaxResponse {
         if (
-            $eventId === null ||
+            $event === null ||
             ($node !== null && $node !== 'NaN')
         ) {
             return $this->returnSuccess([]);
         }
 
-        $elementStore->setEventId($eventId);
+        $elementStore->setEvent($event);
 
         return $this->returnSuccess($elementStore->getList());
     }
@@ -108,11 +120,12 @@ class EventController extends AbstractController
      * @throws GetError
      * @throws SelectError
      * @throws JsonException
+     * @throws ReflectionException
      */
     #[CheckPermission(Permission::READ)]
-    public function triggers(TriggerStore $triggerStore, int $eventId): AjaxResponse
+    public function triggers(TriggerStore $triggerStore, #[GetModel(['id' => 'eventId'])] Event $event): AjaxResponse
     {
-        $triggerStore->setEventId($eventId);
+        $triggerStore->setEvent($event);
 
         return $this->returnSuccess($triggerStore->getList());
     }
@@ -154,13 +167,13 @@ class EventController extends AbstractController
     }
 
     /**
-     * @throws SelectError
      * @throws DeleteError
+     * @throws JsonException
      */
     #[CheckPermission(Permission::DELETE)]
-    public function delete(#[GetModel(['id' => 'eventId'])] Event $event): AjaxResponse
+    public function delete(ModelManager $modelManager, #[GetModel(['id' => 'eventId'])] Event $event): AjaxResponse
     {
-        $event->delete();
+        $modelManager->delete($event);
 
         return $this->returnSuccess();
     }

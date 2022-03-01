@@ -13,6 +13,7 @@ use GibsonOS\Core\Exception\Model\SaveError;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Exception\WeatherError;
 use GibsonOS\Core\Exception\WebException;
+use GibsonOS\Core\Manager\ModelManager;
 use GibsonOS\Core\Mapper\WeatherMapper;
 use GibsonOS\Core\Model\Weather\Location;
 use GibsonOS\Core\Repository\WeatherRepository;
@@ -21,8 +22,15 @@ use JsonException;
 
 class WeatherService
 {
-    public function __construct(private WebService $webService, private EnvService $envService, private WeatherMapper $weatherMapper, private DateTimeService $dateTimeService, private EventService $eventService, private WeatherRepository $weatherRepository)
-    {
+    public function __construct(
+        private WebService $webService,
+        private EnvService $envService,
+        private WeatherMapper $weatherMapper,
+        private DateTimeService $dateTimeService,
+        private EventService $eventService,
+        private WeatherRepository $weatherRepository,
+        private ModelManager $modelManager
+    ) {
     }
 
     /**
@@ -67,7 +75,7 @@ class WeatherService
 
         $now = $this->dateTimeService->get('now', new DateTimeZone($location->getTimezone()));
         $current = $this->weatherMapper->mapFromArray($data['current'], $location);
-        $current->save();
+        $this->modelManager->save($current);
 
         foreach ($data['hourly'] as $hourly) {
             $hourlyWeather = $this->weatherMapper->mapFromArray($hourly, $location);
@@ -77,11 +85,10 @@ class WeatherService
                     $this->weatherRepository->getByDate($location, $hourlyWeather->getDate())->getId()
                 );
             } catch (SelectError) {
-                // Do nothing
             }
 
             if ($hourlyWeather->getDate() > $now) {
-                $hourlyWeather->save();
+                $this->modelManager->save($hourlyWeather);
             }
         }
 

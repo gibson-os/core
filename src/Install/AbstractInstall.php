@@ -10,6 +10,7 @@ use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\InstallException;
 use GibsonOS\Core\Exception\Model\SaveError;
 use GibsonOS\Core\Exception\Repository\SelectError;
+use GibsonOS\Core\Manager\ModelManager;
 use GibsonOS\Core\Manager\ServiceManager;
 use GibsonOS\Core\Model\Setting;
 use GibsonOS\Core\Repository\ModuleRepository;
@@ -19,6 +20,7 @@ use GibsonOS\Core\Service\EnvService;
 use GibsonOS\Core\Utility\JsonUtility;
 use JsonException;
 use Psr\Log\LoggerInterface;
+use ReflectionException;
 
 abstract class AbstractInstall implements InstallInterface
 {
@@ -29,6 +31,8 @@ abstract class AbstractInstall implements InstallInterface
     protected SettingRepository $settingRepository;
 
     protected ModuleRepository $moduleRepository;
+
+    protected ModelManager $modelManager;
 
     protected LoggerInterface $logger;
 
@@ -43,6 +47,7 @@ abstract class AbstractInstall implements InstallInterface
         $this->envService = $this->serviceManagerService->get(EnvService::class);
         $this->settingRepository = $this->serviceManagerService->get(SettingRepository::class);
         $this->moduleRepository = $this->serviceManagerService->get(ModuleRepository::class);
+        $this->modelManager = $this->serviceManagerService->get(ModelManager::class);
         $this->logger = $this->serviceManagerService->get(LoggerInterface::class);
     }
 
@@ -88,6 +93,8 @@ abstract class AbstractInstall implements InstallInterface
     }
 
     /**
+     * @throws JsonException
+     * @throws ReflectionException
      * @throws SaveError
      * @throws SelectError
      */
@@ -101,12 +108,12 @@ abstract class AbstractInstall implements InstallInterface
             $setting = new Setting();
         }
 
-        $setting
-            ->setModuleId($module->getId() ?? 0)
-            ->setKey($key)
-            ->setValue($value)
-            ->save()
-        ;
+        $this->modelManager->save(
+            $setting
+                ->setModuleId($module->getId() ?? 0)
+                ->setKey($key)
+                ->setValue($value)
+        );
     }
 
     /**
@@ -149,8 +156,7 @@ abstract class AbstractInstall implements InstallInterface
      * @throws SaveError
      * @throws SelectError
      * @throws JsonException
-     *
-     * @return $this
+     * @throws ReflectionException
      */
     protected function addApp(string $text, string $module, string $task, string $action, string $icon): self
     {
@@ -183,7 +189,7 @@ abstract class AbstractInstall implements InstallInterface
             'action' => $action,
             'icon' => $icon,
         ];
-        $appsSetting->setValue(JsonUtility::encode($apps))->save();
+        $this->modelManager->save($appsSetting->setValue(JsonUtility::encode($apps)));
 
         return $this;
     }

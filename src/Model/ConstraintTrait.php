@@ -323,8 +323,7 @@ trait ConstraintTrait
         string|int|float $value,
         string $foreignField = 'id',
         string $where = null,
-        array $whereParameters = [],
-        string $orderBy = null
+        array $whereParameters = []
     ): ?AbstractModel {
         $mysqlTable = new mysqlTable($this->database, $model->getTableName());
         $mysqlTable

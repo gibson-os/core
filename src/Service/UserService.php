@@ -4,21 +4,28 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Service;
 
 use Exception;
-use GibsonOS\Core\Exception\DateTimeError;
 use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\Model\SaveError;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Exception\UserError;
+use GibsonOS\Core\Manager\ModelManager;
 use GibsonOS\Core\Model\User;
 use GibsonOS\Core\Repository\User\DeviceRepository;
 use GibsonOS\Core\Repository\UserRepository;
+use JsonException;
+use ReflectionException;
 
 class UserService
 {
     private const PASSWORD_MIN_LENGTH = 6;
 
-    public function __construct(private EnvService $envService, private UserRepository $userRepository, private DeviceRepository $deviceRepository, private SessionService $sessionService)
-    {
+    public function __construct(
+        private EnvService $envService,
+        private UserRepository $userRepository,
+        private DeviceRepository $deviceRepository,
+        private SessionService $sessionService,
+        private ModelManager $modelManager
+    ) {
     }
 
     /**
@@ -46,13 +53,12 @@ class UserService
             $this->sessionService->login($device->getUser());
 
             return $device;
-        } catch (SelectError|DateTimeError $e) {
+        } catch (SelectError $e) {
             throw new UserError($e->getMessage(), 0, $e);
         }
     }
 
     /**
-     * @throws DateTimeError
      * @throws SaveError
      * @throws Exception
      */
@@ -75,7 +81,7 @@ class UserService
             ->setModel($model)
             ->setToken(md5((string) mt_rand()) . md5((string) mt_rand()))
         ;
-        $device->save();
+        $this->modelManager->save($device);
 
         return $device;
     }
@@ -88,6 +94,8 @@ class UserService
     /**
      * @throws SaveError
      * @throws UserError
+     * @throws JsonException
+     * @throws ReflectionException
      */
     public function save(
         User $user,
@@ -121,7 +129,7 @@ class UserService
             ->setHost($host)
             ->setIp($ip)
         ;
-        $user->save();
+        $this->modelManager->save($user);
 
         return $user;
     }

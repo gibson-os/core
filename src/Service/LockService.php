@@ -10,17 +10,24 @@ use GibsonOS\Core\Exception\Flock\UnlockError;
 use GibsonOS\Core\Exception\Model\DeleteError;
 use GibsonOS\Core\Exception\Model\SaveError;
 use GibsonOS\Core\Exception\Repository\SelectError;
+use GibsonOS\Core\Manager\ModelManager;
 use GibsonOS\Core\Model\Lock;
 use GibsonOS\Core\Repository\LockRepository;
+use JsonException;
+use ReflectionException;
 
 class LockService
 {
-    public function __construct(private LockRepository $lockRepository, private ProcessService $processService)
-    {
+    public function __construct(
+        private LockRepository $lockRepository,
+        private ProcessService $processService,
+        private ModelManager $modelManager
+    ) {
     }
 
     /**
      * @throws LockError
+     * @throws JsonException
      */
     public function lock(string $name = null): void
     {
@@ -31,11 +38,11 @@ class LockService
         }
 
         try {
-            (new Lock())
-                ->setName($name)
-                ->setPid(getmypid())
-                ->save()
-            ;
+            $this->modelManager->save(
+                (new Lock())
+                    ->setName($name)
+                    ->setPid(getmypid())
+            );
         } catch (SaveError|Exception) {
             throw new LockError('Can not save lock!');
         }
@@ -43,6 +50,8 @@ class LockService
 
     /**
      * @throws LockError
+     * @throws JsonException
+     * @throws ReflectionException
      */
     public function forceLock(string $name = null): void
     {
@@ -63,10 +72,7 @@ class LockService
         }
 
         try {
-            $lock
-                ->setPid(getmypid())
-                ->save()
-            ;
+            $this->modelManager->save($lock->setPid(getmypid()));
         } catch (SaveError) {
             throw new LockError('Can not save lock!');
         }
@@ -74,6 +80,7 @@ class LockService
 
     /**
      * @throws UnlockError
+     * @throws JsonException
      */
     public function unlock(string $name = null): void
     {
@@ -81,12 +88,15 @@ class LockService
 
         try {
             $lock = $this->lockRepository->getByName($name);
-            $lock->delete();
+            $this->modelManager->delete($lock);
         } catch (SelectError|DeleteError) {
             throw new UnlockError();
         }
     }
 
+    /**
+     * @throws JsonException
+     */
     public function isLocked(string $name = null): bool
     {
         $name = $this->getName($name);
@@ -99,9 +109,8 @@ class LockService
             }
 
             try {
-                $lock->delete();
+                $this->modelManager->delete($lock);
             } catch (DeleteError) {
-                // do nothing
             }
 
             return false;
@@ -112,6 +121,7 @@ class LockService
 
     /**
      * @throws DateTimeError
+     * @throws JsonException
      */
     public function waitUnlockToLock(string $name = null): void
     {
@@ -125,6 +135,7 @@ class LockService
 
     /**
      * @throws DeleteError
+     * @throws JsonException
      */
     public function kill(string $name = null): void
     {
@@ -133,13 +144,14 @@ class LockService
         try {
             $lock = $this->lockRepository->getByName($name);
             $this->processService->kill($lock->getPid());
-            $lock->delete();
+            $this->modelManager->delete($lock);
         } catch (SelectError) {
-            // Do nothing
         }
     }
 
     /**
+     * @throws JsonException
+     * @throws ReflectionException
      * @throws SaveError
      */
     public function stop(string $name = null): void
@@ -147,15 +159,14 @@ class LockService
         $name = $this->getName($name);
 
         try {
-            $this->lockRepository->getByName($name)
-                ->setStop(true)
-                ->save()
-            ;
+            $this->modelManager->save($this->lockRepository->getByName($name)->setStop(true));
         } catch (SelectError) {
-            // Do nothing
         }
     }
 
+    /**
+     * @throws LockError
+     */
     public function shouldStop(string $name = null): bool
     {
         $name = $this->getName($name);

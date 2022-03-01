@@ -7,6 +7,7 @@ use GibsonOS\Core\Dto\Parameter\AbstractParameter;
 use GibsonOS\Core\Exception\FactoryError;
 use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\Repository\SelectError;
+use GibsonOS\Core\Model\Event;
 use GibsonOS\Core\Model\Event\Element;
 use GibsonOS\Core\Store\AbstractDatabaseStore;
 use JsonException;
@@ -23,11 +24,11 @@ class ElementStore extends AbstractDatabaseStore
         parent::__construct($database);
     }
 
-    private int $eventId;
+    private Event $event;
 
-    public function setEventId(int $eventId): void
+    public function setEvent(Event $event): void
     {
-        $this->eventId = $eventId;
+        $this->event = $event;
     }
 
     protected function getModelClassName(): string
@@ -37,7 +38,7 @@ class ElementStore extends AbstractDatabaseStore
 
     protected function setWheres(): void
     {
-        $this->addWhere('`event_id`=?', [$this->eventId]);
+        $this->addWhere('`event_id`=?', [$this->event->getId() ?? 0]);
     }
 
     /**

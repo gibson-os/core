@@ -7,15 +7,18 @@ use DateTime;
 use GibsonOS\Core\Dto\Cronjob\Time;
 use GibsonOS\Core\Dto\Cronjob\TimePart;
 use GibsonOS\Core\Exception\Model\SaveError;
+use GibsonOS\Core\Manager\ModelManager;
 use GibsonOS\Core\Model\Cronjob;
 use GibsonOS\Core\Repository\CronjobRepository;
 use GibsonOS\Core\Utility\JsonUtility;
 use JsonException;
 use Psr\Log\LoggerInterface;
+use ReflectionException;
 
 class CronjobService
 {
     public function __construct(
+        private ModelManager $modelManager,
         private CronjobRepository $cronjobRepository,
         private CommandService $commandService,
         private LoggerInterface $logger
@@ -27,6 +30,7 @@ class CronjobService
      *
      * @throws JsonException
      * @throws SaveError
+     * @throws ReflectionException
      */
     public function add(
         string $command,
@@ -48,7 +52,7 @@ class CronjobService
             ->setUser($user)
             ->setActive(true)
         ;
-        $cronjob->save();
+        $this->modelManager->save($cronjob);
 
         $times = $this->getCombinedTimes(
             $this->getTimesFromString($hours),
@@ -61,24 +65,24 @@ class CronjobService
         );
 
         foreach ($times as $time) {
-            (new Cronjob\Time())
-                ->setCronjob($cronjob)
-                ->setFromHour($time->getHour()->getFrom())
-                ->setToHour($time->getHour()->getTo())
-                ->setFromMinute($time->getMinute()->getFrom())
-                ->setToMinute($time->getMinute()->getTo())
-                ->setFromSecond($time->getSecond()->getFrom())
-                ->setToSecond($time->getSecond()->getTo())
-                ->setFromDayOfMonth($time->getDayOfMonth()->getFrom())
-                ->setToDayOfMonth($time->getDayOfMonth()->getTo())
-                ->setFromDayOfWeek($time->getDayOfWeek()->getFrom())
-                ->setToDayOfWeek($time->getDayOfWeek()->getTo())
-                ->setFromMonth($time->getMonth()->getFrom())
-                ->setToMonth($time->getMonth()->getTo())
-                ->setFromYear($time->getYear()->getFrom())
-                ->setToYear($time->getYear()->getTo())
-                ->save()
-            ;
+            $this->modelManager->save(
+                (new Cronjob\Time())
+                    ->setCronjob($cronjob)
+                    ->setFromHour($time->getHour()->getFrom())
+                    ->setToHour($time->getHour()->getTo())
+                    ->setFromMinute($time->getMinute()->getFrom())
+                    ->setToMinute($time->getMinute()->getTo())
+                    ->setFromSecond($time->getSecond()->getFrom())
+                    ->setToSecond($time->getSecond()->getTo())
+                    ->setFromDayOfMonth($time->getDayOfMonth()->getFrom())
+                    ->setToDayOfMonth($time->getDayOfMonth()->getTo())
+                    ->setFromDayOfWeek($time->getDayOfWeek()->getFrom())
+                    ->setToDayOfWeek($time->getDayOfWeek()->getTo())
+                    ->setFromMonth($time->getMonth()->getFrom())
+                    ->setToMonth($time->getMonth()->getTo())
+                    ->setFromYear($time->getYear()->getFrom())
+                    ->setToYear($time->getYear()->getTo())
+            );
         }
     }
 
@@ -102,7 +106,7 @@ class CronjobService
             );
 
             $cronjob->setLastRun($dateTime);
-            $cronjob->save();
+            $this->modelManager->save($cronjob);
 
             $dateTime = new DateTime();
         }

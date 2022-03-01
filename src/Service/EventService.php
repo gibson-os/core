@@ -14,6 +14,7 @@ use GibsonOS\Core\Exception\DateTimeError;
 use GibsonOS\Core\Exception\EventException;
 use GibsonOS\Core\Exception\FactoryError;
 use GibsonOS\Core\Exception\Model\SaveError;
+use GibsonOS\Core\Manager\ModelManager;
 use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Manager\ServiceManager;
 use GibsonOS\Core\Model\AutoCompleteModelInterface;
@@ -40,6 +41,7 @@ class EventService
         private CommandService $commandService,
         private DateTimeService $dateTimeService,
         private ReflectionManager $reflectionManager,
+        private ModelManager $modelManager,
         private LoggerInterface $logger
     ) {
     }
@@ -95,6 +97,7 @@ class EventService
      * @throws JsonException
      * @throws SaveError
      * @throws EventException
+     * @throws ReflectionException
      */
     public function runEvent(Event $event, bool $async): void
     {
@@ -106,7 +109,7 @@ class EventService
         }
 
         $this->logger->info('Run event ' . $event->getId());
-        $event->setLastRun($this->dateTimeService->get())->save();
+        $this->modelManager->save($event->setLastRun($this->dateTimeService->get()));
         $this->elementService->runElements($event->getElements(), $event);
     }
 

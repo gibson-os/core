@@ -13,6 +13,8 @@ use GibsonOS\Core\Model\User\Permission;
 use GibsonOS\Core\Repository\User\PermissionRepository;
 use GibsonOS\Core\Service\InstallService;
 use GibsonOS\Core\Service\PriorityInterface;
+use JsonException;
+use ReflectionException;
 
 class GeneralPermissionData extends AbstractInstall implements PriorityInterface
 {
@@ -25,19 +27,21 @@ class GeneralPermissionData extends AbstractInstall implements PriorityInterface
 
     /**
      * @throws SaveError
+     * @throws JsonException
+     * @throws ReflectionException
      */
     public function install(string $module): Generator
     {
         try {
             $this->permissionRepository->getByModuleTaskAndAction('core', 'user', 'login');
         } catch (SelectError) {
-            (new Permission())
-                ->setModule('core')
-                ->setTask('user')
-                ->setAction('login')
-                ->setPermission(Permission::READ)
-                ->save()
-            ;
+            $this->modelManager->save(
+                (new Permission())
+                    ->setModule('core')
+                    ->setTask('user')
+                    ->setAction('login')
+                    ->setPermission(Permission::READ)
+            );
         }
 
         yield new Success('Set general permission for core!');

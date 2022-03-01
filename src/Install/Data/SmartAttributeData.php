@@ -5,13 +5,21 @@ namespace GibsonOS\Core\Install\Data;
 
 use Generator;
 use GibsonOS\Core\Dto\Install\Success;
+use GibsonOS\Core\Exception\Model\SaveError;
 use GibsonOS\Core\Install\AbstractInstall;
 use GibsonOS\Core\Model\SmartAttribute;
 use GibsonOS\Core\Service\InstallService;
 use GibsonOS\Core\Service\PriorityInterface;
+use JsonException;
+use ReflectionException;
 
 class SmartAttributeData extends AbstractInstall implements PriorityInterface
 {
+    /**
+     * @throws JsonException
+     * @throws ReflectionException
+     * @throws SaveError
+     */
     public function install(string $module): Generator
     {
         $this
@@ -82,15 +90,20 @@ class SmartAttributeData extends AbstractInstall implements PriorityInterface
         yield new Success('Smart Attributes installed!');
     }
 
+    /**
+     * @throws SaveError
+     * @throws JsonException
+     * @throws ReflectionException
+     */
     private function setSmartAttribute(int $id, string $short, string $description): SmartAttributeData
     {
         $this->logger->info(sprintf('Add smart attribute #%d "%s"', $id, $short));
-        (new SmartAttribute())
-            ->setId($id)
-            ->setShort($short)
-            ->setDescription($description)
-            ->save()
-        ;
+        $this->modelManager->save(
+            (new SmartAttribute())
+                ->setId($id)
+                ->setShort($short)
+                ->setDescription($description)
+        );
 
         return $this;
     }

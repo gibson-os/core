@@ -5,12 +5,12 @@ namespace GibsonOS\Core\Controller;
 
 use GibsonOS\Core\Attribute\CheckPermission;
 use GibsonOS\Core\Attribute\GetModel;
-use GibsonOS\Core\Exception\DateTimeError;
 use GibsonOS\Core\Exception\Model\DeleteError;
 use GibsonOS\Core\Exception\Model\SaveError;
 use GibsonOS\Core\Exception\PermissionDenied;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Exception\UserError;
+use GibsonOS\Core\Manager\ModelManager;
 use GibsonOS\Core\Model\User;
 use GibsonOS\Core\Model\User\Permission;
 use GibsonOS\Core\Repository\User\DeviceRepository;
@@ -25,6 +25,8 @@ use GibsonOS\Core\Service\TwigService;
 use GibsonOS\Core\Service\UserService;
 use GibsonOS\Core\Store\UserStore;
 use GibsonOS\Core\Utility\StatusCode;
+use JsonException;
+use ReflectionException;
 
 class UserController extends AbstractController
 {
@@ -73,27 +75,29 @@ class UserController extends AbstractController
      */
     #[CheckPermission(Permission::READ)]
     public function settings(
-        UserRepository $userRepository,
         DeviceRepository $deviceRepository,
         int $userPermission,
-        int $id = null
+        #[GetModel] User $user = null
     ): AjaxResponse {
-        $this->checkUserPermission($id, Permission::READ, $userPermission);
+        $this->checkUserPermission($user?->getId(), Permission::READ, $userPermission);
 
-        if ($id === null) {
-            $id = $this->sessionService->getUserId() ?? 0;
+        if ($user === null) {
+            $user = $this->sessionService->getUser();
         }
 
-        $user = $userRepository->getById($id)->jsonSerialize();
-        $user['devices'] = $deviceRepository->findByUserId($id);
+        if ($user === null) {
+            return $this->returnFailure('User not found!');
+        }
 
-        return $this->returnSuccess($user);
+        $userJson = $user->jsonSerialize();
+        $userJson['devices'] = $deviceRepository->findByUserId($user->getId() ?? 0);
+
+        return $this->returnSuccess($userJson);
     }
 
     /**
-     * @throws UserError
-     * @throws DateTimeError
      * @throws SaveError
+     * @throws UserError
      */
     public function appLogin(
         UserService $userService,
@@ -130,10 +134,14 @@ class UserController extends AbstractController
     }
 
     /**
+     * @throws JsonException
      * @throws PermissionDenied
+     * @throws ReflectionException
      * @throws SaveError
      * @throws SelectError
      * @throws UserError
+     *
+     * @todo Model mapping?
      */
     public function save(
         UserService $userService,
@@ -197,47 +205,51 @@ class UserController extends AbstractController
      */
     public function deleteDevice(
         DeviceRepository $deviceRepository,
-        int $id,
+        #[GetModel] User $user,
         array $devices,
         int $userPermission
     ): AjaxResponse {
-        $this->checkUserPermission($id, Permission::DELETE, $userPermission);
+        $this->checkUserPermission($user->getId(), Permission::DELETE, $userPermission);
 
-        $deviceRepository->deleteByIds($devices, $id);
+        $deviceRepository->deleteByIds($devices, $user->getId());
 
         return $this->returnSuccess();
     }
 
     /**
+     * @throws JsonException
      * @throws SaveError
+     * @throws ReflectionException
      */
     #[CheckPermission(Permission::MANAGE + Permission::WRITE)]
     public function savePermission(
-        ?int $id,
+        ModelManager $modelManager,
         int $permission,
         string $module,
         string $task = '',
-        string $action = ''
+        string $action = '',
+        #[GetModel] User $user = null
     ): AjaxResponse {
-        (new Permission())
-            ->setUserId($id ?: null)
+        $modelManager->save(
+            (new Permission())
+            ->setUserId($user?->getId())
             ->setPermission($permission)
             ->setModule($module)
             ->setTask($task)
             ->setAction($action)
-            ->save()
-        ;
+        );
 
         return $this->returnSuccess();
     }
 
     /**
      * @throws DeleteError
+     * @throws JsonException
      */
     #[CheckPermission(Permission::MANAGE + Permission::DELETE)]
-    public function delete(#[GetModel] User $user): AjaxResponse
+    public function delete(ModelManager $modelManager, #[GetModel] User $user): AjaxResponse
     {
-        $user->delete();
+        $modelManager->delete($user);
 
         return $this->returnSuccess();
     }

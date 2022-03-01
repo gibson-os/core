@@ -11,9 +11,11 @@ use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\Model\DeleteError;
 use GibsonOS\Core\Exception\Model\SaveError;
 use GibsonOS\Core\Exception\SetError;
+use GibsonOS\Core\Manager\ModelManager;
 use GibsonOS\Core\Model\Icon;
 use GibsonOS\Core\Model\Setting;
 use GibsonOS\Core\Repository\Icon\TagRepository;
+use JsonException;
 use Throwable;
 
 class IconService
@@ -23,6 +25,7 @@ class IconService
     public function __construct(
         private TagRepository $tagRepository,
         private FileService $fileService,
+        private ModelManager $modelManager,
         #[GetSetting('custom_icon_path', 'core')] Setting $customIconPath
     ) {
         $this->iconPath = $customIconPath->getValue();
@@ -41,7 +44,7 @@ class IconService
         $database->startTransaction();
 
         try {
-            $icon->save();
+            $this->modelManager->save($icon);
             $this->fileService->copy(
                 $imageFilename,
                 $this->iconPath . DIRECTORY_SEPARATOR . 'icon' . $icon->getId() . '.' . $icon->getOriginalType()
@@ -57,10 +60,11 @@ class IconService
             $this->tagRepository->deleteByIconId($icon->getId() ?? 0);
 
             foreach ($tags as $tag) {
-                (new Icon\Tag())
-                    ->setIcon($icon)
-                    ->setTag(trim($tag))
-                    ->save();
+                $this->modelManager->save(
+                    (new Icon\Tag())
+                        ->setIcon($icon)
+                        ->setTag(trim($tag))
+                );
             }
         } catch (Throwable $exception) {
             $database->rollback();
@@ -76,10 +80,11 @@ class IconService
      * @throws FileDeleteError
      * @throws FileNotFound
      * @throws DeleteError
+     * @throws JsonException
      */
     public function delete(Icon $icon): void
     {
-        $icon->delete();
+        $this->modelManager->delete($icon);
         $this->fileService->delete($this->iconPath . DIRECTORY_SEPARATOR . 'icon' . $icon->getId() . '.' . $icon->getOriginalType());
 
         if ($this->fileService->exists($this->iconPath . DIRECTORY_SEPARATOR . 'icon' . $icon->getId() . '.ico')) {

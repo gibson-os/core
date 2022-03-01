@@ -12,6 +12,7 @@ use GibsonOS\Core\Exception\Flock\LockError;
 use GibsonOS\Core\Exception\Flock\UnlockError;
 use GibsonOS\Core\Exception\Model\SaveError;
 use GibsonOS\Core\Exception\WeatherError;
+use GibsonOS\Core\Manager\ModelManager;
 use GibsonOS\Core\Repository\Weather\LocationRepository;
 use GibsonOS\Core\Repository\WeatherRepository;
 use GibsonOS\Core\Service\DateTimeService;
@@ -19,6 +20,7 @@ use GibsonOS\Core\Service\LockService;
 use GibsonOS\Core\Service\WeatherService;
 use JsonException;
 use Psr\Log\LoggerInterface;
+use ReflectionException;
 
 /**
  * @description Collect weather information of required locations
@@ -32,6 +34,7 @@ class WeatherCommand extends AbstractCommand
         private LocationRepository $locationRepository,
         private WeatherRepository $weatherRepository,
         private DateTimeService $dateTimeService,
+        private ModelManager $modelManager,
         private LockService $lockService
     ) {
         parent::__construct($logger);
@@ -44,6 +47,7 @@ class WeatherCommand extends AbstractCommand
      * @throws SaveError
      * @throws UnlockError
      * @throws WeatherError
+     * @throws ReflectionException
      */
     protected function run(): int
     {
@@ -65,20 +69,20 @@ class WeatherCommand extends AbstractCommand
             try {
                 $this->weatherService->load($location);
             } catch (WeatherError|SaveError $e) {
-                $location
-                    ->setError($e->getMessage())
-                    ->setLastRun($lastRun)
-                    ->save()
-                ;
+                $this->modelManager->save(
+                    $location
+                        ->setError($e->getMessage())
+                        ->setLastRun($lastRun)
+                );
 
                 throw $e;
             }
 
-            $location
-                ->setError(null)
-                ->setLastRun($lastRun)
-                ->save()
-            ;
+            $this->modelManager->save(
+                $location
+                    ->setError(null)
+                    ->setLastRun($lastRun)
+            );
         }
 
         $this->lockService->unlock();

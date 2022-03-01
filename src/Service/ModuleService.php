@@ -7,6 +7,7 @@ use GibsonOS\Core\Attribute\CheckPermission;
 use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\Model\SaveError;
 use GibsonOS\Core\Exception\Repository\SelectError;
+use GibsonOS\Core\Manager\ModelManager;
 use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Model\Action;
 use GibsonOS\Core\Model\Module;
@@ -15,6 +16,7 @@ use GibsonOS\Core\Repository\Action\PermissionRepository;
 use GibsonOS\Core\Repository\ActionRepository;
 use GibsonOS\Core\Repository\ModuleRepository;
 use GibsonOS\Core\Repository\TaskRepository;
+use JsonException;
 use Psr\Log\LoggerInterface;
 use ReflectionClass;
 use ReflectionException;
@@ -36,6 +38,7 @@ class ModuleService
         private PermissionRepository $permissionRepository,
         private DirService $dirService,
         private ReflectionManager $reflectionManager,
+        private ModelManager $modelManager,
         private LoggerInterface $logger
     ) {
         $this->vendorPath = realpath(
@@ -60,6 +63,7 @@ class ModuleService
     /**
      * @throws GetError
      * @throws SaveError
+     * @throws JsonException
      */
     public function scan(): void
     {
@@ -76,9 +80,10 @@ class ModuleService
     }
 
     /**
-     * @throws GetError
      * @throws ReflectionException
      * @throws SaveError
+     * @throws JsonException
+     * @throws GetError
      *
      * @return array{moduleIds: array<int>, taskIds: array<int>, actionIds: array<int>}
      */
@@ -102,7 +107,7 @@ class ModuleService
                 $module = $this->moduleRepository->getByName($moduleName);
             } catch (SelectError) {
                 $module = (new Module())->setName($moduleName);
-                $module->save();
+                $this->modelManager->save($module);
             }
 
             $moduleIds[] = $module->getId() ?? 0;
@@ -122,9 +127,10 @@ class ModuleService
     }
 
     /**
-     * @throws GetError
      * @throws ReflectionException
      * @throws SaveError
+     * @throws JsonException
+     * @throws GetError
      *
      * @return array{taskIds: array<int>, actionIds: array<int>}
      */
@@ -176,7 +182,7 @@ class ModuleService
                     ->setName($taskName)
                     ->setModule($module)
                 ;
-                $task->save();
+                $this->modelManager->save($task);
             }
 
             $taskIds[] = $task->getId() ?? 0;
@@ -190,7 +196,9 @@ class ModuleService
     }
 
     /**
+     * @throws ReflectionException
      * @throws SaveError
+     * @throws JsonException
      *
      * @return int[]
      */
@@ -215,24 +223,24 @@ class ModuleService
                 ;
             }
 
-            $action->save();
+            $this->modelManager->save($action);
             $actionIds[] = $action->getId() ?? 0;
 
             $this->permissionRepository->deleteByAction($action->getName());
 
             foreach ($this->reflectionManager->getAttributes($reflectionMethod, CheckPermission::class) as $checkPermission) {
-                (new Action\Permission())
-                    ->setActionId($action->getId() ?? 0)
-                    ->setPermission($checkPermission->getPermission())
-                    ->save()
-                ;
-
-                foreach ($checkPermission->getPermissionsByRequestValues() as $permission) {
+                $this->modelManager->save(
                     (new Action\Permission())
                         ->setActionId($action->getId() ?? 0)
-                        ->setPermission($permission)
-                        ->save()
-                    ;
+                        ->setPermission($checkPermission->getPermission())
+                );
+
+                foreach ($checkPermission->getPermissionsByRequestValues() as $permission) {
+                    $this->modelManager->save(
+                        (new Action\Permission())
+                            ->setActionId($action->getId() ?? 0)
+                            ->setPermission($permission)
+                    );
                 }
             }
         }
@@ -242,6 +250,8 @@ class ModuleService
 
     /**
      * @throws GetError
+     * @throws JsonException
+     * @throws ReflectionException
      * @throws SaveError
      *
      * @return array{moduleIds: array<int>, taskIds: array<int>, actionIds: array<int>}
@@ -266,7 +276,7 @@ class ModuleService
                 $module = $this->moduleRepository->getByName($moduleName);
             } catch (SelectError) {
                 $module = (new Module())->setName($moduleName);
-                $module->save();
+                $this->modelManager->save($module);
             }
 
             $moduleIds[] = $module->getId() ?? 0;
@@ -283,12 +293,14 @@ class ModuleService
     }
 
     /**
-     * @deprecated
-     *
      * @throws GetError
+     * @throws JsonException
+     * @throws ReflectionException
      * @throws SaveError
      *
      * @return array{taskIds: array<int>, actionIds: array<int>}
+     *
+     * @deprecated
      */
     private function scanOldTasks(Module $module, string $path): array
     {
@@ -309,7 +321,7 @@ class ModuleService
                     ->setName($taskName)
                     ->setModule($module)
                 ;
-                $task->save();
+                $this->modelManager->save($task);
             }
 
             $taskIds[] = $task->getId() ?? 0;
@@ -323,6 +335,8 @@ class ModuleService
     }
 
     /**
+     * @throws JsonException
+     * @throws ReflectionException
      * @throws SaveError
      *
      * @return int[]
@@ -344,7 +358,7 @@ class ModuleService
                     ->setTask($task)
                     ->setModule($module)
                 ;
-                $action->save();
+                $this->modelManager->save($action);
             }
 
             $actionIds[] = $action->getId() ?? 0;

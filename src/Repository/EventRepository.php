@@ -9,6 +9,7 @@ use GibsonOS\Core\Dto\Event\Command;
 use GibsonOS\Core\Exception\Model\SaveError;
 use GibsonOS\Core\Exception\Repository\DeleteError;
 use GibsonOS\Core\Exception\Repository\SelectError;
+use GibsonOS\Core\Manager\ModelManager;
 use GibsonOS\Core\Model\Event;
 use GibsonOS\Core\Model\Event\Element;
 use GibsonOS\Core\Model\Event\Trigger;
@@ -16,6 +17,7 @@ use GibsonOS\Core\Service\DateTimeService;
 use GibsonOS\Core\Utility\JsonUtility;
 use JsonException;
 use mysqlTable;
+use ReflectionException;
 use stdClass;
 
 class EventRepository extends AbstractRepository
@@ -23,6 +25,7 @@ class EventRepository extends AbstractRepository
     public function __construct(
         private JsonUtility $jsonUtility,
         private DateTimeService $dateTimeService,
+        private ModelManager $modelManager,
         #[GetTableName(Element::class)] private string $elementTableName,
         #[GetTableName(Trigger::class)] private string $triggerTableName
     ) {
@@ -159,8 +162,9 @@ class EventRepository extends AbstractRepository
     /**
      * @param int[] $elementIds
      *
-     * @throws SaveError
      * @throws JsonException
+     * @throws ReflectionException
+     * @throws SaveError
      *
      * @return int[]
      */
@@ -180,7 +184,7 @@ class EventRepository extends AbstractRepository
                 ->setReturns($element['returns'] ?? [])
                 ->setOrder($order++)
             ;
-            $elementModel->save();
+            $this->modelManager->save($elementModel);
             $elementIds[] = $elementModel->getId() ?? 0;
             $elementIds = $this->saveElements($event, $element['children'], $elementModel->getId() ?? 0, $elementIds);
         }
@@ -217,8 +221,9 @@ class EventRepository extends AbstractRepository
     }
 
     /**
-     * @throws JsonException
      * @throws SaveError
+     * @throws ReflectionException
+     * @throws JsonException
      *
      * @return int[]
      */
@@ -242,7 +247,7 @@ class EventRepository extends AbstractRepository
                 ->setSecond($trigger['second'])
                 ->setPriority($priority)
             ;
-            $triggerModel->save();
+            $this->modelManager->save($triggerModel);
             $triggerIds[] = $triggerModel->getId() ?? 0;
         }
 

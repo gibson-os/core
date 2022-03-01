@@ -7,6 +7,7 @@ use GibsonOS\Core\Dto\Parameter\AbstractParameter;
 use GibsonOS\Core\Exception\FactoryError;
 use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\Repository\SelectError;
+use GibsonOS\Core\Model\Event;
 use GibsonOS\Core\Model\Event\Trigger;
 use GibsonOS\Core\Store\AbstractDatabaseStore;
 use GibsonOS\Core\Utility\JsonUtility;
@@ -16,7 +17,7 @@ use ReflectionException;
 
 class TriggerStore extends AbstractDatabaseStore
 {
-    private int $eventId;
+    private Event $event;
 
     public function __construct(
         private ClassTriggerStore $classTriggerStore,
@@ -33,7 +34,7 @@ class TriggerStore extends AbstractDatabaseStore
 
     protected function setWheres(): void
     {
-        $this->addWhere('`event_id`=?', [$this->eventId]);
+        $this->addWhere('`event_id`=?', [$this->event->getId() ?? 0]);
     }
 
     /**
@@ -92,9 +93,9 @@ class TriggerStore extends AbstractDatabaseStore
         return $models;
     }
 
-    public function setEventId(int $eventId): TriggerStore
+    public function setEvent(Event $event): TriggerStore
     {
-        $this->eventId = $eventId;
+        $this->event = $event;
 
         return $this;
     }
