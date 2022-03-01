@@ -3,11 +3,8 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Model;
 
-use Exception;
 use GibsonOS\Core\Attribute\Install\Database\Table;
 use GibsonOS\Core\Exception\GetError;
-use GibsonOS\Core\Exception\Model\DeleteError;
-use GibsonOS\Core\Exception\Model\SaveError;
 use GibsonOS\Core\Factory\DateTimeFactory;
 use GibsonOS\Core\Service\DateTimeService;
 use GibsonOS\Core\Utility\JsonUtility;
@@ -231,53 +228,6 @@ abstract class AbstractModel implements ModelInterface
             } else {
                 $fieldObject->setValue(is_bool($value) ? (int) $value : $value);
             }
-        }
-    }
-
-    /**
-     * @deprecated
-     *
-     * @throws SaveError
-     * @throws Exception
-     */
-    public function save(mysqlTable $mysqlTable = null): void
-    {
-        if ($mysqlTable === null) {
-            $mysqlTable = new mysqlTable($this->database, $this->getTableName());
-        }
-
-        $this->setToMysqlTable($mysqlTable);
-
-        if (!$mysqlTable->save()) {
-            $exception = new SaveError();
-            $exception->setModel($this);
-
-            throw $exception;
-        }
-
-        $mysqlTable->getReplacedRecord();
-        $this->loadFromMysqlTable($mysqlTable);
-    }
-
-    /**
-     * @throws DeleteError
-     * @throws JsonException
-     *
-     * @deprecated
-     */
-    public function delete(mysqlTable $mysqlTable = null): void
-    {
-        if (null === $mysqlTable) {
-            $mysqlTable = new mysqlTable($this->database, $this->getTableName());
-        }
-
-        $this->setToMysqlTable($mysqlTable);
-
-        if (!$mysqlTable->deletePrepared()) {
-            $exception = new DeleteError();
-            $exception->setModel($this);
-
-            throw $exception;
         }
     }
 
