@@ -23,10 +23,16 @@ class ObjectMapper implements ObjectMapperInterface
     }
 
     /**
+     * @template T
+     *
+     * @param class-string<T> $className
+     *
      * @throws ReflectionException
      * @throws FactoryError
      * @throws MapperException
      * @throws JsonException
+     *
+     * @return T
      */
     public function mapToObject(string $className, array $properties): object
     {
@@ -49,11 +55,6 @@ class ObjectMapper implements ObjectMapperInterface
         $this->setObjectValues($object, $properties);
 
         return $object;
-    }
-
-    public function mapFromObject(object $object): array
-    {
-        return [];
     }
 
     /**
@@ -93,15 +94,15 @@ class ObjectMapper implements ObjectMapperInterface
         ReflectionParameter|ReflectionProperty $reflectionObject,
         int|float|string|bool|array|object|null $values
     ): int|float|string|bool|array|object|null {
-        $attribute = $this->reflectionManager->getAttribute($reflectionObject, ObjectMapperAttribute::class);
-
         if (is_object($values)) {
             if (enum_exists($values::class)) {
-                return $values->value;
+                return $values;
             }
 
             return $values;
         }
+
+        $attribute = $this->reflectionManager->getAttribute($reflectionObject, ObjectMapperAttribute::class);
 
         if ($attribute !== null || !$this->reflectionManager->isBuiltin($reflectionObject)) {
             $mapper = $this;
@@ -139,7 +140,7 @@ class ObjectMapper implements ObjectMapperInterface
             $typeName = $this->reflectionManager->getNonBuiltinTypeName($reflectionObject);
 
             if (enum_exists($typeName)) {
-                return empty($values) ? null : $typeName::from($values);
+                return ($values === null || mb_strlen(trim($values)) === 0) ? null : $typeName::from($values);
             }
 
             return $mapper->mapToObject(
