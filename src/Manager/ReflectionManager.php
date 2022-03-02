@@ -107,6 +107,14 @@ class ReflectionManager
             return reset($attributes);
         }
 
+        if ($reflectionObject instanceof ReflectionParameter) {
+            $reflectionProperty = $this->getPropertyByParameter($reflectionObject);
+
+            if ($reflectionProperty !== null) {
+                return $this->getAttribute($reflectionProperty, $attributeClassName, $flags);
+            }
+        }
+
         return null;
     }
 
@@ -182,6 +190,28 @@ class ReflectionManager
             return null;
         }
 
+        $reflectionProperty = $this->getPropertyByParameter($reflectionParameter);
+
+        if (
+            $reflectionProperty !== null &&
+            $reflectionProperty->isPromoted() &&
+            $reflectionProperty->hasDefaultValue()
+        ) {
+            return $reflectionProperty->getDefaultValue();
+        }
+
+        throw new ReflectionException(sprintf(
+            'Parameter "%s" of class "%s" has no default value!',
+            $reflectionParameter->getName(),
+            $reflectionParameter->getDeclaringClass()?->getName() ?? 'null'
+        ));
+    }
+
+    /**
+     * @throws ReflectionException
+     */
+    private function getPropertyByParameter(ReflectionParameter $reflectionParameter): ?ReflectionProperty
+    {
         $reflectionClass = $reflectionParameter->getDeclaringClass();
 
         if (!$reflectionClass) {
@@ -196,16 +226,10 @@ class ReflectionManager
                 continue;
             }
 
-            if ($reflectionProperty->isPromoted() && $reflectionProperty->hasDefaultValue()) {
-                return $reflectionProperty->getDefaultValue();
-            }
+            return $reflectionProperty;
         }
 
-        throw new ReflectionException(sprintf(
-            'Parameter "%s" of class "%s" has no default value!',
-            $reflectionParameter->getName(),
-            $reflectionClass->getName()
-        ));
+        return null;
     }
 
     public function getTypeName(ReflectionProperty|ReflectionParameter $reflectionObject): ?string

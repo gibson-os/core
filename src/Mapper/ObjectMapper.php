@@ -94,14 +94,6 @@ class ObjectMapper implements ObjectMapperInterface
         ReflectionParameter|ReflectionProperty $reflectionObject,
         int|float|string|bool|array|object|null $values
     ): int|float|string|bool|array|object|null {
-        if (is_object($values)) {
-            if (enum_exists($values::class)) {
-                return $values;
-            }
-
-            return $values;
-        }
-
         $attribute = $this->reflectionManager->getAttribute($reflectionObject, ObjectMapperAttribute::class);
 
         if ($attribute !== null || !$this->reflectionManager->isBuiltin($reflectionObject)) {
@@ -140,7 +132,14 @@ class ObjectMapper implements ObjectMapperInterface
             $typeName = $this->reflectionManager->getNonBuiltinTypeName($reflectionObject);
 
             if (enum_exists($typeName)) {
-                return ($values === null || mb_strlen(trim($values)) === 0) ? null : $typeName::from($values);
+                if (is_object($values) || is_array($values)) {
+                    throw new ReflectionException(sprintf(
+                        'Value for enum "%s" is an array or object!',
+                        $typeName
+                    ));
+                }
+
+                return ($values === null || mb_strlen(trim((string) $values)) === 0) ? null : $typeName::from($values);
             }
 
             return $mapper->mapToObject(
