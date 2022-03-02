@@ -5,6 +5,8 @@ namespace GibsonOS\UnitTest;
 
 use Codeception\Test\Unit;
 use GibsonOS\Core\Manager\ServiceManager;
+use mysqlDatabase;
+use mysqlRegistry;
 
 class AbstractTest extends Unit
 {
@@ -23,5 +25,7 @@ class AbstractTest extends Unit
         putenv('MYSQL_DATABASE=gibson_os_test');
         putenv('MYSQL_USER=root');
         putenv('MYSQL_PASS=67yhnkMR');
+
+        mysqlRegistry::getInstance()->set('database', new mysqlDatabase('gos_mysql', 'root', '67yhnkMR'));
     }
 }

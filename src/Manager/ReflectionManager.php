@@ -194,7 +194,6 @@ class ReflectionManager
 
         if (
             $reflectionProperty !== null &&
-            $reflectionProperty->isPromoted() &&
             $reflectionProperty->hasDefaultValue()
         ) {
             return $reflectionProperty->getDefaultValue();

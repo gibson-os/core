@@ -3,9 +3,7 @@ declare(strict_types=1);
 
 namespace GibsonOS\UnitTest\Mapper;
 
-use Exception;
 use GibsonOS\Core\Exception\FactoryError;
-use GibsonOS\Core\Exception\MapperException;
 use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Mapper\ObjectMapper;
 use GibsonOS\Core\Utility\JsonUtility;
@@ -34,10 +32,7 @@ class ObjectMapperTest extends AbstractTest
     /**
      * @dataProvider getTestData
      *
-     * @throws FactoryError
-     * @throws MapperException
      * @throws JsonException
-     * @throws ReflectionException
      */
     public function testMapToObject(array $properties, string $exception = null): void
     {
@@ -45,7 +40,7 @@ class ObjectMapperTest extends AbstractTest
             $object = $this->objectMapper->mapToObject(MapObject::class, $properties);
         } catch (Throwable $e) {
             if ($exception !== $e::class) {
-                throw new Exception($e::class . ': ' . $e->getMessage(), $e->getCode(), $e);
+                throw $e;
             }
 
             $this->assertEquals($exception, $e::class, $e->getMessage());

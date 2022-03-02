@@ -8,6 +8,7 @@ use GibsonOS\Core\Exception\FactoryError;
 use GibsonOS\Core\Exception\MapperException;
 use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Manager\ServiceManager;
+use GibsonOS\Core\Utility\JsonUtility;
 use JsonException;
 use ReflectionAttribute;
 use ReflectionException;
@@ -48,10 +49,17 @@ class ModelMapper extends ObjectMapper
 
             if ($constraintAttribute !== null) {
                 $typeName = $this->reflectionManager->getTypeName($reflectionProperty);
+
+                if (is_string($value)) {
+                    $value = JsonUtility::decode($value);
+                }
+
                 $values = array_map(
                     fn ($mapValue) => $this->mapToObject(
                         $constraintAttribute->getParentModelClassName() ?? $this->reflectionManager->getNonBuiltinTypeName($reflectionProperty),
-                        $mapValue
+                        is_array($mapValue)
+                            ? $mapValue
+                            : [$reflectionProperty->getName() => $mapValue]
                     ),
                     $typeName !== 'array' ? [$value] : $value
                 );
