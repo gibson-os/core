@@ -77,14 +77,29 @@ class EventServiceTest extends AbstractTest
         $this->assertEquals(['Handtuch' => true], $globalParams);
     }
 
-    public function testRunEvent(): void
+    /**
+     * @dataProvider getTestData
+     */
+    public function testRunEvent(Event $event, string $returnValue): void
     {
-        $element = (new Element())
-            ->setClass(TestEvent::class)
-            ->setMethod('test')
-        ;
-        $event = (new Event())->setElements([$element]);
+        $testEvent = $this->serviceManager->get(TestEvent::class);
+        $this->eventService->runEvent($event, false);
 
-        $this->assertEquals('Will end in tears', $this->eventService->runEvent($event, false));
+        $this->assertEquals($returnValue, $testEvent->arthur);
+    }
+
+    public function getTestData(): array
+    {
+        return [
+            'Simple Event' => [
+                (new Event())->setElements([
+                    (new Element())
+                        ->setClass(TestEvent::class)
+                        ->setMethod('test')
+                        ->setParameters(['arthur' => 'dent']),
+                ]),
+                'dent',
+            ],
+        ];
     }
 }

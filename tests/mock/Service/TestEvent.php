@@ -15,9 +15,13 @@ class TestEvent extends AbstractEvent
     #[Event\Trigger('Hitchhiker')]
     public const TRIGGER_FORD = 'ford';
 
+    public string $arthur;
+
     #[Event\Method('Out to galaxy')]
     public function test(#[Event\Parameter(StringParameter::class)] string $arthur): string
     {
-        return $arthur;
+        $this->arthur = $arthur;
+
+        return $this->arthur;
     }
 }
