@@ -20,8 +20,8 @@ class ModelMapperTest extends AbstractTest
     protected function _before(): void
     {
         $this->modelMapper = new ModelMapper(
-            $this->serviceManagerService,
-            $this->serviceManagerService->get(ReflectionManager::class)
+            $this->serviceManager,
+            $this->serviceManager->get(ReflectionManager::class)
         );
     }
 

@@ -1,6 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
-namespace Service;
+namespace GibsonOS\UnitTest\Service;
 
 use Codeception\Test\Unit;
 use GibsonOS\Core\Exception\CreateError;
@@ -14,20 +15,11 @@ class DirTest extends Unit
 {
     use ProphecyTrait;
 
-    /**
-     * @var UnitTester
-     */
-    protected $tester;
+    protected UnitTester $tester;
 
-    /**
-     * @var DirService
-     */
-    private $dir;
+    private DirService $dir;
 
-    /**
-     * @var string
-     */
-    private $dirName;
+    private string $dirName;
 
     protected function _before()
     {
@@ -100,7 +92,7 @@ class DirTest extends Unit
         $file = $this->prophesize(FileService::class);
 
         foreach ($dontExists as $dontExist) {
-            $file->exists(($dontExist))
+            $file->exists($dontExist)
                 ->willReturn(false)
                 ->shouldBeCalledOnce()
             ;

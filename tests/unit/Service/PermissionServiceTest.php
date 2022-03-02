@@ -1,10 +1,11 @@
 <?php
 declare(strict_types=1);
 
-namespace Service;
+namespace GibsonOS\UnitTest\Service;
 
 use Codeception\Test\Unit;
 use GibsonOS\Core\Model\User\Permission;
+use GibsonOS\Core\Model\User\PermissionView;
 use GibsonOS\Core\Repository\User\PermissionViewRepository;
 use GibsonOS\Core\Service\PermissionService;
 use Prophecy\PhpUnit\ProphecyTrait;
@@ -14,10 +15,7 @@ class PermissionServiceTest extends Unit
 {
     use ProphecyTrait;
 
-    /**
-     * @var PermissionService
-     */
-    private $permissionService;
+    private PermissionService $permissionService;
 
     /**
      * @var ObjectProphecy|PermissionViewRepository
@@ -56,7 +54,7 @@ class PermissionServiceTest extends Unit
         string $task = null,
         string $action = null
     ): void {
-        $permissionModel = $this->prophesize(Permission::class);
+        $permissionModel = $this->prophesize(PermissionView::class);
         $permissionModel->getPermission()
             ->shouldBeCalledOnce()
             ->willReturn($permission)

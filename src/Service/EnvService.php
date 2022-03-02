@@ -82,16 +82,6 @@ class EnvService
 
     /**
      * @throws SetError
-     */
-    public function setEmpty(string $name): EnvService
-    {
-        $this->set($name, '');
-
-        return $this;
-    }
-
-    /**
-     * @throws SetError
      *
      * @return $this
      */

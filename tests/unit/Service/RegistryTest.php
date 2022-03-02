@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Service;
+namespace GibsonOS\UnitTest\Service;
 
 use Codeception\Test\Unit;
 use GibsonOS\Core\Exception\GetError;
@@ -11,15 +11,9 @@ use UnitTester;
 
 class RegistryTest extends Unit
 {
-    /**
-     * @var UnitTester
-     */
-    protected $tester;
+    protected UnitTester $tester;
 
-    /**
-     * @var RegistryService
-     */
-    private $registry;
+    private RegistryService $registry;
 
     protected function _before()
     {

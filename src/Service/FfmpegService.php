@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Service;
 
+use GibsonOS\Core\Attribute\GetEnv;
 use GibsonOS\Core\Dto\Ffmpeg\ConvertStatus;
 use GibsonOS\Core\Dto\Ffmpeg\Media;
 use GibsonOS\Core\Dto\Image as ImageDto;
@@ -17,18 +18,17 @@ use GibsonOS\Core\Exception\ProcessError;
 
 class FfmpegService
 {
-    public string $ffpmegPath;
-
-    public string $ffprobePath;
-
     /**
      * @throws GetError
      */
-    public function __construct(EnvService $envService, private DateTimeService $dateTime, private FileService $file, private ProcessService $process, private ImageService $image)
-    {
-        // @todo anders machen
-        $this->ffpmegPath = $envService->getString('FFMPEG_PATH');
-        $this->ffprobePath = $envService->getString('FFPROBE_PATH');
+    public function __construct(
+        #[GetEnv('FFMPEG_PATH')] private string $ffmpegPath,
+        #[GetEnv('FFPROBE_PATH')] private string $ffprobePath,
+        private DateTimeService $dateTime,
+        private FileService $file,
+        private ProcessService $process,
+        private ImageService $image
+    ) {
     }
 
     /**
@@ -44,7 +44,7 @@ class FfmpegService
             throw new FileNotFound(sprintf('Datei %s existiert nicht!', $filename));
         }
 
-        $ffMpeg = $this->process->open(sprintf('%s -i %s', $this->ffpmegPath, escapeshellarg($filename)), 'r');
+        $ffMpeg = $this->process->open(sprintf('%s -i %s', $this->ffmpegPath, escapeshellarg($filename)), 'r');
         $output = '';
 
         while ($out = fgets($ffMpeg)) {
@@ -233,6 +233,6 @@ class FfmpegService
 
     private function execute(string $parameters): void
     {
-        $this->process->execute($this->ffpmegPath . ' ' . $parameters);
+        $this->process->execute($this->ffmpegPath . ' ' . $parameters);
     }
 }

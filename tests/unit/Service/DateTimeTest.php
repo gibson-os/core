@@ -1,35 +1,26 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
-namespace Service;
+namespace GibsonOS\UnitTest\Service;
 
 use Codeception\Test\Unit;
 use DateTime;
 use DateTimeZone;
 use GibsonOS\Core\Service\DateTimeService;
-use TypeError;
 use UnitTester;
 
 class DateTimeTest extends Unit
 {
-    /**
-     * @var UnitTester
-     */
-    protected $tester;
+    protected UnitTester $tester;
 
-    /**
-     * @var DateTimeService
-     */
-    private $dateTime;
+    private DateTimeService $dateTime;
 
-    /**
-     * @var DateTimeZone
-     */
-    private $timeZone;
+    private DateTimeZone $timeZone;
 
     protected function _before()
     {
         $this->timeZone = new DateTimeZone('Europe/Berlin');
-        $this->dateTime = new DateTimeService($this->timeZone, 51.2642156, 6.8001438);
+        $this->dateTime = new DateTimeService('Europe/Berlin', 51.2642156, 6.8001438);
     }
 
     protected function _after()
@@ -44,10 +35,8 @@ class DateTimeTest extends Unit
         $this->assertEquals($testDateTime->getTimestamp(), $dateTime->getTimestamp());
     }
 
-    public function testGetError()
+    public function testGetInvalidDate()
     {
-        $this->expectException(TypeError::class);
-
         $this->dateTime->get('not today');
     }
 

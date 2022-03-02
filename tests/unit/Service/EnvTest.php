@@ -1,35 +1,23 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
-namespace GibsonOS\Core\Service;
+namespace GibsonOS\UnitTest\Service;
 
 use Codeception\Test\Unit;
 use GibsonOS\Core\Exception\GetError;
-use GibsonOS\Core\Exception\SetError;
-use phpmock\phpunit\PHPMock;
+use GibsonOS\Core\Service\EnvService;
 use Throwable;
 use UnitTester;
 
 class EnvTest extends Unit
 {
-    use PHPMock;
+    protected UnitTester $tester;
 
-    /**
-     * @var UnitTester
-     */
-    protected $tester;
-
-    /**
-     * @var EnvService
-     */
-    private $env;
+    private EnvService $envService;
 
     protected function _before()
     {
-        $this->env = new EnvService();
-    }
-
-    protected function _after()
-    {
+        $this->envService = new EnvService();
     }
 
     /**
@@ -41,11 +29,9 @@ class EnvTest extends Unit
     {
         if (!$isInt) {
             $this->expectException(Throwable::class);
-        } else {
-            $this->mockPutEnv($value);
         }
 
-        $this->env->setInt('answer', $value);
+        $this->envService->setInt('answer', $value);
     }
 
     /**
@@ -55,12 +41,12 @@ class EnvTest extends Unit
      */
     public function testGetInt($value, bool $isInt, bool $isFloat, bool $isString, bool $isBool): void
     {
-        $this->mockGetEnv($value);
+        putenv('ANSWER=' . $value);
 
         if ($isInt) {
-            $this->assertEquals($value, $this->env->getInt('answer'));
+            $this->assertEquals($value, $this->envService->getInt('answer'));
         } else {
-            $this->assertNotSame($value, $this->env->getInt('answer'));
+            $this->assertNotSame($value, $this->envService->getInt('answer'));
         }
     }
 
@@ -73,11 +59,9 @@ class EnvTest extends Unit
     {
         if (!$isFloat) {
             $this->expectException(Throwable::class);
-        } else {
-            $this->mockPutEnv($value);
         }
 
-        $this->env->setFloat('answer', $value);
+        $this->envService->setFloat('answer', $value);
     }
 
     /**
@@ -87,12 +71,12 @@ class EnvTest extends Unit
      */
     public function testGetFloat($value, bool $isInt, bool $isFloat, bool $isString, bool $isBool): void
     {
-        $this->mockGetEnv($value);
+        putenv('ANSWER=' . $value);
 
         if ($isFloat) {
-            $this->assertEquals($value, $this->env->getFloat('answer'));
+            $this->assertEquals($value, $this->envService->getFloat('answer'));
         } else {
-            $this->assertNotSame($value, $this->env->getFloat('answer'));
+            $this->assertNotSame($value, $this->envService->getFloat('answer'));
         }
     }
 
@@ -105,11 +89,9 @@ class EnvTest extends Unit
     {
         if (!$isString) {
             $this->expectException(Throwable::class);
-        } else {
-            $this->mockPutEnv($value);
         }
 
-        $this->env->setString('answer', $value);
+        $this->envService->setString('answer', $value);
     }
 
     /**
@@ -119,12 +101,12 @@ class EnvTest extends Unit
      */
     public function testGetString($value, bool $isInt, bool $isFloat, bool $isString, bool $isBool): void
     {
-        $this->mockGetEnv($value);
+        putenv('ANSWER=' . $value);
 
         if ($isString) {
-            $this->assertEquals($value, $this->env->getString('answer'));
+            $this->assertEquals($value, $this->envService->getString('answer'));
         } else {
-            $this->assertNotSame($value, $this->env->getString('answer'));
+            $this->assertNotSame($value, $this->envService->getString('answer'));
         }
     }
 
@@ -137,11 +119,9 @@ class EnvTest extends Unit
     {
         if (!$isBool) {
             $this->expectException(Throwable::class);
-        } else {
-            $this->mockPutEnv($value);
         }
 
-        $this->env->setBool('answer', $value);
+        $this->envService->setBool('answer', $value);
     }
 
     /**
@@ -151,48 +131,19 @@ class EnvTest extends Unit
      */
     public function testGetBool($value, bool $isInt, bool $isFloat, bool $isString, bool $isBool): void
     {
-        $this->mockGetEnv($value);
+        putenv('ANSWER=' . ($value ? 'true' : 'false'));
 
         if ($isBool) {
-            $this->assertEquals($value, $this->env->getBool('answer'));
+            $this->assertEquals($value, $this->envService->getBool('answer'));
         } else {
-            $this->assertNotSame($value, $this->env->getBool('answer'));
+            $this->assertNotSame($value, $this->envService->getBool('answer'));
         }
-    }
-
-    public function testSetEmpty(): void
-    {
-        $this->getFunctionMock(__NAMESPACE__, 'putenv')
-            ->expects($this->once())
-            ->with('ANSWER')
-            ->willReturn(true)
-        ;
-
-        $this->env->setEmpty('answer');
-    }
-
-    public function testSetError(): void
-    {
-        $this->expectException(SetError::class);
-        $this->getFunctionMock(__NAMESPACE__, 'putenv')
-            ->expects($this->once())
-            ->with('ANSWER=42')
-            ->willReturn(false)
-        ;
-
-        $this->env->setInt('answer', 42);
     }
 
     public function testGetError(): void
     {
         $this->expectException(GetError::class);
-        $this->getFunctionMock(__NAMESPACE__, 'getenv')
-            ->expects($this->once())
-            ->with('ANSWER')
-            ->willReturn(false)
-        ;
-
-        $this->env->getInt('answer');
+        $this->envService->getInt('galaxy');
     }
 
     public function getData(): array
@@ -205,27 +156,5 @@ class EnvTest extends Unit
             [true, false, false, false, true],
             [false, false, false, false, true],
         ];
-    }
-
-    private function mockGetEnv($value): void
-    {
-        $this->getFunctionMock(__NAMESPACE__, 'getenv')
-            ->expects($this->once())
-            ->with('ANSWER')
-            ->willReturn(
-                is_bool($value)
-                ? $value === true ? 'true' : 'false'
-                : (string) $value
-            )
-        ;
-    }
-
-    private function mockPutEnv($value): void
-    {
-        $this->getFunctionMock(__NAMESPACE__, 'putenv')
-            ->expects($this->once())
-            ->with('ANSWER=' . (is_bool($value) ? $value === true ? 'true' : 'false' : $value))
-            ->willReturn(true)
-        ;
     }
 }

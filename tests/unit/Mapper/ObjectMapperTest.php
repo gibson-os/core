@@ -24,8 +24,8 @@ class ObjectMapperTest extends AbstractTest
     protected function _before(): void
     {
         $this->objectMapper = new ObjectMapper(
-            $this->serviceManagerService,
-            $this->serviceManagerService->get(ReflectionManager::class)
+            $this->serviceManager,
+            $this->serviceManager->get(ReflectionManager::class)
         );
     }
 

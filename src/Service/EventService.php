@@ -35,7 +35,7 @@ class EventService
     private array $events = [];
 
     public function __construct(
-        private ServiceManager $serviceManagerService,
+        private ServiceManager $serviceManager,
         private EventRepository $eventRepository,
         private ElementService $elementService,
         private CommandService $commandService,
@@ -147,7 +147,7 @@ class EventService
         }
 
         /** @var AbstractParameter $parameter */
-        $parameter = $this->serviceManagerService->create(
+        $parameter = $this->serviceManager->create(
             $className,
             $constructorParameters,
             AbstractParameter::class
@@ -248,7 +248,7 @@ class EventService
                 }
 
                 foreach ($triggerAttribute->getParameters() as $parameter) {
-                    $triggerParameter = $this->serviceManagerService->create(
+                    $triggerParameter = $this->serviceManager->create(
                         $parameter['className'],
                         isset($parameter['title']) ? ['title' => $parameter['title']] : [],
                         AbstractParameter::class

@@ -1,8 +1,8 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
-namespace Service;
+namespace GibsonOS\UnitTest\Service;
 
-use Codeception\Test\Unit;
 use GibsonOS\Core\Dto\Ffmpeg\Media;
 use GibsonOS\Core\Dto\Image as ImageDto;
 use GibsonOS\Core\Exception\Ffmpeg\ConvertStatusError;
@@ -14,29 +14,19 @@ use GibsonOS\Core\Service\FileService;
 use GibsonOS\Core\Service\ImageService;
 use GibsonOS\Core\Service\ProcessService;
 use GibsonOS\Mock\Dto\Ffmpeg\Media as MediaMock;
+use GibsonOS\UnitTest\AbstractTest;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 use UnitTester;
 
-class FfmpegTest extends Unit
+class FfmpegTest extends AbstractTest
 {
     use ProphecyTrait;
 
-    /**
-     * @var UnitTester
-     */
-    protected $tester;
+    protected UnitTester $tester;
 
-    /**
-     * @var string
-     */
-    private $ffmpegPath;
-
-    /**
-     * @var FfmpegService
-     */
-    private $ffmpeg;
+    private FfmpegService $ffmpeg;
 
     /**
      * @var ObjectProphecy|DateTimeService
@@ -58,30 +48,17 @@ class FfmpegTest extends Unit
      */
     private $image;
 
-    /**
-     * @var string
-     */
-    private $inputVideoFilename;
+    private string $ffmpegPath;
 
-    /**
-     * @var string
-     */
-    private $outputVideoFilename;
+    private string $inputVideoFilename;
 
-    /**
-     * @var string
-     */
-    private $logFilename;
+    private string $outputVideoFilename;
 
-    /**
-     * @var string
-     */
-    private $logPath;
+    private string $logFilename;
 
-    /**
-     * @var string
-     */
-    private $defaultCommand;
+    private string$logPath;
+
+    private string $defaultCommand;
 
     protected function _before()
     {
@@ -105,6 +82,7 @@ class FfmpegTest extends Unit
 
         $this->ffmpeg = new FfmpegService(
             $this->ffmpegPath,
+            'path/to/ffprobe',
             $this->dateTime->reveal(),
             $this->file->reveal(),
             $this->process->reveal(),
