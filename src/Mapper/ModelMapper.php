@@ -44,7 +44,6 @@ class ModelMapper extends ObjectMapper
                 Constraint::class,
                 ReflectionAttribute::IS_INSTANCEOF
             );
-
             $setter = 'set' . ucfirst($key);
 
             if ($constraintAttribute !== null) {
@@ -55,7 +54,7 @@ class ModelMapper extends ObjectMapper
                 }
 
                 $values = array_map(
-                    fn ($mapValue) => $this->mapToObject(
+                    fn ($mapValue) => is_object($mapValue) ? $mapValue : $this->mapToObject(
                         $constraintAttribute->getParentModelClassName() ?? $this->reflectionManager->getNonBuiltinTypeName($reflectionProperty),
                         is_array($mapValue)
                             ? $mapValue
