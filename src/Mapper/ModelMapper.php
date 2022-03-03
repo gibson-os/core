@@ -69,10 +69,11 @@ class ModelMapper extends ObjectMapper
                 continue;
             }
 
+            $reflectionParameter = $reflectionClass->getMethod($setter)->getParameters()[0];
             $this->reflectionManager->setProperty(
                 $reflectionProperty,
                 $object,
-                $this->mapValueToObject($reflectionClass->getMethod($setter)->getParameters()[0], $value)
+                $this->mapValueToObject($reflectionParameter, $this->reflectionManager->castValue($reflectionParameter, $value))
             );
         }
 

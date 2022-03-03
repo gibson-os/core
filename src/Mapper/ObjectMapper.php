@@ -46,8 +46,17 @@ class ObjectMapper implements ObjectMapperInterface
                 continue;
             }
 
-            $property = $properties[$reflectionParameter->getName()];
-            $constructorParameters[] = $this->mapValueToObject($reflectionParameter, $property);
+            $value = $properties[$reflectionParameter->getName()];
+            $property = is_object($value) ? $value : $this->reflectionManager->castValue($reflectionParameter, $value);
+
+//            if (is_object($property)) {
+//                errlog($property->getId());
+//                errlog($this->mapValueToObject($reflectionParameter, $property)->getId());
+//            }
+            $constructorParameters[] = is_object($property)
+                ? $property
+                : $this->mapValueToObject($reflectionParameter, $property)
+            ;
             unset($properties[$reflectionParameter->getName()]);
         }
 
@@ -122,7 +131,7 @@ class ObjectMapper implements ObjectMapperInterface
                 }
 
                 return array_map(
-                    fn ($value) => $mapper->mapToObject($objectClassName, is_array($value)
+                    fn ($value) => is_object($value) ? $value : $mapper->mapToObject($objectClassName, is_array($value)
                         ? $value
                         : [$reflectionObject->getName() => $value]),
                     $values
@@ -139,7 +148,17 @@ class ObjectMapper implements ObjectMapperInterface
                     ));
                 }
 
-                return ($values === null || mb_strlen(trim((string) $values)) === 0) ? null : $typeName::from($values);
+                if ($values === null || mb_strlen(trim((string) $values)) === 0) {
+                    return null;
+                }
+
+                $enumReflection = $this->reflectionManager->getReflectionEnum($typeName);
+
+                return $typeName::from(match ((string) $enumReflection->getBackingType()) {
+                    'string' => (string) $values,
+                    'int' => (int) $values,
+                    'float' => (float) $values,
+                });
             }
 
             return $mapper->mapToObject(

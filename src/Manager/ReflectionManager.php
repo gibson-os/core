@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Manager;
 
+use GibsonOS\Core\Utility\JsonUtility;
+use JsonException;
 use ReflectionClass;
 use ReflectionClassConstant;
 use ReflectionEnum;
@@ -291,5 +293,54 @@ class ReflectionManager
     public function allowsNul(ReflectionProperty|ReflectionParameter $reflectionObject): bool
     {
         return $reflectionObject->getType()?->allowsNull() ?? false;
+    }
+
+    /**
+     * @throws ReflectionException
+     * @throws JsonException
+     */
+    public function castValue(
+        ReflectionProperty|ReflectionParameter $reflectionObject,
+        int|float|bool|string|null|array $value
+    ): int|float|bool|string|null|array|object {
+        if (!$this->isBuiltin($reflectionObject)) {
+            return $value;
+        }
+
+        if ($value === null) {
+            return null;
+        }
+
+        $typeName = $this->getTypeName($reflectionObject);
+
+        if (enum_exists($typeName)) {
+            $reflectionEnum = $this->getReflectionEnum($typeName);
+
+            return $typeName::from(match ((string) $reflectionEnum->getBackingType()) {
+                'string' => (string) $value,
+                'int' => (int) $value,
+                'float' => (float) $value,
+            });
+        }
+
+        return match ($typeName) {
+            'int' => is_numeric($value) ? (int) $value : null,
+            'float' => is_numeric($value) ? (float) $value : null,
+            'string' => !is_array($value) ? (string) $value : JsonUtility::encode($value),
+            'array' => !is_array($value) ? (array) JsonUtility::decode((string) $value) : $value,
+            'bool' => !is_array($value) && (
+                mb_strtolower((string) $value) === 'true' ||
+                (is_numeric((string) $value) && ((int) $value)) ||
+                (is_bool($value) && $value)
+            ),
+            default => throw new ReflectionException(sprintf(
+                'Type "%s" of %s "%s" for "%s%s" is not allowed!',
+                $this->getTypeName($reflectionObject) ?? 'null',
+                $reflectionObject instanceof ReflectionParameter ? 'parameter' : 'property',
+                $reflectionObject->getName(),
+                $reflectionObject->getDeclaringClass()?->getName() ?? 'null',
+                $reflectionObject instanceof ReflectionParameter ? '::' . $reflectionObject->getDeclaringFunction()->getName() : ''
+            ))
+        };
     }
 }

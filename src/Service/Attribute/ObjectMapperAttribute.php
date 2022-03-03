@@ -11,7 +11,6 @@ use GibsonOS\Core\Exception\RequestError;
 use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Mapper\ObjectMapper;
 use GibsonOS\Core\Service\RequestService;
-use GibsonOS\Core\Utility\JsonUtility;
 use GibsonOS\Core\Utility\StatusCode;
 use JsonException;
 use ReflectionException;
@@ -105,7 +104,6 @@ class ObjectMapperAttribute implements AttributeServiceInterface, ParameterAttri
     }
 
     /**
-     * @throws JsonException
      * @throws MapperException
      */
     public function getParameterFromRequest(
@@ -143,19 +141,10 @@ class ObjectMapperAttribute implements AttributeServiceInterface, ParameterAttri
             }
         }
 
-        return match ($this->reflectionManager->getTypeName($reflectionParameter)) {
-            'int' => (int) $value,
-            'float' => (float) $value,
-            'bool' => $value === 'true' || ((int) $value),
-            'string' => (string) $value,
-            'array' => !is_array($value) ? (array) JsonUtility::decode($value) : $value,
-            default => throw new MapperException(sprintf(
-                'Type %s of parameter %s for %s::%s is not allowed!',
-                $this->reflectionManager->getTypeName($reflectionParameter) ?? 'null',
-                $reflectionParameter->getName(),
-                $reflectionParameter->getDeclaringClass() === null ? '' : $reflectionParameter->getDeclaringClass()->getName(),
-                $reflectionParameter->getDeclaringFunction()->getName()
-            ))
-        };
+        try {
+            return $this->reflectionManager->castValue($reflectionParameter, $value);
+        } catch (JsonException|ReflectionException $e) {
+            throw new MapperException($e->getMessage());
+        }
     }
 }

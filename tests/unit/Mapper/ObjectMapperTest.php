@@ -7,7 +7,10 @@ use GibsonOS\Core\Exception\FactoryError;
 use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Mapper\ObjectMapper;
 use GibsonOS\Core\Utility\JsonUtility;
+use GibsonOS\Mock\Dto\Mapper\IntEnum;
 use GibsonOS\Mock\Dto\Mapper\MapObject;
+use GibsonOS\Mock\Dto\Mapper\MapObjectChild;
+use GibsonOS\Mock\Dto\Mapper\MapObjectParent;
 use GibsonOS\UnitTest\AbstractTest;
 use JsonException;
 use ReflectionException;
@@ -56,8 +59,8 @@ class ObjectMapperTest extends AbstractTest
 
         if ($parentObject !== null) {
             $parent = $object->getParent();
-            $this->assertEquals($parentObject['default'] ?? true, $parent->isDefault());
-            $this->assertEquals($parentObject['options'] ?? [], $parent->getOptions());
+            $this->assertEquals($parentObject instanceof MapObjectParent ? $parentObject->isDefault() : ($parentObject['default'] ?? true), $parent->isDefault());
+            $this->assertEquals($parentObject instanceof MapObjectParent ? $parentObject->getOptions() : ($parentObject['options'] ?? []), $parent->getOptions());
         }
 
         $childObjects = $object->getChildObjects();
@@ -79,9 +82,9 @@ class ObjectMapperTest extends AbstractTest
             }
 
             $childObject = $childObjects[$key];
-            $this->assertEquals($propertyChildObject['stringValue'], $childObject->getStringValue());
-            $this->assertEquals($propertyChildObject['nullableStringValue'] ?? null, $childObject->getNullableStringValue());
-            $this->assertEquals($propertyChildObject['nullableIntEnumValue'] ?? null, $childObject->getNullableIntEnumValue()?->value);
+            $this->assertEquals($propertyChildObject instanceof MapObjectChild ? $propertyChildObject->getStringValue() : $propertyChildObject['stringValue'], $childObject->getStringValue());
+            $this->assertEquals($propertyChildObject instanceof MapObjectChild ? $propertyChildObject->getNullableStringValue() : ($propertyChildObject['nullableStringValue'] ?? null), $childObject->getNullableStringValue());
+            $this->assertEquals($propertyChildObject instanceof MapObjectChild ? $propertyChildObject->getNullableIntEnumValue()?->value : ($propertyChildObject['nullableIntEnumValue'] ?? null), $childObject->getNullableIntEnumValue()?->value);
         }
     }
 
@@ -171,6 +174,27 @@ class ObjectMapperTest extends AbstractTest
             'with missing value' => [['stringEnumValue' => 'ja'], ReflectionException::class],
             'with wrong enum value' => [['stringEnumValue' => 'Trilian', 'intValue' => 1], ValueError::class],
             'with wrong enum type' => [['stringEnumValue' => ['ja'], 'intValue' => 1], ReflectionException::class],
+            'with int value as string' => [['stringEnumValue' => 'ja', 'intValue' => '1']],
+            'with int enum value as string' => [
+                [
+                    'stringEnumValue' => 'nein',
+                    'intValue' => 42,
+                    'childObjects' => [
+                        [
+                            'stringValue' => 'Marvin',
+                            'nullableIntEnumValue' => '1',
+                        ],
+                    ],
+                ],
+            ],
+            'with objects' => [
+                [
+                    'stringEnumValue' => 'nein',
+                    'intValue' => 42,
+                    'parent' => new MapObjectParent(false),
+                    'childObjects' => [(new MapObjectChild('Marvin'))->setNullableIntEnumValue(IntEnum::DEFINED)],
+                ],
+            ],
         ];
     }
 }

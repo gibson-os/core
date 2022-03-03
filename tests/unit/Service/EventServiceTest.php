@@ -84,6 +84,7 @@ class EventServiceTest extends AbstractTest
     {
         $testEvent = $this->serviceManager->get(TestEvent::class);
         $this->eventService->runEvent($event, false);
+        $this->modelManager->save(Argument::any())->shouldBeCalledOnce();
 
         $this->assertEquals($returnValue, $testEvent->arthur);
     }

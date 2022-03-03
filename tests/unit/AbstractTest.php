@@ -9,6 +9,7 @@ use GibsonOS\Core\Manager\ServiceManager;
 use GibsonOS\Core\Service\LoggerService;
 use mysqlDatabase;
 use mysqlRegistry;
+use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Log\LoggerInterface;
@@ -22,12 +23,12 @@ class AbstractTest extends Unit
     /**
      * @var ObjectProphecy|mysqlDatabase
      */
-    private $database;
+    protected $database;
 
     /**
      * @var ObjectProphecy|ModelManager
      */
-    private $modelManager;
+    protected $modelManager;
 
     public function __construct($name = null, array $data = [], $dataName = '')
     {
@@ -35,6 +36,8 @@ class AbstractTest extends Unit
         $this->database = $this->prophesize(mysqlDatabase::class);
         mysqlRegistry::getInstance()->set('database', $this->database->reveal());
         $this->modelManager = $this->prophesize(ModelManager::class);
+        $this->modelManager->save(Argument::any())->shouldNotBeCalled();
+        $this->modelManager->delete(Argument::any())->shouldNotBeCalled();
 
         $this->serviceManager = new ServiceManager();
         $this->serviceManager->setInterface(LoggerInterface::class, LoggerService::class);

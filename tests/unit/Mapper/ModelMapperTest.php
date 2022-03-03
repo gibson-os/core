@@ -6,7 +6,10 @@ namespace GibsonOS\UnitTest\Mapper;
 use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Mapper\ModelMapper;
 use GibsonOS\Core\Utility\JsonUtility;
+use GibsonOS\Mock\Dto\Mapper\IntEnum;
 use GibsonOS\Mock\Dto\Mapper\MapModel;
+use GibsonOS\Mock\Dto\Mapper\MapModelChild;
+use GibsonOS\Mock\Dto\Mapper\MapModelParent;
 use GibsonOS\UnitTest\AbstractTest;
 use JsonException;
 use ReflectionException;
@@ -57,9 +60,9 @@ class ModelMapperTest extends AbstractTest
 
         if ($parentObject !== null) {
             $parent = $object->getParent();
-            $this->assertEquals($parentObject['id'] ?? null, $parent->getId());
-            $this->assertEquals($parentObject['default'] ?? false, $parent->isDefault());
-            $this->assertEquals($parentObject['options'] ?? [], $parent->getOptions());
+            $this->assertEquals($parentObject instanceof MapModelParent ? $parentObject->getId() : ($parentObject['id'] ?? null), $parent->getId());
+            $this->assertEquals($parentObject instanceof MapModelParent ? $parentObject->isDefault() : ($parentObject['default'] ?? false), $parent->isDefault());
+            $this->assertEquals($parentObject instanceof MapModelParent ? $parentObject->getOptions() : ($parentObject['options'] ?? []), $parent->getOptions());
 //            $this->assertEquals($object, $parent->getObjects()[0]);
         }
 
@@ -82,14 +85,14 @@ class ModelMapperTest extends AbstractTest
             }
 
             $childObject = $childObjects[$key];
-            $this->assertEquals($propertyChildObject['id'] ?? null, $childObject->getId());
+            $this->assertEquals($propertyChildObject instanceof MapModelChild ? $propertyChildObject->getId() : ($propertyChildObject['id'] ?? null), $childObject->getId());
 
-            if (isset($propertyChildObject['stringValue'])) {
+            if (!$propertyChildObject instanceof MapModelChild && isset($propertyChildObject['stringValue'])) {
                 $this->assertEquals($propertyChildObject['stringValue'], $childObject->getStringValue());
             }
 
-            $this->assertEquals($propertyChildObject['nullableStringValue'] ?? null, $childObject->getNullableStringValue());
-            $this->assertEquals($propertyChildObject['nullableIntEnumValue'] ?? null, $childObject->getNullableIntEnumValue()?->value);
+            $this->assertEquals($propertyChildObject instanceof MapModelChild ? $propertyChildObject->getNullableStringValue() : ($propertyChildObject['nullableStringValue'] ?? null), $childObject->getNullableStringValue());
+            $this->assertEquals($propertyChildObject instanceof MapModelChild ? $propertyChildObject->getNullableIntEnumValue()?->value : ($propertyChildObject['nullableIntEnumValue'] ?? null), $childObject->getNullableIntEnumValue()?->value);
 
             if (isset($properties['id'])) {
                 $this->assertEquals($object->getId(), $childObject->getMapModelId());
@@ -189,6 +192,27 @@ class ModelMapperTest extends AbstractTest
             'with missing value' => [['stringEnumValue' => 'ja']],
             'with wrong enum value' => [['stringEnumValue' => 'Trilian', 'intValue' => 1], ValueError::class],
             'with wrong enum type' => [['stringEnumValue' => ['ja'], 'intValue' => 1], ReflectionException::class],
+            'with int value as string' => [['stringEnumValue' => 'ja', 'intValue' => '1']],
+            'with int enum value as string' => [
+                [
+                    'stringEnumValue' => 'nein',
+                    'intValue' => 42,
+                    'childObjects' => [
+                        [
+                            'stringValue' => 'Marvin',
+                            'nullableIntEnumValue' => '1',
+                        ],
+                    ],
+                ],
+            ],
+            'with objects' => [
+                [
+                    'stringEnumValue' => 'nein',
+                    'intValue' => 42,
+                    'parent' => (new MapModelParent())->setOptions(['foo' => 'bar']),
+                    'childObjects' => [(new MapModelChild())->setNullableIntEnumValue(IntEnum::DEFINED)],
+                ],
+            ],
         ];
     }
 }
