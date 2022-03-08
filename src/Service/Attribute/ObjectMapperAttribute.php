@@ -50,7 +50,6 @@ class ObjectMapperAttribute implements AttributeServiceInterface, ParameterAttri
     /**
      * @param class-string $objectClassName
      *
-     * @throws JsonException
      * @throws MapperException
      * @throws ReflectionException
      */
@@ -58,7 +57,6 @@ class ObjectMapperAttribute implements AttributeServiceInterface, ParameterAttri
     {
         $reflectionClass = $this->reflectionManager->getReflectionClass($objectClassName);
         $objectParameters = [];
-        $constructorProperties = [];
 
         foreach ($reflectionClass->getConstructor()?->getParameters() ?? [] as $reflectionParameter) {
             $parameterName = $reflectionParameter->getName();
@@ -66,14 +64,24 @@ class ObjectMapperAttribute implements AttributeServiceInterface, ParameterAttri
             $objectParameters[$parameterName] = $parameters[$requestKey]
                 ?? $this->getParameterFromRequest($reflectionParameter, $requestKey)
             ;
-            $constructorProperties[] = $parameterName;
         }
 
+        return array_merge($objectParameters, $this->getSetterParameters($attribute, $objectClassName, $parameters));
+    }
+
+    /**
+     * @param class-string $objectClassName
+     *
+     * @throws MapperException
+     * @throws ReflectionException
+     */
+    protected function getSetterParameters(GetObject $attribute, string $objectClassName, array $parameters): array
+    {
+        $reflectionClass = $this->reflectionManager->getReflectionClass($objectClassName);
+        $setterParameters = [];
+
         foreach ($reflectionClass->getMethods(ReflectionMethod::IS_PUBLIC) as $reflectionMethod) {
-            if (
-                mb_strpos($reflectionMethod->getName(), 'set') !== 0 &&
-                !in_array(lcfirst(mb_substr($reflectionMethod->getName(), 3)), $constructorProperties)
-            ) {
+            if (mb_strpos($reflectionMethod->getName(), 'set') !== 0) {
                 continue;
             }
 
@@ -83,15 +91,15 @@ class ObjectMapperAttribute implements AttributeServiceInterface, ParameterAttri
 
                 try {
                     $this->requestService->getRequestValue($requestKey);
-                    $objectParameters[$parameterName] = $parameters[$requestKey]
+                    $setterParameters[$parameterName] = $parameters[$requestKey]
                         ?? $this->getParameterFromRequest($reflectionParameter, $requestKey)
                     ;
-                } catch (RequestError|MapperException) {
+                } catch (RequestError) {
                 }
             }
         }
 
-        return $objectParameters;
+        return $setterParameters;
     }
 
     protected function getRequestKey(

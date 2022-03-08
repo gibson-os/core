@@ -313,7 +313,7 @@ class ReflectionManager
 
         $typeName = $this->getTypeName($reflectionObject);
 
-        if (enum_exists($typeName)) {
+        if ($typeName !== null && class_exists($typeName) && enum_exists($typeName)) {
             $reflectionEnum = $this->getReflectionEnum($typeName);
 
             return $typeName::from(match ((string) $reflectionEnum->getBackingType()) {

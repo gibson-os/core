@@ -141,7 +141,7 @@ class KeyInstall extends AbstractInstall implements PriorityInterface
         }
 
         $keyFields = $this->mysqlDatabase->fetchAssocList();
-        //@todo hier muss geprüft werden ob die richtigen columns im key sind. Er noch/nicht mehr unique ist usw.
+        // @todo hier muss geprüft werden ob die richtigen columns im key sind. Er noch/nicht mehr unique ist usw.
 
         if (count($keyFields) === count($key->getColumns())) {
             return $name;

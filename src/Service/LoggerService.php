@@ -115,7 +115,7 @@ class LoggerService implements LoggerInterface
             $message .= "\033[0m " . PHP_EOL;
         }
 
-        //$this->writeOut($level, $message);
+        // $this->writeOut($level, $message);
         error_log($message);
     }
 
