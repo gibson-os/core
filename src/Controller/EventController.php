@@ -159,7 +159,7 @@ class EventController extends AbstractController
      * @throws EventException
      */
     #[CheckPermission(Permission::WRITE)]
-    public function run(EventService $eventService, #[GetModel(['id' => 'eventId'])] $event): AjaxResponse
+    public function run(EventService $eventService, #[GetModel(['id' => 'eventId'])] Event $event): AjaxResponse
     {
         $eventService->runEvent($event, true);
 
