@@ -9,7 +9,6 @@ use GibsonOS\Core\Attribute\Install\Database\Key;
 use GibsonOS\Core\Attribute\Install\Database\Table;
 use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Model\Event;
-use GibsonOS\Core\Utility\JsonUtility;
 use JsonException;
 use JsonSerializable;
 
@@ -47,8 +46,8 @@ class Trigger extends AbstractModel implements JsonSerializable
      */
     private string $triggerTitle;
 
-    #[Column(type: Column::TYPE_JSON)]
-    private ?string $parameters = null;
+    #[Column]
+    private array $parameters = [];
 
     #[Column(type: Column::TYPE_TINYINT, length: 1, attributes: [Column::ATTRIBUTE_UNSIGNED])]
     private ?int $weekday = null;
@@ -156,12 +155,12 @@ class Trigger extends AbstractModel implements JsonSerializable
         return $this;
     }
 
-    public function getParameters(): ?string
+    public function getParameters(): array
     {
         return $this->parameters;
     }
 
-    public function setParameters(?string $parameters): Trigger
+    public function setParameters(array $parameters): Trigger
     {
         $this->parameters = $parameters;
 
@@ -275,7 +274,7 @@ class Trigger extends AbstractModel implements JsonSerializable
             'classNameTitle' => $this->getClassTitle(),
             'trigger' => $this->getTrigger(),
             'triggerTitle' => $this->getTriggerTitle(),
-            'parameters' => JsonUtility::decode($this->getParameters() ?? 'null'),
+            'parameters' => $this->getParameters(),
             'weekday' => $this->getWeekday(),
             'day' => $this->getDay(),
             'month' => $this->getMonth(),

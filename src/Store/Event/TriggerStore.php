@@ -10,7 +10,6 @@ use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\Event;
 use GibsonOS\Core\Model\Event\Trigger;
 use GibsonOS\Core\Store\AbstractDatabaseStore;
-use GibsonOS\Core\Utility\JsonUtility;
 use JsonException;
 use mysqlDatabase;
 use ReflectionException;
@@ -102,13 +101,9 @@ class TriggerStore extends AbstractDatabaseStore
 
     /**
      * @param array<string, AbstractParameter> $triggerParameters
-     *
-     * @throws JsonException
      */
-    private function completeParameters(array $triggerParameters, ?string $parameters): ?string
+    private function completeParameters(array $triggerParameters, array $parameters): array
     {
-        $parameters = $parameters === null ? [] : JsonUtility::decode($parameters);
-
         foreach ($triggerParameters as $parameterName => $methodParameter) {
             if (!isset($parameters[$parameterName])) {
                 continue;
@@ -118,6 +113,6 @@ class TriggerStore extends AbstractDatabaseStore
             $methodParameter->setOperator($parameters[$parameterName]['operator']);
         }
 
-        return JsonUtility::encode($triggerParameters);
+        return $triggerParameters;
     }
 }

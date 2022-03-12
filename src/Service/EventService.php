@@ -21,7 +21,6 @@ use GibsonOS\Core\Model\AutoCompleteModelInterface;
 use GibsonOS\Core\Model\Event;
 use GibsonOS\Core\Repository\EventRepository;
 use GibsonOS\Core\Service\Event\ElementService;
-use GibsonOS\Core\Utility\JsonUtility;
 use JsonException;
 use Psr\Log\LoggerInterface;
 use ReflectionAttribute;
@@ -266,9 +265,7 @@ class EventService
                 }
             }
 
-            $eventParameters = JsonUtility::decode($eventTrigger->getParameters() ?? '[]');
-
-            foreach ($eventParameters ?? [] as $parameterName => $eventParameter) {
+            foreach ($eventTrigger->getParameters() as $parameterName => $eventParameter) {
                 if (!isset($parameters[$parameterName])) {
                     continue;
                 }
