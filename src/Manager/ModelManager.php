@@ -63,6 +63,33 @@ class ModelManager
     public function save(ModelInterface $model): void
     {
         $reflectionClass = $this->reflectionManager->getReflectionClass($model);
+        $childrenModels = [];
+
+        foreach ($reflectionClass->getProperties() as $reflectionProperty) {
+            $constraintAttribute = $this->reflectionManager->getAttribute(
+                $reflectionProperty,
+                Constraint::class,
+                ReflectionAttribute::IS_INSTANCEOF
+            );
+
+            if ($constraintAttribute === null) {
+                continue;
+            }
+
+            $getter = 'get' . ucfirst($reflectionProperty->getName());
+
+            if ($this->reflectionManager->getTypeName($reflectionProperty) !== 'array') {
+                $setter = 'set' . ucfirst($reflectionProperty->getName());
+                $model->$setter($model->$getter());
+
+                continue;
+            }
+
+            foreach ($model->$getter() as $child) {
+                $childrenModels[] = $child;
+            }
+        }
+
         $mysqlTable = $this->setToMysqlTable($model);
 
         try {
@@ -77,24 +104,8 @@ class ModelManager
         $mysqlTable->getReplacedRecord();
         $this->loadFromMysqlTable($mysqlTable, $model);
 
-        foreach ($reflectionClass->getProperties() as $reflectionProperty) {
-            $constraintAttribute = $this->reflectionManager->getAttribute(
-                $reflectionProperty,
-                Constraint::class,
-                ReflectionAttribute::IS_INSTANCEOF
-            );
-
-            if ($constraintAttribute === null) {
-                continue;
-            }
-
-            if ($this->reflectionManager->getTypeName($reflectionProperty) !== 'array') {
-                continue;
-            }
-
-            foreach ($model->{'get' . ucfirst($reflectionProperty->getName())}() as $child) {
-                $this->save($child);
-            }
+        foreach ($childrenModels as $childrenModel) {
+            $this->save($childrenModel);
         }
     }
 

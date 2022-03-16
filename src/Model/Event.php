@@ -71,7 +71,7 @@ class Event extends AbstractModel implements JsonSerializable, AutoCompleteModel
         return $this->id;
     }
 
-    public function setId(int $id): Event
+    public function setId(?int $id): Event
     {
         $this->id = $id;
 
