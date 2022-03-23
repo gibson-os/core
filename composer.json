@@ -12,7 +12,8 @@
     "twig/twig": "^3.0",
     "ext-zip": "*",
     "ext-curl": "*",
-    "ext-openssl": "*"
+    "ext-openssl": "*",
+    "google/auth": "^1.18"
   },
   "require-dev": {
     "codeception/codeception": "^4.0",

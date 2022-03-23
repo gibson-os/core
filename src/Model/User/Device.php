@@ -36,6 +36,9 @@ class Device extends AbstractModel
     #[Column(length: 64)]
     private ?string $token = null;
 
+    #[Column(length: 512)]
+    private ?string $fcmToken = null;
+
     #[Column]
     private ?DateTimeInterface $lastLogin = null;
 
@@ -108,6 +111,18 @@ class Device extends AbstractModel
     public function setToken(?string $token): Device
     {
         $this->token = $token;
+
+        return $this;
+    }
+
+    public function getFcmToken(): ?string
+    {
+        return $this->fcmToken;
+    }
+
+    public function setFcmToken(?string $fcmToken): Device
+    {
+        $this->fcmToken = $fcmToken;
 
         return $this;
     }

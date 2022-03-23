@@ -20,6 +20,7 @@ use GibsonOS\Core\Model\ModelInterface;
 use GibsonOS\Core\Service\Attribute\TableAttribute;
 use GibsonOS\Core\Service\InstallService;
 use GibsonOS\Core\Service\PriorityInterface;
+use GibsonOS\Core\Utility\JsonUtility;
 use mysqlDatabase;
 use ReflectionAttribute;
 use ReflectionException;
@@ -119,11 +120,11 @@ class TableInstall extends AbstractInstall implements PriorityInterface
                     continue;
                 }
 
-                $type = $this->reflectionManager->getNonBuiltinTypeName($reflectionProperty);
+                $type = $this->reflectionManager->getTypeName($reflectionProperty);
                 $defaultValue = $reflectionProperty->getDefaultValue();
                 $columnAttribute
                     ->setName($columnAttribute->getName() ?? $this->tableAttribute->transformName($reflectionProperty->getName()))
-                    ->setType($columnAttribute->getType() ?? $this->mapType($type))
+                    ->setType($columnAttribute->getType() ?? $this->mapType($this->reflectionManager->getNonBuiltinTypeName($reflectionProperty)))
                     ->setNullable(
                         $columnAttribute->isAutoIncrement()
                             ? false
@@ -135,7 +136,7 @@ class TableInstall extends AbstractInstall implements PriorityInterface
                         $columnAttribute->getDefault() === null && ($reflectionProperty->hasDefaultValue())
                             ? (is_bool($defaultValue)
                                 ? (string) ((int) $defaultValue)
-                                : ($defaultValue === null ? null : (string) $defaultValue))
+                                : ($defaultValue === null ? null : (is_array($defaultValue) ? JsonUtility::encode($defaultValue) : (string) $defaultValue)))
                             : $columnAttribute->getDefault()
                     )
                 ;
@@ -151,7 +152,8 @@ class TableInstall extends AbstractInstall implements PriorityInterface
                     $columnAttribute->getType() === Column::TYPE_ENUM &&
                     count($columnAttribute->getValues()) === 0
                 ) {
-                    $reflectionEnum = $this->reflectionManager->getReflectionEnum($type);
+                    $type = $this->reflectionManager->getNonBuiltinTypeName($reflectionProperty);
+                    $this->reflectionManager->getReflectionEnum($type);
                     $columnAttribute->setValues(array_map(
                         fn (UnitEnum $enum): string => (string) $enum->value,
                         $type::cases()

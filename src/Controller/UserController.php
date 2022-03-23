@@ -103,14 +103,15 @@ class UserController extends AbstractController
         UserService $userService,
         string $model,
         string $username,
-        string $password
+        string $password,
+        string $fcmToken
     ): AjaxResponse {
         if (empty($password) || empty($username)) {
             return $this->returnFailure('Login Error', StatusCode::UNAUTHORIZED);
         }
 
         $user = $userService->login($username, $password);
-        $device = $userService->addDevice($user, $model);
+        $device = $userService->addDevice($user, $model, $fcmToken);
 
         return $this->returnSuccess([
             'id' => $user->getId(),

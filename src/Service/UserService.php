@@ -62,7 +62,7 @@ class UserService
      * @throws SaveError
      * @throws Exception
      */
-    public function addDevice(User $user, string $model): User\Device
+    public function addDevice(User $user, string $model, string $fcmToken = null): User\Device
     {
         // @todo remove after app release
         while (true) {
@@ -80,6 +80,7 @@ class UserService
             ->setUser($user)
             ->setModel($model)
             ->setToken(md5((string) mt_rand()) . md5((string) mt_rand()))
+            ->setFcmToken($fcmToken)
         ;
         $this->modelManager->save($device);
 
