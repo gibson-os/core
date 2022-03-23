@@ -41,7 +41,7 @@ class Message implements JsonSerializable
             'module' => $this->module,
             'task' => $this->task,
             'action' => $this->action,
-            'options' => $this->options,
+            'options' => (string) $this->options,
         ];
 
         if (count($this->data)) {
