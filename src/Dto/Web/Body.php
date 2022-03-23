@@ -43,7 +43,7 @@ class Body
      */
     public function getContent(): string
     {
-        if ($this->resource === null || $this->length === 0) {
+        if (!is_resource($this->resource) || $this->length === 0) {
             throw new WebException('No body!');
         }
 
@@ -62,10 +62,13 @@ class Body
     public function setContent(string $content, int $length): Body
     {
         $this->resource = fopen('php://memory', 'r+');
+        $this->length = $length;
 
         if (fwrite($this->resource, $content, $length) === false) {
             throw new WebException('Content write error!');
         }
+
+        rewind($this->resource);
 
         return $this;
     }

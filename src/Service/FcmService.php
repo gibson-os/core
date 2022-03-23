@@ -3,10 +3,12 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Service;
 
+use GibsonOS\Core\Attribute\GetEnv;
 use GibsonOS\Core\Attribute\GetSetting;
 use GibsonOS\Core\Dto\Fcm\Message;
 use GibsonOS\Core\Dto\Web\Body;
 use GibsonOS\Core\Dto\Web\Request;
+use GibsonOS\Core\Exception\FcmException;
 use GibsonOS\Core\Exception\WebException;
 use GibsonOS\Core\Model\Setting;
 use GibsonOS\Core\Utility\JsonUtility;
@@ -21,8 +23,8 @@ class FcmService
     private string $url;
 
     public function __construct(
-        #[GetSetting('fcmKey', 'core')] private Setting $key,
         #[GetSetting('fcmProjectId', 'core')] private Setting $projectId,
+        #[GetEnv('GOOGLE_APPLICATION_CREDENTIALS')] private string $googleCredentialFile,
         private WebService $webService,
         private LoggerInterface $logger
     ) {
@@ -31,27 +33,39 @@ class FcmService
 
     /**
      * @throws WebException
+     * @throws FcmException
      * @throws JsonException
      */
     public function pushMessage(Message $message): FcmService
     {
         $credentials = CredentialsLoader::makeCredentials(
-            [$this->url . 'messages:send'],
-            ['key' => $this->key->getValue()]
+            ['https://www.googleapis.com/auth/cloud-platform'],
+            JsonUtility::decode(file_get_contents($this->googleCredentialFile))
         );
 
-        $content = JsonUtility::encode($message);
+        $content = JsonUtility::encode(['message' => $message]);
+        $authToken = $credentials->fetchAuthToken();
+
+        if (!isset($authToken['access_token'])) {
+            throw new FcmException('Access token not in googles oauth response!');
+        }
+
         $request = (new Request($this->url . 'messages:send'))
             ->setHeaders([
                 'Content-Type' => 'application/json',
-                'Authorization' => 'Bearer ' . $credentials->fetchAuthToken()['access_token'],
+                'Authorization' => 'Bearer ' . $authToken['access_token'],
             ])
             ->setBody((new Body())->setContent($content, mb_strlen($content)))
         ;
 
         $response = $this->webService->post($request);
+        $body = $response->getBody()->getContent();
+        $this->logger->debug(sprintf('FCM push response: %s', $body));
+        $body = JsonUtility::decode($body);
 
-        $this->logger->debug(sprintf('FCM push response: %s', $response->getBody()->getContent()));
+        if (isset($body['error'])) {
+            throw new FcmException($body['error']['message'], $body['error']['code']);
+        }
 
         return $this;
     }

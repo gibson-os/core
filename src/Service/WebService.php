@@ -51,7 +51,6 @@ class WebService
     private function request(Request $request, string $method): Response
     {
         $responseHandle = fopen('php://memory', 'r+');
-        $headers = [];
 
         $port = $request->getPort();
         $url = $request->getUrl();
@@ -60,11 +59,36 @@ class WebService
         curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $method);
         $parameters = $request->getParameters();
 
+        try {
+            $requestBody = $request->getBody()?->getContent();
+        } catch (WebException) {
+            $requestBody = null;
+        }
+
+        $headers = $request->getHeaders();
+
         if (!empty($parameters)) {
-            $parameterString = http_build_query($parameters);
-            $this->logger->debug('With parameters: ' . $parameterString);
-            curl_setopt($curl, CURLOPT_HTTPHEADER, ['Content-Length: ' . strlen($parameterString)]);
-            curl_setopt($curl, CURLOPT_POSTFIELDS, $parameterString);
+            if (!empty($requestBody)) {
+                throw new WebException('Request body and parameters are set!');
+            }
+
+            $requestBody = http_build_query($parameters);
+        }
+
+        if (!empty($requestBody)) {
+            $this->logger->debug('With body: ' . $requestBody);
+            $headers['Content-Length'] = (string) strlen($requestBody);
+            curl_setopt($curl, CURLOPT_POSTFIELDS, $requestBody);
+        }
+
+        if (!empty($headers)) {
+            $curlHeaders = [];
+
+            foreach ($headers as $headerKey => $headerValue) {
+                $curlHeaders[] = $headerKey . ': ' . $headerValue;
+            }
+
+            curl_setopt($curl, CURLOPT_HTTPHEADER, $curlHeaders);
         }
 
         curl_setopt($curl, CURLOPT_ENCODING, 'gzip');
