@@ -4,10 +4,7 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Repository;
 
 use GibsonOS\Core\Exception\Repository\SelectError;
-use GibsonOS\Core\Model\Action;
 use GibsonOS\Core\Model\DevicePush;
-use GibsonOS\Core\Model\Module;
-use GibsonOS\Core\Model\Task;
 use GibsonOS\Core\Model\User\Device;
 
 class DevicePushRepository extends AbstractRepository
@@ -15,11 +12,25 @@ class DevicePushRepository extends AbstractRepository
     /**
      * @throws SelectError
      */
-    public function get(Device $device, Module $module, Task $task, Action $action, string $foreignId): DevicePush
+    public function getByDevice(Device $device, string $module, string $task, string $action, string $foreignId): DevicePush
     {
         return $this->fetchOne(
             '`device_id`=? AND `module`=? AND `task`=? AND `action`=? AND `foreign_id`=?',
-            [$device->getId(), $module->getName(), $task->getName(), $action->getName(), $foreignId],
+            [$device->getId(), $module, $task, $action, $foreignId],
+            DevicePush::class
+        );
+    }
+
+    /**
+     * @throws SelectError
+     *
+     * @return DevicePush[]
+     */
+    public function getAllByAction(string $module, string $task, string $action, string $foreignId): array
+    {
+        return $this->fetchAll(
+            '`module`=? AND `task`=? AND `action`=? AND `foreign_id`=?',
+            [$module, $task, $action, $foreignId],
             DevicePush::class
         );
     }

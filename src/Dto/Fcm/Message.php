@@ -8,6 +8,8 @@ use JsonSerializable;
 
 class Message implements JsonSerializable
 {
+    public const OPTION_NONE = 0;
+
     public const OPTION_VIBRATION = 1;
 
     public const OPTION_SOUND = 2;

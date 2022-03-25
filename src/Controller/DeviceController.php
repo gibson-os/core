@@ -60,16 +60,16 @@ class DeviceController extends AbstractController
         ModelManager $modelManager,
         DeviceRepository $deviceRepository,
         DevicePushRepository $devicePushRepository,
-        #[GetModel(['name' => 'module'])] Module $module,
-        #[GetModel(['name' => 'task'])] Task $task,
-        #[GetModel(['name' => 'action'])] Action $action,
+        string $module,
+        string $task,
+        string $action,
         string $foreignId
     ): AjaxResponse {
         $deviceToken = $this->requestService->getHeader('X-Device-Token');
         $device = $deviceRepository->getByToken($deviceToken);
 
         try {
-            $devicePush = $devicePushRepository->get($device, $module, $task, $action, $foreignId);
+            $devicePush = $devicePushRepository->getByDevice($device, $module, $task, $action, $foreignId);
             $modelManager->delete($devicePush);
         } catch (SelectError) {
         }
