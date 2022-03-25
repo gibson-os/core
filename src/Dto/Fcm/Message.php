@@ -13,12 +13,13 @@ class Message implements JsonSerializable
     public const OPTION_SOUND = 2;
 
     public function __construct(
+        private string $token,
         private string $fcmToken,
         private Type $type = Type::NOTIFICATION,
         private ?string $title = null,
         private ?string $body = null,
         private string $module = 'core',
-        private string $task = 'index',
+        private string $task = 'desktop',
         private string $action = 'index',
         private array $data = [],
         private int $options = self::OPTION_VIBRATION + self::OPTION_SOUND
@@ -37,6 +38,7 @@ class Message implements JsonSerializable
         }
 
         $data['data'] = [
+            'token' => $this->token,
             'type' => $this->type->value,
             'module' => $this->module,
             'task' => $this->task,

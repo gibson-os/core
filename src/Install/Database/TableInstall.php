@@ -120,11 +120,13 @@ class TableInstall extends AbstractInstall implements PriorityInterface
                     continue;
                 }
 
-                $type = $this->reflectionManager->getTypeName($reflectionProperty);
+                $type = $this->reflectionManager->getTypeName($reflectionProperty)
+                    ?? throw new ReflectionException(sprintf('No type found for "%s"', $reflectionProperty->getName()))
+                ;
                 $defaultValue = $reflectionProperty->getDefaultValue();
                 $columnAttribute
                     ->setName($columnAttribute->getName() ?? $this->tableAttribute->transformName($reflectionProperty->getName()))
-                    ->setType($columnAttribute->getType() ?? $this->mapType($this->reflectionManager->getNonBuiltinTypeName($reflectionProperty)))
+                    ->setType($columnAttribute->getType() ?? $this->mapType($type))
                     ->setNullable(
                         $columnAttribute->isAutoIncrement()
                             ? false
@@ -247,7 +249,7 @@ class TableInstall extends AbstractInstall implements PriorityInterface
     }
 
     /**
-     * @param class-string $type
+     * @param class-string|string $type
      */
     private function mapType(string $type): string
     {
@@ -258,7 +260,7 @@ class TableInstall extends AbstractInstall implements PriorityInterface
                 'array' => Column::TYPE_JSON,
                 'string' => Column::TYPE_VARCHAR,
                 DateTimeInterface::class, DateTime::class, DateTimeImmutable::class => Column::TYPE_DATETIME,
-                default => enum_exists($type) ? Column::TYPE_ENUM : Column::TYPE_VARCHAR
+                default => class_exists($type) && enum_exists($type) ? Column::TYPE_ENUM : Column::TYPE_VARCHAR
         };
     }
 

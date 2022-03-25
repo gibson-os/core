@@ -7,19 +7,21 @@ use DateTimeImmutable;
 use DateTimeInterface;
 use GibsonOS\Core\Attribute\Install\Database\Column;
 use GibsonOS\Core\Attribute\Install\Database\Constraint;
-use GibsonOS\Core\Attribute\Install\Database\Key;
 use GibsonOS\Core\Attribute\Install\Database\Table;
 use GibsonOS\Core\Model\User\Device;
 use mysqlDatabase;
 
 /**
+ * @method Device     getDevice()
+ * @method DevicePush setDevice(Device $device)
  * @method Module     getModuleModel()
  * @method DevicePush setModuleModel(Module $module)
  * @method Task       getTaskModel()
  * @method DevicePush setTaskModel(Task $task)
+ * @method Action     getActionModel()
+ * @method DevicePush setActionModel(Action $action)
  */
 #[Table]
-#[Key(columns: ['registered', 'modified'])]
 class DevicePush extends AbstractModel
 {
     #[Column(length: 16, primary: true)]
@@ -31,8 +33,11 @@ class DevicePush extends AbstractModel
     #[Column(length: 32, primary: true)]
     private string $task;
 
-    #[Column]
-    private bool $registered = false;
+    #[Column(length: 32, primary: true)]
+    private ?string $action = null;
+
+    #[Column(length: 512, primary: true)]
+    private string $foreignId;
 
     #[Column(type: Column::TYPE_TIMESTAMP, default: Column::DEFAULT_CURRENT_TIMESTAMP, attributes: [Column::ATTRIBUTE_CURRENT_TIMESTAMP])]
     private DateTimeInterface $modified;
@@ -45,6 +50,9 @@ class DevicePush extends AbstractModel
 
     #[Constraint(parentColumn: 'name', ownColumn: 'task')]
     protected Task $taskModel;
+
+    #[Constraint(parentColumn: 'name', ownColumn: 'action')]
+    protected Action $actionModel;
 
     public function __construct(mysqlDatabase $database = null)
     {
@@ -89,24 +97,36 @@ class DevicePush extends AbstractModel
         return $this;
     }
 
-    public function isRegistered(): bool
+    public function getAction(): ?string
     {
-        return $this->registered;
+        return $this->action;
     }
 
-    public function setRegistered(bool $registered): DevicePush
+    public function setAction(?string $action): DevicePush
     {
-        $this->registered = $registered;
+        $this->action = $action;
 
         return $this;
     }
 
-    public function getModified(): DateTimeImmutable|DateTimeInterface
+    public function getForeignId(): string
+    {
+        return $this->foreignId;
+    }
+
+    public function setForeignId(string $foreignId): DevicePush
+    {
+        $this->foreignId = $foreignId;
+
+        return $this;
+    }
+
+    public function getModified(): DateTimeInterface
     {
         return $this->modified;
     }
 
-    public function setModified(DateTimeImmutable|DateTimeInterface $modified): DevicePush
+    public function setModified(DateTimeInterface $modified): DevicePush
     {
         $this->modified = $modified;
 
