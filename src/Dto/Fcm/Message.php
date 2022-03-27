@@ -3,7 +3,10 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Dto\Fcm;
 
+use GibsonOS\Core\Dto\Fcm\Message\Priority;
 use GibsonOS\Core\Dto\Fcm\Message\Type;
+use GibsonOS\Core\Utility\JsonUtility;
+use JsonException;
 use JsonSerializable;
 
 class Message implements JsonSerializable
@@ -24,13 +27,22 @@ class Message implements JsonSerializable
         private string $task = 'desktop',
         private string $action = 'index',
         private array $data = [],
+        private Priority $priority = Priority::NORMAL,
         private int $options = self::OPTION_VIBRATION + self::OPTION_SOUND
     ) {
     }
 
+    /**
+     * @throws JsonException
+     */
     public function jsonSerialize(): array
     {
-        $data = ['token' => $this->fcmToken];
+        $data = [
+            'token' => $this->fcmToken,
+            'android' => [
+                'priority' => $this->priority->value,
+            ],
+        ];
 
         if ($this->title === null || $this->body !== null) {
             $data['notification'] = [
@@ -49,7 +61,7 @@ class Message implements JsonSerializable
         ];
 
         if (count($this->data)) {
-            $data['data']['payload'] = $data;
+            $data['data']['payload'] = JsonUtility::encode($this->data);
         }
 
         return $data;

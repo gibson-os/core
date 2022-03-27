@@ -42,14 +42,13 @@ class FcmService
             ['https://www.googleapis.com/auth/cloud-platform'],
             JsonUtility::decode(file_get_contents($this->googleCredentialFile))
         );
-
-        $content = JsonUtility::encode(['message' => $message]);
         $authToken = $credentials->fetchAuthToken();
 
         if (!isset($authToken['access_token'])) {
             throw new FcmException('Access token not in googles oauth response!');
         }
 
+        $content = JsonUtility::encode(['message' => $message]);
         $request = (new Request($this->url . 'messages:send'))
             ->setHeaders([
                 'Content-Type' => 'application/json',

@@ -12,9 +12,9 @@ class JsonUtility
      *
      * @throws JsonException
      */
-    public static function encode($value): string
+    public static function encode($value, int $flags = JSON_UNESCAPED_UNICODE + JSON_THROW_ON_ERROR): string
     {
-        return json_encode($value, JSON_UNESCAPED_UNICODE + JSON_THROW_ON_ERROR);
+        return json_encode($value, $flags);
     }
 
     /**
@@ -22,9 +22,9 @@ class JsonUtility
      *
      * @return mixed
      */
-    public static function decode(string $json)
+    public static function decode(string $json, int $flags = JSON_THROW_ON_ERROR)
     {
-        return json_decode($json, true, 512, JSON_THROW_ON_ERROR);
+        return json_decode($json, true, 512, $flags);
     }
 
     /**
@@ -32,8 +32,8 @@ class JsonUtility
      *
      * @return mixed
      */
-    public static function decodeNotAssoc(string $json)
+    public static function decodeNotAssoc(string $json, int $flags = JSON_THROW_ON_ERROR)
     {
-        return json_decode($json, false, 512, JSON_THROW_ON_ERROR);
+        return json_decode($json, false, 512, $flags);
     }
 }
