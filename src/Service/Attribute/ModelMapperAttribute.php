@@ -15,11 +15,13 @@ use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Mapper\ModelMapper;
 use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Service\RequestService;
+use GibsonOS\Core\Service\SessionService;
 use GibsonOS\Core\Utility\JsonUtility;
 use JsonException;
 use ReflectionAttribute;
 use ReflectionException;
 use ReflectionParameter;
+use ReflectionProperty;
 
 class ModelMapperAttribute extends ObjectMapperAttribute
 {
@@ -27,7 +29,8 @@ class ModelMapperAttribute extends ObjectMapperAttribute
         ModelMapper $objectMapper,
         RequestService $requestService,
         ReflectionManager $reflectionManager,
-        private ModelFetcherAttribute $modelFetcherAttribute
+        private ModelFetcherAttribute $modelFetcherAttribute,
+        private SessionService $sessionService
     ) {
         parent::__construct($objectMapper, $requestService, $reflectionManager);
     }
@@ -92,13 +95,14 @@ class ModelMapperAttribute extends ObjectMapperAttribute
             ;
 
             if (!class_exists($parentModelClassName)) {
-                throw new MapperException(sprintf('"%s" is no class!', $parentModelClassName ?? 'null'));
+                throw new MapperException(sprintf('"%s" is no class!', $parentModelClassName ?? 'HeyHo
+               '));
             }
 
-            $values = JsonUtility::decode($this->requestService->getRequestValue($this->getRequestKey($attribute, $reflectionProperty)));
+            $values = $this->getValues($attribute, $reflectionProperty);
             $typeName = $this->reflectionManager->getTypeName($reflectionProperty);
             $values = array_map(
-                fn ($value): object => $this->objectMapper->mapToObject($parentModelClassName, $value),
+                fn ($value): object => is_object($value) ? $value : $this->objectMapper->mapToObject($parentModelClassName, $value),
                 $typeName === 'array' ? $values : [$reflectionProperty->getName() => $values]
             );
             $setter = 'set' . ucfirst($reflectionProperty->getName());
@@ -106,5 +110,43 @@ class ModelMapperAttribute extends ObjectMapperAttribute
         }
 
         return $model;
+    }
+
+    /**
+     * @throws JsonException
+     * @throws ReflectionException
+     * @throws RequestError
+     */
+    private function getValues(GetMappedModel $attribute, ReflectionProperty $reflectionProperty): mixed
+    {
+        $mappingKey = $this->getMappingKey($attribute, $reflectionProperty);
+        $conditionParts = explode('.', $mappingKey);
+        $count = count($conditionParts);
+
+        if ($count === 1) {
+            try {
+                return JsonUtility::decode($this->requestService->getRequestValue($mappingKey));
+            } catch (RequestError) {
+                return $reflectionProperty->getDefaultValue();
+            }
+        }
+
+        if ($conditionParts[0] === 'session') {
+            $value = $this->sessionService->get($conditionParts[1]);
+
+            if ($count < 3) {
+                return $value;
+            }
+
+            if (is_object($value)) {
+                return $this->reflectionManager->getProperty(
+                    $reflectionProperty,
+                    $value
+                );
+            }
+        }
+
+        // Muss noch aufgebohrt werden
+        return null;
     }
 }

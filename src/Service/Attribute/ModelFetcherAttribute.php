@@ -11,6 +11,7 @@ use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Model\ModelInterface;
 use GibsonOS\Core\Service\RequestService;
+use GibsonOS\Core\Service\SessionService;
 use InvalidArgumentException;
 use JsonException;
 use mysqlDatabase;
@@ -23,7 +24,8 @@ class ModelFetcherAttribute implements AttributeServiceInterface, ParameterAttri
     public function __construct(
         private mysqlDatabase $mysqlDatabase,
         private RequestService $requestService,
-        private ReflectionManager $reflectionManager
+        private ReflectionManager $reflectionManager,
+        private SessionService $sessionService
     ) {
     }
 
@@ -54,10 +56,7 @@ class ModelFetcherAttribute implements AttributeServiceInterface, ParameterAttri
         }
 
         $table = (new mysqlTable($this->mysqlDatabase, $model->getTableName()))
-            ->setWhereParameters(array_map(
-                fn (string $key) => $this->requestService->getRequestValue($key),
-                array_values($attribute->getConditions())
-            ))
+            ->setWhereParameters($this->getWhereValues($attribute))
             ->setWhere(implode(' AND ', array_map(
                 fn (string $field): string => '`' . $field . '`=?',
                 array_keys($attribute->getConditions())
@@ -91,5 +90,41 @@ class ModelFetcherAttribute implements AttributeServiceInterface, ParameterAttri
         $model->loadFromMysqlTable($table);
 
         return $model;
+    }
+
+    private function getWhereValues(GetModel $attribute): array
+    {
+        $values = [];
+
+        foreach ($attribute->getConditions() as $condition) {
+            $conditionParts = explode('.', $condition);
+            $count = count($conditionParts);
+
+            if ($count === 1) {
+                $values[] = $this->requestService->getRequestValue($condition);
+
+                continue;
+            }
+
+            if ($conditionParts[0] === 'session') {
+                $value = $this->sessionService->get($conditionParts[1]);
+
+                if ($count < 3) {
+                    $values[] = $value;
+
+                    continue;
+                }
+
+                if (is_object($value)) {
+                    $reflectionClass = $this->reflectionManager->getReflectionClass($value);
+                    $values[] = $this->reflectionManager->getProperty(
+                        $reflectionClass->getProperty($conditionParts[2]),
+                        $value
+                    );
+                }
+            }
+        }
+
+        return $values;
     }
 }

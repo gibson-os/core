@@ -60,7 +60,7 @@ class ObjectMapperAttribute implements AttributeServiceInterface, ParameterAttri
 
         foreach ($reflectionClass->getConstructor()?->getParameters() ?? [] as $reflectionParameter) {
             $parameterName = $reflectionParameter->getName();
-            $requestKey = $this->getRequestKey($attribute, $reflectionParameter);
+            $requestKey = $this->getMappingKey($attribute, $reflectionParameter);
             $objectParameters[$parameterName] = $parameters[$requestKey]
                 ?? $this->getParameterFromRequest($reflectionParameter, $requestKey)
             ;
@@ -87,7 +87,7 @@ class ObjectMapperAttribute implements AttributeServiceInterface, ParameterAttri
 
             foreach ($reflectionMethod->getParameters() as $reflectionParameter) {
                 $parameterName = $reflectionParameter->getName();
-                $requestKey = $this->getRequestKey($attribute, $reflectionParameter);
+                $requestKey = $this->getMappingKey($attribute, $reflectionParameter);
 
                 try {
                     $this->requestService->getRequestValue($requestKey);
@@ -102,7 +102,7 @@ class ObjectMapperAttribute implements AttributeServiceInterface, ParameterAttri
         return $setterParameters;
     }
 
-    protected function getRequestKey(
+    protected function getMappingKey(
         GetObject $attribute,
         ReflectionParameter|ReflectionProperty $reflectionObject
     ): string {
