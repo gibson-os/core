@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Service;
 
 use DateTime;
+use Exception;
 use GibsonOS\Core\Attribute\Event\Listener;
 use GibsonOS\Core\Attribute\Event\ParameterOption;
 use GibsonOS\Core\Attribute\Event\Trigger;
@@ -70,7 +71,7 @@ class EventService
      * @throws ReflectionException
      * @throws SaveError
      */
-    public function fire(string $className, string $trigger, array $parameters = null): void
+    public function fireInCommand(string $className, string $trigger, array $parameters = null): void
     {
         $triggerName = $this->getTriggerName($className, $trigger);
         $this->logger->info('Fire event ' . $triggerName);
@@ -87,6 +88,23 @@ class EventService
             } else {
                 $event($parameters);
             }
+        }
+    }
+
+    /**
+     * @param class-string $className
+     */
+    public function fire(string $className, string $trigger, array $parameters = null): void
+    {
+        try {
+            $this->fireInCommand($className, $trigger, $parameters);
+        } catch (Exception $e) {
+            $this->logger->error(sprintf(
+                "%s: %s\n%s",
+                get_class($e),
+                $e->getMessage(),
+                $e->getTraceAsString()
+            ));
         }
     }
 

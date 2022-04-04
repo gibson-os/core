@@ -7,8 +7,13 @@ use GibsonOS\Core\Attribute\Install\Cronjob;
 use GibsonOS\Core\Command\AbstractCommand;
 use GibsonOS\Core\Event\TimeEvent;
 use GibsonOS\Core\Exception\DateTimeError;
+use GibsonOS\Core\Exception\EventException;
+use GibsonOS\Core\Exception\FactoryError;
+use GibsonOS\Core\Exception\Model\SaveError;
 use GibsonOS\Core\Service\EventService;
+use JsonException;
 use Psr\Log\LoggerInterface;
+use ReflectionException;
 
 /**
  * @description Run time controlled events
@@ -23,10 +28,15 @@ class CronjobCommand extends AbstractCommand
 
     /**
      * @throws DateTimeError
+     * @throws EventException
+     * @throws FactoryError
+     * @throws SaveError
+     * @throws JsonException
+     * @throws ReflectionException
      */
     protected function run(): int
     {
-        $this->eventService->fire(TimeEvent::class, TimeEvent::TRIGGER_CRONJOB);
+        $this->eventService->fireInCommand(TimeEvent::class, TimeEvent::TRIGGER_CRONJOB);
 
         return self::SUCCESS;
     }
