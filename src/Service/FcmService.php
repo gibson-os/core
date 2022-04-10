@@ -4,13 +4,11 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Service;
 
 use GibsonOS\Core\Attribute\GetEnv;
-use GibsonOS\Core\Attribute\GetSetting;
 use GibsonOS\Core\Dto\Fcm\Message;
 use GibsonOS\Core\Dto\Web\Body;
 use GibsonOS\Core\Dto\Web\Request;
 use GibsonOS\Core\Exception\FcmException;
 use GibsonOS\Core\Exception\WebException;
-use GibsonOS\Core\Model\Setting;
 use GibsonOS\Core\Utility\JsonUtility;
 use Google\Auth\CredentialsLoader;
 use JsonException;
@@ -23,12 +21,12 @@ class FcmService
     private string $url;
 
     public function __construct(
-        #[GetSetting('fcmProjectId', 'core')] private Setting $projectId,
+        #[GetEnv('FCM_PROJECT_ID')] private string $projectId,
         #[GetEnv('GOOGLE_APPLICATION_CREDENTIALS')] private string $googleCredentialFile,
         private WebService $webService,
         private LoggerInterface $logger
     ) {
-        $this->url = self::URL . $this->projectId->getValue() . '/';
+        $this->url = self::URL . $this->projectId . '/';
     }
 
     /**

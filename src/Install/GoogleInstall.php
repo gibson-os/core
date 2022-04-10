@@ -16,16 +16,15 @@ class GoogleInstall extends AbstractInstall implements PriorityInterface, Single
             'GOOGLE_APPLICATION_CREDENTIALS',
             'What is the path of the google application credentials?'
         );
+        yield $fcmProjectIdInput = $this->getEnvInput(
+            'FCM_PROJECT_ID',
+            'What is the path of the google application credentials?'
+        );
 
         yield (new Configuration('Google application configuration generated!'))
             ->setValue('GOOGLE_APPLICATION_CREDENTIALS', $googleApplicationCredentialsInput->getValue() ?? '')
+            ->setValue('FCM_PROJECT_ID', $fcmProjectIdInput->getValue() ?? '')
         ;
-
-        yield $this->getSettingInput(
-            'core',
-            'fcmProjectId',
-            'What is the FCM project id?'
-        );
     }
 
     public function getPart(): string
