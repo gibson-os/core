@@ -20,6 +20,12 @@ class GoogleInstall extends AbstractInstall implements PriorityInterface, Single
         yield (new Configuration('Google application configuration generated!'))
             ->setValue('GOOGLE_APPLICATION_CREDENTIALS', $googleApplicationCredentialsInput->getValue() ?? '')
         ;
+
+        yield $this->getSettingInput(
+            'core',
+            'fcmProjectId',
+            'What is the FCM project id?'
+        );
     }
 
     public function getPart(): string
