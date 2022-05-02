@@ -109,7 +109,11 @@ class LoggerService implements LoggerInterface
             ;
 
             foreach ($context['exception']->getTrace() as $trace) {
-                $message .= "\t" . $trace['file'] . ':' . $trace['line'] . ($trace['type'] ?? ' ') . $trace['function'] . '()' . PHP_EOL;
+                $message .=
+                    "\t" . ($trace['file'] ?? 'unknown file') . ':' .
+                    ($trace['line'] ?? 'unknown line') . ($trace['type'] ?? ' ') .
+                    ($trace['function'] ?? 'unknown function') . '()' . PHP_EOL
+                ;
             }
 
             $message .= "\033[0m " . PHP_EOL;

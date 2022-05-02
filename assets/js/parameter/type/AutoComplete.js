@@ -18,7 +18,13 @@ Ext.define('GibsonOS.module.core.parameter.type.AutoComplete', {
             }
 
             Ext.iterate(config.listeners, function(fieldName, options) {
-                me.up('form').getForm().findField(fieldName).on('change', function(field, value) {
+                const listenerField =  me.up('form').getForm().findField(fieldName);
+
+                if (!listenerField) {
+                    return true;
+                }
+
+                listenerField.on('change', function(field, value) {
                     let record = field.findRecordByValue(value);
 
                     Ext.iterate(options, function(property, option) {
