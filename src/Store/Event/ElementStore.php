@@ -150,7 +150,12 @@ class ElementStore extends AbstractDatabaseStore
      */
     private function completeReturns(array $methodReturns, array $returns): array
     {
+        $newMethodReturns = [];
+
         foreach ($methodReturns as $parameterName => $methodReturn) {
+            $methodReturn = clone $methodReturn;
+            $newMethodReturns[$parameterName] = $methodReturn;
+
             if (!isset($returns[$parameterName])) {
                 continue;
             }
@@ -162,6 +167,6 @@ class ElementStore extends AbstractDatabaseStore
             ;
         }
 
-        return $methodReturns;
+        return $newMethodReturns;
     }
 }
