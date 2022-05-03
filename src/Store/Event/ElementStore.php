@@ -117,7 +117,12 @@ class ElementStore extends AbstractDatabaseStore
      */
     private function completeParameters(array $methodParameters, array $parameters): array
     {
+        $newMethodParameters = [];
+
         foreach ($methodParameters as $parameterName => $methodParameter) {
+            $methodParameter = clone $methodParameter;
+            $newMethodParameters[$parameterName] = $methodParameter;
+
             if (!isset($parameters[$parameterName])) {
                 continue;
             }
@@ -133,7 +138,7 @@ class ElementStore extends AbstractDatabaseStore
             $methodParameter->setValue($parameter);
         }
 
-        return $methodParameters;
+        return $newMethodParameters;
     }
 
     /**
