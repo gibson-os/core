@@ -36,6 +36,7 @@ Ext.define('GibsonOS.module.core.parameter.Form', {
             xtype: parameter.xtype,
             name: name,
             value: parameter.value ?? null,
+            checked: parameter.value === true,
             parameterObject: parameter,
             fieldLabel: parameter.title
         };
