@@ -76,9 +76,9 @@ Ext.define('GibsonOS.module.core.component.form.field.AutoComplete', {
             if (records.length) {
                 me.select(records[0]);
             }
-
-            delete params[me.queryParamId];
             me.isSetting = false;
         });
+        delete params[me.queryParamId];
+        me.getStore().getProxy().extraParams = params;
     }
 });

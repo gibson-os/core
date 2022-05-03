@@ -30,14 +30,24 @@ Ext.define('GibsonOS.module.core.parameter.type.AutoComplete', {
                     if (options['params']) {
                         me.getStore().getProxy().setExtraParam(options['params'].paramKey, record.get(options['params'].recordKey));
                         me.setValueById(null);
+                        me.getStore().load();
                     }
-                    // Ext.iterate(options, function(property, option) {
-                    //     if (property === 'params') {
-                    //         me.getStore().getProxy().setExtraParam(option.paramKey, record.get(option.recordKey));
-                    //         me.setValueById(null);
-                    //     }
-                    // });
                 });
+
+                if (listenerField.getValue()) {
+                    let record = listenerField.findRecordByValue(listenerField.getValue());
+
+                    if (!record) {
+                        const loadFunction = (store, records) => {
+                            record = records[0];
+                            me.getStore().getProxy().setExtraParam(options['params'].paramKey, record.get(options['params'].recordKey));
+                            me.getStore().load();
+                            listenerField.getStore().un('load', loadFunction);
+                        };
+
+                        listenerField.getStore().on('load', loadFunction);
+                    }
+                }
             });
         });
     }
