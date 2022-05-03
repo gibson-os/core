@@ -104,7 +104,7 @@ abstract class AbstractEvent
 
             $parameters[$parameterName] = $methodParameter->getAutoComplete()->getById(
                 (string) $parameters[$parameterName],
-                []
+                $parameters
             );
         }
 
