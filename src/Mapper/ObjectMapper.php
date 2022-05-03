@@ -49,10 +49,6 @@ class ObjectMapper implements ObjectMapperInterface
             $value = $properties[$reflectionParameter->getName()];
             $property = is_object($value) ? $value : $this->reflectionManager->castValue($reflectionParameter, $value);
 
-//            if (is_object($property)) {
-//                errlog($property->getId());
-//                errlog($this->mapValueToObject($reflectionParameter, $property)->getId());
-//            }
             $constructorParameters[] = is_object($property)
                 ? $property
                 : $this->mapValueToObject($reflectionParameter, $property)

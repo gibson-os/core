@@ -27,12 +27,16 @@ Ext.define('GibsonOS.module.core.parameter.type.AutoComplete', {
                 listenerField.on('change', function(field, value) {
                     let record = field.findRecordByValue(value);
 
-                    Ext.iterate(options, function(property, option) {
-                        if (property === 'params') {
-                            me.getStore().getProxy().setExtraParam(option.paramKey, record.get(option.recordKey));
-                            me.setValueById(null);
-                        }
-                    })
+                    if (options['params']) {
+                        me.getStore().getProxy().setExtraParam(options['params'].paramKey, record.get(options['params'].recordKey));
+                        me.setValueById(null);
+                    }
+                    // Ext.iterate(options, function(property, option) {
+                    //     if (property === 'params') {
+                    //         me.getStore().getProxy().setExtraParam(option.paramKey, record.get(option.recordKey));
+                    //         me.setValueById(null);
+                    //     }
+                    // });
                 });
             });
         });
