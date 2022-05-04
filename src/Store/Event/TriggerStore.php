@@ -109,6 +109,7 @@ class TriggerStore extends AbstractDatabaseStore
                 continue;
             }
 
+            $methodParameter = clone $methodParameter;
             $methodParameter->setValue($parameters[$parameterName]['value']);
             $methodParameter->setOperator($parameters[$parameterName]['operator']);
         }
