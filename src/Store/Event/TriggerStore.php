@@ -104,16 +104,20 @@ class TriggerStore extends AbstractDatabaseStore
      */
     private function completeParameters(array $triggerParameters, array $parameters): array
     {
-        foreach ($triggerParameters as $parameterName => $methodParameter) {
+        $newTriggerParameters = [];
+
+        foreach ($triggerParameters as $parameterName => $triggerParameter) {
+            $triggerParameter = clone $triggerParameter;
+            $newTriggerParameters[$parameterName] = $triggerParameter;
+
             if (!isset($parameters[$parameterName])) {
                 continue;
             }
 
-            $methodParameter = clone $methodParameter;
-            $methodParameter->setValue($parameters[$parameterName]['value']);
-            $methodParameter->setOperator($parameters[$parameterName]['operator']);
+            $triggerParameter->setValue($parameters[$parameterName]['value']);
+            $triggerParameter->setOperator($parameters[$parameterName]['operator']);
         }
 
-        return $triggerParameters;
+        return $newTriggerParameters;
     }
 }
