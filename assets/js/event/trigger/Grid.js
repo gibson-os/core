@@ -80,6 +80,7 @@ Ext.define('GibsonOS.module.core.event.trigger.Grid', {
             flex: 1,
             editor: {
                 xtype: 'gosModuleCoreEventElementClassNameComboBox',
+                editable: true,
                 listeners: {
                     change: function(comboBox, newValue) {
                         let triggerColumnEditor = me.down('#gosModuleCoreEventTriggerGridColumnTrigger').getEditor();
@@ -109,6 +110,7 @@ Ext.define('GibsonOS.module.core.event.trigger.Grid', {
             flex: 1,
             editor: {
                 xtype: 'gosModuleCoreEventElementTriggerComboBox',
+                editable: true,
                 listeners: {
                     change: function(comboBox, newValue) {
                         let record = comboBox.findRecordByValue(newValue);

@@ -170,6 +170,7 @@ Ext.define('GibsonOS.module.core.event.element.TreeGrid', {
             flex: 1,
             editor: {
                 xtype: 'gosModuleCoreEventElementClassNameComboBox',
+                editable: true,
                 listeners: {
                     change: function(comboBox, newValue) {
                         let methodColumnEditor = me.down('#gosModuleCoreEventElementTreeGridColumnMethod').getEditor();
@@ -200,6 +201,7 @@ Ext.define('GibsonOS.module.core.event.element.TreeGrid', {
             flex: 1,
             editor: {
                 xtype: 'gosModuleCoreEventElementMethodComboBox',
+                editable: true,
                 listeners: {
                     change: function(comboBox, newValue) {
                         let record = comboBox.findRecordByValue(newValue);
