@@ -1,4 +1,5 @@
 <?php
+/** @noinspection PhpUndefinedMethodInspection */
 declare(strict_types=1);
 
 namespace GibsonOS\Core\Model\Event;
@@ -20,8 +21,6 @@ use Serializable;
  * @method Element|null getParent()
  * @method Element      setParent(?Element $element)
  * @method Element[]    getChildren()
- * @method Element      addChildren(Element[] $elements)
- * @method Element      setChildren(Element[] $elements)
  */
 #[Table]
 #[Key(unique: true, columns: ['parent_id', 'order'])]
@@ -226,6 +225,38 @@ class Element extends AbstractModel implements Serializable, JsonSerializable
     public function setMethodTitle(?string $methodTitle): Element
     {
         $this->methodTitle = $methodTitle;
+
+        return $this;
+    }
+
+    /**
+     * @param Element[] $elements
+     */
+    public function addChildren(array $elements): Element
+    {
+        $order = count($this->getChildren());
+
+        foreach ($elements as $element) {
+            $element->setOrder($order++);
+        }
+
+        parent::addChildren($elements);
+
+        return $this;
+    }
+
+    /**
+     * @param Element[] $elements
+     */
+    public function setChildren(array $elements): Element
+    {
+        $order = 0;
+
+        foreach ($elements as $element) {
+            $element->setOrder($order++);
+        }
+
+        parent::setChildren($elements);
 
         return $this;
     }
