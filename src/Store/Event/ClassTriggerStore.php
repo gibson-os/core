@@ -125,7 +125,7 @@ class ClassTriggerStore extends AbstractStore
                     $parameter['options'] ?? []
                 ),
                 $parameter['title'] ?? null,
-                $listeners
+                $listeners[$parameter['key']] ?? []
             );
         }
 

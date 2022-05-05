@@ -213,11 +213,13 @@ class EventService
         );
 
         foreach ($listenerAttributes as $listener) {
-            if (!isset($listeners[$listener->getForKey()])) {
-                $listeners[$listener->getForKey()] = [];
+            $forKey = $listener->getForKey();
+
+            if (!isset($listeners[$forKey])) {
+                $listeners[$forKey] = [];
             }
 
-            $listeners[$listener->getForKey()][$listener->getToKey()] = $listener->getOptions();
+            $listeners[$forKey][$listener->getToKey()] = $listener->getOptions();
         }
 
         return $listeners;
