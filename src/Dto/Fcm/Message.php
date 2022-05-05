@@ -61,7 +61,7 @@ class Message implements JsonSerializable
         ];
 
         if (count($this->data)) {
-            $data['data']['payload'] = JsonUtility::encode($this->data);
+            $data['data']['payload'] = JsonUtility::encode($this->data, JSON_THROW_ON_ERROR);
         }
 
         return $data;
