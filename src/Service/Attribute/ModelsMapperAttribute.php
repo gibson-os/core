@@ -66,9 +66,11 @@ class ModelsMapperAttribute implements AttributeServiceInterface, ParameterAttri
         }
 
         $parameterFromRequest = $this->objectMapperAttribute->getParameterFromRequest($reflectionParameter);
+        $models = [];
 
         foreach (is_array($parameterFromRequest) ? $parameterFromRequest : [] as $requestValues) {
-            $model = null;
+            $modelClassName = $attribute->getClassName();
+            $model = new $modelClassName();
 
             foreach ($fetchedModels ?? [] as $fetchedModel) {
                 foreach ($attribute->getConditions() as $property => $condition) {
