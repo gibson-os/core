@@ -10,7 +10,6 @@ use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Model\ModelInterface;
-use GibsonOS\Core\Service\RequestService;
 use GibsonOS\Core\Service\SessionService;
 use InvalidArgumentException;
 use JsonException;
@@ -23,7 +22,6 @@ class ModelsFetcherAttribute implements AttributeServiceInterface, ParameterAttr
 {
     public function __construct(
         private mysqlDatabase $mysqlDatabase,
-        private RequestService $requestService,
         private ReflectionManager $reflectionManager,
         private SessionService $sessionService,
         private ObjectMapperAttribute $objectMapperAttribute
@@ -69,7 +67,7 @@ class ModelsFetcherAttribute implements AttributeServiceInterface, ParameterAttr
         foreach (is_array($parameterFromRequest) ? $parameterFromRequest : [] as $requestValue) {
             array_push(
                 $whereParameters,
-                ...$this->getWhereValuesForModel($attribute, $requestValue)
+                ...$this->getWhereValuesForModel($attribute, $requestValue, $parameters)
             );
             $where[] = implode(' AND ', array_map(
                 fn (string $field): string => '`' . $field . '`=?',
@@ -114,7 +112,8 @@ class ModelsFetcherAttribute implements AttributeServiceInterface, ParameterAttr
 
     private function getWhereValuesForModel(
         GetModels $attribute,
-        array $requestValue
+        array $requestValue,
+        array $parameters,
     ): array {
         $values = [];
 
@@ -123,7 +122,7 @@ class ModelsFetcherAttribute implements AttributeServiceInterface, ParameterAttr
             $count = count($conditionParts);
 
             if ($count === 1) {
-                $values[] = $requestValue[$condition];
+                $values[] = $parameters[$condition] ?? $requestValue[$condition];
 
                 continue;
             }
@@ -144,6 +143,18 @@ class ModelsFetcherAttribute implements AttributeServiceInterface, ParameterAttr
                         $value
                     );
                 }
+
+                continue;
+            }
+
+            $object = $parameters[$conditionParts[0]] ?? $requestValue[$conditionParts[0]];
+
+            if (is_object($object)) {
+                $reflectionClass = $this->reflectionManager->getReflectionClass($object);
+                $values[] = $this->reflectionManager->getProperty(
+                    $reflectionClass->getProperty($conditionParts[1]),
+                    $object
+                );
             }
         }
 

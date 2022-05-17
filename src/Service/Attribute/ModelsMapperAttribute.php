@@ -75,11 +75,13 @@ class ModelsMapperAttribute implements AttributeServiceInterface, ParameterAttri
             foreach ($fetchedModels ?? [] as $fetchedModel) {
                 foreach ($attribute->getConditions() as $property => $condition) {
                     $modelValue = $this->reflectionManager->getProperty(
-                        $this->reflectionManager->getReflectionClass($fetchedModel)->getProperty($property),
+                        $this->reflectionManager->getReflectionClass($fetchedModel)->getProperty(
+                            lcfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $property))))
+                        ),
                         $fetchedModel
                     );
 
-                    if ($modelValue !== $requestValues[$condition]) {
+                    if ($modelValue !== ($requestValues[$condition] ?? null)) {
                         continue 2;
                     }
                 }
