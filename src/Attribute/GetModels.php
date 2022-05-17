@@ -5,24 +5,22 @@ namespace GibsonOS\Core\Attribute;
 
 use Attribute;
 use GibsonOS\Core\Model\AbstractModel;
-use GibsonOS\Core\Service\Attribute\ModelsMapperAttribute;
+use GibsonOS\Core\Service\Attribute\ModelsFetcherAttribute;
 
 #[Attribute(Attribute::TARGET_PARAMETER)]
-class GetMappedModels extends GetObject
+class GetModels implements AttributeInterface
 {
     /**
      * @param class-string<AbstractModel> $className
      * @param array<string, string>       $conditions
-     * @param array<string, string>       $mapping
      */
-    public function __construct(private string $className, private array $conditions = ['id' => 'id'], array $mapping = [])
+    public function __construct(private string $className, private array $conditions = ['id' => 'id'])
     {
-        parent::__construct($mapping);
     }
 
     public function getAttributeServiceName(): string
     {
-        return ModelsMapperAttribute::class;
+        return ModelsFetcherAttribute::class;
     }
 
     /**

@@ -4,10 +4,9 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Service\Attribute;
 
 use GibsonOS\Core\Attribute\AttributeInterface;
-use GibsonOS\Core\Attribute\GetModel;
+use GibsonOS\Core\Attribute\GetModels;
 use GibsonOS\Core\Exception\MapperException;
 use GibsonOS\Core\Exception\Repository\SelectError;
-use GibsonOS\Core\Exception\RequestError;
 use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Model\ModelInterface;
@@ -20,36 +19,39 @@ use mysqlTable;
 use ReflectionException;
 use ReflectionParameter;
 
-class ModelFetcherAttribute implements AttributeServiceInterface, ParameterAttributeInterface
+class ModelsFetcherAttribute implements AttributeServiceInterface, ParameterAttributeInterface
 {
     public function __construct(
         private mysqlDatabase $mysqlDatabase,
         private RequestService $requestService,
         private ReflectionManager $reflectionManager,
-        private SessionService $sessionService
+        private SessionService $sessionService,
+        private ObjectMapperAttribute $objectMapperAttribute
     ) {
     }
 
     /**
-     * @throws SelectError
-     * @throws RequestError
      * @throws ReflectionException
      * @throws JsonException
+     * @throws MapperException
+     * @throws SelectError
+     *
+     * @return AbstractModel[]|null
      */
     public function replace(
         AttributeInterface $attribute,
         array $parameters,
         ReflectionParameter $reflectionParameter
-    ): ?AbstractModel {
-        if (!$attribute instanceof GetModel) {
+    ): ?array {
+        if (!$attribute instanceof GetModels) {
             throw new MapperException(sprintf(
                 'Attribute "%s" is not an instance of "%s"!',
                 $attribute::class,
-                GetModel::class
+                GetModels::class
             ));
         }
 
-        $modelClassName = $this->reflectionManager->getNonBuiltinTypeName($reflectionParameter);
+        $modelClassName = $attribute->getClassName();
         $model = new $modelClassName();
 
         if (!$model instanceof AbstractModel) {
@@ -60,15 +62,25 @@ class ModelFetcherAttribute implements AttributeServiceInterface, ParameterAttri
             ));
         }
 
-        $table = (new mysqlTable($this->mysqlDatabase, $model->getTableName()))
-            ->setWhereParameters($this->getWhereValues($attribute))
-            ->setWhere(implode(' AND ', array_map(
+        $whereParameters = [];
+        $where = [];
+        $parameterFromRequest = $this->objectMapperAttribute->getParameterFromRequest($reflectionParameter);
+
+        foreach (is_array($parameterFromRequest) ? $parameterFromRequest : [] as $requestValue) {
+            array_push(
+                $whereParameters,
+                ...$this->getWhereValuesForModel($attribute, $requestValue)
+            );
+            $where[] = implode(' AND ', array_map(
                 fn (string $field): string => '`' . $field . '`=?',
                 array_keys($attribute->getConditions())
-            )))
-            ->setLimit(1)
-        ;
+            ));
+        }
 
+        $table = (new mysqlTable($this->mysqlDatabase, $model->getTableName()))
+            ->setWhereParameters($whereParameters)
+            ->setWhere('(' . implode(') OR (', $where) . ')')
+        ;
         $select = $table->selectPrepared();
 
         if ($select === false) {
@@ -85,20 +97,25 @@ class ModelFetcherAttribute implements AttributeServiceInterface, ParameterAttri
                 return null;
             }
 
-            throw (new SelectError(sprintf(
-                'Model of type "%s" for parameter "%s" not found!',
-                $modelClassName,
-                $reflectionParameter->getName()
-            )))->setTable($table);
+            return [];
         }
 
-        $model->loadFromMysqlTable($table);
+        $models = [];
 
-        return $model;
+        do {
+            $model->loadFromMysqlTable($table);
+            $models[] = $model;
+            /** @var AbstractModel $model */
+            $model = new $modelClassName();
+        } while ($table->next());
+
+        return $models;
     }
 
-    private function getWhereValues(GetModel $attribute): array
-    {
+    private function getWhereValuesForModel(
+        GetModels $attribute,
+        array $requestValue
+    ): array {
         $values = [];
 
         foreach ($attribute->getConditions() as $condition) {
@@ -106,7 +123,7 @@ class ModelFetcherAttribute implements AttributeServiceInterface, ParameterAttri
             $count = count($conditionParts);
 
             if ($count === 1) {
-                $values[] = $this->requestService->getRequestValue($condition);
+                $values[] = $requestValue[$condition];
 
                 continue;
             }

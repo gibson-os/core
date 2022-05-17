@@ -79,7 +79,7 @@ abstract class AbstractDatabaseStore extends AbstractStore
      * @throws ReflectionException
      * @throws SelectError
      *
-     * @return iterable<T>
+     * @return T[]|iterable
      */
     public function getList(): iterable
     {

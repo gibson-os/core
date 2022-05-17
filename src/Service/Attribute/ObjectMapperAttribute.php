@@ -53,7 +53,7 @@ class ObjectMapperAttribute implements AttributeServiceInterface, ParameterAttri
      * @throws MapperException
      * @throws ReflectionException
      */
-    protected function getObjectParameters(GetObject $attribute, string $objectClassName, array $parameters): array
+    public function getObjectParameters(GetObject $attribute, string $objectClassName, array $parameters): array
     {
         $reflectionClass = $this->reflectionManager->getReflectionClass($objectClassName);
         $objectParameters = [];
@@ -102,7 +102,7 @@ class ObjectMapperAttribute implements AttributeServiceInterface, ParameterAttri
         return $setterParameters;
     }
 
-    protected function getMappingKey(
+    public function getMappingKey(
         GetObject $attribute,
         ReflectionParameter|ReflectionProperty $reflectionObject
     ): string {

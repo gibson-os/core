@@ -95,8 +95,7 @@ class ModelMapperAttribute extends ObjectMapperAttribute
             ;
 
             if (!class_exists($parentModelClassName)) {
-                throw new MapperException(sprintf('"%s" is no class!', $parentModelClassName ?? 'HeyHo
-               '));
+                throw new MapperException(sprintf('"%s" is no class!', $parentModelClassName ?? 'NULL'));
             }
 
             $values = $this->getValues($attribute, $reflectionProperty);
@@ -115,7 +114,6 @@ class ModelMapperAttribute extends ObjectMapperAttribute
     /**
      * @throws JsonException
      * @throws ReflectionException
-     * @throws RequestError
      */
     private function getValues(GetMappedModel $attribute, ReflectionProperty $reflectionProperty): mixed
     {
