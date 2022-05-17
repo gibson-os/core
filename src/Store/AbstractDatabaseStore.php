@@ -6,11 +6,16 @@ namespace GibsonOS\Core\Store;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Model\ModelInterface;
+use JsonException;
 use JsonSerializable;
 use mysqlDatabase;
 use mysqlRegistry;
 use mysqlTable;
+use ReflectionException;
 
+/**
+ * @template T
+ */
 abstract class AbstractDatabaseStore extends AbstractStore
 {
     protected mysqlDatabase $database;
@@ -26,7 +31,7 @@ abstract class AbstractDatabaseStore extends AbstractStore
     protected string $tableName;
 
     /**
-     * @return class-string
+     * @return class-string<T>
      */
     abstract protected function getModelClassName(): string;
 
@@ -70,9 +75,11 @@ abstract class AbstractDatabaseStore extends AbstractStore
     }
 
     /**
+     * @throws JsonException
+     * @throws ReflectionException
      * @throws SelectError
      *
-     * @return AbstractModel[]|iterable
+     * @return iterable<T>
      */
     public function getList(): iterable
     {
@@ -193,9 +200,11 @@ abstract class AbstractDatabaseStore extends AbstractStore
     }
 
     /**
+     * @throws JsonException
+     * @throws ReflectionException
      * @throws SelectError
      *
-     * @return AbstractModel[]|iterable
+     * @return iterable<T>
      */
     protected function getModels(): iterable
     {
@@ -217,6 +226,10 @@ abstract class AbstractDatabaseStore extends AbstractStore
 
     /**
      * @throws SelectError
+     * @throws JsonException
+     * @throws ReflectionException
+     *
+     * @return T
      */
     private function getModel(): AbstractModel
     {
