@@ -98,7 +98,9 @@ class ModelMapperAttribute extends ObjectMapperAttribute
                 throw new MapperException(sprintf('"%s" is no class!', $parentModelClassName ?? 'NULL'));
             }
 
-            $values = $this->getValues($attribute, $reflectionProperty);
+            $values = $this->getValues($attribute, $reflectionProperty)
+                ?? $parameters[$reflectionProperty->getName()]
+            ;
             $typeName = $this->reflectionManager->getTypeName($reflectionProperty);
             $values = array_map(
                 fn ($value): object => is_object($value) ? $value : $this->objectMapper->mapToObject($parentModelClassName, $value),
