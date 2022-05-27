@@ -13,6 +13,7 @@ use GibsonOS\Core\Service\CommandService;
 use GibsonOS\Core\Service\DateTimeService;
 use GibsonOS\Core\Service\Event\ElementService;
 use GibsonOS\Core\Service\EventService;
+use GibsonOS\Core\Service\ProcessService;
 use GibsonOS\Mock\Service\TestEvent;
 use GibsonOS\UnitTest\AbstractTest;
 use Prophecy\Argument;
@@ -42,6 +43,7 @@ class EventServiceTest extends AbstractTest
             $this->serviceManager->get(DateTimeService::class),
             $this->serviceManager->get(ReflectionManager::class),
             $this->serviceManager->get(ModelManager::class),
+            $this->serviceManager->get(ProcessService::class),
             $this->serviceManager->get(LoggerInterface::class)
         );
     }
@@ -84,7 +86,7 @@ class EventServiceTest extends AbstractTest
     {
         $testEvent = $this->serviceManager->get(TestEvent::class);
         $this->eventService->runEvent($event, false);
-        $this->modelManager->save(Argument::any())->shouldBeCalledOnce();
+        $this->modelManager->save(Argument::any())->shouldBeCalledTimes(2);
 
         $this->assertEquals($returnValue, $testEvent->arthur);
     }

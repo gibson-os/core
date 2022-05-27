@@ -42,6 +42,7 @@ class EventService
         private DateTimeService $dateTimeService,
         private ReflectionManager $reflectionManager,
         private ModelManager $modelManager,
+        private ProcessService $processService,
         private LoggerInterface $logger
     ) {
     }
@@ -126,8 +127,42 @@ class EventService
         }
 
         $this->logger->info('Run event ' . $event->getId());
-        $this->modelManager->save($event->setLastRun($this->dateTimeService->get()));
+        $this->modelManager->save(
+            $event
+                ->setPid(getmypid())
+                ->setLastRun($this->dateTimeService->get())
+        );
+        $startTime = (int) microtime();
         $this->elementService->runElements($event->getElements(), $event);
+        $this->modelManager->save(
+            $event
+                ->setPid(null)
+                ->setLastRun($this->dateTimeService->get())
+                ->setRuntime(((int) microtime()) - $startTime)
+        );
+    }
+
+    /**
+     * @throws JsonException
+     * @throws ReflectionException
+     * @throws SaveError
+     */
+    public function stop(Event $event): void
+    {
+        $pid = $event->getPid();
+
+        if ($pid === null) {
+            return;
+        }
+
+        $this->processService->kill($pid);
+
+        $this->modelManager->save(
+            $event
+                ->setPid(null)
+                ->setLastRun($this->dateTimeService->get())
+                ->setRuntime(null)
+        );
     }
 
     /**

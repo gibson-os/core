@@ -38,6 +38,12 @@ class Event extends AbstractModel implements JsonSerializable, AutoCompleteModel
     #[Column]
     private bool $async = true;
 
+    #[Column(attributes: [Column::ATTRIBUTE_UNSIGNED])]
+    private ?int $pid = null;
+
+    #[Column(attributes: [Column::ATTRIBUTE_UNSIGNED])]
+    private ?int $runtime = null;
+
     #[Column]
     private bool $exitOnError = true;
 
@@ -114,6 +120,30 @@ class Event extends AbstractModel implements JsonSerializable, AutoCompleteModel
         return $this;
     }
 
+    public function getPid(): ?int
+    {
+        return $this->pid;
+    }
+
+    public function setPid(?int $pid): Event
+    {
+        $this->pid = $pid;
+
+        return $this;
+    }
+
+    public function getRuntime(): ?int
+    {
+        return $this->runtime;
+    }
+
+    public function setRuntime(?int $runtime): Event
+    {
+        $this->runtime = $runtime;
+
+        return $this;
+    }
+
     public function isExitOnError(): bool
     {
         return $this->exitOnError;
@@ -159,6 +189,7 @@ class Event extends AbstractModel implements JsonSerializable, AutoCompleteModel
             'async' => $this->isAsync(),
             'exitOnError' => $this->isExitOnError(),
             'lastRun' => $this->getLastRun()?->format('Y-m-d H:i:s'),
+            'runtime' => $this->getRuntime(),
         ];
     }
 

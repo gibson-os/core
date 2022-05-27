@@ -74,4 +74,11 @@ class EventEvent extends AbstractEvent
     {
         return $event->isActive();
     }
+
+    #[Event\Method('Stoppen')]
+    #[Event\ReturnValue(BoolParameter::class, 'Aktiv')]
+    public function stop(#[Event\Parameter(EventParameter::class)] EventModel $event): void
+    {
+        $this->eventService->stop($event);
+    }
 }
