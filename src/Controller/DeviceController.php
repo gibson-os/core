@@ -76,4 +76,26 @@ class DeviceController extends AbstractController
 
         return $this->returnSuccess();
     }
+
+    /**
+     * @throws JsonException
+     * @throws ReflectionException
+     * @throws RequestError
+     * @throws SaveError
+     * @throws SelectError
+     */
+    public function updateToken(
+        ModelManager $modelManager,
+        DeviceRepository $deviceRepository,
+        string $fcmToken
+    ): AjaxResponse {
+        $deviceToken = $this->requestService->getHeader('X-Device-Token');
+        $modelManager->save(
+            $deviceRepository
+                ->getByToken($deviceToken)
+                ->setFcmToken($fcmToken)
+        );
+
+        return $this->returnSuccess();
+    }
 }
