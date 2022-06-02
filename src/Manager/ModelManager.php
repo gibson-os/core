@@ -95,10 +95,16 @@ class ModelManager
                 continue;
             }
 
+            $childModels = $model->$getter();
+
+            if (count($childModels) === 0) {
+                continue;
+            }
+
             $childrenList[] = new Children(
                 $reflectionProperty,
                 $constraintAttribute,
-                $model->$getter(),
+                $childModels,
                 $model->{'get' . ucfirst($this->transformFieldName($constraintAttribute->getOwnColumn() ?? 'id'))}()
             );
         }
