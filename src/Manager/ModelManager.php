@@ -4,10 +4,14 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Manager;
 
 use Exception;
+use GibsonOS\Core\Attribute\Install\Database\Column;
 use GibsonOS\Core\Attribute\Install\Database\Constraint;
+use GibsonOS\Core\Dto\Model\Children;
+use GibsonOS\Core\Dto\Model\PrimaryColumn;
 use GibsonOS\Core\Exception\Model\DeleteError;
 use GibsonOS\Core\Exception\Model\SaveError;
 use GibsonOS\Core\Model\ModelInterface;
+use GibsonOS\Core\Service\Attribute\TableAttribute;
 use GibsonOS\Core\Service\DateTimeService;
 use GibsonOS\Core\Utility\JsonUtility;
 use JsonException;
@@ -47,11 +51,17 @@ class ModelManager
         'decimal' => self::TYPE_FLOAT,
     ];
 
+    /**
+     * @var array<class-string, PrimaryColumn[]>
+     */
+    private array $primaryColumns = [];
+
     public function __construct(
-        private mysqlDatabase $mysqlDatabase,
-        private DateTimeService $dateTimeService,
-        private JsonUtility $jsonUtility,
-        private ReflectionManager $reflectionManager
+        private readonly mysqlDatabase $mysqlDatabase,
+        private readonly DateTimeService $dateTimeService,
+        private readonly JsonUtility $jsonUtility,
+        private readonly ReflectionManager $reflectionManager,
+        private readonly TableAttribute $tableAttribute
     ) {
     }
 
@@ -63,7 +73,7 @@ class ModelManager
     public function save(ModelInterface $model): void
     {
         $reflectionClass = $this->reflectionManager->getReflectionClass($model);
-        $childrenModels = [];
+        $childrenList = [];
 
         foreach ($reflectionClass->getProperties() as $reflectionProperty) {
             $constraintAttribute = $this->reflectionManager->getAttribute(
@@ -85,9 +95,12 @@ class ModelManager
                 continue;
             }
 
-            foreach ($model->$getter() as $child) {
-                $childrenModels[] = $child;
-            }
+            $childrenList[] = new Children(
+                $reflectionProperty,
+                $constraintAttribute,
+                $model->$getter(),
+                $model->{'get' . ucfirst($this->transformFieldName($constraintAttribute->getOwnColumn() ?? 'id'))}()
+            );
         }
 
         $mysqlTable = $this->setToMysqlTable($model);
@@ -104,8 +117,8 @@ class ModelManager
         $mysqlTable->getReplacedRecord();
         $this->loadFromMysqlTable($mysqlTable, $model);
 
-        foreach ($childrenModels as $childrenModel) {
-            $this->save($childrenModel);
+        foreach ($childrenList as $children) {
+            $this->saveChildren($children);
         }
     }
 
@@ -248,5 +261,101 @@ class ModelManager
     private function getColumnType(string $type): string
     {
         return self::COLUMN_TYPES[preg_replace('/^(\\w*).*$/', '$1', $type)];
+    }
+
+    /**
+     * @throws JsonException
+     * @throws ReflectionException
+     * @throws SaveError
+     */
+    private function saveChildren(Children $children): void
+    {
+        $constraintAttribute = $children->getConstraint();
+        $parentModelClassName = $constraintAttribute->getParentModelClassName();
+
+        if ($parentModelClassName === null) {
+            throw new ReflectionException(
+                'Property "parentModelClassName" of constraint attribute  is not set!'
+            );
+        }
+
+        $childrenModel = new $parentModelClassName($this->mysqlDatabase);
+        $tableName = $childrenModel->getTableName();
+        $where = $constraintAttribute->getWhere();
+        $where = sprintf(
+            '(%s`%s_id`=?)',
+            $where === null ? '' : '(' . $where . ') AND ',
+            $constraintAttribute->getParentColumn()
+        );
+        $mysqlTable = (new mysqlTable($this->mysqlDatabase, $tableName))
+            ->setWhereParameters($constraintAttribute->getWhereParameters())
+            ->addWhereParameter($children->getParentId())
+        ;
+        $primaryColumns = $this->getPrimaryColumns($parentModelClassName);
+        $childrenWheres = [];
+
+        foreach ($children->getModels() as $childrenModel) {
+            $this->save($childrenModel);
+            $primaryWheres = [];
+
+            foreach ($primaryColumns as $primaryColumn) {
+                $columnName = $primaryColumn->getColumn()->getName() ??
+                    $this->tableAttribute->transformName($primaryColumn->getReflectionProperty()->getName())
+                ;
+                $primaryWheres[] = sprintf('`%s`!=?', $columnName);
+                $getter = 'get' . ucfirst($this->transformFieldName(
+                    $primaryColumn->getColumn()->getName() ??
+                    $primaryColumn->getReflectionProperty()->getName()
+                ));
+                $mysqlTable->addWhereParameter($childrenModel->$getter());
+            }
+
+            $childrenWheres[] = sprintf('(%s)', implode(' AND ', $primaryWheres));
+        }
+
+        $mysqlTable
+            ->setWhere(sprintf('%s AND (%s)', $where, implode(' AND ', $childrenWheres)))
+            ->setOrderBy($constraintAttribute->getOrderBy())
+            ->deletePrepared()
+        ;
+    }
+
+    /**
+     * @param class-string $className
+     *
+     * @throws ReflectionException
+     *
+     * @return PrimaryColumn[]
+     */
+    public function getPrimaryColumns(string $className): array
+    {
+        if (isset($this->primaryColumns[$className])) {
+            return $this->primaryColumns[$className];
+        }
+
+        $reflectionClass = $this->reflectionManager->getReflectionClass($className);
+        $primaryColumns = [];
+
+        foreach ($reflectionClass->getProperties() as $reflectionProperty) {
+            $columnAttribute = $this->reflectionManager->getAttribute(
+                $reflectionProperty,
+                Column::class,
+                ReflectionAttribute::IS_INSTANCEOF
+            );
+
+            if ($columnAttribute === null) {
+                continue;
+            }
+
+            if (!$columnAttribute->isPrimary()) {
+                continue;
+            }
+
+            $primaryColumns[] = new PrimaryColumn($reflectionProperty, $columnAttribute);
+        }
+
+        $this->primaryColumns[$className] = $primaryColumns;
+
+        return $primaryColumns;
     }
 }

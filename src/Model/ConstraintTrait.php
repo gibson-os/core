@@ -361,8 +361,7 @@ trait ConstraintTrait
             return $models;
         }
 
-        $mysqlTable = new mysqlTable($this->database, $foreignTable);
-        $mysqlTable
+        $mysqlTable = (new mysqlTable($this->database, $foreignTable))
             ->setWhere('`' . $foreignField . '`=?' . ($where === null ? '' : ' AND (' . $where . ')'))
             ->setWhereParameters(array_merge([$value], $whereParameters))
             ->setOrderBy($orderBy)
