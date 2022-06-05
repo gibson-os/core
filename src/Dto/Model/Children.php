@@ -5,6 +5,7 @@ namespace GibsonOS\Core\Dto\Model;
 
 use GibsonOS\Core\Attribute\Install\Database\Constraint;
 use GibsonOS\Core\Model\AbstractModel;
+use GibsonOS\Core\Model\ModelInterface;
 use ReflectionProperty;
 
 class Children
@@ -18,7 +19,7 @@ class Children
         private readonly ReflectionProperty $reflectionProperty,
         private readonly Constraint $constraint,
         private readonly array $models,
-        private readonly int|string|float $parentId,
+        private readonly ModelInterface $parent,
     ) {
     }
 
@@ -40,8 +41,19 @@ class Children
         return $this->models;
     }
 
+    public function getParent(): ModelInterface
+    {
+        return $this->parent;
+    }
+
     public function getParentId(): float|int|string
     {
-        return $this->parentId;
+        $getter = 'get' . ucfirst(str_replace(
+            ' ',
+            '',
+            ucwords(str_replace('_', ' ', $this->constraint->getOwnColumn() ?? 'id'))
+        ));
+
+        return $this->parent->$getter();
     }
 }

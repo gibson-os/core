@@ -105,7 +105,7 @@ class ModelManager
                 $reflectionProperty,
                 $constraintAttribute,
                 $childModels,
-                $model->{'get' . ucfirst($this->transformFieldName($constraintAttribute->getOwnColumn() ?? 'id'))}()
+                $model
             );
         }
 
