@@ -136,10 +136,24 @@ class TableInstall extends AbstractInstall implements PriorityInterface
                     )
                     ->setDefault(
                         $columnAttribute->getDefault() === null && ($reflectionProperty->hasDefaultValue())
-                            ? (is_bool($defaultValue)
-                                ? (string) ((int) $defaultValue)
-                                : ($defaultValue === null ? null : (is_array($defaultValue) ? JsonUtility::encode($defaultValue) : (string) $defaultValue)))
-                            : $columnAttribute->getDefault()
+                        ? (
+                            is_bool($defaultValue)
+                            ? (string) ((int) $defaultValue)
+                            : (
+                                $defaultValue === null
+                                ? null
+                                : (
+                                    is_array($defaultValue)
+                                    ? JsonUtility::encode($defaultValue)
+                                    : (string) (
+                                        is_object($defaultValue) && enum_exists($defaultValue::class)
+                                        ? $defaultValue->value
+                                        : $defaultValue
+                                    )
+                                )
+                            )
+                        )
+                        : $columnAttribute->getDefault()
                     )
                 ;
 
@@ -310,8 +324,8 @@ class TableInstall extends AbstractInstall implements PriorityInterface
             $type .
             (
                 $type === Column::TYPE_ENUM
-                ? "('" . implode("','", $column->getValues()) . "')"
-                : ($column->getLength() === null ? ' ' : '(' . $column->getLength() . ')')
+                    ? "('" . implode("','", $column->getValues()) . "')"
+                    : ($column->getLength() === null ? ' ' : '(' . $column->getLength() . ')')
             )
         );
     }

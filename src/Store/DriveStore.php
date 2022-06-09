@@ -133,14 +133,15 @@ class DriveStore extends AbstractDatabaseStore
         $data = [];
 
         foreach ($this->table->connection->fetchAssocList() as $statAttribute) {
-            if (!isset($data[$statAttribute['timestamp']])) {
-                $data[$statAttribute['timestamp']] = [
+            $timestamp = (string) $statAttribute['timestamp'];
+            if (!isset($data[$timestamp])) {
+                $data[$timestamp] = [
                     'date' => $statAttribute['date'],
-                    'timestamp' => $statAttribute['timestamp'],
+                    'timestamp' => $timestamp,
                 ];
             }
 
-            $data[$statAttribute['timestamp']][$statAttribute['serial']] = (int) $statAttribute['raw_value'];
+            $data[$timestamp][(string) $statAttribute['serial']] = (int) $statAttribute['raw_value'];
         }
 
         /**
