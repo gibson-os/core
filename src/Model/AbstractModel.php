@@ -172,7 +172,11 @@ abstract class AbstractModel implements ModelInterface
                         }
 
                         if (enum_exists($typeName)) {
-                            $this->$setter($typeName::from($fieldObject->getValue()));
+                            try {
+                                $this->$setter($typeName::from($fieldObject->getValue()));
+                            } catch (Throwable) {
+                                $this->$setter($typeName::from((int) $fieldObject->getValue()));
+                            }
 
                             break;
                         }

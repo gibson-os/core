@@ -198,7 +198,11 @@ class ModelManager
                         }
 
                         if (enum_exists($typeName)) {
-                            $model->$setter($typeName::from($fieldObject->getValue()));
+                            try {
+                                $model->$setter($typeName::from($fieldObject->getValue()));
+                            } catch (Throwable) {
+                                $model->$setter($typeName::from((int) $fieldObject->getValue()));
+                            }
 
                             break;
                         }
