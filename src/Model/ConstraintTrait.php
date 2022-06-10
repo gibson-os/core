@@ -238,30 +238,7 @@ trait ConstraintTrait
             $reflectionProperty,
             'get' . ucfirst($constraintAttribute->getOwnColumn() ?? 'id')
         );
-
-        foreach ($models as $model) {
-            $model->{'set' . $fieldName}($this);
-            $reflectionClass = new ReflectionClass($model);
-            $reflectionIdProperty = $reflectionClass->getProperty(lcfirst($fieldName) . 'Id');
-
-            if ($value === null) {
-                if (!$reflectionIdProperty->isInitialized($model)) {
-                    continue;
-                }
-
-                if (!$reflectionIdProperty->hasDefaultValue()) {
-                    throw new ReflectionException(sprintf(
-                        'Property "%s" of class "%s" is initialized an has no default value!',
-                        $reflectionIdProperty->getName(),
-                        $model::class
-                    ));
-                }
-
-                $value = $reflectionIdProperty->getDefaultValue();
-            }
-
-            $model->{'set' . $fieldName . 'Id'}($value);
-        }
+        $this->setRelations($models, $fieldName, $value);
 
         $propertyName = $reflectionProperty->getName();
         $this->$propertyName = $models;
@@ -282,25 +259,54 @@ trait ConstraintTrait
     ): self {
         $this->getConstraints($constraintAttribute, $reflectionProperty);
         $fieldName = $this->transformFieldName($constraintAttribute->getParentColumn());
-        $propertyName = $reflectionProperty->getName();
         $value = $this->getConstraintValue(
             $reflectionProperty,
             'get' . ucfirst($constraintAttribute->getOwnColumn() ?? 'id')
         );
+        $this->setRelations($models, $fieldName, $value);
 
-        foreach ($models as $model) {
-            $model->{'set' . $fieldName . 'Id'}($value);
-            $model->{'set' . $fieldName}($this);
-            $this->$propertyName[] = $model;
-        }
+        $propertyName = $reflectionProperty->getName();
+        array_push($this->$propertyName, ...$models);
 
         return $this;
     }
 
     /**
-     * @param mixed $gettterName
-     * @param mixed $getterName
+     * @param AbstractModel[] $models
      *
+     * @throws ReflectionException
+     */
+    private function setRelations(array $models, string $fieldName, mixed $value): void
+    {
+        foreach ($models as $model) {
+            $model->{'set' . $fieldName}($this);
+
+            if ($value !== null) {
+                $model->{'set' . $fieldName . 'Id'}($value);
+
+                continue;
+            }
+
+            $reflectionClass = new ReflectionClass($model);
+            $reflectionIdProperty = $reflectionClass->getProperty(lcfirst($fieldName) . 'Id');
+
+            if (!$reflectionIdProperty->isInitialized($model)) {
+                continue;
+            }
+
+            if (!$reflectionIdProperty->hasDefaultValue()) {
+                throw new ReflectionException(sprintf(
+                    'Property "%s" of class "%s" is initialized an has no default value!',
+                    $reflectionIdProperty->getName(),
+                    $model::class
+                ));
+            }
+
+            $value = $reflectionIdProperty->getDefaultValue();
+        }
+    }
+
+    /**
      * @throws ReflectionException
      */
     private function getConstraintValue(ReflectionProperty $reflectionProperty, string $getterName): float|int|string|null
