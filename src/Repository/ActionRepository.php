@@ -26,7 +26,7 @@ class ActionRepository extends AbstractRepository
         $table = $this->getTable($this->actionTableName);
 
         return $table
-            ->setWhere('`ids` IN (' . $table->getParametersString($ids) . ')')
+            ->setWhere('`id` NOT IN (' . $table->getParametersString($ids) . ')')
             ->setWhereParameters($ids)
             ->deletePrepared()
         ;

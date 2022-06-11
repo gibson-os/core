@@ -455,7 +455,7 @@
             "source": {
                 "type": "git",
                 "url": "git@wolli.dyndns.tv:/home/git/mdo.git",
-                "reference": "cac9d843a6a50f6213de627930b3422f98969167"
+                "reference": "63ba793aad889e021b57fea08fb1f850e609c07f"
             },
             "require": {
                 "ext-mbstring": "*",
@@ -511,7 +511,7 @@
                     "php ./vendor/codeception/codeception/codecept generate:test unit"
                 ]
             },
-            "time": "2022-06-07T21:41:00+00:00"
+            "time": "2022-06-10T16:31:46+00:00"
         },
         {
             "name": "psr/cache",

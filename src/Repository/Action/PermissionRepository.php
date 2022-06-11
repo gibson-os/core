@@ -27,7 +27,7 @@ class PermissionRepository extends AbstractRepository
     public function deleteByAction(string $action): bool
     {
         $table = $this->getTable($this->permissionTableName)
-            ->setWhere('`action`=?')
+            ->setWhere('`action_id`=?')
             ->addWhereParameter($action)
         ;
 

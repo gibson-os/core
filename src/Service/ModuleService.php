@@ -72,8 +72,8 @@ class ModuleService
             $oldResult = $this->scanOldModules();
 
             $this->actionRepository->deleteByIdsNot(array_merge($result['actionIds'], $oldResult['actionIds']));
-            $this->taskRepository->deleteByIdsNot(array_merge_recursive($result['taskIds'], $oldResult['taskIds']));
-            $this->actionRepository->deleteByIdsNot($result['actionIds']);
+            $this->taskRepository->deleteByIdsNot(array_merge($result['taskIds'], $oldResult['taskIds']));
+            $this->moduleRepository->deleteByIdsNot(array_merge($result['moduleIds'], $oldResult['moduleIds']));
         } catch (ReflectionException $e) {
             throw new GetError($e->getMessage());
         }
@@ -221,9 +221,9 @@ class ModuleService
                     ->setModule($module)
                     ->setTask($task)
                 ;
+                $this->modelManager->save($action);
             }
 
-            $this->modelManager->save($action);
             $actionIds[] = $action->getId() ?? 0;
 
             $this->permissionRepository->deleteByAction($action->getName());
@@ -231,14 +231,14 @@ class ModuleService
             foreach ($this->reflectionManager->getAttributes($reflectionMethod, CheckPermission::class) as $checkPermission) {
                 $this->modelManager->save(
                     (new Action\Permission())
-                        ->setActionId($action->getId() ?? 0)
+                        ->setAction($action)
                         ->setPermission($checkPermission->getPermission())
                 );
 
                 foreach ($checkPermission->getPermissionsByRequestValues() as $permission) {
                     $this->modelManager->save(
                         (new Action\Permission())
-                            ->setActionId($action->getId() ?? 0)
+                            ->setAction($action)
                             ->setPermission($permission)
                     );
                 }
