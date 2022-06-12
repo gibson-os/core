@@ -147,7 +147,7 @@ class TableInstall extends AbstractInstall implements PriorityInterface
                                     ? JsonUtility::encode($defaultValue)
                                     : (string) (
                                         is_object($defaultValue) && enum_exists($defaultValue::class)
-                                        ? $defaultValue->value
+                                        ? $defaultValue->name
                                         : $defaultValue
                                     )
                                 )
@@ -171,7 +171,7 @@ class TableInstall extends AbstractInstall implements PriorityInterface
                     $type = $this->reflectionManager->getNonBuiltinTypeName($reflectionProperty);
                     $this->reflectionManager->getReflectionEnum($type);
                     $columnAttribute->setValues(array_map(
-                        fn (UnitEnum $enum): string => (string) $enum->value,
+                        fn (UnitEnum $enum): string => $enum->name,
                         $type::cases()
                     ));
                 }

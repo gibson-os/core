@@ -198,11 +198,11 @@ class ModelManager
                         }
 
                         if (enum_exists($typeName)) {
-                            try {
-                                $model->$setter($typeName::from($fieldObject->getValue()));
-                            } catch (Throwable) {
-                                $model->$setter($typeName::from((int) $fieldObject->getValue()));
-                            }
+                            $model->$setter(constant(sprintf(
+                                '%s::%s',
+                                $typeName,
+                                $fieldObject->getValue() ?? ''
+                            )));
 
                             break;
                         }
@@ -252,7 +252,7 @@ class ModelManager
                 $fieldObject->setValue($value->format('Y-m-d H:i:s'));
                 $model->{'set' . $fieldName}($this->dateTimeService->get((string) $fieldObject->getValue()));
             } elseif (is_object($value) && enum_exists($value::class)) {
-                $fieldObject->setValue($value->value);
+                $fieldObject->setValue($value->name);
             } elseif (is_array($value)) {
                 $fieldObject->setValue($this->jsonUtility->encode($value));
             } else {
