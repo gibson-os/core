@@ -455,12 +455,12 @@
             "source": {
                 "type": "git",
                 "url": "git@wolli.dyndns.tv:/home/git/mdo.git",
-                "reference": "63ba793aad889e021b57fea08fb1f850e609c07f"
+                "reference": "6138c3b499c8c037a63292cc9cbcdbc00f1cd1be"
             },
             "require": {
                 "ext-mbstring": "*",
                 "ext-mysqli": "*",
-                "php": "^8.0"
+                "php": "^8.1"
             },
             "require-dev": {
                 "captainhook/captainhook": "^5.0",
@@ -511,7 +511,7 @@
                     "php ./vendor/codeception/codeception/codecept generate:test unit"
                 ]
             },
-            "time": "2022-06-10T16:31:46+00:00"
+            "time": "2022-06-12T12:56:22+00:00"
         },
         {
             "name": "psr/cache",
