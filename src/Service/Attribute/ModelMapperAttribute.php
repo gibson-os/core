@@ -29,8 +29,8 @@ class ModelMapperAttribute extends ObjectMapperAttribute
         ModelMapper $objectMapper,
         RequestService $requestService,
         ReflectionManager $reflectionManager,
-        private ModelFetcherAttribute $modelFetcherAttribute,
-        private SessionService $sessionService
+        private readonly ModelFetcherAttribute $modelFetcherAttribute,
+        private readonly SessionService $sessionService
     ) {
         parent::__construct($objectMapper, $requestService, $reflectionManager);
     }
@@ -102,11 +102,24 @@ class ModelMapperAttribute extends ObjectMapperAttribute
                 ?? $parameters[$reflectionProperty->getName()]
             ;
             $typeName = $this->reflectionManager->getTypeName($reflectionProperty);
+
+            $setter = 'set' . ucfirst($reflectionProperty->getName());
             $values = array_map(
-                fn ($value): object => is_object($value) ? $value : $this->objectMapper->mapToObject($parentModelClassName, $value),
+                fn ($value): object => is_object($value)
+                    ? $value
+                    : (
+                        is_array($value)
+                            ? $this->objectMapper->mapToObject($parentModelClassName, $value)
+                            : throw new MapperException(sprintf(
+                                'Properties (%s) for object "%s" used for %s->%s() is no array! Maybe map the required object before',
+                                $value === null ? null : (string) $value,
+                                $parentModelClassName,
+                                $model::class,
+                                $setter
+                            ))
+                    ),
                 $typeName === 'array' ? $values : [$reflectionProperty->getName() => $values]
             );
-            $setter = 'set' . ucfirst($reflectionProperty->getName());
             $model->$setter($typeName === 'array' ? $values : reset($values));
         }
 
