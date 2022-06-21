@@ -94,10 +94,7 @@ abstract class AbstractDatabaseStore extends AbstractStore
     public function getCount(): int
     {
         $this->initTable();
-        $this->table
-            ->setOrderBy()
-            ->setLimit()
-        ;
+        $this->table->setLimit();
 
         $count = $this->table->selectAggregatePrepared('COUNT(' . $this->getCountField() . ')');
         $this->table->setLimit(

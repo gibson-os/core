@@ -112,7 +112,7 @@ class ModelMapperAttribute extends ObjectMapperAttribute
                             ? $this->objectMapper->mapToObject($parentModelClassName, $value)
                             : throw new MapperException(sprintf(
                                 'Properties (%s) for object "%s" used for %s->%s() is no array! Maybe map the required object before',
-                                $value === null ? null : (string) $value,
+                                $value === null ? 'null' : (string) $value,
                                 $parentModelClassName,
                                 $model::class,
                                 $setter
