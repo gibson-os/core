@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Event;
 
 use Exception;
+use GibsonOS\Core\Attribute\Event\Listener;
 use GibsonOS\Core\Attribute\Event\Method;
 use GibsonOS\Core\Attribute\Event\Parameter;
 use GibsonOS\Core\Dto\Parameter\AutoCompleteParameter;
@@ -93,6 +94,11 @@ abstract class AbstractEvent
         }
 
         $parameters = $element->getParameters();
+        /** @var Listener[] $listenerAttributes */
+        $listenerAttributes = $this->reflectionManager->getAttributes(
+            $reflectionMethod->getDeclaringClass(),
+            Listener::class
+        );
 
         foreach ($methodParameters as $parameterName => $methodParameter) {
             if (
@@ -102,9 +108,27 @@ abstract class AbstractEvent
                 continue;
             }
 
+            $extendedParameters = $parameters;
+
+            foreach ($listenerAttributes as $listenerAttribute) {
+                $toKey = $listenerAttribute->getToKey();
+
+                if (
+                    $listenerAttribute->getForKey() !== $parameterName ||
+                    !isset($parameters[$toKey])
+                ) {
+                    continue;
+                }
+
+                $listenerParameters = $listenerAttribute->getOptions()['params'];
+                $extendedParameters[$listenerParameters['paramKey']] =
+                    $parameters[$toKey]->{'get' . ucfirst($listenerParameters['recordKey'])}()
+                ;
+            }
+//            errlog($extendedParameters);
             $parameters[$parameterName] = $methodParameter->getAutoComplete()->getById(
                 (string) $parameters[$parameterName],
-                $parameters
+                $extendedParameters
             );
         }
 
