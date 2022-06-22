@@ -50,7 +50,7 @@ class ModelMapper extends ObjectMapper
                 $typeName = $this->reflectionManager->getTypeName($reflectionProperty);
 
                 if (is_string($value)) {
-                    $value = JsonUtility::decode($value);
+                    $value = mb_strlen($value) ? JsonUtility::decode($value) : null;
                 }
 
                 $values = array_map(
@@ -60,7 +60,7 @@ class ModelMapper extends ObjectMapper
                             ? $mapValue
                             : [$reflectionProperty->getName() => $mapValue]
                     ),
-                    $typeName !== 'array' ? [$value] : $value
+                    $typeName !== 'array' ? [$value] : ($value ?? [])
                 );
 
                 $object->$setter($typeName !== 'array' ? reset($values) : $values);

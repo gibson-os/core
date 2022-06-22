@@ -95,16 +95,10 @@ class ModelManager
                 continue;
             }
 
-            $childModels = $model->$getter();
-
-            if (count($childModels) === 0) {
-                continue;
-            }
-
             $childrenList[] = new Children(
                 $reflectionProperty,
                 $constraintAttribute,
-                $childModels,
+                $model->$getter(),
                 $model
             );
         }
@@ -323,8 +317,12 @@ class ModelManager
             $childrenWheres[] = sprintf('(%s)', implode(' AND ', $primaryWheres));
         }
 
+        if (count($childrenWheres)) {
+            $where .= ' AND (' . implode(' AND ', $childrenWheres) . ')';
+        }
+
         $mysqlTable
-            ->setWhere(sprintf('%s AND (%s)', $where, implode(' AND ', $childrenWheres)))
+            ->setWhere($where)
             ->setOrderBy($constraintAttribute->getOrderBy())
             ->deletePrepared()
         ;
