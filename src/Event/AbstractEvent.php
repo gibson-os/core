@@ -99,6 +99,10 @@ abstract class AbstractEvent
             $reflectionMethod->getDeclaringClass(),
             Listener::class
         );
+        array_push(
+            $listenerAttributes,
+            ...$this->reflectionManager->getAttributes($reflectionMethod, Listener::class),
+        );
 
         foreach ($methodParameters as $parameterName => $methodParameter) {
             if (
