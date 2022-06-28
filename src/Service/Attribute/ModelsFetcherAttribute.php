@@ -75,10 +75,6 @@ class ModelsFetcherAttribute implements AttributeServiceInterface, ParameterAttr
             ));
         }
 
-        if (count($where) === 0) {
-            return [];
-        }
-
         $table = (new mysqlTable($this->mysqlDatabase, $model->getTableName()))
             ->setWhereParameters($whereParameters)
             ->setWhere('(' . implode(') OR (', $where) . ')')
