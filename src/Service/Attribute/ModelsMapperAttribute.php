@@ -15,7 +15,6 @@ use GibsonOS\Core\Exception\RequestError;
 use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Mapper\ModelMapper;
 use GibsonOS\Core\Model\AbstractModel;
-use GibsonOS\Core\Service\RequestService;
 use GibsonOS\Core\Service\SessionService;
 use JsonException;
 use ReflectionAttribute;
@@ -26,12 +25,11 @@ use ReflectionProperty;
 class ModelsMapperAttribute implements AttributeServiceInterface, ParameterAttributeInterface
 {
     public function __construct(
-        private ModelMapper $objectMapper,
-        private RequestService $requestService,
-        private ReflectionManager $reflectionManager,
-        private ModelsFetcherAttribute $modelsFetcherAttribute,
-        private SessionService $sessionService,
-        private ObjectMapperAttribute $objectMapperAttribute
+        private readonly ModelMapper $objectMapper,
+        private readonly ReflectionManager $reflectionManager,
+        private readonly ModelsFetcherAttribute $modelsFetcherAttribute,
+        private readonly SessionService $sessionService,
+        private readonly ObjectMapperAttribute $objectMapperAttribute
     ) {
     }
 
@@ -128,13 +126,20 @@ class ModelsMapperAttribute implements AttributeServiceInterface, ParameterAttri
         return $models;
     }
 
+    /**
+     * @throws MapperException
+     * @throws ReflectionException
+     */
     private function getValues(
         GetMappedModels $attribute,
         ReflectionProperty $reflectionProperty,
         ReflectionParameter $reflectionParameter
     ): array {
         $values = [];
-        $parameterFromRequest = $this->objectMapperAttribute->getParameterFromRequest($reflectionParameter);
+        $parameterFromRequest = $this->objectMapperAttribute->getParameterFromRequest(
+            $reflectionParameter,
+            $reflectionProperty->getName(),
+        );
 
         foreach (is_array($parameterFromRequest) ? $parameterFromRequest : [] as $requestValue) {
             array_push(
@@ -146,6 +151,9 @@ class ModelsMapperAttribute implements AttributeServiceInterface, ParameterAttri
         return $values;
     }
 
+    /**
+     * @throws ReflectionException
+     */
     private function getValuesForModel(
         GetMappedModels $attribute,
         ReflectionProperty $reflectionProperty,

@@ -7,7 +7,6 @@ use GibsonOS\Core\Attribute\AttributeInterface;
 use GibsonOS\Core\Attribute\GetModel;
 use GibsonOS\Core\Exception\MapperException;
 use GibsonOS\Core\Exception\Repository\SelectError;
-use GibsonOS\Core\Exception\RequestError;
 use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Model\ModelInterface;
@@ -23,18 +22,18 @@ use ReflectionParameter;
 class ModelFetcherAttribute implements AttributeServiceInterface, ParameterAttributeInterface
 {
     public function __construct(
-        private mysqlDatabase $mysqlDatabase,
-        private RequestService $requestService,
-        private ReflectionManager $reflectionManager,
-        private SessionService $sessionService
+        private readonly mysqlDatabase $mysqlDatabase,
+        private readonly RequestService $requestService,
+        private readonly ReflectionManager $reflectionManager,
+        private readonly SessionService $sessionService
     ) {
     }
 
     /**
      * @throws SelectError
-     * @throws RequestError
      * @throws ReflectionException
      * @throws JsonException
+     * @throws MapperException
      */
     public function replace(
         AttributeInterface $attribute,

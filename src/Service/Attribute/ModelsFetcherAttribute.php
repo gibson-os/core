@@ -21,10 +21,10 @@ use ReflectionParameter;
 class ModelsFetcherAttribute implements AttributeServiceInterface, ParameterAttributeInterface
 {
     public function __construct(
-        private mysqlDatabase $mysqlDatabase,
-        private ReflectionManager $reflectionManager,
-        private SessionService $sessionService,
-        private ObjectMapperAttribute $objectMapperAttribute
+        private readonly mysqlDatabase $mysqlDatabase,
+        private readonly ReflectionManager $reflectionManager,
+        private readonly SessionService $sessionService,
+        private readonly ObjectMapperAttribute $objectMapperAttribute
     ) {
     }
 
