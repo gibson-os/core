@@ -25,7 +25,7 @@ class ModelFetcherAttributeTest extends AbstractTest
 
     private ObjectProphecy|SessionService $sessionService;
 
-    protected function _before()
+    protected function _before(): void
     {
         $this->requestService = $this->prophesize(RequestService::class);
         $this->sessionService = $this->prophesize(SessionService::class);
