@@ -62,7 +62,12 @@ class ModelsFetcherAttribute implements AttributeServiceInterface, ParameterAttr
 
         $whereParameters = [];
         $where = [];
-        $parameterFromRequest = $this->objectMapperAttribute->getParameterFromRequest($reflectionParameter);
+
+        try {
+            $parameterFromRequest = $this->objectMapperAttribute->getParameterFromRequest($reflectionParameter);
+        } catch (MapperException) {
+            $parameterFromRequest = [];
+        }
 
         foreach (is_array($parameterFromRequest) ? $parameterFromRequest : [] as $requestValue) {
             array_push(

@@ -7,6 +7,7 @@ use GibsonOS\Core\Attribute\AttributeInterface;
 use GibsonOS\Core\Attribute\GetModel;
 use GibsonOS\Core\Exception\MapperException;
 use GibsonOS\Core\Exception\Repository\SelectError;
+use GibsonOS\Core\Exception\RequestError;
 use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Model\ModelInterface;
@@ -25,7 +26,7 @@ class ModelFetcherAttribute implements AttributeServiceInterface, ParameterAttri
         private readonly mysqlDatabase $mysqlDatabase,
         private readonly RequestService $requestService,
         private readonly ReflectionManager $reflectionManager,
-        private readonly SessionService $sessionService
+        private readonly SessionService $sessionService,
     ) {
     }
 
@@ -34,6 +35,7 @@ class ModelFetcherAttribute implements AttributeServiceInterface, ParameterAttri
      * @throws ReflectionException
      * @throws JsonException
      * @throws MapperException
+     * @throws RequestError
      */
     public function replace(
         AttributeInterface $attribute,
@@ -59,8 +61,14 @@ class ModelFetcherAttribute implements AttributeServiceInterface, ParameterAttri
             ));
         }
 
+        try {
+            $whereParameters = $this->getWhereValues($attribute);
+        } catch (RequestError) {
+            return null;
+        }
+
         $table = (new mysqlTable($this->mysqlDatabase, $model->getTableName()))
-            ->setWhereParameters($this->getWhereValues($attribute))
+            ->setWhereParameters($whereParameters)
             ->setWhere(implode(' AND ', array_map(
                 fn (string $field): string => '`' . $field . '`=?',
                 array_keys($attribute->getConditions())
@@ -96,6 +104,10 @@ class ModelFetcherAttribute implements AttributeServiceInterface, ParameterAttri
         return $model;
     }
 
+    /**
+     * @throws ReflectionException
+     * @throws RequestError
+     */
     private function getWhereValues(GetModel $attribute): array
     {
         $values = [];

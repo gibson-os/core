@@ -4,9 +4,12 @@ declare(strict_types=1);
 namespace GibsonOS\UnitTest;
 
 use Codeception\Test\Unit;
+use GibsonOS\Core\Exception\RequestError;
 use GibsonOS\Core\Manager\ModelManager;
 use GibsonOS\Core\Manager\ServiceManager;
 use GibsonOS\Core\Service\LoggerService;
+use GibsonOS\Core\Service\RequestService;
+use GibsonOS\Core\Service\SessionService;
 use mysqlDatabase;
 use mysqlRegistry;
 use Prophecy\Argument;
@@ -27,6 +30,10 @@ class AbstractTest extends Unit
 
     protected ObjectProphecy|ModelManager $modelManager;
 
+    protected ObjectProphecy|RequestService $requestService;
+
+    protected ObjectProphecy|SessionService $sessionService;
+
     public function __construct($name = null, array $data = [], $dataName = '')
     {
         parent::__construct($name, $data, $dataName);
@@ -36,11 +43,16 @@ class AbstractTest extends Unit
         $this->modelManager = $this->prophesize(ModelManager::class);
         $this->modelManager->save(Argument::any())->shouldNotBeCalled();
         $this->modelManager->delete(Argument::any())->shouldNotBeCalled();
+        $this->requestService = $this->prophesize(RequestService::class);
+        $this->requestService->getRequestValue(Argument::any())->willThrow(RequestError::class);
+        $this->sessionService = $this->prophesize(SessionService::class);
 
         $this->serviceManager = new ServiceManager();
         $this->serviceManager->setInterface(LoggerInterface::class, LoggerService::class);
         $this->serviceManager->setService(mysqlDatabase::class, $this->database->reveal());
         $this->serviceManager->setService(ModelManager::class, $this->modelManager->reveal());
+        $this->serviceManager->setService(RequestService::class, $this->requestService->reveal());
+        $this->serviceManager->setService(SessionService::class, $this->sessionService->reveal());
         putenv('TIMEZONE=Europe/Berlin');
         putenv('MYSQL_HOST=gos_mysql');
         putenv('MYSQL_DATABASE=gibson_os_test');

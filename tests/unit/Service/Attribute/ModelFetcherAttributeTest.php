@@ -4,40 +4,21 @@ declare(strict_types=1);
 namespace GibsonOS\UnitTest\Service\Attribute;
 
 use GibsonOS\Core\Attribute\GetModel;
-use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Service\Attribute\ModelFetcherAttribute;
-use GibsonOS\Core\Service\RequestService;
-use GibsonOS\Core\Service\SessionService;
 use GibsonOS\Mock\Dto\Mapper\MapModel;
 use GibsonOS\Mock\Dto\Mapper\StringEnum;
 use GibsonOS\UnitTest\AbstractTest;
-use Prophecy\PhpUnit\ProphecyTrait;
-use Prophecy\Prophecy\ObjectProphecy;
 use ReflectionFunction;
 
 class ModelFetcherAttributeTest extends AbstractTest
 {
-    use ProphecyTrait;
-
     private ModelFetcherAttribute $modelFetcherAttribute;
-
-    private ObjectProphecy|RequestService $requestService;
-
-    private ObjectProphecy|SessionService $sessionService;
 
     protected function _before(): void
     {
-        $this->requestService = $this->prophesize(RequestService::class);
-        $this->sessionService = $this->prophesize(SessionService::class);
-
         $this->showFieldsFromMapModel();
 
-        $this->modelFetcherAttribute = new ModelFetcherAttribute(
-            $this->database->reveal(),
-            $this->requestService->reveal(),
-            $this->serviceManager->get(ReflectionManager::class),
-            $this->sessionService->reveal(),
-        );
+        $this->modelFetcherAttribute = $this->serviceManager->get(ModelFetcherAttribute::class);
     }
 
     /**

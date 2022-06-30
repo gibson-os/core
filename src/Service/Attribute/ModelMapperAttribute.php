@@ -43,7 +43,7 @@ class ModelMapperAttribute extends ObjectMapperAttribute
      * @throws JsonException
      * @throws ReflectionException
      */
-    public function replace(AttributeInterface $attribute, array $parameters, ReflectionParameter $reflectionParameter): AbstractModel
+    public function replace(AttributeInterface $attribute, array $parameters, ReflectionParameter $reflectionParameter): ?AbstractModel
     {
         if (!$attribute instanceof GetMappedModel) {
             throw new MapperException(sprintf(
@@ -60,6 +60,15 @@ class ModelMapperAttribute extends ObjectMapperAttribute
                 $reflectionParameter
             );
         } catch (SelectError) {
+            $modelClassName = $this->reflectionManager->getNonBuiltinTypeName($reflectionParameter);
+            $model = new $modelClassName();
+        }
+
+        if ($model === null) {
+            if ($reflectionParameter->allowsNull()) {
+                return null;
+            }
+
             $modelClassName = $this->reflectionManager->getNonBuiltinTypeName($reflectionParameter);
             $model = new $modelClassName();
         }
@@ -100,15 +109,17 @@ class ModelMapperAttribute extends ObjectMapperAttribute
 
             $values = $this->getValues($attribute, $reflectionProperty)
                 ?? $parameters[$reflectionProperty->getName()]
+                ?? null
             ;
             $typeName = $this->reflectionManager->getTypeName($reflectionProperty);
-
             $setter = 'set' . ucfirst($reflectionProperty->getName());
-            $values = array_map(
-                fn ($value): object => is_object($value)
-                    ? $value
-                    : (
-                        is_array($value)
+
+            if (is_array($values) && count($values) === 0) {
+                $values = array_map(
+                    fn ($value): object => is_object($value)
+                        ? $value
+                        : (
+                            is_array($value)
                             ? $this->objectMapper->mapToObject($parentModelClassName, $value)
                             : throw new MapperException(sprintf(
                                 'Properties (%s) for object "%s" used for %s->%s() is no array! Maybe map the required object before',
@@ -117,10 +128,12 @@ class ModelMapperAttribute extends ObjectMapperAttribute
                                 $model::class,
                                 $setter
                             ))
-                    ),
-                $typeName === 'array' ? $values : [$reflectionProperty->getName() => $values]
-            );
-            $model->$setter($typeName === 'array' ? $values : reset($values));
+                        ),
+                    $typeName === 'array' ? $values : [$reflectionProperty->getName() => $values]
+                );
+            }
+
+            $model->$setter(is_array($values) ? ($typeName === 'array' ? $values : reset($values)) : $values);
         }
 
         return $model;

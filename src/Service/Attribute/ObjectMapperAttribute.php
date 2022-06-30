@@ -123,20 +123,24 @@ class ObjectMapperAttribute implements AttributeServiceInterface, ParameterAttri
         } catch (RequestError) {
             try {
                 return $this->reflectionManager->getDefaultValue($reflectionParameter);
-            } catch (ReflectionException $e) {
+            } catch (ReflectionException $exception) {
                 try {
-                    $reflectionProperty = $reflectionParameter->getDeclaringClass()?->getProperty($reflectionParameter->getName());
+                    try {
+                        $reflectionProperty = $reflectionParameter->getDeclaringClass()?->getProperty($reflectionParameter->getName());
+                    } catch (ReflectionException) {
+                        $reflectionProperty = null;
+                    }
 
                     if ($reflectionProperty === null || !$reflectionProperty->hasDefaultValue()) {
                         throw new MapperException(sprintf(
                             'Parameter "%s" is not in request!',
                             $requestKey ?? $reflectionParameter->getName()
-                        ), 0, $e);
+                        ), 0, $exception);
                     }
 
                     return $reflectionProperty->getDefaultValue();
-                } catch (ReflectionException) {
-                    throw new MapperException($e->getMessage(), StatusCode::BAD_REQUEST, $e);
+                } catch (ReflectionException $exception2) {
+                    throw new MapperException($exception2->getMessage(), StatusCode::BAD_REQUEST, $exception);
                 }
             }
         }

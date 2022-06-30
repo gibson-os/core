@@ -16,8 +16,8 @@ use ReflectionException;
 class ModelMapper extends ObjectMapper
 {
     public function __construct(
-        private ServiceManager $serviceManagerService,
-        private ReflectionManager $reflectionManager
+        private readonly ServiceManager $serviceManagerService,
+        private readonly ReflectionManager $reflectionManager
     ) {
         parent::__construct($this->serviceManagerService, $this->reflectionManager);
     }

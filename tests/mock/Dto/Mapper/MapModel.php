@@ -7,6 +7,7 @@ use GibsonOS\Core\Attribute\Install\Database\Column;
 use GibsonOS\Core\Attribute\Install\Database\Constraint;
 use GibsonOS\Core\Attribute\Install\Database\Table;
 use GibsonOS\Core\Model\AbstractModel;
+use JsonSerializable;
 
 /**
  * @method MapModelParent  getParent()
@@ -16,7 +17,7 @@ use GibsonOS\Core\Model\AbstractModel;
  * @method MapModel        addChildObjects(MapModelChild[] $mapModelChildren)
  */
 #[Table]
-class MapModel extends AbstractModel
+class MapModel extends AbstractModel implements JsonSerializable
 {
     #[Column(autoIncrement: true)]
     private ?int $id = null;
@@ -100,5 +101,16 @@ class MapModel extends AbstractModel
         $this->parentId = $parentId;
 
         return $this;
+    }
+
+    public function jsonSerialize(): array
+    {
+        return [
+            'id' => $this->getId(),
+            'nullableIntValue' => $this->getNullableIntValue(),
+            'stringEnumValue' => $this->getStringEnumValue(),
+            'intValue' => $this->getIntValue(),
+            'parentId' => $this->getParentId(),
+        ];
     }
 }
