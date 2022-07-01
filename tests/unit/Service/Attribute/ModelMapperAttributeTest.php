@@ -36,7 +36,6 @@ class ModelMapperAttributeTest extends AbstractTest
 
         foreach ($parameters as $key => $value) {
             $this->requestService->getRequestValue($key)
-//                ->shouldBeCalledTimes(2)
                 ->willReturn($value)
             ;
         }
@@ -80,7 +79,8 @@ class ModelMapperAttributeTest extends AbstractTest
                 (new MapModel())
                     ->setId(42)
                     ->setStringEnumValue(StringEnum::YES)
-                    ->setIntValue(142),
+                    ->setIntValue(142)
+                    ->setChildObjects([]),
             ],
             'Optional Parameter' => [
                 new GetMappedModel(),
@@ -99,7 +99,8 @@ class ModelMapperAttributeTest extends AbstractTest
                 (new MapModel())
                     ->setId(42)
                     ->setStringEnumValue(StringEnum::YES)
-                    ->setIntValue(142),
+                    ->setIntValue(142)
+                    ->setChildObjects([]),
             ],
             'Change values' => [
                 new GetMappedModel(),
@@ -111,7 +112,8 @@ class ModelMapperAttributeTest extends AbstractTest
                     ->setId(42)
                     ->setNullableIntValue(420)
                     ->setStringEnumValue(StringEnum::NO)
-                    ->setIntValue(24),
+                    ->setIntValue(24)
+                    ->setChildObjects([]),
             ],
             'New model' => [
                 new GetMappedModel(),
@@ -122,7 +124,8 @@ class ModelMapperAttributeTest extends AbstractTest
                 (new MapModel())
                     ->setNullableIntValue(240)
                     ->setStringEnumValue(StringEnum::YES)
-                    ->setIntValue(42),
+                    ->setIntValue(42)
+                    ->setChildObjects([]),
             ],
         ];
     }

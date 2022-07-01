@@ -111,6 +111,7 @@ class MapModel extends AbstractModel implements JsonSerializable
             'stringEnumValue' => $this->getStringEnumValue(),
             'intValue' => $this->getIntValue(),
             'parentId' => $this->getParentId(),
+            'childObjects' => $this->getChildObjects(),
         ];
     }
 }

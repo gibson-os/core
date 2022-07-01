@@ -69,7 +69,7 @@ class AbstractTest extends Unit
         ;
 
         $fields = [
-            ['id', 'bigint(20) unsigned', 'NO', 'PRI', null, 'auto_imcrement'],
+            ['id', 'bigint(20) unsigned', 'NO', 'PRI', null, 'auto_increment'],
             ['nullable_int_value', 'bigint(20)', 'YES', '', null, ''],
             ['string_enum_value', 'enum(\'NO\', \'YES\')', 'NO', '', null, ''],
             ['int_value', 'bigint(20)', 'NO', '', null, ''],

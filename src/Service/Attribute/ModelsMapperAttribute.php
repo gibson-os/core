@@ -109,7 +109,9 @@ class ModelsMapperAttribute implements AttributeServiceInterface, ParameterAttri
                 }
 
                 $values = $parameters[$reflectionProperty->getName()]
-                    ?? $this->getValues($attribute, $reflectionProperty, $reflectionParameter);
+                    ?? $requestValues[$reflectionProperty->getName()]
+                    ?? []
+                ;
 
                 $typeName = $this->reflectionManager->getTypeName($reflectionProperty);
                 $values = array_map(
@@ -133,15 +135,11 @@ class ModelsMapperAttribute implements AttributeServiceInterface, ParameterAttri
     private function getValues(
         GetMappedModels $attribute,
         ReflectionProperty $reflectionProperty,
-        ReflectionParameter $reflectionParameter
+        array $requestValues
     ): array {
         $values = [];
-        $parameterFromRequest = $this->objectMapperAttribute->getParameterFromRequest(
-            $reflectionParameter,
-            $reflectionProperty->getName(),
-        );
 
-        foreach (is_array($parameterFromRequest) ? $parameterFromRequest : [] as $requestValue) {
+        foreach ($requestValues as $requestValue) {
             array_push(
                 $values,
                 $this->getValuesForModel($attribute, $reflectionProperty, $requestValue)
