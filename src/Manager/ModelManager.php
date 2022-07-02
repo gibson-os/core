@@ -72,6 +72,13 @@ class ModelManager
      */
     public function save(ModelInterface $model): void
     {
+        $newTransaction = false;
+
+        if (!$this->mysqlDatabase->isTransaction()) {
+            $newTransaction = true;
+            $this->mysqlDatabase->startTransaction();
+        }
+
         $reflectionClass = $this->reflectionManager->getReflectionClass($model);
         $childrenList = [];
 
@@ -111,14 +118,45 @@ class ModelManager
             $exception = new SaveError($exception->getMessage(), 0, $exception);
             $exception->setModel($model);
 
+            if ($newTransaction) {
+                $this->mysqlDatabase->commit();
+            }
+
             throw $exception;
         }
 
         $mysqlTable->getReplacedRecord();
-        $this->loadFromMysqlTable($mysqlTable, $model);
+
+        try {
+            $this->loadFromMysqlTable($mysqlTable, $model);
+        } catch (JsonException|ReflectionException $exception) {
+            $exception = new SaveError($exception->getMessage(), 0, $exception);
+            $exception->setModel($model);
+
+            if ($newTransaction) {
+                $this->mysqlDatabase->commit();
+            }
+
+            throw $exception;
+        }
 
         foreach ($childrenList as $children) {
-            $this->saveChildren($children);
+            try {
+                $this->saveChildren($children);
+            } catch (SaveError|JsonException|ReflectionException $exception) {
+                $exception = new SaveError($exception->getMessage(), 0, $exception);
+                $exception->setModel($model);
+
+                if ($newTransaction) {
+                    $this->mysqlDatabase->commit();
+                }
+
+                throw $exception;
+            }
+        }
+
+        if ($newTransaction) {
+            $this->mysqlDatabase->commit();
         }
     }
 

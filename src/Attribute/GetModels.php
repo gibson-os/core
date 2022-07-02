@@ -14,7 +14,7 @@ class GetModels implements AttributeInterface
      * @param class-string<AbstractModel> $className
      * @param array<string, string>       $conditions
      */
-    public function __construct(private string $className, private array $conditions = ['id' => 'id'])
+    public function __construct(private readonly string $className, private readonly array $conditions = ['id' => 'id'])
     {
     }
 
