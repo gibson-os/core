@@ -41,10 +41,21 @@ class ObjectMapperAttribute implements AttributeServiceInterface, ParameterAttri
 
         $objectClassName = $this->reflectionManager->getNonBuiltinTypeName($reflectionParameter);
 
-        return $this->objectMapper->mapToObject(
-            $objectClassName,
-            $this->getObjectParameters($attribute, $objectClassName, $parameters)
-        );
+        try {
+            $properties = $this->getObjectParameters($attribute, $objectClassName, $parameters);
+        } catch (MapperException) {
+            $properties = [];
+        }
+
+        try {
+            return $this->objectMapper->mapToObject($objectClassName, $properties);
+        } catch (ReflectionException $exception) {
+            if ($reflectionParameter->allowsNull()) {
+                return null;
+            }
+
+            throw $exception;
+        }
     }
 
     /**
