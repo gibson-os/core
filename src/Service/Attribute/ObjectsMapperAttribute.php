@@ -41,9 +41,7 @@ class ObjectsMapperAttribute implements AttributeServiceInterface, ParameterAttr
         $objectClassName = $attribute->getClassName();
 
         foreach (is_array($parameterFromRequest) ? $parameterFromRequest : [] as $requestValues) {
-            $object = new $objectClassName();
-            $this->objectMapper->setObjectValues($object, $requestValues);
-            $objects[] = $object;
+            $objects[] = $this->objectMapper->mapToObject($objectClassName, $requestValues);
         }
 
         return $objects;
