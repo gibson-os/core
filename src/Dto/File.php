@@ -11,7 +11,7 @@ class File
         private readonly string $name,
         private readonly string $type,
         private readonly int $size,
-        private readonly int $tmp_name,
+        private readonly string $tmp_name,
         private readonly Error $error,
         private readonly string $full_path,
     ) {
@@ -32,7 +32,7 @@ class File
         return $this->size;
     }
 
-    public function getTmpName(): int
+    public function getTmpName(): string
     {
         return $this->tmp_name;
     }

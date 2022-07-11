@@ -40,11 +40,7 @@ class UserController extends AbstractController
     }
 
     /**
-     * @param UserStore $userStore
-     *
      * @throws SelectError
-     *
-     * @return AjaxResponse
      */
     #[CheckPermission(Permission::MANAGE + Permission::READ)]
     public function index(UserStore $userStore): AjaxResponse

@@ -48,17 +48,13 @@ class EventController extends AbstractController
     }
 
     /**
-     * @param ElementStore $elementStore
-     * @param Event|null   $event
-     * @param string|null  $node
+     * @param Event|null $event
      *
      * @throws FactoryError
      * @throws GetError
      * @throws JsonException
      * @throws ReflectionException
      * @throws SelectError
-     *
-     * @return AjaxResponse
      */
     #[CheckPermission(Permission::READ)]
     public function elements(

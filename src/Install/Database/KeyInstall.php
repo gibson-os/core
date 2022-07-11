@@ -17,7 +17,9 @@ use GibsonOS\Core\Model\ModelInterface;
 use GibsonOS\Core\Service\Attribute\TableAttribute;
 use GibsonOS\Core\Service\InstallService;
 use GibsonOS\Core\Service\PriorityInterface;
+
 use function mb_substr;
+
 use mysqlDatabase;
 use ReflectionException;
 

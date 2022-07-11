@@ -11,9 +11,6 @@ class Image
 
     private int $quality = 80;
 
-    /**
-     * @param GdImage $image
-     */
     public function __construct(private GdImage $image)
     {
     }

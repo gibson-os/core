@@ -51,8 +51,6 @@ class IconController extends AbstractController
      * @throws GetError
      * @throws SetError
      * @throws Throwable
-     *
-     * @return AjaxResponse
      */
     #[CheckPermission(Permission::WRITE)]
     #[AlwaysAjaxResponse]

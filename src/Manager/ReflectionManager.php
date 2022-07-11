@@ -157,7 +157,8 @@ class ReflectionManager
     public function getProperty(
         ReflectionProperty $reflectionProperty,
         object $object
-    ): string|int|float|bool|null|array|object {
+    ): string|int|float|bool|null|array|object
+    {
         $propertyName = $reflectionProperty->getName();
 
         foreach (self::GETTER_PREFIXES as $getterPrefix) {
@@ -302,7 +303,8 @@ class ReflectionManager
     public function castValue(
         ReflectionProperty|ReflectionParameter $reflectionObject,
         int|float|bool|string|null|array $value
-    ): int|float|bool|string|null|array|object {
+    ): int|float|bool|string|null|array|object
+    {
         if (!$this->isBuiltin($reflectionObject)) {
             return $value;
         }

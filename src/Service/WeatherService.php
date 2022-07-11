@@ -109,12 +109,12 @@ class WeatherService
     private function getByCoordinates(float $latitude, float $longitude): Response
     {
         return $this->webService->get(
-            (new Request(
+            new Request(
                 'https://' . $this->envService->getString('OPENWEATHERMAP_URL') .
                 'onecall?lat=' . $latitude . '&lon=' . $longitude .
                 '&appid=' . $this->envService->getString('OPENWEATHERMAP_API_KEY') .
                 '&units=metric&lang=de&exclude=minutely,daily'
-            ))
+            )
         );
     }
 }

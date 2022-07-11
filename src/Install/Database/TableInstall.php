@@ -269,12 +269,12 @@ class TableInstall extends AbstractInstall implements PriorityInterface
     {
         return match ($type) {
             'int' => Column::TYPE_BIGINT,
-                'float' => Column::TYPE_FLOAT,
-                'bool' => Column::TYPE_TINYINT,
-                'array' => Column::TYPE_JSON,
-                'string' => Column::TYPE_VARCHAR,
-                DateTimeInterface::class, DateTime::class, DateTimeImmutable::class => Column::TYPE_DATETIME,
-                default => class_exists($type) && enum_exists($type) ? Column::TYPE_ENUM : Column::TYPE_VARCHAR
+            'float' => Column::TYPE_FLOAT,
+            'bool' => Column::TYPE_TINYINT,
+            'array' => Column::TYPE_JSON,
+            'string' => Column::TYPE_VARCHAR,
+            DateTimeInterface::class, DateTime::class, DateTimeImmutable::class => Column::TYPE_DATETIME,
+            default => class_exists($type) && enum_exists($type) ? Column::TYPE_ENUM : Column::TYPE_VARCHAR
         };
     }
 

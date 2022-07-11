@@ -11,9 +11,7 @@ use ReflectionProperty;
 class Children
 {
     /**
-     * @param ReflectionProperty $reflectionProperty
-     * @param Constraint         $constraint
-     * @param AbstractModel[]    $models
+     * @param AbstractModel[] $models
      */
     public function __construct(
         private readonly ReflectionProperty $reflectionProperty,

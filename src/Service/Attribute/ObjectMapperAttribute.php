@@ -128,7 +128,8 @@ class ObjectMapperAttribute implements AttributeServiceInterface, ParameterAttri
     public function getParameterFromRequest(
         ReflectionParameter $reflectionParameter,
         string $requestKey = null
-    ): string|int|float|bool|null|array|object {
+    ): string|int|float|bool|null|array|object
+    {
         try {
             $value = $this->requestService->getRequestValue($requestKey ?? $reflectionParameter->getName());
         } catch (RequestError) {

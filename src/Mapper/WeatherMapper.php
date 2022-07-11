@@ -19,7 +19,7 @@ class WeatherMapper
         return (new Weather())
             ->setLocation($location)
             ->setDate($this->dateTimeService->get(
-                '@' . ($data['dt']),
+                '@' . $data['dt'],
                 new DateTimeZone('UTC')
             )->setTimezone(new DateTimeZone($location->getTimezone())))
             ->setTemperature($data['temp'])

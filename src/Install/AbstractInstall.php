@@ -37,8 +37,6 @@ abstract class AbstractInstall implements InstallInterface
     protected LoggerInterface $logger;
 
     /**
-     * @param ServiceManager $serviceManagerService
-     *
      * @throws FactoryError
      */
     public function __construct(protected ServiceManager $serviceManagerService)

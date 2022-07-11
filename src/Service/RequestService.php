@@ -37,12 +37,26 @@ class RequestService
             $params[(string) array_shift($queryParams)] = array_shift($queryParams);
         }
 
+        $files = [];
+
+        foreach ($_FILES as $key => $file) {
+            $keyFiles = [];
+
+            foreach ($file as $property => $values) {
+                foreach ($values as $index => $value) {
+                    $keyFiles[$index][$property] = $value;
+                }
+            }
+
+            $files[$key] = $keyFiles;
+        }
+
         $this->requestValues = array_merge(
             $_GET,
             $_POST,
             $params,
             $_COOKIE,
-            $_FILES
+            $files
         );
     }
 
