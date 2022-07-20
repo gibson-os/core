@@ -35,15 +35,15 @@ class EventService
     private array $events = [];
 
     public function __construct(
-        private ServiceManager $serviceManager,
-        private EventRepository $eventRepository,
-        private ElementService $elementService,
-        private CommandService $commandService,
-        private DateTimeService $dateTimeService,
-        private ReflectionManager $reflectionManager,
-        private ModelManager $modelManager,
-        private ProcessService $processService,
-        private LoggerInterface $logger
+        private readonly ServiceManager $serviceManager,
+        private readonly EventRepository $eventRepository,
+        private readonly ElementService $elementService,
+        private readonly CommandService $commandService,
+        private readonly DateTimeService $dateTimeService,
+        private readonly ReflectionManager $reflectionManager,
+        private readonly ModelManager $modelManager,
+        private readonly ProcessService $processService,
+        private readonly LoggerInterface $logger
     ) {
     }
 

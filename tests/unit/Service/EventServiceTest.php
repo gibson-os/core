@@ -30,14 +30,14 @@ class EventServiceTest extends AbstractTest
     /**
      * @var ObjectProphecy|EventRepository
      */
-    private $eventServiceRepository;
+    private $eventRepository;
 
     protected function _before(): void
     {
-        $this->eventServiceRepository = $this->prophesize(EventRepository::class);
+        $this->eventRepository = $this->prophesize(EventRepository::class);
         $this->eventService = new EventService(
             $this->serviceManager,
-            $this->eventServiceRepository->reveal(),
+            $this->eventRepository->reveal(),
             $this->serviceManager->get(ElementService::class),
             $this->serviceManager->get(CommandService::class),
             $this->serviceManager->get(DateTimeService::class),
@@ -50,7 +50,7 @@ class EventServiceTest extends AbstractTest
 
     public function testFire(): void
     {
-        $this->eventServiceRepository->getTimeControlled(
+        $this->eventRepository->getTimeControlled(
             TestEvent::class,
             TestEvent::TRIGGER_MARVIN,
             Argument::type(DateTime::class)
@@ -58,7 +58,7 @@ class EventServiceTest extends AbstractTest
             ->shouldBeCalledOnce()
             ->willReturn([])
         ;
-        $this->eventServiceRepository->getTimeControlled(
+        $this->eventRepository->getTimeControlled(
             TestEvent::class,
             TestEvent::TRIGGER_FORD,
             Argument::type(DateTime::class)
@@ -82,6 +82,28 @@ class EventServiceTest extends AbstractTest
     /**
      * @dataProvider getTestData
      */
+    public function testFireTimeControlled(Event $event, string $returnValue): void
+    {
+        $this->eventRepository->getTimeControlled(TestEvent::class, TestEvent::TRIGGER_MARVIN, Argument::any())
+            ->shouldBeCalledOnce()
+            ->willReturn([])
+        ;
+        $this->eventRepository->getTimeControlled(TestEvent::class, TestEvent::TRIGGER_FORD, Argument::any())
+            ->shouldBeCalledOnce()
+            ->willReturn([$event])
+        ;
+        $this->modelManager->save(Argument::any())
+            ->shouldBeCalledTimes(2)
+        ;
+        $this->eventService->fire(TestEvent::class, TestEvent::TRIGGER_MARVIN);
+        $this->assertEquals('', $this->serviceManager->get(TestEvent::class)->arthur);
+        $this->eventService->fire(TestEvent::class, TestEvent::TRIGGER_FORD);
+        $this->assertEquals($returnValue, $this->serviceManager->get(TestEvent::class)->arthur);
+    }
+
+    /**
+     * @dataProvider getTestData
+     */
     public function testRunEvent(Event $event, string $returnValue): void
     {
         $testEvent = $this->serviceManager->get(TestEvent::class);
@@ -95,12 +117,19 @@ class EventServiceTest extends AbstractTest
     {
         return [
             'Simple Event' => [
-                (new Event())->setElements([
-                    (new Element())
-                        ->setClass(TestEvent::class)
-                        ->setMethod('test')
-                        ->setParameters(['arthur' => 'dent']),
-                ]),
+                (new Event())
+                    ->setAsync(false)
+                    ->setElements([
+                        (new Element())
+                            ->setClass(TestEvent::class)
+                            ->setMethod('test')
+                            ->setParameters(['arthur' => 'dent']),
+                    ])
+                    ->setTriggers([
+                        (new Event\Trigger())
+                            ->setClass(TestEvent::class)
+                            ->setTrigger(TestEvent::TRIGGER_FORD),
+                    ]),
                 'dent',
             ],
         ];
