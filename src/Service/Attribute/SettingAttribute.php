@@ -30,8 +30,7 @@ class SettingAttribute implements ParameterAttributeInterface, AttributeServiceI
         AttributeInterface $attribute,
         array $parameters,
         ReflectionParameter $reflectionParameter
-    ): string|int|float|bool|null|array|object
-    {
+    ): string|int|float|bool|null|array|object {
         if (!$attribute instanceof GetSetting) {
             return null;
         }

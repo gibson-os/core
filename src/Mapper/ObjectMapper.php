@@ -98,8 +98,7 @@ class ObjectMapper implements ObjectMapperInterface
     protected function mapValueToObject(
         ReflectionParameter|ReflectionProperty $reflectionObject,
         int|float|string|bool|array|object|null $values
-    ): int|float|string|bool|array|object|null
-    {
+    ): int|float|string|bool|array|object|null {
         $attribute = $this->reflectionManager->getAttribute($reflectionObject, ObjectMapperAttribute::class);
 
         if ($attribute !== null || !$this->reflectionManager->isBuiltin($reflectionObject)) {

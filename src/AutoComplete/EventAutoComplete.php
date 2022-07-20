@@ -8,7 +8,7 @@ use GibsonOS\Core\Repository\EventRepository;
 
 class EventAutoComplete implements AutoCompleteInterface
 {
-    public function __construct(private EventRepository $eventRepository)
+    public function __construct(private readonly EventRepository $eventRepository)
     {
     }
 
