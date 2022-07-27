@@ -114,7 +114,7 @@ class ModelMapperAttribute extends ObjectMapperAttribute
             $typeName = $this->reflectionManager->getTypeName($reflectionProperty);
             $setter = 'set' . ucfirst($reflectionProperty->getName());
 
-            if (is_array($values) && count($values) === 0) {
+            if (is_array($values) && count($values) !== 0) {
                 $values = array_map(
                     fn ($value): object => is_object($value)
                         ? $value
