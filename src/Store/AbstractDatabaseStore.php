@@ -228,7 +228,7 @@ abstract class AbstractDatabaseStore extends AbstractStore
      *
      * @return T
      */
-    private function getModel(): AbstractModel
+    protected function getModel(): AbstractModel
     {
         $modelClassName = $this->getModelClassName();
         $model = new $modelClassName();
