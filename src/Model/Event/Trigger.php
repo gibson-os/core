@@ -82,7 +82,7 @@ class Trigger extends AbstractModel implements JsonSerializable
         return $this->id;
     }
 
-    public function setId(int $id): Trigger
+    public function setId(?int $id): Trigger
     {
         $this->id = $id;
 

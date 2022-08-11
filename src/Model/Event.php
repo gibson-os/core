@@ -10,6 +10,7 @@ use GibsonOS\Core\Attribute\Install\Database\Constraint;
 use GibsonOS\Core\Attribute\Install\Database\Key;
 use GibsonOS\Core\Attribute\Install\Database\Table;
 use GibsonOS\Core\Model\Event\Element;
+use GibsonOS\Core\Model\Event\Event\Tag;
 use GibsonOS\Core\Model\Event\Trigger;
 use JsonSerializable;
 use mysqlDatabase;
@@ -21,6 +22,9 @@ use mysqlDatabase;
  * @method Trigger[] getTriggers()
  * @method Event     addTriggers(Trigger[] $triggers)
  * @method Event     setTriggers(Trigger[] $triggers)
+ * @method Tag[]     getTags()
+ * @method Event     addTags(Tag[] $tags)
+ * @method Event     setTags(Tag[] $tags)
  */
 #[Table]
 class Event extends AbstractModel implements JsonSerializable, AutoCompleteModelInterface
@@ -64,6 +68,12 @@ class Event extends AbstractModel implements JsonSerializable, AutoCompleteModel
      */
     #[Constraint('event', Trigger::class)]
     protected array $triggers = [];
+
+    /**
+     * @var Tag[]
+     */
+    #[Constraint('event', Tag::class)]
+    protected array $tags = [];
 
     public function __construct(mysqlDatabase $database = null)
     {
@@ -190,6 +200,7 @@ class Event extends AbstractModel implements JsonSerializable, AutoCompleteModel
             'exitOnError' => $this->isExitOnError(),
             'lastRun' => $this->getLastRun()?->format('Y-m-d H:i:s'),
             'runtime' => $this->getRuntime(),
+            'tags' => $this->getTags(),
         ];
     }
 
