@@ -16,6 +16,7 @@ use GibsonOS\Core\Exception\Model\SaveError;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Manager\ModelManager;
 use GibsonOS\Core\Model\Event;
+use GibsonOS\Core\Model\Event\Element;
 use GibsonOS\Core\Model\User\Permission;
 use GibsonOS\Core\Repository\EventRepository;
 use GibsonOS\Core\Service\EventService;
@@ -145,6 +146,47 @@ class EventController extends AbstractController
         $eventRepository->commit();
 
         return $this->returnSuccess(['id' => $event->getId()]);
+    }
+
+    /**
+     * @throws JsonException
+     * @throws ReflectionException
+     * @throws SaveError
+     */
+    #[CheckPermission(Permission::WRITE)]
+    public function copy(
+        ModelManager $modelManager,
+        #[GetModel] Event $event
+    ): AjaxResponse {
+        $event
+            ->setId(null)
+            ->setName(sprintf('%s - Kopie', $event->getName()))
+        ;
+
+        foreach ($event->getElements() as $element) {
+            $this->removeElementIds($element);
+        }
+
+        foreach ($event->getTriggers() as $trigger) {
+            $trigger->setId(null);
+        }
+
+        foreach ($event->getTags() as $tag) {
+            $tag->setId(null);
+        }
+
+        $modelManager->save($event);
+
+        return $this->returnSuccess($event);
+    }
+
+    private function removeElementIds(Element $element): void
+    {
+        $element->setId(null);
+
+        foreach ($element->getChildren() as $child) {
+            $this->removeElementIds($child);
+        }
     }
 
     /**
