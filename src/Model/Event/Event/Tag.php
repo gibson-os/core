@@ -33,7 +33,7 @@ class Tag extends AbstractModel implements JsonSerializable
     private int $tagId;
 
     #[Constraint]
-    protected Event $events;
+    protected Event $event;
 
     #[Constraint]
     protected EventTag $tag;

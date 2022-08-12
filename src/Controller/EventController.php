@@ -7,6 +7,7 @@ use Exception;
 use GibsonOS\Core\Attribute\CheckPermission;
 use GibsonOS\Core\Attribute\GetMappedModel;
 use GibsonOS\Core\Attribute\GetModel;
+use GibsonOS\Core\Attribute\GetModels;
 use GibsonOS\Core\Exception\DateTimeError;
 use GibsonOS\Core\Exception\EventException;
 use GibsonOS\Core\Exception\FactoryError;
@@ -17,6 +18,8 @@ use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Manager\ModelManager;
 use GibsonOS\Core\Model\Event;
 use GibsonOS\Core\Model\Event\Element;
+use GibsonOS\Core\Model\Event\Event\Tag;
+use GibsonOS\Core\Model\Event\Trigger;
 use GibsonOS\Core\Model\User\Permission;
 use GibsonOS\Core\Repository\EventRepository;
 use GibsonOS\Core\Service\EventService;
@@ -28,6 +31,7 @@ use GibsonOS\Core\Store\Event\MethodStore;
 use GibsonOS\Core\Store\Event\TriggerStore;
 use GibsonOS\Core\Store\EventStore;
 use JsonException;
+use mysqlDatabase;
 use ReflectionException;
 
 class EventController extends AbstractController
@@ -149,44 +153,69 @@ class EventController extends AbstractController
     }
 
     /**
+     * @param Event[] $events
+     *
      * @throws JsonException
      * @throws ReflectionException
      * @throws SaveError
      */
     #[CheckPermission(Permission::WRITE)]
     public function copy(
+        mysqlDatabase $database,
         ModelManager $modelManager,
-        #[GetModel] Event $event
+        #[GetModels(Event::class)] array $events
     ): AjaxResponse {
-        $event
-            ->setId(null)
-            ->setName(sprintf('%s - Kopie', $event->getName()))
-        ;
+        $database->startTransaction();
 
-        foreach ($event->getElements() as $element) {
-            $this->removeElementIds($element);
+        try {
+            foreach ($events as $event) {
+                $elements = $event->getElements();
+                $triggers = $event->getTriggers();
+                $tags = $event->getTags();
+
+                $event
+                    ->setId(null)
+                    ->setName(sprintf('%s - Kopie', $event->getName()))
+                    ->setActive(false)
+                ;
+                $modelManager->save($event);
+
+                $event
+                    ->setElements($this->removeElementIds($elements))
+                    ->setTriggers(array_map(
+                        fn (Trigger $trigger): Trigger => $trigger->setId(null),
+                        $triggers
+                    ))
+                    ->setTags(array_map(
+                        fn (Tag $tag): Tag => $tag->setId(null),
+                        $tags
+                    ))
+                ;
+
+                $modelManager->save($event);
+            }
+        } catch (Exception $exception) {
+            $database->rollback();
+
+            throw $exception;
         }
 
-        foreach ($event->getTriggers() as $trigger) {
-            $trigger->setId(null);
-        }
+        $database->commit();
 
-        foreach ($event->getTags() as $tag) {
-            $tag->setId(null);
-        }
-
-        $modelManager->save($event);
-
-        return $this->returnSuccess($event);
+        return $this->returnSuccess($events[0]->getElements());
     }
 
-    private function removeElementIds(Element $element): void
+    /**
+     * @param Element[] $elements
+     */
+    private function removeElementIds(array $elements): array
     {
-        $element->setId(null);
-
-        foreach ($element->getChildren() as $child) {
-            $this->removeElementIds($child);
-        }
+        return array_map(
+            fn (Element $element): Element => $element
+                ->setId(null)
+                ->setChildren($this->removeElementIds($element->getChildren())),
+            $elements
+        );
     }
 
     /**
@@ -195,6 +224,7 @@ class EventController extends AbstractController
      * @throws JsonException
      * @throws SaveError
      * @throws EventException
+     * @throws ReflectionException
      */
     #[CheckPermission(Permission::WRITE)]
     public function run(EventService $eventService, #[GetModel(['id' => 'eventId'])] Event $event): AjaxResponse

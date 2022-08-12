@@ -134,26 +134,27 @@ abstract class AbstractModel implements ModelInterface
 
             /** @var mysqlField $fieldObject */
             $fieldObject = $mysqlTable->{$field};
+            $value = $fieldObject->getValue();
 
-            if ($fieldObject->getValue() === null) {
-                $this->$setter($fieldObject->getValue());
+            if ($value === null) {
+                $this->$setter($value);
             } else {
                 switch ($this->getColumnType($fieldObject->getType())) {
                     case self::TYPE_INT:
                         try {
-                            $this->$setter((int) $fieldObject->getValue());
+                            $this->$setter((int) $value);
                         } catch (Throwable) {
-                            $this->$setter((bool) $fieldObject->getValue());
+                            $this->$setter((bool) $value);
                         }
 
                         break;
                     case self::TYPE_FLOAT:
-                        $this->$setter((float) $fieldObject->getValue());
+                        $this->$setter((float) $value);
 
                         break;
                     case self::TYPE_DATE_TIME:
                         $this->$setter($this->dateTime->get(
-                            strtoupper((string) $fieldObject->getValue()) === 'CURRENT_TIMESTAMP()' ? 'now' : (string) $fieldObject->getValue()
+                            strtoupper((string) $value) === 'CURRENT_TIMESTAMP()' ? 'now' : (string) $value
                         ));
 
                         break;
@@ -166,7 +167,7 @@ abstract class AbstractModel implements ModelInterface
                         $typeName = $reflectionParameter->getType()?->getName();
 
                         if ($typeName === 'array') {
-                            $this->$setter(JsonUtility::decode((string) $fieldObject->getValue()));
+                            $this->$setter(JsonUtility::decode((string) $value));
 
                             break;
                         }
@@ -181,7 +182,7 @@ abstract class AbstractModel implements ModelInterface
                             break;
                         }
 
-                        $this->$setter($fieldObject->getValue());
+                        $this->$setter($value);
 
                         break;
                 }

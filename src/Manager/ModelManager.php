@@ -192,26 +192,27 @@ class ModelManager
 
             /** @var mysqlField $fieldObject */
             $fieldObject = $mysqlTable->{$field};
+            $value = $fieldObject->getValue();
 
-            if ($fieldObject->getValue() === null) {
-                $model->$setter($fieldObject->getValue());
+            if ($value === null) {
+                $model->$setter($value);
             } else {
                 switch ($this->getColumnType($fieldObject->getType())) {
                     case self::TYPE_INT:
                         try {
-                            $model->$setter((int) $fieldObject->getValue());
+                            $model->$setter((int) $value);
                         } catch (Throwable) {
-                            $model->$setter((bool) $fieldObject->getValue());
+                            $model->$setter((bool) $value);
                         }
 
                         break;
                     case self::TYPE_FLOAT:
-                        $model->$setter((float) $fieldObject->getValue());
+                        $model->$setter((float) $value);
 
                         break;
                     case self::TYPE_DATE_TIME:
                         $model->$setter($this->dateTimeService->get(
-                            strtoupper((string) $fieldObject->getValue()) === 'CURRENT_TIMESTAMP()' ? 'now' : (string) $fieldObject->getValue()
+                            strtoupper((string) $value) === 'CURRENT_TIMESTAMP()' ? 'now' : (string) $value
                         ));
 
                         break;
@@ -224,7 +225,7 @@ class ModelManager
                         $typeName = $reflectionParameter->getType()?->getName();
 
                         if ($typeName === 'array') {
-                            $model->$setter($this->jsonUtility->decode((string) $fieldObject->getValue()));
+                            $model->$setter($this->jsonUtility->decode((string) $value));
 
                             break;
                         }
@@ -239,7 +240,7 @@ class ModelManager
                             break;
                         }
 
-                        $model->$setter($fieldObject->getValue());
+                        $model->$setter($value);
 
                         break;
                 }

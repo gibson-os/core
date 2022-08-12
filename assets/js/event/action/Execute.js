@@ -1,10 +1,6 @@
 GibsonOS.define('GibsonOS.event.action.Execute', {
     init: (component) => {
         component.addAction({
-            xtype: 'tbseparator',
-            addToContainerContextMenu: false,
-        });
-        component.addAction({
             iconCls: 'icon_system system_play',
             text: 'Ausführen',
             selectionNeeded: true,

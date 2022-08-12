@@ -7,6 +7,7 @@ use GibsonOS\Core\Attribute\AttributeInterface;
 use GibsonOS\Core\Attribute\GetModels;
 use GibsonOS\Core\Exception\MapperException;
 use GibsonOS\Core\Exception\Repository\SelectError;
+use GibsonOS\Core\Manager\ModelManager;
 use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Model\ModelInterface;
@@ -22,6 +23,7 @@ class ModelsFetcherAttribute implements AttributeServiceInterface, ParameterAttr
 {
     public function __construct(
         private readonly mysqlDatabase $mysqlDatabase,
+        private readonly ModelManager $modelManager,
         private readonly ReflectionManager $reflectionManager,
         private readonly SessionService $sessionService,
         private readonly ObjectMapperAttribute $objectMapperAttribute
@@ -110,7 +112,7 @@ class ModelsFetcherAttribute implements AttributeServiceInterface, ParameterAttr
         $models = [];
 
         do {
-            $model->loadFromMysqlTable($table);
+            $this->modelManager->loadFromMysqlTable($table, $model);
             $models[] = $model;
             /** @var AbstractModel $model */
             $model = new $modelClassName();

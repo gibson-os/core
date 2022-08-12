@@ -31,6 +31,10 @@ Ext.define('GibsonOS.module.core.event.Panel', {
 
         me.callParent();
 
+        me.addAction({
+            xtype: 'tbseparator',
+            addToContainerContextMenu: false,
+        });
         GibsonOS.event.action.Execute.init(me);
     },
     addFunction: function() {

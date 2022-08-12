@@ -7,6 +7,7 @@ use GibsonOS\Core\Dto\Parameter\AbstractParameter;
 use GibsonOS\Core\Exception\FactoryError;
 use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\Repository\SelectError;
+use GibsonOS\Core\Manager\ModelManager;
 use GibsonOS\Core\Model\Event;
 use GibsonOS\Core\Model\Event\Trigger;
 use GibsonOS\Core\Store\AbstractDatabaseStore;
@@ -19,8 +20,9 @@ class TriggerStore extends AbstractDatabaseStore
     private Event $event;
 
     public function __construct(
-        private ClassTriggerStore $classTriggerStore,
-        private ClassNameStore $classNameStore,
+        private readonly ClassTriggerStore $classTriggerStore,
+        private readonly ClassNameStore $classNameStore,
+        private readonly ModelManager $modelManager,
         mysqlDatabase $database = null
     ) {
         parent::__construct($database);
@@ -63,7 +65,7 @@ class TriggerStore extends AbstractDatabaseStore
 
         do {
             $model = new Trigger();
-            $model->loadFromMysqlTable($this->table);
+            $this->modelManager->loadFromMysqlTable($this->table, $model);
 
             foreach ($classNames as $className) {
                 if ($className['className'] === $model->getClass()) {

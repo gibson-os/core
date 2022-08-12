@@ -9,6 +9,33 @@ Ext.define('GibsonOS.module.core.event.Grid', {
 
         me.callParent();
 
+        me.addAction({
+            xtype: 'tbseparator',
+            addToContainerContextMenu: false,
+        });
+        me.addAction({
+            iconCls: 'icon_system system_copy',
+            selectionNeeded: true,
+            handler() {
+                me.setLoading(true);
+
+                let events = [];
+
+                Ext.iterate(me.getSelectionModel().getSelection(), (event) => {
+                    events.push({id: event.get('id')});
+                })
+
+                GibsonOS.Ajax.request({
+                    url: baseDir + 'core/event/copy',
+                    params: {
+                        events: Ext.encode(events)
+                    },
+                    callback: function() {
+                        me.setLoading(false);
+                    }
+                });
+            }
+        });
         GibsonOS.event.action.Execute.init(me);
     },
     addFunction: function() {

@@ -12,6 +12,11 @@ class EventStore extends AbstractDatabaseStore
         return Event::class;
     }
 
+    protected function getDefaultOrder(): string
+    {
+        return '`name`';
+    }
+
     protected function getOrderMapping(): array
     {
         return [

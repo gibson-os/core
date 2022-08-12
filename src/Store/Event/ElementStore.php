@@ -7,6 +7,7 @@ use GibsonOS\Core\Dto\Parameter\AbstractParameter;
 use GibsonOS\Core\Exception\FactoryError;
 use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\Repository\SelectError;
+use GibsonOS\Core\Manager\ModelManager;
 use GibsonOS\Core\Model\Event;
 use GibsonOS\Core\Model\Event\Element;
 use GibsonOS\Core\Store\AbstractDatabaseStore;
@@ -17,8 +18,9 @@ use ReflectionException;
 class ElementStore extends AbstractDatabaseStore
 {
     public function __construct(
-        private ClassNameStore $classNameStore,
-        private MethodStore $methodStore,
+        private readonly ClassNameStore $classNameStore,
+        private readonly MethodStore $methodStore,
+        private readonly ModelManager $modelManager,
         mysqlDatabase $database = null
     ) {
         parent::__construct($database);
@@ -71,7 +73,7 @@ class ElementStore extends AbstractDatabaseStore
 
         do {
             $element = new Element();
-            $element->loadFromMysqlTable($this->table);
+            $this->modelManager->loadFromMysqlTable($this->table, $element);
             $element->setChildren([]);
             $models[$element->getId() ?? 0] = $element;
             $parentId = $element->getParentId();

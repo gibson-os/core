@@ -5,21 +5,27 @@ namespace GibsonOS\Core\Repository\Weather;
 
 use GibsonOS\Core\Attribute\GetTableName;
 use GibsonOS\Core\Exception\Repository\SelectError;
+use GibsonOS\Core\Manager\ModelManager;
 use GibsonOS\Core\Model\Weather\Location;
 use GibsonOS\Core\Repository\AbstractRepository;
 use GibsonOS\Core\Service\DateTimeService;
+use JsonException;
 use Psr\Log\LoggerInterface;
+use ReflectionException;
 
 class LocationRepository extends AbstractRepository
 {
     public function __construct(
-        private DateTimeService $dateTimeService,
-        private LoggerInterface $logger,
-        #[GetTableName(Location::class)] private string $locationTableName
+        private readonly DateTimeService $dateTimeService,
+        private readonly LoggerInterface $logger,
+        private readonly ModelManager $modelManager,
+        #[GetTableName(Location::class)] private readonly string $locationTableName
     ) {
     }
 
     /**
+     * @throws JsonException
+     * @throws ReflectionException
      * @throws SelectError
      */
     public function getById(int $id): Location
@@ -35,11 +41,15 @@ class LocationRepository extends AbstractRepository
         }
 
         $location = new Location();
-        $location->loadFromMysqlTable($table);
+        $this->modelManager->loadFromMysqlTable($table, $location);
 
         return $location;
     }
 
+    /**
+     * @throws JsonException
+     * @throws ReflectionException
+     */
     public function findByName(string $name, bool $onlyActive): array
     {
         $this->logger->debug(sprintf('Find weather location with name %d', $name));
@@ -64,7 +74,7 @@ class LocationRepository extends AbstractRepository
 
         do {
             $model = new Location();
-            $model->loadFromMysqlTable($table);
+            $this->modelManager->loadFromMysqlTable($table, $model);
             $models[] = $model;
         } while ($table->next());
 
@@ -91,7 +101,7 @@ class LocationRepository extends AbstractRepository
 
         do {
             $location = new Location();
-            $location->loadFromMysqlTable($table);
+            $this->modelManager->loadFromMysqlTable($table, $location);
             $locations[] = $location;
         } while ($table->next());
 
