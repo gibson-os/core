@@ -24,7 +24,6 @@
       <excludeFolder url="file://$MODULE_DIR$/vendor/netresearch/jsonmapper" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/openlss/lib-array2xml" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/phar-io/version" />
-      <excludeFolder url="file://$MODULE_DIR$/vendor/php-cs-fixer/diff" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/php-mock/php-mock" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/php-mock/php-mock-integration" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/php-mock/php-mock-phpunit" />

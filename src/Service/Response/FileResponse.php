@@ -72,10 +72,11 @@ class FileResponse implements ResponseInterface
         ];
 
         if (!empty($this->disposition)) {
+            $filename = mb_substr($this->filename, (mb_strrpos($this->filename, DIRECTORY_SEPARATOR) ?: -1) + 1);
             $headers['Content-Disposition'] =
                 $this->disposition . '; ' .
-                'filename*=UTF-8\'\'' . rawurlencode($this->filename) . ' ' .
-                'filename="' . rawurlencode($this->filename) . '"'
+                'filename*=UTF-8\'\'' . rawurlencode($filename) . ' ' .
+                'filename="' . rawurlencode($filename) . '"'
             ;
         }
 

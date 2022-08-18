@@ -10,7 +10,7 @@ use GibsonOS\Core\Service\Attribute\ServiceAttribute;
 class GetServices implements AttributeInterface
 {
     /**
-     * @param class-string $instanceOf
+     * @param class-string|null $instanceOf
      */
     public function __construct(private array $dirs, private ?string $instanceOf, private bool $runAttributes = true)
     {
