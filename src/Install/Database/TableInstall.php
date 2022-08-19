@@ -131,7 +131,7 @@ class TableInstall extends AbstractInstall implements PriorityInterface
                         $columnAttribute->isAutoIncrement()
                             ? false
                             : ($columnAttribute->isNullable() === null
-                                ? $this->reflectionManager->allowsNul($reflectionProperty)
+                                ? $this->reflectionManager->allowsNull($reflectionProperty)
                                 : $columnAttribute->isNullable())
                     )
                     ->setDefault(

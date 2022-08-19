@@ -20,7 +20,6 @@ use JsonException;
 use ReflectionAttribute;
 use ReflectionException;
 use ReflectionParameter;
-use ReflectionProperty;
 
 class ModelsMapperAttribute implements AttributeServiceInterface, ParameterAttributeInterface
 {
@@ -119,6 +118,14 @@ class ModelsMapperAttribute implements AttributeServiceInterface, ParameterAttri
                     $typeName === 'array' ? $values : [$reflectionProperty->getName() => $values]
                 );
                 $setter = 'set' . ucfirst($reflectionProperty->getName());
+
+                if (
+                    reset($values) === null &&
+                    !$this->reflectionManager->allowsNull($reflectionProperty)
+                ) {
+                    continue;
+                }
+
                 $model->$setter($typeName === 'array' ? $values : reset($values));
             }
 
@@ -126,61 +133,5 @@ class ModelsMapperAttribute implements AttributeServiceInterface, ParameterAttri
         }
 
         return $models;
-    }
-
-    /**
-     * @throws MapperException
-     * @throws ReflectionException
-     */
-    private function getValues(
-        GetMappedModels $attribute,
-        ReflectionProperty $reflectionProperty,
-        array $requestValues
-    ): array {
-        $values = [];
-
-        foreach ($requestValues as $requestValue) {
-            array_push(
-                $values,
-                $this->getValuesForModel($attribute, $reflectionProperty, $requestValue)
-            );
-        }
-
-        return $values;
-    }
-
-    /**
-     * @throws ReflectionException
-     */
-    private function getValuesForModel(
-        GetMappedModels $attribute,
-        ReflectionProperty $reflectionProperty,
-        array $requestValue
-    ): mixed {
-        $mappingKey = $this->objectMapperAttribute->getMappingKey($attribute, $reflectionProperty);
-        $conditionParts = explode('.', $mappingKey);
-        $count = count($conditionParts);
-
-        if ($count === 1) {
-            return $requestValue[$mappingKey] ?? $reflectionProperty->getDefaultValue();
-        }
-
-        if ($conditionParts[0] === 'session') {
-            $value = $this->sessionService->get($conditionParts[1]);
-
-            if ($count < 3) {
-                return $value;
-            }
-
-            if (is_object($value)) {
-                return $this->reflectionManager->getProperty(
-                    $reflectionProperty,
-                    $value
-                );
-            }
-        }
-
-        // Muss noch aufgebohrt werden
-        return null;
     }
 }

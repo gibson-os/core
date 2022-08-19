@@ -13,6 +13,7 @@ use ReflectionMethod;
 use ReflectionNamedType;
 use ReflectionParameter;
 use ReflectionProperty;
+use Throwable;
 
 class ReflectionManager
 {
@@ -290,7 +291,7 @@ class ReflectionManager
         return false;
     }
 
-    public function allowsNul(ReflectionProperty|ReflectionParameter $reflectionObject): bool
+    public function allowsNull(ReflectionProperty|ReflectionParameter $reflectionObject): bool
     {
         return $reflectionObject->getType()?->allowsNull() ?? false;
     }
@@ -314,13 +315,21 @@ class ReflectionManager
         $typeName = $this->getTypeName($reflectionObject);
 
         if ($typeName !== null && class_exists($typeName) && enum_exists($typeName)) {
-            $reflectionEnum = $this->getReflectionEnum($typeName);
+            if (is_array($value)) {
+                throw new ReflectionException(sprintf('Enum %s does not allow arrays!', $typeName));
+            }
 
-            return $typeName::from(match ((string) $reflectionEnum->getBackingType()) {
-                'string' => (string) $value,
-                'int' => (int) $value,
-                'float' => (float) $value,
-            });
+            try {
+                return constant(sprintf('%s::%s', $typeName, (string) $value));
+            } catch (Throwable) {
+                $reflectionEnum = $this->getReflectionEnum($typeName);
+
+                return $typeName::from(match ((string) $reflectionEnum->getBackingType()) {
+                    'string' => (string) $value,
+                    'int' => (int) $value,
+                    'float' => (float) $value,
+                });
+            }
         }
 
         return match ($typeName) {

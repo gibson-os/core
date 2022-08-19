@@ -133,6 +133,13 @@ class ModelMapperAttribute extends ObjectMapperAttribute
                 );
             }
 
+            if (
+                $values === null &&
+                !$this->reflectionManager->allowsNull($reflectionProperty)
+            ) {
+                continue;
+            }
+
             $model->$setter(is_array($values) ? ($typeName === 'array' ? $values : reset($values)) : $values);
         }
 

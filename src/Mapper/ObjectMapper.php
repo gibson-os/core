@@ -13,6 +13,7 @@ use JsonException;
 use ReflectionException;
 use ReflectionParameter;
 use ReflectionProperty;
+use Throwable;
 
 class ObjectMapper implements ObjectMapperInterface
 {
@@ -148,13 +149,17 @@ class ObjectMapper implements ObjectMapperInterface
                     return null;
                 }
 
-                $enumReflection = $this->reflectionManager->getReflectionEnum($typeName);
+                try {
+                    return constant(sprintf('%s::%s', $typeName, (string) $values));
+                } catch (Throwable) {
+                    $enumReflection = $this->reflectionManager->getReflectionEnum($typeName);
 
-                return $typeName::from(match ((string) $enumReflection->getBackingType()) {
-                    'string' => (string) $values,
-                    'int' => (int) $values,
-                    'float' => (float) $values,
-                });
+                    return $typeName::from(match ((string) $enumReflection->getBackingType()) {
+                        'string' => (string) $values,
+                        'int' => (int) $values,
+                        'float' => (float) $values,
+                    });
+                }
             }
 
             return $mapper->mapToObject(
