@@ -19,10 +19,10 @@ class TimeEvent extends AbstractEvent
     #[Event\Trigger('Zeitgesteuert')]
     public const TRIGGER_CRONJOB = 'cronjob';
 
-    #[Event\Trigger('Sonnenaufgang')]
+    #[Event\Trigger('Sonnenuntergang')]
     public const TRIGGER_SUNSET = 'sunset';
 
-    #[Event\Trigger('Sonnenuntergang')]
+    #[Event\Trigger('Sonnenaufgang')]
     public const TRIGGER_SUNRISE = 'sunrise';
 
     public function __construct(
