@@ -11,7 +11,7 @@ class IntParameter extends AbstractParameter
 
     public function __construct(string $title)
     {
-        parent::__construct($title, 'gosFormNumberfield');
+        parent::__construct($title, 'gosCoreComponentFormFieldNumberField');
     }
 
     public function setRange(?int $min, int $max = null): IntParameter
