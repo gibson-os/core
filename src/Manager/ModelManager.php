@@ -66,6 +66,33 @@ class ModelManager
     }
 
     /**
+     * @throws SaveError
+     */
+    public function saveWithoutChildren(ModelInterface $model): void
+    {
+        try {
+            $mysqlTable = $this->setToMysqlTable($model);
+            $mysqlTable->save();
+        } catch (Exception $exception) {
+            $exception = new SaveError($exception->getMessage(), 0, $exception);
+            $exception->setModel($model);
+
+            throw $exception;
+        }
+
+        $mysqlTable->getReplacedRecord();
+
+        try {
+            $this->loadFromMysqlTable($mysqlTable, $model);
+        } catch (JsonException|ReflectionException $exception) {
+            $exception = new SaveError($exception->getMessage(), 0, $exception);
+            $exception->setModel($model);
+
+            throw $exception;
+        }
+    }
+
+    /**
      * @throws JsonException
      * @throws ReflectionException
      * @throws SaveError
@@ -110,29 +137,9 @@ class ModelManager
             );
         }
 
-        $mysqlTable = $this->setToMysqlTable($model);
-
         try {
-            $mysqlTable->save();
-        } catch (Exception $exception) {
-            $exception = new SaveError($exception->getMessage(), 0, $exception);
-            $exception->setModel($model);
-
-            if ($newTransaction) {
-                $this->mysqlDatabase->commit();
-            }
-
-            throw $exception;
-        }
-
-        $mysqlTable->getReplacedRecord();
-
-        try {
-            $this->loadFromMysqlTable($mysqlTable, $model);
-        } catch (JsonException|ReflectionException $exception) {
-            $exception = new SaveError($exception->getMessage(), 0, $exception);
-            $exception->setModel($model);
-
+            $this->saveWithoutChildren($model);
+        } catch (SaveError $exception) {
             if ($newTransaction) {
                 $this->mysqlDatabase->commit();
             }
