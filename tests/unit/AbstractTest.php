@@ -43,6 +43,7 @@ class AbstractTest extends Unit
         mysqlRegistry::getInstance()->set('database', $this->database->reveal());
         $this->modelManager = $this->prophesize(ModelManager::class);
         $this->modelManager->save(Argument::any())->shouldNotBeCalled();
+        $this->modelManager->saveWithoutChildren(Argument::any())->shouldNotBeCalled();
         $this->modelManager->delete(Argument::any())->shouldNotBeCalled();
         $this->requestService = $this->prophesize(RequestService::class);
         $this->requestService->getRequestValue(Argument::any())->willThrow(RequestError::class);
