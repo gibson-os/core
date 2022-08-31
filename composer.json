@@ -14,7 +14,7 @@
     "ext-curl": "*",
     "ext-openssl": "*",
     "google/auth": "^1.18",
-    "tecnickcom/tcpdf": "^6.3"
+    "smalot/pdfparser": "^2.2"
   },
   "require-dev": {
     "codeception/codeception": "^4.0",
