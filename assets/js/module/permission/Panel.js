@@ -3,9 +3,8 @@ Ext.define('GibsonOS.module.core.module.permission.Panel', {
     alias: ['widget.gosModuleCoreModulePermissionPanel'],
     itemId: 'coreModulePermissionPanel',
     layout: 'border',
-
-    initComponent: function() {
-        var me = this;
+    initComponent() {
+        const me = this;
 
         me.items = [{
             region: 'north',

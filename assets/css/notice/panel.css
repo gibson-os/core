@@ -1,0 +1,22 @@
+.notice {
+    height: 100%;
+    padding: 5px;
+}
+
+.noticeError {
+    background-color: #F00;
+    color: #FFF;
+}
+
+.noticeWarning {
+    background-color: #FF0;
+}
+
+.noticeSuccess {
+    background-color: #0F0;
+}
+
+.noticeIcon {
+    width: 32px;
+    float: left;
+}
