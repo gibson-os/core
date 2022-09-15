@@ -30,14 +30,14 @@ use Throwable;
 class ControllerService
 {
     public function __construct(
-        private ServiceManager $serviceManagerService,
-        private RequestService $requestService,
-        private StatusCode $statusCode,
-        private TwigService $twigService,
-        private EnvService $envService,
-        private AttributeService $attributeService,
-        private ObjectMapperAttribute $objectMapperAttribute,
-        private ReflectionManager $reflectionManager
+        private readonly ServiceManager $serviceManagerService,
+        private readonly RequestService $requestService,
+        private readonly StatusCode $statusCode,
+        private readonly TwigService $twigService,
+        private readonly EnvService $envService,
+        private readonly AttributeService $attributeService,
+        private readonly ObjectMapperAttribute $objectMapperAttribute,
+        private readonly ReflectionManager $reflectionManager,
     ) {
     }
 
@@ -260,12 +260,35 @@ class ControllerService
                 $parameterType instanceof ReflectionNamedType &&
                 !$parameterType->isBuiltin()
             ) {
+                $typeName = $parameterType->getName();
+
+                if (enum_exists($typeName)) {
+                    $value = $this->objectMapperAttribute->getParameterFromRequest($reflectionParameter);
+
+                    try {
+                        $parameters[$name] = $value === null || is_object($value) || is_array($value)
+                            ? null
+                            : constant(sprintf('%s::%s', $typeName, (string) $value))
+                        ;
+                    } catch (Throwable) {
+                        $enumReflection = $this->reflectionManager->getReflectionEnum($typeName);
+
+                        $parameters[$name] = $typeName::from(match ((string) $enumReflection->getBackingType()) {
+                            'string' => (string) $values,
+                            'int' => (int) $values,
+                            'float' => (float) $values,
+                        });
+                    }
+
+                    continue;
+                }
+
                 try {
-                    $parameters[$name] = $this->serviceManagerService->get($parameterType->getName());
+                    $parameters[$name] = $this->serviceManagerService->get($typeName);
                 } catch (FactoryError $e) {
                     throw new ControllerError(sprintf(
                         'Class %s of parameter $%s for %s::%s not found!',
-                        $parameterType->getName(),
+                        $typeName,
                         $name,
                         $reflectionMethod->getDeclaringClass()->getName(),
                         $reflectionMethod->getName()
