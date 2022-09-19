@@ -117,7 +117,9 @@ Ext.define('GibsonOS.module.core.component.form.Panel', {
     addButtons(buttons) {
         const me = this;
 
-        me.down('#buttons').add(buttons);
+        Ext.iterate(buttons, (name, button) => {
+            me.addButton(name, button);
+        });
     },
     addField(name, parameter) {
         const me = this;

@@ -8,18 +8,12 @@ use JsonSerializable;
 class Button implements JsonSerializable
 {
     public function __construct(
-        private readonly string $name,
         private readonly string $text,
         private readonly ?string $module = null,
         private readonly ?string $task = null,
         private readonly ?string $action = null,
         private readonly array $parameters = [],
     ) {
-    }
-
-    public function getName(): string
-    {
-        return $this->name;
     }
 
     public function getText(): string
@@ -50,7 +44,6 @@ class Button implements JsonSerializable
     public function jsonSerialize(): array
     {
         return [
-            'name' => $this->getName(),
             'text' => $this->getText(),
             'module' => $this->getModule(),
             'task' => $this->getTask(),

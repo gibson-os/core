@@ -4,12 +4,8 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Form;
 
 use GibsonOS\Core\Dto\Parameter\AbstractParameter;
-use GibsonOS\Core\Exception\FactoryError;
 use GibsonOS\Core\Exception\FormException;
-use GibsonOS\Core\Exception\MapperException;
 use GibsonOS\Core\Model\ModelInterface;
-use JsonException;
-use ReflectionException;
 
 /**
  * @template T of ModelInterface
@@ -30,8 +26,12 @@ abstract class AbstractModelForm extends AbstractForm
      *
      * @throws FormException
      */
-    public function setData(ModelInterface $data): void
+    public function setModel(ModelInterface $model): self
     {
+        $this->model = $model;
+
+        return $this;
+
         $modelClassName = $this->getModelClassName();
 
         if ($data::class !== $modelClassName) {
@@ -61,19 +61,48 @@ abstract class AbstractModelForm extends AbstractForm
     }
 
     /**
-     * @throws FactoryError
-     * @throws MapperException
-     * @throws JsonException
-     * @throws ReflectionException
+     * @throws FormException
      */
-    public function getData(): ModelInterface
+    public function getForm(): array
     {
-        $modelClassName = $this->getModelClassName();
-        $model = $this->model ?? new $modelClassName();
+        $fields = $this->getFields();
 
-        $data = array_map(fn (AbstractParameter $field) => $field->getValue(), $this->fields);
-        $this->modelMapper->setObjectValues($model, $data);
+        if ($this->model !== null) {
+            foreach ($fields as $name => $field) {
+                $this->setFieldValue($field, $name);
+            }
+        }
 
-        return $model;
+        return [
+            'fields' => $fields,
+            'buttons' => $this->getButtons(),
+        ];
+    }
+
+    /**
+     * @throws FormException
+     */
+    private function setFieldValue(AbstractParameter $field, string $name): void
+    {
+        if ($this->model === null) {
+            return;
+        }
+
+        $propertyName = ucfirst($name);
+        $getterPrefix = null;
+
+        foreach (self::POSSIBLE_PREFIXES as $possiblePrefix) {
+            if (method_exists($this->model, $possiblePrefix . $propertyName)) {
+                $getterPrefix = $possiblePrefix;
+
+                break;
+            }
+        }
+
+        if ($getterPrefix === null) {
+            throw new FormException(sprintf('No getter found for %s n %s!', $name, $this->getModelClassName()));
+        }
+
+        $field->setValue($this->model->{$getterPrefix . $propertyName}());
     }
 }
