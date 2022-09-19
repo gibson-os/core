@@ -17,6 +17,15 @@ Ext.define('GibsonOS.module.core.component.form.Panel', {
         let me = this;
 
         me = GibsonOS.decorator.Panel.init(me);
+        me.dockedItems = [{
+            xtype: 'toolbar',
+            dock: 'bottom',
+            ui: 'footer',
+            itemId: 'buttons',
+            defaults: {
+                minWidth: me.minButtonWidth
+            }
+        }];
 
         me.callParent();
 
@@ -57,11 +66,58 @@ Ext.define('GibsonOS.module.core.component.form.Panel', {
             url: url,
             params: params,
             success(response) {
+                const data = Ext.decode(response.responseText).data;
+                const buttons = me.down('#buttons');
+
                 me.removeAll();
-                me.addFields(Ext.decode(response.responseText).data.fields);
+                buttons.removeAll();
+                buttons.add({
+                    xtype: 'component',
+                    flex: 1
+                });
+                me.addFields(data.fields);
+                me.addButtons(data.buttons);
+                buttons.add({
+                    xtype: 'component',
+                    flex: 1
+                });
                 me.setLoading(false);
             }
         });
+    },
+    addButton(name, button) {
+        const me = this;
+
+        me.down('#buttons').add({
+            text: button.text,
+            handler() {
+                if (button.module === null) {
+                    return;
+                }
+
+                me.setLoading(true);
+
+                const form = me.getForm();
+
+                form.submit({
+                    xtype: 'gosFormActionAction',
+                    itemId: name,
+                    url: baseDir + button.module + '/' + button.task + '/' + button.action,
+                    params: button.parameters,
+                    failure() {
+                        me.setLoading(false);
+                    },
+                    success() {
+                        me.setLoading(false);
+                    }
+                });
+            }
+        });
+    },
+    addButtons(buttons) {
+        const me = this;
+
+        me.down('#buttons').add(buttons);
     },
     addField(name, parameter) {
         const me = this;
