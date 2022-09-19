@@ -51,6 +51,8 @@ class ModelManager
         'decimal' => self::TYPE_FLOAT,
     ];
 
+    private const POSSIBLE_PREFIXES = ['get', 'is', 'has', 'should'];
+
     /**
      * @var array<class-string, PrimaryColumn[]>
      */
@@ -264,10 +266,9 @@ class ModelManager
 
         foreach ($mysqlTable->fields as $field) {
             $fieldName = $this->transformFieldName($field);
-            $possiblePrefixes = ['get', 'is', 'has', 'should'];
             $getterPrefix = null;
 
-            foreach ($possiblePrefixes as $possiblePrefix) {
+            foreach (self::POSSIBLE_PREFIXES as $possiblePrefix) {
                 if (method_exists($model, $possiblePrefix . $fieldName)) {
                     $getterPrefix = $possiblePrefix;
 
