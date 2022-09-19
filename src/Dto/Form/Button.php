@@ -9,7 +9,9 @@ class Button implements JsonSerializable
 {
     public function __construct(
         private readonly string $text,
-        private readonly ?string $url = null,
+        private readonly ?string $module = null,
+        private readonly ?string $task = null,
+        private readonly ?string $action = null,
         private readonly array $parameters = [],
     ) {
     }
@@ -19,9 +21,19 @@ class Button implements JsonSerializable
         return $this->text;
     }
 
-    public function getUrl(): ?string
+    public function getModule(): ?string
     {
-        return $this->url;
+        return $this->module;
+    }
+
+    public function getTask(): ?string
+    {
+        return $this->task;
+    }
+
+    public function getAction(): ?string
+    {
+        return $this->action;
     }
 
     public function getParameters(): array
@@ -33,7 +45,9 @@ class Button implements JsonSerializable
     {
         return [
             'text' => $this->getText(),
-            'url' => $this->getUrl(),
+            'module' => $this->getModule(),
+            'task' => $this->getTask(),
+            'action' => $this->getAction(),
             'parameters' => $this->getParameters(),
         ];
     }
