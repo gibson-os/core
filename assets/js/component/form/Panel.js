@@ -58,7 +58,7 @@ Ext.define('GibsonOS.module.core.component.form.Panel', {
             params: params,
             success(response) {
                 me.removeAll();
-                me.addFields(Ext.decode(response.responseText).data);
+                me.addFields(Ext.decode(response.responseText).data.fields);
                 me.setLoading(false);
             }
         });
