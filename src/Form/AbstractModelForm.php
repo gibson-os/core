@@ -21,43 +21,16 @@ abstract class AbstractModelForm extends AbstractForm
      */
     abstract protected function getModelClassName(): string;
 
-    /**
-     * @param T $data
-     *
-     * @throws FormException
-     */
-    public function setModel(ModelInterface $model): self
+    public function getModel(): ?ModelInterface
+    {
+        return $this->model;
+    }
+
+    public function setModel(?ModelInterface $model): AbstractModelForm
     {
         $this->model = $model;
 
         return $this;
-
-        $modelClassName = $this->getModelClassName();
-
-        if ($data::class !== $modelClassName) {
-            throw new FormException(sprintf('Data %s is no instance of %s!', $data::class, $modelClassName));
-        }
-
-        $this->model = $data;
-
-        foreach ($this->fields as $name => $field) {
-            $propertyName = ucfirst($name);
-            $getterPrefix = null;
-
-            foreach (self::POSSIBLE_PREFIXES as $possiblePrefix) {
-                if (method_exists($data, $possiblePrefix . $propertyName)) {
-                    $getterPrefix = $possiblePrefix;
-
-                    break;
-                }
-            }
-
-            if ($getterPrefix === null) {
-                throw new FormException(sprintf('No getter found for %s n %s!', $name, $data::class));
-            }
-
-            $field->setValue($data->{$getterPrefix . $propertyName}());
-        }
     }
 
     /**

@@ -102,6 +102,11 @@ Ext.define('GibsonOS.module.core.component.form.Panel', {
                 form.submit({
                     xtype: 'gosFormActionAction',
                     itemId: name,
+                    requiredPermission: {
+                        module: button.module,
+                        task: button.task,
+                        action: button.action
+                    },
                     url: baseDir + button.module + '/' + button.task + '/' + button.action,
                     params: button.parameters,
                     failure() {
