@@ -7,19 +7,11 @@ use GibsonOS\Core\Dto\Parameter\AbstractParameter;
 use GibsonOS\Core\Exception\FormException;
 use GibsonOS\Core\Model\ModelInterface;
 
-/**
- * @template T of ModelInterface
- */
 abstract class AbstractModelForm extends AbstractForm
 {
     private const POSSIBLE_PREFIXES = ['get', 'is', 'has', 'should'];
 
     private ?ModelInterface $model = null;
-
-    /**
-     * @return class-string<T>
-     */
-    abstract protected function getModelClassName(): string;
 
     public function getModel(): ?ModelInterface
     {
@@ -73,7 +65,7 @@ abstract class AbstractModelForm extends AbstractForm
         }
 
         if ($getterPrefix === null) {
-            throw new FormException(sprintf('No getter found for %s n %s!', $name, $this->getModelClassName()));
+            throw new FormException(sprintf('No getter found for %s n %s!', $name, $this->model::class));
         }
 
         $field->setValue($this->model->{$getterPrefix . $propertyName}());
