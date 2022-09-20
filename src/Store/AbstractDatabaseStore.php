@@ -50,11 +50,13 @@ abstract class AbstractDatabaseStore extends AbstractStore
         $this->table = new mysqlTable($this->database, $this->tableName);
     }
 
-    public function setLimit(int $rows, int $from): void
+    public function setLimit(int $rows, int $from): self
     {
         parent::setLimit($rows, $from);
 
         $this->table->setLimit($rows, $from);
+
+        return $this;
     }
 
     protected function initTable(): void
@@ -139,10 +141,12 @@ abstract class AbstractDatabaseStore extends AbstractStore
         return [];
     }
 
-    protected function addWhere(string $where, array $parameters = []): void
+    protected function addWhere(string $where, array $parameters = []): self
     {
         $this->wheres[] = $where;
         $this->whereParameters = array_merge($this->whereParameters, $parameters);
+
+        return $this;
     }
 
     protected function setWheres(): void
@@ -158,14 +162,14 @@ abstract class AbstractDatabaseStore extends AbstractStore
         return '(' . implode(') AND (', $this->wheres) . ')';
     }
 
-    public function setSortByExt(array $sort): void
+    public function setSortByExt(array $sort): self
     {
         $mapping = $this->getOrderMapping();
 
         if (count($mapping) === 0) {
             $this->orderBy = null;
 
-            return;
+            return $this;
         }
 
         $orderBy = [];
@@ -189,6 +193,8 @@ abstract class AbstractDatabaseStore extends AbstractStore
         }
 
         $this->orderBy = empty($orderBy) ? null : implode(', ', $orderBy);
+
+        return $this;
     }
 
     protected function getOrderBy(): ?string

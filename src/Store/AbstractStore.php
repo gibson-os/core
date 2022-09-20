@@ -13,10 +13,12 @@ abstract class AbstractStore
 
     abstract public function getCount(): int;
 
-    public function setLimit(int $rows, int $from): void
+    public function setLimit(int $rows, int $from): self
     {
         $this->rows = $rows;
         $this->from = $from;
+
+        return $this;
     }
 
     public function getRows(): int
