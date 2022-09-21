@@ -17,7 +17,12 @@ Ext.define('GibsonOS.module.core.component.form.Panel', {
         let me = this;
 
         me = GibsonOS.decorator.Panel.init(me);
-        me.dockedItems = [{
+
+        if (!me.dockedItems) {
+            me.dockedItems = [];
+        }
+
+        me.dockedItems.push({
             xtype: 'toolbar',
             dock: 'bottom',
             ui: 'footer',
@@ -25,7 +30,7 @@ Ext.define('GibsonOS.module.core.component.form.Panel', {
             defaults: {
                 minWidth: me.minButtonWidth
             }
-        }];
+        });
 
         me.callParent();
 

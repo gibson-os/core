@@ -56,6 +56,7 @@ GibsonOS.define('GibsonOS.decorator.ActionManager', {
             }
 
             if (component.enableToolbar && button.addToToolbar) {
+                console.log(button);
                 toolbar.add(Ext.merge(Ext.clone(button), {text: button.tbarText ?? null}));
             }
 
@@ -90,7 +91,7 @@ GibsonOS.define('GibsonOS.decorator.ActionManager', {
             if (!component.dockedItems) {
                 component.dockedItems = [];
             }
-
+            
             component.dockedItems.push(toolbar);
         }
 
