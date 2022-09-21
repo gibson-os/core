@@ -11,6 +11,7 @@ use GibsonOS\Core\Exception\CommandError;
 use GibsonOS\Core\Exception\FactoryError;
 use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Manager\ServiceManager;
+use GibsonOS\Core\Store\CommandStore;
 use ReflectionAttribute;
 use ReflectionClass;
 use ReflectionException;
@@ -82,23 +83,52 @@ class CommandService
 
     /**
      * @throws CommandError
+     * @throws FactoryError
+     * @throws ReflectionException
      */
     public function getCommandClassname(array $arguments): string
     {
+        $commandNameParts = null;
+        $module = '';
+        $classname = '';
+
         foreach ($arguments as $index => $argument) {
             if ($index === 0 || mb_strpos($argument, '-') === 0) {
                 continue;
             }
 
-            $commandName = explode('\\', $argument);
-            $module = array_shift($commandName);
-            $classname = implode('\\', $commandName);
+            $commandNameParts = str_replace(':', '\\', $argument);
+            $commandNameParts = array_map('ucfirst', explode('\\', $commandNameParts));
+            $module = array_shift($commandNameParts);
+
+            $classname = implode('\\', $commandNameParts);
 
             if ($module === 'Core') {
-                return 'GibsonOS\\Core\\Command\\' . $classname . 'Command';
+                $classname = 'GibsonOS\\Core\\Command\\' . $classname . 'Command';
+
+                break;
             }
 
-            return 'GibsonOS\\Module\\' . $module . '\\Command\\' . $classname . 'Command';
+            $classname = 'GibsonOS\\Module\\' . $module . '\\Command\\' . $classname . 'Command';
+
+            break;
+        }
+
+        if (class_exists($classname)) {
+            return $classname;
+        }
+
+        $possibleCommands = $this->getPossibleCommands();
+        $possibleCommands = $this->getPossibleCommandsPart($possibleCommands, $module);
+        $possibleCommands = reset($possibleCommands);
+
+        foreach ($commandNameParts ?? [] as $commandNamePart) {
+            $possibleCommands = $this->getPossibleCommandsPart($possibleCommands, $commandNamePart);
+            $possibleCommands = reset($possibleCommands);
+        }
+
+        if (is_string($possibleCommands)) {
+            return $possibleCommands;
         }
 
         throw new CommandError('No Command found!');
@@ -236,5 +266,56 @@ class CommandService
                 implode('", "', $optionsProperties)
             ));
         }
+    }
+
+    /**
+     * @throws FactoryError
+     * @throws ReflectionException
+     */
+    private function getPossibleCommands(): array
+    {
+        $commands = [];
+        $commandStore = $this->serviceManager->get(CommandStore::class);
+
+        foreach ($commandStore->getList() as $command) {
+            $commandParts = explode('\\', $command->getCommand());
+            $commandPosition = &$commands;
+
+            foreach ($commandParts as $commandPart) {
+                if (!isset($commandPosition[$commandPart])) {
+                    $commandPosition[$commandPart] = [];
+                }
+
+                $commandPosition = &$commandPosition[$commandPart];
+            }
+
+            $commandPosition = $command->getClassString();
+        }
+
+        return $commands;
+    }
+
+    /**
+     * @throws CommandError
+     */
+    private function getPossibleCommandsPart(array &$commands, string $keyPart): array
+    {
+        $parts = [];
+
+        foreach ($commands as $key => $command) {
+            if (mb_stripos($key, $keyPart) === 0) {
+                $parts[$key] = $command;
+            }
+        }
+
+        if (count($parts) > 1) {
+            throw new CommandError(sprintf(
+                '%s is not unique! Possible is: %s',
+                $keyPart,
+                implode(', ', array_keys($parts))
+            ));
+        }
+
+        return $parts;
     }
 }

@@ -27,6 +27,8 @@ class CommandStore extends AbstractStore
 
     /**
      * @throws ReflectionException
+     *
+     * @return Generator<Command>
      */
     public function getList(): Generator
     {
