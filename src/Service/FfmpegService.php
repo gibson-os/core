@@ -107,7 +107,7 @@ class FfmpegService
             } else {
                 $subtitleStreamIds = array_keys($media->getSubtitleStreams());
                 $optionString .=
-                    '-vf subtitles=' . escapeshellarg($media->getFilename()) .
+                    '-vf subtitles=\'' . preg_replace('/([\[\]])/', '\\\\$1', $media->getFilename()) . '\'' .
                     ':si=' . (array_search($media->getSelectedSubtitleStreamId(), $subtitleStreamIds) ?: 0) . ' ';
             }
         }
