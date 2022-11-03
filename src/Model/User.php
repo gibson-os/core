@@ -3,16 +3,12 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Model;
 
-use DateTimeImmutable;
-use DateTimeInterface;
 use GibsonOS\Core\Attribute\Install\Database\Column;
 use GibsonOS\Core\Attribute\Install\Database\Key;
 use GibsonOS\Core\Attribute\Install\Database\Table;
-use JsonSerializable;
-use mysqlDatabase;
 
 #[Table]
-class User extends AbstractModel implements JsonSerializable
+class User extends AbstractModel implements \JsonSerializable
 {
     #[Column(attributes: [Column::ATTRIBUTE_UNSIGNED], autoIncrement: true)]
     private ?int $id = null;
@@ -31,16 +27,16 @@ class User extends AbstractModel implements JsonSerializable
     private ?string $password = null;
 
     #[Column]
-    private ?DateTimeInterface $lastLogin = null;
+    private ?\DateTimeInterface $lastLogin = null;
 
     #[Column(type: Column::TYPE_TIMESTAMP, default: Column::DEFAULT_CURRENT_TIMESTAMP)]
-    private DateTimeInterface $added;
+    private \DateTimeInterface $added;
 
-    public function __construct(mysqlDatabase $database = null)
+    public function __construct(\mysqlDatabase $database = null)
     {
         parent::__construct($database);
 
-        $this->added = new DateTimeImmutable();
+        $this->added = new \DateTimeImmutable();
     }
 
     public function getId(): ?int
@@ -103,24 +99,24 @@ class User extends AbstractModel implements JsonSerializable
         return $this;
     }
 
-    public function getLastLogin(): ?DateTimeInterface
+    public function getLastLogin(): ?\DateTimeInterface
     {
         return $this->lastLogin;
     }
 
-    public function setLastLogin(?DateTimeInterface $lastLogin): User
+    public function setLastLogin(?\DateTimeInterface $lastLogin): User
     {
         $this->lastLogin = $lastLogin;
 
         return $this;
     }
 
-    public function getAdded(): DateTimeInterface
+    public function getAdded(): \DateTimeInterface
     {
         return $this->added;
     }
 
-    public function setAdded(DateTimeInterface $added): User
+    public function setAdded(\DateTimeInterface $added): User
     {
         $this->added = $added;
 

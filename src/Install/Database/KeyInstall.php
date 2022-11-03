@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Install\Database;
 
-use Generator;
 use GibsonOS\Core\Attribute\Install\Database\Key;
 use GibsonOS\Core\Attribute\Install\Database\Table;
 use GibsonOS\Core\Dto\Install\Success;
@@ -18,16 +17,11 @@ use GibsonOS\Core\Service\Attribute\TableAttribute;
 use GibsonOS\Core\Service\InstallService;
 use GibsonOS\Core\Service\PriorityInterface;
 
-use function mb_substr;
-
-use mysqlDatabase;
-use ReflectionException;
-
 class KeyInstall extends AbstractInstall implements PriorityInterface
 {
     public function __construct(
         ServiceManager $serviceManagerService,
-        private mysqlDatabase $mysqlDatabase,
+        private \mysqlDatabase $mysqlDatabase,
         private TableAttribute $tableAttribute,
         private ReflectionManager $reflectionManager
     ) {
@@ -38,9 +32,9 @@ class KeyInstall extends AbstractInstall implements PriorityInterface
      * @throws InstallException
      * @throws FactoryError
      * @throws GetError
-     * @throws ReflectionException
+     * @throws \ReflectionException
      */
-    public function install(string $module): Generator
+    public function install(string $module): \Generator
     {
         $path = $this->dirService->addEndSlash($module) . 'src' . DIRECTORY_SEPARATOR . 'Model';
 
@@ -129,7 +123,7 @@ class KeyInstall extends AbstractInstall implements PriorityInterface
 
     private function installKey(string $tableName, Key $key): string
     {
-        $name = mb_substr($key->getName() ?? ($key->isUnique() ? 'unique' : '') . implode('', array_map(
+        $name = \mb_substr($key->getName() ?? ($key->isUnique() ? 'unique' : '') . implode('', array_map(
             static fn (string $column): string => ucfirst($column),
             $key->getColumns(),
         )), 0, 64);

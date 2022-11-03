@@ -9,9 +9,7 @@ use GibsonOS\Core\Manager\ModelManager;
 use GibsonOS\Core\Model\Weather\Location;
 use GibsonOS\Core\Repository\AbstractRepository;
 use GibsonOS\Core\Service\DateTimeService;
-use JsonException;
 use Psr\Log\LoggerInterface;
-use ReflectionException;
 
 class LocationRepository extends AbstractRepository
 {
@@ -24,8 +22,8 @@ class LocationRepository extends AbstractRepository
     }
 
     /**
-     * @throws JsonException
-     * @throws ReflectionException
+     * @throws \JsonException
+     * @throws \ReflectionException
      * @throws SelectError
      */
     public function getById(int $id): Location
@@ -47,8 +45,8 @@ class LocationRepository extends AbstractRepository
     }
 
     /**
-     * @throws JsonException
-     * @throws ReflectionException
+     * @throws \JsonException
+     * @throws \ReflectionException
      */
     public function findByName(string $name, bool $onlyActive): array
     {

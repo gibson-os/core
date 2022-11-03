@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Install;
 
-use Generator;
 use GibsonOS\Core\Dto\Install\Success;
 use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\Model\SaveError;
@@ -25,7 +24,7 @@ class ModuleInstall extends AbstractInstall implements PriorityInterface, Single
      * @throws GetError
      * @throws SaveError
      */
-    public function install(string $module): Generator
+    public function install(string $module): \Generator
     {
         $this->moduleService->scan();
 

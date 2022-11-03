@@ -3,9 +3,7 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Dto\Parameter;
 
-use JsonSerializable;
-
-abstract class AbstractParameter implements JsonSerializable
+abstract class AbstractParameter implements \JsonSerializable
 {
     protected const OPERATOR_EQUAL = '===';
 

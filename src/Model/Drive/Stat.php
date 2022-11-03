@@ -3,14 +3,11 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Model\Drive;
 
-use DateTimeImmutable;
-use DateTimeInterface;
 use GibsonOS\Core\Attribute\Install\Database\Column;
 use GibsonOS\Core\Attribute\Install\Database\Constraint;
 use GibsonOS\Core\Attribute\Install\Database\Table;
 use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Model\Drive;
-use mysqlDatabase;
 
 /**
  * @method Drive getDrive()
@@ -29,16 +26,16 @@ class Stat extends AbstractModel
     private string $disk;
 
     #[Column(type: Column::TYPE_TIMESTAMP, default: Column::DEFAULT_CURRENT_TIMESTAMP)]
-    private DateTimeInterface $added;
+    private \DateTimeInterface $added;
 
     #[Constraint]
     protected Drive $drive;
 
-    public function __construct(mysqlDatabase $database = null)
+    public function __construct(\mysqlDatabase $database = null)
     {
         parent::__construct($database);
 
-        $this->added = new DateTimeImmutable();
+        $this->added = new \DateTimeImmutable();
     }
 
     public function getId(): ?int
@@ -77,12 +74,12 @@ class Stat extends AbstractModel
         return $this;
     }
 
-    public function getAdded(): DateTimeImmutable|DateTimeInterface
+    public function getAdded(): \DateTimeImmutable|\DateTimeInterface
     {
         return $this->added;
     }
 
-    public function setAdded(DateTimeImmutable|DateTimeInterface $added): Stat
+    public function setAdded(\DateTimeImmutable|\DateTimeInterface $added): Stat
     {
         $this->added = $added;
 

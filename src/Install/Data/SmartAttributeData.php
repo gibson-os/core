@@ -3,24 +3,21 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Install\Data;
 
-use Generator;
 use GibsonOS\Core\Dto\Install\Success;
 use GibsonOS\Core\Exception\Model\SaveError;
 use GibsonOS\Core\Install\AbstractInstall;
 use GibsonOS\Core\Model\SmartAttribute;
 use GibsonOS\Core\Service\InstallService;
 use GibsonOS\Core\Service\PriorityInterface;
-use JsonException;
-use ReflectionException;
 
 class SmartAttributeData extends AbstractInstall implements PriorityInterface
 {
     /**
-     * @throws JsonException
-     * @throws ReflectionException
+     * @throws \JsonException
+     * @throws \ReflectionException
      * @throws SaveError
      */
-    public function install(string $module): Generator
+    public function install(string $module): \Generator
     {
         $this
             ->setSmartAttribute(1, 'Read Error Rate', '(Vendor specific raw value.) Stores data related to the rate of hardware read errors that occurred when reading data from a disk surface. The raw value has different structure for different vendors and is often not meaningful as a decimal number.')
@@ -92,8 +89,8 @@ class SmartAttributeData extends AbstractInstall implements PriorityInterface
 
     /**
      * @throws SaveError
-     * @throws JsonException
-     * @throws ReflectionException
+     * @throws \JsonException
+     * @throws \ReflectionException
      */
     private function setSmartAttribute(int $id, string $short, string $description): SmartAttributeData
     {

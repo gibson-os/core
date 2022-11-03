@@ -8,8 +8,6 @@ use GibsonOS\Core\Attribute\GetClassNames;
 use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Store\AbstractStore;
-use ReflectionAttribute;
-use ReflectionException;
 
 class ClassNameStore extends AbstractStore
 {
@@ -45,7 +43,7 @@ class ClassNameStore extends AbstractStore
     }
 
     /**
-     * @throws ReflectionException
+     * @throws \ReflectionException
      */
     private function generateList(): void
     {
@@ -60,7 +58,7 @@ class ClassNameStore extends AbstractStore
             $eventAttribute = $this->reflectionManager->getAttribute(
                 $reflectionClass,
                 Event::class,
-                ReflectionAttribute::IS_INSTANCEOF
+                \ReflectionAttribute::IS_INSTANCEOF
             );
 
             if ($eventAttribute === null) {

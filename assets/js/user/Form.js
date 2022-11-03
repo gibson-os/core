@@ -24,7 +24,7 @@ Ext.define('GibsonOS.module.core.user.Form', {
         this.items = [{
             xtype: 'gosFormTextfield',
             itemId: 'coreUserFormUsername',
-            name: 'username',
+            name: 'user',
             fieldLabel: 'Benutzername',
             requiredPermission: {
                 action: 'save',
@@ -78,7 +78,7 @@ Ext.define('GibsonOS.module.core.user.Form', {
                 this.up('form').getForm().submit({
                     xtype: 'gosFormActionAction',
                     params: {
-                        user: form.gos.data.userId ? form.gos.data.userId : 0,
+                        id: form.gos.data.userId ? form.gos.data.userId : 0,
                         add: form.gos.data.add ? form.gos.data.add : false
                     },
                     url: baseDir + 'core/user/save',

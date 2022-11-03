@@ -3,15 +3,11 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Model;
 
-use DateTimeImmutable;
-use DateTimeInterface;
 use GibsonOS\Core\Attribute\Install\Database\Column;
 use GibsonOS\Core\Attribute\Install\Database\Table;
-use JsonSerializable;
-use mysqlDatabase;
 
 #[Table]
-class Icon extends AbstractModel implements JsonSerializable
+class Icon extends AbstractModel implements \JsonSerializable
 {
     #[Column(attributes: [Column::ATTRIBUTE_UNSIGNED], autoIncrement: true)]
     private ?int $id = null;
@@ -23,13 +19,13 @@ class Icon extends AbstractModel implements JsonSerializable
     private string $originalType;
 
     #[Column(type: Column::TYPE_TIMESTAMP, default: Column::DEFAULT_CURRENT_TIMESTAMP)]
-    private DateTimeInterface $added;
+    private \DateTimeInterface $added;
 
-    public function __construct(mysqlDatabase $database = null)
+    public function __construct(\mysqlDatabase $database = null)
     {
         parent::__construct($database);
 
-        $this->added = new DateTimeImmutable();
+        $this->added = new \DateTimeImmutable();
     }
 
     public function getId(): ?int
@@ -68,12 +64,12 @@ class Icon extends AbstractModel implements JsonSerializable
         return $this;
     }
 
-    public function getAdded(): DateTimeImmutable|DateTimeInterface
+    public function getAdded(): \DateTimeImmutable|\DateTimeInterface
     {
         return $this->added;
     }
 
-    public function setAdded(DateTimeImmutable|DateTimeInterface $added): Icon
+    public function setAdded(\DateTimeImmutable|\DateTimeInterface $added): Icon
     {
         $this->added = $added;
 

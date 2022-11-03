@@ -3,24 +3,22 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Dto;
 
-use GdImage;
-
 class Image
 {
     private string $filename;
 
     private int $quality = 80;
 
-    public function __construct(private GdImage $image)
+    public function __construct(private \GdImage $image)
     {
     }
 
-    public function getImage(): GdImage
+    public function getImage(): \GdImage
     {
         return $this->image;
     }
 
-    public function setImage(GdImage $image): Image
+    public function setImage(\GdImage $image): Image
     {
         $this->image = $image;
 

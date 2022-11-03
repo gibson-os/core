@@ -3,8 +3,6 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Exception;
 
-use Exception;
-
 /**
  * Gibson OS.
  *
@@ -14,7 +12,7 @@ use Exception;
  *
  * @copyright 2014
  */
-abstract class AbstractException extends Exception
+abstract class AbstractException extends \Exception
 {
     public const INFO = 0;
 

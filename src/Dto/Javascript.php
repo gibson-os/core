@@ -3,9 +3,7 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Dto;
 
-use Stringable;
-
-class Javascript implements Stringable
+class Javascript implements \Stringable
 {
     private bool $loaded = false;
 

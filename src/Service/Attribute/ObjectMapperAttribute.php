@@ -12,11 +12,7 @@ use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Mapper\ObjectMapper;
 use GibsonOS\Core\Service\RequestService;
 use GibsonOS\Core\Utility\StatusCode;
-use JsonException;
 use ReflectionException;
-use ReflectionMethod;
-use ReflectionParameter;
-use ReflectionProperty;
 
 class ObjectMapperAttribute implements AttributeServiceInterface, ParameterAttributeInterface
 {
@@ -29,11 +25,11 @@ class ObjectMapperAttribute implements AttributeServiceInterface, ParameterAttri
 
     /**
      * @throws MapperException
-     * @throws ReflectionException
-     * @throws JsonException
+     * @throws \ReflectionException
+     * @throws \JsonException
      * @throws FactoryError
      */
-    public function replace(AttributeInterface $attribute, array $parameters, ReflectionParameter $reflectionParameter): ?object
+    public function replace(AttributeInterface $attribute, array $parameters, \ReflectionParameter $reflectionParameter): ?object
     {
         if (!$attribute instanceof GetObject) {
             return null;
@@ -49,7 +45,7 @@ class ObjectMapperAttribute implements AttributeServiceInterface, ParameterAttri
 
         try {
             return $this->objectMapper->mapToObject($objectClassName, $properties);
-        } catch (ReflectionException $exception) {
+        } catch (\ReflectionException $exception) {
             if ($reflectionParameter->allowsNull()) {
                 return null;
             }
@@ -62,7 +58,7 @@ class ObjectMapperAttribute implements AttributeServiceInterface, ParameterAttri
      * @param class-string $objectClassName
      *
      * @throws MapperException
-     * @throws ReflectionException
+     * @throws \ReflectionException
      */
     public function getObjectParameters(GetObject $attribute, string $objectClassName, array $parameters): array
     {
@@ -84,14 +80,14 @@ class ObjectMapperAttribute implements AttributeServiceInterface, ParameterAttri
      * @param class-string $objectClassName
      *
      * @throws MapperException
-     * @throws ReflectionException
+     * @throws \ReflectionException
      */
     protected function getSetterParameters(GetObject $attribute, string $objectClassName, array $parameters): array
     {
         $reflectionClass = $this->reflectionManager->getReflectionClass($objectClassName);
         $setterParameters = [];
 
-        foreach ($reflectionClass->getMethods(ReflectionMethod::IS_PUBLIC) as $reflectionMethod) {
+        foreach ($reflectionClass->getMethods(\ReflectionMethod::IS_PUBLIC) as $reflectionMethod) {
             if (mb_strpos($reflectionMethod->getName(), 'set') !== 0) {
                 continue;
             }
@@ -115,7 +111,7 @@ class ObjectMapperAttribute implements AttributeServiceInterface, ParameterAttri
 
     public function getMappingKey(
         GetObject $attribute,
-        ReflectionParameter|ReflectionProperty $reflectionObject
+        \ReflectionParameter|\ReflectionProperty $reflectionObject
     ): string {
         $parameterName = $reflectionObject->getName();
 
@@ -126,7 +122,7 @@ class ObjectMapperAttribute implements AttributeServiceInterface, ParameterAttri
      * @throws MapperException
      */
     public function getParameterFromRequest(
-        ReflectionParameter $reflectionParameter,
+        \ReflectionParameter $reflectionParameter,
         string $requestKey = null
     ): string|int|float|bool|null|array|object {
         try {
@@ -134,7 +130,7 @@ class ObjectMapperAttribute implements AttributeServiceInterface, ParameterAttri
         } catch (RequestError) {
             try {
                 return $this->reflectionManager->getDefaultValue($reflectionParameter);
-            } catch (ReflectionException $exception) {
+            } catch (\ReflectionException $exception) {
                 try {
                     try {
                         $reflectionProperty = $reflectionParameter->getDeclaringClass()?->getProperty($reflectionParameter->getName());
@@ -150,7 +146,7 @@ class ObjectMapperAttribute implements AttributeServiceInterface, ParameterAttri
                     }
 
                     return $reflectionProperty->getDefaultValue();
-                } catch (ReflectionException $exception2) {
+                } catch (\ReflectionException $exception2) {
                     throw new MapperException($exception2->getMessage(), StatusCode::BAD_REQUEST, $exception);
                 }
             }
@@ -159,14 +155,14 @@ class ObjectMapperAttribute implements AttributeServiceInterface, ParameterAttri
         if ($value === null || $value === '') {
             try {
                 return $this->reflectionManager->getDefaultValue($reflectionParameter);
-            } catch (ReflectionException $e) {
+            } catch (\ReflectionException $e) {
                 throw new MapperException($e->getMessage());
             }
         }
 
         try {
             return $this->reflectionManager->castValue($reflectionParameter, $value);
-        } catch (JsonException|ReflectionException $e) {
+        } catch (\JsonException|\ReflectionException $e) {
             throw new MapperException($e->getMessage());
         }
     }

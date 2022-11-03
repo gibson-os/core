@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Install\Database;
 
-use Generator;
 use GibsonOS\Core\Attribute\Install\Database\View;
 use GibsonOS\Core\Dto\Install\Success;
 use GibsonOS\Core\Exception\FactoryError;
@@ -15,14 +14,12 @@ use GibsonOS\Core\Manager\ServiceManager;
 use GibsonOS\Core\Model\ModelInterface;
 use GibsonOS\Core\Service\InstallService;
 use GibsonOS\Core\Service\PriorityInterface;
-use mysqlDatabase;
-use ReflectionException;
 
 class ViewInstall extends AbstractInstall implements PriorityInterface
 {
     public function __construct(
         ServiceManager $serviceManagerService,
-        private mysqlDatabase $mysqlDatabase,
+        private \mysqlDatabase $mysqlDatabase,
         private ReflectionManager $reflectionManager
     ) {
         parent::__construct($serviceManagerService);
@@ -31,10 +28,10 @@ class ViewInstall extends AbstractInstall implements PriorityInterface
     /**
      * @throws FactoryError
      * @throws GetError
-     * @throws ReflectionException
+     * @throws \ReflectionException
      * @throws InstallException
      */
-    public function install(string $module): Generator
+    public function install(string $module): \Generator
     {
         $path = $this->dirService->addEndSlash($module) . 'src' . DIRECTORY_SEPARATOR . 'Model';
 

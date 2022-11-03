@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Install\Database;
 
-use Generator;
 use GibsonOS\Core\Attribute\Install\Database\Constraint;
 use GibsonOS\Core\Attribute\Install\Database\Table;
 use GibsonOS\Core\Dto\Install\Success;
@@ -17,15 +16,12 @@ use GibsonOS\Core\Model\ModelInterface;
 use GibsonOS\Core\Service\Attribute\TableAttribute;
 use GibsonOS\Core\Service\InstallService;
 use GibsonOS\Core\Service\PriorityInterface;
-use mysqlDatabase;
-use ReflectionAttribute;
-use ReflectionException;
 
 class ConstraintInstall extends AbstractInstall implements PriorityInterface
 {
     public function __construct(
         ServiceManager $serviceManagerService,
-        private mysqlDatabase $mysqlDatabase,
+        private \mysqlDatabase $mysqlDatabase,
         private TableAttribute $tableAttribute,
         private ReflectionManager $reflectionManager
     ) {
@@ -36,9 +32,9 @@ class ConstraintInstall extends AbstractInstall implements PriorityInterface
      * @throws InstallException
      * @throws FactoryError
      * @throws GetError
-     * @throws ReflectionException
+     * @throws \ReflectionException
      */
-    public function install(string $module): Generator
+    public function install(string $module): \Generator
     {
         $path = $this->dirService->addEndSlash($module) . 'src' . DIRECTORY_SEPARATOR . 'Model';
 
@@ -63,7 +59,7 @@ class ConstraintInstall extends AbstractInstall implements PriorityInterface
                 $constraintAttribute = $this->reflectionManager->getAttribute(
                     $reflectionProperty,
                     Constraint::class,
-                    ReflectionAttribute::IS_INSTANCEOF
+                    \ReflectionAttribute::IS_INSTANCEOF
                 );
 
                 if ($constraintAttribute === null) {

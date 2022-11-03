@@ -8,9 +8,6 @@ use GibsonOS\Core\Attribute\GetTableName;
 use GibsonOS\Core\Attribute\Install\Database\Table;
 use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Model\ModelInterface;
-use ReflectionAttribute;
-use ReflectionException;
-use ReflectionParameter;
 
 class TableAttribute implements ParameterAttributeInterface, AttributeServiceInterface
 {
@@ -21,9 +18,9 @@ class TableAttribute implements ParameterAttributeInterface, AttributeServiceInt
     }
 
     /**
-     * @throws ReflectionException
+     * @throws \ReflectionException
      */
-    public function replace(AttributeInterface $attribute, array $parameters, ReflectionParameter $reflectionParameter): mixed
+    public function replace(AttributeInterface $attribute, array $parameters, \ReflectionParameter $reflectionParameter): mixed
     {
         if (!$attribute instanceof GetTableName) {
             return null;
@@ -37,7 +34,7 @@ class TableAttribute implements ParameterAttributeInterface, AttributeServiceInt
 
         $reflectionClass = $this->reflectionManager->getReflectionClass($modelClassName);
 
-        if (!$this->reflectionManager->hasAttribute($reflectionClass, Table::class, ReflectionAttribute::IS_INSTANCEOF)) {
+        if (!$this->reflectionManager->hasAttribute($reflectionClass, Table::class, \ReflectionAttribute::IS_INSTANCEOF)) {
             return null;
         }
 

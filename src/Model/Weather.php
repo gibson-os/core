@@ -3,15 +3,11 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Model;
 
-use DateTime;
-use DateTimeInterface;
 use GibsonOS\Core\Attribute\Install\Database\Column;
 use GibsonOS\Core\Attribute\Install\Database\Constraint;
 use GibsonOS\Core\Attribute\Install\Database\Key;
 use GibsonOS\Core\Attribute\Install\Database\Table;
 use GibsonOS\Core\Model\Weather\Location;
-use JsonSerializable;
-use mysqlDatabase;
 
 /**
  * @method Location getLocation()
@@ -19,7 +15,7 @@ use mysqlDatabase;
  */
 #[Table]
 #[Key(unique: true, columns: ['location_id', 'date'])]
-class Weather extends AbstractModel implements JsonSerializable
+class Weather extends AbstractModel implements \JsonSerializable
 {
     #[Column(attributes: [Column::ATTRIBUTE_UNSIGNED], autoIncrement: true)]
     private ?int $id = null;
@@ -28,7 +24,7 @@ class Weather extends AbstractModel implements JsonSerializable
     private int $locationId;
 
     #[Column]
-    private DateTimeInterface $date;
+    private \DateTimeInterface $date;
 
     #[Column]
     private float $temperature;
@@ -79,19 +75,19 @@ class Weather extends AbstractModel implements JsonSerializable
     private ?string $icon = null;
 
     #[Column]
-    private ?DateTimeInterface $sunset = null;
+    private ?\DateTimeInterface $sunset = null;
 
     #[Column]
-    private ?DateTimeInterface $sunrise = null;
+    private ?\DateTimeInterface $sunrise = null;
 
     #[Constraint]
     protected Location $location;
 
-    public function __construct(mysqlDatabase $database = null)
+    public function __construct(\mysqlDatabase $database = null)
     {
         parent::__construct($database);
 
-        $this->date = new DateTime();
+        $this->date = new \DateTime();
     }
 
     public function getId(): ?int
@@ -118,12 +114,12 @@ class Weather extends AbstractModel implements JsonSerializable
         return $this;
     }
 
-    public function getDate(): DateTimeInterface
+    public function getDate(): \DateTimeInterface
     {
         return $this->date;
     }
 
-    public function setDate(DateTimeInterface $date): Weather
+    public function setDate(\DateTimeInterface $date): Weather
     {
         $this->date = $date;
 
@@ -322,24 +318,24 @@ class Weather extends AbstractModel implements JsonSerializable
         return $this;
     }
 
-    public function getSunset(): ?DateTimeInterface
+    public function getSunset(): ?\DateTimeInterface
     {
         return $this->sunset;
     }
 
-    public function setSunset(?DateTimeInterface $sunset): Weather
+    public function setSunset(?\DateTimeInterface $sunset): Weather
     {
         $this->sunset = $sunset;
 
         return $this;
     }
 
-    public function getSunrise(): ?DateTimeInterface
+    public function getSunrise(): ?\DateTimeInterface
     {
         return $this->sunrise;
     }
 
-    public function setSunrise(?DateTimeInterface $sunrise): Weather
+    public function setSunrise(?\DateTimeInterface $sunrise): Weather
     {
         $this->sunrise = $sunrise;
 

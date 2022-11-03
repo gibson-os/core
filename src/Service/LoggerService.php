@@ -5,7 +5,6 @@ namespace GibsonOS\Core\Service;
 
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
-use Throwable;
 
 class LoggerService implements LoggerInterface
 {
@@ -101,7 +100,7 @@ class LoggerService implements LoggerInterface
         if (
             $this->debug &&
             isset($context['exception']) &&
-            $context['exception'] instanceof Throwable
+            $context['exception'] instanceof \Throwable
         ) {
             $message .=
                 PHP_EOL . $this->getLevelColor($level) . PHP_EOL . PHP_EOL .

@@ -3,10 +3,6 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Install\Database;
 
-use DateTime;
-use DateTimeImmutable;
-use DateTimeInterface;
-use Generator;
 use GibsonOS\Core\Attribute\Install\Database\Column;
 use GibsonOS\Core\Attribute\Install\Database\Table;
 use GibsonOS\Core\Dto\Install\Success;
@@ -21,11 +17,6 @@ use GibsonOS\Core\Service\Attribute\TableAttribute;
 use GibsonOS\Core\Service\InstallService;
 use GibsonOS\Core\Service\PriorityInterface;
 use GibsonOS\Core\Utility\JsonUtility;
-use mysqlDatabase;
-use ReflectionAttribute;
-use ReflectionException;
-use stdClass;
-use UnitEnum;
 
 class TableInstall extends AbstractInstall implements PriorityInterface
 {
@@ -77,7 +68,7 @@ class TableInstall extends AbstractInstall implements PriorityInterface
 
     public function __construct(
         ServiceManager $serviceManagerService,
-        private mysqlDatabase $mysqlDatabase,
+        private \mysqlDatabase $mysqlDatabase,
         private TableAttribute $tableAttribute,
         private ReflectionManager $reflectionManager
     ) {
@@ -87,10 +78,10 @@ class TableInstall extends AbstractInstall implements PriorityInterface
     /**
      * @throws FactoryError
      * @throws GetError
-     * @throws ReflectionException
+     * @throws \ReflectionException
      * @throws InstallException
      */
-    public function install(string $module): Generator
+    public function install(string $module): \Generator
     {
         $path = $this->dirService->addEndSlash($module) . 'src' . DIRECTORY_SEPARATOR . 'Model';
 
@@ -113,7 +104,7 @@ class TableInstall extends AbstractInstall implements PriorityInterface
                 $columnAttribute = $this->reflectionManager->getAttribute(
                     $reflectionProperty,
                     Column::class,
-                    ReflectionAttribute::IS_INSTANCEOF
+                    \ReflectionAttribute::IS_INSTANCEOF
                 );
 
                 if ($columnAttribute === null) {
@@ -121,7 +112,7 @@ class TableInstall extends AbstractInstall implements PriorityInterface
                 }
 
                 $type = $this->reflectionManager->getTypeName($reflectionProperty)
-                    ?? throw new ReflectionException(sprintf('No type found for "%s"', $reflectionProperty->getName()))
+                    ?? throw new \ReflectionException(sprintf('No type found for "%s"', $reflectionProperty->getName()))
                 ;
                 $defaultValue = $reflectionProperty->getDefaultValue();
                 $columnAttribute
@@ -171,7 +162,7 @@ class TableInstall extends AbstractInstall implements PriorityInterface
                     $type = $this->reflectionManager->getNonBuiltinTypeName($reflectionProperty);
                     $this->reflectionManager->getReflectionEnum($type);
                     $columnAttribute->setValues(array_map(
-                        fn (UnitEnum $enum): string => $enum->name,
+                        fn (\UnitEnum $enum): string => $enum->name,
                         $type::cases()
                     ));
                 }
@@ -273,7 +264,7 @@ class TableInstall extends AbstractInstall implements PriorityInterface
             'bool' => Column::TYPE_TINYINT,
             'array' => Column::TYPE_JSON,
             'string' => Column::TYPE_VARCHAR,
-            DateTimeInterface::class, DateTime::class, DateTimeImmutable::class => Column::TYPE_DATETIME,
+            \DateTimeInterface::class, \DateTime::class, \DateTimeImmutable::class => Column::TYPE_DATETIME,
             default => class_exists($type) && enum_exists($type) ? Column::TYPE_ENUM : Column::TYPE_VARCHAR
         };
     }
@@ -357,7 +348,7 @@ class TableInstall extends AbstractInstall implements PriorityInterface
         ;
     }
 
-    private function isColumnModified(Column $columnAttribute, stdClass $column): bool
+    private function isColumnModified(Column $columnAttribute, \stdClass $column): bool
     {
         if (($column->Null === 'YES') !== $columnAttribute->isNullable()) {
             return true;

@@ -9,7 +9,6 @@ use GibsonOS\Core\Attribute\Install\Cronjob as CronjobAttribute;
 use GibsonOS\Core\Exception\Model\SaveError;
 use GibsonOS\Core\Service\Attribute\AttributeServiceInterface;
 use GibsonOS\Core\Service\CronjobService;
-use JsonException;
 
 class CronjobInstallAttribute implements InstallAttributeInterface, AttributeServiceInterface
 {
@@ -21,7 +20,7 @@ class CronjobInstallAttribute implements InstallAttributeInterface, AttributeSer
 
     /**
      * @throws SaveError
-     * @throws JsonException
+     * @throws \JsonException
      */
     public function execute(AttributeInterface $attribute, string $className): void
     {

@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Event;
 
-use Exception;
 use GibsonOS\Core\Attribute\Event\Listener;
 use GibsonOS\Core\Attribute\Event\Method;
 use GibsonOS\Core\Attribute\Event\Parameter;
@@ -15,10 +14,7 @@ use GibsonOS\Core\Model\AutoCompleteModelInterface;
 use GibsonOS\Core\Model\Event;
 use GibsonOS\Core\Model\Event\Element;
 use GibsonOS\Core\Service\EventService;
-use JsonException;
-use ReflectionAttribute;
 use ReflectionException;
-use ReflectionMethod;
 
 abstract class AbstractEvent
 {
@@ -28,9 +24,9 @@ abstract class AbstractEvent
 
     /**
      * @throws FactoryError
-     * @throws JsonException
+     * @throws \JsonException
      * @throws EventException
-     * @throws ReflectionException
+     * @throws \ReflectionException
      */
     public function run(Element $element, Event $event)
     {
@@ -46,7 +42,7 @@ abstract class AbstractEvent
         if (!$this->reflectionManager->hasAttribute(
             $reflectionMethod,
             Method::class,
-            ReflectionAttribute::IS_INSTANCEOF
+            \ReflectionAttribute::IS_INSTANCEOF
         )) {
             throw new EventException(sprintf(
                 'Method "%s" has no "%s" attribute',
@@ -57,7 +53,7 @@ abstract class AbstractEvent
 
         try {
             return $this->{$method}(...$this->getParameters($reflectionMethod, $element));
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
             if ($event->isExitOnError()) {
                 return null;
             }
@@ -67,11 +63,11 @@ abstract class AbstractEvent
     }
 
     /**
-     * @throws JsonException
+     * @throws \JsonException
      * @throws FactoryError
-     * @throws ReflectionException
+     * @throws \ReflectionException
      */
-    protected function getParameters(ReflectionMethod $reflectionMethod, Element $element): array
+    protected function getParameters(\ReflectionMethod $reflectionMethod, Element $element): array
     {
         $methodParameters = [];
 
@@ -79,7 +75,7 @@ abstract class AbstractEvent
             $parameterAttribute = $this->reflectionManager->getAttribute(
                 $reflectionParameter,
                 Parameter::class,
-                ReflectionAttribute::IS_INSTANCEOF
+                \ReflectionAttribute::IS_INSTANCEOF
             );
 
             if ($parameterAttribute === null) {

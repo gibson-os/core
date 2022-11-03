@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Controller;
 
 use GibsonOS\Core\Attribute\CheckPermission;
+use GibsonOS\Core\Attribute\GetMappedModel;
 use GibsonOS\Core\Attribute\GetModel;
 use GibsonOS\Core\Exception\Model\DeleteError;
 use GibsonOS\Core\Exception\Model\SaveError;
@@ -25,8 +26,6 @@ use GibsonOS\Core\Service\TwigService;
 use GibsonOS\Core\Service\UserService;
 use GibsonOS\Core\Store\UserStore;
 use GibsonOS\Core\Utility\StatusCode;
-use JsonException;
-use ReflectionException;
 
 class UserController extends AbstractController
 {
@@ -34,13 +33,15 @@ class UserController extends AbstractController
         RequestService $requestService,
         TwigService $twigService,
         SessionService $sessionService,
-        private PermissionService $permissionService
+        private readonly PermissionService $permissionService
     ) {
         parent::__construct($requestService, $twigService, $sessionService);
     }
 
     /**
      * @throws SelectError
+     * @throws \JsonException
+     * @throws \ReflectionException
      */
     #[CheckPermission(Permission::MANAGE + Permission::READ)]
     public function index(UserStore $userStore): AjaxResponse
@@ -66,17 +67,13 @@ class UserController extends AbstractController
     }
 
     /**
-     * @throws PermissionDenied
      * @throws SelectError
      */
-    #[CheckPermission(Permission::READ)]
+    #[CheckPermission(Permission::READ, ['id' => Permission::READ + Permission::MANAGE])]
     public function settings(
         DeviceRepository $deviceRepository,
-        int $userPermission,
         #[GetModel] User $user = null
     ): AjaxResponse {
-        $this->checkUserPermission($user?->getId(), Permission::READ, $userPermission);
-
         if ($user === null) {
             $user = $this->sessionService->getUser();
         }
@@ -131,69 +128,42 @@ class UserController extends AbstractController
     }
 
     /**
-     * @throws JsonException
-     * @throws PermissionDenied
-     * @throws ReflectionException
+     * @throws \JsonException
+     * @throws \ReflectionException
      * @throws SaveError
-     * @throws SelectError
      * @throws UserError
      *
      * @todo Model mapping?
      */
+    #[CheckPermission(Permission::WRITE, ['add' => Permission::WRITE + Permission::MANAGE])]
     public function save(
         UserService $userService,
         UserRepository $userRepository,
-        int $userPermission,
-        string $username,
+        #[GetMappedModel] User $user,
         string $password,
         string $passwordRepeat,
-        string $host = null,
-        string $ip = null,
-        int $id = null
+        bool $add = false,
     ): AjaxResponse {
-        $this->checkUserPermission($id, Permission::WRITE, $userPermission);
+        if ($user->getId() === null) {
+            if (!$add) {
+                $user = $this->sessionService->getUser()
+                    ?? throw new UserError('User not found!')
+                ;
+            } else {
+                try {
+                    $userRepository->getByUsername($user->getUser());
 
-        if (empty($username)) {
-            return $this->returnFailure('Benutzername ist leer.');
-        }
-
-        $user = new User();
-
-        if ($id !== null) {
-            $user = $userRepository->getById($id);
-        } else {
-            try {
-                $userRepository->getByUsername($username);
-
-                return $this->returnFailure('Benutzername existiert schon.');
-            } catch (SelectError) {
-                // Do nothing
-            }
-        }
-
-        if (
-            !empty($password) ||
-            !empty($passwordRepeat)
-        ) {
-            if ($password != $passwordRepeat) {
-                return $this->returnFailure('Passwort stimmt nicht überein.');
-            }
-
-            if (
-                !empty($password) &&
-                mb_strlen($password) < 6
-            ) {
-                return $this->returnFailure('Passwort zu kurz. Mindestens 6 Zeichen.');
+                    return $this->returnFailure('Benutzername existiert schon.');
+                } catch (SelectError) {
+                    // Do nothing
+                }
             }
         }
 
         return $this->returnSuccess($userService->save(
             $user,
-            $username,
             $password,
             $passwordRepeat,
-            $host,
-            $ip
         ));
     }
 
@@ -214,9 +184,9 @@ class UserController extends AbstractController
     }
 
     /**
-     * @throws JsonException
+     * @throws \JsonException
      * @throws SaveError
-     * @throws ReflectionException
+     * @throws \ReflectionException
      */
     #[CheckPermission(Permission::MANAGE + Permission::WRITE)]
     public function savePermission(
@@ -241,7 +211,7 @@ class UserController extends AbstractController
 
     /**
      * @throws DeleteError
-     * @throws JsonException
+     * @throws \JsonException
      */
     #[CheckPermission(Permission::MANAGE + Permission::DELETE)]
     public function delete(ModelManager $modelManager, #[GetModel] User $user): AjaxResponse

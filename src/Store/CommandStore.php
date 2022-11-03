@@ -3,15 +3,12 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Store;
 
-use Generator;
 use GibsonOS\Core\Attribute\GetClassNames;
 use GibsonOS\Core\Attribute\Install\Cronjob;
 use GibsonOS\Core\Command\CommandInterface;
 use GibsonOS\Core\Dto\Command;
 use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Service\CommandService;
-use ReflectionAttribute;
-use ReflectionException;
 
 class CommandStore extends AbstractStore
 {
@@ -26,11 +23,11 @@ class CommandStore extends AbstractStore
     }
 
     /**
-     * @throws ReflectionException
+     * @throws \ReflectionException
      *
-     * @return Generator<Command>
+     * @return \Generator<Command>
      */
-    public function getList(): Generator
+    public function getList(): \Generator
     {
         foreach ($this->classStrings as $classString) {
             $reflectionClass = $this->reflectionManager->getReflectionClass($classString);
@@ -59,7 +56,7 @@ class CommandStore extends AbstractStore
                 $this->reflectionManager->getAttributes(
                     $reflectionClass,
                     Cronjob::class,
-                    ReflectionAttribute::IS_INSTANCEOF
+                    \ReflectionAttribute::IS_INSTANCEOF
                 )
             );
         }

@@ -6,7 +6,7 @@ namespace GibsonOS\Core\Attribute\Event;
 use Attribute;
 use GibsonOS\Core\Dto\Parameter\AbstractParameter;
 
-#[Attribute(Attribute::TARGET_PARAMETER)]
+#[\Attribute(\Attribute::TARGET_PARAMETER)]
 class Parameter
 {
     /**

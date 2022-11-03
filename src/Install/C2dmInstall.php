@@ -3,14 +3,13 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Install;
 
-use Generator;
 use GibsonOS\Core\Dto\Install\Configuration;
 use GibsonOS\Core\Service\InstallService;
 use GibsonOS\Core\Service\PriorityInterface;
 
 class C2dmInstall extends AbstractInstall implements PriorityInterface, SingleInstallInterface
 {
-    public function install(string $module): Generator
+    public function install(string $module): \Generator
     {
         yield $emailInput = $this->getEnvInput('C2DM_EMAIL', 'What is the c2dm email address?');
         yield $passwordInput = $this->getEnvInput('C2DM_PASSWORD', 'What is the c2dm password?');

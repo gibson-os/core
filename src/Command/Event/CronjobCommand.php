@@ -11,9 +11,7 @@ use GibsonOS\Core\Exception\EventException;
 use GibsonOS\Core\Exception\FactoryError;
 use GibsonOS\Core\Exception\Model\SaveError;
 use GibsonOS\Core\Service\EventService;
-use JsonException;
 use Psr\Log\LoggerInterface;
-use ReflectionException;
 
 /**
  * @description Run time controlled events
@@ -31,8 +29,8 @@ class CronjobCommand extends AbstractCommand
      * @throws EventException
      * @throws FactoryError
      * @throws SaveError
-     * @throws JsonException
-     * @throws ReflectionException
+     * @throws \JsonException
+     * @throws \ReflectionException
      */
     protected function run(): int
     {

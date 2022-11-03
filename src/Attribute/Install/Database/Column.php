@@ -5,7 +5,7 @@ namespace GibsonOS\Core\Attribute\Install\Database;
 
 use Attribute;
 
-#[Attribute(Attribute::TARGET_PROPERTY)]
+#[\Attribute(\Attribute::TARGET_PROPERTY)]
 class Column
 {
     public const DEFAULT_CURRENT_TIMESTAMP = 'CURRENT_TIMESTAMP';

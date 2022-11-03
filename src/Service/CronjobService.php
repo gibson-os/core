@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Service;
 
-use DateTime;
 use GibsonOS\Core\Dto\Cronjob\Time;
 use GibsonOS\Core\Dto\Cronjob\TimePart;
 use GibsonOS\Core\Exception\Model\SaveError;
@@ -11,9 +10,7 @@ use GibsonOS\Core\Manager\ModelManager;
 use GibsonOS\Core\Model\Cronjob;
 use GibsonOS\Core\Repository\CronjobRepository;
 use GibsonOS\Core\Utility\JsonUtility;
-use JsonException;
 use Psr\Log\LoggerInterface;
-use ReflectionException;
 
 class CronjobService
 {
@@ -28,9 +25,9 @@ class CronjobService
     /**
      * @param class-string $command
      *
-     * @throws JsonException
+     * @throws \JsonException
      * @throws SaveError
-     * @throws ReflectionException
+     * @throws \ReflectionException
      */
     public function add(
         string $command,
@@ -88,11 +85,11 @@ class CronjobService
 
     /**
      * @throws SaveError
-     * @throws JsonException
+     * @throws \JsonException
      */
     public function run(string $user): void
     {
-        $dateTime = new DateTime();
+        $dateTime = new \DateTime();
 
         foreach ($this->cronjobRepository->getRunnableByUser($dateTime, $user) as $cronjob) {
             $this->logger->info(sprintf('Run cronjob %s', $cronjob->getCommand()));
@@ -108,7 +105,7 @@ class CronjobService
             $cronjob->setLastRun($dateTime);
             $this->modelManager->save($cronjob);
 
-            $dateTime = new DateTime();
+            $dateTime = new \DateTime();
         }
     }
 

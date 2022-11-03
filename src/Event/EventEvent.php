@@ -14,8 +14,6 @@ use GibsonOS\Core\Manager\ModelManager;
 use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Model\Event as EventModel;
 use GibsonOS\Core\Service\EventService;
-use JsonException;
-use ReflectionException;
 
 #[Event('Event')]
 class EventEvent extends AbstractEvent
@@ -29,9 +27,9 @@ class EventEvent extends AbstractEvent
     }
 
     /**
-     * @throws JsonException
+     * @throws \JsonException
      * @throws SaveError
-     * @throws ReflectionException
+     * @throws \ReflectionException
      */
     #[Event\Method('Aktivieren')]
     public function activate(#[Event\Parameter(EventParameter::class)] EventModel $event): void
@@ -40,8 +38,8 @@ class EventEvent extends AbstractEvent
     }
 
     /**
-     * @throws JsonException
-     * @throws ReflectionException
+     * @throws \JsonException
+     * @throws \ReflectionException
      * @throws SaveError
      */
     #[Event\Method('Deaktivieren')]
@@ -55,7 +53,7 @@ class EventEvent extends AbstractEvent
      * @param bool       $async
      *
      * @throws DateTimeError
-     * @throws JsonException
+     * @throws \JsonException
      * @throws SaveError
      * @throws EventException
      * @throws FactoryError
@@ -76,8 +74,8 @@ class EventEvent extends AbstractEvent
     }
 
     /**
-     * @throws JsonException
-     * @throws ReflectionException
+     * @throws \JsonException
+     * @throws \ReflectionException
      * @throws SaveError
      */
     #[Event\Method('Stoppen')]

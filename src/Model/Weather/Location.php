@@ -3,18 +3,16 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Model\Weather;
 
-use DateTimeInterface;
 use GibsonOS\Core\Attribute\Install\Database\Column;
 use GibsonOS\Core\Attribute\Install\Database\Key;
 use GibsonOS\Core\Attribute\Install\Database\Table;
 use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Model\AutoCompleteModelInterface;
-use JsonSerializable;
 
 #[Table]
 #[Key(unique: true, columns: ['latitude', 'longitude'])]
 #[Key(columns: ['interval', 'active'])]
-class Location extends AbstractModel implements JsonSerializable, AutoCompleteModelInterface
+class Location extends AbstractModel implements \JsonSerializable, AutoCompleteModelInterface
 {
     #[Column(attributes: [Column::ATTRIBUTE_UNSIGNED], autoIncrement: true)]
     private ?int $id = null;
@@ -39,7 +37,7 @@ class Location extends AbstractModel implements JsonSerializable, AutoCompleteMo
     private bool $active = false;
 
     #[Column]
-    private ?DateTimeInterface $lastRun = null;
+    private ?\DateTimeInterface $lastRun = null;
 
     #[Column(length: 255)]
     private ?string $error = null;
@@ -128,12 +126,12 @@ class Location extends AbstractModel implements JsonSerializable, AutoCompleteMo
         return $this;
     }
 
-    public function getLastRun(): ?DateTimeInterface
+    public function getLastRun(): ?\DateTimeInterface
     {
         return $this->lastRun;
     }
 
-    public function setLastRun(?DateTimeInterface $lastRun): Location
+    public function setLastRun(?\DateTimeInterface $lastRun): Location
     {
         $this->lastRun = $lastRun;
 

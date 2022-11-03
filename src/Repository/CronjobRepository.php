@@ -3,11 +3,9 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Repository;
 
-use DateTimeInterface;
 use GibsonOS\Core\Attribute\GetTableName;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\Cronjob;
-use mysqlTable;
 
 class CronjobRepository extends AbstractRepository
 {
@@ -20,7 +18,7 @@ class CronjobRepository extends AbstractRepository
     /**
      * @return Cronjob[]
      */
-    public function getRunnableByUser(DateTimeInterface $dateTime, string $user): array
+    public function getRunnableByUser(\DateTimeInterface $dateTime, string $user): array
     {
         $tableName = $this->cronjobTableName;
         $timeTableName = $this->cronjobTimeTableName;
@@ -54,7 +52,7 @@ class CronjobRepository extends AbstractRepository
         }
     }
 
-    private function getFirstRunBetweenPart(mysqlTable $table, DateTimeInterface $dateTime): string
+    private function getFirstRunBetweenPart(\mysqlTable $table, \DateTimeInterface $dateTime): string
     {
         $tableName = $this->cronjobTableName;
         $table
@@ -79,7 +77,7 @@ class CronjobRepository extends AbstractRepository
         ;
     }
 
-    private function getTimeAsUnixTimestampFunction(mysqlTable $table, DateTimeInterface $dateTime): string
+    private function getTimeAsUnixTimestampFunction(\mysqlTable $table, \DateTimeInterface $dateTime): string
     {
         $table->addWhereParameter(
             ((int) $dateTime->format('Y')) . '-' . ((int) $dateTime->format('n')) . '-' . ((int) $dateTime->format('j')) . ' ' .
@@ -89,7 +87,7 @@ class CronjobRepository extends AbstractRepository
         return 'UNIX_TIMESTAMP(?)';
     }
 
-    private function getTimePart(mysqlTable $table, string $field, int $value): string
+    private function getTimePart(\mysqlTable $table, string $field, int $value): string
     {
         $tableName = $this->cronjobTimeTableName;
         $table

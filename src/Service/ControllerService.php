@@ -20,11 +20,6 @@ use GibsonOS\Core\Service\Response\ExceptionResponse;
 use GibsonOS\Core\Service\Response\ResponseInterface;
 use GibsonOS\Core\Service\Response\TwigResponse;
 use GibsonOS\Core\Utility\StatusCode;
-use JsonException;
-use OutOfBoundsException;
-use ReflectionException;
-use ReflectionMethod;
-use ReflectionNamedType;
 use Throwable;
 
 class ControllerService
@@ -50,7 +45,7 @@ class ControllerService
             $controller = $this->serviceManagerService->get($controllerName);
             /** @psalm-suppress ArgumentTypeCoercion */
             $reflectionClass = $this->reflectionManager->getReflectionClass($controllerName);
-        } catch (ReflectionException|FactoryError $e) {
+        } catch (\ReflectionException|FactoryError $e) {
             $this->outputResponse(new ExceptionResponse(
                 new ControllerError(sprintf('Controller %s not found!', $controllerName), 404, $e),
                 $this->requestService,
@@ -63,7 +58,7 @@ class ControllerService
 
         try {
             $reflectionMethod = $reflectionClass->getMethod($action);
-        } catch (ReflectionException $e) {
+        } catch (\ReflectionException $e) {
             $this->outputResponse(new ExceptionResponse(
                 new ControllerError(sprintf('Action %s::%s not exists!', $controllerName, $action), 404, $e),
                 $this->requestService,
@@ -112,7 +107,7 @@ class ControllerService
                     $response = $this->renderTemplate();
                 }
             }
-        } catch (Throwable $e) {
+        } catch (\Throwable $e) {
             $response = new ExceptionResponse($e, $this->requestService, $this->twigService, $this->statusCode);
         }
 
@@ -127,8 +122,8 @@ class ControllerService
     {
         $now = time();
         $context = [
-            'baseDir' => preg_replace('|^(.*/).+?$|', '$1', $_SERVER['SCRIPT_NAME']),
-            'domain' => strtolower($_SERVER['REQUEST_SCHEME']) . '://' . $_SERVER['HTTP_HOST'],
+            'baseDir' => preg_replace('|^(.*/).+?$|', '$1', $_SERVER['SCRIPT_NAME'] ?? ''),
+            'domain' => strtolower($_SERVER['REQUEST_SCHEME'] ?? '') . '://' . ($_SERVER['HTTP_HOST'] ?? ''),
             'serverDate' => [
                 'now' => $now,
                 'sunrise' => date_sunrise(
@@ -157,7 +152,7 @@ class ControllerService
     {
         try {
             header($this->statusCode->getStatusHeader($response->getCode()));
-        } catch (OutOfBoundsException $exception) {
+        } catch (\OutOfBoundsException $exception) {
             $this->outputResponse(new ExceptionResponse(
                 $exception,
                 $this->requestService,
@@ -209,11 +204,11 @@ class ControllerService
      *
      * @throws ControllerError
      * @throws FactoryError
-     * @throws JsonException
-     * @throws ReflectionException
+     * @throws \JsonException
+     * @throws \ReflectionException
      * @throws MapperException
      */
-    private function getParameters(ReflectionMethod $reflectionMethod, array $attributes): array
+    private function getParameters(\ReflectionMethod $reflectionMethod, array $attributes): array
     {
         $parameters = [];
         $attributeParameters = [];
@@ -257,7 +252,7 @@ class ControllerService
             $parameterType = $reflectionParameter->getType();
 
             if (
-                $parameterType instanceof ReflectionNamedType &&
+                $parameterType instanceof \ReflectionNamedType &&
                 !$parameterType->isBuiltin()
             ) {
                 $typeName = $parameterType->getName();
@@ -307,7 +302,7 @@ class ControllerService
         return $parameters;
     }
 
-    private function cleanParameters(ReflectionMethod $reflectionMethod, array $parameters): array
+    private function cleanParameters(\ReflectionMethod $reflectionMethod, array $parameters): array
     {
         $newParameters = [];
 

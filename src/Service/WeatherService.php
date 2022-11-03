@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Service;
 
-use DateTimeZone;
 use GibsonOS\Core\Dto\Web\Request;
 use GibsonOS\Core\Dto\Web\Response;
 use GibsonOS\Core\Event\WeatherEvent;
@@ -18,7 +17,6 @@ use GibsonOS\Core\Mapper\WeatherMapper;
 use GibsonOS\Core\Model\Weather\Location;
 use GibsonOS\Core\Repository\WeatherRepository;
 use GibsonOS\Core\Utility\JsonUtility;
-use JsonException;
 
 class WeatherService
 {
@@ -35,7 +33,7 @@ class WeatherService
 
     /**
      * @throws DateTimeError
-     * @throws JsonException
+     * @throws \JsonException
      * @throws SaveError
      * @throws WeatherError
      */
@@ -73,7 +71,7 @@ class WeatherService
             );
         }
 
-        $now = $this->dateTimeService->get('now', new DateTimeZone($location->getTimezone()));
+        $now = $this->dateTimeService->get('now', new \DateTimeZone($location->getTimezone()));
         $current = $this->weatherMapper->mapFromArray($data['current'], $location);
         $this->modelManager->save($current);
 

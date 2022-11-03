@@ -3,16 +3,12 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Model;
 
-use DateTimeImmutable;
-use DateTimeInterface;
 use GibsonOS\Core\Attribute\Install\Database\Column;
 use GibsonOS\Core\Attribute\Install\Database\Key;
 use GibsonOS\Core\Attribute\Install\Database\Table;
-use JsonSerializable;
-use mysqlDatabase;
 
 #[Table('system_drive')]
-class Drive extends AbstractModel implements JsonSerializable
+class Drive extends AbstractModel implements \JsonSerializable
 {
     public const LBA_YES = 'yes';
 
@@ -80,13 +76,13 @@ class Drive extends AbstractModel implements JsonSerializable
     private string $tDma;
 
     #[Column(type: Column::TYPE_TIMESTAMP, default: Column::DEFAULT_CURRENT_TIMESTAMP)]
-    private DateTimeInterface $added;
+    private \DateTimeInterface $added;
 
-    public function __construct(mysqlDatabase $database = null)
+    public function __construct(\mysqlDatabase $database = null)
     {
         parent::__construct($database);
 
-        $this->added = new DateTimeImmutable();
+        $this->added = new \DateTimeImmutable();
     }
 
     public function getId(): ?int
@@ -329,12 +325,12 @@ class Drive extends AbstractModel implements JsonSerializable
         return $this;
     }
 
-    public function getAdded(): DateTimeImmutable|DateTimeInterface
+    public function getAdded(): \DateTimeImmutable|\DateTimeInterface
     {
         return $this->added;
     }
 
-    public function setAdded(DateTimeImmutable|DateTimeInterface $added): Drive
+    public function setAdded(\DateTimeImmutable|\DateTimeInterface $added): Drive
     {
         $this->added = $added;
 

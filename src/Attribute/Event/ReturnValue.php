@@ -6,7 +6,7 @@ namespace GibsonOS\Core\Attribute\Event;
 use Attribute;
 use GibsonOS\Core\Dto\Parameter\AbstractParameter;
 
-#[Attribute(Attribute::TARGET_METHOD | Attribute::IS_REPEATABLE)]
+#[\Attribute(\Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class ReturnValue
 {
     /**

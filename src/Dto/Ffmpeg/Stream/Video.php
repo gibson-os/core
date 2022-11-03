@@ -3,9 +3,7 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Dto\Ffmpeg\Stream;
 
-use JsonSerializable;
-
-class Video implements JsonSerializable
+class Video implements \JsonSerializable
 {
     private ?string $language = null;
 

@@ -3,14 +3,12 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Utility;
 
-use JsonException;
-
 class JsonUtility
 {
     /**
      * @param mixed $value
      *
-     * @throws JsonException
+     * @throws \JsonException
      */
     public static function encode($value, int $flags = JSON_UNESCAPED_UNICODE + JSON_THROW_ON_ERROR): string
     {
@@ -18,7 +16,7 @@ class JsonUtility
     }
 
     /**
-     * @throws JsonException
+     * @throws \JsonException
      *
      * @return mixed
      */
@@ -28,7 +26,7 @@ class JsonUtility
     }
 
     /**
-     * @throws JsonException
+     * @throws \JsonException
      *
      * @return mixed
      */

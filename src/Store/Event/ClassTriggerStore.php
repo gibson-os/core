@@ -10,10 +10,6 @@ use GibsonOS\Core\Exception\FactoryError;
 use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Service\EventService;
 use GibsonOS\Core\Store\AbstractStore;
-use ReflectionAttribute;
-use ReflectionClass;
-use ReflectionClassConstant;
-use ReflectionException;
 
 class ClassTriggerStore extends AbstractStore
 {
@@ -43,7 +39,7 @@ class ClassTriggerStore extends AbstractStore
 
     /**
      * @throws FactoryError
-     * @throws ReflectionException
+     * @throws \ReflectionException
      *
      * @return array[]
      */
@@ -63,7 +59,7 @@ class ClassTriggerStore extends AbstractStore
     }
 
     /**
-     * @throws ReflectionException
+     * @throws \ReflectionException
      * @throws FactoryError
      */
     private function generateList(): void
@@ -76,11 +72,11 @@ class ClassTriggerStore extends AbstractStore
         $reflectionClass = $this->reflectionManager->getReflectionClass($this->className);
         $listeners = $this->eventService->getListeners($reflectionClass);
 
-        foreach ($reflectionClass->getReflectionConstants(ReflectionClassConstant::IS_PUBLIC) as $reflectionClassConstant) {
+        foreach ($reflectionClass->getReflectionConstants(\ReflectionClassConstant::IS_PUBLIC) as $reflectionClassConstant) {
             $triggerAttribute = $this->reflectionManager->getAttribute(
                 $reflectionClassConstant,
                 Trigger::class,
-                ReflectionAttribute::IS_INSTANCEOF
+                \ReflectionAttribute::IS_INSTANCEOF
             );
 
             if ($triggerAttribute === null) {
@@ -105,12 +101,12 @@ class ClassTriggerStore extends AbstractStore
 
     /**
      * @throws FactoryError
-     * @throws ReflectionException
+     * @throws \ReflectionException
      *
      * @return array<string, AbstractParameter>
      */
     private function getParameters(
-        ReflectionClass $reflectionClass,
+        \ReflectionClass $reflectionClass,
         Trigger $triggerAttribute,
         array $listeners = []
     ): array {

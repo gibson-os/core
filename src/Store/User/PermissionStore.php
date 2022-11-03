@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Store\User;
 
-use Generator;
 use GibsonOS\Core\Model\User\PermissionView;
 use GibsonOS\Core\Store\AbstractDatabaseStore;
 
@@ -36,7 +35,7 @@ class PermissionStore extends AbstractDatabaseStore
         return '`user_ip`, `user_host`, `user_name`';
     }
 
-    public function getList(): Generator
+    public function getList(): \Generator
     {
         /** @var PermissionView $permissionView */
         foreach (parent::getList() as $permissionView) {

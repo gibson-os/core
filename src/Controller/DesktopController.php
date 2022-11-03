@@ -13,8 +13,6 @@ use GibsonOS\Core\Model\User\Permission;
 use GibsonOS\Core\Repository\ModuleRepository;
 use GibsonOS\Core\Service\Response\AjaxResponse;
 use GibsonOS\Core\Utility\JsonUtility;
-use JsonException;
-use ReflectionException;
 
 class DesktopController extends AbstractController
 {
@@ -25,7 +23,7 @@ class DesktopController extends AbstractController
     public const TOOLS_KEY = 'tools';
 
     /**
-     * @throws JsonException
+     * @throws \JsonException
      */
     #[CheckPermission(Permission::READ)]
     public function index(
@@ -43,8 +41,8 @@ class DesktopController extends AbstractController
     /**
      * @throws SaveError
      * @throws SelectError
-     * @throws JsonException
-     * @throws ReflectionException
+     * @throws \JsonException
+     * @throws \ReflectionException
      */
     #[CheckPermission(Permission::WRITE)]
     public function save(ModelManager $modelManager, ModuleRepository $moduleRepository, array $items): AjaxResponse

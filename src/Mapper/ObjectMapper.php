@@ -9,10 +9,7 @@ use GibsonOS\Core\Exception\MapperException;
 use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Manager\ServiceManager;
 use GibsonOS\Core\Utility\JsonUtility;
-use JsonException;
 use ReflectionException;
-use ReflectionParameter;
-use ReflectionProperty;
 use Throwable;
 
 class ObjectMapper implements ObjectMapperInterface
@@ -28,10 +25,10 @@ class ObjectMapper implements ObjectMapperInterface
      *
      * @param class-string<T> $className
      *
-     * @throws ReflectionException
+     * @throws \ReflectionException
      * @throws FactoryError
      * @throws MapperException
-     * @throws JsonException
+     * @throws \JsonException
      *
      * @return T
      */
@@ -65,9 +62,9 @@ class ObjectMapper implements ObjectMapperInterface
 
     /**
      * @throws FactoryError
-     * @throws JsonException
+     * @throws \JsonException
      * @throws MapperException
-     * @throws ReflectionException
+     * @throws \ReflectionException
      */
     public function setObjectValues(object $object, array $properties): object
     {
@@ -92,12 +89,12 @@ class ObjectMapper implements ObjectMapperInterface
 
     /**
      * @throws MapperException
-     * @throws ReflectionException
+     * @throws \ReflectionException
      * @throws FactoryError
-     * @throws JsonException
+     * @throws \JsonException
      */
     protected function mapValueToObject(
-        ReflectionParameter|ReflectionProperty $reflectionObject,
+        \ReflectionParameter|\ReflectionProperty $reflectionObject,
         int|float|string|bool|array|object|null $values
     ): int|float|string|bool|array|object|null {
         $attribute = $this->reflectionManager->getAttribute($reflectionObject, ObjectMapperAttribute::class);
@@ -111,7 +108,7 @@ class ObjectMapper implements ObjectMapperInterface
                 $mapper = $this->serviceManagerService->get($attribute->getMapperClassName(), ObjectMapperInterface::class);
             }
 
-            if ($values === null && $reflectionObject instanceof ReflectionParameter) {
+            if ($values === null && $reflectionObject instanceof \ReflectionParameter) {
                 return $this->reflectionManager->getDefaultValue($reflectionObject);
             }
 
@@ -139,7 +136,7 @@ class ObjectMapper implements ObjectMapperInterface
 
             if (enum_exists($typeName)) {
                 if (is_object($values) || is_array($values)) {
-                    throw new ReflectionException(sprintf(
+                    throw new \ReflectionException(sprintf(
                         'Value for enum "%s" is an array or object!',
                         $typeName
                     ));
@@ -170,7 +167,7 @@ class ObjectMapper implements ObjectMapperInterface
 
         if (
             $values === null &&
-            $reflectionObject instanceof ReflectionParameter &&
+            $reflectionObject instanceof \ReflectionParameter &&
             !$reflectionObject->allowsNull()
         ) {
             return $this->reflectionManager->getDefaultValue($reflectionObject);

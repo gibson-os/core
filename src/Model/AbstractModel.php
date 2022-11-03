@@ -8,13 +8,6 @@ use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Factory\DateTimeFactory;
 use GibsonOS\Core\Service\DateTimeService;
 use GibsonOS\Core\Utility\JsonUtility;
-use JsonException;
-use mysqlDatabase;
-use mysqlField;
-use mysqlRegistry;
-use mysqlTable;
-use ReflectionAttribute;
-use ReflectionClass;
 use ReflectionException;
 use Throwable;
 
@@ -22,7 +15,7 @@ abstract class AbstractModel implements ModelInterface
 {
     use ConstraintTrait;
 
-    private mysqlDatabase $database;
+    private \mysqlDatabase $database;
 
     private const TYPE_INT = 'int';
 
@@ -58,26 +51,26 @@ abstract class AbstractModel implements ModelInterface
     /**
      * @throws GetError
      */
-    public function __construct(mysqlDatabase $database = null)
+    public function __construct(\mysqlDatabase $database = null)
     {
         $this->dateTime = DateTimeFactory::get();
 
         if ($database === null) {
-            $this->database = mysqlRegistry::getInstance()->get('database');
+            $this->database = \mysqlRegistry::getInstance()->get('database');
         } else {
             $this->database = $database;
         }
     }
 
-    public function getMysqlTable(): mysqlTable
+    public function getMysqlTable(): \mysqlTable
     {
-        $mysqlTable = new mysqlTable($this->database, $this->getTableName());
+        $mysqlTable = new \mysqlTable($this->database, $this->getTableName());
         $this->loadFromMysqlTable($mysqlTable);
 
         return $mysqlTable;
     }
 
-    public function getDatabase(): mysqlDatabase
+    public function getDatabase(): \mysqlDatabase
     {
         return $this->database;
     }
@@ -89,8 +82,8 @@ abstract class AbstractModel implements ModelInterface
         }
 
         try {
-            $reflectionClass = new ReflectionClass($this::class);
-            $tableAttributes = $reflectionClass->getAttributes(Table::class, ReflectionAttribute::IS_INSTANCEOF);
+            $reflectionClass = new \ReflectionClass($this::class);
+            $tableAttributes = $reflectionClass->getAttributes(Table::class, \ReflectionAttribute::IS_INSTANCEOF);
             /** @var Table $tableAttribute */
             $tableAttribute = $tableAttributes[0]->newInstance();
             $this->tableName = $tableAttribute->getName() ?? $this->transformName(str_replace(
@@ -119,10 +112,10 @@ abstract class AbstractModel implements ModelInterface
     /**
      * @deprecated
      *
-     * @throws ReflectionException
-     * @throws JsonException
+     * @throws \ReflectionException
+     * @throws \JsonException
      */
-    public function loadFromMysqlTable(mysqlTable $mysqlTable): void
+    public function loadFromMysqlTable(\mysqlTable $mysqlTable): void
     {
         foreach ($mysqlTable->fields as $field) {
             $fieldName = $this->transformFieldName($field);
@@ -132,7 +125,7 @@ abstract class AbstractModel implements ModelInterface
                 continue;
             }
 
-            /** @var mysqlField $fieldObject */
+            /** @var \mysqlField $fieldObject */
             $fieldObject = $mysqlTable->{$field};
             $value = $fieldObject->getValue();
 
@@ -159,7 +152,7 @@ abstract class AbstractModel implements ModelInterface
 
                         break;
                     default:
-                        $reflectionParameter = (new ReflectionClass($this::class))
+                        $reflectionParameter = (new \ReflectionClass($this::class))
                             ->getMethod($setter)
                             ->getParameters()[0]
                         ;
@@ -193,9 +186,9 @@ abstract class AbstractModel implements ModelInterface
     /**
      * @deprecated
      *
-     * @throws JsonException
+     * @throws \JsonException
      */
-    public function setToMysqlTable(mysqlTable $mysqlTable): void
+    public function setToMysqlTable(\mysqlTable $mysqlTable): void
     {
         foreach ($mysqlTable->fields as $field) {
             $fieldName = $this->transformFieldName($field);
@@ -220,7 +213,7 @@ abstract class AbstractModel implements ModelInterface
                 continue;
             }
 
-            /** @var mysqlField $fieldObject */
+            /** @var \mysqlField $fieldObject */
             $fieldObject = $mysqlTable->{$field};
 
             if ($this->getColumnType($fieldObject->getType()) === self::TYPE_DATE_TIME) {

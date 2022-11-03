@@ -6,8 +6,6 @@ namespace GibsonOS\Core\Service\Attribute;
 use GibsonOS\Core\Attribute\AttributeInterface;
 use GibsonOS\Core\Attribute\GetEnv;
 use GibsonOS\Core\Service\EnvService;
-use ReflectionNamedType;
-use ReflectionParameter;
 
 class EnvAttribute implements ParameterAttributeInterface, AttributeServiceInterface
 {
@@ -15,7 +13,7 @@ class EnvAttribute implements ParameterAttributeInterface, AttributeServiceInter
     {
     }
 
-    public function replace(AttributeInterface $attribute, array $parameters, ReflectionParameter $reflectionParameter): mixed
+    public function replace(AttributeInterface $attribute, array $parameters, \ReflectionParameter $reflectionParameter): mixed
     {
         if (!$attribute instanceof GetEnv) {
             return null;
@@ -23,7 +21,7 @@ class EnvAttribute implements ParameterAttributeInterface, AttributeServiceInter
 
         $reflectionParameterType = $reflectionParameter->getType();
 
-        if ($reflectionParameterType instanceof ReflectionNamedType) {
+        if ($reflectionParameterType instanceof \ReflectionNamedType) {
             $parameterType = ucfirst($reflectionParameterType->getName());
 
             return $this->envService->{'get' . $parameterType}($attribute->getKey());

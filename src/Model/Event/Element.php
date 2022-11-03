@@ -11,10 +11,6 @@ use GibsonOS\Core\Attribute\Install\Database\Table;
 use GibsonOS\Core\Dto\Event\Command;
 use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Model\Event;
-use JsonException;
-use JsonSerializable;
-use ReflectionException;
-use Serializable;
 
 /**
  * @method Element      setEvent(Event $event)
@@ -24,7 +20,7 @@ use Serializable;
  */
 #[Table]
 #[Key(unique: true, columns: ['parent_id', 'order'])]
-class Element extends AbstractModel implements Serializable, JsonSerializable
+class Element extends AbstractModel implements \Serializable, \JsonSerializable
 {
     #[Column(attributes: [Column::ATTRIBUTE_UNSIGNED], autoIncrement: true)]
     private ?int $id = null;
@@ -98,7 +94,7 @@ class Element extends AbstractModel implements Serializable, JsonSerializable
     }
 
     /**
-     * @throws ReflectionException
+     * @throws \ReflectionException
      */
     public function getEvent(): Event
     {
@@ -272,7 +268,7 @@ class Element extends AbstractModel implements Serializable, JsonSerializable
     }
 
     /**
-     * @throws JsonException
+     * @throws \JsonException
      */
     public function jsonSerialize(): array
     {

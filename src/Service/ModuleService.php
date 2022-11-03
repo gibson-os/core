@@ -16,11 +16,8 @@ use GibsonOS\Core\Repository\Action\PermissionRepository;
 use GibsonOS\Core\Repository\ActionRepository;
 use GibsonOS\Core\Repository\ModuleRepository;
 use GibsonOS\Core\Repository\TaskRepository;
-use JsonException;
 use Psr\Log\LoggerInterface;
-use ReflectionClass;
 use ReflectionException;
-use ReflectionMethod;
 
 class ModuleService
 {
@@ -63,7 +60,7 @@ class ModuleService
     /**
      * @throws GetError
      * @throws SaveError
-     * @throws JsonException
+     * @throws \JsonException
      */
     public function scan(): void
     {
@@ -74,15 +71,15 @@ class ModuleService
             $this->actionRepository->deleteByIdsNot(array_merge($result['actionIds'], $oldResult['actionIds']));
             $this->taskRepository->deleteByIdsNot(array_merge($result['taskIds'], $oldResult['taskIds']));
             $this->moduleRepository->deleteByIdsNot(array_merge($result['moduleIds'], $oldResult['moduleIds']));
-        } catch (ReflectionException $e) {
+        } catch (\ReflectionException $e) {
             throw new GetError($e->getMessage());
         }
     }
 
     /**
-     * @throws ReflectionException
+     * @throws \ReflectionException
      * @throws SaveError
-     * @throws JsonException
+     * @throws \JsonException
      * @throws GetError
      *
      * @return array{moduleIds: array<int>, taskIds: array<int>, actionIds: array<int>}
@@ -127,9 +124,9 @@ class ModuleService
     }
 
     /**
-     * @throws ReflectionException
+     * @throws \ReflectionException
      * @throws SaveError
-     * @throws JsonException
+     * @throws \JsonException
      * @throws GetError
      *
      * @return array{taskIds: array<int>, actionIds: array<int>}
@@ -196,18 +193,18 @@ class ModuleService
     }
 
     /**
-     * @throws ReflectionException
+     * @throws \ReflectionException
      * @throws SaveError
-     * @throws JsonException
+     * @throws \JsonException
      *
      * @return int[]
      */
-    private function scanActions(Module $module, Task $task, ReflectionClass $reflectionClass): array
+    private function scanActions(Module $module, Task $task, \ReflectionClass $reflectionClass): array
     {
         $this->logger->info(sprintf('Scan actions for task %s in module %s...', $task->getName(), $module->getName()));
         $actionIds = [];
 
-        foreach ($reflectionClass->getMethods(ReflectionMethod::IS_PUBLIC) as $reflectionMethod) {
+        foreach ($reflectionClass->getMethods(\ReflectionMethod::IS_PUBLIC) as $reflectionMethod) {
             if (mb_strpos($reflectionMethod->getName(), '__') === 0) {
                 continue;
             }
@@ -250,8 +247,8 @@ class ModuleService
 
     /**
      * @throws GetError
-     * @throws JsonException
-     * @throws ReflectionException
+     * @throws \JsonException
+     * @throws \ReflectionException
      * @throws SaveError
      *
      * @return array{moduleIds: array<int>, taskIds: array<int>, actionIds: array<int>}
@@ -294,8 +291,8 @@ class ModuleService
 
     /**
      * @throws GetError
-     * @throws JsonException
-     * @throws ReflectionException
+     * @throws \JsonException
+     * @throws \ReflectionException
      * @throws SaveError
      *
      * @return array{taskIds: array<int>, actionIds: array<int>}
@@ -335,8 +332,8 @@ class ModuleService
     }
 
     /**
-     * @throws JsonException
-     * @throws ReflectionException
+     * @throws \JsonException
+     * @throws \ReflectionException
      * @throws SaveError
      *
      * @return int[]

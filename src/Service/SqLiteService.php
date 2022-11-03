@@ -5,17 +5,14 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Service;
 
 use GibsonOS\Core\Exception\Sqlite\ExecuteError;
-use SQLite3;
-use SQLite3Result;
-use SQLite3Stmt;
 
 class SqLiteService
 {
-    private SQLite3 $database;
+    private \SQLite3 $database;
 
     public function __construct(private string $filename, private FileService $file)
     {
-        $this->database = new SQLite3($this->filename);
+        $this->database = new \SQLite3($this->filename);
     }
 
     /**
@@ -31,11 +28,11 @@ class SqLiteService
     /**
      * @throws ExecuteError
      */
-    public function prepare(string $query): SQLite3Stmt
+    public function prepare(string $query): \SQLite3Stmt
     {
         $statement = $this->database->prepare($query);
 
-        if ($statement instanceof SQLite3Stmt) {
+        if ($statement instanceof \SQLite3Stmt) {
             return $statement;
         }
 
@@ -65,7 +62,7 @@ class SqLiteService
     /**
      * @throws ExecuteError
      */
-    public function query(string $query): SQLite3Result
+    public function query(string $query): \SQLite3Result
     {
         $result = $this->database->query($query);
 
@@ -106,14 +103,14 @@ class SqLiteService
 
     public function hasTable(string $name): bool
     {
-        if ($this->database->querySingle("SELECT * FROM sqlite_master WHERE type='table' AND tbl_name='" . SQLite3::escapeString($name) . "'")) {
+        if ($this->database->querySingle("SELECT * FROM sqlite_master WHERE type='table' AND tbl_name='" . \SQLite3::escapeString($name) . "'")) {
             return true;
         }
 
         return false;
     }
 
-    public function getDatabase(): SQLite3
+    public function getDatabase(): \SQLite3
     {
         return $this->database;
     }

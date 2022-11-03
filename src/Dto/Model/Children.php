@@ -6,7 +6,6 @@ namespace GibsonOS\Core\Dto\Model;
 use GibsonOS\Core\Attribute\Install\Database\Constraint;
 use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Model\ModelInterface;
-use ReflectionProperty;
 
 class Children
 {
@@ -14,14 +13,14 @@ class Children
      * @param AbstractModel[] $models
      */
     public function __construct(
-        private readonly ReflectionProperty $reflectionProperty,
+        private readonly \ReflectionProperty $reflectionProperty,
         private readonly Constraint $constraint,
         private readonly array $models,
         private readonly ModelInterface $parent,
     ) {
     }
 
-    public function getReflectionProperty(): ReflectionProperty
+    public function getReflectionProperty(): \ReflectionProperty
     {
         return $this->reflectionProperty;
     }

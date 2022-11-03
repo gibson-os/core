@@ -3,15 +3,12 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Model\User;
 
-use DateTimeImmutable;
-use DateTimeInterface;
 use GibsonOS\Core\Attribute\Install\Database\Column;
 use GibsonOS\Core\Attribute\Install\Database\Constraint;
 use GibsonOS\Core\Attribute\Install\Database\Key;
 use GibsonOS\Core\Attribute\Install\Database\Table;
 use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Model\User;
-use mysqlDatabase;
 
 /**
  * @method User   getUser()
@@ -40,19 +37,19 @@ class Device extends AbstractModel
     private ?string $fcmToken = null;
 
     #[Column]
-    private ?DateTimeInterface $lastLogin = null;
+    private ?\DateTimeInterface $lastLogin = null;
 
     #[Column(type: Column::TYPE_TIMESTAMP, default: Column::DEFAULT_CURRENT_TIMESTAMP)]
-    private DateTimeInterface $added;
+    private \DateTimeInterface $added;
 
     #[Constraint]
     protected User $user;
 
-    public function __construct(mysqlDatabase $database = null)
+    public function __construct(\mysqlDatabase $database = null)
     {
         parent::__construct($database);
 
-        $this->added = new DateTimeImmutable();
+        $this->added = new \DateTimeImmutable();
     }
 
     public function getId(): string
@@ -127,24 +124,24 @@ class Device extends AbstractModel
         return $this;
     }
 
-    public function getLastLogin(): ?DateTimeInterface
+    public function getLastLogin(): ?\DateTimeInterface
     {
         return $this->lastLogin;
     }
 
-    public function setLastLogin(?DateTimeInterface $lastLogin): Device
+    public function setLastLogin(?\DateTimeInterface $lastLogin): Device
     {
         $this->lastLogin = $lastLogin;
 
         return $this;
     }
 
-    public function getAdded(): DateTimeInterface
+    public function getAdded(): \DateTimeInterface
     {
         return $this->added;
     }
 
-    public function setAdded(DateTimeInterface $added): Device
+    public function setAdded(\DateTimeInterface $added): Device
     {
         $this->added = $added;
 

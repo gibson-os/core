@@ -3,14 +3,13 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Install;
 
-use Generator;
 use GibsonOS\Core\Dto\Install\Configuration;
 use GibsonOS\Core\Service\InstallService;
 use GibsonOS\Core\Service\PriorityInterface;
 
 class ApacheInstall extends AbstractInstall implements PriorityInterface, SingleInstallInterface
 {
-    public function install(string $module): Generator
+    public function install(string $module): \Generator
     {
         yield $apacheUserInput = $this->getEnvInput('APACHE_USER', 'What is the apache username?');
         yield $apacheGroupInput = $this->getEnvInput('APACHE_GROUP', 'What is the apache group?');

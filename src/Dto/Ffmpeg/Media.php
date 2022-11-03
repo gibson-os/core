@@ -8,10 +8,8 @@ use GibsonOS\Core\Dto\Ffmpeg\Stream\Subtitle;
 use GibsonOS\Core\Dto\Ffmpeg\Stream\Video;
 use GibsonOS\Core\Exception\Ffmpeg\NoAudioError;
 use GibsonOS\Core\Exception\Ffmpeg\NoSubtitleError;
-use InvalidArgumentException;
-use JsonSerializable;
 
-class Media implements JsonSerializable
+class Media implements \JsonSerializable
 {
     /**
      * @var Video[]
@@ -236,7 +234,7 @@ class Media implements JsonSerializable
     public function selectAudioStream(?string $streamId): Media
     {
         if ($streamId !== null && !isset($this->audioStreams[$streamId])) {
-            throw new InvalidArgumentException('Audio Stream (' . $streamId . ') existiert nicht!');
+            throw new \InvalidArgumentException('Audio Stream (' . $streamId . ') existiert nicht!');
         }
 
         $this->selectedAudioStreamId = $streamId;
@@ -247,7 +245,7 @@ class Media implements JsonSerializable
     public function selectSubtitleStream(?string $streamId): Media
     {
         if ($streamId !== null && !isset($this->subtitleStreams[$streamId])) {
-            throw new InvalidArgumentException('Subtitle Stream (' . $streamId . ') existiert nicht!');
+            throw new \InvalidArgumentException('Subtitle Stream (' . $streamId . ') existiert nicht!');
         }
 
         $this->selectedSubtitleStreamId = $streamId;
@@ -258,7 +256,7 @@ class Media implements JsonSerializable
     public function selectVideoStream(?string $streamId): Media
     {
         if ($streamId !== null && !isset($this->videoStreams[$streamId])) {
-            throw new InvalidArgumentException('Video Stream (' . $streamId . ') existiert nicht!');
+            throw new \InvalidArgumentException('Video Stream (' . $streamId . ') existiert nicht!');
         }
 
         $this->selectedVideoStreamId = $streamId;

@@ -26,7 +26,7 @@ class UserRepository extends AbstractRepository
      */
     public function getByUsername(string $username): User
     {
-        return $this->fetchOne('`user`=? AND', [$username], User::class);
+        return $this->fetchOne('`user`=?', [$username], User::class);
     }
 
     /**

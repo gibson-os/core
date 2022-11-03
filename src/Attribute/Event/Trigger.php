@@ -5,7 +5,7 @@ namespace GibsonOS\Core\Attribute\Event;
 
 use Attribute;
 
-#[Attribute(Attribute::TARGET_CLASS_CONSTANT)]
+#[\Attribute(\Attribute::TARGET_CLASS_CONSTANT)]
 class Trigger
 {
     /**

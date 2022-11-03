@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Install;
 
-use Generator;
 use GibsonOS\Core\Attribute\Install\Cronjob;
 use GibsonOS\Core\Dto\Install\Success;
 use GibsonOS\Core\Exception\FactoryError;
@@ -15,8 +14,6 @@ use GibsonOS\Core\Service\Attribute\Install\CronjobInstallAttribute;
 use GibsonOS\Core\Service\AttributeService;
 use GibsonOS\Core\Service\InstallService;
 use GibsonOS\Core\Service\PriorityInterface;
-use JsonException;
-use ReflectionException;
 
 class CronjobInstall extends AbstractInstall implements PriorityInterface
 {
@@ -31,11 +28,11 @@ class CronjobInstall extends AbstractInstall implements PriorityInterface
     /**
      * @throws FactoryError
      * @throws GetError
-     * @throws ReflectionException
+     * @throws \ReflectionException
      * @throws SaveError
-     * @throws JsonException
+     * @throws \JsonException
      */
-    public function install(string $module): Generator
+    public function install(string $module): \Generator
     {
         foreach ($this->getFiles($this->dirService->addEndSlash($module) . 'src' . DIRECTORY_SEPARATOR . 'Command') as $file) {
             $className = $this->serviceManagerService->getNamespaceByPath($file);

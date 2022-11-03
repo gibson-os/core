@@ -10,8 +10,6 @@ use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Repository\SettingRepository;
 use GibsonOS\Core\Service\RequestService;
 use GibsonOS\Core\Service\SessionService;
-use ReflectionException;
-use ReflectionParameter;
 
 class SettingAttribute implements ParameterAttributeInterface, AttributeServiceInterface
 {
@@ -24,12 +22,12 @@ class SettingAttribute implements ParameterAttributeInterface, AttributeServiceI
     }
 
     /**
-     * @throws ReflectionException
+     * @throws \ReflectionException
      */
     public function replace(
         AttributeInterface $attribute,
         array $parameters,
-        ReflectionParameter $reflectionParameter
+        \ReflectionParameter $reflectionParameter
     ): string|int|float|bool|null|array|object {
         if (!$attribute instanceof GetSetting) {
             return null;

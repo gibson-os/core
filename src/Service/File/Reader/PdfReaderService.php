@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Service\File\Reader;
 
-use Exception;
 use Smalot\PdfParser\Parser;
 
 class PdfReaderService implements ReaderInterface
@@ -18,7 +17,7 @@ class PdfReaderService implements ReaderInterface
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function getContent(string $filename): string
     {

@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Manager;
 
-use Exception;
 use GibsonOS\Core\Attribute\Install\Database\Column;
 use GibsonOS\Core\Attribute\Install\Database\Constraint;
 use GibsonOS\Core\Dto\Model\Children;
@@ -14,12 +13,6 @@ use GibsonOS\Core\Model\ModelInterface;
 use GibsonOS\Core\Service\Attribute\TableAttribute;
 use GibsonOS\Core\Service\DateTimeService;
 use GibsonOS\Core\Utility\JsonUtility;
-use JsonException;
-use mysqlDatabase;
-use mysqlField;
-use mysqlTable;
-use ReflectionAttribute;
-use ReflectionException;
 use Throwable;
 
 class ModelManager
@@ -59,7 +52,7 @@ class ModelManager
     private array $primaryColumns = [];
 
     public function __construct(
-        private readonly mysqlDatabase $mysqlDatabase,
+        private readonly \mysqlDatabase $mysqlDatabase,
         private readonly DateTimeService $dateTimeService,
         private readonly JsonUtility $jsonUtility,
         private readonly ReflectionManager $reflectionManager,
@@ -75,7 +68,7 @@ class ModelManager
         try {
             $mysqlTable = $this->setToMysqlTable($model);
             $mysqlTable->save();
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
             $exception = new SaveError($exception->getMessage(), 0, $exception);
             $exception->setModel($model);
 
@@ -86,7 +79,7 @@ class ModelManager
 
         try {
             $this->loadFromMysqlTable($mysqlTable, $model);
-        } catch (JsonException|ReflectionException $exception) {
+        } catch (\JsonException|\ReflectionException $exception) {
             $exception = new SaveError($exception->getMessage(), 0, $exception);
             $exception->setModel($model);
 
@@ -95,8 +88,8 @@ class ModelManager
     }
 
     /**
-     * @throws JsonException
-     * @throws ReflectionException
+     * @throws \JsonException
+     * @throws \ReflectionException
      * @throws SaveError
      */
     public function save(ModelInterface $model): void
@@ -115,7 +108,7 @@ class ModelManager
             $constraintAttribute = $this->reflectionManager->getAttribute(
                 $reflectionProperty,
                 Constraint::class,
-                ReflectionAttribute::IS_INSTANCEOF
+                \ReflectionAttribute::IS_INSTANCEOF
             );
 
             if ($constraintAttribute === null) {
@@ -152,7 +145,7 @@ class ModelManager
         foreach ($childrenList as $children) {
             try {
                 $this->saveChildren($children);
-            } catch (SaveError|JsonException|ReflectionException $exception) {
+            } catch (SaveError|\JsonException|\ReflectionException $exception) {
                 $exception = new SaveError($exception->getMessage(), 0, $exception);
                 $exception->setModel($model);
 
@@ -171,7 +164,7 @@ class ModelManager
 
     /**
      * @throws DeleteError
-     * @throws JsonException
+     * @throws \JsonException
      */
     public function delete(ModelInterface $model): void
     {
@@ -186,10 +179,10 @@ class ModelManager
     }
 
     /**
-     * @throws ReflectionException
-     * @throws JsonException
+     * @throws \ReflectionException
+     * @throws \JsonException
      */
-    public function loadFromMysqlTable(mysqlTable $mysqlTable, ModelInterface $model): void
+    public function loadFromMysqlTable(\mysqlTable $mysqlTable, ModelInterface $model): void
     {
         foreach ($mysqlTable->fields as $field) {
             $fieldName = $this->transformFieldName($field);
@@ -199,7 +192,7 @@ class ModelManager
                 continue;
             }
 
-            /** @var mysqlField $fieldObject */
+            /** @var \mysqlField $fieldObject */
             $fieldObject = $mysqlTable->{$field};
             $value = $fieldObject->getValue();
 
@@ -258,11 +251,11 @@ class ModelManager
     }
 
     /**
-     * @throws JsonException
+     * @throws \JsonException
      */
-    public function setToMysqlTable(ModelInterface $model): mysqlTable
+    public function setToMysqlTable(ModelInterface $model): \mysqlTable
     {
-        $mysqlTable = new mysqlTable($this->mysqlDatabase, $model->getTableName());
+        $mysqlTable = new \mysqlTable($this->mysqlDatabase, $model->getTableName());
 
         foreach ($mysqlTable->fields as $field) {
             $fieldName = $this->transformFieldName($field);
@@ -286,7 +279,7 @@ class ModelManager
                 continue;
             }
 
-            /** @var mysqlField $fieldObject */
+            /** @var \mysqlField $fieldObject */
             $fieldObject = $mysqlTable->{$field};
 
             if ($this->getColumnType($fieldObject->getType()) === self::TYPE_DATE_TIME) {
@@ -315,8 +308,8 @@ class ModelManager
     }
 
     /**
-     * @throws JsonException
-     * @throws ReflectionException
+     * @throws \JsonException
+     * @throws \ReflectionException
      * @throws SaveError
      */
     private function saveChildren(Children $children): void
@@ -325,7 +318,7 @@ class ModelManager
         $parentModelClassName = $constraintAttribute->getParentModelClassName();
 
         if ($parentModelClassName === null) {
-            throw new ReflectionException(
+            throw new \ReflectionException(
                 'Property "parentModelClassName" of constraint attribute  is not set!'
             );
         }
@@ -338,7 +331,7 @@ class ModelManager
             $where === null ? '' : '(' . $where . ') AND ',
             $constraintAttribute->getParentColumn()
         );
-        $mysqlTable = (new mysqlTable($this->mysqlDatabase, $tableName))
+        $mysqlTable = (new \mysqlTable($this->mysqlDatabase, $tableName))
             ->setWhereParameters($constraintAttribute->getWhereParameters())
             ->addWhereParameter($children->getParentId())
         ;
@@ -378,7 +371,7 @@ class ModelManager
     /**
      * @param class-string $className
      *
-     * @throws ReflectionException
+     * @throws \ReflectionException
      *
      * @return PrimaryColumn[]
      */
@@ -395,7 +388,7 @@ class ModelManager
             $columnAttribute = $this->reflectionManager->getAttribute(
                 $reflectionProperty,
                 Column::class,
-                ReflectionAttribute::IS_INSTANCEOF
+                \ReflectionAttribute::IS_INSTANCEOF
             );
 
             if ($columnAttribute === null) {

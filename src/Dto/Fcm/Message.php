@@ -6,10 +6,8 @@ namespace GibsonOS\Core\Dto\Fcm;
 use GibsonOS\Core\Dto\Fcm\Message\Priority;
 use GibsonOS\Core\Dto\Fcm\Message\Type;
 use GibsonOS\Core\Utility\JsonUtility;
-use JsonException;
-use JsonSerializable;
 
-class Message implements JsonSerializable
+class Message implements \JsonSerializable
 {
     public const OPTION_NONE = 0;
 
@@ -33,7 +31,7 @@ class Message implements JsonSerializable
     }
 
     /**
-     * @throws JsonException
+     * @throws \JsonException
      */
     public function jsonSerialize(): array
     {

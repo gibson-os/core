@@ -6,12 +6,11 @@ namespace GibsonOS\Core\Controller;
 use GibsonOS\Core\Attribute\GetSetting;
 use GibsonOS\Core\Model\Setting;
 use GibsonOS\Core\Service\Response\AjaxResponse;
-use JsonException;
 
 class IndexController extends AbstractController
 {
     /**
-     * @throws JsonException
+     * @throws \JsonException
      */
     public function index(
         DesktopController $desktopController,

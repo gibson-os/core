@@ -9,8 +9,6 @@ use GibsonOS\Core\Exception\MapperException;
 use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Manager\ServiceManager;
 use GibsonOS\Core\Utility\JsonUtility;
-use JsonException;
-use ReflectionAttribute;
 use ReflectionException;
 
 class ModelMapper extends ObjectMapper
@@ -24,9 +22,9 @@ class ModelMapper extends ObjectMapper
 
     /**
      * @throws FactoryError
-     * @throws JsonException
+     * @throws \JsonException
      * @throws MapperException
-     * @throws ReflectionException
+     * @throws \ReflectionException
      */
     public function setObjectValues(object $object, array $properties): object
     {
@@ -42,7 +40,7 @@ class ModelMapper extends ObjectMapper
             $constraintAttribute = $this->reflectionManager->getAttribute(
                 $reflectionProperty,
                 Constraint::class,
-                ReflectionAttribute::IS_INSTANCEOF
+                \ReflectionAttribute::IS_INSTANCEOF
             );
             $setter = 'set' . ucfirst($key);
 

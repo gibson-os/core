@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Repository;
 
-use DateTimeInterface;
 use GibsonOS\Core\Attribute\GetTableName;
 use GibsonOS\Core\Dto\Event\Command;
 use GibsonOS\Core\Exception\Model\SaveError;
@@ -15,10 +14,6 @@ use GibsonOS\Core\Model\Event\Element;
 use GibsonOS\Core\Model\Event\Trigger;
 use GibsonOS\Core\Service\DateTimeService;
 use GibsonOS\Core\Utility\JsonUtility;
-use JsonException;
-use mysqlTable;
-use ReflectionException;
-use stdClass;
 
 class EventRepository extends AbstractRepository
 {
@@ -60,7 +55,7 @@ class EventRepository extends AbstractRepository
     /**
      * @return Event[]
      */
-    public function getTimeControlled(string $className, string $trigger, DateTimeInterface $dateTime): array
+    public function getTimeControlled(string $className, string $trigger, \DateTimeInterface $dateTime): array
     {
         $table = $this->initializeTable()
             ->setWhere(
@@ -95,7 +90,7 @@ class EventRepository extends AbstractRepository
         return $this->matchModels($table->connection->fetchObjectList());
     }
 
-    private function initializeTable(): mysqlTable
+    private function initializeTable(): \mysqlTable
     {
         $table = $this->getTable($this->elementTableName);
         $table->appendJoinLeft('`event`', '`event_element`.`event_id`=`event`.`id`');
@@ -162,8 +157,8 @@ class EventRepository extends AbstractRepository
     /**
      * @param int[] $elementIds
      *
-     * @throws JsonException
-     * @throws ReflectionException
+     * @throws \JsonException
+     * @throws \ReflectionException
      * @throws SaveError
      *
      * @return int[]
@@ -222,8 +217,8 @@ class EventRepository extends AbstractRepository
 
     /**
      * @throws SaveError
-     * @throws ReflectionException
-     * @throws JsonException
+     * @throws \ReflectionException
+     * @throws \JsonException
      *
      * @return int[]
      */
@@ -255,7 +250,7 @@ class EventRepository extends AbstractRepository
     }
 
     /**
-     * @param stdClass[] $events
+     * @param \stdClass[] $events
      *
      * @return Event[]
      */

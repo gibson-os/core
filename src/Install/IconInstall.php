@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Install;
 
-use Generator;
 use GibsonOS\Core\Dto\Install\Success;
 use GibsonOS\Core\Exception\CreateError;
 use GibsonOS\Core\Exception\Model\SaveError;
@@ -18,7 +17,7 @@ class IconInstall extends AbstractInstall implements PriorityInterface
      * @throws SaveError
      * @throws SelectError
      */
-    public function install(string $module): Generator
+    public function install(string $module): \Generator
     {
         $customIconPath = realpath(
             dirname(__FILE__) . DIRECTORY_SEPARATOR .

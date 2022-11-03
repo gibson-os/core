@@ -7,7 +7,7 @@ use Attribute;
 use GibsonOS\Core\Attribute\AttributeInterface;
 use GibsonOS\Core\Service\Attribute\Install\CronjobInstallAttribute;
 
-#[Attribute(Attribute::TARGET_CLASS | Attribute::IS_REPEATABLE)]
+#[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
 class Cronjob implements AttributeInterface
 {
     public function __construct(

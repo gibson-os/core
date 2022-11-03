@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Install\Database;
 
-use Generator;
 use GibsonOS\Core\Dto\Install\Configuration;
 use GibsonOS\Core\Dto\Install\Input;
 use GibsonOS\Core\Exception\InstallException;
@@ -11,14 +10,13 @@ use GibsonOS\Core\Install\AbstractInstall;
 use GibsonOS\Core\Install\SingleInstallInterface;
 use GibsonOS\Core\Service\InstallService;
 use GibsonOS\Core\Service\PriorityInterface;
-use mysqlDatabase;
 
 class ConnectInstall extends AbstractInstall implements PriorityInterface, SingleInstallInterface
 {
     /**
      * @throws InstallException
      */
-    public function install(string $module): Generator
+    public function install(string $module): \Generator
     {
         yield $hostInput = $this->getEnvInput('MYSQL_HOST', 'What is the MySQL hostname?');
         yield $userInput = $this->getEnvInput('MYSQL_USER', 'What is the MySQL username?');
@@ -32,7 +30,7 @@ class ConnectInstall extends AbstractInstall implements PriorityInterface, Singl
         yield $databaseInput = $this->getEnvInput('MYSQL_DATABASE', 'What is the MySQL database name?');
 
         $host = $hostInput->getValue() ?? '';
-        $mysqlDatabase = $this->serviceManagerService->get(mysqlDatabase::class);
+        $mysqlDatabase = $this->serviceManagerService->get(\mysqlDatabase::class);
         $mysqlDatabase->host = $host;
         $mysqlDatabase->user = $installUserInput->getValue() ?? '';
         $mysqlDatabase->pass = $installPasswordInput->getValue() ?? '';
@@ -65,7 +63,7 @@ class ConnectInstall extends AbstractInstall implements PriorityInterface, Singl
             }
         }
 
-        $mysqlUserDatabase = new mysqlDatabase($host, $user, $password);
+        $mysqlUserDatabase = new \mysqlDatabase($host, $user, $password);
 
         if (
             !$mysqlUserDatabase->openDB() &&

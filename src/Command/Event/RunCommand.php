@@ -12,7 +12,6 @@ use GibsonOS\Core\Exception\Model\SaveError;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Repository\EventRepository;
 use GibsonOS\Core\Service\EventService;
-use JsonException;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -33,7 +32,7 @@ class RunCommand extends AbstractCommand
 
     /**
      * @throws DateTimeError
-     * @throws JsonException
+     * @throws \JsonException
      * @throws SaveError
      * @throws SelectError
      * @throws EventException

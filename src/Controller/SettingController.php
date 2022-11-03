@@ -10,14 +10,13 @@ use GibsonOS\Core\Repository\SettingRepository;
 use GibsonOS\Core\Service\PermissionService;
 use GibsonOS\Core\Service\Response\AjaxResponse;
 use GibsonOS\Core\Utility\JsonUtility;
-use JsonException;
 
 class SettingController extends AbstractController
 {
     /**
      * @param array<string, array{permissionRequired: bool, items: array}> $requiredPermissions
      *
-     * @throws JsonException
+     * @throws \JsonException
      */
     #[CheckPermission(Permission::READ)]
     public function window(

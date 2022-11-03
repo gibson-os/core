@@ -8,8 +8,6 @@ use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\User\Permission;
 use GibsonOS\Core\Model\User\PermissionView;
 use GibsonOS\Core\Repository\AbstractRepository;
-use mysqlTable;
-use stdClass;
 
 class PermissionViewRepository extends AbstractRepository
 {
@@ -20,7 +18,7 @@ class PermissionViewRepository extends AbstractRepository
     /**
      * @throws SelectError
      *
-     * @return stdClass[]
+     * @return \stdClass[]
      */
     public function getTaskList(?int $userId, string $module = null): array
     {
@@ -124,28 +122,28 @@ class PermissionViewRepository extends AbstractRepository
         return $this->getModel($table, PermissionView::class);
     }
 
-    private function getModuleWhere(mysqlTable $table, string $module): string
+    private function getModuleWhere(\mysqlTable $table, string $module): string
     {
         $table->addWhereParameter($module);
 
         return '`module_name`=?';
     }
 
-    private function getTaskWhere(mysqlTable $table, string $task): string
+    private function getTaskWhere(\mysqlTable $table, string $task): string
     {
         $table->addWhereParameter($task);
 
         return '`task_name`=?';
     }
 
-    private function getActionWhere(mysqlTable $table, string $action): string
+    private function getActionWhere(\mysqlTable $table, string $action): string
     {
         $table->addWhereParameter($action);
 
         return '`action_name`=?';
     }
 
-    private function getUserIdWhere(mysqlTable $table, int $userId = null): string
+    private function getUserIdWhere(\mysqlTable $table, int $userId = null): string
     {
         $table->addWhereParameter($userId ?? 0);
         $table->addWhereParameter($userId ?? 0);

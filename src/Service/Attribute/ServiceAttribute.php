@@ -11,7 +11,6 @@ use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Manager\ServiceManager;
 use GibsonOS\Core\Service\DirService;
 use GibsonOS\Core\Service\PriorityInterface;
-use ReflectionParameter;
 
 class ServiceAttribute implements ParameterAttributeInterface, AttributeServiceInterface
 {
@@ -28,7 +27,7 @@ class ServiceAttribute implements ParameterAttributeInterface, AttributeServiceI
     public function replace(
         AttributeInterface $attribute,
         array $parameters,
-        ReflectionParameter $reflectionParameter
+        \ReflectionParameter $reflectionParameter
     ): array {
         if (
             !$attribute instanceof GetServices &&

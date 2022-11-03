@@ -12,9 +12,6 @@ use GibsonOS\Core\Exception\FactoryError;
 use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Manager\ServiceManager;
 use GibsonOS\Core\Store\CommandStore;
-use ReflectionAttribute;
-use ReflectionClass;
-use ReflectionException;
 
 class CommandService
 {
@@ -31,7 +28,7 @@ class CommandService
      * @param bool[]       $options
      *
      * @throws FactoryError
-     * @throws ReflectionException
+     * @throws \ReflectionException
      * @throws ArgumentError
      */
     public function execute(string $commandClassname, array $arguments = [], array $options = []): int
@@ -84,7 +81,7 @@ class CommandService
     /**
      * @throws CommandError
      * @throws FactoryError
-     * @throws ReflectionException
+     * @throws \ReflectionException
      */
     public function getCommandClassname(array $arguments): string
     {
@@ -174,7 +171,7 @@ class CommandService
      *
      * @throws ArgumentError
      */
-    private function setArguments(CommandInterface $command, ReflectionClass $reflectionClass, array $arguments): void
+    private function setArguments(CommandInterface $command, \ReflectionClass $reflectionClass, array $arguments): void
     {
         $argumentProperties = [];
 
@@ -182,7 +179,7 @@ class CommandService
             if (!$this->reflectionManager->hasAttribute(
                 $reflectionProperty,
                 Argument::class,
-                ReflectionAttribute::IS_INSTANCEOF
+                \ReflectionAttribute::IS_INSTANCEOF
             )) {
                 continue;
             }
@@ -224,7 +221,7 @@ class CommandService
      *
      * @throws ArgumentError
      */
-    private function setOptions(CommandInterface $command, ReflectionClass $reflectionClass, array $options): void
+    private function setOptions(CommandInterface $command, \ReflectionClass $reflectionClass, array $options): void
     {
         $optionsProperties = [];
 
@@ -232,7 +229,7 @@ class CommandService
             if (!$this->reflectionManager->hasAttribute(
                 $reflectionProperty,
                 Option::class,
-                ReflectionAttribute::IS_INSTANCEOF
+                \ReflectionAttribute::IS_INSTANCEOF
             )) {
                 continue;
             }
@@ -270,7 +267,7 @@ class CommandService
 
     /**
      * @throws FactoryError
-     * @throws ReflectionException
+     * @throws \ReflectionException
      */
     private function getPossibleCommands(): array
     {

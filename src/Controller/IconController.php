@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Controller;
 
 use Exception;
-use Generator;
 use GibsonOS\Core\Attribute\AlwaysAjaxResponse;
 use GibsonOS\Core\Attribute\CheckPermission;
 use GibsonOS\Core\Attribute\GetModel;
@@ -21,7 +20,6 @@ use GibsonOS\Core\Service\ImageService;
 use GibsonOS\Core\Service\Response\AjaxResponse;
 use GibsonOS\Core\Store\Icon\TagStore;
 use GibsonOS\Core\Store\IconStore;
-use Throwable;
 
 class IconController extends AbstractController
 {
@@ -33,7 +31,7 @@ class IconController extends AbstractController
     {
         $iconStore->setTags($tags);
 
-        /** @var Generator $icons */
+        /** @var \Generator $icons */
         $icons = $iconStore->getList();
 
         return new AjaxResponse([
@@ -50,7 +48,7 @@ class IconController extends AbstractController
      * @throws CreateError
      * @throws GetError
      * @throws SetError
-     * @throws Throwable
+     * @throws \Throwable
      */
     #[CheckPermission(Permission::WRITE)]
     #[AlwaysAjaxResponse]
@@ -77,7 +75,7 @@ class IconController extends AbstractController
             explode(',', $tags)
         );
 
-        /** @var Generator $icons */
+        /** @var \Generator $icons */
         $icons = $iconStore->getList();
 
         return new AjaxResponse([

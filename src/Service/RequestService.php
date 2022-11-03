@@ -39,6 +39,7 @@ class RequestService
 
         $files = [];
 
+        /** @var array $file */
         foreach ($_FILES as $key => $file) {
             $keyFiles = [];
 
@@ -77,7 +78,7 @@ class RequestService
 
     public function getBaseDir(): string
     {
-        return preg_replace('|^(.*/).+?$|', '$1', $_SERVER['SCRIPT_NAME']);
+        return preg_replace('|^(.*/).+?$|', '$1', $_SERVER['SCRIPT_NAME'] ?? '');
     }
 
     /**
@@ -143,7 +144,7 @@ class RequestService
 
     public function getMethod(): string
     {
-        return (string) $_SERVER['REQUEST_METHOD'];
+        return $_SERVER['REQUEST_METHOD'] ?? '';
     }
 
     public function getQueryString(): string

@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Event;
 
-use DateTimeInterface;
 use GibsonOS\Core\Attribute\Event;
 use GibsonOS\Core\Dto\Parameter\DateTimeParameter;
 use GibsonOS\Core\Dto\Parameter\FloatParameter;
@@ -61,7 +60,7 @@ class WeatherEvent extends AbstractEvent
     #[Event\Method('Temperatur')]
     public function temperature(
         #[Event\Parameter(LocationParameter::class)] Location $location,
-        #[Event\Parameter(DateTimeParameter::class, 'Datum', ['increase' => [10]])] DateTimeInterface $dateTime = null
+        #[Event\Parameter(DateTimeParameter::class, 'Datum', ['increase' => [10]])] \DateTimeInterface $dateTime = null
     ): float {
         return $this->weatherRepository->getByNearestDate($location, $dateTime)->getTemperature();
     }
@@ -72,7 +71,7 @@ class WeatherEvent extends AbstractEvent
     #[Event\Method('Gefühlte Temperatur')]
     public function feelsLike(
         #[Event\Parameter(LocationParameter::class)] Location $location,
-        #[Event\Parameter(DateTimeParameter::class, 'Datum', ['increase' => [10]])] DateTimeInterface $dateTime = null
+        #[Event\Parameter(DateTimeParameter::class, 'Datum', ['increase' => [10]])] \DateTimeInterface $dateTime = null
     ): float {
         return $this->weatherRepository->getByNearestDate($location, $dateTime)->getFeelsLike();
     }
@@ -83,7 +82,7 @@ class WeatherEvent extends AbstractEvent
     #[Event\Method('Luftdruck')]
     public function pressure(
         #[Event\Parameter(LocationParameter::class)] Location $location,
-        #[Event\Parameter(DateTimeParameter::class, 'Datum', ['increase' => [10]])] DateTimeInterface $dateTime = null
+        #[Event\Parameter(DateTimeParameter::class, 'Datum', ['increase' => [10]])] \DateTimeInterface $dateTime = null
     ): int {
         return $this->weatherRepository->getByNearestDate($location, $dateTime)->getPressure();
     }
@@ -94,7 +93,7 @@ class WeatherEvent extends AbstractEvent
     #[Event\Method('Luftfeuchtigkeit')]
     public function humidity(
         #[Event\Parameter(LocationParameter::class)] Location $location,
-        #[Event\Parameter(DateTimeParameter::class, 'Datum', ['increase' => [10]])] DateTimeInterface $dateTime = null
+        #[Event\Parameter(DateTimeParameter::class, 'Datum', ['increase' => [10]])] \DateTimeInterface $dateTime = null
     ): int {
         return $this->weatherRepository->getByNearestDate($location, $dateTime)->getHumidity();
     }
@@ -105,7 +104,7 @@ class WeatherEvent extends AbstractEvent
     #[Event\Method('Taupunkt')]
     public function dewPoint(
         #[Event\Parameter(LocationParameter::class)] Location $location,
-        #[Event\Parameter(DateTimeParameter::class, 'Datum', ['increase' => [10]])] DateTimeInterface $dateTime = null
+        #[Event\Parameter(DateTimeParameter::class, 'Datum', ['increase' => [10]])] \DateTimeInterface $dateTime = null
     ): float {
         return $this->weatherRepository->getByNearestDate($location, $dateTime)->getDewPoint();
     }
@@ -116,7 +115,7 @@ class WeatherEvent extends AbstractEvent
     #[Event\Method('Wolken')]
     public function clouds(
         #[Event\Parameter(LocationParameter::class)] Location $location,
-        #[Event\Parameter(DateTimeParameter::class, 'Datum', ['increase' => [10]])] DateTimeInterface $dateTime = null
+        #[Event\Parameter(DateTimeParameter::class, 'Datum', ['increase' => [10]])] \DateTimeInterface $dateTime = null
     ): int {
         return $this->weatherRepository->getByNearestDate($location, $dateTime)->getClouds();
     }
@@ -127,7 +126,7 @@ class WeatherEvent extends AbstractEvent
     #[Event\Method('UV Index')]
     public function uvIndex(
         #[Event\Parameter(LocationParameter::class)] Location $location,
-        #[Event\Parameter(DateTimeParameter::class, 'Datum', ['increase' => [10]])] DateTimeInterface $dateTime = null
+        #[Event\Parameter(DateTimeParameter::class, 'Datum', ['increase' => [10]])] \DateTimeInterface $dateTime = null
     ): float {
         return $this->weatherRepository->getByNearestDate($location, $dateTime)->getUvIndex();
     }
@@ -138,7 +137,7 @@ class WeatherEvent extends AbstractEvent
     #[Event\Method('Wind Geschwindigkeit')]
     public function windSpeed(
         #[Event\Parameter(LocationParameter::class)] Location $location,
-        #[Event\Parameter(DateTimeParameter::class, 'Datum', ['increase' => [10]])] DateTimeInterface $dateTime = null
+        #[Event\Parameter(DateTimeParameter::class, 'Datum', ['increase' => [10]])] \DateTimeInterface $dateTime = null
     ): float {
         return $this->weatherRepository->getByNearestDate($location, $dateTime)->getWindSpeed();
     }
@@ -149,7 +148,7 @@ class WeatherEvent extends AbstractEvent
     #[Event\Method('Wind Böen')]
     public function windGust(
         #[Event\Parameter(LocationParameter::class)] Location $location,
-        #[Event\Parameter(DateTimeParameter::class, 'Datum', ['increase' => [10]])] DateTimeInterface $dateTime = null
+        #[Event\Parameter(DateTimeParameter::class, 'Datum', ['increase' => [10]])] \DateTimeInterface $dateTime = null
     ): ?float {
         return $this->weatherRepository->getByNearestDate($location, $dateTime)->getWindGust();
     }
@@ -160,7 +159,7 @@ class WeatherEvent extends AbstractEvent
     #[Event\Method('Wind Richtung')]
     public function windDegree(
         #[Event\Parameter(LocationParameter::class)] Location $location,
-        #[Event\Parameter(DateTimeParameter::class, 'Datum', ['increase' => [10]])] DateTimeInterface $dateTime = null
+        #[Event\Parameter(DateTimeParameter::class, 'Datum', ['increase' => [10]])] \DateTimeInterface $dateTime = null
     ): int {
         return $this->weatherRepository->getByNearestDate($location, $dateTime)->getWindDegree();
     }
@@ -171,7 +170,7 @@ class WeatherEvent extends AbstractEvent
     #[Event\Method('Sichtweite')]
     public function visibility(
         #[Event\Parameter(LocationParameter::class)] Location $location,
-        #[Event\Parameter(DateTimeParameter::class, 'Datum', ['increase' => [10]])] DateTimeInterface $dateTime = null
+        #[Event\Parameter(DateTimeParameter::class, 'Datum', ['increase' => [10]])] \DateTimeInterface $dateTime = null
     ): int {
         return $this->weatherRepository->getByNearestDate($location, $dateTime)->getVisibility();
     }
@@ -182,7 +181,7 @@ class WeatherEvent extends AbstractEvent
     #[Event\Method('Regen')]
     public function rain(
         #[Event\Parameter(LocationParameter::class)] Location $location,
-        #[Event\Parameter(DateTimeParameter::class, 'Datum', ['increase' => [10]])] DateTimeInterface $dateTime = null
+        #[Event\Parameter(DateTimeParameter::class, 'Datum', ['increase' => [10]])] \DateTimeInterface $dateTime = null
     ): ?float {
         return $this->weatherRepository->getByNearestDate($location, $dateTime)->getRain();
     }
@@ -193,7 +192,7 @@ class WeatherEvent extends AbstractEvent
     #[Event\Method('Schnee')]
     public function snow(
         #[Event\Parameter(LocationParameter::class)] Location $location,
-        #[Event\Parameter(DateTimeParameter::class, 'Datum', ['increase' => [10]])] DateTimeInterface $dateTime = null
+        #[Event\Parameter(DateTimeParameter::class, 'Datum', ['increase' => [10]])] \DateTimeInterface $dateTime = null
     ): ?float {
         return $this->weatherRepository->getByNearestDate($location, $dateTime)->getSnow();
     }

@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Service;
 
-use Exception;
 use GibsonOS\Core\Exception\DateTimeError;
 use GibsonOS\Core\Exception\Flock\LockError;
 use GibsonOS\Core\Exception\Flock\UnlockError;
@@ -13,8 +12,6 @@ use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Manager\ModelManager;
 use GibsonOS\Core\Model\Lock;
 use GibsonOS\Core\Repository\LockRepository;
-use JsonException;
-use ReflectionException;
 
 class LockService
 {
@@ -27,7 +24,7 @@ class LockService
 
     /**
      * @throws LockError
-     * @throws JsonException
+     * @throws \JsonException
      */
     public function lock(string $name = null): void
     {
@@ -43,15 +40,15 @@ class LockService
                     ->setName($name)
                     ->setPid(getmypid())
             );
-        } catch (SaveError|Exception) {
+        } catch (SaveError|\Exception) {
             throw new LockError('Can not save lock!');
         }
     }
 
     /**
      * @throws LockError
-     * @throws JsonException
-     * @throws ReflectionException
+     * @throws \JsonException
+     * @throws \ReflectionException
      */
     public function forceLock(string $name = null): void
     {
@@ -80,7 +77,7 @@ class LockService
 
     /**
      * @throws UnlockError
-     * @throws JsonException
+     * @throws \JsonException
      */
     public function unlock(string $name = null): void
     {
@@ -95,7 +92,7 @@ class LockService
     }
 
     /**
-     * @throws JsonException
+     * @throws \JsonException
      */
     public function isLocked(string $name = null): bool
     {
@@ -121,7 +118,7 @@ class LockService
 
     /**
      * @throws DateTimeError
-     * @throws JsonException
+     * @throws \JsonException
      */
     public function waitUnlockToLock(string $name = null): void
     {
@@ -135,7 +132,7 @@ class LockService
 
     /**
      * @throws DeleteError
-     * @throws JsonException
+     * @throws \JsonException
      */
     public function kill(string $name = null): void
     {
@@ -150,8 +147,8 @@ class LockService
     }
 
     /**
-     * @throws JsonException
-     * @throws ReflectionException
+     * @throws \JsonException
+     * @throws \ReflectionException
      * @throws SaveError
      */
     public function stop(string $name = null): void

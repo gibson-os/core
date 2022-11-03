@@ -6,10 +6,9 @@ namespace GibsonOS\Core\Model;
 use GibsonOS\Core\Attribute\Install\Database\Column;
 use GibsonOS\Core\Attribute\Install\Database\Key;
 use GibsonOS\Core\Attribute\Install\Database\Table;
-use JsonSerializable;
 
 #[Table]
-class Module extends AbstractModel implements JsonSerializable
+class Module extends AbstractModel implements \JsonSerializable
 {
     #[Column(attributes: [Column::ATTRIBUTE_UNSIGNED], autoIncrement: true)]
     private ?int $id = null;

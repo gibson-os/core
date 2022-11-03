@@ -6,7 +6,7 @@ namespace GibsonOS\Core\Attribute\Install\Database;
 use Attribute;
 use GibsonOS\Core\Model\AbstractModel;
 
-#[Attribute(Attribute::TARGET_PROPERTY | Attribute::IS_REPEATABLE)]
+#[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::IS_REPEATABLE)]
 class Constraint
 {
     public const RULE_CASCADE = 'CASCADE';

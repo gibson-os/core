@@ -6,7 +6,7 @@ namespace GibsonOS\Core\Attribute;
 use Attribute;
 use GibsonOS\Core\Service\Attribute\AlwaysAjaxResponseService;
 
-#[Attribute(Attribute::TARGET_METHOD)]
+#[\Attribute(\Attribute::TARGET_METHOD)]
 class AlwaysAjaxResponse implements AttributeInterface
 {
     public function getAttributeServiceName(): string
