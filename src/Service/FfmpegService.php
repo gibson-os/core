@@ -239,7 +239,7 @@ class FfmpegService
             return $optionString;
         }
 
-        $optionString .= '-' . $key . ' ' . escapeshellarg($options[$key]) . ' ';
+        $optionString .= '-' . $key . ' ' . escapeshellarg((string) $options[$key]) . ' ';
         unset($options[$key]);
 
         return $optionString;
