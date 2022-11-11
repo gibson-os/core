@@ -76,13 +76,7 @@ class FfmpegService
         string $audioCodec = null,
         array $options = []
     ): void {
-        $optionString = '';
-
-        if (isset($options['activation_bytes'])) {
-            $optionString .= '-activation_bytes ' . escapeshellarg($options['activation_bytes']) . ' ';
-            unset($options['activation_bytes']);
-        }
-
+        $optionString = $this->getOption($options, 'activation_bytes', '');
         $optionString .= '-i ' . escapeshellarg($media->getFilename()) . ' ';
 
         if (
@@ -91,7 +85,10 @@ class FfmpegService
         ) {
             $optionString .=
                 '-map ' . $media->getSelectedAudioStreamId() . ' ' .
-                '-c:a ' . escapeshellarg($audioCodec) . ' ';
+                '-c:a ' . escapeshellarg($audioCodec) . ' '
+            ;
+            $optionString = $this->getOption($options, 'ac', $optionString);
+            $optionString = $this->getOption($options, 'vol', $optionString);
         }
 
         if (
@@ -234,5 +231,17 @@ class FfmpegService
     private function execute(string $parameters): void
     {
         $this->process->execute($this->ffmpegPath . ' ' . $parameters);
+    }
+
+    private function getOption(array &$options, string $key, string $optionString): string
+    {
+        if (!isset($options[$key])) {
+            return $optionString;
+        }
+
+        $optionString .= '-' . $key . ' ' . escapeshellarg($options[$key]) . ' ';
+        unset($options[$key]);
+
+        return $optionString;
     }
 }
