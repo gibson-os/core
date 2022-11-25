@@ -19,8 +19,8 @@ trait ConstraintTrait
      */
     public function __call(string $name, array $arguments)
     {
-        $methodType = mb_substr($name, 0, 3);
-        $propertyName = lcfirst(mb_substr($name, 3));
+        $methodType = preg_replace('/^(get|set|add|unload).*/', '$1', $name, 1);
+        $propertyName = lcfirst(preg_replace('/^(get|set|add|unload)/', '', $name, 1));
         $reflectionClass = new \ReflectionClass($this::class);
         $reflectionProperty = $reflectionClass->getProperty($propertyName);
         /** @psalm-suppress UndefinedMethod */
@@ -30,7 +30,7 @@ trait ConstraintTrait
         if ($propertyTypeName === 'array') {
             $models = [];
 
-            if ($methodType !== 'get') {
+            if ($methodType === 'set' || $methodType === 'add') {
                 if (!is_array($arguments[0])) {
                     throw new \InvalidArgumentException(sprintf(
                         'Argument for "set%s" is no array',

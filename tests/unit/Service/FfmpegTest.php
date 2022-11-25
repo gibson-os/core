@@ -18,13 +18,12 @@ use GibsonOS\UnitTest\AbstractTest;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
-use UnitTester;
 
 class FfmpegTest extends AbstractTest
 {
     use ProphecyTrait;
 
-    protected UnitTester $tester;
+    protected \UnitTester $tester;
 
     private FfmpegService $ffmpeg;
 
