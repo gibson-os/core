@@ -23,6 +23,19 @@ class UserRepository extends AbstractRepository
 
     /**
      * @throws SelectError
+     *
+     * @return User[]
+     */
+    public function findByName(string $name): array
+    {
+        $where = '`user` LIKE ?';
+        $parameters = [$name . '%'];
+
+        return $this->fetchAll($where, $parameters, User::class);
+    }
+
+    /**
+     * @throws SelectError
      */
     public function getByUsername(string $username): User
     {
