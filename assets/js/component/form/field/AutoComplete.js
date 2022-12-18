@@ -18,9 +18,9 @@ Ext.define('GibsonOS.module.core.component.form.field.AutoComplete', {
     },
     initComponent() {
         const me = this;
-        me.store.model = this.model;
-        me.store.proxy.model = this.model;
-        me.store.proxy.url = this.url;
+        me.store.model = me.model;
+        me.store.proxy.model = me.model;
+        me.store.proxy.url = me.url;
 
         if (me.params) {
             me.store.proxy.extraParams = this.params;
@@ -29,7 +29,7 @@ Ext.define('GibsonOS.module.core.component.form.field.AutoComplete', {
         me.callParent();
 
         if (me.value) {
-            me.setValueById(this.value);
+            me.setValueById(me.value);
         }
     },
     setValue(value, doSelect) {
