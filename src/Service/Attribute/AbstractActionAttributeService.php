@@ -27,6 +27,7 @@ abstract class AbstractActionAttributeService implements AttributeServiceInterfa
 
     /**
      * @param \ReflectionParameter[] $reflectionParameters
+     * @param mixed                  $name
      */
     protected function getReflectionParameter($name, array $reflectionParameters): ?\ReflectionParameter
     {

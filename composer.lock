@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "51a03e5be5debd3852c721d3fdc513f1",
+    "content-hash": "bece3b931305ddcdab53fb7f0811c4df",
     "packages": [
         {
             "name": "firebase/php-jwt",
@@ -70,7 +70,7 @@
         },
         {
             "name": "gibson-os/mdo",
-            "version": "dev-master",
+            "version": "v1.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/gibson-os/mdo.git",
@@ -97,7 +97,6 @@
                 "rector/rector": "^0.11.57",
                 "vimeo/psalm": "^4.0"
             },
-            "default-branch": true,
             "type": "library",
             "autoload": {
                 "classmap": [
@@ -107,7 +106,7 @@
             "notification-url": "https://packagist.org/downloads/",
             "support": {
                 "issues": "https://github.com/gibson-os/mdo/issues",
-                "source": "https://github.com/gibson-os/mdo/tree/master"
+                "source": "https://github.com/gibson-os/mdo/tree/v1.0.0"
             },
             "time": "2022-12-18T16:22:22+00:00"
         },
@@ -7157,9 +7156,7 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "gibson-os/mdo": 20
-    },
+    "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
