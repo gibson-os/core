@@ -8,7 +8,7 @@ use Attribute;
 #[\Attribute(\Attribute::TARGET_METHOD)]
 class Method
 {
-    public function __construct(private string $title)
+    public function __construct(private readonly string $title)
     {
     }
 

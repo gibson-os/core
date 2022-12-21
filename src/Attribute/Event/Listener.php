@@ -8,8 +8,11 @@ use Attribute;
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::TARGET_METHOD | \Attribute::TARGET_CLASS_CONSTANT | \Attribute::IS_REPEATABLE)]
 class Listener
 {
-    public function __construct(private string $forKey, private string $toKey, private array $options)
-    {
+    public function __construct(
+        private readonly string $forKey,
+        private readonly string $toKey,
+        private readonly array $options
+    ) {
     }
 
     public function getForKey(): string

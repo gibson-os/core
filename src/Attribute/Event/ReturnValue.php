@@ -14,10 +14,10 @@ class ReturnValue
      * @param array<string, array>            $options
      */
     public function __construct(
-        private string $className,
-        private ?string $title = null,
-        private array $options = [],
-        private ?string $key = null
+        private readonly string $className,
+        private readonly ?string $title = null,
+        private readonly array $options = [],
+        private readonly ?string $key = null
     ) {
     }
 

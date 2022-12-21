@@ -11,8 +11,10 @@ class Trigger
     /**
      * @param array<array-key, array{key: string, className: class-string, options: array<string, array>|null, title: ?string}> $parameters
      */
-    public function __construct(private string $title, private array $parameters = [])
-    {
+    public function __construct(
+        private readonly string $title,
+        private readonly array $parameters = []
+    ) {
     }
 
     public function getTitle(): string

@@ -8,8 +8,11 @@ use Attribute;
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
 class ParameterOption
 {
-    public function __construct(private string $parameterKey, private string $optionKey, private mixed $optionValue)
-    {
+    public function __construct(
+        private readonly string $parameterKey,
+        private readonly string $optionKey,
+        private readonly mixed $optionValue
+    ) {
     }
 
     public function getParameterKey(): string
