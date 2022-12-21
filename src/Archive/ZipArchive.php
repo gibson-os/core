@@ -8,7 +8,7 @@ use ZipArchive as StandardZipArchive;
 
 class ZipArchive implements ArchiveInterface
 {
-    public function __construct(private StandardZipArchive $zipArchive)
+    public function __construct(private readonly StandardZipArchive $zipArchive)
     {
     }
 
