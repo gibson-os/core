@@ -8,15 +8,25 @@ use GibsonOS\UnitTest\AbstractTest;
 
 abstract class AbstractAutoCompleteTest extends AbstractTest
 {
+    protected AutoCompleteInterface $autoComplete;
+
     /**
      * @return class-string
      */
     abstract protected function getAutoCompleteClassName(): string;
 
+    abstract public function testGetByNamePart(): void;
+
+    abstract public function testGetById(): void;
+
+    protected function _before()
+    {
+        $this->autoComplete = $this->serviceManager->get($this->getAutoCompleteClassName(), AutoCompleteInterface::class);
+    }
+
     public function testGetModel(): void
     {
-        $autoComplete = $this->serviceManager->get($this->getAutoCompleteClassName(), AutoCompleteInterface::class);
-        $model = $autoComplete->getModel();
+        $model = $this->autoComplete->getModel();
         $modelParts = explode('.', $model);
 
         $this->assertEquals('GibsonOS', $modelParts[0]);

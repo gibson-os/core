@@ -11,9 +11,6 @@ class DateTimeFactory
 {
     private static ?DateTimeService $instance = null;
 
-    /**
-     * @throws GetError
-     */
     public static function get(): DateTimeService
     {
         if (self::$instance === null) {
