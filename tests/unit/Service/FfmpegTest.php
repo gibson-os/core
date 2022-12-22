@@ -59,7 +59,7 @@ class FfmpegTest extends AbstractTest
 
     private string $defaultCommand;
 
-    protected function _before()
+    protected function _before(): void
     {
         $this->ffmpegPath = 'path/to/ffmpeg';
         $this->dateTime = $this->prophesize(DateTimeService::class);
@@ -255,10 +255,10 @@ class FfmpegTest extends AbstractTest
             ->shouldNotBeCalled()
         ;
         $this->process->execute(sprintf(
-            '%s -i %s -map v2 -c:v "codec" -vf subtitles=%s:si=3 %s > %s 2> %s',
+            '%s -i %s -map v2 -c:v "codec" -vf subtitles=\'%s\':si=3 %s > %s 2> %s',
             $this->ffmpegPath,
             escapeshellarg($this->inputVideoFilename),
-            escapeshellarg($this->inputVideoFilename),
+            $this->inputVideoFilename,
             escapeshellarg($this->outputVideoFilename),
             escapeshellarg($this->logPath),
             escapeshellarg($this->logPath)
