@@ -119,14 +119,14 @@ class EventService
         }
 
         $this->logger->info('Run event ' . $event->getId());
-        $this->modelManager->save(
+        $this->modelManager->saveWithoutChildren(
             $event
                 ->setPid(getmypid())
                 ->setLastRun($this->dateTimeService->get())
         );
         $startTime = (int) microtime();
         $this->elementService->runElements($event->getElements(), $event);
-        $this->modelManager->save(
+        $this->modelManager->saveWithoutChildren(
             $event
                 ->setPid(null)
                 ->setLastRun($this->dateTimeService->get())

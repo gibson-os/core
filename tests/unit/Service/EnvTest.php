@@ -6,16 +6,14 @@ namespace GibsonOS\UnitTest\Service;
 use Codeception\Test\Unit;
 use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Service\EnvService;
-use Throwable;
-use UnitTester;
 
 class EnvTest extends Unit
 {
-    protected UnitTester $tester;
+    protected \UnitTester $tester;
 
     private EnvService $envService;
 
-    protected function _before()
+    protected function _before(): void
     {
         $this->envService = new EnvService();
     }
@@ -28,7 +26,7 @@ class EnvTest extends Unit
     public function testSetInt($value, bool $isInt, bool $isFloat, bool $isString, bool $isBool): void
     {
         if (!$isInt) {
-            $this->expectException(Throwable::class);
+            $this->expectException(\Throwable::class);
         }
 
         $this->envService->setInt('answer', $value);
@@ -58,7 +56,7 @@ class EnvTest extends Unit
     public function testSetFloat($value, bool $isInt, bool $isFloat, bool $isString, bool $isBool): void
     {
         if (!$isFloat) {
-            $this->expectException(Throwable::class);
+            $this->expectException(\Throwable::class);
         }
 
         $this->envService->setFloat('answer', $value);
@@ -88,7 +86,7 @@ class EnvTest extends Unit
     public function testSetString($value, bool $isInt, bool $isFloat, bool $isString, bool $isBool): void
     {
         if (!$isString) {
-            $this->expectException(Throwable::class);
+            $this->expectException(\Throwable::class);
         }
 
         $this->envService->setString('answer', $value);
@@ -118,7 +116,7 @@ class EnvTest extends Unit
     public function testSetBool($value, bool $isInt, bool $isFloat, bool $isString, bool $isBool): void
     {
         if (!$isBool) {
-            $this->expectException(Throwable::class);
+            $this->expectException(\Throwable::class);
         }
 
         $this->envService->setBool('answer', $value);

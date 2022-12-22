@@ -49,7 +49,7 @@ class WeatherEvent extends AbstractEvent
     public function __construct(
         EventService $eventService,
         ReflectionManager $reflectionManager,
-        private WeatherRepository $weatherRepository
+        private readonly WeatherRepository $weatherRepository
     ) {
         parent::__construct($eventService, $reflectionManager);
     }

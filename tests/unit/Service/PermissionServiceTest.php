@@ -22,7 +22,7 @@ class PermissionServiceTest extends Unit
      */
     private $permissionViewRepository;
 
-    protected function _before()
+    protected function _before(): void
     {
         $this->permissionViewRepository = $this->prophesize(PermissionViewRepository::class);
 

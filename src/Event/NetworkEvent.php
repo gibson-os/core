@@ -30,7 +30,7 @@ class NetworkEvent extends AbstractEvent
     public function __construct(
         EventService $eventService,
         ReflectionManager $reflectionManager,
-        private NetworkService $networkService
+        private readonly NetworkService $networkService
     ) {
         parent::__construct($eventService, $reflectionManager);
     }

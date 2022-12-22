@@ -27,7 +27,7 @@ class TimeEvent extends AbstractEvent
     public function __construct(
         EventService $eventService,
         ReflectionManager $reflectionManager,
-        private DateTimeService $dateTimeService
+        private readonly DateTimeService $dateTimeService
     ) {
         parent::__construct($eventService, $reflectionManager);
     }

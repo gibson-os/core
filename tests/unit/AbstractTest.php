@@ -7,11 +7,10 @@ use Codeception\Test\Unit;
 use GibsonOS\Core\Exception\RequestError;
 use GibsonOS\Core\Manager\ModelManager;
 use GibsonOS\Core\Manager\ServiceManager;
+use GibsonOS\Core\Service\CommandService;
 use GibsonOS\Core\Service\LoggerService;
 use GibsonOS\Core\Service\RequestService;
 use GibsonOS\Core\Service\SessionService;
-use mysqlDatabase;
-use mysqlRegistry;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Promise\ReturnPromise;
@@ -26,7 +25,7 @@ class AbstractTest extends Unit
 
     protected ServiceManager $serviceManager;
 
-    protected ObjectProphecy|mysqlDatabase $database;
+    protected ObjectProphecy|\mysqlDatabase $database;
 
     protected ObjectProphecy|ModelManager $modelManager;
 
@@ -34,13 +33,15 @@ class AbstractTest extends Unit
 
     protected ObjectProphecy|SessionService $sessionService;
 
+    protected ObjectProphecy|CommandService $commandService;
+
     public function __construct($name = null, array $data = [], $dataName = '')
     {
         parent::__construct($name, $data, $dataName);
 
-        $this->database = $this->prophesize(mysqlDatabase::class);
+        $this->database = $this->prophesize(\mysqlDatabase::class);
         $this->database->getDatabaseName()->willReturn($this->databaseName);
-        mysqlRegistry::getInstance()->set('database', $this->database->reveal());
+        \mysqlRegistry::getInstance()->set('database', $this->database->reveal());
         $this->modelManager = $this->prophesize(ModelManager::class);
         $this->modelManager->save(Argument::any())->shouldNotBeCalled();
         $this->modelManager->saveWithoutChildren(Argument::any())->shouldNotBeCalled();
@@ -48,12 +49,14 @@ class AbstractTest extends Unit
         $this->requestService = $this->prophesize(RequestService::class);
         $this->requestService->getRequestValue(Argument::any())->willThrow(RequestError::class);
         $this->sessionService = $this->prophesize(SessionService::class);
+        $this->commandService = $this->prophesize(CommandService::class);
 
         $this->serviceManager = new ServiceManager();
         $this->serviceManager->setInterface(LoggerInterface::class, LoggerService::class);
-        $this->serviceManager->setService(mysqlDatabase::class, $this->database->reveal());
+        $this->serviceManager->setService(\mysqlDatabase::class, $this->database->reveal());
         $this->serviceManager->setService(RequestService::class, $this->requestService->reveal());
         $this->serviceManager->setService(SessionService::class, $this->sessionService->reveal());
+        $this->serviceManager->setService(CommandService::class, $this->commandService->reveal());
 
         putenv('TIMEZONE=Europe/Berlin');
         putenv('MYSQL_HOST=gos_mysql');

@@ -21,7 +21,7 @@ class EventEvent extends AbstractEvent
     public function __construct(
         EventService $eventService,
         ReflectionManager $reflectionManager,
-        private ModelManager $modelManager
+        private readonly ModelManager $modelManager
     ) {
         parent::__construct($eventService, $reflectionManager);
     }
@@ -34,7 +34,7 @@ class EventEvent extends AbstractEvent
     #[Event\Method('Aktivieren')]
     public function activate(#[Event\Parameter(EventParameter::class)] EventModel $event): void
     {
-        $this->modelManager->save($event->setActive(true));
+        $this->modelManager->saveWithoutChildren($event->setActive(true));
     }
 
     /**
@@ -45,7 +45,7 @@ class EventEvent extends AbstractEvent
     #[Event\Method('Deaktivieren')]
     public function deactivate(#[Event\Parameter(EventParameter::class)] EventModel $event): void
     {
-        $this->modelManager->save($event->setActive(false));
+        $this->modelManager->saveWithoutChildren($event->setActive(false));
     }
 
     /**

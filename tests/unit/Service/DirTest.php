@@ -9,19 +9,18 @@ use GibsonOS\Core\Service\DirService;
 use GibsonOS\Core\Service\FileService;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
-use UnitTester;
 
 class DirTest extends Unit
 {
     use ProphecyTrait;
 
-    protected UnitTester $tester;
+    protected \UnitTester $tester;
 
     private DirService $dir;
 
     private string $dirName;
 
-    protected function _before()
+    protected function _before(): void
     {
         $this->dirName = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'newDir';
         $this->dir = new DirService();

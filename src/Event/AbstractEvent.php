@@ -90,6 +90,7 @@ abstract class AbstractEvent
         }
 
         $parameters = $element->getParameters();
+        $newParameters = [];
         /** @var Listener[] $listenerAttributes */
         $listenerAttributes = $this->reflectionManager->getAttributes(
             $reflectionMethod->getDeclaringClass(),
@@ -101,6 +102,12 @@ abstract class AbstractEvent
         );
 
         foreach ($methodParameters as $parameterName => $methodParameter) {
+            if (!isset($parameters[$parameterName])) {
+                continue;
+            }
+
+            $newParameters[] = $parameters[$parameterName];
+
             if (
                 !$methodParameter instanceof AutoCompleteParameter ||
                 $parameters[$parameterName] instanceof AutoCompleteModelInterface
@@ -125,13 +132,13 @@ abstract class AbstractEvent
                     $parameters[$toKey]->{'get' . ucfirst($listenerParameters['recordKey'])}()
                 ;
             }
-//            errlog($extendedParameters);
-            $parameters[$parameterName] = $methodParameter->getAutoComplete()->getById(
+
+            $newParameters[] = $methodParameter->getAutoComplete()->getById(
                 (string) $parameters[$parameterName],
                 $extendedParameters
             );
         }
 
-        return empty($parameters) ? [] : array_values($parameters);
+        return $newParameters;
     }
 }

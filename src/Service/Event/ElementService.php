@@ -38,8 +38,10 @@ class ElementService
 
     private const OPERATOR_SET = '=';
 
-    public function __construct(private LoggerInterface $logger, private ServiceManager $serviceManagerService)
-    {
+    public function __construct(
+        private readonly LoggerInterface $logger,
+        private readonly ServiceManager $serviceManagerService,
+    ) {
     }
 
     /**
@@ -173,9 +175,10 @@ class ElementService
     }
 
     /**
-     * @throws \JsonException
      * @throws EventException
      * @throws FactoryError
+     * @throws \ReflectionException
+     * @throws \JsonException
      *
      * @return mixed
      */

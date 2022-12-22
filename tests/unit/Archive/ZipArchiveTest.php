@@ -13,7 +13,7 @@ class ZipArchiveTest extends AbstractTest
 {
     private StandardZipArchive|ObjectProphecy $zipArchive;
 
-    protected function _before()
+    protected function _before(): void
     {
         $this->zipArchive = $this->prophesize(StandardZipArchive::class);
         $this->serviceManager->setService(StandardZipArchive::class, $this->zipArchive->reveal());

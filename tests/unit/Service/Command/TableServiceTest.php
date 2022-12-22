@@ -10,7 +10,7 @@ class TableServiceTest extends AbstractTest
 {
     private TableService $tableService;
 
-    protected function _before()
+    protected function _before(): void
     {
         $this->tableService = $this->serviceManager->get(TableService::class);
     }

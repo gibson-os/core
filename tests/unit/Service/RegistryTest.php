@@ -6,16 +6,14 @@ namespace GibsonOS\UnitTest\Service;
 use Codeception\Test\Unit;
 use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Service\RegistryService;
-use stdClass;
-use UnitTester;
 
 class RegistryTest extends Unit
 {
-    protected UnitTester $tester;
+    protected \UnitTester $tester;
 
     private RegistryService $registry;
 
-    protected function _before()
+    protected function _before(): void
     {
         $this->registry = new RegistryService();
         $this->registry->set('arthur', 'dent');
@@ -30,7 +28,7 @@ class RegistryTest extends Unit
      */
     public function testSetObject(): void
     {
-        $object = new stdClass();
+        $object = new \stdClass();
         $object->marvin = true;
         $object->herz = 'aus Gold';
         $this->registry->set('object', $object);

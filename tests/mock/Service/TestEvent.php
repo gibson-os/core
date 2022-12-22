@@ -24,4 +24,14 @@ class TestEvent extends AbstractEvent
 
         return $this->arthur;
     }
+
+    public function noMethod(): void
+    {
+    }
+
+    #[Event\Method('Exception')]
+    public function exception(): void
+    {
+        throw new \Exception();
+    }
 }

@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace GibsonOS\UnitTest\Service;
 
-use DateTime;
 use GibsonOS\Core\Manager\ModelManager;
 use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Model\Event;
@@ -53,7 +52,7 @@ class EventServiceTest extends AbstractTest
         $this->eventRepository->getTimeControlled(
             TestEvent::class,
             TestEvent::TRIGGER_MARVIN,
-            Argument::type(DateTime::class)
+            Argument::type(\DateTime::class)
         )
             ->shouldBeCalledOnce()
             ->willReturn([])
@@ -61,7 +60,7 @@ class EventServiceTest extends AbstractTest
         $this->eventRepository->getTimeControlled(
             TestEvent::class,
             TestEvent::TRIGGER_FORD,
-            Argument::type(DateTime::class)
+            Argument::type(\DateTime::class)
         )
             ->shouldBeCalledOnce()
             ->willReturn([])
@@ -92,7 +91,7 @@ class EventServiceTest extends AbstractTest
             ->shouldBeCalledOnce()
             ->willReturn([$event])
         ;
-        $this->modelManager->save(Argument::any())
+        $this->modelManager->saveWithoutChildren(Argument::any())
             ->shouldBeCalledTimes(2)
         ;
         $this->eventService->fire(TestEvent::class, TestEvent::TRIGGER_MARVIN);
@@ -108,7 +107,7 @@ class EventServiceTest extends AbstractTest
     {
         $testEvent = $this->serviceManager->get(TestEvent::class);
         $this->eventService->runEvent($event, false);
-        $this->modelManager->save(Argument::any())->shouldBeCalledTimes(2);
+        $this->modelManager->saveWithoutChildren(Argument::any())->shouldBeCalledTimes(2);
 
         $this->assertEquals($returnValue, $testEvent->arthur);
     }
