@@ -16,9 +16,9 @@ use GibsonOS\Core\Store\CommandStore;
 class CommandService
 {
     public function __construct(
-        private ServiceManager $serviceManager,
-        private ProcessService $processService,
-        private ReflectionManager $reflectionManager
+        private readonly ServiceManager $serviceManager,
+        private readonly ProcessService $processService,
+        private readonly ReflectionManager $reflectionManager
     ) {
     }
 
@@ -34,7 +34,7 @@ class CommandService
     public function execute(string $commandClassname, array $arguments = [], array $options = []): int
     {
         /** @var CommandInterface $command */
-        $command = $this->serviceManager->get($commandClassname);
+        $command = $this->serviceManager->create($commandClassname);
         $reflectionClass = $this->reflectionManager->getReflectionClass($commandClassname);
         $this->setArguments($command, $reflectionClass, $arguments);
         $this->setOptions($command, $reflectionClass, $options);
@@ -117,7 +117,7 @@ class CommandService
 
         $possibleCommands = $this->getPossibleCommands();
         $possibleCommands = $this->getPossibleCommandsPart($possibleCommands, $module);
-        $possibleCommands = reset($possibleCommands);
+        $possibleCommands = reset($possibleCommands) ?: [];
 
         foreach ($commandNameParts ?? [] as $commandNamePart) {
             $possibleCommands = $this->getPossibleCommandsPart($possibleCommands, $commandNamePart);
