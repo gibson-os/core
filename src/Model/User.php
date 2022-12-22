@@ -4,9 +4,16 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Model;
 
 use GibsonOS\Core\Attribute\Install\Database\Column;
+use GibsonOS\Core\Attribute\Install\Database\Constraint;
 use GibsonOS\Core\Attribute\Install\Database\Key;
 use GibsonOS\Core\Attribute\Install\Database\Table;
+use GibsonOS\Core\Model\User\Device;
 
+/**
+ * @method Device[] getDevices()
+ * @method User     setDevices(Device[] $devices)
+ * @method User     addDevices(Device[] $devices)
+ */
 #[Table]
 class User extends AbstractModel implements \JsonSerializable, AutoCompleteModelInterface
 {
@@ -31,6 +38,12 @@ class User extends AbstractModel implements \JsonSerializable, AutoCompleteModel
 
     #[Column(type: Column::TYPE_TIMESTAMP, default: Column::DEFAULT_CURRENT_TIMESTAMP)]
     private \DateTimeInterface $added;
+
+    /**
+     * @var Device[]
+     */
+    #[Constraint('user', Device::class)]
+    protected array $devices;
 
     public function __construct(\mysqlDatabase $database = null)
     {

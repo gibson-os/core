@@ -43,7 +43,7 @@ abstract class AbstractAutoCompleteTest extends AbstractTest
             implode(DIRECTORY_SEPARATOR, $modelParts) . '.js'
         );
 
-        $this->assertNotFalse($modelPath);
+        $this->assertNotFalse($modelPath, sprintf('JS model "%s" not found', $model));
 
         $this->assertNotFalse(mb_strpos(file_get_contents($modelPath), "Ext.define('" . $model . "'"));
     }

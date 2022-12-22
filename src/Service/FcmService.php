@@ -7,6 +7,7 @@ use GibsonOS\Core\Attribute\GetEnv;
 use GibsonOS\Core\Dto\Fcm\Message;
 use GibsonOS\Core\Dto\Web\Body;
 use GibsonOS\Core\Dto\Web\Request;
+use GibsonOS\Core\Event\FcmEvent;
 use GibsonOS\Core\Exception\FcmException;
 use GibsonOS\Core\Exception\WebException;
 use GibsonOS\Core\Utility\JsonUtility;
@@ -20,10 +21,11 @@ class FcmService
     private string $url;
 
     public function __construct(
-        #[GetEnv('FCM_PROJECT_ID')] private string $projectId,
-        #[GetEnv('GOOGLE_APPLICATION_CREDENTIALS')] private string $googleCredentialFile,
-        private WebService $webService,
-        private LoggerInterface $logger
+        #[GetEnv('FCM_PROJECT_ID')] private readonly string $projectId,
+        #[GetEnv('GOOGLE_APPLICATION_CREDENTIALS')] private readonly string $googleCredentialFile,
+        private readonly WebService $webService,
+        private readonly LoggerInterface $logger,
+        private readonly EventService $eventService,
     ) {
         $this->url = self::URL . $this->projectId . '/';
     }
@@ -54,7 +56,10 @@ class FcmService
             ->setBody((new Body())->setContent($content, mb_strlen($content)))
         ;
 
+        $this->eventService->fire(FcmEvent::class, FcmEvent::TRIGGER_BEFORE_PUSH_MESSAGE);
         $response = $this->webService->post($request);
+        $this->eventService->fire(FcmEvent::class, FcmEvent::TRIGGER_AFTER_PUSH_MESSAGE);
+
         $body = $response->getBody()->getContent();
         $this->logger->debug(sprintf('FCM push response: %s', $body));
         $body = JsonUtility::decode($body);

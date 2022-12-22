@@ -16,7 +16,7 @@ use GibsonOS\Core\Attribute\Install\Database\Table;
  */
 #[Table]
 #[Key(unique: true, columns: ['name', 'module_id', 'task_id'])]
-class Action extends AbstractModel implements \JsonSerializable
+class Action extends AbstractModel implements \JsonSerializable, AutoCompleteModelInterface
 {
     #[Column(attributes: [Column::ATTRIBUTE_UNSIGNED], autoIncrement: true)]
     private ?int $id = null;
@@ -91,5 +91,10 @@ class Action extends AbstractModel implements \JsonSerializable
             'text' => $this->getName(),
             'moduleId' => $this->getModuleId(),
         ];
+    }
+
+    public function getAutoCompleteId(): int
+    {
+        return $this->getId() ?? 0;
     }
 }

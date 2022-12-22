@@ -16,6 +16,27 @@ class ModuleRepository extends AbstractRepository
     /**
      * @throws SelectError
      */
+    public function getById(int $id): Module
+    {
+        return $this->fetchOne('`id`=?', [$id], Module::class);
+    }
+
+    /**
+     * @throws SelectError
+     *
+     * @return Module[]
+     */
+    public function findByName(string $name): array
+    {
+        $where = '`name` LIKE ?';
+        $parameters = [$name . '%'];
+
+        return $this->fetchAll($where, $parameters, Module::class);
+    }
+
+    /**
+     * @throws SelectError
+     */
     public function getByName(string $name): Module
     {
         return $this->fetchOne('`name`=?', [$name], Module::class);

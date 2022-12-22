@@ -16,6 +16,32 @@ class ActionRepository extends AbstractRepository
     /**
      * @throws SelectError
      */
+    public function getById(int $id): Action
+    {
+        return $this->fetchOne('`id`=?', [$id], Action::class);
+    }
+
+    /**
+     * @throws SelectError
+     *
+     * @return Action[]
+     */
+    public function findByName(string $name, int $taskId = null): array
+    {
+        $where = '`name` LIKE ?';
+        $parameters = [$name . '%'];
+
+        if ($taskId !== null) {
+            $where .= ' AND `task_id`=?';
+            $parameters[] = $taskId;
+        }
+
+        return $this->fetchAll($where, $parameters, Action::class);
+    }
+
+    /**
+     * @throws SelectError
+     */
     public function getByNameAndTaskId(string $name, int $taskId): Action
     {
         return $this->fetchOne('`name`=? AND `task_id`=?', [$name, $taskId], Action::class);

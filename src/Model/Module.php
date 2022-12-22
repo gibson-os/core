@@ -8,7 +8,7 @@ use GibsonOS\Core\Attribute\Install\Database\Key;
 use GibsonOS\Core\Attribute\Install\Database\Table;
 
 #[Table]
-class Module extends AbstractModel implements \JsonSerializable
+class Module extends AbstractModel implements \JsonSerializable, AutoCompleteModelInterface
 {
     #[Column(attributes: [Column::ATTRIBUTE_UNSIGNED], autoIncrement: true)]
     private ?int $id = null;
@@ -47,5 +47,10 @@ class Module extends AbstractModel implements \JsonSerializable
             'id' => $this->getId(),
             'text' => $this->getName(),
         ];
+    }
+
+    public function getAutoCompleteId(): int
+    {
+        return $this->getId() ?? 0;
     }
 }
