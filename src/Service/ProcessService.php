@@ -56,7 +56,7 @@ class ProcessService
 
         $return = 0;
         $out = [];
-        exec('kill -s 0 ' . $pid, $out, $return);
+        exec('kill -s 9 ' . $pid, $out, $return);
 
         return $return === 0;
     }
