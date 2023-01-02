@@ -75,7 +75,8 @@ class Task extends AbstractModel implements \JsonSerializable, AutoCompleteModel
     {
         return [
             'id' => $this->getId(),
-            'text' => $this->getName(),
+            'name' => $this->getName(),
+            'moduleId' => $this->getModuleId(),
         ];
     }
 

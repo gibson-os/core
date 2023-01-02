@@ -88,8 +88,9 @@ class Action extends AbstractModel implements \JsonSerializable, AutoCompleteMod
     {
         return [
             'id' => $this->getId(),
-            'text' => $this->getName(),
+            'name' => $this->getName(),
             'moduleId' => $this->getModuleId(),
+            'taskId' => $this->getTaskId(),
         ];
     }
 

@@ -21,6 +21,14 @@ use GibsonOS\Core\Service\EventService;
 use GibsonOS\Core\Service\FcmService;
 
 #[Event('Firebase cloud messaging')]
+#[Event\Listener('task', 'module', ['params' => [
+    'paramKey' => 'moduleId',
+    'recordKey' => 'id',
+]])]
+#[Event\Listener('action', 'task', ['params' => [
+    'paramKey' => 'taskId',
+    'recordKey' => 'id',
+]])]
 class FcmEvent extends AbstractEvent
 {
     #[Event\Trigger('Vor dem senden einer Nachricht')]
