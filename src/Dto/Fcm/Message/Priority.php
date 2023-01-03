@@ -5,6 +5,6 @@ namespace GibsonOS\Core\Dto\Fcm\Message;
 
 enum Priority: string
 {
-    case NORMAL = 'nosrmal';
+    case NORMAL = 'normal';
     case HIGH = 'high';
 }

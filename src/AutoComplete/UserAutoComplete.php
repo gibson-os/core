@@ -36,4 +36,14 @@ class UserAutoComplete implements AutoCompleteInterface
     {
         return 'GibsonOS.module.core.user.model.User';
     }
+
+    public function getValueField(): string
+    {
+        return 'id';
+    }
+
+    public function getDisplayField(): string
+    {
+        return 'user';
+    }
 }

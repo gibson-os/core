@@ -15,4 +15,8 @@ interface AutoCompleteInterface
     public function getById(string $id, array $parameters): AutoCompleteModelInterface;
 
     public function getModel(): string;
+
+    public function getValueField(): string;
+
+    public function getDisplayField(): string;
 }

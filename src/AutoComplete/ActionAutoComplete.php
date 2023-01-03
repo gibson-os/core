@@ -20,7 +20,10 @@ class ActionAutoComplete implements AutoCompleteInterface
      */
     public function getByNamePart(string $namePart, array $parameters): array
     {
-        return $this->actionRepository->findByName($namePart, $parameters['taskId'] ?? null);
+        return $this->actionRepository->findByName(
+            $namePart,
+            isset($parameters['taskId']) ? (int) $parameters['taskId'] : null
+        );
     }
 
     /**
@@ -33,6 +36,16 @@ class ActionAutoComplete implements AutoCompleteInterface
 
     public function getModel(): string
     {
-        return 'GibsonOS.module.core.action.model.Action';
+        return 'GibsonOS.module.core.module.model.Action';
+    }
+
+    public function getValueField(): string
+    {
+        return 'id';
+    }
+
+    public function getDisplayField(): string
+    {
+        return 'name';
     }
 }

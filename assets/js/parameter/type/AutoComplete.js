@@ -9,6 +9,8 @@ Ext.define('GibsonOS.module.core.parameter.type.AutoComplete', {
         me.model = config.model;
         me.params = config.parameters ?? [];
         me.params.autoCompleteClassname = config.autoCompleteClassname;
+        me.valueField = config.valueField;
+        me.displayField = config.displayField;
 
         me.callParent();
 

@@ -16,17 +16,17 @@ class Message implements \JsonSerializable
     public const OPTION_SOUND = 2;
 
     public function __construct(
-        private string $token,
-        private string $fcmToken,
-        private Type $type = Type::NOTIFICATION,
-        private ?string $title = null,
-        private ?string $body = null,
-        private string $module = 'core',
-        private string $task = 'desktop',
-        private string $action = 'index',
-        private array $data = [],
-        private Priority $priority = Priority::NORMAL,
-        private int $options = self::OPTION_VIBRATION + self::OPTION_SOUND
+        private readonly string $token,
+        private readonly string $fcmToken,
+        private readonly Type $type = Type::NOTIFICATION,
+        private readonly ?string $title = null,
+        private readonly ?string $body = null,
+        private readonly string $module = 'core',
+        private readonly string $task = 'desktop',
+        private readonly string $action = 'index',
+        private readonly array $data = [],
+        private readonly Priority $priority = Priority::NORMAL,
+        private readonly int $options = self::OPTION_VIBRATION + self::OPTION_SOUND
     ) {
     }
 
@@ -42,13 +42,6 @@ class Message implements \JsonSerializable
             ],
         ];
 
-        if ($this->title === null || $this->body !== null) {
-            $data['notification'] = [
-                'title' => $this->title,
-                'body' => $this->body,
-            ];
-        }
-
         $data['data'] = [
             'token' => $this->token,
             'type' => $this->type->value,
@@ -56,6 +49,8 @@ class Message implements \JsonSerializable
             'task' => $this->task,
             'action' => $this->action,
             'options' => (string) $this->options,
+            'title' => $this->title,
+            'body' => $this->body,
         ];
 
         if (count($this->data)) {
@@ -63,5 +58,10 @@ class Message implements \JsonSerializable
         }
 
         return $data;
+    }
+
+    public function getFcmToken(): string
+    {
+        return $this->fcmToken;
     }
 }

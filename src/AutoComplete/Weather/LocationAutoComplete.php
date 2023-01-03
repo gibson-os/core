@@ -31,4 +31,14 @@ class LocationAutoComplete implements AutoCompleteInterface
     {
         return 'GibsonOS.module.core.weather.model.Location';
     }
+
+    public function getValueField(): string
+    {
+        return 'id';
+    }
+
+    public function getDisplayField(): string
+    {
+        return 'name';
+    }
 }

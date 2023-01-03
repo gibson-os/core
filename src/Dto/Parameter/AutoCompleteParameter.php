@@ -43,6 +43,8 @@ class AutoCompleteParameter extends AbstractParameter
         return [
             'autoCompleteClassname' => $this->autoComplete::class,
             'model' => $this->autoComplete->getModel(),
+            'valueField' => $this->autoComplete->getValueField(),
+            'displayField' => $this->autoComplete->getDisplayField(),
             'parameters' => $this->getParameters(),
         ];
     }

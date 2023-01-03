@@ -11,6 +11,7 @@ use GibsonOS\Core\Event\FcmEvent;
 use GibsonOS\Core\Exception\FcmException;
 use GibsonOS\Core\Exception\WebException;
 use GibsonOS\Core\Utility\JsonUtility;
+use GibsonOS\Core\Utility\StatusCode;
 use Google\Auth\CredentialsLoader;
 use Psr\Log\LoggerInterface;
 
@@ -65,6 +66,12 @@ class FcmService
         $body = JsonUtility::decode($body);
 
         if (isset($body['error'])) {
+            if ($body['error']['code'] === StatusCode::NOT_FOUND) {
+                $this->logger->error(sprintf('%s: %s', $message->getFcmToken(), $body['error']['message']));
+
+                return $this;
+            }
+
             throw new FcmException($body['error']['message'], $body['error']['code']);
         }
 

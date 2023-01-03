@@ -35,4 +35,14 @@ class ModuleAutoComplete implements AutoCompleteInterface
     {
         return 'GibsonOS.module.core.module.model.Module';
     }
+
+    public function getValueField(): string
+    {
+        return 'id';
+    }
+
+    public function getDisplayField(): string
+    {
+        return 'name';
+    }
 }

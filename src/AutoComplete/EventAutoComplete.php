@@ -26,4 +26,14 @@ class EventAutoComplete implements AutoCompleteInterface
     {
         return 'GibsonOS.module.core.event.model.Grid';
     }
+
+    public function getValueField(): string
+    {
+        return 'id';
+    }
+
+    public function getDisplayField(): string
+    {
+        return 'name';
+    }
 }

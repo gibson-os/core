@@ -13,6 +13,7 @@ use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Exception\UserError;
 use GibsonOS\Core\Manager\ModelManager;
 use GibsonOS\Core\Model\User;
+use GibsonOS\Core\Model\User\Device;
 use GibsonOS\Core\Model\User\Permission;
 use GibsonOS\Core\Repository\User\DeviceRepository;
 use GibsonOS\Core\Repository\UserRepository;
@@ -205,6 +206,20 @@ class UserController extends AbstractController
             ->setTask($task)
             ->setAction($action)
         );
+
+        return $this->returnSuccess();
+    }
+
+    /**
+     * @throws SaveError
+     */
+    #[CheckPermission(Permission::WRITE)]
+    public function updateFcmToken(
+        ModelManager $modelManager,
+        #[GetModel(['token' => 'token'])] Device $device,
+        string $fcmToken,
+    ): AjaxResponse {
+        $modelManager->saveWithoutChildren($device->setFcmToken($fcmToken));
 
         return $this->returnSuccess();
     }

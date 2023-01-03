@@ -106,12 +106,12 @@ abstract class AbstractEvent
                 continue;
             }
 
-            $newParameters[] = $parameters[$parameterName];
-
             if (
                 !$methodParameter instanceof AutoCompleteParameter ||
                 $parameters[$parameterName] instanceof AutoCompleteModelInterface
             ) {
+                $newParameters[] = $parameters[$parameterName];
+
                 continue;
             }
 
@@ -128,9 +128,7 @@ abstract class AbstractEvent
                 }
 
                 $listenerParameters = $listenerAttribute->getOptions()['params'];
-                $extendedParameters[$listenerParameters['paramKey']] =
-                    $parameters[$toKey]->{'get' . ucfirst($listenerParameters['recordKey'])}()
-                ;
+                $extendedParameters[$listenerParameters['paramKey']] = $parameters[$toKey];
             }
 
             $newParameters[] = $methodParameter->getAutoComplete()->getById(
