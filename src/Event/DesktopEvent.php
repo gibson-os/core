@@ -9,14 +9,20 @@ use GibsonOS\Core\Dto\Parameter\StringParameter;
 use GibsonOS\Core\Dto\Parameter\UserParameter;
 use GibsonOS\Core\Exception\FcmException;
 use GibsonOS\Core\Exception\WebException;
+use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Model\User;
+use GibsonOS\Core\Service\EventService;
 use GibsonOS\Core\Service\FcmService;
 
 #[Event('Desktop')]
-class DesktopEvent
+class DesktopEvent extends AbstractEvent
 {
-    public function __construct(private readonly FcmService $fcmService)
-    {
+    public function __construct(
+        EventService $eventService,
+        ReflectionManager $reflectionManager,
+        private readonly FcmService $fcmService
+    ) {
+        parent::__construct($eventService, $reflectionManager);
     }
 
     /**
