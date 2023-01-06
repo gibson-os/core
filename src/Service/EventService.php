@@ -294,9 +294,19 @@ class EventService
                 }
 
                 foreach ($triggerAttribute->getParameters() as $parameter) {
+                    $cleanParameters = [];
+
+                    if (isset($parameter['title'])) {
+                        $cleanParameters['title'] = $parameter['title'];
+                    }
+
+                    if (isset($parameter['options'])) {
+                        $cleanParameters['options'] = $parameter['options'];
+                    }
+
                     $triggerParameter = $this->serviceManager->create(
                         $parameter['className'],
-                        isset($parameter['title']) ? ['title' => $parameter['title']] : [],
+                        $cleanParameters,
                         AbstractParameter::class
                     );
 
