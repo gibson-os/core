@@ -234,17 +234,4 @@ class UserController extends AbstractController
 
         return $this->returnSuccess();
     }
-
-    /**
-     * @throws PermissionDenied
-     */
-    private function checkUserPermission(?int $userId, int $requiredPermission, int $permission): void
-    {
-        if (
-            $userId !== $this->sessionService->getUserId() &&
-            !$this->permissionService->checkPermission($requiredPermission + Permission::MANAGE, $permission)
-        ) {
-            throw new PermissionDenied();
-        }
-    }
 }
