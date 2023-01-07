@@ -66,4 +66,13 @@ class DeviceRepository extends AbstractRepository
             ->deletePrepared()
         ;
     }
+
+    public function removeFcmToken(string $fcmToken): void
+    {
+        $this->getTable($this->deviceTableName)
+            ->setWhere('`fcm_token`=?')
+            ->addWhereParameter($fcmToken)
+            ->update('`fcm_token`=NULL')
+        ;
+    }
 }

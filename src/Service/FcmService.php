@@ -10,6 +10,7 @@ use GibsonOS\Core\Dto\Web\Request;
 use GibsonOS\Core\Event\FcmEvent;
 use GibsonOS\Core\Exception\FcmException;
 use GibsonOS\Core\Exception\WebException;
+use GibsonOS\Core\Repository\User\DeviceRepository;
 use GibsonOS\Core\Utility\JsonUtility;
 use GibsonOS\Core\Utility\StatusCode;
 use Google\Auth\CredentialsLoader;
@@ -27,6 +28,7 @@ class FcmService
         private readonly WebService $webService,
         private readonly LoggerInterface $logger,
         private readonly EventService $eventService,
+        private readonly DeviceRepository $deviceRepository,
     ) {
         $this->url = self::URL . $this->projectId . '/';
     }
@@ -68,6 +70,7 @@ class FcmService
         if (isset($body['error'])) {
             if ($body['error']['code'] === StatusCode::NOT_FOUND) {
                 $this->logger->error(sprintf('%s: %s', $message->getFcmToken(), $body['error']['message']));
+                $this->deviceRepository->removeFcmToken($message->getFcmToken());
 
                 return $this;
             }
