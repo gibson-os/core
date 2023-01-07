@@ -111,6 +111,7 @@ class UserController extends AbstractController
             'id' => $user->getId(),
             'user' => $user->getUser(),
             'token' => $device->getToken(),
+            'deviceId' => (int) $device->getId(),
         ]);
     }
 
@@ -171,14 +172,12 @@ class UserController extends AbstractController
     /**
      * @throws PermissionDenied
      */
+    #[CheckPermission(Permission::DELETE, ['id' => Permission::DELETE + Permission::MANAGE])]
     public function deleteDevice(
         DeviceRepository $deviceRepository,
         #[GetModel] User $user,
         array $devices,
-        int $userPermission
     ): AjaxResponse {
-        $this->checkUserPermission($user->getId(), Permission::DELETE, $userPermission);
-
         $deviceRepository->deleteByIds($devices, $user->getId());
 
         return $this->returnSuccess();

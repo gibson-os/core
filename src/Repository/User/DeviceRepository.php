@@ -50,10 +50,8 @@ class DeviceRepository extends AbstractRepository
 
     public function deleteByIds(array $ids, int $userId = null): void
     {
-        $table = $this->getTable($this->deviceTableName);
-        $table
+        $table = $this->getTable($this->deviceTableName)
             ->setWhereParameters($ids)
-            ->deletePrepared()
         ;
 
         $where = '`id` IN (' . $table->getParametersString($ids) . ')';
@@ -63,6 +61,9 @@ class DeviceRepository extends AbstractRepository
             $table->addWhereParameter($userId);
         }
 
-        $table->setWhere($where);
+        $table
+            ->setWhere($where)
+            ->deletePrepared()
+        ;
     }
 }
