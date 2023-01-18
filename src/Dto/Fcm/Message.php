@@ -5,6 +5,7 @@ namespace GibsonOS\Core\Dto\Fcm;
 
 use GibsonOS\Core\Dto\Fcm\Message\Priority;
 use GibsonOS\Core\Dto\Fcm\Message\Type;
+use GibsonOS\Core\Dto\Fcm\Message\Vibrate;
 use GibsonOS\Core\Utility\JsonUtility;
 
 class Message implements \JsonSerializable
@@ -26,7 +27,7 @@ class Message implements \JsonSerializable
         private readonly string $action = 'index',
         private readonly array $data = [],
         private readonly Priority $priority = Priority::NORMAL,
-        private readonly int $options = self::OPTION_VIBRATION + self::OPTION_SOUND
+        private readonly ?Vibrate $vibrate = null,
     ) {
     }
 
@@ -48,7 +49,7 @@ class Message implements \JsonSerializable
             'module' => $this->module,
             'task' => $this->task,
             'action' => $this->action,
-            'options' => (string) $this->options,
+            'vibrate' => JsonUtility::encode($this->vibrate?->getPattern() ?? []),
             'title' => $this->title,
             'body' => $this->body,
         ];

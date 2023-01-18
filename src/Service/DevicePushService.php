@@ -35,7 +35,6 @@ class DevicePushService
                 action: $action,
                 data: $payload,
                 priority: Priority::HIGH,
-                options: Message::OPTION_NONE
             ));
         }
     }
