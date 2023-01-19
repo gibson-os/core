@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Dto\Parameter;
 
+use GibsonOS\Core\Exception\ParameterException;
 use GibsonOS\Core\Manager\ReflectionManager;
 
 class EnumParameter extends OptionParameter
@@ -25,5 +26,16 @@ class EnumParameter extends OptionParameter
         }
 
         parent::__construct($title, $cases);
+    }
+
+    public function getEnum(string $value): object
+    {
+        $className = $this->className;
+
+        if (!enum_exists($className)) {
+            throw new ParameterException(sprintf('%s is no enum!', $className));
+        }
+
+        return $className::from($value);
     }
 }

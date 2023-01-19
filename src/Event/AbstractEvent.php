@@ -7,6 +7,7 @@ use GibsonOS\Core\Attribute\Event\Listener;
 use GibsonOS\Core\Attribute\Event\Method;
 use GibsonOS\Core\Attribute\Event\Parameter;
 use GibsonOS\Core\Dto\Parameter\AutoCompleteParameter;
+use GibsonOS\Core\Dto\Parameter\EnumParameter;
 use GibsonOS\Core\Exception\EventException;
 use GibsonOS\Core\Exception\FactoryError;
 use GibsonOS\Core\Manager\ReflectionManager;
@@ -103,6 +104,12 @@ abstract class AbstractEvent
 
         foreach ($methodParameters as $parameterName => $methodParameter) {
             if (!isset($parameters[$parameterName])) {
+                continue;
+            }
+
+            if ($methodParameter instanceof EnumParameter) {
+                $newParameters[] = $methodParameter->getEnum($parameters[$parameterName]);
+
                 continue;
             }
 
