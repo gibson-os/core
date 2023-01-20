@@ -6,6 +6,8 @@ GibsonOS.define('GibsonOS.decorator.Panel', {
 
         component = GibsonOS.decorator.ActionManager.init(component);
         component = GibsonOS.decorator.AutoReload.init(component);
+        component = GibsonOS.decorator.Drag.init(component);
+        component = GibsonOS.decorator.Drop.init(component);
         component = GibsonOS.decorator.action.Add.init(component);
         component = GibsonOS.decorator.action.Enter.init(component);
         component = GibsonOS.decorator.action.Delete.init(component);
@@ -15,5 +17,7 @@ GibsonOS.define('GibsonOS.decorator.Panel', {
     addListeners: (component) => {
         GibsonOS.decorator.ActionManager.addListeners(component);
         GibsonOS.decorator.AutoReload.addListeners(component);
+        GibsonOS.decorator.Drag.addListeners(component);
+        GibsonOS.decorator.Drop.addListeners(component);
     }
 });
