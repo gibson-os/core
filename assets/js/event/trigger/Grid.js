@@ -2,7 +2,8 @@ Ext.define('GibsonOS.module.core.event.trigger.Grid', {
     extend: 'GibsonOS.module.core.component.grid.Panel',
     alias: ['widget.gosModuleCoreEventTriggerGrid'],
     autoScroll: true,
-    initComponent: function() {
+    multiSelect: true,
+    initComponent() {
         let me = this;
 
         me.store = new GibsonOS.module.core.event.trigger.store.Grid();
@@ -14,7 +15,7 @@ Ext.define('GibsonOS.module.core.event.trigger.Grid', {
                 clicksToMoveEditor: 1,
                 pluginId: 'rowEditing',
                 listeners: {
-                    beforeedit: function(editor, context) {
+                    beforeedit(editor, context) {
                         let form = editor.getEditor().getForm();
                         let record = context.record;
                         let triggerComboBox = form.findField('trigger');
