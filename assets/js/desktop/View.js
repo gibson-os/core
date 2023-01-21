@@ -67,8 +67,7 @@ Ext.define('GibsonOS.module.core.desktop.View', {
         if (me.activeDropZone) {
             return me.activeDropZone.onNodeOver(target, dd, event, data);
         }
-console.log(data);
-console.log(data.shortcuts);
+
         if (data.shortcuts) {
             return Ext.dd.DropZone.prototype.dropAllowed;
         }
@@ -99,7 +98,7 @@ console.log(data.shortcuts);
             me.getStore().add(data.shortcuts);
         }
 
-        // saveDesktop();
+        me.saveDesktop();
     },
     initComponent() {
         const me = this;
@@ -120,5 +119,20 @@ console.log(data.shortcuts);
         );
 
         me.callParent();
+    },
+    saveDesktop() {
+        const me = this;
+        let records = [];
+
+        Ext.getCmp('desktop').getStore().each(function(record) {
+            records.push(record.getData());
+        });
+
+        GibsonOS.Ajax.request({
+            url: baseDir + 'core/desktop/save',
+            params: {
+                items: Ext.encode(records)
+            }
+        });
     }
 });

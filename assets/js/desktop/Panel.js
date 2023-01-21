@@ -263,7 +263,7 @@ Ext.define('GibsonOS.module.core.desktop.Panel', {
                     }
 
                     record.set('text', text);
-                    // saveDesktop();
+                    view.saveDesktop();
                 }, window, false, record.get('text'));
             }
         });
