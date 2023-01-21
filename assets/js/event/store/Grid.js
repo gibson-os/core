@@ -2,7 +2,7 @@ Ext.define('GibsonOS.module.core.event.store.Grid', {
     extend: 'GibsonOS.data.Store',
     alias: ['coreEventGridStore'],
     model: 'GibsonOS.module.core.event.model.Grid',
-    constructor: function(data) {
+    constructor(data) {
         let me = this;
 
         me.proxy = {

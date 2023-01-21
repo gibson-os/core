@@ -2,7 +2,7 @@ Ext.define('GibsonOS.module.core.event.Panel', {
     extend: 'GibsonOS.module.core.component.Panel',
     alias: ['widget.gosModuleCoreEventPanel'],
     layout: 'border',
-    initComponent: function () {
+    initComponent() {
         let me = this;
 
         me.items = [{
