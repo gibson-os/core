@@ -3,6 +3,7 @@ Ext.define('GibsonOS.module.core.desktop.Panel', {
     height: window.innerHeight,
     extend: 'GibsonOS.module.core.component.Panel',
     alias: ['widget.gosModuleCoreDesktopPanel'],
+    id: 'gosDesktopContainer',
     enableToolbar: false,
     enableClickEvents: true,
     enableContextMenu: true,

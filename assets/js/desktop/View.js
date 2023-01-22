@@ -1,7 +1,7 @@
 Ext.define('GibsonOS.module.core.desktop.View', {
     extend: 'GibsonOS.module.core.component.view.View',
     alias: ['widget.gosCoreDesktopView'],
-    id: 'desktop',
+    id: 'gosDesktop',
     height: window.innerHeight-25,
     frame: false,
     plain: true,
@@ -11,9 +11,9 @@ Ext.define('GibsonOS.module.core.desktop.View', {
     multiSelect: true,
     singleSelect: false,
     trackOver: true,
-    itemSelector: 'div.desktop_item',
-    selectedItemCls: 'desktop_item_selected',
-    overItemCls: 'desktop_item_hover',
+    itemSelector: 'div.desktopItem',
+    selectedItemCls: 'desktopItemSelected',
+    overItemCls: 'desktopItemHover',
     activeDropZone: null,
     itemContextMenu: [],
     enableDrag: true,
@@ -55,8 +55,8 @@ Ext.define('GibsonOS.module.core.desktop.View', {
 
         me.activeDropZone = null;
 
-        if (event.getTarget('.desktop_item') != null) {
-            return event.getTarget('.desktop_item');
+        if (event.getTarget('.desktopItem') != null) {
+            return event.getTarget('.desktopItem');
         }
 
         return event.getTarget('#desktop');
@@ -91,7 +91,7 @@ Ext.define('GibsonOS.module.core.desktop.View', {
             me.getStore().remove(data.shortcuts);
         }
 
-        if (event.getTarget('.desktop_item') != null) {
+        if (event.getTarget('.desktopItem') != null) {
             const record = me.getRecord(target);
             me.getStore().insert(me.getStore().indexOf(record), data.shortcuts);
         } else {
@@ -107,13 +107,13 @@ Ext.define('GibsonOS.module.core.desktop.View', {
 
         me.tpl = new Ext.XTemplate(
             '<tpl for=".">',
-                '<div class="desktop_item" title="{text}">',
+                '<div class="desktopItem" title="{text}">',
                     '<tpl if="thumb">',
-                        '<div class="desktop_item_icon icon64" style="background-image: url(data:image/png;base64,{thumb});"></div>',
+                        '<div class="desktopItemIcon icon64" style="background-image: url(data:image/png;base64,{thumb});"></div>',
                     '<tpl else>',
-                        '<div class="desktop_item_icon icon64 <tpl if="customIcon &gt; 0">customIcon{customIcon}<tpl else>{icon}</tpl>"></div>',
+                        '<div class="desktopItemIcon icon64 <tpl if="customIcon &gt; 0">customIcon{customIcon}<tpl else>{icon}</tpl>"></div>',
                     '</tpl>',
-                    '<div class="desktop_item_name">{text}</div>',
+                    '<div class="desktopItemName">{text}</div>',
                 '</div>',
             '</tpl>'
         );

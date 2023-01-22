@@ -1,0 +1,18 @@
+#clockWindow {
+    right: 5px !important;
+    bottom: 30px !important;
+    left: auto !important;
+    top: auto !important;
+}
+
+#clockDate,
+#clockSunrise,
+#clockSunset {
+    font-size: 10px;
+}
+
+#clockTime {
+    font-size: 24px;
+    font-weight: bold;
+    margin: 4px 0;
+}
