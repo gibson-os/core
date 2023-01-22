@@ -124,7 +124,7 @@ Ext.define('GibsonOS.module.core.desktop.View', {
         const me = this;
         let records = [];
 
-        Ext.getCmp('gosDesktop').getStore().each(function(record) {
+        Ext.getCmp('gosDesktop').getStore().each((record) => {
             records.push(record.getData());
         });
 

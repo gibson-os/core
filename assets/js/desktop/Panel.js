@@ -98,5 +98,26 @@ Ext.define('GibsonOS.module.core.desktop.Panel', {
                 }, window, false, record.get('text'));
             }
         });
+
+        me.on('render', () => {
+            window.onresize = () => {
+                me.setHeight(window.innerHeight);
+                me.setWidth(window.innerWidth);
+                me.viewItem.setHeight(window.innerHeight-25);
+                me.viewItem.setWidth(window.innerWidth);
+            };
+
+            setTimeout(me.sessionRefresh, 60000);
+        })
+    },
+    sessionRefresh() {
+        const me = this;
+
+        GibsonOS.Ajax.request({
+            url: baseDir + 'core/user/sessionRefresh',
+            success() {
+                setTimeout(me.sessionRefresh, 60000);
+            }
+        });
     }
 });
