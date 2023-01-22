@@ -78,60 +78,6 @@ Ext.define('GibsonOS.module.core.desktop.Panel', {
             xtype: 'gosCoreDesktopClockButton'
         }];
 
-        // me.bbar =[{
-        //     xtype: 'gosButton',
-        //     id: 'clock',
-        //     enableToggle: true,
-        //     timeDifference: 0,
-        //     setTime() {
-        //         const button = Ext.getCmp('clock');
-        //         const clockWindow = Ext.getCmp('clockWindow');
-        //         const localDate = new Date();
-        //         const showDate = new Date(localDate.getTime() + button.timeDifference);
-        //
-        //         button.setText(Ext.Date.format(showDate, 'H:i'));
-        //
-        //         if (clockWindow) {
-        //             clockWindow.update({
-        //                 date: Ext.Date.format(showDate, 'l, d.m.Y (W)'),
-        //                 time: Ext.Date.format(showDate, 'H:i:s'),
-        //                 sunrise: Ext.Date.format(new Date(serverDate.sunrise*1000), 'H:i'),
-        //                 sunset: Ext.Date.format(new Date(serverDate.sunset*1000), 'H:i')
-        //             });
-        //         }
-        //
-        //         setTimeout(button.setTime, 250);
-        //     },
-        //     listeners: {
-        //         render(btn) {
-        //             var localDate = new Date();
-        //
-        //             btn.timeDifference = parseInt((serverDate.now - (localDate.getTime()/1000))*1000);
-        //             btn.setTime();
-        //         },
-        //         toggle(btn, pressed) {
-        //             if (pressed) {
-        //                 new GibsonOS.Window({
-        //                     id: 'clockWindow',
-        //                     width: 145,
-        //                     autoHeight: true,
-        //                     plain: true,
-        //                     header: false,
-        //                     data: [],
-        //                     tpl: new Ext.XTemplate(
-        //                         '<div id="clockDate">{date}</div>',
-        //                         '<div id="clockTime">{time}</div>',
-        //                         '<div id="clockSunrise">Sonnenaufgang: {sunrise}</div>',
-        //                         '<div id="clockSunset">Sonnenuntergang: {sunset}</div>'
-        //                     )
-        //                 }).show();
-        //             } else {
-        //                 Ext.getCmp('clockWindow').close();
-        //             }
-        //         }
-        //     }
-        // }];
-
         me.callParent();
 
         me.addAction({
