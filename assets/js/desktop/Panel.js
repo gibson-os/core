@@ -70,131 +70,15 @@ Ext.define('GibsonOS.module.core.desktop.Panel', {
         me.bbar = [{
             xtype: 'gosCoreDesktopStartMenuMenu',
             store: view.getStore()
+        },('-'),{
+            xtype: 'gosCoreDesktopQuickLaunchPanel'
+        },{
+            xtype: 'gosCoreDesktopTaskbarPanel'
+        },('->'),('-'),{
+            xtype: 'gosCoreDesktopClockButton'
         }];
 
         // me.bbar =[{
-        //     xtype: 'gosButton',
-        //     id: 'startmenu',
-        //     iconCls: 'icon16 icon_logo',
-        //     menu: [{
-        //         xtype: 'gosCoreDesktopStartMenuButton',
-        //         text: 'Programme',
-        //         menu: [],
-        //         listeners: {
-        //             render(btn) {
-        //                 Ext.iterate(desktopStore.getProxy().getReader().jsonData.data.apps, (app) => {
-        //                     btn.menu.add({
-        //                         xtype: 'gosCoreDesktopStartMenuButton',
-        //                         text: app.text,
-        //                         iconCls: 'icon16 ' + app.icon,
-        //                         handler() {
-        //                             var functionName = app.module;
-        //                             functionName += app.task.charAt(0).toUpperCase() + app.task.slice(1);
-        //                             functionName += app.action.charAt(0).toUpperCase() + app.action.slice(1);
-        //
-        //                             if (eval('typeof(' + functionName + ') == "function"')) {
-        //                                 eval(functionName + '();');
-        //                             } else {
-        //                                 functionName = 'GibsonOS.module.' + app.module + '.'
-        //                                              + app.task + '.App';
-        //
-        //                                 if (eval('typeof(' + functionName + ') == "function"')) {
-        //                                     eval('new ' + functionName + '();');
-        //                                 } else {
-        //                                     GibsonOS.MessageBox.show({msg: 'Modul wurde nicht gefunden!'});
-        //                                 }
-        //                             }
-        //                         },
-        //                         listeners: {
-        //                             render(btn) {
-        //                                 btn.dragZone = Ext.create('Ext.dd.DragZone', btn.getEl(), {
-        //                                     getDragData(event) {
-        //                                         var sourceElement = event.getTarget();
-        //
-        //                                         if (sourceElement) {
-        //                                             var clone = sourceElement.cloneNode(true);
-        //                                             return btn.dragData = {
-        //                                                 sourceEl: sourceElement,
-        //                                                 repairXY: Ext.fly(sourceElement).getXY(),
-        //                                                 ddel: clone,
-        //                                                 shortcuts: [app]
-        //                                             };
-        //                                         }
-        //                                     },
-        //                                     getRepairXY() {
-        //                                         return this.dragData.repairXY;
-        //                                     }
-        //                                 });
-        //                             }
-        //                         }
-        //                     });
-        //                 });
-        //             }
-        //         }
-        //     },{
-        //         xtype: 'gosCoreDesktopStartMenuButton',
-        //         text: 'Verwaltung',
-        //         menu: [{
-        //             xtype: 'gosCoreDesktopStartMenuButton',
-        //             text: 'Benutzer',
-        //             iconCls: 'icon16 icon_user',
-		//             handler() {
-        //                 new GibsonOS.module.core.user.App();
-		//             }
-        //         },{
-        //             xtype: 'gosCoreDesktopStartMenuButton',
-        //             text: 'Module',
-        //             iconCls: 'icon16 icon_modules',
-        //             handler() {
-        //                 new GibsonOS.module.core.module.App();
-        //             }
-        //         },{
-        //             xtype: 'gosCoreDesktopStartMenuButton',
-        //             text: 'Icons',
-        //             handler() {
-        //                 new GibsonOS.module.core.icon.App();
-        //             }
-        //         },{
-        //             xtype: 'gosCoreDesktopStartMenuButton',
-        //             text: 'Cronjobs',
-        //             handler() {
-        //                 new GibsonOS.module.core.cronjob.App();
-        //             }
-        //         },{
-        //             xtype: 'gosCoreDesktopStartMenuButton',
-        //             text: 'Events',
-        //             handler() {
-        //                 new GibsonOS.module.core.event.App();
-        //             }
-        //         }]
-        //     },{
-        //         xtype: 'gosCoreDesktopStartMenuButton',
-        //         text: 'Einstellungen',
-        //         iconCls: 'icon16 icon_settings',
-        //         handler() {
-        //             new GibsonOS.module.core.user.setting.App();
-        //         }
-        //     },('-'),{
-        //         xtype: 'gosCoreDesktopStartMenuButton',
-        //         text: 'Logout',
-        //         iconCls: 'icon_system system_exit',
-        //         handler() {
-        //             document.location = baseDir + 'core/user/logout';
-        //         }
-        //     }]
-        // },('-'),{
-        //     xtype: 'GibsonOS.module.core.component.Panel',
-		//     id: 'quicklaunch',
-		//     frame: false,
-		//     plain: false,
-		//     flex: 0
-        // },('-'),{
-        //     xtype: 'GibsonOS.module.core.component.Panel',
-		//     id: 'taskbar',
-		//     frame: false,
-		//     plain: false,
-		//     flex: 0
-        // },('->'),('-'),{
         //     xtype: 'gosButton',
         //     id: 'clock',
         //     enableToggle: true,
