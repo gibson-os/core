@@ -10,6 +10,22 @@ Ext.define('GibsonOS.module.core.desktop.startMenu.Menu', {
         me.menu = [{
             xtype: 'gosCoreDesktopStartMenuApps',
             store: me.store
+        },{
+            xtype: 'gosCoreDesktopStartMenuAdministration',
+        },{
+            xtype: 'gosCoreDesktopStartMenuButton',
+            text: 'Einstellungen',
+            iconCls: 'icon16 icon_settings',
+            handler() {
+                new GibsonOS.module.core.user.setting.App();
+            }
+        },('-'),{
+            xtype: 'gosCoreDesktopStartMenuButton',
+            text: 'Logout',
+            iconCls: 'icon_system system_exit',
+            handler() {
+                document.location = baseDir + 'core/user/logout';
+            }
         }];
 
         me.callParent();
