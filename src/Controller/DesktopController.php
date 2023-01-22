@@ -65,4 +65,34 @@ class DesktopController extends AbstractController
 
         return $this->returnSuccess();
     }
+
+    /**
+     * @throws SaveError
+     * @throws \JsonException
+     * @throws SelectError
+     */
+    #[CheckPermission(Permission::WRITE)]
+    public function add(
+        ModelManager $modelManager,
+        ModuleRepository $moduleRepository,
+        #[GetSetting(self::DESKTOP_KEY)] ?Setting $desktop,
+        array $items,
+    ): AjaxResponse {
+        /** @var array $desktopItems */
+        $desktopItems = JsonUtility::decode($desktop?->getValue() ?? '[]');
+        array_push($desktopItems, ...$items);
+
+        if ($desktop === null) {
+            $module = $moduleRepository->getByName($this->requestService->getModuleName());
+            $desktop = (new Setting())
+                ->setUserId($this->sessionService->getUserId() ?? 0)
+                ->setModule($module)
+                ->setKey(self::DESKTOP_KEY)
+            ;
+        }
+
+        $modelManager->saveWithoutChildren($desktop->setValue(JsonUtility::encode($desktopItems)));
+
+        return $this->returnSuccess();
+    }
 }
