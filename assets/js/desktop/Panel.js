@@ -32,6 +32,10 @@ Ext.define('GibsonOS.module.core.desktop.Panel', {
             }
         );
     },
+    enterButton: {
+        text: 'Öffnen',
+        iconCls: null,
+    },
     enterFunction(record) {
         let functionName = record.get('module');
         let parameters = '';
