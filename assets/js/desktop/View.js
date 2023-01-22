@@ -59,7 +59,7 @@ Ext.define('GibsonOS.module.core.desktop.View', {
             return event.getTarget('.desktopItem');
         }
 
-        return event.getTarget('#desktop');
+        return event.getTarget('#gosDesktop');
     },
     onNodeOver : function(target, dd, event, data) {
         const me = this;
@@ -124,7 +124,7 @@ Ext.define('GibsonOS.module.core.desktop.View', {
         const me = this;
         let records = [];
 
-        Ext.getCmp('desktop').getStore().each(function(record) {
+        Ext.getCmp('gosDesktop').getStore().each(function(record) {
             records.push(record.getData());
         });
 
