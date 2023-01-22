@@ -28,7 +28,7 @@ Ext.define('GibsonOS.module.core.desktop.Panel', {
                 }
 
                 me.viewItem.getStore().remove(records);
-                // saveDesktop();
+                me.viewItem.saveDesktop();
             }
         );
     },
