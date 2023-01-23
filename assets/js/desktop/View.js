@@ -34,7 +34,11 @@ Ext.define('GibsonOS.module.core.desktop.View', {
         if (event.getTarget('.x-window') != null) {
             let target = null;
 
-            Ext.iterate(GibsonOS.dropZones.zones, function(elementId, dropZone) {
+            Ext.iterate(GibsonOS.dropZones.zones, (elementId, dropZone) => {
+                if (elementId === me.id) {
+                    return true;
+                }
+
                 target = dropZone.getTargetFromEvent(event);
 
                 if (!target) {
@@ -47,7 +51,7 @@ Ext.define('GibsonOS.module.core.desktop.View', {
             });
 
             if (!target) {
-                view.activeDropZone = null;
+                me.activeDropZone = null;
             }
 
             return target;
@@ -61,7 +65,7 @@ Ext.define('GibsonOS.module.core.desktop.View', {
 
         return event.getTarget('#gosDesktop');
     },
-    onNodeOver : function(target, dd, event, data) {
+    onNodeOver(target, dd, event, data) {
         const me = this;
 
         if (me.activeDropZone) {
@@ -76,7 +80,7 @@ Ext.define('GibsonOS.module.core.desktop.View', {
 
         return Ext.dd.DropZone.prototype.dropNotAllowed;
     },
-    onNodeDrop: function(target, dd, event, data) {
+    onNodeDrop(target, dd, event, data) {
         const me = this;
 
         if (me.activeDropZone) {
@@ -121,7 +125,6 @@ Ext.define('GibsonOS.module.core.desktop.View', {
         me.callParent();
     },
     saveDesktop() {
-        const me = this;
         let records = [];
 
         Ext.getCmp('gosDesktop').getStore().each((record) => {

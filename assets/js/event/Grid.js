@@ -3,6 +3,24 @@ Ext.define('GibsonOS.module.core.event.Grid', {
     alias: ['widget.gosModuleCoreEventGrid'],
     autoScroll: true,
     enableDrag: true,
+    getShortcuts(records) {
+        let shortcuts = [];
+
+        Ext.iterate(records, (record) => {
+            shortcuts.push({
+                text: record.get('name'),
+                icon: 'icon_exe',
+                module: 'core',
+                task: 'event',
+                action: 'run',
+                params: {
+                    eventId: record.get('id'),
+                },
+            });
+        });
+
+        return shortcuts;
+    },
     initComponent() {
         let me = this;
 
