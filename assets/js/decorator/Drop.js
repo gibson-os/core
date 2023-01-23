@@ -15,7 +15,7 @@ GibsonOS.define('GibsonOS.decorator.Drop', {
 
                 return Ext.dd.DropZone.prototype.dropNotAllowed;
             },
-            onNodeDrop(target, dd, event, data) {
+            onNodeDrop(target, dd, event, data, view) {
                 let records = [];
                 const ctrlPressed = window.event.ctrlKey;
 
@@ -29,25 +29,41 @@ GibsonOS.define('GibsonOS.decorator.Drop', {
                     records.push(recordData);
                 });
 
-                if (!ctrlPressed) {
-                    Ext.iterate(data.records, (record) => {
-                        record.remove();
-                    });
-                }
+                if (event.getTarget('.x-grid-row')) {
+                    const targetRecord = view.getRecord(target);
+                    let records = data.records;
 
+                    if (!ctrlPressed) {
+                        records = [];
+
+                        Ext.iterate(data.records, (record) => {
+                            if (record !== targetRecord) {
+                                records.push(record);
+                            }
+                        });
+
+                        component.deleteRecords(records);
+                    }
+
+                    component.insertRecords(targetRecord, records);
+                } else {
+                    if (!ctrlPressed) {
+                        component.deleteRecords(data.records);
+                    }
+
+                    component.addRecords(records);
+                }
+            },
+            insertRecords(beforeRecord, records) {
                 const store = component.getStore();
 
-                if (event.getTarget('.x-grid-row')) {
-                    const node = view.getRecord(target);
-                    const parentNode = node.parentNode;
-                    let index = parentNode.indexOf(node);
-
-                    Ext.iterate(records, (record) => {
-                        parentNode.insertChild(index++, record);
-                    });
-                } else {
-                    store.getRootNode().appendChild(records);
-                }
+                store.insert(store.indexOf(beforeRecord), records);
+            },
+            addRecords(records) {
+                component.getStore().add(records);
+            },
+            deleteRecords(records) {
+                component.getStore().remove(records);
             }
         }, component));
 
@@ -69,7 +85,7 @@ GibsonOS.define('GibsonOS.decorator.Drop', {
                     return component.onNodeOver(target, dd, event, data);
                 },
                 onNodeDrop(target, dd, event, data) {
-                    return component.onNodeDrop(target, dd, event, data);
+                    return component.onNodeDrop(target, dd, event, data, view);
                 }
             });
         });

@@ -2,7 +2,8 @@ Ext.define('GibsonOS.module.core.event.Grid', {
     extend: 'GibsonOS.module.core.component.grid.Panel',
     alias: ['widget.gosModuleCoreEventGrid'],
     autoScroll: true,
-    initComponent: function () {
+    enableDrag: true,
+    initComponent() {
         let me = this;
 
         me.store = new GibsonOS.module.core.event.store.Grid();
@@ -38,10 +39,10 @@ Ext.define('GibsonOS.module.core.event.Grid', {
         });
         GibsonOS.event.action.Execute.init(me);
     },
-    addFunction: function() {
+    addFunction() {
         new GibsonOS.module.core.event.Window();
     },
-    enterFunction: function(record) {
+    enterFunction(record) {
         let window = new GibsonOS.module.core.event.Window();
         window.down('gosModuleCoreEventForm').loadRecord(record);
 
@@ -53,7 +54,7 @@ Ext.define('GibsonOS.module.core.event.Grid', {
         triggerStore.getProxy().setExtraParam('eventId', record.get('id'));
         triggerStore.load();
     },
-    deleteFunction: function(records) {
+    deleteFunction(records) {
         const me = this;
 
         Ext.MessageBox.confirm(
@@ -80,7 +81,7 @@ Ext.define('GibsonOS.module.core.event.Grid', {
             }
         );
     },
-    getColumns: function() {
+    getColumns() {
         return [{
             header: 'Name',
             dataIndex: 'name',

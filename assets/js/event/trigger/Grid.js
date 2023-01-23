@@ -3,6 +3,8 @@ Ext.define('GibsonOS.module.core.event.trigger.Grid', {
     alias: ['widget.gosModuleCoreEventTriggerGrid'],
     autoScroll: true,
     multiSelect: true,
+    enableDrag: true,
+    enableDrop: true,
     initComponent() {
         let me = this;
 
