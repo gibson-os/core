@@ -4,13 +4,16 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Controller;
 
 use GibsonOS\Core\Attribute\CheckPermission;
+use GibsonOS\Core\Attribute\GetMappedModels;
 use GibsonOS\Core\Attribute\GetSetting;
 use GibsonOS\Core\Exception\Model\SaveError;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Manager\ModelManager;
+use GibsonOS\Core\Model\Desktop\Item;
 use GibsonOS\Core\Model\Setting;
+use GibsonOS\Core\Model\User;
 use GibsonOS\Core\Model\User\Permission;
-use GibsonOS\Core\Repository\ModuleRepository;
+use GibsonOS\Core\Repository\Desktop\ItemRepository;
 use GibsonOS\Core\Service\Response\AjaxResponse;
 use GibsonOS\Core\Utility\JsonUtility;
 
@@ -24,74 +27,76 @@ class DesktopController extends AbstractController
 
     /**
      * @throws \JsonException
+     * @throws SelectError
      */
     #[CheckPermission(Permission::READ)]
     public function index(
-        #[GetSetting(self::DESKTOP_KEY)] ?Setting $desktop,
+        ItemRepository $itemRepository,
         #[GetSetting(self::APPS_KEY)] ?Setting $apps,
         #[GetSetting(self::TOOLS_KEY)] ?Setting $tools
     ): AjaxResponse {
         return $this->returnSuccess([
-            self::DESKTOP_KEY => JsonUtility::decode($desktop?->getValue() ?: '[]'),
+            self::DESKTOP_KEY => $itemRepository->getByUser($this->sessionService->getUser() ?? new User()),
             self::APPS_KEY => JsonUtility::decode($apps?->getValue() ?: '[]'),
             self::TOOLS_KEY => JsonUtility::decode($tools?->getValue() ?: '[]'),
         ]);
     }
 
     /**
+     * @param Item[] $items
+     *
      * @throws SaveError
-     * @throws SelectError
-     * @throws \JsonException
-     * @throws \ReflectionException
      */
     #[CheckPermission(Permission::WRITE)]
-    public function save(ModelManager $modelManager, ModuleRepository $moduleRepository, array $items): AjaxResponse
-    {
-        $module = $moduleRepository->getByName($this->requestService->getModuleName());
+    public function save(
+        ModelManager $modelManager,
+        ItemRepository $itemRepository,
+        #[GetMappedModels(Item::class)] array $items,
+    ): AjaxResponse {
+        $position = 0;
+        $itemIds = [];
+        $user = $this->sessionService->getUser() ?? new User();
 
-        foreach ($items as &$item) {
-            if (empty($item['params'])) {
-                $item['params'] = null;
-            }
+        foreach ($items as $item) {
+            $modelManager->saveWithoutChildren(
+                $item
+                    ->setUser($user)
+                    ->setPosition($position++)
+            );
+            $itemIds[] = $item->getId();
         }
 
-        $modelManager->save(
-            (new Setting())
-                ->setUserId($this->sessionService->getUserId() ?? 0)
-                ->setModule($module)
-                ->setKey(self::DESKTOP_KEY)
-                ->setValue(JsonUtility::encode($items))
-        );
+        $itemRepository->deleteByIdsNot($user, $itemIds);
 
         return $this->returnSuccess();
     }
 
     /**
+     * @param Item[] $items
+     *
      * @throws SaveError
-     * @throws \JsonException
-     * @throws SelectError
      */
     #[CheckPermission(Permission::WRITE)]
     public function add(
         ModelManager $modelManager,
-        ModuleRepository $moduleRepository,
-        #[GetSetting(self::DESKTOP_KEY)] ?Setting $desktop,
-        array $items,
+        ItemRepository $itemRepository,
+        #[GetMappedModels(Item::class)] array $items,
     ): AjaxResponse {
-        /** @var array $desktopItems */
-        $desktopItems = JsonUtility::decode($desktop?->getValue() ?? '[]');
-        array_push($desktopItems, ...$items);
+        $user = $this->sessionService->getUser() ?? new User();
 
-        if ($desktop === null) {
-            $module = $moduleRepository->getByName($this->requestService->getModuleName());
-            $desktop = (new Setting())
-                ->setUserId($this->sessionService->getUserId() ?? 0)
-                ->setModule($module)
-                ->setKey(self::DESKTOP_KEY)
-            ;
+        try {
+            $position = $itemRepository->getLastPosition($user)->getPosition() + 1;
+        } catch (SelectError) {
+            $position = 0;
         }
 
-        $modelManager->saveWithoutChildren($desktop->setValue(JsonUtility::encode($desktopItems)));
+        foreach ($items as $item) {
+            $modelManager->saveWithoutChildren(
+                $item
+                    ->setPosition($position++)
+                    ->setUser($user)
+            );
+        }
 
         return $this->returnSuccess();
     }

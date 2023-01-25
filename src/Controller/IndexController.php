@@ -5,6 +5,7 @@ namespace GibsonOS\Core\Controller;
 
 use GibsonOS\Core\Attribute\GetSetting;
 use GibsonOS\Core\Model\Setting;
+use GibsonOS\Core\Repository\Desktop\ItemRepository;
 use GibsonOS\Core\Service\Response\AjaxResponse;
 
 class IndexController extends AbstractController
@@ -14,7 +15,7 @@ class IndexController extends AbstractController
      */
     public function index(
         DesktopController $desktopController,
-        #[GetSetting(DesktopController::DESKTOP_KEY)] ?Setting $desktop,
+        ItemRepository $itemRepository,
         #[GetSetting(DesktopController::APPS_KEY)] ?Setting $apps,
         #[GetSetting(DesktopController::TOOLS_KEY)] ?Setting $tools
     ): AjaxResponse {
@@ -22,6 +23,6 @@ class IndexController extends AbstractController
             return $this->returnSuccess();
         }
 
-        return $desktopController->index($desktop, $apps, $tools);
+        return $desktopController->index($itemRepository, $apps, $tools);
     }
 }
