@@ -1,17 +1,14 @@
 Ext.define('GibsonOS.module.core.desktop.model.Item', {
     extend: 'GibsonOS.data.Model',
     fields: [{
+        name: 'id',
+        type: 'int'
+    },{
         name: 'text',
         type: 'string'
     },{
         name: 'icon',
         type: 'string'
-    },{
-        name: 'thumb',
-        type: 'string'
-    },{
-        name: 'customIcon',
-        type: 'int'
     },{
         name: 'module',
         type: 'string'
@@ -22,7 +19,7 @@ Ext.define('GibsonOS.module.core.desktop.model.Item', {
         name: 'action',
         type: 'string'
     },{
-        name: 'params',
+        name: 'parameters',
         type: 'object'
     }]
 });

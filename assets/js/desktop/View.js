@@ -125,16 +125,33 @@ Ext.define('GibsonOS.module.core.desktop.View', {
         me.callParent();
     },
     saveDesktop() {
+        const me = this;
         let records = [];
 
-        Ext.getCmp('gosDesktop').getStore().each((record) => {
-            records.push(record.getData());
+        me.getStore().each((record) => {
+            let data = record.getData();
+
+            if (data.parameters === '') {
+                data.parameters = {};
+            }
+
+            records.push(data);
         });
 
         GibsonOS.Ajax.request({
             url: baseDir + 'core/desktop/save',
             params: {
                 items: Ext.encode(records)
+            },
+            success(response) {
+                const data = Ext.decode(response.responseText).data;
+                let index = 0;
+
+                me.getStore().each((record) => {
+                    Ext.iterate(data[index++], (field, value) => {
+                        record.set(field, value);
+                    });
+                });
             }
         });
     }

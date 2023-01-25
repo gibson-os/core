@@ -159,6 +159,7 @@ class Item extends AbstractModel implements \JsonSerializable
         return [
             'id' => $this->getId(),
             'text' => $this->getText(),
+            'icon' => $this->getIcon(),
             'module' => $this->getModule(),
             'task' => $this->getTask(),
             'action' => $this->getAction(),

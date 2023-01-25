@@ -68,7 +68,7 @@ class DesktopController extends AbstractController
 
         $itemRepository->deleteByIdsNot($user, $itemIds);
 
-        return $this->returnSuccess();
+        return $this->returnSuccess($items);
     }
 
     /**
@@ -98,6 +98,6 @@ class DesktopController extends AbstractController
             );
         }
 
-        return $this->returnSuccess();
+        return $this->returnSuccess($items);
     }
 }
