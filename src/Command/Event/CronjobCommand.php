@@ -19,7 +19,7 @@ use Psr\Log\LoggerInterface;
 #[Cronjob]
 class CronjobCommand extends AbstractCommand
 {
-    public function __construct(private EventService $eventService, LoggerInterface $logger)
+    public function __construct(private readonly EventService $eventService, LoggerInterface $logger)
     {
         parent::__construct($logger);
     }

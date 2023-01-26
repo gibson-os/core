@@ -22,7 +22,7 @@ class InstallCommand extends AbstractCommand
     #[Argument('Part to install')]
     private ?string $part = null;
 
-    public function __construct(private InstallService $installService, LoggerInterface $logger)
+    public function __construct(private readonly InstallService $installService, LoggerInterface $logger)
     {
         parent::__construct($logger);
     }

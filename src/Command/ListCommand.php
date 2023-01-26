@@ -15,8 +15,8 @@ use Psr\Log\LoggerInterface;
 class ListCommand extends AbstractCommand
 {
     public function __construct(
-        private CommandStore $commandStore,
-        private TableService $tableService,
+        private readonly CommandStore $commandStore,
+        private readonly TableService $tableService,
         LoggerInterface $logger
     ) {
         parent::__construct($logger);

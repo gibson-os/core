@@ -26,12 +26,12 @@ class WeatherCommand extends AbstractCommand
 {
     public function __construct(
         LoggerInterface $logger,
-        private WeatherService $weatherService,
-        private LocationRepository $locationRepository,
-        private WeatherRepository $weatherRepository,
-        private DateTimeService $dateTimeService,
-        private ModelManager $modelManager,
-        private LockService $lockService
+        private readonly WeatherService $weatherService,
+        private readonly LocationRepository $locationRepository,
+        private readonly WeatherRepository $weatherRepository,
+        private readonly DateTimeService $dateTimeService,
+        private readonly ModelManager $modelManager,
+        private readonly LockService $lockService
     ) {
         parent::__construct($logger);
     }

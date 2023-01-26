@@ -23,8 +23,8 @@ class RunCommand extends AbstractCommand
     private int $eventId;
 
     public function __construct(
-        private EventRepository $eventRepository,
-        private EventService $eventService,
+        private readonly EventRepository $eventRepository,
+        private readonly EventService $eventService,
         LoggerInterface $logger
     ) {
         parent::__construct($logger);

@@ -112,4 +112,14 @@ class SettingRepository extends AbstractRepository
 
         return $this->getModel($table, Setting::class);
     }
+
+    /**
+     * @throws SelectError
+     *
+     * @return Setting[]
+     */
+    public function getDesktops(): array
+    {
+        return $this->fetchAll('`key`=?', ['desktop'], Setting::class);
+    }
 }

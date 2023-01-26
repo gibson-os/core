@@ -14,7 +14,7 @@ use Psr\Log\LoggerInterface;
  */
 class ScanCommand extends AbstractCommand
 {
-    public function __construct(private ModuleService $moduleService, LoggerInterface $logger)
+    public function __construct(private readonly ModuleService $moduleService, LoggerInterface $logger)
     {
         parent::__construct($logger);
     }

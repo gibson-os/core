@@ -28,9 +28,9 @@ class RunCommand extends AbstractCommand
     private string $user;
 
     public function __construct(
-        private CronjobService $cronjobService,
-        private LockService $lockService,
-        private LockRepository $lockRepository,
+        private readonly CronjobService $cronjobService,
+        private readonly LockService $lockService,
+        private readonly LockRepository $lockRepository,
         LoggerInterface $logger
     ) {
         parent::__construct($logger);

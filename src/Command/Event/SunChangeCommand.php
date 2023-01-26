@@ -17,8 +17,11 @@ use Psr\Log\LoggerInterface;
 #[Cronjob(seconds: '0')]
 class SunChangeCommand extends AbstractCommand
 {
-    public function __construct(private DateTimeService $dateTimeService, private EventService $eventService, LoggerInterface $logger)
-    {
+    public function __construct(
+        private readonly DateTimeService $dateTimeService,
+        private readonly EventService $eventService,
+        LoggerInterface $logger
+    ) {
         parent::__construct($logger);
     }
 
