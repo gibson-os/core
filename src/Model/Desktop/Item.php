@@ -156,6 +156,8 @@ class Item extends AbstractModel implements \JsonSerializable
 
     public function jsonSerialize(): array
     {
+        $parameters = $this->getParameters();
+
         return [
             'id' => $this->getId(),
             'text' => $this->getText(),
@@ -163,7 +165,7 @@ class Item extends AbstractModel implements \JsonSerializable
             'module' => $this->getModule(),
             'task' => $this->getTask(),
             'action' => $this->getAction(),
-            'parameters' => $this->getParameters(),
+            'parameters' => count($parameters) === 0 ? null : $parameters,
         ];
     }
 }
