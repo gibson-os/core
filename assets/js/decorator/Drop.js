@@ -5,15 +5,14 @@ GibsonOS.define('GibsonOS.decorator.Drop', {
             getTargetFromEvent(event) {
                 return event.getTarget('.x-grid-row') ?? event.getTarget('#' + component.id + '-body');
             },
+            isDropAllowed(target, dd, event, data) {
+                return !!(component.id === data.dragElementId && event.getTarget('#' + component.id + '-body'));
+            },
             onNodeOver(target, dd, event, data) {
-                if (
-                    component.id === data.dragElementId &&
-                    event.getTarget('#' + component.id + '-body')
-                ) {
-                    return Ext.dd.DropZone.prototype.dropAllowed;
-                }
-
-                return Ext.dd.DropZone.prototype.dropNotAllowed;
+                return component.isDropAllowed(target, dd, event, data)
+                    ? Ext.dd.DropZone.prototype.dropAllowed
+                    : Ext.dd.DropZone.prototype.dropNotAllowed
+                ;
             },
             onNodeDrop(target, dd, event, data, view) {
                 let records = [];
@@ -42,16 +41,16 @@ GibsonOS.define('GibsonOS.decorator.Drop', {
                             }
                         });
 
-                        component.deleteRecords(records);
+                        component.deleteRecords(records, data);
                     }
 
-                    component.insertRecords(targetRecord, records);
+                    component.insertRecords(targetRecord, records, ctrlPressed, data);
                 } else {
                     if (!ctrlPressed) {
-                        component.deleteRecords(data.records);
+                        component.deleteRecords(data.records, data);
                     }
 
-                    component.addRecords(records);
+                    component.addRecords(records, ctrlPressed, data);
                 }
             },
             insertRecords(beforeRecord, records) {
@@ -62,8 +61,8 @@ GibsonOS.define('GibsonOS.decorator.Drop', {
             addRecords(records) {
                 component.getStore().add(records);
             },
-            deleteRecords(records) {
-                component.getStore().remove(records);
+            deleteRecords(records, data) {
+                data.component.getStore().remove(records);
             }
         }, component));
 
@@ -81,11 +80,14 @@ GibsonOS.define('GibsonOS.decorator.Drop', {
                 getTargetFromEvent(event) {
                     return component.getTargetFromEvent(event);
                 },
+                isDropAllowed(target, dd, event, data) {
+                    return component.isDropAllowed(target, dd, event, data);
+                },
                 onNodeOver(target, dd, event, data) {
                     return component.onNodeOver(target, dd, event, data);
                 },
                 onNodeDrop(target, dd, event, data) {
-                    return component.onNodeDrop(target, dd, event, data, view);
+                    component.onNodeDrop(target, dd, event, data, view);
                 }
             });
         });

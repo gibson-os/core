@@ -55,7 +55,7 @@ GibsonOS.define('GibsonOS.decorator.Drag', {
                         repairXY: Ext.fly(sourceElement).getXY(),
                         ddel: clone,
                         records: records,
-                        // store: component.getStore(),
+                        component: component,
                         shortcuts: component.getShortcuts(records)
                     };
                 },

@@ -65,26 +65,32 @@ Ext.define('GibsonOS.module.core.desktop.View', {
 
         return event.getTarget('#gosDesktop');
     },
-    onNodeOver(target, dd, event, data) {
+    isDropAllowed(target, dd, event, data) {
         const me = this;
 
         if (me.activeDropZone) {
-            return me.activeDropZone.onNodeOver(target, dd, event, data);
+            return me.activeDropZone.isDropAllowed(target, dd, event, data);
         }
 
         if (data.shortcuts) {
-            return Ext.dd.DropZone.prototype.dropAllowed;
+            return true;
         }
 
         me.activeDropZone = null;
 
-        return Ext.dd.DropZone.prototype.dropNotAllowed;
+        return false;
     },
     onNodeDrop(target, dd, event, data) {
         const me = this;
 
         if (me.activeDropZone) {
-            return me.activeDropZone.onNodeDrop(target, dd, event, data);
+            if (!me.activeDropZone.isDropAllowed(target, dd, event, data)) {
+                return;
+            }
+
+            me.activeDropZone.onNodeDrop(target, dd, event, data);
+
+            return;
         }
 
         if (!data.shortcuts && data.shortcuts) {
