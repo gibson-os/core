@@ -6,8 +6,8 @@ GibsonOS.define('GibsonOS.event.action.Execute', {
             selectionNeeded: true,
             eventId: null,
             listeners: {
-                click: () => {
-                    let record = component.getSelectionModel().getSelection()[0];
+                click() {
+                    let record = this.component.getSelectionModel().getSelection()[0];
                     component.setLoading(true);
 
                     GibsonOS.Ajax.request({

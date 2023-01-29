@@ -8,7 +8,7 @@ Ext.define('GibsonOS.module.core.component.grid.Panel', {
     enableKeyEvents: true,
     enableClickEvents: true,
     enableContextMenu: true,
-    initComponent: function() {
+    initComponent() {
         let me = this;
 
         me = GibsonOS.decorator.Panel.init(me);

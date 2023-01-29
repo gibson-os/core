@@ -36,7 +36,7 @@ GibsonOS.define('GibsonOS.decorator.ActionManager', {
         let containerContextMenu = null;
         let itemContextMenu = null;
 
-        component.addAction = (button) => {
+        component.addAction = function(button) {
             button = Ext.merge({
                 addToToolbar: true,
                 addToContainerContextMenu: !button.selectionNeeded,
@@ -48,6 +48,7 @@ GibsonOS.define('GibsonOS.decorator.ActionManager', {
                 enableSingleClick: false,
                 enableDoubleClick: false,
                 tbarText: null,
+                component: this
             }, button);
 
             if (!button.requiredPermission) {

@@ -11,9 +11,10 @@ GibsonOS.define('GibsonOS.decorator.action.Enter', {
                 maxSelectionAllowed: 1,
                 enableDoubleClick: true,
                 listeners: {
-                    click: () => {
-                        const viewItem = component.viewItem ?? component;
-                        component.enterFunction(viewItem.getSelectionModel().getSelection()[0]);
+                    click() {
+                        const component = this.component;
+                        
+                        component.enterFunction(component.viewItem.getSelectionModel().getSelection()[0]);
                     }
                 }
             },

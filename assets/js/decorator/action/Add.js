@@ -7,8 +7,8 @@ GibsonOS.define('GibsonOS.decorator.action.Add', {
                 itemId: 'addButton',
                 iconCls: 'icon_system system_add',
                 listeners: {
-                    click: () => {
-                        component.addFunction();
+                    click() {
+                        this.component.addFunction();
                     }
                 }
             },
