@@ -43,8 +43,8 @@ Ext.define('GibsonOS.module.core.desktop.Panel', {
         functionName += record.get('task').charAt(0).toUpperCase() + record.get('task').slice(1);
         functionName += record.get('action').charAt(0).toUpperCase() + record.get('action').slice(1);
 
-        if (record.get('params')) {
-            parameters = Ext.encode(record.get('params'));
+        if (record.get('parameters')) {
+            parameters = Ext.encode(record.get('parameters'));
         }
 
         if (eval('typeof(' + functionName + ') == "function"')) {
@@ -53,8 +53,8 @@ Ext.define('GibsonOS.module.core.desktop.Panel', {
         } else {
             parameters = '';
 
-            if (record.get('params')) {
-                parameters = '{gos: {data: ' + Ext.encode(record.get('params')) + '}}';
+            if (record.get('parameters')) {
+                parameters = '{gos: {data: ' + Ext.encode(record.get('parameters')) + '}}';
             }
 
             functionName = 'GibsonOS.module.' + record.get('module') + '.' + record.get('task') + '.App';
@@ -92,7 +92,7 @@ Ext.define('GibsonOS.module.core.desktop.Panel', {
             handler() {
                 const record = me.viewItem.getSelectionModel().getSelection()[0];
 
-                Ext.MessageBox.prompt('Neuer Name', 'Neuer Name', function(button, text) {
+                Ext.MessageBox.prompt('Neuer Name', 'Neuer Name', (button, text) => {
                     if (button !== 'ok') {
                         return;
                     }
