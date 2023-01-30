@@ -19,6 +19,9 @@ Ext.define('GibsonOS.module.core.desktop.model.Item', {
         name: 'action',
         type: 'string'
     },{
+        name: 'position',
+        type: 'int'
+    },{
         name: 'parameters',
         type: 'object'
     }]

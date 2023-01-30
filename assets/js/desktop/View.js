@@ -97,18 +97,48 @@ Ext.define('GibsonOS.module.core.desktop.View', {
             return;
         }
 
+        const store = me.getStore();
+
         if (data.shortcuts && data.shortcuts[0].move) {
-            me.getStore().remove(data.shortcuts);
+            store.remove(data.shortcuts);
         }
 
-        if (event.getTarget('.desktopItem') != null) {
-            const record = me.getRecord(target);
-            me.getStore().insert(me.getStore().indexOf(record), data.shortcuts);
-        } else {
-            me.getStore().add(data.shortcuts);
+        let position = store.count();
+        let start = position;
+
+        if (event.getTarget('.desktopItem') !== null) {
+            const targetRecord = me.getRecord(target);
+
+            position = targetRecord.get('position');
+            start = store.indexOf(targetRecord);
         }
 
-        me.saveDesktop();
+        const records = me.getRecordsWithPosition(data.shortcuts, position);
+
+        if (data.shortcuts[0].move) {
+            Ext.iterate(store.getRange(start), (record) => {
+                record.set('position', record.get('position') + records.length);
+            });
+
+            store.insert(start, records);
+            me.saveDesktop();
+
+            return;
+        }
+
+        GibsonOS.Ajax.request({
+            url: baseDir + 'core/desktop/add',
+            params: {
+                items: Ext.encode(records)
+            },
+            success(response) {
+                Ext.iterate(store.getRange(start), (record) => {
+                    record.set('position', record.get('position') + records.length);
+                });
+
+                store.insert(start, Ext.decode(response.responseText).data);
+            }
+        });
     },
     initComponent() {
         const me = this;
@@ -129,6 +159,24 @@ Ext.define('GibsonOS.module.core.desktop.View', {
         );
 
         me.callParent();
+    },
+    getRecordsWithPosition(records, position = 0) {
+        let newRecords = [];
+
+        Ext.iterate(records, (record) => {
+            if (!record.id) {
+                record.id = 0;
+            }
+
+            // if (typeof(record.parameters) !== 'object') {
+            //     record.parameters = {};
+            // }
+
+            record.position = position++;
+            newRecords.push(record);
+        });
+
+        return newRecords;
     },
     saveDesktop() {
         const me = this;

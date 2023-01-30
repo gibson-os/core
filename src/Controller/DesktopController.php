@@ -72,7 +72,7 @@ class DesktopController extends AbstractController
     }
 
     /**
-     * @param Item[] $items
+     * @param non-empty-array<Item> $items
      *
      * @throws SaveError
      */
@@ -84,18 +84,14 @@ class DesktopController extends AbstractController
     ): AjaxResponse {
         $user = $this->sessionService->getUser() ?? new User();
 
-        try {
-            $position = $itemRepository->getLastPosition($user)->getPosition() + 1;
-        } catch (SelectError) {
-            $position = 0;
-        }
+        $itemRepository->updatePosition(
+            $user,
+            min(array_map(fn (Item $item): int => $item->getPosition(), $items)),
+            count($items),
+        );
 
         foreach ($items as $item) {
-            $modelManager->saveWithoutChildren(
-                $item
-                    ->setPosition($position++)
-                    ->setUser($user)
-            );
+            $modelManager->saveWithoutChildren($item->setUser($user));
         }
 
         return $this->returnSuccess($items);

@@ -27,17 +27,13 @@ class ItemRepository extends AbstractRepository
         ;
     }
 
-    /**
-     * @throws SelectError
-     */
-    public function getLastPosition(User $user): Item
+    public function updatePosition(User $user, int $fromPosition, int $increase): bool
     {
-        return $this->fetchOne(
-            '`user_id`=?',
-            [$user->getId() ?? 0],
-            Item::class,
-            '`position` DESC',
-        );
+        return $this->getTable($this->itemTableName)
+            ->setWhere('`user_id`=? AND `position`>=?')
+            ->setWhereParameters([$increase, $user->getId() ?? 0, $fromPosition])
+            ->update('`position`=`position`+?')
+        ;
     }
 
     /**

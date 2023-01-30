@@ -165,6 +165,7 @@ class Item extends AbstractModel implements \JsonSerializable
             'module' => $this->getModule(),
             'task' => $this->getTask(),
             'action' => $this->getAction(),
+            'position' => $this->getPosition(),
             'parameters' => count($parameters) === 0 ? null : $parameters,
         ];
     }
