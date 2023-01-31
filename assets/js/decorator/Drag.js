@@ -12,12 +12,9 @@ GibsonOS.define('GibsonOS.decorator.Drag', {
                 const record = view.getRecord(sourceElement);
                 const selectedRecords = component.getSelectionModel().getSelection();
                 let records = [record];
-                const clone = sourceElement.cloneNode(true);
 
                 Ext.iterate(selectedRecords, (selectedRecord) => {
-                    const idProperty = selectedRecord.idProperty;
-
-                    if (record.get(idProperty) === selectedRecord.get(idProperty)) {
+                    if (record.getId() === selectedRecord.getId()) {
                         records = selectedRecords;
 
                         return false;
