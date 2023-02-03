@@ -11,26 +11,29 @@ Ext.define('GibsonOS.module.core.component.tree.Panel', {
     enableKeyEvents: true,
     enableClickEvents: true,
     enableContextMenu: true,
-    insertRecords(beforeRecord, records) {
-        const parentNode = beforeRecord.parentNode;
-        let index = parentNode.indexOf(beforeRecord);
-
-        Ext.iterate(records, (record) => {
-            parentNode.insertChild(index++, record);
-        });
-    },
-    addRecords(records) {
-        let me = this;
-
-        me.getStore().getRootNode().appendChild(records);
-    },
-    deleteRecords(records) {
-        Ext.iterate(records, (record) => {
-            record.remove();
-        });
-    },
     initComponent: function() {
         let me = this;
+
+        me = Ext.merge(me, Ext.merge({
+            insertRecords(beforeRecord, records) {
+                const parentNode = beforeRecord.parentNode;
+                let index = parentNode.indexOf(beforeRecord);
+
+                Ext.iterate(records, (record) => {
+                    parentNode.insertChild(index++, record);
+                });
+            },
+            addRecords(records) {
+                let me = this;
+
+                me.getStore().getRootNode().appendChild(records);
+            },
+            deleteRecords(records) {
+                Ext.iterate(records, (record) => {
+                    record.remove();
+                });
+            },
+        }, me));
 
         me = GibsonOS.decorator.Panel.init(me);
 

@@ -48,13 +48,13 @@ GibsonOS.define('GibsonOS.decorator.Drop', {
                             }
                         });
 
-                        me.deleteRecords(records, data);
+                        data.component.deleteRecords(records, data);
                     }
 
                     me.insertRecords(targetRecord, records, ctrlPressed, data);
                 } else {
                     if (!ctrlPressed) {
-                        me.deleteRecords(data.records, data);
+                        data.component.deleteRecords(data.records, data);
                     }
 
                     me.addRecords(records, ctrlPressed, data);
