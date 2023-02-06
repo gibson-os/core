@@ -83,6 +83,23 @@ class DesktopController extends AbstractController
         #[GetMappedModels(Item::class)] array $items,
     ): AjaxResponse {
         $user = $this->sessionService->getUser() ?? new User();
+        $nextPosition = -1;
+
+        foreach ($items as $item) {
+            if ($item->getPosition() >= 0) {
+                break;
+            }
+
+            if ($nextPosition === -1) {
+                try {
+                    $nextPosition = $itemRepository->getLastPosition($user)->getPosition() + 1;
+                } catch (SelectError) {
+                    $nextPosition = 0;
+                }
+            }
+
+            $item->setPosition($nextPosition++);
+        }
 
         $itemRepository->updatePosition(
             $user,

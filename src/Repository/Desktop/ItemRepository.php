@@ -11,7 +11,7 @@ use GibsonOS\Core\Repository\AbstractRepository;
 
 class ItemRepository extends AbstractRepository
 {
-    public function __construct(#[GetTableName(Item::class)] private string $itemTableName)
+    public function __construct(#[GetTableName(Item::class)] private readonly string $itemTableName)
     {
     }
 
@@ -25,6 +25,19 @@ class ItemRepository extends AbstractRepository
             ->addWhereParameter($user->getId() ?? 0)
             ->deletePrepared()
         ;
+    }
+
+    /**
+     * @throws SelectError
+     */
+    public function getLastPosition(User $user): Item
+    {
+        return $this->fetchOne(
+            '`user_id`=?',
+            [$user->getId() ?? 0],
+            Item::class,
+            '`position` DESC',
+        );
     }
 
     public function updatePosition(User $user, int $fromPosition, int $increase): bool
