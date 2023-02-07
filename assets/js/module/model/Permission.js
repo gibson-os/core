@@ -10,13 +10,13 @@ Ext.define('GibsonOS.module.core.module.model.Permission', {
         name: 'userIp',
         type: 'string'
     },{
-        name: 'module',
+        name: 'moduleName',
         type: 'string'
     },{
-        name: 'task',
+        name: 'taskName',
         type: 'string'
     },{
-        name: 'action',
+        name: 'actionName',
         type: 'string'
     },{
         name: 'userId',
