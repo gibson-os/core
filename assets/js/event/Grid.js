@@ -13,7 +13,7 @@ Ext.define('GibsonOS.module.core.event.Grid', {
                 module: 'core',
                 task: 'event',
                 action: 'run',
-                params: {
+                parameters: {
                     eventId: record.get('id'),
                 },
             });

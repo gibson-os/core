@@ -8,7 +8,7 @@ Ext.define('GibsonOS.module.core.event.App', {
         module: 'core',
         task: 'event'
     },
-    initComponent: function() {
+    initComponent() {
         let me = this;
 
         me.items = [{
@@ -16,5 +16,21 @@ Ext.define('GibsonOS.module.core.event.App', {
         }];
 
         me.callParent();
+
+        if (me.gos.data.eventId) {
+            GibsonOS.MessageBox.show({
+                title: 'Event ausführen?',
+                msg: 'Soll das Event ausgeführt werden?',
+                type: GibsonOS.MessageBox.type.QUESTION,
+                buttons: [{
+                    text: 'Ja',
+                    handler() {
+                        GibsonOS.event.action.Execute.run(me, me.gos.data.eventId);
+                    }
+                },{
+                    text: 'Nein'
+                }]
+            });
+        }
     }
 });

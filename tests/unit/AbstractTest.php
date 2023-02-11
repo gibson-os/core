@@ -62,7 +62,7 @@ class AbstractTest extends Unit
         putenv('MYSQL_HOST=gos_mysql');
         putenv('MYSQL_DATABASE=gibson_os_test');
         putenv('MYSQL_USER=root');
-        putenv('MYSQL_PASS=67yhnkMR');
+        putenv('MYSQL_PASS=Arthur');
         putenv('DATE_LATITUDE=51.2642156');
         putenv('DATE_LONGITUDE=6.8001438');
 
