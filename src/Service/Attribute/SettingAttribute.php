@@ -14,10 +14,10 @@ use GibsonOS\Core\Service\SessionService;
 class SettingAttribute implements ParameterAttributeInterface, AttributeServiceInterface
 {
     public function __construct(
-        private SettingRepository $settingRepository,
-        private RequestService $requestService,
-        private SessionService $sessionService,
-        private ReflectionManager $reflectionManager
+        private readonly SettingRepository $settingRepository,
+        private readonly RequestService $requestService,
+        private readonly SessionService $sessionService,
+        private readonly ReflectionManager $reflectionManager
     ) {
     }
 

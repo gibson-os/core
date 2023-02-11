@@ -10,8 +10,8 @@ use GibsonOS\Core\Service\Attribute\SettingAttribute;
 class GetSetting implements AttributeInterface
 {
     public function __construct(
-        private string $key,
-        private ?string $module = null
+        private readonly string $key,
+        private readonly ?string $module = null
     ) {
     }
 
