@@ -28,7 +28,7 @@ Ext.define('GibsonOS.module.core.module.permission.Grid', {
             });
         }, me.store, {
             priority: -999
-        })
+        });
     },
     getColumns() {
         return [{

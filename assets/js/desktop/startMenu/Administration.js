@@ -12,6 +12,13 @@ Ext.define('GibsonOS.module.core.desktop.startMenu.Administration', {
         }
     },{
         xtype: 'gosCoreDesktopStartMenuButton',
+        text: 'Rollen',
+        iconCls: 'icon16 icon_user',
+        handler() {
+            new GibsonOS.module.core.role.App();
+        }
+    },{
+        xtype: 'gosCoreDesktopStartMenuButton',
         text: 'Module',
         iconCls: 'icon16 icon_modules',
         handler() {

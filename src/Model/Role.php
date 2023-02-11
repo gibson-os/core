@@ -19,7 +19,7 @@ use GibsonOS\Core\Model\Role\User as RoleUser;
  * @method Role         addUsers(RoleUser[] $users)
  */
 #[Table]
-class Role extends AbstractModel
+class Role extends AbstractModel implements \JsonSerializable
 {
     #[Column(attributes: [Column::ATTRIBUTE_UNSIGNED], autoIncrement: true)]
     private ?int $id = null;
@@ -62,5 +62,13 @@ class Role extends AbstractModel
         $this->name = $name;
 
         return $this;
+    }
+
+    public function jsonSerialize(): array
+    {
+        return [
+            'id' => $this->getId(),
+            'name' => $this->getName(),
+        ];
     }
 }
