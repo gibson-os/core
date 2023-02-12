@@ -105,18 +105,13 @@ class RoleController extends AbstractController
      * @throws SaveError
      */
     #[CheckPermission(UserPermission::MANAGE + UserPermission::WRITE)]
-    public function addUser(
-        #[GetModel] Role $role,
-        #[GetModel(['id' => 'userId'])] User $user,
+    public function saveUser(
+        #[GetMappedModel] Role\User $roleUser,
         ModelManager $modelManager,
     ): AjaxResponse {
-        $modelManager->saveWithoutChildren(
-            (new Role\User())
-                ->setRole($role)
-                ->setUser($user)
-        );
+        $modelManager->saveWithoutChildren($roleUser);
 
-        return $this->returnSuccess();
+        return $this->returnSuccess($roleUser);
     }
 
     /**
