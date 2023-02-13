@@ -3,10 +3,15 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Store\User;
 
-use GibsonOS\Core\Model\User\PermissionView;
-use GibsonOS\Core\Store\AbstractDatabaseStore;
+use GibsonOS\Core\Attribute\GetTableName;
+use GibsonOS\Core\Model\Action;
+use GibsonOS\Core\Model\Module;
+use GibsonOS\Core\Model\Task;
+use GibsonOS\Core\Model\User;
+use GibsonOS\Core\Model\User\Permission;
+use GibsonOS\Core\Store\AbstractStore;
 
-class PermissionStore extends AbstractDatabaseStore
+class PermissionStore extends AbstractStore
 {
     private ?int $moduleId = null;
 
@@ -14,40 +19,150 @@ class PermissionStore extends AbstractDatabaseStore
 
     private ?int $actionId = null;
 
-    protected function getModelClassName(): string
-    {
-        return PermissionView::class;
+    public function __construct(
+        #[GetTableName(User::class)] private readonly string $userTableName,
+        #[GetTableName(Permission::class)] private readonly string $permissionTableName,
+        #[GetTableName(Module::class)] private readonly string $moduleTableName,
+        #[GetTableName(Task::class)] private readonly string $taskTableName,
+        #[GetTableName(Action::class)] private readonly string $actionTableName,
+        private readonly \mysqlDatabase $mysqlDatabase
+    ) {
     }
 
-    protected function setWheres(): void
+    public function getCount(): int
     {
-        if ($this->moduleId !== null) {
-            $this->addWhere('`module_id`=? AND `task_id` IS NULL AND `action_id` IS NULL', [$this->moduleId]);
-        } elseif ($this->taskId !== null) {
-            $this->addWhere('`task_id`=? AND `action_id` IS NULL', [$this->taskId]);
-        } elseif ($this->actionId !== null) {
-            $this->addWhere('`action_id`=?', [$this->actionId]);
+        if (!$this->mysqlDatabase->sendQuery(sprintf('SELECT COUNT(`id`) FROM `%s`', $this->userTableName))) {
+            return 0;
         }
-    }
 
-    protected function getDefaultOrder(): string
-    {
-        return '`user_ip`, `user_host`, `user_name`';
+        return (int) $this->mysqlDatabase->fetchResult(0);
     }
 
     public function getList(): \Generator
     {
-        /** @var PermissionView $permissionView */
-        foreach (parent::getList() as $permissionView) {
-            $permissionViewData = $permissionView->jsonSerialize();
-            $permissionViewData['parentPermission'] = 0;
+        $selects = [
+            '`u`.`id` `userId`',
+            '`u`.`user` `userName`',
+            '`upm`.`id` `modulePermissionId`',
+            '`upm`.`permission` `modulePermission`',
+            '`m`.`name` `moduleName`',
+        ];
+        $joins = [];
+        $parameters = [];
 
-            if ($this->isParentPermission($permissionView)) {
-                $permissionViewData['parentPermission'] = $permissionView->getPermission();
-                $permissionViewData['permission'] = 0;
-            }
+        if ($this->moduleId !== null) {
+            $joins = [
+                sprintf('LEFT JOIN `%s` `m` ON `m`.`id`=?', $this->moduleTableName),
+                sprintf(
+                    'LEFT JOIN `%s` `upm` ON ' .
+                    '`u`.`id`=IFNULL(`upm`.`user_id`, 0) AND ' .
+                    '`upm`.`module`=`m`.`name` ' .
+                    'AND `upm`.`task` IS NULL',
+                    $this->permissionTableName
+                ),
+            ];
+            $parameters = [$this->moduleId];
+            $selects[] = 'NULL `taskName`';
+            $selects[] = 'NULL `actionName`';
+            $selects[] = '`upm`.`id` `id`';
+            $selects[] = '`upm`.`permission` `permission`';
+            $selects[] = 'NULL `parentId`';
+            $selects[] = sprintf('%d `parentPermission`', Permission::DENIED);
+            $selects[] = 'NULL `taskPermissionId`';
+            $selects[] = 'NULL `taskPermission`';
+            $selects[] = 'NULL `actionPermissionId`';
+            $selects[] = 'NULL `actionPermission`';
+        }
 
-            yield $permissionViewData;
+        if ($this->taskId !== null) {
+            $joins = [
+                sprintf('LEFT JOIN `%s` `t` ON `t`.`id`=?', $this->taskTableName),
+                sprintf(
+                    'LEFT JOIN `%s` `upt` ON ' .
+                    '`u`.`id`=IFNULL(`upt`.`user_id`, 0) AND ' .
+                    '`upt`.`task`=`t`.`name` AND ' .
+                    '`upt`.`action` IS NULL',
+                    $this->permissionTableName
+                ),
+                sprintf('LEFT JOIN `%s` `m` ON `m`.`id`=`t`.`module_id`', $this->moduleTableName),
+                sprintf(
+                    'LEFT JOIN `%s` `upm` ON ' .
+                    '`u`.`id`=IFNULL(`upm`.`user_id`, 0) AND ' .
+                    '`upm`.`module`=`m`.`name` ' .
+                    'AND `upm`.`task` IS NULL',
+                    $this->permissionTableName
+                ),
+            ];
+            $parameters = [$this->taskId];
+            $selects[] = '`t`.`name` `taskName`';
+            $selects[] = 'NULL `actionName`';
+            $selects[] = '`upt`.`id` `id`';
+            $selects[] = '`upt`.`permission` `permission`';
+            $selects[] = '`upm`.`id` `parentId`';
+            $selects[] = sprintf('IFNULL(`upm`.`permission`, %d) `parentPermission`', Permission::DENIED);
+            $selects[] = '`upt`.`id` `taskPermissionId`';
+            $selects[] = '`upt`.`permission` `taskPermission`';
+            $selects[] = 'NULL `actionPermissionId`';
+            $selects[] = 'NULL `actionPermission`';
+        }
+
+        if ($this->actionId !== null) {
+            $joins = [
+                sprintf('LEFT JOIN `%s` `a` ON `a`.`id`=?', $this->actionTableName),
+                sprintf(
+                    'LEFT JOIN `%s` `upa` ON ' .
+                    '`u`.`id`=IFNULL(`upa`.`user_id`, 0) AND ' .
+                    '`upa`.`action`=`a`.`name`',
+                    $this->permissionTableName
+                ),
+                sprintf('LEFT JOIN `%s` `t` ON `t`.`id`=`a`.`task_id`', $this->taskTableName),
+                sprintf(
+                    'LEFT JOIN `%s` `upt` ON ' .
+                    '`u`.`id`=IFNULL(`upt`.`user_id`, 0) AND ' .
+                    '`upt`.`task`=`t`.`name` AND ' .
+                    '`upt`.`action` IS NULL',
+                    $this->permissionTableName
+                ),
+                sprintf('LEFT JOIN `%s` `m` ON `m`.`id`=`t`.`module_id`', $this->moduleTableName),
+                sprintf(
+                    'LEFT JOIN `%s` `upm` ON ' .
+                    '`u`.`id`=IFNULL(`upm`.`user_id`, 0) AND ' .
+                    '`upm`.`module`=`m`.`name` AND ' .
+                    '`upm`.`task` IS NULL',
+                    $this->permissionTableName
+                ),
+            ];
+            $parameters = [$this->actionId];
+            $selects[] = '`t`.`name` `taskName`';
+            $selects[] = '`a`.`name` `actionName`';
+            $selects[] = '`upa`.`id` `id`';
+            $selects[] = '`upa`.`permission` `permission`';
+            $selects[] = 'IFNULL(`upt`.`id`, `upm`.`id`) `parentId`';
+            $selects[] = sprintf(
+                'IFNULL(IFNULL(`upt`.`permission`, `upm`.`permission`), %d) `parentPermission`',
+                Permission::DENIED,
+            );
+            $selects[] = '`upt`.`id` `taskPermissionId`';
+            $selects[] = '`upt`.`permission` `taskPermission`';
+            $selects[] = '`upa`.`id` `actionPermissionId`';
+            $selects[] = '`upa`.`permission` `actionPermission`';
+        }
+
+        $query = sprintf(
+            'SELECT %s ' .
+            'FROM ((SELECT `id`, `user` FROM `%s`) UNION ALL (SELECT 0 `id`, "Allgemein" `user`)) `u` %s ' .
+            'ORDER BY `u`.`user`',
+            implode(', ', $selects),
+            $this->userTableName,
+            implode(' ', $joins),
+        );
+
+        if (!$this->mysqlDatabase->execute($query, $parameters)) {
+            return;
+        }
+
+        while ($permission = $this->mysqlDatabase->fetchAssoc()) {
+            yield $permission;
         }
     }
 
@@ -70,18 +185,5 @@ class PermissionStore extends AbstractDatabaseStore
         $this->actionId = $actionId;
 
         return $this;
-    }
-
-    private function isParentPermission(PermissionView $permissionView): bool
-    {
-        if ($this->taskId !== null && $permissionView->getTask() === null) {
-            return true;
-        }
-
-        if ($this->actionId !== null && $permissionView->getAction() === null) {
-            return true;
-        }
-
-        return false;
     }
 }

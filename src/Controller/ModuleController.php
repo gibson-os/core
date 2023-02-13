@@ -21,6 +21,8 @@ class ModuleController extends AbstractController
 {
     /**
      * @throws SelectError
+     * @throws \JsonException
+     * @throws \ReflectionException
      */
     #[CheckPermission(Permission::MANAGE + Permission::READ)]
     public function index(
@@ -45,9 +47,11 @@ class ModuleController extends AbstractController
     }
 
     /**
-     * @throws SelectError
      * @throws GetError
      * @throws SaveError
+     * @throws SelectError
+     * @throws \JsonException
+     * @throws \ReflectionException
      */
     #[CheckPermission(Permission::MANAGE + Permission::WRITE)]
     public function scan(ModuleService $moduleService, ModuleStore $moduleStore): AjaxResponse
@@ -59,6 +63,8 @@ class ModuleController extends AbstractController
 
     /**
      * @throws SelectError
+     * @throws \JsonException
+     * @throws \ReflectionException
      */
     #[CheckPermission(Permission::MANAGE + Permission::READ)]
     public function permission(
@@ -91,6 +97,8 @@ class ModuleController extends AbstractController
 
     /**
      * @throws SelectError
+     * @throws \JsonException
+     * @throws \ReflectionException
      */
     #[CheckPermission(Permission::MANAGE + Permission::READ)]
     public function setting(SettingStore $settingStore, int $moduleId): AjaxResponse

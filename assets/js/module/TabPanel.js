@@ -1,9 +1,9 @@
 Ext.define('GibsonOS.module.core.module.TabPanel', {
-    extend: 'GibsonOS.TabPanel',
+    extend: 'GibsonOS.module.core.component.tab.Panel',
     alias: ['widget.gosModuleCoreModuleTabPanel'],
     itemId: 'coreModuleTabPanel',
-    initComponent: function() {
-        var me = this;
+    initComponent() {
+        const me = this;
 
         me.items = [{
             xtype: 'gosModuleCoreModulePermissionPanel',
@@ -15,15 +15,15 @@ Ext.define('GibsonOS.module.core.module.TabPanel', {
 
         me.callParent();
 
-        me.down('#coreModulePermissionGrid').getStore().on('load', function(store) {
-            var data = store.getProxy().getReader().rawData;
-            var requiredPermissions = null;
+        me.down('gosModuleCoreModulePermissionGrid').getStore().on('load', (store) => {
+            const data = store.getProxy().getReader().rawData;
+            let requiredPermissions = null;
             
             if (data.requiredPermissions) {
                 requiredPermissions = data.requiredPermissions;
             }
 
-            var panel = me.down('#coreModulePermissionPanel').down('panel');
+            const panel = me.down('#coreModulePermissionPanel').down('panel');
 
             if (requiredPermissions) {
                 panel.show();

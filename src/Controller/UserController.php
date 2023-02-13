@@ -186,25 +186,25 @@ class UserController extends AbstractController
     /**
      * @throws \JsonException
      * @throws SaveError
-     * @throws \ReflectionException
+     * @throws DeleteError
      */
     #[CheckPermission(Permission::MANAGE + Permission::WRITE)]
     public function savePermission(
         ModelManager $modelManager,
-        int $permission,
-        string $module,
-        string $task = '',
-        string $action = '',
-        #[GetModel] User $user = null
+        #[GetMappedModel] Permission $permission,
+        #[GetModel] Permission $originalPermission = null,
     ): AjaxResponse {
-        $modelManager->save(
-            (new Permission())
-            ->setUserId($user?->getId())
-            ->setPermission($permission)
-            ->setModule($module)
-            ->setTask($task)
-            ->setAction($action)
-        );
+        if ($permission->getPermission() === 0) {
+            if ($originalPermission === null) {
+                return $this->returnFailure('Permission not found!');
+            }
+
+            $modelManager->delete($originalPermission);
+
+            return $this->returnSuccess();
+        }
+
+        $modelManager->saveWithoutChildren($permission);
 
         return $this->returnSuccess();
     }

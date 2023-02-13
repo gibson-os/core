@@ -11,10 +11,6 @@ use GibsonOS\Mock\Dto\Mapper\MapModel;
 use GibsonOS\Mock\Dto\Mapper\MapModelChild;
 use GibsonOS\Mock\Dto\Mapper\MapModelParent;
 use GibsonOS\UnitTest\AbstractTest;
-use JsonException;
-use ReflectionException;
-use Throwable;
-use ValueError;
 
 class ModelMapperTest extends AbstractTest
 {
@@ -31,13 +27,13 @@ class ModelMapperTest extends AbstractTest
     /**
      * @dataProvider getTestData
      *
-     * @throws JsonException
+     * @throws \JsonException
      */
     public function testMapToObject(array $properties, string $exception = null): void
     {
         try {
             $object = $this->modelMapper->mapToObject(MapModel::class, $properties);
-        } catch (Throwable $e) {
+        } catch (\Throwable $e) {
             if ($exception !== $e::class) {
                 throw $e;
             }
@@ -55,8 +51,8 @@ class ModelMapperTest extends AbstractTest
         }
 
         $this->assertEquals($properties['nullableIntValue'] ?? null, $object->getNullableIntValue());
-
         $parentObject = $properties['parent'] ?? null;
+        $this->assertEquals($parentObject instanceof MapModelParent ? $parentObject->getId() : ($parentObject === null ? ($properties['parentId'] ?? null) : ($parentObject['id'] ?? null)), $object->getParentId());
 
         if ($parentObject !== null) {
             $parent = $object->getParent();
@@ -190,8 +186,8 @@ class ModelMapperTest extends AbstractTest
             ],
             'with non object value' => [['stringEnumValue' => 'ja', 'intValue' => 1, 'foo' => 'bar']],
             'with missing value' => [['stringEnumValue' => 'ja']],
-            'with wrong enum value' => [['stringEnumValue' => 'Trilian', 'intValue' => 1], ValueError::class],
-            'with wrong enum type' => [['stringEnumValue' => ['ja'], 'intValue' => 1], ReflectionException::class],
+            'with wrong enum value' => [['stringEnumValue' => 'Trilian', 'intValue' => 1], \ValueError::class],
+            'with wrong enum type' => [['stringEnumValue' => ['ja'], 'intValue' => 1], \ReflectionException::class],
             'with int value as string' => [['stringEnumValue' => 'ja', 'intValue' => '1']],
             'with int enum value as string' => [
                 [
@@ -211,6 +207,13 @@ class ModelMapperTest extends AbstractTest
                     'intValue' => 42,
                     'parent' => (new MapModelParent())->setOptions(['foo' => 'bar']),
                     'childObjects' => [(new MapModelChild())->setNullableIntEnumValue(IntEnum::DEFINED)],
+                ],
+            ],
+            'with parent object id' => [
+                [
+                    'stringEnumValue' => 'nein',
+                    'intValue' => 42,
+                    'parentId' => 24,
                 ],
             ],
         ];

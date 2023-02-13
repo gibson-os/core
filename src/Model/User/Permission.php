@@ -27,8 +27,6 @@ use GibsonOS\Core\Model\User;
 #[Key(unique: true, columns: ['module', 'task', 'action', 'user_id'])]
 class Permission extends AbstractModel
 {
-    public const INHERIT = 0; // 00000
-
     public const DENIED = 1;  // 00001
 
     public const READ = 2;    // 00010

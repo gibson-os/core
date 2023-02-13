@@ -16,14 +16,15 @@ Ext.define('GibsonOS.module.core.module.permission.Grid', {
             GibsonOS.Ajax.request({
                 url: baseDir + 'core/user/savePermission',
                 params: {
-                    id: record.get('userId'),
+                    id: record.get('id'),
+                    userId: record.get('userId'),
                     permission: record.get('permission'),
                     module: record.get('moduleName'),
                     task: record.get('taskName'),
                     action: record.get('actionName')
                 },
-                failure: function() {
-                    GibsonOS.MessageBox.show({msg: 'Berechtigung konnte nicht gespeichert werden!'});
+                success() {
+                    me.store.load();
                 }
             });
         }, me.store, {
@@ -36,19 +37,11 @@ Ext.define('GibsonOS.module.core.module.permission.Grid', {
             dataIndex: 'userName',
             flex: 1
         },{
-            header: 'Host',
-            dataIndex: 'userHost',
-            flex: 1
-        },{
-            header: 'IP',
-            dataIndex: 'userIp',
-            flex: 1
-        },{
-            header: 'Rechte',
+            header: 'Berechtigung',
             dataIndex: 'permission',
             width: 300,
             editor: {
-                xtype: 'gosFormComboBox',
+                xtype: 'gosCoreComponentFormFieldComboBox',
                 id: 'coreModuleManagePermissionCombo',
                 typeAhead: true,
                 triggerAction: 'all',

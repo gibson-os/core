@@ -80,63 +80,7 @@ class ModelMapperAttribute extends ObjectMapperAttribute
             $model,
             $this->getObjectParameters($attribute, $model::class, $parameters)
         );
-
-        $reflectionClass = $this->reflectionManager->getReflectionClass($model);
-
-        foreach ($reflectionClass->getProperties() as $reflectionProperty) {
-            $constraintAttribute = $this->reflectionManager->getAttribute(
-                $reflectionProperty,
-                Constraint::class,
-                \ReflectionAttribute::IS_INSTANCEOF
-            );
-
-            if ($constraintAttribute === null) {
-                continue;
-            }
-
-            $parentModelClassName = $constraintAttribute->getParentModelClassName()
-                ?? $this->reflectionManager->getNonBuiltinTypeName($reflectionProperty)
-            ;
-
-            if (!class_exists($parentModelClassName)) {
-                throw new MapperException(sprintf('"%s" is no class!', $parentModelClassName ?? 'NULL'));
-            }
-
-            $values = $this->getValues($attribute, $reflectionProperty)
-                ?? $parameters[$reflectionProperty->getName()]
-                ?? null
-            ;
-            $typeName = $this->reflectionManager->getTypeName($reflectionProperty);
-            $setter = 'set' . ucfirst($reflectionProperty->getName());
-
-            if (is_array($values) && count($values) !== 0) {
-                $values = array_map(
-                    fn ($value): object => is_object($value)
-                        ? $value
-                        : (
-                            is_array($value)
-                            ? $this->objectMapper->mapToObject($parentModelClassName, $value)
-                            : throw new MapperException(sprintf(
-                                'Properties (%s) for object "%s" used for %s->%s() is no array! Maybe map the required object before',
-                                $value === null ? 'null' : (string) $value,
-                                $parentModelClassName,
-                                $model::class,
-                                $setter
-                            ))
-                        ),
-                    $typeName === 'array' ? $values : [$reflectionProperty->getName() => $values]
-                );
-            }
-
-            if (
-                $values === null &&
-                !$this->reflectionManager->allowsNull($reflectionProperty)
-            ) {
-                continue;
-            }
-
-            $model->$setter(is_array($values) ? ($typeName === 'array' ? $values : reset($values)) : $values);
-        }
+        $this->loadConstraints($model, $attribute, $parameters);
 
         return $model;
     }
@@ -176,5 +120,74 @@ class ModelMapperAttribute extends ObjectMapperAttribute
 
         // Muss noch aufgebohrt werden
         return null;
+    }
+
+    /**
+     * @throws FactoryError
+     * @throws MapperException
+     * @throws \JsonException
+     * @throws \ReflectionException
+     */
+    private function loadConstraints(
+        AbstractModel $model,
+        GetMappedModel $attribute,
+        array $parameters,
+    ): void {
+        $reflectionClass = $this->reflectionManager->getReflectionClass($model);
+
+        foreach ($reflectionClass->getProperties() as $reflectionProperty) {
+            $constraintAttribute = $this->reflectionManager->getAttribute(
+                $reflectionProperty,
+                Constraint::class,
+                \ReflectionAttribute::IS_INSTANCEOF
+            );
+
+            if ($constraintAttribute === null) {
+                continue;
+            }
+
+            $parentModelClassName = $constraintAttribute->getParentModelClassName()
+                ?? $this->reflectionManager->getNonBuiltinTypeName($reflectionProperty);
+
+            if (!class_exists($parentModelClassName)) {
+                throw new MapperException(sprintf('"%s" is no class!', $parentModelClassName ?? 'NULL'));
+            }
+
+            $propertyName = $reflectionProperty->getName();
+            $values = $this->getValues($attribute, $reflectionProperty)
+                ?? $parameters[$propertyName]
+                ?? null;
+            $typeName = $this->reflectionManager->getTypeName($reflectionProperty);
+            $idGetter = 'get' . ucfirst($constraintAttribute->getOwnColumn() ?? $propertyName . 'id');
+            $setter = 'set' . ucfirst($propertyName);
+
+            if (is_array($values) && count($values) !== 0) {
+                $values = array_map(
+                    fn ($value): object => is_object($value)
+                        ? $value
+                        : (
+                            is_array($value)
+                                ? $this->objectMapper->mapToObject($parentModelClassName, $value)
+                                : throw new MapperException(sprintf(
+                                    'Properties (%s) for object "%s" used for %s->%s() is no array! Maybe map the required object before',
+                                    $value === null ? 'null' : (string) $value,
+                                    $parentModelClassName,
+                                    $model::class,
+                                    $setter
+                                ))
+                        ),
+                    $typeName === 'array' ? $values : [$propertyName => $values]
+                );
+            }
+
+            if (
+                $values === null &&
+                (!$this->reflectionManager->allowsNull($reflectionProperty) || $model->$idGetter() !== null)
+            ) {
+                continue;
+            }
+
+            $model->$setter(is_array($values) ? ($typeName === 'array' ? $values : reset($values)) : $values);
+        }
     }
 }

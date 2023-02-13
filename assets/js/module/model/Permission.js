@@ -1,13 +1,10 @@
 Ext.define('GibsonOS.module.core.module.model.Permission', {
     extend: 'GibsonOS.data.Model',
     fields: [{
+        name: 'id',
+        type: 'int'
+    },{
         name: 'userName',
-        type: 'string'
-    },{
-        name: 'userHost',
-        type: 'string'
-    },{
-        name: 'userIp',
         type: 'string'
     },{
         name: 'moduleName',
