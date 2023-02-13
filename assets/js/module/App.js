@@ -5,11 +5,11 @@ Ext.define('GibsonOS.module.core.module.App', {
     title: 'Module',
     appIcon: 'icon_modules',
     width: 700,
-    height: 300,
-    initComponent: function() {
-        var app = this;
+    height: 400,
+    initComponent() {
+        const me = this;
 
-        this.items = [{
+        me.items = [{
             layout: 'border',
             items: [{
                 xtype: 'gosModuleCoreModuleTree',
@@ -20,18 +20,22 @@ Ext.define('GibsonOS.module.core.module.App', {
                 width: 150,
                 hideCollapseTool: true,
                 listeners: {
-                    itemclick: function(tree, record, item, index, event, options) {
+                    itemclick(tree, record) {
                         const id = record.get('id');
-                        const settingStore = app.down('#coreModuleManageSettingsGrid').getStore();
-                        const permissionStore = app.down('#coreModulePermissionGrid').getStore();
+                        const settingStore = me.down('#coreModuleManageSettingsGrid').getStore();
+                        const userPermissionStore = me.down('gosModuleCoreModulePermissionUserGrid').getStore();
+                        const rolePermissionStore = me.down('gosModuleCoreModulePermissionRoleGrid').getStore();
 
                         if (!isNaN(id)) {
                             settingStore.getProxy().extraParams.moduleId = id;
                             settingStore.load();
                         }
 
-                        permissionStore.getProxy().extraParams.node = id;
-                        permissionStore.load();
+                        userPermissionStore.getProxy().extraParams.node = id;
+                        userPermissionStore.load();
+
+                        rolePermissionStore.getProxy().extraParams.node = id;
+                        rolePermissionStore.load();
                     }
                 }
             },{
@@ -39,26 +43,27 @@ Ext.define('GibsonOS.module.core.module.App', {
                 region: 'center'
             }]
         }];
-        this.tbar = [{
+        me.tbar = [{
             text: 'Scan',
             handler: function() {
-                var button = this;
+                const button = this;
                 button.disable();
 
                 GibsonOS.module.core.module.fn.scan({
-                    success: function(response, options) {
-                        app.down('#coreModuleTree').getStore().load();
-                        app.down('#coreModulePermissionGrid').getStore().loadData([]);
-                        app.down('#coreModuleManageSettingsGrid').getStore().loadData([]);
+                    success() {
+                        me.down('#coreModuleTree').getStore().load();
+                        me.down('gosModuleCoreModulePermissionUserGrid').getStore().loadData([]);
+                        me.down('gosModuleCoreModulePermissionRoleGrid').getStore().loadData([]);
+                        me.down('#coreModuleManageSettingsGrid').getStore().loadData([]);
                         button.enable();
                     },
-                    failure: function(response, options) {
+                    failure() {
                         button.enable();
                     }
                 });
             }
         }];
 
-        this.callParent();
+        me.callParent();
     }
 });

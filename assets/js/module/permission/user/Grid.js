@@ -1,14 +1,13 @@
-Ext.define('GibsonOS.module.core.module.permission.Grid', {
+Ext.define('GibsonOS.module.core.module.permission.user.Grid', {
     extend: 'GibsonOS.module.core.component.grid.Panel',
-    alias: ['widget.gosModuleCoreModulePermissionGrid'],
-    itemId: 'coreModulePermissionGrid',
+    alias: ['widget.gosModuleCoreModulePermissionUserGrid'],
     plugins: [{
         ptype: 'gosGridPluginCellEditing'
     }],
     initComponent() {
         const me = this;
 
-        me.store = new GibsonOS.module.core.module.store.Permission();
+        me.store = new GibsonOS.module.core.module.store.user.Permission();
 
         me.callParent();
 

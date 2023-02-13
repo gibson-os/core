@@ -1,10 +1,10 @@
-Ext.define('GibsonOS.module.core.module.model.Permission', {
+Ext.define('GibsonOS.module.core.module.model.role.Permission', {
     extend: 'GibsonOS.data.Model',
     fields: [{
         name: 'id',
         type: 'int'
     },{
-        name: 'userName',
+        name: 'roleName',
         type: 'string'
     },{
         name: 'moduleName',
@@ -16,7 +16,7 @@ Ext.define('GibsonOS.module.core.module.model.Permission', {
         name: 'actionName',
         type: 'string'
     },{
-        name: 'userId',
+        name: 'roleId',
         type: 'int'
     },{
         name: 'permission',

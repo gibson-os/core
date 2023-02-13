@@ -16,18 +16,19 @@ Ext.define('GibsonOS.module.core.module.permission.Panel', {
                 '<table class="gibson_status_table">',
                 '<tpl for=".">',
                     '<tr>',
-                        '<th>Verwendetes Recht:</th>',
-                        '<td>{[this.test(values)]}</td>',
+                        '<th>Benötigte Berechtigung:</th>',
+                        '<td>{[this.text(values)]}</td>',
                     '</tr>',
                 '</tpl>',
                 '</table>',
                 {
-                    test: function(permission) {
-                        var permissionString = null;
+                    text(permission) {
+                        let permissionString = null;
 
-                        Ext.each(GibsonOS.module.core.module.data.permissions, function(item) {
-                            if (permission == item[0]) {
+                        Ext.each(GibsonOS.module.core.module.data.permissions, (item) => {
+                            if (permission === item[0]) {
                                 permissionString = item[1];
+
                                 return false;
                             }
                         });
@@ -37,8 +38,15 @@ Ext.define('GibsonOS.module.core.module.permission.Panel', {
                 }
             )
         },{
-            xtype: 'gosModuleCoreModulePermissionGrid',
-            region: 'center'
+            xtype: 'gosCoreComponentTabPanel',
+            region: 'center',
+            items: [{
+                xtype: 'gosModuleCoreModulePermissionUserGrid',
+                title: 'Benutzer'
+            },{
+                xtype: 'gosModuleCoreModulePermissionRoleGrid',
+                title: 'Rollen'
+            }]
         }];
 
         me.callParent();

@@ -15,6 +15,7 @@ use GibsonOS\Core\Manager\ModelManager;
 use GibsonOS\Core\Model\User;
 use GibsonOS\Core\Model\User\Device;
 use GibsonOS\Core\Model\User\Permission;
+use GibsonOS\Core\Repository\Action\PermissionRepository;
 use GibsonOS\Core\Repository\User\DeviceRepository;
 use GibsonOS\Core\Repository\UserRepository;
 use GibsonOS\Core\Service\PermissionService;
@@ -25,6 +26,7 @@ use GibsonOS\Core\Service\Response\ResponseInterface;
 use GibsonOS\Core\Service\SessionService;
 use GibsonOS\Core\Service\TwigService;
 use GibsonOS\Core\Service\UserService;
+use GibsonOS\Core\Store\User\PermissionStore;
 use GibsonOS\Core\Store\UserStore;
 use GibsonOS\Core\Utility\StatusCode;
 
@@ -233,5 +235,39 @@ class UserController extends AbstractController
         $modelManager->delete($user);
 
         return $this->returnSuccess();
+    }
+
+    /**
+     * @throws SelectError
+     * @throws \JsonException
+     * @throws \ReflectionException
+     */
+    #[CheckPermission(Permission::MANAGE + Permission::READ)]
+    public function permission(
+        PermissionStore $permissionStore,
+        PermissionRepository $permissionRepository,
+        string $node
+    ): AjaxResponse {
+        $requiredPermissions = [];
+
+        if (mb_strpos($node, 'a') === 0) {
+            $actionId = (int) mb_substr($node, 1);
+            $permissionStore->setActionId($actionId);
+
+            foreach ($permissionRepository->findByActionId($actionId) as $permission) {
+                $requiredPermissions[] = $permission->getPermission();
+            }
+        } elseif (mb_strpos($node, 't') === 0) {
+            $permissionStore->setTaskId((int) mb_substr($node, 1));
+        } else {
+            $permissionStore->setModuleId((int) $node);
+        }
+
+        return new AjaxResponse([
+            'success' => true,
+            'failure' => false,
+            'data' => [...$permissionStore->getList()],
+            'requiredPermissions' => $requiredPermissions,
+        ]);
     }
 }

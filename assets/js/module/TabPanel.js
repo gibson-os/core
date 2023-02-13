@@ -15,7 +15,7 @@ Ext.define('GibsonOS.module.core.module.TabPanel', {
 
         me.callParent();
 
-        me.down('gosModuleCoreModulePermissionGrid').getStore().on('load', (store) => {
+        me.down('gosModuleCoreModulePermissionUserGrid').getStore().on('load', (store) => {
             const data = store.getProxy().getReader().rawData;
             let requiredPermissions = null;
             
@@ -34,7 +34,7 @@ Ext.define('GibsonOS.module.core.module.TabPanel', {
             panel.update(requiredPermissions);
         });
 
-        me.down('#coreModulePermissionGrid').getStore().on('update', function(store, record, operation, options) {
+        me.down('gosModuleCoreModulePermissionUserGrid').getStore().on('update', (store) => {
             var nodes = [];
             var app = me.up('#app');
 
