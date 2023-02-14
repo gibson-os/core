@@ -5,7 +5,7 @@ Ext.define('GibsonOS.module.core.module.store.role.Permission', {
     pageSize: 100,
     proxy: {
         type: 'gosDataProxyAjax',
-        url: baseDir + 'core/role/permission'
+        url: baseDir + 'core/role/permissions'
     },
     model: 'GibsonOS.module.core.module.model.role.Permission'
 });

@@ -33,7 +33,7 @@ Ext.define('GibsonOS.module.core.module.permission.role.Grid', {
     getColumns() {
         return [{
             header: 'Rolle',
-            dataIndex: 'role',
+            dataIndex: 'roleName',
             flex: 1
         },{
             header: 'Berechtigung',

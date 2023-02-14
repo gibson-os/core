@@ -243,7 +243,7 @@ class UserController extends AbstractController
      * @throws \ReflectionException
      */
     #[CheckPermission(Permission::MANAGE + Permission::READ)]
-    public function permission(
+    public function permissions(
         PermissionStore $permissionStore,
         PermissionRepository $permissionRepository,
         string $node

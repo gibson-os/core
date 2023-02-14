@@ -13,9 +13,10 @@ use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Manager\ModelManager;
 use GibsonOS\Core\Model\Role;
 use GibsonOS\Core\Model\Role\Permission;
-use GibsonOS\Core\Model\User;
 use GibsonOS\Core\Model\User\Permission as UserPermission;
+use GibsonOS\Core\Repository\Action\PermissionRepository;
 use GibsonOS\Core\Service\Response\AjaxResponse;
+use GibsonOS\Core\Store\Role\PermissionStore;
 use GibsonOS\Core\Store\Role\UserStore;
 use GibsonOS\Core\Store\RoleStore;
 
@@ -128,5 +129,34 @@ class RoleController extends AbstractController
         }
 
         return $this->returnSuccess();
+    }
+
+    #[CheckPermission(UserPermission::MANAGE + UserPermission::READ)]
+    public function permissions(
+        PermissionStore $permissionStore,
+        PermissionRepository $permissionRepository,
+        string $node
+    ): AjaxResponse {
+        $requiredPermissions = [];
+
+        if (mb_strpos($node, 'a') === 0) {
+            $actionId = (int) mb_substr($node, 1);
+            $permissionStore->setActionId($actionId);
+
+            foreach ($permissionRepository->findByActionId($actionId) as $permission) {
+                $requiredPermissions[] = $permission->getPermission();
+            }
+        } elseif (mb_strpos($node, 't') === 0) {
+            $permissionStore->setTaskId((int) mb_substr($node, 1));
+        } else {
+            $permissionStore->setModuleId((int) $node);
+        }
+
+        return new AjaxResponse([
+            'success' => true,
+            'failure' => false,
+            'data' => [...$permissionStore->getList()],
+            'requiredPermissions' => $requiredPermissions,
+        ]);
     }
 }
