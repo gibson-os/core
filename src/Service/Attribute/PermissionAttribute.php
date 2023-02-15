@@ -16,9 +16,9 @@ use GibsonOS\Core\Service\SessionService;
 class PermissionAttribute extends AbstractActionAttributeService
 {
     public function __construct(
-        private PermissionService $permissionService,
-        private RequestService $requestService,
-        private SessionService $sessionService
+        private readonly PermissionService $permissionService,
+        private readonly RequestService $requestService,
+        private readonly SessionService $sessionService
     ) {
     }
 
