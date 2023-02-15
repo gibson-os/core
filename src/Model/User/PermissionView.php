@@ -30,9 +30,10 @@ class PermissionView extends AbstractModel implements \JsonSerializable
                 '`rp`.`module` AS `module`, ' .
                 '`rp`.`task` AS `task`, ' .
                 '`rp`.`action` AS `action`, ' .
-                '`rp`.`permission` AS `permission` ' .
+                'MAX(`rp`.`permission`) AS `permission` ' .
             'FROM `role_user` `ru` ' .
-            'JOIN `role_permission` `rp` ON `rp`.`role_id` = `ru`.`role_id`' .
+            'JOIN `role_permission` `rp` ON `rp`.`role_id` = `ru`.`role_id` ' .
+            'GROUP BY `ru`.`user_id`, `rp`.`module`, `rp`.`task`, `rp`.`action`' .
         ') ' .
         'SELECT ' .
             'CAST(`p`.`user_id` AS UNSIGNED) `user_id`, ' .
