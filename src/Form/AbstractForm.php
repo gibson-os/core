@@ -17,7 +17,7 @@ abstract class AbstractForm
     abstract protected function getForm(): array;
 
     /**
-     * @return Button[]
+     * @return array<string, Button>
      */
     abstract public function getButtons(): array;
 

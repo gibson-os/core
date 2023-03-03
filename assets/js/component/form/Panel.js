@@ -37,18 +37,18 @@ Ext.define('GibsonOS.module.core.component.form.Panel', {
         GibsonOS.decorator.Panel.addListeners(me);
 
         const basicForm = me.getForm();
-        basicForm.on('actioncomplete', function(form, action) {
-            let responseText = Ext.decode(action.response.responseText);
+        basicForm.on('actioncomplete', (form, action) => {
+            const responseText = Ext.decode(action.response.responseText);
             GibsonOS.checkResponseForLogin(responseText);
             GibsonOS.checkResponseForErrorMessage(responseText, action);
 
-            form.getFields().each(function(field) {
+            form.getFields().each((field) => {
                 field.originalValue = field.getValue();
             });
         }, this, {
             priority: 999
         });
-        basicForm.on('actionfailed', function(form, action) {
+        basicForm.on('actionfailed', (form, action) => {
             let responseText = Ext.decode(action.response.responseText);
             GibsonOS.checkResponseForLogin(responseText);
             GibsonOS.checkResponseForErrorMessage(responseText, action);

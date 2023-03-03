@@ -17,7 +17,7 @@ class GeneralPermissionData extends AbstractInstall implements PriorityInterface
 {
     public function __construct(
         ServiceManager $serviceManagerService,
-        private PermissionRepository $permissionRepository
+        private readonly PermissionRepository $permissionRepository
     ) {
         parent::__construct($serviceManagerService);
     }
@@ -51,7 +51,7 @@ class GeneralPermissionData extends AbstractInstall implements PriorityInterface
 
     public function getModule(): ?string
     {
-        return 'explorer';
+        return 'core';
     }
 
     public function getPriority(): int

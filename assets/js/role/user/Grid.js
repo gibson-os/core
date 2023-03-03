@@ -45,7 +45,6 @@ Ext.define('GibsonOS.module.core.role.user.Grid', {
                 me.getStore().load();
             }
         });
-
     },
     initComponent() {
         const me = this;

@@ -18,13 +18,9 @@ use GibsonOS\Core\Model\User\Permission;
 use GibsonOS\Core\Repository\Action\PermissionRepository;
 use GibsonOS\Core\Repository\User\DeviceRepository;
 use GibsonOS\Core\Repository\UserRepository;
-use GibsonOS\Core\Service\PermissionService;
-use GibsonOS\Core\Service\RequestService;
 use GibsonOS\Core\Service\Response\AjaxResponse;
 use GibsonOS\Core\Service\Response\RedirectResponse;
 use GibsonOS\Core\Service\Response\ResponseInterface;
-use GibsonOS\Core\Service\SessionService;
-use GibsonOS\Core\Service\TwigService;
 use GibsonOS\Core\Service\UserService;
 use GibsonOS\Core\Store\User\PermissionStore;
 use GibsonOS\Core\Store\UserStore;
@@ -32,15 +28,6 @@ use GibsonOS\Core\Utility\StatusCode;
 
 class UserController extends AbstractController
 {
-    public function __construct(
-        RequestService $requestService,
-        TwigService $twigService,
-        SessionService $sessionService,
-        private readonly PermissionService $permissionService
-    ) {
-        parent::__construct($requestService, $twigService, $sessionService);
-    }
-
     /**
      * @throws SelectError
      * @throws \JsonException
