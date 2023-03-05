@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace GibsonOS\Core\Dto\Fcm\Message;
+namespace GibsonOS\Core\Enum\Middleware\Message;
 
 enum Type: string
 {

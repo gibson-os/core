@@ -3,19 +3,13 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Dto\Fcm;
 
-use GibsonOS\Core\Dto\Fcm\Message\Priority;
-use GibsonOS\Core\Dto\Fcm\Message\Type;
-use GibsonOS\Core\Dto\Fcm\Message\Vibrate;
+use GibsonOS\Core\Enum\Middleware\Message\Priority;
+use GibsonOS\Core\Enum\Middleware\Message\Type;
+use GibsonOS\Core\Enum\Middleware\Message\Vibrate;
 use GibsonOS\Core\Utility\JsonUtility;
 
 class Message implements \JsonSerializable
 {
-    public const OPTION_NONE = 0;
-
-    public const OPTION_VIBRATION = 1;
-
-    public const OPTION_SOUND = 2;
-
     public function __construct(
         private readonly string $token,
         private readonly string $fcmToken,

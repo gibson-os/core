@@ -4,8 +4,8 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Service;
 
 use GibsonOS\Core\Dto\Fcm\Message;
-use GibsonOS\Core\Dto\Fcm\Message\Priority;
-use GibsonOS\Core\Dto\Fcm\Message\Type;
+use GibsonOS\Core\Enum\Middleware\Message\Priority;
+use GibsonOS\Core\Enum\Middleware\Message\Type;
 use GibsonOS\Core\Repository\DevicePushRepository;
 
 class DevicePushService
