@@ -4,14 +4,18 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Service;
 
 use GibsonOS\Core\Attribute\AlwaysAjaxResponse;
+use GibsonOS\Core\Attribute\GetSetting;
 use GibsonOS\Core\Dto\Attribute;
 use GibsonOS\Core\Exception\ControllerError;
 use GibsonOS\Core\Exception\FactoryError;
 use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\MapperException;
 use GibsonOS\Core\Exception\RequestError;
+use GibsonOS\Core\Manager\ModelManager;
 use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Manager\ServiceManager;
+use GibsonOS\Core\Model\Setting;
+use GibsonOS\Core\Repository\ModuleRepository;
 use GibsonOS\Core\Service\Attribute\AbstractActionAttributeService;
 use GibsonOS\Core\Service\Attribute\ObjectMapperAttribute;
 use GibsonOS\Core\Service\Attribute\ParameterAttributeInterface;
@@ -19,11 +23,14 @@ use GibsonOS\Core\Service\Response\AjaxResponse;
 use GibsonOS\Core\Service\Response\ExceptionResponse;
 use GibsonOS\Core\Service\Response\ResponseInterface;
 use GibsonOS\Core\Service\Response\TwigResponse;
+use GibsonOS\Core\Utility\JsonUtility;
 use GibsonOS\Core\Utility\StatusCode;
 use Throwable;
 
 class ControllerService
 {
+    private readonly Setting $chromecastReceiverAppId;
+
     public function __construct(
         private readonly ServiceManager $serviceManagerService,
         private readonly RequestService $requestService,
@@ -33,7 +40,16 @@ class ControllerService
         private readonly AttributeService $attributeService,
         private readonly ObjectMapperAttribute $objectMapperAttribute,
         private readonly ReflectionManager $reflectionManager,
+        private readonly ModuleRepository $moduleRepository,
+        private readonly MiddlewareService $middlewareService,
+        private readonly ModelManager $modelManager,
+        #[GetSetting('chromecastReceiverAppId')] Setting $chromecastReceiverAppId = null,
     ) {
+        $this->chromecastReceiverAppId = $chromecastReceiverAppId
+            ?? (new Setting())
+                ->setModule($moduleRepository->getByName('core'))
+                ->setKey('chromecastReceiverAppId')
+        ;
     }
 
     public function runAction(): void
@@ -120,6 +136,14 @@ class ControllerService
      */
     private function renderTemplate(): TwigResponse
     {
+        if ($this->chromecastReceiverAppId->getId() === null) {
+            $response = $this->middlewareService->send('chromecast', 'getReceiverAppId');
+            $this->chromecastReceiverAppId
+                ->setValue(JsonUtility::decode($response->getBody()->getContent())['data'])
+            ;
+            $this->modelManager->saveWithoutChildren($this->chromecastReceiverAppId);
+        }
+
         $now = time();
         $context = [
             'baseDir' => preg_replace('|^(.*/).+?$|', '$1', $_SERVER['SCRIPT_NAME'] ?? ''),
@@ -141,6 +165,7 @@ class ControllerService
             ],
             'request' => $this->requestService,
             'session' => $this->serviceManagerService->get(SessionService::class),
+            'chromecastReceiverAppId' => $this->chromecastReceiverAppId->getValue(),
         ];
 
         return (new TwigResponse($this->twigService, '@core/base.html.twig'))

@@ -16,8 +16,14 @@ class MiddlewareInstall extends AbstractInstall implements PriorityInterface, Si
             'What is the middleware URL?'
         );
 
+        $middlewareUrl = $middlewareUrlInput->getValue() ?? '';
+
+        if (mb_substr($middlewareUrl, -1) !== '/') {
+            $middlewareUrl .= '/';
+        }
+
         yield (new Configuration('Middleware configuration generated!'))
-            ->setValue('MIDDLEWARE_URL', $middlewareUrlInput->getValue() ?? '')
+            ->setValue('MIDDLEWARE_URL', $middlewareUrl)
         ;
     }
 

@@ -20,7 +20,7 @@ use GibsonOS\Core\Utility\StatusCode;
 
 class MiddlewareService
 {
-    private Setting $middlewareToken;
+    private readonly Setting $middlewareToken;
 
     /**
      * @throws SelectError
