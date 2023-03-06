@@ -27,13 +27,16 @@ class MiddlewareService
      */
     public function __construct(
         #[GetEnv('MIDDLEWARE_URL')] private readonly string $middlewareUrl,
+        #[GetEnv('WEB_URL')] private readonly string $webUrl,
         private readonly WebService $webService,
         private readonly ModelManager $modelManager,
         ModuleRepository $moduleRepository,
-        #[GetSetting('middlewareToken', 'core')] Setting $middlewareToken = null,
+        #[GetSetting('token', 'middleware')] Setting $middlewareToken = null,
     ) {
         $this->middlewareToken = $middlewareToken
-            ?? (new Setting())->setModule($moduleRepository->getByName('middleware'))
+            ?? (new Setting())
+                ->setModule($moduleRepository->getByName('middleware'))
+                ->setKey('token')
         ;
     }
 
@@ -45,8 +48,15 @@ class MiddlewareService
      */
     public function send(string $task, string $action, array $parameters = [], string $body = null): Response
     {
+        if ($this->middlewareToken->getId() === null) {
+            $this->getNewToken();
+        }
+
         $request = (new Request(sprintf('%smiddleware/%s/%s', $this->middlewareUrl, $task, $action)))
-            ->setHeaders(['X-GibsonOs-Token' => $this->middlewareToken->getValue()])
+            ->setHeaders([
+                'X-GibsonOs-Token' => $this->middlewareToken->getValue(),
+                'X-Requested-With' => 'XMLHttpRequest',
+            ])
         ;
 
         if (count($parameters)) {
@@ -55,15 +65,36 @@ class MiddlewareService
 
         if ($body !== null) {
             $request->setBody((new Body())->setContent($body, strlen($body)));
+        }
+
+        if (count($parameters) || $body !== null) {
             $response = $this->webService->post($request);
         } else {
             $response = $this->webService->get($request);
         }
 
-        if ($response->getStatusCode() === StatusCode::UNAUTHORIZED) {
+        $statusCode = $response->getStatusCode();
+
+        if ($statusCode === StatusCode::UNAUTHORIZED) {
             $this->getNewToken();
 
-            return $this->webService->get($request);
+            return $this->checkResponse($request, $this->webService->get($request));
+        }
+
+        return $this->checkResponse($request, $response);
+    }
+
+    private function checkResponse(Request $request, Response $response): Response
+    {
+        $statusCode = $response->getStatusCode();
+
+        if ($statusCode < StatusCode::OK || $statusCode > StatusCode::PERMANENT_REDIRECT) {
+            throw new MiddlewareException(sprintf(
+                'Response error! URL %s. Code %d. Response: %s',
+                $request->getUrl(),
+                $statusCode,
+                $response->getBody()->getContent(),
+            ));
         }
 
         return $response;
@@ -77,7 +108,11 @@ class MiddlewareService
      */
     private function getNewToken(): void
     {
-        $response = $this->webService->get(new Request($this->middlewareUrl . 'middleware/instance/newToken'));
+        $response = $this->webService->post(
+            (new Request(sprintf('%smiddleware/instance/newToken', $this->middlewareUrl)))
+                ->setParameters(['url' => $this->webUrl])
+                ->setHeaders(['X-Requested-With' => 'XMLHttpRequest'])
+        );
 
         try {
             $content = $response->getBody()->getContent();
@@ -93,7 +128,7 @@ class MiddlewareService
             ));
         }
 
-        $instance = JsonUtility::decode($content);
+        $instance = JsonUtility::decode($content)['data'];
         $this->modelManager->saveWithoutChildren($this->middlewareToken->setValue($instance['token']));
     }
 }

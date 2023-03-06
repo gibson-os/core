@@ -6,7 +6,6 @@ namespace GibsonOS\Core\Dto\Fcm;
 use GibsonOS\Core\Enum\Middleware\Message\Priority;
 use GibsonOS\Core\Enum\Middleware\Message\Type;
 use GibsonOS\Core\Enum\Middleware\Message\Vibrate;
-use GibsonOS\Core\Utility\JsonUtility;
 
 class Message implements \JsonSerializable
 {
@@ -30,29 +29,19 @@ class Message implements \JsonSerializable
      */
     public function jsonSerialize(): array
     {
-        $data = [
-            'token' => $this->fcmToken,
-            'android' => [
-                'priority' => $this->priority->value,
-            ],
-        ];
-
-        $data['data'] = [
-            'token' => $this->token,
-            'type' => $this->type->value,
-            'module' => $this->module,
-            'task' => $this->task,
+        return [
             'action' => $this->action,
-            'vibrate' => JsonUtility::encode($this->vibrate?->getPattern() ?? []),
+            'task' => $this->task,
+            'module' => $this->module,
+            'token' => $this->token,
+            'fcmToken' => $this->getFcmToken(),
+            'type' => $this->type->value,
             'title' => $this->title,
             'body' => $this->body,
+            'data' => $this->data,
+            'priority' => $this->priority->value,
+            'vibrate' => $this->vibrate?->value ?? null,
         ];
-
-        if (count($this->data)) {
-            $data['data']['payload'] = JsonUtility::encode($this->data, JSON_THROW_ON_ERROR);
-        }
-
-        return $data;
     }
 
     public function getFcmToken(): string

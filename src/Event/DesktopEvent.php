@@ -20,7 +20,7 @@ class DesktopEvent extends AbstractEvent
     public function __construct(
         EventService $eventService,
         ReflectionManager $reflectionManager,
-        private readonly FcmService $fcmService
+        private readonly FcmService $fcmService,
     ) {
         parent::__construct($eventService, $reflectionManager);
     }
