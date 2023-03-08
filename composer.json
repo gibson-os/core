@@ -14,7 +14,8 @@
     "ext-curl": "*",
     "ext-openssl": "*",
     "google/auth": "^1.18",
-    "smalot/pdfparser": "^2.2"
+    "smalot/pdfparser": "^2.2",
+    "psr/log": "*"
   },
   "require-dev": {
     "codeception/codeception": "^4.0",
