@@ -31,7 +31,7 @@ class MiddlewareService
         private readonly WebService $webService,
         private readonly ModelManager $modelManager,
         ModuleRepository $moduleRepository,
-        #[GetSetting('token', 'core')] Setting $middlewareToken = null,
+        #[GetSetting('middlewareToken', 'core')] Setting $middlewareToken = null,
     ) {
         $this->middlewareToken = $middlewareToken
             ?? (new Setting())
