@@ -73,10 +73,9 @@ class MiddlewareService
             $response = $this->webService->get($request);
         }
 
-        $statusCode = $response->getStatusCode();
-
-        if ($statusCode === StatusCode::UNAUTHORIZED) {
+        if ($response->getStatusCode() === StatusCode::UNAUTHORIZED) {
             $this->getNewToken();
+            $request->setHeader('X-GibsonOs-Token', $this->middlewareToken->getValue());
 
             return $this->checkResponse($request, $this->webService->get($request));
         }

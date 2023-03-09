@@ -104,6 +104,13 @@ class Request
         return $this;
     }
 
+    public function setHeader(string $key, string $value): Request
+    {
+        $this->headers[$key] = $value;
+
+        return $this;
+    }
+
     public function getBody(): ?Body
     {
         return $this->body;
