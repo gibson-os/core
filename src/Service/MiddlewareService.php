@@ -31,11 +31,11 @@ class MiddlewareService
         private readonly WebService $webService,
         private readonly ModelManager $modelManager,
         ModuleRepository $moduleRepository,
-        #[GetSetting('token', 'middleware')] Setting $middlewareToken = null,
+        #[GetSetting('token', 'core')] Setting $middlewareToken = null,
     ) {
         $this->middlewareToken = $middlewareToken
             ?? (new Setting())
-                ->setModule($moduleRepository->getByName('middleware'))
+                ->setModule($moduleRepository->getByName('core'))
                 ->setKey('token')
         ;
     }
