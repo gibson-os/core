@@ -67,7 +67,7 @@ class WebService
 
         $headers = $request->getHeaders();
 
-        if (!empty($parameters)) {
+        if (count($parameters) > 0) {
             if (!empty($requestBody)) {
                 throw new WebException('Request body and parameters are set!');
             }
@@ -81,7 +81,7 @@ class WebService
             curl_setopt($curl, CURLOPT_POSTFIELDS, $requestBody);
         }
 
-        if (!empty($headers)) {
+        if (count($headers) > 0) {
             $curlHeaders = [];
 
             foreach ($headers as $headerKey => $headerValue) {
