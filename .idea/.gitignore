@@ -8,3 +8,4 @@
 /httpRequests/
 deployment.xml
 webServers.xml
+/sshConfigs.xml

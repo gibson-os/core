@@ -20,4 +20,16 @@ class PermissionRepository extends AbstractRepository
             Permission::class
         );
     }
+
+    /**
+     * @throws SelectError
+     */
+    public function getByModuleAndTask(string $module, string $task, int $userId = null): Permission
+    {
+        return $this->fetchOne(
+            '`module`=? AND `task`=? AND `action` IS NULL AND IFNULL(`user_id`, ?)=?',
+            [$module, $task, 0, $userId ?? 0],
+            Permission::class
+        );
+    }
 }
