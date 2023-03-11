@@ -15,19 +15,23 @@ class JavascriptController extends AbstractController
      * @throws SelectError
      * @throws GetError
      */
-    public function index(JavascriptService $javaScriptService, string $module = 'all', string $task = 'all'): Response
-    {
+    public function index(
+        JavascriptService $javaScriptService,
+        string $module = 'all',
+        string $task = 'all',
+        bool $withDefault = true,
+    ): Response {
         $userId = $this->sessionService->getUserId();
 
         if ($module === 'all') {
-            return $this->getResponse($javaScriptService->getByUserId($userId));
+            return $this->getResponse($javaScriptService->getByUserId($userId, withDefault: $withDefault));
         }
 
         if ($task === 'all') {
-            return $this->getResponse($javaScriptService->getByUserId($userId, $module));
+            return $this->getResponse($javaScriptService->getByUserId($userId, $module, $withDefault));
         }
 
-        return $this->getResponse($javaScriptService->getByUserIdAndTask($userId, $module, $task));
+        return $this->getResponse($javaScriptService->getByUserIdAndTask($userId, $module, $task, $withDefault));
     }
 
     private function getResponse(string $body): Response

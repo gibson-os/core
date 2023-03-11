@@ -31,9 +31,9 @@ class JavascriptService
      * @throws GetError
      * @throws SelectError
      */
-    public function getByUserId(?int $userId, string $module = null): string
+    public function getByUserId(?int $userId, string $module = null, bool $withDefault = true): string
     {
-        $files = $this->getDefaultFiles();
+        $files = $withDefault ? $this->getDefaultFiles() : [];
         $oldData = '';
 
         foreach ($this->permissionViewRepository->getTaskList($userId, $module) as $task) {
@@ -70,9 +70,9 @@ class JavascriptService
      * @throws GetError
      * @throws SelectError
      */
-    public function getByUserIdAndTask(?int $userId, string $module, string $task): string
+    public function getByUserIdAndTask(?int $userId, string $module, string $task, bool $withDefault = true): string
     {
-        $files = $this->getDefaultFiles();
+        $files = $withDefault ? $this->getDefaultFiles() : [];
         $oldData = '';
 
         foreach ($this->permissionViewRepository->getTaskList($userId, $module) as $permission) {
