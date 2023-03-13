@@ -40,9 +40,9 @@ class ControllerService
         private readonly AttributeService $attributeService,
         private readonly ObjectMapperAttribute $objectMapperAttribute,
         private readonly ReflectionManager $reflectionManager,
-        private readonly ModuleRepository $moduleRepository,
         private readonly MiddlewareService $middlewareService,
         private readonly ModelManager $modelManager,
+        ModuleRepository $moduleRepository,
         #[GetSetting('chromecastReceiverAppId', 'core')] Setting $chromecastReceiverAppId = null,
     ) {
         $this->chromecastReceiverAppId = $chromecastReceiverAppId
