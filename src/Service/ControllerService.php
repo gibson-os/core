@@ -43,7 +43,7 @@ class ControllerService
         private readonly ModuleRepository $moduleRepository,
         private readonly MiddlewareService $middlewareService,
         private readonly ModelManager $modelManager,
-        #[GetSetting('chromecastReceiverAppId')] Setting $chromecastReceiverAppId = null,
+        #[GetSetting('chromecastReceiverAppId', 'core')] Setting $chromecastReceiverAppId = null,
     ) {
         $this->chromecastReceiverAppId = $chromecastReceiverAppId
             ?? (new Setting())
