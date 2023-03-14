@@ -52,6 +52,7 @@ class PermissionViewRepository extends AbstractRepository
         $table = $this
             ->getTable($this->permissionViewName)
             ->setLimit(1)
+            ->setOrderBy('`user_id` DESC, `module` DESC')
         ;
         $table->setWhere(
             $this->getUserIdWhere($table, $userId) . ' AND ' .
@@ -78,6 +79,7 @@ class PermissionViewRepository extends AbstractRepository
         $table = $this
             ->getTable($this->permissionViewName)
             ->setLimit(1)
+            ->setOrderBy('`user_id` DESC, `task` DESC, `module` DESC')
         ;
         $table->setWhere(
             $this->getUserIdWhere($table, $userId) . ' AND ' .
@@ -104,6 +106,7 @@ class PermissionViewRepository extends AbstractRepository
         $table = $this
             ->getTable($this->permissionViewName)
             ->setLimit(1)
+            ->setOrderBy('`user_id` DESC, `action` DESC, `task` DESC, `module` DESC')
         ;
         $table->setWhere(
             $this->getUserIdWhere($table, $userId) . ' AND ' .

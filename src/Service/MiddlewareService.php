@@ -36,7 +36,7 @@ class MiddlewareService
         $this->middlewareToken = $middlewareToken
             ?? (new Setting())
                 ->setModule($moduleRepository->getByName('core'))
-                ->setKey('token')
+                ->setKey('middlewareToken')
         ;
     }
 
