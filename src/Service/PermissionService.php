@@ -9,7 +9,7 @@ use GibsonOS\Core\Repository\User\PermissionViewRepository;
 
 class PermissionService
 {
-    public function __construct(private PermissionViewRepository $permissionViewRepository)
+    public function __construct(private readonly PermissionViewRepository $permissionViewRepository)
     {
     }
 

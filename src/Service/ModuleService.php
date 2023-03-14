@@ -29,14 +29,14 @@ class ModuleService
     private string $oldPath;
 
     public function __construct(
-        private ModuleRepository $moduleRepository,
-        private TaskRepository $taskRepository,
-        private ActionRepository $actionRepository,
-        private PermissionRepository $permissionRepository,
-        private DirService $dirService,
-        private ReflectionManager $reflectionManager,
-        private ModelManager $modelManager,
-        private LoggerInterface $logger
+        private readonly ModuleRepository $moduleRepository,
+        private readonly TaskRepository $taskRepository,
+        private readonly ActionRepository $actionRepository,
+        private readonly PermissionRepository $permissionRepository,
+        private readonly DirService $dirService,
+        private readonly ReflectionManager $reflectionManager,
+        private readonly ModelManager $modelManager,
+        private readonly LoggerInterface $logger,
     ) {
         $this->vendorPath = realpath(
             dirname(__FILE__) . DIRECTORY_SEPARATOR .

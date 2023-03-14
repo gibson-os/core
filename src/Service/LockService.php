@@ -16,9 +16,9 @@ use GibsonOS\Core\Repository\LockRepository;
 class LockService
 {
     public function __construct(
-        private LockRepository $lockRepository,
-        private ProcessService $processService,
-        private ModelManager $modelManager
+        private readonly LockRepository $lockRepository,
+        private readonly ProcessService $processService,
+        private readonly ModelManager $modelManager,
     ) {
     }
 

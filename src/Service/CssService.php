@@ -14,10 +14,10 @@ class CssService
     private string $vendorPath;
 
     public function __construct(
-        private PermissionViewRepository $permissionViewRepository,
-        private DirService $dirService,
-        private FileService $fileService,
-        private PermissionService $permissionService
+        private readonly PermissionViewRepository $permissionViewRepository,
+        private readonly DirService $dirService,
+        private readonly FileService $fileService,
+        private readonly PermissionService $permissionService,
     ) {
         $this->vendorPath = realpath(
             dirname(__FILE__) . DIRECTORY_SEPARATOR .
@@ -63,7 +63,7 @@ class CssService
      */
     public function getByUserIdAndTask(?int $userId, string $module, string $task): string
     {
-        if ($this->permissionService->isDenied($module, null, null, $userId)) {
+        if ($this->permissionService->isDenied($module, $task, null, $userId)) {
             return '';
         }
 

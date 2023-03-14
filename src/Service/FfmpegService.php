@@ -22,12 +22,12 @@ class FfmpegService
      * @throws GetError
      */
     public function __construct(
-        #[GetEnv('FFMPEG_PATH')] private string $ffmpegPath,
-        #[GetEnv('FFPROBE_PATH')] private string $ffprobePath,
-        private DateTimeService $dateTime,
-        private FileService $file,
-        private ProcessService $process,
-        private ImageService $image
+        #[GetEnv('FFMPEG_PATH')] private readonly string $ffmpegPath,
+        #[GetEnv('FFPROBE_PATH')] private readonly string $ffprobePath,
+        private readonly DateTimeService $dateTime,
+        private readonly FileService $file,
+        private readonly ProcessService $process,
+        private readonly ImageService $image,
     ) {
     }
 

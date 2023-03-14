@@ -10,7 +10,7 @@ use Twig\Loader\FilesystemLoader;
 
 class TwigService
 {
-    private Environment $twig;
+    private readonly Environment $twig;
 
     /**
      * @throws GetError

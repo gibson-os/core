@@ -7,7 +7,7 @@ use GibsonOS\Core\Event\NetworkEvent;
 
 class NetworkService
 {
-    public function __construct(private EventService $eventService)
+    public function __construct(private readonly EventService $eventService)
     {
     }
 

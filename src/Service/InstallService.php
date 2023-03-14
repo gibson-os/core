@@ -34,10 +34,10 @@ class InstallService
      * @param InstallInterface[] $installers
      */
     public function __construct(
-        private DirService $dirService,
-        private FileService $fileService,
-        private EnvService $envService,
-        #[GetServices(['*/src/Install'], InstallInterface::class)] private array $installers
+        private readonly DirService $dirService,
+        private readonly FileService $fileService,
+        private readonly EnvService $envService,
+        #[GetServices(['*/src/Install'], InstallInterface::class)] private readonly array $installers,
     ) {
     }
 

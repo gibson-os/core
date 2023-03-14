@@ -18,7 +18,7 @@ class CommandService
     public function __construct(
         private readonly ServiceManager $serviceManager,
         private readonly ProcessService $processService,
-        private readonly ReflectionManager $reflectionManager
+        private readonly ReflectionManager $reflectionManager,
     ) {
     }
 

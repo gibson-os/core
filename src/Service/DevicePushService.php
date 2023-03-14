@@ -11,8 +11,8 @@ use GibsonOS\Core\Repository\DevicePushRepository;
 class DevicePushService
 {
     public function __construct(
-        private DevicePushRepository $devicePushRepository,
-        private FcmService $fcmService
+        private readonly DevicePushRepository $devicePushRepository,
+        private readonly FcmService $fcmService,
     ) {
     }
 

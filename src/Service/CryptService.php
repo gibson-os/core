@@ -9,9 +9,9 @@ use GibsonOS\Core\Exception\FileNotFound;
 class CryptService
 {
     public function __construct(
-        #[GetEnv('CRYPT_INITIALIZATION_VECTOR')] private string $cryptInitializationVector,
-        #[GetEnv('CRYPT_ALGO')] private string $cryptAlgo,
-        #[GetEnv('CRYPT_SALT')] private string $cryptSalt
+        #[GetEnv('CRYPT_INITIALIZATION_VECTOR')] private readonly string $cryptInitializationVector,
+        #[GetEnv('CRYPT_ALGO')] private readonly string $cryptAlgo,
+        #[GetEnv('CRYPT_SALT')] private readonly string $cryptSalt,
     ) {
     }
 

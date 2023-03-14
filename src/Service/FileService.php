@@ -13,7 +13,7 @@ use GibsonOS\Core\Exception\SetError;
 
 class FileService
 {
-    public function __construct(private DirService $dir)
+    public function __construct(private readonly DirService $dirService)
     {
     }
 
@@ -35,11 +35,11 @@ class FileService
     public function copy(string $from, string $to): void
     {
         if (is_dir($from)) {
-            $from = $this->dir->addEndSlash($from);
-            $to = $this->dir->addEndSlash($to);
+            $from = $this->dirService->addEndSlash($from);
+            $to = $this->dirService->addEndSlash($to);
 
             if (!file_exists($to)) {
-                $this->dir->create($to);
+                $this->dirService->create($to);
             }
 
 //            $chmod = $this->getPerms($from);
@@ -51,7 +51,7 @@ class FileService
 //            $group = $this->getGroup($from);
 //            $this->setGroup($to, $group);
 
-            foreach ($this->dir->getFiles($from) as $path) {
+            foreach ($this->dirService->getFiles($from) as $path) {
                 $filename = $this->getFilename($path);
                 $this->copy($path, $to . $filename);
             }
@@ -70,11 +70,11 @@ class FileService
     public function move(string $from, string $to, bool $overwrite = false, bool $ignore = false): void
     {
         if (is_dir($from)) {
-            $from = $this->dir->addEndSlash($from);
-            $to = $this->dir->addEndSlash($to);
+            $from = $this->dirService->addEndSlash($from);
+            $to = $this->dirService->addEndSlash($to);
 
             if (!file_exists($to)) {
-                $this->dir->create($to);
+                $this->dirService->create($to);
             }
 
 //            $chmod = $this->getPerms($from);
@@ -86,7 +86,7 @@ class FileService
 //            $group = $this->getGroup($from);
 //            $this->setGroup($to, $group);
 
-            foreach ($this->dir->getFiles($from) as $path) {
+            foreach ($this->dirService->getFiles($from) as $path) {
                 $filename = $this->getFilename($path);
                 $this->move($path, $to . $filename, $overwrite, $ignore);
             }
@@ -209,7 +209,7 @@ class FileService
             return false;
         }
 
-        return is_writable($this->getDir($path));
+        return is_writable($this->getDirService($path));
     }
 
     /**
@@ -221,7 +221,7 @@ class FileService
      */
     public function delete(string $dir, string|array|null $files = null): void
     {
-        $dir = $this->dir->addEndSlash($dir);
+        $dir = $this->dirService->addEndSlash($dir);
 
         if (
             is_array($files) ||
@@ -230,7 +230,7 @@ class FileService
             $deleteDir = false;
 
             if ($files === null) {
-                $files = $this->dir->getFiles($dir);
+                $files = $this->dirService->getFiles($dir);
                 $deleteDir = true;
             }
 
@@ -240,9 +240,9 @@ class FileService
             }
 
             if ($deleteDir) {
-                $dirs = explode(DIRECTORY_SEPARATOR, $this->dir->removeEndSlash($dir));
+                $dirs = explode(DIRECTORY_SEPARATOR, $this->dirService->removeEndSlash($dir));
                 $lastDir = array_pop($dirs);
-                $dir = $this->dir->addEndSlash(implode(DIRECTORY_SEPARATOR, $dirs));
+                $dir = $this->dirService->addEndSlash(implode(DIRECTORY_SEPARATOR, $dirs));
                 $this->delete($dir, $lastDir);
             }
 
@@ -267,7 +267,7 @@ class FileService
         }
     }
 
-    public function getDir(string $path, string $directorySeparator = DIRECTORY_SEPARATOR): string
+    public function getDirService(string $path, string $directorySeparator = DIRECTORY_SEPARATOR): string
     {
         if (mb_strrpos($path, $directorySeparator) === false) {
             return '';

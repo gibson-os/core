@@ -17,11 +17,11 @@ class UserService
     private const PASSWORD_MIN_LENGTH = 6;
 
     public function __construct(
-        private EnvService $envService,
-        private UserRepository $userRepository,
-        private DeviceRepository $deviceRepository,
-        private SessionService $sessionService,
-        private ModelManager $modelManager
+        private readonly EnvService $envService,
+        private readonly UserRepository $userRepository,
+        private readonly DeviceRepository $deviceRepository,
+        private readonly SessionService $sessionService,
+        private readonly ModelManager $modelManager,
     ) {
     }
 

@@ -17,7 +17,7 @@ class WebService
 
     private const METHOD_HEAD = 'HEAD';
 
-    public function __construct(private LoggerInterface $logger)
+    public function __construct(private readonly LoggerInterface $logger)
     {
     }
 

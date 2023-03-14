@@ -12,8 +12,8 @@ class DateTimeService
 
     public function __construct(
         #[GetEnv('timezone')] ?string $timezone,
-        #[GetEnv('date_latitude')] private ?float $latitude,
-        #[GetEnv('date_longitude')] private ?float $longitude
+        #[GetEnv('date_latitude')] private readonly ?float $latitude,
+        #[GetEnv('date_longitude')] private readonly ?float $longitude,
     ) {
         $this->timezone = $timezone === null ? null : new \DateTimeZone($timezone);
     }

@@ -21,13 +21,13 @@ use GibsonOS\Core\Utility\JsonUtility;
 class WeatherService
 {
     public function __construct(
-        private WebService $webService,
-        private EnvService $envService,
-        private WeatherMapper $weatherMapper,
-        private DateTimeService $dateTimeService,
-        private EventService $eventService,
-        private WeatherRepository $weatherRepository,
-        private ModelManager $modelManager
+        private readonly WebService $webService,
+        private readonly EnvService $envService,
+        private readonly WeatherMapper $weatherMapper,
+        private readonly DateTimeService $dateTimeService,
+        private readonly EventService $eventService,
+        private readonly WeatherRepository $weatherRepository,
+        private readonly ModelManager $modelManager,
     ) {
     }
 

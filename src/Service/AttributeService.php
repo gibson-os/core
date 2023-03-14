@@ -13,8 +13,8 @@ use GibsonOS\Core\Service\Attribute\AttributeServiceInterface;
 class AttributeService
 {
     public function __construct(
-        private ServiceManager $serviceManagerService,
-        private ReflectionManager $reflectionManager
+        private readonly ServiceManager $serviceManagerService,
+        private readonly ReflectionManager $reflectionManager,
     ) {
     }
 

@@ -10,7 +10,7 @@ class SqLiteService
 {
     private \SQLite3 $database;
 
-    public function __construct(private string $filename, private FileService $file)
+    public function __construct(private readonly string $filename, private readonly FileService $fileService)
     {
         $this->database = new \SQLite3($this->filename);
     }
@@ -117,7 +117,7 @@ class SqLiteService
 
     public function isWritable(): bool
     {
-        if (!is_writable($this->file->getDir($this->filename))) {
+        if (!is_writable($this->fileService->getDirService($this->filename))) {
             return false;
         }
 

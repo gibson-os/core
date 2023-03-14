@@ -15,10 +15,10 @@ use Psr\Log\LoggerInterface;
 class CronjobService
 {
     public function __construct(
-        private ModelManager $modelManager,
-        private CronjobRepository $cronjobRepository,
-        private CommandService $commandService,
-        private LoggerInterface $logger
+        private readonly ModelManager $modelManager,
+        private readonly CronjobRepository $cronjobRepository,
+        private readonly CommandService $commandService,
+        private readonly LoggerInterface $logger,
     ) {
     }
 

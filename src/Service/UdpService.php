@@ -16,16 +16,13 @@ class UdpService
 
     private const CREATE_RETRY_SLEEP_MS = 10000;
 
-    /**
-     * @var \Socket
-     */
-    private $socket;
+    private readonly \Socket $socket;
 
     /**
      * @throws CreateError
      * @throws SetError
      */
-    public function __construct(private LoggerInterface $logger, string $ip, int $port)
+    public function __construct(private readonly LoggerInterface $logger, string $ip, int $port)
     {
         $socket = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP);
 

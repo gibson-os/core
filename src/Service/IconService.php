@@ -19,13 +19,13 @@ use JsonException;
 
 class IconService
 {
-    private string $iconPath;
+    private readonly string $iconPath;
 
     public function __construct(
-        private TagRepository $tagRepository,
-        private FileService $fileService,
-        private ModelManager $modelManager,
-        #[GetSetting('custom_icon_path', 'core')] Setting $customIconPath
+        private readonly TagRepository $tagRepository,
+        private readonly FileService $fileService,
+        private readonly ModelManager $modelManager,
+        #[GetSetting('custom_icon_path', 'core')] Setting $customIconPath,
     ) {
         $this->iconPath = $customIconPath->getValue();
     }

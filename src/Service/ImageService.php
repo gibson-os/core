@@ -12,7 +12,7 @@ use GibsonOS\Core\Exception\Image\LoadError;
 
 class ImageService
 {
-    public function __construct(private FileService $file)
+    public function __construct(private readonly FileService $fileService)
     {
     }
 
@@ -84,7 +84,7 @@ class ImageService
 
         if (
             $type != 'string' &&
-            !$this->file->exists($filename)
+            !$this->fileService->exists($filename)
         ) {
             throw new FileNotFound(sprintf('Bild %s existiert nicht!', $filename));
         }
@@ -186,9 +186,9 @@ class ImageService
         }
 
         try {
-            $this->file->delete(
-                $this->file->getDir($image->getFilename()),
-                $this->file->getFilename($image->getFilename())
+            $this->fileService->delete(
+                $this->fileService->getDirService($image->getFilename()),
+                $this->fileService->getFilename($image->getFilename())
             );
         } catch (FileNotFound) {
         }

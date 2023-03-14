@@ -35,7 +35,7 @@ class EventService
         private readonly ReflectionManager $reflectionManager,
         private readonly ModelManager $modelManager,
         private readonly ProcessService $processService,
-        private readonly LoggerInterface $logger
+        private readonly LoggerInterface $logger,
     ) {
     }
 

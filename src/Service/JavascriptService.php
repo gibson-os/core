@@ -13,10 +13,9 @@ class JavascriptService
     private string $vendorPath;
 
     public function __construct(
-        private PermissionViewRepository $permissionViewRepository,
-        private DirService $dirService,
-        private FileService $fileService,
-        private PermissionService $permissionService
+        private readonly PermissionViewRepository $permissionViewRepository,
+        private readonly DirService $dirService,
+        private readonly FileService $fileService,
     ) {
         $this->vendorPath = realpath(
             dirname(__FILE__) . DIRECTORY_SEPARATOR .
