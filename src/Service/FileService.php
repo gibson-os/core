@@ -209,7 +209,7 @@ class FileService
             return false;
         }
 
-        return is_writable($this->getDirService($path));
+        return is_writable($this->getDir($path));
     }
 
     /**
@@ -267,7 +267,7 @@ class FileService
         }
     }
 
-    public function getDirService(string $path, string $directorySeparator = DIRECTORY_SEPARATOR): string
+    public function getDir(string $path, string $directorySeparator = DIRECTORY_SEPARATOR): string
     {
         if (mb_strrpos($path, $directorySeparator) === false) {
             return '';

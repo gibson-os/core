@@ -117,7 +117,7 @@ class SqLiteService
 
     public function isWritable(): bool
     {
-        if (!is_writable($this->fileService->getDirService($this->filename))) {
+        if (!is_writable($this->fileService->getDir($this->filename))) {
             return false;
         }
 

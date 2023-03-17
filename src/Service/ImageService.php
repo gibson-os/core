@@ -187,7 +187,7 @@ class ImageService
 
         try {
             $this->fileService->delete(
-                $this->fileService->getDirService($image->getFilename()),
+                $this->fileService->getDir($image->getFilename()),
                 $this->fileService->getFilename($image->getFilename())
             );
         } catch (FileNotFound) {
