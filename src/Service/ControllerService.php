@@ -137,10 +137,15 @@ class ControllerService
     private function renderTemplate(): TwigResponse
     {
         if ($this->chromecastReceiverAppId->getId() === null) {
-            $response = $this->middlewareService->send('chromecast', 'getReceiverAppId');
-            $this->chromecastReceiverAppId
-                ->setValue(JsonUtility::decode($response->getBody()->getContent())['data'])
-            ;
+            try {
+                $response = $this->middlewareService->send('chromecast', 'getReceiverAppId');
+                $this->chromecastReceiverAppId
+                    ->setValue(JsonUtility::decode($response->getBody()->getContent())['data'])
+                ;
+            } catch (\InvalidArgumentException) {
+                $this->chromecastReceiverAppId->setValue('');
+            }
+
             $this->modelManager->saveWithoutChildren($this->chromecastReceiverAppId);
         }
 

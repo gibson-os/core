@@ -5,6 +5,7 @@ namespace GibsonOS\Core\Service\Attribute;
 
 use GibsonOS\Core\Attribute\AttributeInterface;
 use GibsonOS\Core\Attribute\GetEnv;
+use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Service\EnvService;
 
 class EnvAttribute implements ParameterAttributeInterface, AttributeServiceInterface
@@ -24,7 +25,15 @@ class EnvAttribute implements ParameterAttributeInterface, AttributeServiceInter
         if ($reflectionParameterType instanceof \ReflectionNamedType) {
             $parameterType = ucfirst($reflectionParameterType->getName());
 
-            return $this->envService->{'get' . $parameterType}($attribute->getKey());
+            try {
+                return $this->envService->{'get' . $parameterType}($attribute->getKey());
+            } catch (GetError $exception) {
+                if ($reflectionParameterType->allowsNull()) {
+                    return null;
+                }
+
+                throw $exception;
+            }
         }
 
         return null;

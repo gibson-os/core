@@ -15,28 +15,38 @@ use GibsonOS\Core\Exception\WebException;
 use GibsonOS\Core\Manager\ModelManager;
 use GibsonOS\Core\Model\Setting;
 use GibsonOS\Core\Repository\ModuleRepository;
-use GibsonOS\Core\Utility\JsonUtility;
+use GibsonOS\Core\Repository\SettingRepository;
 use GibsonOS\Core\Utility\StatusCode;
 
 class MiddlewareService
 {
-    private readonly Setting $middlewareToken;
+    private Setting $middlewareToken;
+
+    private readonly Setting $middlewareSecret;
 
     /**
      * @throws SelectError
      */
     public function __construct(
-        #[GetEnv('MIDDLEWARE_URL')] private readonly string $middlewareUrl,
+        #[GetEnv('MIDDLEWARE_URL')] private readonly ?string $middlewareUrl,
         #[GetEnv('WEB_URL')] private readonly string $webUrl,
         private readonly WebService $webService,
         private readonly ModelManager $modelManager,
+        private readonly SettingRepository $settingRepository,
         ModuleRepository $moduleRepository,
         #[GetSetting('middlewareToken', 'core')] Setting $middlewareToken = null,
+        #[GetSetting('middlewareSecret', 'core')] Setting $middlewareSecret = null,
     ) {
+        $module = $moduleRepository->getByName('core');
         $this->middlewareToken = $middlewareToken
             ?? (new Setting())
-                ->setModule($moduleRepository->getByName('core'))
+                ->setModule($module)
                 ->setKey('middlewareToken')
+        ;
+        $this->middlewareSecret = $middlewareSecret
+            ?? (new Setting())
+                ->setModule($module)
+                ->setKey('middlewareSecret')
         ;
     }
 
@@ -48,6 +58,10 @@ class MiddlewareService
      */
     public function send(string $task, string $action, array $parameters = [], string $body = null): Response
     {
+        if ($this->middlewareUrl === null) {
+            throw new \InvalidArgumentException('Middleware URL not set');
+        }
+
         if ($this->middlewareToken->getId() === null) {
             $this->getNewToken();
         }
@@ -83,6 +97,10 @@ class MiddlewareService
         return $this->checkResponse($request, $response);
     }
 
+    /**
+     * @throws MiddlewareException
+     * @throws WebException
+     */
     private function checkResponse(Request $request, Response $response): Response
     {
         $statusCode = $response->getStatusCode();
@@ -107,27 +125,34 @@ class MiddlewareService
      */
     private function getNewToken(): void
     {
+        if ($this->middlewareUrl === null) {
+            throw new \InvalidArgumentException('Middleware URL not set');
+        }
+
+        $this->modelManager->saveWithoutChildren(
+            $this->middlewareSecret->setValue(mb_substr(base64_encode(random_bytes(190)), 0, 256))
+        );
         $response = $this->webService->post(
             (new Request(sprintf('%smiddleware/instance/newToken', $this->middlewareUrl)))
-                ->setParameters(['url' => $this->webUrl])
+                ->setParameters([
+                    'url' => $this->webUrl,
+                    'secret' => $this->middlewareSecret->getValue(),
+                ])
                 ->setHeaders(['X-Requested-With' => 'XMLHttpRequest'])
         );
-
-        try {
-            $content = $response->getBody()->getContent();
-        } catch (WebException) {
-            $content = '';
-        }
 
         if ($response->getStatusCode() !== StatusCode::OK) {
             throw new MiddlewareException(sprintf(
                 'Response error. Code %d. Response: %s',
                 $response->getStatusCode(),
-                $content,
+                $response->getBody()->getContent(),
             ));
         }
 
-        $instance = JsonUtility::decode($content)['data'];
-        $this->modelManager->saveWithoutChildren($this->middlewareToken->setValue($instance['token']));
+        $this->middlewareToken = $this->settingRepository->getByKeyAndModuleName(
+            'core',
+            null,
+            'middlewareToken'
+        );
     }
 }

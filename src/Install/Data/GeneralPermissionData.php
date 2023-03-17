@@ -41,6 +41,17 @@ class GeneralPermissionData extends AbstractInstall implements PriorityInterface
             );
         }
 
+        try {
+            $this->permissionRepository->getByModuleAndTask('core', 'middleware');
+        } catch (SelectError) {
+            $this->modelManager->save(
+                (new Permission())
+                    ->setModule('core')
+                    ->setTask('middleware')
+                    ->setPermission(Permission::READ + Permission::WRITE)
+            );
+        }
+
         yield new Success('Set general permission for core!');
     }
 
