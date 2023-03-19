@@ -1,12 +1,12 @@
 <?php
 declare(strict_types=1);
 
-namespace GibsonOS\UnitTest\AutoComplete;
+namespace GibsonOS\Test\Unit\Core\AutoComplete;
 
 use GibsonOS\Core\AutoComplete\AutoCompleteInterface;
-use GibsonOS\UnitTest\AbstractTest;
+use GibsonOS\Test\Unit\Core\UnitTest;
 
-abstract class AbstractAutoCompleteTest extends AbstractTest
+abstract class UnitAutoCompleteTest extends UnitTest
 {
     protected AutoCompleteInterface $autoComplete;
 

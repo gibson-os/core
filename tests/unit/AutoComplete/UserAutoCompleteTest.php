@@ -1,14 +1,14 @@
 <?php
 declare(strict_types=1);
 
-namespace GibsonOS\UnitTest\AutoComplete;
+namespace GibsonOS\Test\Unit\Core\AutoComplete;
 
 use GibsonOS\Core\AutoComplete\UserAutoComplete;
 use GibsonOS\Core\Model\User;
 use GibsonOS\Core\Repository\UserRepository;
 use Prophecy\Prophecy\ObjectProphecy;
 
-class UserAutoCompleteTest extends AbstractAutoCompleteTest
+class UserAutoCompleteTest extends UnitAutoCompleteTest
 {
     private UserRepository|ObjectProphecy $userRepository;
 

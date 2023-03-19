@@ -1,16 +1,16 @@
 <?php
 declare(strict_types=1);
 
-namespace GibsonOS\UnitTest\Event;
+namespace GibsonOS\Test\Unit\Core\Event;
 
 use GibsonOS\Core\Event\WeatherEvent;
 use GibsonOS\Core\Model\Weather;
 use GibsonOS\Core\Model\Weather\Location;
 use GibsonOS\Core\Repository\WeatherRepository;
-use GibsonOS\UnitTest\AbstractTest;
+use GibsonOS\Test\Unit\Core\UnitTest;
 use Prophecy\Prophecy\ObjectProphecy;
 
-class WeatherEventTest extends AbstractTest
+class WeatherEventTest extends UnitTest
 {
     private WeatherRepository|ObjectProphecy $weatherRepository;
 

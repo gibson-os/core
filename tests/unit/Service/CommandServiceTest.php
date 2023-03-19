@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace GibsonOS\UnitTest\Service;
+namespace GibsonOS\Test\Unit\Core\Service;
 
 use GibsonOS\Core\Command\InstallCommand;
 use GibsonOS\Core\Dto\Command;
@@ -14,10 +14,10 @@ use GibsonOS\Core\Store\CommandStore;
 use GibsonOS\Mock\Service\TestCommand;
 use GibsonOS\Mock\Service\TestInvalidOptionCommand;
 use GibsonOS\Mock\Service\TestRequiresArgumentCommand;
-use GibsonOS\UnitTest\AbstractTest;
+use GibsonOS\Test\Unit\Core\UnitTest;
 use Prophecy\Prophecy\ObjectProphecy;
 
-class CommandServiceTest extends AbstractTest
+class CommandServiceTest extends UnitTest
 {
     private ProcessService|ObjectProphecy $processService;
 

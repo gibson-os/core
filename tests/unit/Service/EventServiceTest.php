@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace GibsonOS\UnitTest\Service;
+namespace GibsonOS\Test\Unit\Core\Service;
 
 use GibsonOS\Core\Manager\ModelManager;
 use GibsonOS\Core\Manager\ReflectionManager;
@@ -14,13 +14,13 @@ use GibsonOS\Core\Service\Event\ElementService;
 use GibsonOS\Core\Service\EventService;
 use GibsonOS\Core\Service\ProcessService;
 use GibsonOS\Mock\Service\TestEvent;
-use GibsonOS\UnitTest\AbstractTest;
+use GibsonOS\Test\Unit\Core\UnitTest;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Log\LoggerInterface;
 
-class EventServiceTest extends AbstractTest
+class EventServiceTest extends UnitTest
 {
     use ProphecyTrait;
 

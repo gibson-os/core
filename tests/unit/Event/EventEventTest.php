@@ -1,16 +1,16 @@
 <?php
 declare(strict_types=1);
 
-namespace GibsonOS\UnitTest\Event;
+namespace GibsonOS\Test\Unit\Core\Event;
 
 use GibsonOS\Core\Event\EventEvent;
 use GibsonOS\Core\Model\Event;
 use GibsonOS\Core\Service\EventService;
-use GibsonOS\UnitTest\AbstractTest;
+use GibsonOS\Test\Unit\Core\UnitTest;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 
-class EventEventTest extends AbstractTest
+class EventEventTest extends UnitTest
 {
     private EventService|ObjectProphecy $eventService;
 

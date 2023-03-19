@@ -88,7 +88,7 @@ class EnvService
     public function loadFile(string $filename): EnvService
     {
         $file = file_get_contents($filename);
-        $rows = explode(PHP_EOL, $file);
+        $rows = preg_split('/\r\n|\r|\n/', $file);
 
         foreach ($rows as $row) {
             if (mb_strpos($row, '#') === 0 || empty($row)) {

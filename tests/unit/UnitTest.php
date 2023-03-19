@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace GibsonOS\UnitTest;
+namespace GibsonOS\Test\Unit\Core;
 
 use Codeception\Test\Unit;
 use GibsonOS\Core\Exception\RequestError;
@@ -17,7 +17,7 @@ use Prophecy\Promise\ReturnPromise;
 use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Log\LoggerInterface;
 
-class AbstractTest extends Unit
+abstract class UnitTest extends Unit
 {
     use ProphecyTrait;
 

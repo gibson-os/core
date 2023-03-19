@@ -148,35 +148,35 @@ class ServiceManager
     {
         $dirService = $this->get(DirService::class);
         $pathParts = explode(DIRECTORY_SEPARATOR, $dirService->removeEndSlash($path));
-        $namespace = '';
 
-        if (is_file($path)) {
-            $namespace = str_replace('.php', '', array_pop($pathParts));
+        if (!is_file($path)) {
+            throw new FactoryError(sprintf('"%s" is no file!', $path));
         }
 
-        $previousPart = null;
+        $handle = fopen($path, 'r');
 
-        while ($lastPart = array_pop($pathParts)) {
-            if ($lastPart === 'gibson-os') {
-                break;
-            }
+        if (!is_resource($handle)) {
+            throw new FactoryError(sprintf('"%s" can not be opened!', $path));
+        }
 
-            if ($lastPart === 'src') {
+        while (is_resource($handle) && ($line = fgets($handle)) !== false) {
+            if (!preg_match('/((?<!#)\s|^)namespace\s+(.*);/', $line, $hits)) {
                 continue;
             }
 
-            $namespace = ucfirst($lastPart) . '\\' . $namespace;
-            $previousPart = $lastPart;
+            fclose($handle);
+
+            /** @var class-string $className */
+            $className = $hits[2] . '\\' . str_replace('.php', '', array_pop($pathParts));
+
+            return $className;
         }
 
-        if ($previousPart !== 'core') {
-            $namespace = 'Module\\' . $namespace;
+        if (is_resource($handle)) {
+            fclose($handle);
         }
 
-        /** @var class-string $namespace */
-        $namespace = 'GibsonOS\\' . $namespace;
-
-        return $namespace;
+        throw new FactoryError(sprintf('"%s" namespace not found!', $path));
     }
 
     /**

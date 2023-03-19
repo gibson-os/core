@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace GibsonOS\UnitTest\Mapper;
+namespace GibsonOS\Test\Unit\Core\Mapper;
 
 use GibsonOS\Core\Exception\FactoryError;
 use GibsonOS\Core\Manager\ReflectionManager;
@@ -11,13 +11,9 @@ use GibsonOS\Mock\Dto\Mapper\IntEnum;
 use GibsonOS\Mock\Dto\Mapper\MapObject;
 use GibsonOS\Mock\Dto\Mapper\MapObjectChild;
 use GibsonOS\Mock\Dto\Mapper\MapObjectParent;
-use GibsonOS\UnitTest\AbstractTest;
-use JsonException;
-use ReflectionException;
-use Throwable;
-use ValueError;
+use GibsonOS\Test\Unit\Core\UnitTest;
 
-class ObjectMapperTest extends AbstractTest
+class ObjectMapperTest extends UnitTest
 {
     private ObjectMapper $objectMapper;
 
@@ -35,13 +31,13 @@ class ObjectMapperTest extends AbstractTest
     /**
      * @dataProvider getTestData
      *
-     * @throws JsonException
+     * @throws \JsonException
      */
     public function testMapToObject(array $properties, string $exception = null): void
     {
         try {
             $object = $this->objectMapper->mapToObject(MapObject::class, $properties);
-        } catch (Throwable $e) {
+        } catch (\Throwable $e) {
             if ($exception !== $e::class) {
                 throw $e;
             }
@@ -121,7 +117,7 @@ class ObjectMapperTest extends AbstractTest
                     'intValue' => 1,
                     'childObjects' => '{"stringValue": "Marvin"}',
                 ],
-                ReflectionException::class,
+                \ReflectionException::class,
             ],
             'only defaults with corrupt child' => [
                 [
@@ -129,7 +125,7 @@ class ObjectMapperTest extends AbstractTest
                     'intValue' => 1,
                     'childObjects' => ['stringValue' => 'Marvin'],
                 ],
-                ReflectionException::class,
+                \ReflectionException::class,
             ],
             'all values' => [
                 [
@@ -171,9 +167,9 @@ class ObjectMapperTest extends AbstractTest
                 ],
             ],
             'with non object value' => [['stringEnumValue' => 'ja', 'intValue' => 1, 'foo' => 'bar']],
-            'with missing value' => [['stringEnumValue' => 'ja'], ReflectionException::class],
-            'with wrong enum value' => [['stringEnumValue' => 'Trilian', 'intValue' => 1], ValueError::class],
-            'with wrong enum type' => [['stringEnumValue' => ['ja'], 'intValue' => 1], ReflectionException::class],
+            'with missing value' => [['stringEnumValue' => 'ja'], \ReflectionException::class],
+            'with wrong enum value' => [['stringEnumValue' => 'Trilian', 'intValue' => 1], \ValueError::class],
+            'with wrong enum type' => [['stringEnumValue' => ['ja'], 'intValue' => 1], \ReflectionException::class],
             'with int value as string' => [['stringEnumValue' => 'ja', 'intValue' => '1']],
             'with int enum value as string' => [
                 [

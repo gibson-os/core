@@ -14,6 +14,8 @@ class CronjobController extends AbstractController
 {
     /**
      * @throws SelectError
+     * @throws \JsonException
+     * @throws \ReflectionException
      */
     #[CheckPermission(Permission::READ)]
     public function index(CronjobStore $cronjobStore, int $limit = 100, int $start = 0, array $sort = []): AjaxResponse
@@ -26,6 +28,8 @@ class CronjobController extends AbstractController
 
     /**
      * @throws SelectError
+     * @throws \JsonException
+     * @throws \ReflectionException
      */
     #[CheckPermission(Permission::READ)]
     public function times(TimeStore $timeStore): AjaxResponse

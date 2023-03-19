@@ -1,14 +1,14 @@
 <?php
 declare(strict_types=1);
 
-namespace GibsonOS\UnitTest\Event;
+namespace GibsonOS\Test\Unit\Core\Event;
 
 use GibsonOS\Core\Event\NetworkEvent;
 use GibsonOS\Core\Service\NetworkService;
-use GibsonOS\UnitTest\AbstractTest;
+use GibsonOS\Test\Unit\Core\UnitTest;
 use Prophecy\Prophecy\ObjectProphecy;
 
-class NetworkEventTest extends AbstractTest
+class NetworkEventTest extends UnitTest
 {
     private NetworkService|ObjectProphecy $networkService;
 

@@ -1,12 +1,12 @@
 <?php
 declare(strict_types=1);
 
-namespace GibsonOS\UnitTest\Service\Command;
+namespace GibsonOS\Test\Unit\Core\Service\Command;
 
 use GibsonOS\Core\Service\Command\TableService;
-use GibsonOS\UnitTest\AbstractTest;
+use GibsonOS\Test\Unit\Core\UnitTest;
 
-class TableServiceTest extends AbstractTest
+class TableServiceTest extends UnitTest
 {
     private TableService $tableService;
 

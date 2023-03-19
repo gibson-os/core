@@ -33,7 +33,8 @@
     "psr-4": {
       "GibsonOS\\Core\\": "src/",
       "GibsonOS\\Mock\\": "tests/mock/",
-      "GibsonOS\\UnitTest\\": "tests/unit/"
+      "GibsonOS\\Test\\Unit\\Core\\": "tests/unit/",
+      "GibsonOS\\Test\\Functional\\Core\\": "tests/functional/"
     }
   },
   "scripts": {
@@ -51,6 +52,7 @@
     "php:psalm": "php ./vendor/vimeo/psalm/psalm",
     "php:md": "php ./vendor/phpmd/phpmd/src/bin/phpmd src text ruleset.xml",
     "php:unit:run": "php ./vendor/codeception/codeception/codecept run unit --ext DotReporter",
+    "php:functional:run": "php ./vendor/codeception/codeception/codecept run functional --ext DotReporter",
     "php:unit:push": "php ./vendor/codeception/codeception/codecept run unit --ext DotReporter --no-ansi --no-colors",
     "php:unit:add": "php ./vendor/codeception/codeception/codecept generate:test unit"
   },

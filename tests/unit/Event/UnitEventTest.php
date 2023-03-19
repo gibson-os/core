@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace GibsonOS\UnitTest\Event;
+namespace GibsonOS\Test\Unit\Core\Event;
 
 use GibsonOS\Core\Exception\EventException;
 use GibsonOS\Core\Manager\ReflectionManager;
@@ -9,9 +9,9 @@ use GibsonOS\Core\Model\Event;
 use GibsonOS\Core\Model\Event\Element;
 use GibsonOS\Core\Service\EventService;
 use GibsonOS\Mock\Service\TestEvent;
-use GibsonOS\UnitTest\AbstractTest;
+use GibsonOS\Test\Unit\Core\UnitTest;
 
-class AbstractEventTest extends AbstractTest
+class UnitEventTest extends UnitTest
 {
     private TestEvent $testEvent;
 

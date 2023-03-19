@@ -1,15 +1,15 @@
 <?php
 declare(strict_types=1);
 
-namespace GibsonOS\UnitTest\Archive;
+namespace GibsonOS\Test\Unit\Core\Archive;
 
 use GibsonOS\Core\Archive\ZipArchive;
 use GibsonOS\Core\Exception\ArchiveException;
-use GibsonOS\UnitTest\AbstractTest;
+use GibsonOS\Test\Unit\Core\UnitTest;
 use Prophecy\Prophecy\ObjectProphecy;
 use ZipArchive as StandardZipArchive;
 
-class ZipArchiveTest extends AbstractTest
+class ZipArchiveTest extends UnitTest
 {
     private StandardZipArchive|ObjectProphecy $zipArchive;
 

@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace GibsonOS\UnitTest\Service;
+namespace GibsonOS\Test\Unit\Core\Service;
 
 use Codeception\Test\Unit;
 use GibsonOS\Core\Exception\GetError;

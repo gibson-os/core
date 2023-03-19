@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace GibsonOS\UnitTest\Mapper;
+namespace GibsonOS\Test\Unit\Core\Mapper;
 
 use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Mapper\ModelMapper;
@@ -10,9 +10,9 @@ use GibsonOS\Mock\Dto\Mapper\IntEnum;
 use GibsonOS\Mock\Dto\Mapper\MapModel;
 use GibsonOS\Mock\Dto\Mapper\MapModelChild;
 use GibsonOS\Mock\Dto\Mapper\MapModelParent;
-use GibsonOS\UnitTest\AbstractTest;
+use GibsonOS\Test\Unit\Core\UnitTest;
 
-class ModelMapperTest extends AbstractTest
+class ModelMapperTest extends UnitTest
 {
     private ModelMapper $modelMapper;
 

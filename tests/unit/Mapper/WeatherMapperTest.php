@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace GibsonOS\UnitTest\Mapper;
+namespace GibsonOS\Test\Unit\Core\Mapper;
 
 class WeatherMapperTest
 {

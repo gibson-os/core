@@ -1,14 +1,14 @@
 <?php
 declare(strict_types=1);
 
-namespace GibsonOS\UnitTest\Event;
+namespace GibsonOS\Test\Unit\Core\Event;
 
 use GibsonOS\Core\Event\TimeEvent;
 use GibsonOS\Core\Service\DateTimeService;
-use GibsonOS\UnitTest\AbstractTest;
+use GibsonOS\Test\Unit\Core\UnitTest;
 use Prophecy\Prophecy\ObjectProphecy;
 
-class TimeEventTest extends AbstractTest
+class TimeEventTest extends UnitTest
 {
     private DateTimeService|ObjectProphecy $dateTimeService;
 

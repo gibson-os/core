@@ -1,16 +1,15 @@
 <?php
 declare(strict_types=1);
 
-namespace GibsonOS\UnitTest\Service\Attribute;
+namespace GibsonOS\Test\Unit\Core\Service\Attribute;
 
 use GibsonOS\Core\Attribute\GetObject;
 use GibsonOS\Core\Service\Attribute\ObjectMapperAttribute;
 use GibsonOS\Mock\Dto\Mapper\MapObject;
 use GibsonOS\Mock\Dto\Mapper\StringEnum;
-use GibsonOS\UnitTest\AbstractTest;
-use ReflectionFunction;
+use GibsonOS\Test\Unit\Core\UnitTest;
 
-class ObjectMapperAttributeTest extends AbstractTest
+class ObjectMapperAttributeTest extends UnitTest
 {
     private ObjectMapperAttribute $objectMapperAttribute;
 
@@ -28,7 +27,7 @@ class ObjectMapperAttributeTest extends AbstractTest
         callable $function,
         ?MapObject $return
     ): void {
-        $reflectionFunction = new ReflectionFunction($function);
+        $reflectionFunction = new \ReflectionFunction($function);
 
         $this->assertEquals(
             $return,

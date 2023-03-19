@@ -80,6 +80,7 @@ class TableInstall extends AbstractInstall implements PriorityInterface
      * @throws GetError
      * @throws \ReflectionException
      * @throws InstallException
+     * @throws \JsonException
      */
     public function install(string $module): \Generator
     {

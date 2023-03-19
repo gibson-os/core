@@ -1,14 +1,14 @@
 <?php
 declare(strict_types=1);
 
-namespace GibsonOS\UnitTest\AutoComplete;
+namespace GibsonOS\Test\Unit\Core\AutoComplete;
 
 use GibsonOS\Core\AutoComplete\ActionAutoComplete;
 use GibsonOS\Core\Model\Action;
 use GibsonOS\Core\Repository\ActionRepository;
 use Prophecy\Prophecy\ObjectProphecy;
 
-class ActionAutoCompleteTest extends AbstractAutoCompleteTest
+class ActionAutoCompleteTest extends UnitAutoCompleteTest
 {
     private ActionRepository|ObjectProphecy $actionRepository;
 

@@ -1,14 +1,14 @@
 <?php
 declare(strict_types=1);
 
-namespace GibsonOS\UnitTest\AutoComplete;
+namespace GibsonOS\Test\Unit\Core\AutoComplete;
 
 use GibsonOS\Core\AutoComplete\EventAutoComplete;
 use GibsonOS\Core\Model\Event;
 use GibsonOS\Core\Repository\EventRepository;
 use Prophecy\Prophecy\ObjectProphecy;
 
-class EventAutoCompleteTest extends AbstractAutoCompleteTest
+class EventAutoCompleteTest extends UnitAutoCompleteTest
 {
     private EventRepository|ObjectProphecy $eventRepository;
 

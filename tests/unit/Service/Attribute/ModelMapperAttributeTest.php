@@ -1,16 +1,15 @@
 <?php
 declare(strict_types=1);
 
-namespace GibsonOS\UnitTest\Service\Attribute;
+namespace GibsonOS\Test\Unit\Core\Service\Attribute;
 
 use GibsonOS\Core\Attribute\GetMappedModel;
 use GibsonOS\Core\Service\Attribute\ModelMapperAttribute;
 use GibsonOS\Mock\Dto\Mapper\MapModel;
 use GibsonOS\Mock\Dto\Mapper\StringEnum;
-use GibsonOS\UnitTest\AbstractTest;
-use ReflectionFunction;
+use GibsonOS\Test\Unit\Core\UnitTest;
 
-class ModelMapperAttributeTest extends AbstractTest
+class ModelMapperAttributeTest extends UnitTest
 {
     private ModelMapperAttribute $modelMapperAttribute;
 
@@ -32,7 +31,7 @@ class ModelMapperAttributeTest extends AbstractTest
         callable $function,
         ?MapModel $return
     ): void {
-        $reflectionFunction = new ReflectionFunction($function);
+        $reflectionFunction = new \ReflectionFunction($function);
 
         foreach ($parameters as $key => $value) {
             $this->requestService->getRequestValue($key)

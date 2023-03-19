@@ -21,4 +21,9 @@ class CronjobStore extends AbstractDatabaseStore
             'active' => 'active',
         ];
     }
+
+    protected function getDefaultOrder(): string
+    {
+        return '`command`';
+    }
 }

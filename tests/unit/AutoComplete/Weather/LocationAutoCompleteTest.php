@@ -1,15 +1,15 @@
 <?php
 declare(strict_types=1);
 
-namespace GibsonOS\UnitTest\AutoComplete\Weather;
+namespace GibsonOS\Test\Unit\Core\AutoComplete\Weather;
 
 use GibsonOS\Core\AutoComplete\Weather\LocationAutoComplete;
 use GibsonOS\Core\Model\Weather\Location;
 use GibsonOS\Core\Repository\Weather\LocationRepository;
-use GibsonOS\UnitTest\AutoComplete\AbstractAutoCompleteTest;
+use GibsonOS\Test\Unit\Core\AutoComplete\UnitAutoCompleteTest;
 use Prophecy\Prophecy\ObjectProphecy;
 
-class LocationAutoCompleteTest extends AbstractAutoCompleteTest
+class LocationAutoCompleteTest extends UnitAutoCompleteTest
 {
     private LocationRepository|ObjectProphecy $locationRepository;
 

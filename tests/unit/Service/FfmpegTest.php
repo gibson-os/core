@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace GibsonOS\UnitTest\Service;
+namespace GibsonOS\Test\Unit\Core\Service;
 
 use GibsonOS\Core\Dto\Ffmpeg\Media;
 use GibsonOS\Core\Dto\Image as ImageDto;
@@ -14,12 +14,12 @@ use GibsonOS\Core\Service\FileService;
 use GibsonOS\Core\Service\ImageService;
 use GibsonOS\Core\Service\ProcessService;
 use GibsonOS\Mock\Dto\Ffmpeg\Media as MediaMock;
-use GibsonOS\UnitTest\AbstractTest;
+use GibsonOS\Test\Unit\Core\UnitTest;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 
-class FfmpegTest extends AbstractTest
+class FfmpegTest extends UnitTest
 {
     use ProphecyTrait;
 
