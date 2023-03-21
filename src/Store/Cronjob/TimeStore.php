@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Store\Cronjob;
 
+use GibsonOS\Core\Model\Cronjob;
 use GibsonOS\Core\Model\Cronjob\Time;
 use GibsonOS\Core\Store\AbstractDatabaseStore;
 
@@ -18,7 +19,7 @@ class TimeStore extends AbstractDatabaseStore
         'second',
     ];
 
-    private ?int $cronjobId = null;
+    private ?Cronjob $cronjob = null;
 
     protected function getModelClassName(): string
     {
@@ -27,8 +28,8 @@ class TimeStore extends AbstractDatabaseStore
 
     protected function setWheres(): void
     {
-        if ($this->cronjobId !== null) {
-            $this->addWhere('`cronjob_d`=?', [$this->cronjobId]);
+        if ($this->cronjob !== null) {
+            $this->addWhere('`cronjob_d`=?', [$this->cronjob->getId() ?? 0]);
         }
     }
 
@@ -50,9 +51,9 @@ class TimeStore extends AbstractDatabaseStore
         return $this->group($this->table->connection->fetchAssocList());
     }
 
-    public function setCronjobId(?int $cronjobId): TimeStore
+    public function setCronjob(?Cronjob $cronjob): TimeStore
     {
-        $this->cronjobId = $cronjobId;
+        $this->cronjob = $cronjob;
 
         return $this;
     }

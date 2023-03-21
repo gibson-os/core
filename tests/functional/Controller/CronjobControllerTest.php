@@ -6,6 +6,8 @@ namespace GibsonOS\Test\Functional\Core\Controller;
 use GibsonOS\Core\Controller\CronjobController;
 use GibsonOS\Core\Manager\ModelManager;
 use GibsonOS\Core\Model\Cronjob;
+use GibsonOS\Core\Model\Cronjob\Time;
+use GibsonOS\Core\Store\Cronjob\TimeStore;
 use GibsonOS\Core\Store\CronjobStore;
 use GibsonOS\Test\Functional\Core\FunctionalTest;
 
@@ -249,14 +251,56 @@ class CronjobControllerTest extends FunctionalTest
             array_values($list),
             5,
         );
-//        krsort($list);
-//        $this->checkAjaxResponse(
-//            $this->cronjobController->index(
-//                $this->serviceManager->get(CronjobStore::class),
-//                sort: [['property' => 'active', 'direction' => 'desc']],
-//            ),
-//            array_values($list),
-//            5,
-//        );
+
+        $response = $this->cronjobController->index(
+            $this->serviceManager->get(CronjobStore::class),
+            sort: [['property' => 'active', 'direction' => 'desc']],
+        );
+        $body = json_decode($response->getBody(), true);
+        $this->assertTrue($body['success']);
+        $this->assertFalse($body['failure']);
+        $this->assertEquals(5, $body['total']);
+
+        foreach ($body['data'] as $item) {
+            $position = array_search($item, $list);
+
+            if ($position === false) {
+                $this->assertTrue(false, sprintf('%s not found', json_encode($item)));
+
+                continue;
+            }
+
+            unset($list[$position]);
+        }
+
+        $this->assertEquals(0, count($list));
     }
+
+//    public function testTimes(): void
+//    {
+//        $modelManager = $this->serviceManager->get(ModelManager::class);
+//        $cronjob = (new Cronjob())
+//            ->setUser('marvin')
+//            ->setCommand('galaxy')
+//        ;
+//        $modelManager->saveWithoutChildren(
+//            (new Time())
+//                ->setCronjob($cronjob)
+//        );
+//        $modelManager->saveWithoutChildren(
+//            (new Time())
+//                ->setCronjob($cronjob)
+//                ->setFromMinute(7)
+//                ->setToMinute(7)
+//                ->setFromSecond(42)
+//                ->setToSecond(42)
+//        );
+//
+//        $this->checkAjaxResponse(
+//            $this->cronjobController->times(
+//                $this->serviceManager->get(TimeStore::class),
+//                $cronjob,
+//            ),
+//        );
+//    }
 }
