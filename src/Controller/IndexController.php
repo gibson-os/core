@@ -5,6 +5,7 @@ namespace GibsonOS\Core\Controller;
 
 use GibsonOS\Core\Attribute\GetSetting;
 use GibsonOS\Core\Model\Setting;
+use GibsonOS\Core\Model\User;
 use GibsonOS\Core\Repository\Desktop\ItemRepository;
 use GibsonOS\Core\Service\Response\AjaxResponse;
 
@@ -23,6 +24,6 @@ class IndexController extends AbstractController
             return $this->returnSuccess();
         }
 
-        return $desktopController->index($itemRepository, $apps, $tools);
+        return $desktopController->index($itemRepository, $apps, $tools, $this->sessionService->getUser() ?? new User());
     }
 }

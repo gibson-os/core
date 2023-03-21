@@ -87,12 +87,12 @@ abstract class FunctionalTest extends Unit
         return $user;
     }
 
-    protected function checkAjaxResponse(AjaxResponse $response, mixed $data, int $total): void
+    protected function checkAjaxResponse(AjaxResponse $response, mixed $data, int $total = null): void
     {
         $body = json_decode($response->getBody(), true);
         $this->assertTrue($body['success']);
         $this->assertFalse($body['failure']);
-        $this->assertEquals($total, $body['total']);
+        $this->assertEquals($total, $body['total'] ?? null);
         $this->assertEquals($data, $body['data']);
     }
 }

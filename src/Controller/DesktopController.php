@@ -33,10 +33,11 @@ class DesktopController extends AbstractController
     public function index(
         ItemRepository $itemRepository,
         #[GetSetting(self::APPS_KEY)] ?Setting $apps,
-        #[GetSetting(self::TOOLS_KEY)] ?Setting $tools
+        #[GetSetting(self::TOOLS_KEY)] ?Setting $tools,
+        User $user,
     ): AjaxResponse {
         return $this->returnSuccess([
-            self::DESKTOP_KEY => $itemRepository->getByUser($this->sessionService->getUser() ?? new User()),
+            self::DESKTOP_KEY => $itemRepository->getByUser($user),
             self::APPS_KEY => JsonUtility::decode($apps?->getValue() ?: '[]'),
             self::TOOLS_KEY => JsonUtility::decode($tools?->getValue() ?: '[]'),
         ]);
@@ -52,10 +53,10 @@ class DesktopController extends AbstractController
         ModelManager $modelManager,
         ItemRepository $itemRepository,
         #[GetMappedModels(Item::class)] array $items,
+        User $user
     ): AjaxResponse {
         $position = 0;
         $itemIds = [];
-        $user = $this->sessionService->getUser() ?? new User();
 
         foreach ($items as $item) {
             $modelManager->saveWithoutChildren(
@@ -81,8 +82,8 @@ class DesktopController extends AbstractController
         ModelManager $modelManager,
         ItemRepository $itemRepository,
         #[GetMappedModels(Item::class)] array $items,
+        User $user
     ): AjaxResponse {
-        $user = $this->sessionService->getUser() ?? new User();
         $nextPosition = -1;
 
         foreach ($items as $item) {

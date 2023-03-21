@@ -10,9 +10,10 @@ use GibsonOS\Core\Service\Attribute\PermissionAttribute;
 class CheckPermission implements AttributeInterface
 {
     public function __construct(
-        private int $permission,
-        private array $permissionsByRequestValues = [],
-        private string $permissionParameter = 'userPermission'
+        private readonly int $permission,
+        private readonly array $permissionsByRequestValues = [],
+        private readonly string $permissionParameter = 'userPermission',
+        private readonly string $userParameter = 'user',
     ) {
     }
 
@@ -34,5 +35,10 @@ class CheckPermission implements AttributeInterface
     public function getPermissionParameter(): string
     {
         return $this->permissionParameter;
+    }
+
+    public function getUserParameter(): string
+    {
+        return $this->userParameter;
     }
 }

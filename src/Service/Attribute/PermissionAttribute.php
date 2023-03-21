@@ -52,8 +52,8 @@ class PermissionAttribute extends AbstractActionAttributeService
         );
 
         if ($this->permissionService->checkPermission($requiredPermission, $permission)) {
-            $permissionParameter = $attribute->getPermissionParameter();
-            $parameters[$permissionParameter] = $permission;
+            $parameters[$attribute->getPermissionParameter()] = $permission;
+            $parameters[$attribute->getUserParameter()] = $this->sessionService->getUser();
 
             return $parameters;
         }
@@ -71,6 +71,6 @@ class PermissionAttribute extends AbstractActionAttributeService
             return [];
         }
 
-        return [$attribute->getPermissionParameter()];
+        return [$attribute->getPermissionParameter(), $attribute->getUserParameter()];
     }
 }
