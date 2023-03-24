@@ -51,14 +51,14 @@
         };
 
         Ext.onReady(() => {
-            new GibsonOS.module.core.desktop.Panel();
-
             {% set moduleName = request.getModuleName() %}
             {% set taskName = request.getTaskName() %}
             {% set actionName = request.getActionName() %}
             {% if session.getWithDefault('login', false) != true %}
                 {% set taskName = 'user' %}
                 {% set actionName = 'login' %}
+            {% else %}
+                new GibsonOS.module.core.desktop.Panel();
             {% endif %}
 
             if (
