@@ -43,7 +43,7 @@ class DeviceController extends AbstractController
             ->setActionModel($action)
             ->setForeignId($foreignId)
         ;
-        $modelManager->save($devicePush);
+        $modelManager->saveWithoutChildren($devicePush);
 
         return $this->returnSuccess();
     }

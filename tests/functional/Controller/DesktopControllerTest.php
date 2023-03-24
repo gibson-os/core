@@ -49,7 +49,7 @@ class DesktopControllerTest extends FunctionalTest
                 ->setIcon('dent')
                 ->setUser($user)
         );
-        $item =
+
         $this->checkAjaxResponse(
             $this->desktopController->index(
                 $this->serviceManager->get(ItemRepository::class),
