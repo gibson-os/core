@@ -159,7 +159,7 @@ class Cronjob extends AbstractModel implements \JsonSerializable
             'options' => $this->getOptions(),
             'user' => $this->getUser(),
             'active' => $this->isActive(),
-            'lastRun' => $this->getLastRun()?->format('Y-m-d H:i:s'),
+            'last_run' => $this->getLastRun()?->format('Y-m-d H:i:s'),
             'added' => $this->getAdded()->format('Y-m-d H:i:s'),
         ];
     }
