@@ -28,19 +28,19 @@ class ConvertStatus implements JsonSerializable
 
     private string $status;
 
-    private int $frame;
+    private int $frame = 0;
 
     private int $frames = 0;
 
-    private int $fps;
+    private int $fps = 0;
 
-    private float $quality;
+    private float $quality = 0.0;
 
-    private int $size;
+    private int $size = 0;
 
-    private DateTimeInterface $time;
+    private ?DateTimeInterface $time = null;
 
-    private float $bitrate;
+    private float $bitrate = 0.0;
 
     /**
      * ConvertStatus constructor.
@@ -112,12 +112,12 @@ class ConvertStatus implements JsonSerializable
         return $this;
     }
 
-    public function getTime(): DateTimeInterface
+    public function getTime(): ?DateTimeInterface
     {
         return $this->time;
     }
 
-    public function setTime(DateTimeInterface $time): ConvertStatus
+    public function setTime(?DateTimeInterface $time): ConvertStatus
     {
         $this->time = $time;
 
@@ -198,7 +198,7 @@ class ConvertStatus implements JsonSerializable
                 'frames' => $this->getFrames(),
                 'quality' => $this->getQuality(),
                 'size' => $this->getSize(),
-                'time' => $this->getTime()->format('H:i:s'),
+                'time' => $this->getTime()?->format('H:i:s') ?? null,
                 'timeRemaining' => $timeRemaining instanceof DateTime ? $timeRemaining->format('H:i:s') : 0,
                 'percent' => $this->getPercent(),
             ];
