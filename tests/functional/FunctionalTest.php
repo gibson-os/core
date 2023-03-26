@@ -15,6 +15,8 @@ use GibsonOS\Core\Service\LoggerService;
 use GibsonOS\Core\Service\Response\AjaxResponse;
 use GibsonOS\Core\Service\SessionService;
 use GibsonOS\Mock\Service\TestSessionService;
+use mysqlDatabase;
+use mysqlRegistry;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Log\LoggerInterface;
@@ -29,6 +31,11 @@ abstract class FunctionalTest extends Unit
 
     protected ObjectProphecy|CommandService $commandService;
 
+    protected function getDir(): string
+    {
+        return __DIR__;
+    }
+
     protected function _before(): void
     {
         $this->serviceManager = new ServiceManager();
@@ -36,10 +43,11 @@ abstract class FunctionalTest extends Unit
         $this->serviceManager->setService(SessionService::class, new TestSessionService());
 
         $envService = $this->serviceManager->get(EnvService::class);
-        $envService->loadFile(__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '.env.test');
+
+        $envService->loadFile($this->getDir() . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '.env.test');
         $this->serviceManager->setService(EnvService::class, $envService);
 
-        $mysqlDatabase = new \mysqlDatabase(
+        $mysqlDatabase = new mysqlDatabase(
             $envService->getString('MYSQL_HOST'),
             $envService->getString('MYSQL_USER'),
             $envService->getString('MYSQL_PASS'),
@@ -55,8 +63,8 @@ abstract class FunctionalTest extends Unit
             $databaseName
         ));
         $mysqlDatabase->useDatabase($databaseName);
-        $this->serviceManager->setService(\mysqlDatabase::class, $mysqlDatabase);
-        \mysqlRegistry::getInstance()->set('database', $mysqlDatabase);
+        $this->serviceManager->setService(mysqlDatabase::class, $mysqlDatabase);
+        mysqlRegistry::getInstance()->set('database', $mysqlDatabase);
 
         $this->initDatabase();
     }
@@ -67,21 +75,28 @@ abstract class FunctionalTest extends Unit
 
         foreach ($tableInstall->install(__DIR__ . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..') as $success) {
         }
+
+        if (__DIR__ === $this->getDir()) {
+            return;
+        }
+
+        foreach ($tableInstall->install($this->getDir() . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..') as $success) {
+        }
     }
 
-    protected function addUser(): User
+    protected function addUser(string $username = 'marvin'): User
     {
         $modelManager = $this->serviceManager->get(ModelManager::class);
         $user = (new User())
-            ->setUser('marvin')
+            ->setUser($username)
             ->setPassword('galaxy')
         ;
         $modelManager->saveWithoutChildren($user);
         $modelManager->saveWithoutChildren(
             (new Permission())
-            ->setModule('core')
-            ->setPermission(Permission::READ + Permission::WRITE + Permission::DELETE + Permission::MANAGE)
-            ->setUser($user)
+                ->setModule('core')
+                ->setPermission(Permission::READ + Permission::WRITE + Permission::DELETE + Permission::MANAGE)
+                ->setUser($user)
         );
 
         return $user;
