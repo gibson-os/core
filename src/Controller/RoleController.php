@@ -19,13 +19,15 @@ use GibsonOS\Core\Service\Response\AjaxResponse;
 use GibsonOS\Core\Store\Role\PermissionStore;
 use GibsonOS\Core\Store\Role\UserStore;
 use GibsonOS\Core\Store\RoleStore;
+use JsonException;
+use ReflectionException;
 
 class RoleController extends AbstractController
 {
     /**
      * @throws SelectError
-     * @throws \JsonException
-     * @throws \ReflectionException
+     * @throws JsonException
+     * @throws ReflectionException
      */
     #[CheckPermission(UserPermission::MANAGE + UserPermission::READ)]
     public function index(
@@ -55,7 +57,7 @@ class RoleController extends AbstractController
 
     /**
      * @throws DeleteError
-     * @throws \JsonException
+     * @throws JsonException
      */
     #[CheckPermission(UserPermission::MANAGE + UserPermission::DELETE)]
     public function delete(
@@ -82,8 +84,8 @@ class RoleController extends AbstractController
 
     /**
      * @throws SelectError
-     * @throws \JsonException
-     * @throws \ReflectionException
+     * @throws JsonException
+     * @throws ReflectionException
      */
     #[CheckPermission(UserPermission::MANAGE + UserPermission::READ)]
     public function users(
@@ -117,7 +119,7 @@ class RoleController extends AbstractController
 
     /**
      * @throws DeleteError
-     * @throws \JsonException
+     * @throws JsonException
      */
     #[CheckPermission(UserPermission::MANAGE + UserPermission::DELETE)]
     public function deleteUsers(

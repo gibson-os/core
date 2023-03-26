@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Service;
 
+use Generator;
 use GibsonOS\Core\Attribute\GetServices;
 use GibsonOS\Core\Dto\Install\Configuration;
 use GibsonOS\Core\Dto\Install\InstallDtoInterface;
@@ -46,7 +47,7 @@ class InstallService
      * @throws SetError
      * @throws InstallException
      *
-     * @return \Generator<InstallDtoInterface>|InstallDtoInterface[]
+     * @return Generator<InstallDtoInterface>|InstallDtoInterface[]
      */
     public function install(string $module = null, string $part = null): iterable
     {

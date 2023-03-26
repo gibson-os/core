@@ -16,6 +16,10 @@ use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Mapper\ModelMapper;
 use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Service\SessionService;
+use JsonException;
+use ReflectionAttribute;
+use ReflectionException;
+use ReflectionParameter;
 
 class ModelsMapperAttribute implements AttributeServiceInterface, ParameterAttributeInterface
 {
@@ -33,12 +37,12 @@ class ModelsMapperAttribute implements AttributeServiceInterface, ParameterAttri
      * @throws SelectError
      * @throws FactoryError
      * @throws MapperException
-     * @throws \JsonException
-     * @throws \ReflectionException
+     * @throws JsonException
+     * @throws ReflectionException
      *
      * @return AbstractModel[]
      */
-    public function replace(AttributeInterface $attribute, array $parameters, \ReflectionParameter $reflectionParameter): array
+    public function replace(AttributeInterface $attribute, array $parameters, ReflectionParameter $reflectionParameter): array
     {
         if (!$attribute instanceof GetMappedModels) {
             throw new MapperException(sprintf(
@@ -89,7 +93,7 @@ class ModelsMapperAttribute implements AttributeServiceInterface, ParameterAttri
                 $constraintAttribute = $this->reflectionManager->getAttribute(
                     $reflectionProperty,
                     Constraint::class,
-                    \ReflectionAttribute::IS_INSTANCEOF
+                    ReflectionAttribute::IS_INSTANCEOF
                 );
 
                 if ($constraintAttribute === null) {

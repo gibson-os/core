@@ -3,7 +3,9 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Dto\Ffmpeg\Stream;
 
-class Subtitle implements \JsonSerializable
+use JsonSerializable;
+
+class Subtitle implements JsonSerializable
 {
     private ?string $language = null;
 

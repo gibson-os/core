@@ -6,28 +6,32 @@ namespace GibsonOS\Core\Repository;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Model\ModelInterface;
+use InvalidArgumentException;
+use mysqlDatabase;
+use mysqlRegistry;
+use mysqlTable;
 
 abstract class AbstractRepository
 {
-    public function startTransaction(\mysqlDatabase $database = null): void
+    public function startTransaction(mysqlDatabase $database = null): void
     {
         $database = $this->getDatabase($database);
         $database->startTransaction();
     }
 
-    public function commit(\mysqlDatabase $database = null): void
+    public function commit(mysqlDatabase $database = null): void
     {
         $database = $this->getDatabase($database);
         $database->commit();
     }
 
-    public function rollback(\mysqlDatabase $database = null): void
+    public function rollback(mysqlDatabase $database = null): void
     {
         $database = $this->getDatabase($database);
         $database->rollback();
     }
 
-    public function isTransaction(\mysqlDatabase $database = null): bool
+    public function isTransaction(mysqlDatabase $database = null): bool
     {
         $database = $this->getDatabase($database);
 
@@ -43,7 +47,7 @@ abstract class AbstractRepository
      *
      * @return T[]
      */
-    protected function getModels(\mysqlTable $table, string $modelClassName): array
+    protected function getModels(mysqlTable $table, string $modelClassName): array
     {
         if ($table->selectPrepared() === false) {
             $exception = new SelectError($table->connection->error());
@@ -72,7 +76,7 @@ abstract class AbstractRepository
      *
      * @return T
      */
-    protected function getModel(\mysqlTable $table, string $modelClassName): AbstractModel
+    protected function getModel(mysqlTable $table, string $modelClassName): AbstractModel
     {
         $model = new $modelClassName();
         $model->loadFromMysqlTable($table);
@@ -159,30 +163,30 @@ abstract class AbstractRepository
         return $table->selectAggregatePrepared($function);
     }
 
-    protected function getTable(string $tableName, \mysqlDatabase $database = null): \mysqlTable
+    protected function getTable(string $tableName, mysqlDatabase $database = null): mysqlTable
     {
         $database = $this->getDatabase($database);
 
-        return new \mysqlTable($database, $tableName);
+        return new mysqlTable($database, $tableName);
     }
 
-    protected function getRegexString(string $search, \mysqlDatabase $database = null): string
+    protected function getRegexString(string $search, mysqlDatabase $database = null): string
     {
         $database = $this->getDatabase($database);
 
         return $database->getUnescapedRegexString($search);
     }
 
-    private function getDatabase(\mysqlDatabase $database = null): \mysqlDatabase
+    private function getDatabase(mysqlDatabase $database = null): mysqlDatabase
     {
-        if ($database instanceof \mysqlDatabase) {
+        if ($database instanceof mysqlDatabase) {
             return $database;
         }
 
-        $database = \mysqlRegistry::getInstance()->get('database');
+        $database = mysqlRegistry::getInstance()->get('database');
 
-        if (!$database instanceof \mysqlDatabase) {
-            throw new \InvalidArgumentException('Datenbank nicht in der Registry gefunden!');
+        if (!$database instanceof mysqlDatabase) {
+            throw new InvalidArgumentException('Datenbank nicht in der Registry gefunden!');
         }
 
         return $database;

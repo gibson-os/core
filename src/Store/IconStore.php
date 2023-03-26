@@ -5,6 +5,7 @@ namespace GibsonOS\Core\Store;
 
 use GibsonOS\Core\Attribute\GetTableName;
 use GibsonOS\Core\Model\Icon;
+use mysqlDatabase;
 
 class IconStore extends AbstractDatabaseStore
 {
@@ -15,7 +16,7 @@ class IconStore extends AbstractDatabaseStore
 
     public function __construct(
         #[GetTableName(Icon\Tag::class)] private string $iconTagTableName,
-        \mysqlDatabase $database = null
+        mysqlDatabase $database = null
     ) {
         parent::__construct($database);
     }

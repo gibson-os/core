@@ -5,7 +5,7 @@ namespace GibsonOS\Core\Attribute\Install\Database;
 
 use Attribute;
 
-#[\Attribute(\Attribute::TARGET_CLASS | \Attribute::TARGET_PROPERTY | \Attribute::IS_REPEATABLE)]
+#[Attribute(Attribute::TARGET_CLASS | Attribute::TARGET_PROPERTY | Attribute::IS_REPEATABLE)]
 class Key
 {
     public function __construct(

@@ -10,7 +10,10 @@ use GibsonOS\Core\Exception\FactoryError;
 use GibsonOS\Core\Manager\ServiceManager;
 use GibsonOS\Core\Model\Event;
 use GibsonOS\Core\Model\Event\Element;
+use InvalidArgumentException;
+use JsonException;
 use Psr\Log\LoggerInterface;
+use ReflectionException;
 
 class ElementService
 {
@@ -49,7 +52,7 @@ class ElementService
      *
      * @throws DateTimeError
      * @throws FactoryError
-     * @throws \JsonException
+     * @throws JsonException
      * @throws EventException
      */
     public function runElements(array $elements, Event $event, array $variables = []): void
@@ -70,7 +73,7 @@ class ElementService
             self::OPERATOR_BIGGER_EQUAL => $value1 >= $value2,
             self::OPERATOR_SMALLER => $value1 < $value2,
             self::OPERATOR_SMALLER_EQUAL => $value1 <= $value2,
-            default => throw new \InvalidArgumentException(sprintf('Operator "%s" not allowed!', $operator)),
+            default => throw new InvalidArgumentException(sprintf('Operator "%s" not allowed!', $operator)),
         };
     }
 
@@ -78,7 +81,7 @@ class ElementService
      * @throws DateTimeError
      * @throws EventException
      * @throws FactoryError
-     * @throws \JsonException
+     * @throws JsonException
      */
     private function runElement(Element $element, Event $event, ?bool $previousConditionResult, array &$variables): ?bool
     {
@@ -145,7 +148,7 @@ class ElementService
 
     /**
      * @throws FactoryError
-     * @throws \JsonException
+     * @throws JsonException
      * @throws EventException
      */
     private function getReturnsConditionResult(Element $element, Event $event, array &$variables): bool
@@ -177,8 +180,8 @@ class ElementService
     /**
      * @throws EventException
      * @throws FactoryError
-     * @throws \ReflectionException
-     * @throws \JsonException
+     * @throws ReflectionException
+     * @throws JsonException
      *
      * @return mixed
      */

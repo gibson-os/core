@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Command\Cronjob;
 
+use DateTime;
 use GibsonOS\Core\Attribute\Command\Argument;
 use GibsonOS\Core\Command\AbstractCommand;
 use GibsonOS\Core\Exception\DateTimeError;
@@ -13,6 +14,7 @@ use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Repository\LockRepository;
 use GibsonOS\Core\Service\CronjobService;
 use GibsonOS\Core\Service\LockService;
+use JsonException;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -42,7 +44,7 @@ class RunCommand extends AbstractCommand
      * @throws UnlockError
      * @throws DateTimeError
      * @throws SaveError
-     * @throws \JsonException
+     * @throws JsonException
      */
     protected function run(): int
     {
@@ -57,12 +59,12 @@ class RunCommand extends AbstractCommand
         $pid = getmypid();
 
         while ($this->lockRepository->getByName(self::FLOCK_NAME_NEW . $this->user)->getPid() === $pid) {
-            $startSecond = (int) (new \DateTime())->format('s');
+            $startSecond = (int) (new DateTime())->format('s');
             $this->cronjobService->run($this->user);
 
             do {
                 usleep(100000);
-                $endSecond = (int) (new \DateTime())->format('s');
+                $endSecond = (int) (new DateTime())->format('s');
             } while ($startSecond === $endSecond);
         }
 

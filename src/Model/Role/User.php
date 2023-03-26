@@ -10,6 +10,7 @@ use GibsonOS\Core\Attribute\Install\Database\Table;
 use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Model\Role;
 use GibsonOS\Core\Model\User as BaseUser;
+use JsonSerializable;
 
 /**
  * @method User     setRole(Role $role)
@@ -19,7 +20,7 @@ use GibsonOS\Core\Model\User as BaseUser;
  */
 #[Table]
 #[Key(unique: true, columns: ['role_id', 'user_id'])]
-class User extends AbstractModel implements \JsonSerializable
+class User extends AbstractModel implements JsonSerializable
 {
     #[Column(attributes: [Column::ATTRIBUTE_UNSIGNED], autoIncrement: true)]
     private ?int $id = null;

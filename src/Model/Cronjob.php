@@ -3,13 +3,17 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Model;
 
+use DateTimeImmutable;
+use DateTimeInterface;
 use GibsonOS\Core\Attribute\Install\Database\Column;
 use GibsonOS\Core\Attribute\Install\Database\Key;
 use GibsonOS\Core\Attribute\Install\Database\Table;
+use JsonSerializable;
+use mysqlDatabase;
 
 #[Table]
 #[Key(unique: true, columns: ['command', 'arguments', 'options', 'user'])]
-class Cronjob extends AbstractModel implements \JsonSerializable
+class Cronjob extends AbstractModel implements JsonSerializable
 {
     #[Column(attributes: [Column::ATTRIBUTE_UNSIGNED], autoIncrement: true)]
     private ?int $id = null;
@@ -31,19 +35,19 @@ class Cronjob extends AbstractModel implements \JsonSerializable
     private string $user;
 
     #[Column]
-    private ?\DateTimeInterface $lastRun = null;
+    private ?DateTimeInterface $lastRun = null;
 
     #[Column]
     private bool $active = true;
 
     #[Column(type: Column::TYPE_TIMESTAMP, default: Column::DEFAULT_CURRENT_TIMESTAMP)]
-    private \DateTimeInterface $added;
+    private DateTimeInterface $added;
 
-    public function __construct(\mysqlDatabase $database = null)
+    public function __construct(mysqlDatabase $database = null)
     {
         parent::__construct($database);
 
-        $this->added = new \DateTimeImmutable();
+        $this->added = new DateTimeImmutable();
     }
 
     public function getId(): ?int
@@ -114,12 +118,12 @@ class Cronjob extends AbstractModel implements \JsonSerializable
         return $this;
     }
 
-    public function getLastRun(): ?\DateTimeInterface
+    public function getLastRun(): ?DateTimeInterface
     {
         return $this->lastRun;
     }
 
-    public function setLastRun(?\DateTimeInterface $lastRun): Cronjob
+    public function setLastRun(?DateTimeInterface $lastRun): Cronjob
     {
         $this->lastRun = $lastRun;
 
@@ -138,12 +142,12 @@ class Cronjob extends AbstractModel implements \JsonSerializable
         return $this;
     }
 
-    public function getAdded(): \DateTimeInterface
+    public function getAdded(): DateTimeInterface
     {
         return $this->added;
     }
 
-    public function setAdded(\DateTimeInterface $added): Cronjob
+    public function setAdded(DateTimeInterface $added): Cronjob
     {
         $this->added = $added;
 

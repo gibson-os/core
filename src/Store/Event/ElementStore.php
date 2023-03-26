@@ -11,6 +11,9 @@ use GibsonOS\Core\Manager\ModelManager;
 use GibsonOS\Core\Model\Event;
 use GibsonOS\Core\Model\Event\Element;
 use GibsonOS\Core\Store\AbstractDatabaseStore;
+use JsonException;
+use mysqlDatabase;
+use ReflectionException;
 
 class ElementStore extends AbstractDatabaseStore
 {
@@ -18,7 +21,7 @@ class ElementStore extends AbstractDatabaseStore
         private readonly ClassNameStore $classNameStore,
         private readonly MethodStore $methodStore,
         private readonly ModelManager $modelManager,
-        \mysqlDatabase $database = null
+        mysqlDatabase $database = null
     ) {
         parent::__construct($database);
     }
@@ -42,10 +45,10 @@ class ElementStore extends AbstractDatabaseStore
 
     /**
      * @throws GetError
-     * @throws \JsonException
+     * @throws JsonException
      * @throws SelectError
      * @throws FactoryError
-     * @throws \ReflectionException
+     * @throws ReflectionException
      *
      * @return Element[]
      */
@@ -110,7 +113,7 @@ class ElementStore extends AbstractDatabaseStore
     /**
      * @param AbstractParameter[] $methodParameters
      *
-     * @throws \JsonException
+     * @throws JsonException
      *
      * @return AbstractParameter[]
      */
@@ -143,7 +146,7 @@ class ElementStore extends AbstractDatabaseStore
     /**
      * @param AbstractParameter[] $methodReturns
      *
-     * @throws \JsonException
+     * @throws JsonException
      *
      * @return AbstractParameter[]
      */

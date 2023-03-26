@@ -3,13 +3,14 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Install;
 
+use Generator;
 use GibsonOS\Core\Dto\Install\Configuration;
 use GibsonOS\Core\Service\InstallService;
 use GibsonOS\Core\Service\PriorityInterface;
 
 class DateInstall extends AbstractInstall implements PriorityInterface, SingleInstallInterface
 {
-    public function install(string $module): \Generator
+    public function install(string $module): Generator
     {
         yield $timezoneInput = $this->getEnvInput('TIMEZONE', 'What is the timezone?');
         yield $dateLatitudeInput = $this->getEnvInput('DATE_LATITUDE', 'What is the timezone latitude?');

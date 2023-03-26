@@ -14,13 +14,15 @@ use GibsonOS\Core\Store\ActionStore;
 use GibsonOS\Core\Store\ModuleStore;
 use GibsonOS\Core\Store\SettingStore;
 use GibsonOS\Core\Store\TaskStore;
+use JsonException;
+use ReflectionException;
 
 class ModuleController extends AbstractController
 {
     /**
      * @throws SelectError
-     * @throws \JsonException
-     * @throws \ReflectionException
+     * @throws JsonException
+     * @throws ReflectionException
      */
     #[CheckPermission(Permission::MANAGE + Permission::READ)]
     public function index(
@@ -48,8 +50,8 @@ class ModuleController extends AbstractController
      * @throws GetError
      * @throws SaveError
      * @throws SelectError
-     * @throws \JsonException
-     * @throws \ReflectionException
+     * @throws JsonException
+     * @throws ReflectionException
      */
     #[CheckPermission(Permission::MANAGE + Permission::WRITE)]
     public function scan(ModuleService $moduleService, ModuleStore $moduleStore): AjaxResponse
@@ -61,8 +63,8 @@ class ModuleController extends AbstractController
 
     /**
      * @throws SelectError
-     * @throws \JsonException
-     * @throws \ReflectionException
+     * @throws JsonException
+     * @throws ReflectionException
      */
     #[CheckPermission(Permission::MANAGE + Permission::READ)]
     public function setting(SettingStore $settingStore, int $moduleId): AjaxResponse

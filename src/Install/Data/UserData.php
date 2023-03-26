@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Install\Data;
 
+use Generator;
 use GibsonOS\Core\Dto\Install\Input;
 use GibsonOS\Core\Exception\Model\SaveError;
 use GibsonOS\Core\Exception\Repository\SelectError;
@@ -15,6 +16,8 @@ use GibsonOS\Core\Repository\UserRepository;
 use GibsonOS\Core\Service\InstallService;
 use GibsonOS\Core\Service\PriorityInterface;
 use GibsonOS\Core\Service\UserService;
+use JsonException;
+use ReflectionException;
 
 class UserData extends AbstractInstall implements PriorityInterface, SingleInstallInterface
 {
@@ -30,10 +33,10 @@ class UserData extends AbstractInstall implements PriorityInterface, SingleInsta
      * @throws SaveError
      * @throws SelectError
      * @throws UserError
-     * @throws \JsonException
-     * @throws \ReflectionException
+     * @throws JsonException
+     * @throws ReflectionException
      */
-    public function install(string $module): \Generator
+    public function install(string $module): Generator
     {
         if ($this->userRepository->getCount() !== 0) {
             return;

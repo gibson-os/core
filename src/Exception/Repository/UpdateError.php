@@ -4,21 +4,23 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Exception\Repository;
 
 use GibsonOS\Core\Exception\AbstractException;
+use mysqlTable;
+use Throwable;
 
 class UpdateError extends AbstractException
 {
     /**
-     * @var \mysqlTable
+     * @var mysqlTable
      */
     private $table;
 
-    public function __construct($message = 'Update war nicht erfolgreich!', $code = 0, \Throwable $previous = null)
+    public function __construct($message = 'Update war nicht erfolgreich!', $code = 0, Throwable $previous = null)
     {
         parent::__construct($message, $code, $previous);
     }
 
     /**
-     * @return \mysqlTable
+     * @return mysqlTable
      */
     public function getTable()
     {
@@ -26,7 +28,7 @@ class UpdateError extends AbstractException
     }
 
     /**
-     * @param \mysqlTable $table
+     * @param mysqlTable $table
      *
      * @return UpdateError
      */

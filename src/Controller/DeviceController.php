@@ -16,12 +16,14 @@ use GibsonOS\Core\Model\Task;
 use GibsonOS\Core\Repository\DevicePushRepository;
 use GibsonOS\Core\Repository\User\DeviceRepository;
 use GibsonOS\Core\Service\Response\AjaxResponse;
+use JsonException;
+use ReflectionException;
 
 class DeviceController extends AbstractController
 {
     /**
-     * @throws \JsonException
-     * @throws \ReflectionException
+     * @throws JsonException
+     * @throws ReflectionException
      * @throws SaveError
      * @throws SelectError
      * @throws RequestError
@@ -50,7 +52,7 @@ class DeviceController extends AbstractController
 
     /**
      * @throws DeleteError
-     * @throws \JsonException
+     * @throws JsonException
      * @throws RequestError
      * @throws SelectError
      */
@@ -76,8 +78,8 @@ class DeviceController extends AbstractController
     }
 
     /**
-     * @throws \JsonException
-     * @throws \ReflectionException
+     * @throws JsonException
+     * @throws ReflectionException
      * @throws RequestError
      * @throws SaveError
      * @throws SelectError

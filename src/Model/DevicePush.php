@@ -3,10 +3,13 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Model;
 
+use DateTimeImmutable;
+use DateTimeInterface;
 use GibsonOS\Core\Attribute\Install\Database\Column;
 use GibsonOS\Core\Attribute\Install\Database\Constraint;
 use GibsonOS\Core\Attribute\Install\Database\Table;
 use GibsonOS\Core\Model\User\Device;
+use mysqlDatabase;
 
 /**
  * @method Device     getDevice()
@@ -37,7 +40,7 @@ class DevicePush extends AbstractModel
     private string $foreignId;
 
     #[Column(type: Column::TYPE_TIMESTAMP, default: Column::DEFAULT_CURRENT_TIMESTAMP, attributes: [Column::ATTRIBUTE_CURRENT_TIMESTAMP])]
-    private \DateTimeInterface $modified;
+    private DateTimeInterface $modified;
 
     #[Constraint]
     protected Device $device;
@@ -51,11 +54,11 @@ class DevicePush extends AbstractModel
     #[Constraint(parentColumn: 'name', ownColumn: 'action')]
     protected Action $actionModel;
 
-    public function __construct(\mysqlDatabase $database = null)
+    public function __construct(mysqlDatabase $database = null)
     {
         parent::__construct($database);
 
-        $this->modified = new \DateTimeImmutable();
+        $this->modified = new DateTimeImmutable();
     }
 
     public function getDeviceId(): string
@@ -118,12 +121,12 @@ class DevicePush extends AbstractModel
         return $this;
     }
 
-    public function getModified(): \DateTimeInterface
+    public function getModified(): DateTimeInterface
     {
         return $this->modified;
     }
 
-    public function setModified(\DateTimeInterface $modified): DevicePush
+    public function setModified(DateTimeInterface $modified): DevicePush
     {
         $this->modified = $modified;
 

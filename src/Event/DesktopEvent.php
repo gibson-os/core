@@ -13,6 +13,7 @@ use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Model\User;
 use GibsonOS\Core\Service\EventService;
 use GibsonOS\Core\Service\FcmService;
+use JsonException;
 
 #[Event('Desktop')]
 class DesktopEvent extends AbstractEvent
@@ -28,7 +29,7 @@ class DesktopEvent extends AbstractEvent
     /**
      * @throws FcmException
      * @throws WebException
-     * @throws \JsonException
+     * @throws JsonException
      */
     #[Event\Method('Nachricht senden')]
     public function pushMessage(

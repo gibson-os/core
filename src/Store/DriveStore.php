@@ -3,25 +3,27 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Store;
 
+use DateTimeInterface;
 use GibsonOS\Core\Attribute\GetTableName;
 use GibsonOS\Core\Model\Drive;
+use mysqlDatabase;
 
 class DriveStore extends AbstractDatabaseStore
 {
     private int $attributeId = 194;
 
-    private ?\DateTimeInterface $from;
+    private ?DateTimeInterface $from;
 
-    private \DateTimeInterface $fromTime;
+    private DateTimeInterface $fromTime;
 
-    private ?\DateTimeInterface $to;
+    private ?DateTimeInterface $to;
 
-    private \DateTimeInterface $toTime;
+    private DateTimeInterface $toTime;
 
     public function __construct(
-        #[GetTableName(Drive\Stat::class)] private string $driveStatTableName,
-        #[GetTableName(Drive\StatAttribute::class)] private string $driveStatAttributeTableName,
-        \mysqlDatabase $database = null
+        #[GetTableName(Drive\Stat::class)] private readonly string $driveStatTableName,
+        #[GetTableName(Drive\StatAttribute::class)] private readonly string $driveStatAttributeTableName,
+        mysqlDatabase $database = null
     ) {
         parent::__construct($database);
     }
@@ -90,28 +92,28 @@ class DriveStore extends AbstractDatabaseStore
         return $this;
     }
 
-    public function setFrom(?\DateTimeInterface $from): DriveStore
+    public function setFrom(?DateTimeInterface $from): DriveStore
     {
         $this->from = $from;
 
         return $this;
     }
 
-    public function setFromTime(\DateTimeInterface $fromTime): DriveStore
+    public function setFromTime(DateTimeInterface $fromTime): DriveStore
     {
         $this->fromTime = $fromTime;
 
         return $this;
     }
 
-    public function setTo(?\DateTimeInterface $to): DriveStore
+    public function setTo(?DateTimeInterface $to): DriveStore
     {
         $this->to = $to;
 
         return $this;
     }
 
-    public function setToTime(\DateTimeInterface $toTime): DriveStore
+    public function setToTime(DateTimeInterface $toTime): DriveStore
     {
         $this->toTime = $toTime;
 

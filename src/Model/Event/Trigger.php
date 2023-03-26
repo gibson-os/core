@@ -9,6 +9,8 @@ use GibsonOS\Core\Attribute\Install\Database\Key;
 use GibsonOS\Core\Attribute\Install\Database\Table;
 use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Model\Event;
+use JsonException;
+use JsonSerializable;
 
 /**
  * @method Event   getEvent()
@@ -16,7 +18,7 @@ use GibsonOS\Core\Model\Event;
  */
 #[Table]
 #[Key(unique: true, columns: ['event_id', 'trigger', 'weekday', 'day', 'month', 'year', 'hour', 'minute', 'second'])]
-class Trigger extends AbstractModel implements \JsonSerializable
+class Trigger extends AbstractModel implements JsonSerializable
 {
     #[Column(attributes: [Column::ATTRIBUTE_UNSIGNED], autoIncrement: true)]
     private ?int $id = null;
@@ -262,7 +264,7 @@ class Trigger extends AbstractModel implements \JsonSerializable
     }
 
     /**
-     * @throws \JsonException
+     * @throws JsonException
      */
     public function jsonSerialize(): array
     {

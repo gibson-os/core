@@ -16,6 +16,7 @@ use GibsonOS\Core\Model\User\Permission;
 use GibsonOS\Core\Repository\Desktop\ItemRepository;
 use GibsonOS\Core\Service\Response\AjaxResponse;
 use GibsonOS\Core\Utility\JsonUtility;
+use JsonException;
 
 class DesktopController extends AbstractController
 {
@@ -26,7 +27,7 @@ class DesktopController extends AbstractController
     public const TOOLS_KEY = 'tools';
 
     /**
-     * @throws \JsonException
+     * @throws JsonException
      * @throws SelectError
      */
     #[CheckPermission(Permission::READ)]

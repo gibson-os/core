@@ -9,6 +9,7 @@ use GibsonOS\Core\Attribute\Install\Database\Key;
 use GibsonOS\Core\Attribute\Install\Database\Table;
 use GibsonOS\Core\Model\Role\Permission;
 use GibsonOS\Core\Model\Role\User as RoleUser;
+use JsonSerializable;
 
 /**
  * @method Permission[] getPermissions()
@@ -19,7 +20,7 @@ use GibsonOS\Core\Model\Role\User as RoleUser;
  * @method Role         addUsers(RoleUser[] $users)
  */
 #[Table]
-class Role extends AbstractModel implements \JsonSerializable
+class Role extends AbstractModel implements JsonSerializable
 {
     #[Column(attributes: [Column::ATTRIBUTE_UNSIGNED], autoIncrement: true)]
     private ?int $id = null;

@@ -17,6 +17,8 @@ use GibsonOS\Core\Model\Setting;
 use GibsonOS\Core\Repository\ModuleRepository;
 use GibsonOS\Core\Repository\SettingRepository;
 use GibsonOS\Core\Utility\StatusCode;
+use InvalidArgumentException;
+use JsonException;
 
 class MiddlewareService
 {
@@ -54,12 +56,12 @@ class MiddlewareService
      * @throws MiddlewareException
      * @throws SaveError
      * @throws WebException
-     * @throws \JsonException
+     * @throws JsonException
      */
     public function send(string $task, string $action, array $parameters = [], string $body = null): Response
     {
         if ($this->middlewareUrl === null) {
-            throw new \InvalidArgumentException('Middleware URL not set');
+            throw new InvalidArgumentException('Middleware URL not set');
         }
 
         if ($this->middlewareToken->getId() === null) {
@@ -121,12 +123,12 @@ class MiddlewareService
      * @throws MiddlewareException
      * @throws WebException
      * @throws SaveError
-     * @throws \JsonException
+     * @throws JsonException
      */
     private function getNewToken(): void
     {
         if ($this->middlewareUrl === null) {
-            throw new \InvalidArgumentException('Middleware URL not set');
+            throw new InvalidArgumentException('Middleware URL not set');
         }
 
         $this->modelManager->saveWithoutChildren(

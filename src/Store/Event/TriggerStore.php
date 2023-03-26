@@ -11,6 +11,9 @@ use GibsonOS\Core\Manager\ModelManager;
 use GibsonOS\Core\Model\Event;
 use GibsonOS\Core\Model\Event\Trigger;
 use GibsonOS\Core\Store\AbstractDatabaseStore;
+use JsonException;
+use mysqlDatabase;
+use ReflectionException;
 
 class TriggerStore extends AbstractDatabaseStore
 {
@@ -20,7 +23,7 @@ class TriggerStore extends AbstractDatabaseStore
         private readonly ClassTriggerStore $classTriggerStore,
         private readonly ClassNameStore $classNameStore,
         private readonly ModelManager $modelManager,
-        \mysqlDatabase $database = null
+        mysqlDatabase $database = null
     ) {
         parent::__construct($database);
     }
@@ -38,9 +41,9 @@ class TriggerStore extends AbstractDatabaseStore
     /**
      * @throws FactoryError
      * @throws GetError
-     * @throws \JsonException
+     * @throws JsonException
      * @throws SelectError
-     * @throws \ReflectionException
+     * @throws ReflectionException
      */
     public function getList(): iterable
     {

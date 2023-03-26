@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Controller;
 
+use DateTimeZone;
 use GibsonOS\Core\Attribute\CheckPermission;
 use GibsonOS\Core\Attribute\GetModel;
 use GibsonOS\Core\Exception\Repository\SelectError;
@@ -30,7 +31,7 @@ class WeatherController extends AbstractController
     ): AjaxResponse {
         $weatherStore
             ->setLocationId($location->getId() ?? 0)
-            ->setDate($dateTimeService->get('now', new \DateTimeZone($location->getTimezone())))
+            ->setDate($dateTimeService->get('now', new DateTimeZone($location->getTimezone())))
         ;
 
         return $this->returnSuccess($weatherStore->getList());

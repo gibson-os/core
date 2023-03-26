@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Service;
 
+use DateTime;
+use Exception;
 use GibsonOS\Core\Attribute\Event\Listener;
 use GibsonOS\Core\Attribute\Event\ParameterOption;
 use GibsonOS\Core\Attribute\Event\Trigger;
@@ -20,7 +22,13 @@ use GibsonOS\Core\Model\AutoCompleteModelInterface;
 use GibsonOS\Core\Model\Event;
 use GibsonOS\Core\Repository\EventRepository;
 use GibsonOS\Core\Service\Event\ElementService;
+use JsonException;
 use Psr\Log\LoggerInterface;
+use ReflectionAttribute;
+use ReflectionClass;
+use ReflectionClassConstant;
+use ReflectionException;
+use ReflectionMethod;
 
 class EventService
 {
@@ -60,8 +68,8 @@ class EventService
      * @throws DateTimeError
      * @throws EventException
      * @throws FactoryError
-     * @throws \JsonException
-     * @throws \ReflectionException
+     * @throws JsonException
+     * @throws ReflectionException
      * @throws SaveError
      */
     public function fireInCommand(string $className, string $trigger, array $parameters = null): void
@@ -70,7 +78,7 @@ class EventService
         $this->logger->info('Fire event ' . $triggerName);
         $events = array_merge(
             $this->events[$triggerName] ?? [],
-            $this->eventRepository->getTimeControlled($className, $trigger, new \DateTime())
+            $this->eventRepository->getTimeControlled($className, $trigger, new DateTime())
         );
 
         foreach ($events as $event) {
@@ -91,7 +99,7 @@ class EventService
     {
         try {
             $this->fireInCommand($className, $trigger, $parameters);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->logger->error(sprintf(
                 "%s: %s\n%s",
                 get_class($e),
@@ -104,10 +112,10 @@ class EventService
     /**
      * @throws DateTimeError
      * @throws FactoryError
-     * @throws \JsonException
+     * @throws JsonException
      * @throws SaveError
      * @throws EventException
-     * @throws \ReflectionException
+     * @throws ReflectionException
      */
     public function runEvent(Event $event, bool $async): void
     {
@@ -135,8 +143,8 @@ class EventService
     }
 
     /**
-     * @throws \JsonException
-     * @throws \ReflectionException
+     * @throws JsonException
+     * @throws ReflectionException
      * @throws SaveError
      */
     public function stop(Event $event): void
@@ -161,7 +169,7 @@ class EventService
      * @param class-string $className
      *
      * @throws FactoryError
-     * @throws \ReflectionException
+     * @throws ReflectionException
      */
     public function getParameter(
         string $className,
@@ -208,12 +216,12 @@ class EventService
         return $parameter;
     }
 
-    public function getParameterOptions(\ReflectionClass $reflectionClass, string $name): array
+    public function getParameterOptions(ReflectionClass $reflectionClass, string $name): array
     {
         $parameterOptionAttributes = $this->reflectionManager->getAttributes(
             $reflectionClass,
             ParameterOption::class,
-            \ReflectionAttribute::IS_INSTANCEOF
+            ReflectionAttribute::IS_INSTANCEOF
         );
 
         $options = [];
@@ -230,13 +238,13 @@ class EventService
     }
 
     public function getListeners(
-        \ReflectionClass|\ReflectionMethod|\ReflectionClassConstant $reflectionObject,
+        ReflectionClass|ReflectionMethod|ReflectionClassConstant $reflectionObject,
         array $listeners = []
     ): array {
         $listenerAttributes = $this->reflectionManager->getAttributes(
             $reflectionObject,
             Listener::class,
-            \ReflectionAttribute::IS_INSTANCEOF
+            ReflectionAttribute::IS_INSTANCEOF
         );
 
         foreach ($listenerAttributes as $listener) {
@@ -257,8 +265,8 @@ class EventService
      *
      * @throws EventException
      * @throws FactoryError
-     * @throws \JsonException
-     * @throws \ReflectionException
+     * @throws JsonException
+     * @throws ReflectionException
      */
     private function checkTriggerParameters(Event $event, string $className, string $trigger, array $parameters): bool
     {
@@ -274,7 +282,7 @@ class EventService
 
             $reflectionClass = $this->reflectionManager->getReflectionClass($className);
 
-            foreach ($reflectionClass->getReflectionConstants(\ReflectionClassConstant::IS_PUBLIC) as $reflectionClassConstant) {
+            foreach ($reflectionClass->getReflectionConstants(ReflectionClassConstant::IS_PUBLIC) as $reflectionClassConstant) {
                 if ($reflectionClassConstant->getValue() !== $eventTrigger->getTrigger()) {
                     continue;
                 }
@@ -282,7 +290,7 @@ class EventService
                 $triggerAttribute = $this->reflectionManager->getAttribute(
                     $reflectionClassConstant,
                     Trigger::class,
-                    \ReflectionAttribute::IS_INSTANCEOF
+                    ReflectionAttribute::IS_INSTANCEOF
                 );
 
                 if ($triggerAttribute === null) {

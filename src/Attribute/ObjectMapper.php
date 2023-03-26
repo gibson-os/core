@@ -7,7 +7,7 @@ use Attribute;
 use GibsonOS\Core\Mapper\ObjectMapper as ObjectMapperClass;
 use GibsonOS\Core\Mapper\ObjectMapperInterface;
 
-#[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_PARAMETER)]
+#[Attribute(Attribute::TARGET_PROPERTY | Attribute::TARGET_PARAMETER)]
 class ObjectMapper
 {
     /**

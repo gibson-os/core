@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Store\User;
 
+use Generator;
 use GibsonOS\Core\Attribute\GetTableName;
 use GibsonOS\Core\Model\Action;
 use GibsonOS\Core\Model\Module;
@@ -10,6 +11,7 @@ use GibsonOS\Core\Model\Task;
 use GibsonOS\Core\Model\User;
 use GibsonOS\Core\Model\User\Permission;
 use GibsonOS\Core\Store\AbstractStore;
+use mysqlDatabase;
 
 class PermissionStore extends AbstractStore
 {
@@ -25,7 +27,7 @@ class PermissionStore extends AbstractStore
         #[GetTableName(Module::class)] private readonly string $moduleTableName,
         #[GetTableName(Task::class)] private readonly string $taskTableName,
         #[GetTableName(Action::class)] private readonly string $actionTableName,
-        private readonly \mysqlDatabase $mysqlDatabase
+        private readonly mysqlDatabase $mysqlDatabase
     ) {
     }
 
@@ -38,7 +40,7 @@ class PermissionStore extends AbstractStore
         return (int) $this->mysqlDatabase->fetchResult(0);
     }
 
-    public function getList(): \Generator
+    public function getList(): Generator
     {
         $selects = [
             '`u`.`id` `userId`',

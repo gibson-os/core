@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Service;
 
+use Exception;
 use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\Model\SaveError;
 use GibsonOS\Core\Exception\Repository\SelectError;
@@ -11,6 +12,8 @@ use GibsonOS\Core\Manager\ModelManager;
 use GibsonOS\Core\Model\User;
 use GibsonOS\Core\Repository\User\DeviceRepository;
 use GibsonOS\Core\Repository\UserRepository;
+use JsonException;
+use ReflectionException;
 
 class UserService
 {
@@ -57,7 +60,7 @@ class UserService
 
     /**
      * @throws SaveError
-     * @throws \Exception
+     * @throws Exception
      */
     public function addDevice(User $user, string $model, string $fcmToken = null): User\Device
     {
@@ -92,8 +95,8 @@ class UserService
     /**
      * @throws SaveError
      * @throws UserError
-     * @throws \JsonException
-     * @throws \ReflectionException
+     * @throws JsonException
+     * @throws ReflectionException
      */
     public function save(
         User $user,

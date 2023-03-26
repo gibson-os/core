@@ -3,11 +3,13 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Store\Role;
 
+use DateTimeImmutable;
 use GibsonOS\Core\Attribute\GetTableName;
 use GibsonOS\Core\Model\Role;
 use GibsonOS\Core\Model\Role\User;
 use GibsonOS\Core\Model\User as BaseUser;
 use GibsonOS\Core\Store\AbstractDatabaseStore;
+use mysqlDatabase;
 
 class UserStore extends AbstractDatabaseStore
 {
@@ -16,7 +18,7 @@ class UserStore extends AbstractDatabaseStore
     public function __construct(
         #[GetTableName(BaseUser::class)] private readonly string $userTableName,
         #[GetTableName(User::class)] private readonly string $roleUserTableName,
-        \mysqlDatabase $database = null,
+        mysqlDatabase $database = null,
     ) {
         parent::__construct($database);
     }
@@ -90,11 +92,11 @@ class UserStore extends AbstractDatabaseStore
                     ->setPassword($record['userPassword'])
                     ->setHost($record['userHost'])
                     ->setIp($record['userIp'])
-                    ->setAdded(new \DateTimeImmutable($record['userAdded']))
+                    ->setAdded(new DateTimeImmutable($record['userAdded']))
                     ->setLastLogin(
                         $record['userLastLogin'] === null
                         ? null
-                        : new \DateTimeImmutable($record['userLastLogin'])
+                        : new DateTimeImmutable($record['userLastLogin'])
                     )
             )
         ;

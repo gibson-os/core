@@ -14,11 +14,17 @@ use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Model\ModelInterface;
 use GibsonOS\Core\Service\RequestService;
 use GibsonOS\Core\Service\SessionService;
+use InvalidArgumentException;
+use JsonException;
+use mysqlDatabase;
+use mysqlTable;
+use ReflectionException;
+use ReflectionParameter;
 
 class ModelFetcherAttribute implements AttributeServiceInterface, ParameterAttributeInterface
 {
     public function __construct(
-        private readonly \mysqlDatabase $mysqlDatabase,
+        private readonly mysqlDatabase $mysqlDatabase,
         private readonly ModelManager $modelManager,
         private readonly RequestService $requestService,
         private readonly ReflectionManager $reflectionManager,
@@ -28,15 +34,15 @@ class ModelFetcherAttribute implements AttributeServiceInterface, ParameterAttri
 
     /**
      * @throws SelectError
-     * @throws \ReflectionException
-     * @throws \JsonException
+     * @throws ReflectionException
+     * @throws JsonException
      * @throws MapperException
      * @throws RequestError
      */
     public function replace(
         AttributeInterface $attribute,
         array $parameters,
-        \ReflectionParameter $reflectionParameter
+        ReflectionParameter $reflectionParameter
     ): ?AbstractModel {
         if (!$attribute instanceof GetModel) {
             throw new MapperException(sprintf(
@@ -50,7 +56,7 @@ class ModelFetcherAttribute implements AttributeServiceInterface, ParameterAttri
         $model = new $modelClassName();
 
         if (!$model instanceof AbstractModel) {
-            throw new \InvalidArgumentException(sprintf(
+            throw new InvalidArgumentException(sprintf(
                 'Model "%s" is no instance of "%s"!',
                 $model::class,
                 ModelInterface::class
@@ -63,7 +69,7 @@ class ModelFetcherAttribute implements AttributeServiceInterface, ParameterAttri
             return null;
         }
 
-        $table = (new \mysqlTable($this->mysqlDatabase, $model->getTableName()))
+        $table = (new mysqlTable($this->mysqlDatabase, $model->getTableName()))
             ->setWhereParameters($whereParameters)
             ->setWhere(implode(' AND ', array_map(
                 fn (string $field): string => '`' . $field . '`=?',
@@ -101,7 +107,7 @@ class ModelFetcherAttribute implements AttributeServiceInterface, ParameterAttri
     }
 
     /**
-     * @throws \ReflectionException
+     * @throws ReflectionException
      * @throws RequestError
      */
     private function getWhereValues(GetModel $attribute): array

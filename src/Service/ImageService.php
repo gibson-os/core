@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Service;
 
+use GdImage;
 use GibsonOS\Core\Dto\Image;
 use GibsonOS\Core\Exception\DeleteError;
 use GibsonOS\Core\Exception\FileNotFound;
@@ -96,7 +97,7 @@ class ImageService
             'string' => imagecreatefromstring($filename),
         };
 
-        if (!$image instanceof \GdImage) {
+        if (!$image instanceof GdImage) {
             throw new LoadError(sprintf('Bild "%s" konnte nicht geladen werden!', $filename));
         }
 

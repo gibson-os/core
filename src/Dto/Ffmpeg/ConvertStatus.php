@@ -3,9 +3,13 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Dto\Ffmpeg;
 
+use DateTime;
+use DateTimeInterface;
+use Exception;
 use GibsonOS\Core\Exception\SetError;
+use JsonSerializable;
 
-class ConvertStatus implements \JsonSerializable
+class ConvertStatus implements JsonSerializable
 {
     public const STATUS_ERROR = 'error';
 
@@ -34,7 +38,7 @@ class ConvertStatus implements \JsonSerializable
 
     private int $size;
 
-    private \DateTimeInterface $time;
+    private DateTimeInterface $time;
 
     private float $bitrate;
 
@@ -108,12 +112,12 @@ class ConvertStatus implements \JsonSerializable
         return $this;
     }
 
-    public function getTime(): \DateTimeInterface
+    public function getTime(): DateTimeInterface
     {
         return $this->time;
     }
 
-    public function setTime(\DateTimeInterface $time): ConvertStatus
+    public function setTime(DateTimeInterface $time): ConvertStatus
     {
         $this->time = $time;
 
@@ -144,15 +148,15 @@ class ConvertStatus implements \JsonSerializable
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
-    public function getTimeRemaining(): ?\DateTime
+    public function getTimeRemaining(): ?DateTime
     {
         if ($this->getFrames() === 0) {
             return null;
         }
 
-        return new \DateTime('@' . round(($this->getFrames() - $this->getFrame()) / $this->getFps()));
+        return new DateTime('@' . round(($this->getFrames() - $this->getFrame()) / $this->getFps()));
     }
 
     public function getStatus(): string
@@ -179,7 +183,7 @@ class ConvertStatus implements \JsonSerializable
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     public function jsonSerialize(): array
     {
@@ -195,7 +199,7 @@ class ConvertStatus implements \JsonSerializable
                 'quality' => $this->getQuality(),
                 'size' => $this->getSize(),
                 'time' => $this->getTime()->format('H:i:s'),
-                'timeRemaining' => $timeRemaining instanceof \DateTime ? $timeRemaining->format('H:i:s') : 0,
+                'timeRemaining' => $timeRemaining instanceof DateTime ? $timeRemaining->format('H:i:s') : 0,
                 'percent' => $this->getPercent(),
             ];
         }

@@ -3,7 +3,9 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Dto\Form;
 
-class Button implements \JsonSerializable
+use JsonSerializable;
+
+class Button implements JsonSerializable
 {
     public function __construct(
         private readonly string $text,

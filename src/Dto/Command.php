@@ -4,8 +4,9 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Dto;
 
 use GibsonOS\Core\Attribute\Install\Cronjob;
+use JsonSerializable;
 
-class Command implements \JsonSerializable
+class Command implements JsonSerializable
 {
     /**
      * @param class-string $classString

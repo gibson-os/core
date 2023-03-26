@@ -6,15 +6,21 @@ namespace GibsonOS\Core\Store;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Model\ModelInterface;
+use JsonException;
+use JsonSerializable;
+use mysqlDatabase;
+use mysqlRegistry;
+use mysqlTable;
+use ReflectionException;
 
 /**
  * @template T
  */
 abstract class AbstractDatabaseStore extends AbstractStore
 {
-    protected \mysqlDatabase $database;
+    protected mysqlDatabase $database;
 
-    protected \mysqlTable $table;
+    protected mysqlTable $table;
 
     private array $wheres = [];
 
@@ -29,10 +35,10 @@ abstract class AbstractDatabaseStore extends AbstractStore
      */
     abstract protected function getModelClassName(): string;
 
-    public function __construct(\mysqlDatabase $database = null)
+    public function __construct(mysqlDatabase $database = null)
     {
         if ($database === null) {
-            $this->database = \mysqlRegistry::getInstance()->get('database');
+            $this->database = mysqlRegistry::getInstance()->get('database');
         } else {
             $this->database = $database;
         }
@@ -41,7 +47,7 @@ abstract class AbstractDatabaseStore extends AbstractStore
         /** @var ModelInterface $model */
         $model = new $modelClassName();
         $this->tableName = $model->getTableName();
-        $this->table = new \mysqlTable($this->database, $this->tableName);
+        $this->table = new mysqlTable($this->database, $this->tableName);
     }
 
     public function setLimit(int $rows, int $from): self
@@ -71,8 +77,8 @@ abstract class AbstractDatabaseStore extends AbstractStore
     }
 
     /**
-     * @throws \JsonException
-     * @throws \ReflectionException
+     * @throws JsonException
+     * @throws ReflectionException
      * @throws SelectError
      *
      * @return T[]|iterable
@@ -197,8 +203,8 @@ abstract class AbstractDatabaseStore extends AbstractStore
     }
 
     /**
-     * @throws \JsonException
-     * @throws \ReflectionException
+     * @throws JsonException
+     * @throws ReflectionException
      * @throws SelectError
      *
      * @return iterable<T>
@@ -223,8 +229,8 @@ abstract class AbstractDatabaseStore extends AbstractStore
 
     /**
      * @throws SelectError
-     * @throws \JsonException
-     * @throws \ReflectionException
+     * @throws JsonException
+     * @throws ReflectionException
      *
      * @return T
      */
@@ -244,7 +250,7 @@ abstract class AbstractDatabaseStore extends AbstractStore
             throw $exception;
         }
 
-        if (!$model instanceof \JsonSerializable) {
+        if (!$model instanceof JsonSerializable) {
             $exception = new SelectError(sprintf('%s is not json serializable', $modelClassName));
             $exception->setTable($this->table);
 

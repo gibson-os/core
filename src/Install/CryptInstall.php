@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Install;
 
+use Generator;
 use GibsonOS\Core\Dto\Install\Configuration;
 use GibsonOS\Core\Dto\Install\Success;
 use GibsonOS\Core\Exception\GetError;
@@ -12,7 +13,7 @@ use GibsonOS\Core\Service\PriorityInterface;
 
 class CryptInstall extends AbstractInstall implements PriorityInterface, SingleInstallInterface
 {
-    public function install(string $module): \Generator
+    public function install(string $module): Generator
     {
         try {
             $hashAlgorithm = $this->envService->getString('PASSWORD_HASH_ALGO');

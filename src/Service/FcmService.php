@@ -8,6 +8,7 @@ use GibsonOS\Core\Event\FcmEvent;
 use GibsonOS\Core\Exception\WebException;
 use GibsonOS\Core\Repository\User\DeviceRepository;
 use GibsonOS\Core\Utility\StatusCode;
+use JsonException;
 
 class FcmService
 {
@@ -20,7 +21,7 @@ class FcmService
 
     /**
      * @throws WebException
-     * @throws \JsonException
+     * @throws JsonException
      */
     public function pushMessage(Message $message): FcmService
     {

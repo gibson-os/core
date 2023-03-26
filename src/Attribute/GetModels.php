@@ -7,7 +7,7 @@ use Attribute;
 use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Service\Attribute\ModelsFetcherAttribute;
 
-#[\Attribute(\Attribute::TARGET_PARAMETER)]
+#[Attribute(Attribute::TARGET_PARAMETER)]
 class GetModels implements AttributeInterface
 {
     /**

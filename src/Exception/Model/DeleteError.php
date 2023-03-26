@@ -5,6 +5,7 @@ namespace GibsonOS\Core\Exception\Model;
 
 use GibsonOS\Core\Exception\AbstractException;
 use GibsonOS\Core\Model\ModelInterface;
+use Throwable;
 
 class DeleteError extends AbstractException
 {
@@ -13,7 +14,7 @@ class DeleteError extends AbstractException
      */
     private $model;
 
-    public function __construct($message = 'Datensatz konnte nicht gelöscht werden!', $code = 0, \Throwable $previous = null)
+    public function __construct($message = 'Datensatz konnte nicht gelöscht werden!', $code = 0, Throwable $previous = null)
     {
         parent::__construct($message, $code, $previous);
     }

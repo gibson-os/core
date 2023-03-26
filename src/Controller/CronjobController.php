@@ -11,13 +11,15 @@ use GibsonOS\Core\Model\User\Permission;
 use GibsonOS\Core\Service\Response\AjaxResponse;
 use GibsonOS\Core\Store\Cronjob\TimeStore;
 use GibsonOS\Core\Store\CronjobStore;
+use JsonException;
+use ReflectionException;
 
 class CronjobController extends AbstractController
 {
     /**
      * @throws SelectError
-     * @throws \JsonException
-     * @throws \ReflectionException
+     * @throws JsonException
+     * @throws ReflectionException
      */
     #[CheckPermission(Permission::READ)]
     public function index(CronjobStore $cronjobStore, int $limit = 100, int $start = 0, array $sort = []): AjaxResponse
@@ -30,8 +32,8 @@ class CronjobController extends AbstractController
 
     /**
      * @throws SelectError
-     * @throws \JsonException
-     * @throws \ReflectionException
+     * @throws JsonException
+     * @throws ReflectionException
      */
     #[CheckPermission(Permission::READ)]
     public function times(

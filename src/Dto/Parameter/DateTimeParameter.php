@@ -3,11 +3,13 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Dto\Parameter;
 
+use DateTimeInterface;
+
 class DateTimeParameter extends AbstractParameter
 {
-    private ?\DateTimeInterface $min = null;
+    private ?DateTimeInterface $min = null;
 
-    private ?\DateTimeInterface $max = null;
+    private ?DateTimeInterface $max = null;
 
     private int $increase = 15;
 
@@ -16,7 +18,7 @@ class DateTimeParameter extends AbstractParameter
         parent::__construct($title, 'gosCoreComponentFormFieldDateTime');
     }
 
-    public function setRange(?\DateTimeInterface $min, \DateTimeInterface $max = null): DateTimeParameter
+    public function setRange(?DateTimeInterface $min, DateTimeInterface $max = null): DateTimeParameter
     {
         $this->min = $min;
         $this->max = $max;

@@ -9,6 +9,7 @@ use GibsonOS\Core\Exception\Server\ReceiveError;
 use GibsonOS\Core\Exception\Server\SendError;
 use GibsonOS\Core\Exception\SetError;
 use Psr\Log\LoggerInterface;
+use Socket;
 
 class UdpService
 {
@@ -16,7 +17,7 @@ class UdpService
 
     private const CREATE_RETRY_SLEEP_MS = 10000;
 
-    private readonly \Socket $socket;
+    private readonly Socket $socket;
 
     /**
      * @throws CreateError
@@ -26,7 +27,7 @@ class UdpService
     {
         $socket = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP);
 
-        if (!$socket instanceof \Socket) {
+        if (!$socket instanceof Socket) {
             throw new CreateError('Socket konnte nicht angelegt werden!');
         }
 

@@ -5,7 +5,7 @@ namespace GibsonOS\Core\Attribute\Event;
 
 use Attribute;
 
-#[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
+#[Attribute(Attribute::TARGET_CLASS | Attribute::IS_REPEATABLE)]
 class ParameterOption
 {
     public function __construct(

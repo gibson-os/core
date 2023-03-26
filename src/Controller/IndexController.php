@@ -8,11 +8,12 @@ use GibsonOS\Core\Model\Setting;
 use GibsonOS\Core\Model\User;
 use GibsonOS\Core\Repository\Desktop\ItemRepository;
 use GibsonOS\Core\Service\Response\AjaxResponse;
+use JsonException;
 
 class IndexController extends AbstractController
 {
     /**
-     * @throws \JsonException
+     * @throws JsonException
      */
     public function index(
         DesktopController $desktopController,

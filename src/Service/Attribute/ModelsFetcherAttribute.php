@@ -12,11 +12,17 @@ use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Model\ModelInterface;
 use GibsonOS\Core\Service\SessionService;
+use InvalidArgumentException;
+use JsonException;
+use mysqlDatabase;
+use mysqlTable;
+use ReflectionException;
+use ReflectionParameter;
 
 class ModelsFetcherAttribute implements AttributeServiceInterface, ParameterAttributeInterface
 {
     public function __construct(
-        private readonly \mysqlDatabase $mysqlDatabase,
+        private readonly mysqlDatabase $mysqlDatabase,
         private readonly ModelManager $modelManager,
         private readonly ReflectionManager $reflectionManager,
         private readonly SessionService $sessionService,
@@ -25,8 +31,8 @@ class ModelsFetcherAttribute implements AttributeServiceInterface, ParameterAttr
     }
 
     /**
-     * @throws \ReflectionException
-     * @throws \JsonException
+     * @throws ReflectionException
+     * @throws JsonException
      * @throws MapperException
      * @throws SelectError
      *
@@ -35,7 +41,7 @@ class ModelsFetcherAttribute implements AttributeServiceInterface, ParameterAttr
     public function replace(
         AttributeInterface $attribute,
         array $parameters,
-        \ReflectionParameter $reflectionParameter
+        ReflectionParameter $reflectionParameter
     ): ?array {
         if (!$attribute instanceof GetModels) {
             throw new MapperException(sprintf(
@@ -49,7 +55,7 @@ class ModelsFetcherAttribute implements AttributeServiceInterface, ParameterAttr
         $model = new $modelClassName();
 
         if (!$model instanceof AbstractModel) {
-            throw new \InvalidArgumentException(sprintf(
+            throw new InvalidArgumentException(sprintf(
                 'Model "%s" is no instance of "%s"!',
                 $model::class,
                 ModelInterface::class
@@ -80,7 +86,7 @@ class ModelsFetcherAttribute implements AttributeServiceInterface, ParameterAttr
             return [];
         }
 
-        $table = (new \mysqlTable($this->mysqlDatabase, $model->getTableName()))
+        $table = (new mysqlTable($this->mysqlDatabase, $model->getTableName()))
             ->setWhereParameters($whereParameters)
             ->setWhere('(' . implode(') OR (', $where) . ')')
         ;

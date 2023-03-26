@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Service\Ffmpeg;
 
+use DateInterval;
+use DateTime;
 use Exception;
 use GibsonOS\Core\Dto\Ffmpeg\ConvertStatus;
 use GibsonOS\Core\Dto\Ffmpeg\Media as MediaDto;
@@ -22,6 +24,8 @@ use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\Image\LoadError;
 use GibsonOS\Core\Exception\ProcessError;
 use GibsonOS\Core\Service\FfmpegService;
+use InvalidArgumentException;
+use OutOfRangeException;
 
 class MediaService
 {
@@ -40,7 +44,7 @@ class MediaService
         $loadString = $this->ffmpeg->getFileMetaDataString($media->getFilename());
 
         if (!preg_match('/Duration:\s*(\d{2}):(\d{2}):(\d{2}).(\d{2}),.*bitrate:\s*(.*)\s*kb/', $loadString, $hits)) {
-            throw new \InvalidArgumentException('Keine Video Metadaten gefunden!');
+            throw new InvalidArgumentException('Keine Video Metadaten gefunden!');
         }
 
         $this->calculateDuration($media, $hits);
@@ -132,7 +136,7 @@ class MediaService
     public function getImageBySecond(MediaDto $media, int $second, int $frame = null): Image
     {
         if ($second > $media->getDuration()) {
-            throw new \OutOfRangeException(
+            throw new OutOfRangeException(
                 'Sekunde ' . $second . ' ist größer als ' . $media->getDuration() . '!'
             );
         }
@@ -155,17 +159,17 @@ class MediaService
         }
 
         if ($frameNumber > $media->getFrames()) {
-            throw new \OutOfRangeException(
+            throw new OutOfRangeException(
                 'Frame Nummer ' . $frameNumber . ' ist größer als ' . $media->getFrames() . '!'
             );
         }
 
         try {
-            $date = (new \DateTime('01.01.2000 00:00:00'))->add(
-                new \DateInterval('PT' . (int) ($frameNumber / $media->getSelectedVideoStream()->getFps()) . 'S')
+            $date = (new DateTime('01.01.2000 00:00:00'))->add(
+                new DateInterval('PT' . (int) ($frameNumber / $media->getSelectedVideoStream()->getFps()) . 'S')
             );
         } catch (Exception) {
-            throw new \OutOfRangeException('Frame Nummer ' . $frameNumber . ' kann nicht addiert werden!');
+            throw new OutOfRangeException('Frame Nummer ' . $frameNumber . ' kann nicht addiert werden!');
         }
 
         return $this->ffmpeg->getImageByFrame(

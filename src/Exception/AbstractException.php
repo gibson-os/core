@@ -3,16 +3,9 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Exception;
 
-/**
- * Gibson OS.
- *
- * @author Benjamin Wollenweber
- *
- * @package GibsonOS\System
- *
- * @copyright 2014
- */
-abstract class AbstractException extends \Exception
+use Exception;
+
+abstract class AbstractException extends Exception
 {
     public const INFO = 0;
 

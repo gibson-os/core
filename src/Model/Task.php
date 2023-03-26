@@ -7,6 +7,8 @@ use GibsonOS\Core\Attribute\Install\Database\Column;
 use GibsonOS\Core\Attribute\Install\Database\Constraint;
 use GibsonOS\Core\Attribute\Install\Database\Key;
 use GibsonOS\Core\Attribute\Install\Database\Table;
+use JsonSerializable;
+use mysqlDatabase;
 
 /**
  * @method Module getModule()
@@ -14,7 +16,7 @@ use GibsonOS\Core\Attribute\Install\Database\Table;
  */
 #[Table]
 #[Key(unique: true, columns: ['name', 'module_id'])]
-class Task extends AbstractModel implements \JsonSerializable, AutoCompleteModelInterface
+class Task extends AbstractModel implements JsonSerializable, AutoCompleteModelInterface
 {
     #[Column(attributes: [Column::ATTRIBUTE_UNSIGNED], autoIncrement: true)]
     private ?int $id = null;
@@ -28,7 +30,7 @@ class Task extends AbstractModel implements \JsonSerializable, AutoCompleteModel
     #[Constraint]
     protected Module $module;
 
-    public function __construct(\mysqlDatabase $database = null)
+    public function __construct(mysqlDatabase $database = null)
     {
         parent::__construct($database);
 

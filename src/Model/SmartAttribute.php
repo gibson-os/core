@@ -5,9 +5,10 @@ namespace GibsonOS\Core\Model;
 
 use GibsonOS\Core\Attribute\Install\Database\Column;
 use GibsonOS\Core\Attribute\Install\Database\Table;
+use JsonSerializable;
 
 #[Table('system_smart_attribute')]
-class SmartAttribute extends AbstractModel implements \JsonSerializable
+class SmartAttribute extends AbstractModel implements JsonSerializable
 {
     #[Column(attributes: [Column::ATTRIBUTE_UNSIGNED], primary: true)]
     private int $id;

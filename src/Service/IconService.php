@@ -16,6 +16,7 @@ use GibsonOS\Core\Model\Icon;
 use GibsonOS\Core\Model\Setting;
 use GibsonOS\Core\Repository\Icon\TagRepository;
 use JsonException;
+use Throwable;
 
 class IconService
 {
@@ -35,7 +36,7 @@ class IconService
      * @throws GetError
      * @throws SaveError
      * @throws SetError
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function save(Icon $icon, string $imageFilename, string $iconFilename = null, array $tags = []): void
     {
@@ -65,7 +66,7 @@ class IconService
                         ->setTag(trim($tag))
                 );
             }
-        } catch (\Throwable $exception) {
+        } catch (Throwable $exception) {
             $database->rollback();
 
             throw $exception;

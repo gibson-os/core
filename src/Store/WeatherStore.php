@@ -3,13 +3,14 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Store;
 
+use DateTimeInterface;
 use GibsonOS\Core\Model\Weather;
 
 class WeatherStore extends AbstractDatabaseStore
 {
     private int $locationId;
 
-    private ?\DateTimeInterface $date = null;
+    private ?DateTimeInterface $date = null;
 
     protected function getModelClassName(): string
     {
@@ -32,7 +33,7 @@ class WeatherStore extends AbstractDatabaseStore
         return $this;
     }
 
-    public function setDate(?\DateTimeInterface $date): WeatherStore
+    public function setDate(?DateTimeInterface $date): WeatherStore
     {
         $this->date = $date;
 

@@ -5,7 +5,7 @@ namespace GibsonOS\Core\Attribute\Install\Database;
 
 use Attribute;
 
-#[\Attribute(\Attribute::TARGET_CLASS)]
+#[Attribute(Attribute::TARGET_CLASS)]
 class View extends Table
 {
     public function __construct(private string $query, private ?string $name = null)

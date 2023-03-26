@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Command\Cronjob;
 
+use DateTime;
+use DateTimeZone;
 use GibsonOS\Core\Attribute\Install\Cronjob;
 use GibsonOS\Core\Command\AbstractCommand;
 use GibsonOS\Core\Exception\DateTimeError;
@@ -16,7 +18,9 @@ use GibsonOS\Core\Repository\WeatherRepository;
 use GibsonOS\Core\Service\DateTimeService;
 use GibsonOS\Core\Service\LockService;
 use GibsonOS\Core\Service\WeatherService;
+use JsonException;
 use Psr\Log\LoggerInterface;
+use ReflectionException;
 
 /**
  * @description Collect weather information of required locations
@@ -38,12 +42,12 @@ class WeatherCommand extends AbstractCommand
 
     /**
      * @throws DateTimeError
-     * @throws \JsonException
+     * @throws JsonException
      * @throws LockError
      * @throws SaveError
      * @throws UnlockError
      * @throws WeatherError
-     * @throws \ReflectionException
+     * @throws ReflectionException
      */
     protected function run(): int
     {
@@ -51,11 +55,11 @@ class WeatherCommand extends AbstractCommand
 
         foreach ($this->locationRepository->getToUpdate() as $location) {
             $lastRun = $this->dateTimeService->get();
-            /** @var \DateTime $oldLastRun */
+            /** @var DateTime $oldLastRun */
             $oldLastRun = $location->getLastRun();
 
             if ($oldLastRun !== null) {
-                $localTimezone = new \DateTimeZone($location->getTimezone());
+                $localTimezone = new DateTimeZone($location->getTimezone());
                 $oldLastRun->setTimezone($localTimezone);
                 $lastRunLocalTime = clone $lastRun;
                 $lastRunLocalTime->setTimezone($localTimezone);

@@ -25,13 +25,15 @@ use GibsonOS\Core\Service\UserService;
 use GibsonOS\Core\Store\User\PermissionStore;
 use GibsonOS\Core\Store\UserStore;
 use GibsonOS\Core\Utility\StatusCode;
+use JsonException;
+use ReflectionException;
 
 class UserController extends AbstractController
 {
     /**
      * @throws SelectError
-     * @throws \JsonException
-     * @throws \ReflectionException
+     * @throws JsonException
+     * @throws ReflectionException
      */
     #[CheckPermission(Permission::MANAGE + Permission::READ)]
     public function index(UserStore $userStore): AjaxResponse
@@ -119,8 +121,8 @@ class UserController extends AbstractController
     }
 
     /**
-     * @throws \JsonException
-     * @throws \ReflectionException
+     * @throws JsonException
+     * @throws ReflectionException
      * @throws SaveError
      * @throws UserError
      *
@@ -173,7 +175,7 @@ class UserController extends AbstractController
     }
 
     /**
-     * @throws \JsonException
+     * @throws JsonException
      * @throws SaveError
      * @throws DeleteError
      */
@@ -214,7 +216,7 @@ class UserController extends AbstractController
 
     /**
      * @throws DeleteError
-     * @throws \JsonException
+     * @throws JsonException
      */
     #[CheckPermission(Permission::MANAGE + Permission::DELETE)]
     public function delete(ModelManager $modelManager, #[GetModel] User $user): AjaxResponse
@@ -226,8 +228,8 @@ class UserController extends AbstractController
 
     /**
      * @throws SelectError
-     * @throws \JsonException
-     * @throws \ReflectionException
+     * @throws JsonException
+     * @throws ReflectionException
      */
     #[CheckPermission(Permission::MANAGE + Permission::READ)]
     public function permissions(

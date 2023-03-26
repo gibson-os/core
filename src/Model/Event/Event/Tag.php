@@ -11,6 +11,7 @@ use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Model\Event;
 use GibsonOS\Core\Model\Event\Element;
 use GibsonOS\Core\Model\Event\Tag as EventTag;
+use JsonSerializable;
 
 /**
  * @method Tag      setEvent(Element $element)
@@ -20,7 +21,7 @@ use GibsonOS\Core\Model\Event\Tag as EventTag;
  */
 #[Table]
 #[Key(unique: true, columns: ['event_id', 'tag_id'])]
-class Tag extends AbstractModel implements \JsonSerializable
+class Tag extends AbstractModel implements JsonSerializable
 {
     #[Column(attributes: [Column::ATTRIBUTE_UNSIGNED], autoIncrement: true)]
     private ?int $id = null;

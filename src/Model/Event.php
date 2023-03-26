@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Model;
 
+use DateTimeImmutable;
+use DateTimeInterface;
 use GibsonOS\Core\Attribute\Install\Database\Column;
 use GibsonOS\Core\Attribute\Install\Database\Constraint;
 use GibsonOS\Core\Attribute\Install\Database\Key;
@@ -10,6 +12,8 @@ use GibsonOS\Core\Attribute\Install\Database\Table;
 use GibsonOS\Core\Model\Event\Element;
 use GibsonOS\Core\Model\Event\Event\Tag;
 use GibsonOS\Core\Model\Event\Trigger;
+use JsonSerializable;
+use mysqlDatabase;
 
 /**
  * @method Element[] getElements()
@@ -23,7 +27,7 @@ use GibsonOS\Core\Model\Event\Trigger;
  * @method Event     setTags(Tag[] $tags)
  */
 #[Table]
-class Event extends AbstractModel implements \JsonSerializable, AutoCompleteModelInterface
+class Event extends AbstractModel implements JsonSerializable, AutoCompleteModelInterface
 {
     #[Column(attributes: [Column::ATTRIBUTE_UNSIGNED], autoIncrement: true)]
     private ?int $id = null;
@@ -48,10 +52,10 @@ class Event extends AbstractModel implements \JsonSerializable, AutoCompleteMode
     private bool $exitOnError = true;
 
     #[Column(type: Column::TYPE_TIMESTAMP, default: Column::DEFAULT_CURRENT_TIMESTAMP)]
-    private \DateTimeInterface $modified;
+    private DateTimeInterface $modified;
 
     #[Column]
-    private ?\DateTimeInterface $lastRun = null;
+    private ?DateTimeInterface $lastRun = null;
 
     /**
      * @var Element[]
@@ -71,11 +75,11 @@ class Event extends AbstractModel implements \JsonSerializable, AutoCompleteMode
     #[Constraint('event', Tag::class)]
     protected array $tags = [];
 
-    public function __construct(\mysqlDatabase $database = null)
+    public function __construct(mysqlDatabase $database = null)
     {
         parent::__construct($database);
 
-        $this->modified = new \DateTimeImmutable();
+        $this->modified = new DateTimeImmutable();
     }
 
     public function getId(): ?int
@@ -162,24 +166,24 @@ class Event extends AbstractModel implements \JsonSerializable, AutoCompleteMode
         return $this;
     }
 
-    public function getModified(): \DateTimeInterface
+    public function getModified(): DateTimeInterface
     {
         return $this->modified;
     }
 
-    public function setModified(\DateTimeInterface $modified): Event
+    public function setModified(DateTimeInterface $modified): Event
     {
         $this->modified = $modified;
 
         return $this;
     }
 
-    public function getLastRun(): ?\DateTimeInterface
+    public function getLastRun(): ?DateTimeInterface
     {
         return $this->lastRun;
     }
 
-    public function setLastRun(?\DateTimeInterface $lastRun): Event
+    public function setLastRun(?DateTimeInterface $lastRun): Event
     {
         $this->lastRun = $lastRun;
 

@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Utility;
 
+use OutOfBoundsException;
+
 class StatusCode
 {
     public const CONTINUE = 100;
@@ -205,12 +207,12 @@ class StatusCode
     }
 
     /**
-     * @throws \OutOfBoundsException
+     * @throws OutOfBoundsException
      */
     public function getStatusHeader(int $code): string
     {
         if (!$this->isValidCode($code)) {
-            throw new \OutOfBoundsException(sprintf('Status Code %d is not allowed!', $code), self::BAD_REQUEST);
+            throw new OutOfBoundsException(sprintf('Status Code %d is not allowed!', $code), self::BAD_REQUEST);
         }
 
         return 'HTTP/1.0 ' . $code . ' ' . self::CODES[$code];

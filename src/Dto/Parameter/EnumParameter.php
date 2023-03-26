@@ -5,13 +5,14 @@ namespace GibsonOS\Core\Dto\Parameter;
 
 use GibsonOS\Core\Exception\ParameterException;
 use GibsonOS\Core\Manager\ReflectionManager;
+use ReflectionException;
 
 class EnumParameter extends OptionParameter
 {
     /**
      * @param class-string $className
      *
-     * @throws \ReflectionException
+     * @throws ReflectionException
      */
     public function __construct(
         private readonly ReflectionManager $reflectionManager,

@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Mapper;
 
+use DateTimeZone;
 use GibsonOS\Core\Model\Weather;
 use GibsonOS\Core\Model\Weather\Location;
 use GibsonOS\Core\Service\DateTimeService;
@@ -19,8 +20,8 @@ class WeatherMapper
             ->setLocation($location)
             ->setDate($this->dateTimeService->get(
                 '@' . $data['dt'],
-                new \DateTimeZone('UTC')
-            )->setTimezone(new \DateTimeZone($location->getTimezone())))
+                new DateTimeZone('UTC')
+            )->setTimezone(new DateTimeZone($location->getTimezone())))
             ->setTemperature($data['temp'])
             ->setFeelsLike($data['feels_like'])
             ->setPressure($data['pressure'])

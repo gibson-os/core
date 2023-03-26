@@ -9,13 +9,14 @@ use GibsonOS\Core\Attribute\Install\Database\Key;
 use GibsonOS\Core\Attribute\Install\Database\Table;
 use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Model\Icon;
+use JsonSerializable;
 
 /**
  * @method Icon getIcon()
  * @method Tag  setIcon(Icon $icon)
  */
 #[Table]
-class Tag extends AbstractModel implements \JsonSerializable
+class Tag extends AbstractModel implements JsonSerializable
 {
     #[Column(attributes: [Column::ATTRIBUTE_UNSIGNED], primary: true)]
     private int $iconId;

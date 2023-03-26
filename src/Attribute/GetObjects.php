@@ -6,7 +6,7 @@ namespace GibsonOS\Core\Attribute;
 use Attribute;
 use GibsonOS\Core\Service\Attribute\ObjectsMapperAttribute;
 
-#[\Attribute(\Attribute::TARGET_PARAMETER)]
+#[Attribute(Attribute::TARGET_PARAMETER)]
 class GetObjects implements AttributeInterface
 {
     /**

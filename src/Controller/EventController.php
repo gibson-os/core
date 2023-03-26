@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Controller;
 
+use Exception;
 use GibsonOS\Core\Attribute\CheckPermission;
 use GibsonOS\Core\Attribute\GetMappedModel;
 use GibsonOS\Core\Attribute\GetModel;
@@ -29,6 +30,9 @@ use GibsonOS\Core\Store\Event\ElementStore;
 use GibsonOS\Core\Store\Event\MethodStore;
 use GibsonOS\Core\Store\Event\TriggerStore;
 use GibsonOS\Core\Store\EventStore;
+use JsonException;
+use mysqlDatabase;
+use ReflectionException;
 
 class EventController extends AbstractController
 {
@@ -53,8 +57,8 @@ class EventController extends AbstractController
      *
      * @throws FactoryError
      * @throws GetError
-     * @throws \JsonException
-     * @throws \ReflectionException
+     * @throws JsonException
+     * @throws ReflectionException
      * @throws SelectError
      */
     #[CheckPermission(Permission::READ)]
@@ -88,7 +92,7 @@ class EventController extends AbstractController
      * @param class-string $className
      *
      * @throws FactoryError
-     * @throws \ReflectionException
+     * @throws ReflectionException
      */
     #[CheckPermission(Permission::READ)]
     public function methods(MethodStore $methodStore, string $className): AjaxResponse
@@ -102,7 +106,7 @@ class EventController extends AbstractController
      * @param class-string $className
      *
      * @throws FactoryError
-     * @throws \ReflectionException
+     * @throws ReflectionException
      */
     #[CheckPermission(Permission::READ)]
     public function classTriggers(ClassTriggerStore $classTriggerStore, string $className): AjaxResponse
@@ -116,8 +120,8 @@ class EventController extends AbstractController
      * @throws FactoryError
      * @throws GetError
      * @throws SelectError
-     * @throws \JsonException
-     * @throws \ReflectionException
+     * @throws JsonException
+     * @throws ReflectionException
      */
     #[CheckPermission(Permission::READ)]
     public function triggers(TriggerStore $triggerStore, #[GetModel(['id' => 'eventId'])] Event $event): AjaxResponse
@@ -137,7 +141,7 @@ class EventController extends AbstractController
 
         try {
             $modelManager->save($event);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $eventRepository->rollback();
 
             return $this->returnFailure($e->getMessage());
@@ -151,13 +155,13 @@ class EventController extends AbstractController
     /**
      * @param Event[] $events
      *
-     * @throws \JsonException
-     * @throws \ReflectionException
+     * @throws JsonException
+     * @throws ReflectionException
      * @throws SaveError
      */
     #[CheckPermission(Permission::WRITE)]
     public function copy(
-        \mysqlDatabase $database,
+        mysqlDatabase $database,
         ModelManager $modelManager,
         #[GetModels(Event::class)] array $events
     ): AjaxResponse {
@@ -190,7 +194,7 @@ class EventController extends AbstractController
 
                 $modelManager->save($event);
             }
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             $database->rollback();
 
             throw $exception;
@@ -217,10 +221,10 @@ class EventController extends AbstractController
     /**
      * @throws DateTimeError
      * @throws FactoryError
-     * @throws \JsonException
+     * @throws JsonException
      * @throws SaveError
      * @throws EventException
-     * @throws \ReflectionException
+     * @throws ReflectionException
      */
     #[CheckPermission(Permission::WRITE)]
     public function run(EventService $eventService, #[GetModel(['id' => 'eventId'])] Event $event): AjaxResponse
@@ -232,7 +236,7 @@ class EventController extends AbstractController
 
     /**
      * @throws DeleteError
-     * @throws \JsonException
+     * @throws JsonException
      */
     #[CheckPermission(Permission::DELETE)]
     public function delete(ModelManager $modelManager, #[GetModel(['id' => 'eventId'])] Event $event): AjaxResponse

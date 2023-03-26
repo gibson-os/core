@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Event;
 
+use DateTimeInterface;
 use GibsonOS\Core\Attribute\Event;
 use GibsonOS\Core\Dto\Parameter\BoolParameter;
 use GibsonOS\Core\Dto\Parameter\DateParameter;
@@ -55,8 +56,8 @@ class TimeEvent extends AbstractEvent
     #[Event\Method('Zwischen')]
     #[Event\ReturnValue(BoolParameter::class, 'Trifft zu')]
     public function between(
-        #[Event\Parameter(DateParameter::class, 'Startdatum')] \DateTimeInterface $start,
-        #[Event\Parameter(DateParameter::class, 'Enddatum')] \DateTimeInterface $end
+        #[Event\Parameter(DateParameter::class, 'Startdatum')] DateTimeInterface $start,
+        #[Event\Parameter(DateParameter::class, 'Enddatum')] DateTimeInterface $end
     ): bool {
         $now = $this->dateTimeService->get();
 

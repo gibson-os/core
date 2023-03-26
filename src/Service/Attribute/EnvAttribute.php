@@ -7,14 +7,19 @@ use GibsonOS\Core\Attribute\AttributeInterface;
 use GibsonOS\Core\Attribute\GetEnv;
 use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Service\EnvService;
+use ReflectionNamedType;
+use ReflectionParameter;
 
 class EnvAttribute implements ParameterAttributeInterface, AttributeServiceInterface
 {
-    public function __construct(private EnvService $envService)
+    public function __construct(private readonly EnvService $envService)
     {
     }
 
-    public function replace(AttributeInterface $attribute, array $parameters, \ReflectionParameter $reflectionParameter): mixed
+    /**
+     * @throws GetError
+     */
+    public function replace(AttributeInterface $attribute, array $parameters, ReflectionParameter $reflectionParameter): mixed
     {
         if (!$attribute instanceof GetEnv) {
             return null;
@@ -22,7 +27,7 @@ class EnvAttribute implements ParameterAttributeInterface, AttributeServiceInter
 
         $reflectionParameterType = $reflectionParameter->getType();
 
-        if ($reflectionParameterType instanceof \ReflectionNamedType) {
+        if ($reflectionParameterType instanceof ReflectionNamedType) {
             $parameterType = ucfirst($reflectionParameterType->getName());
 
             try {

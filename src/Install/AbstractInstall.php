@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Install;
 
+use Generator;
 use GibsonOS\Core\Dto\Install\Input;
 use GibsonOS\Core\Exception\FactoryError;
 use GibsonOS\Core\Exception\GetError;
@@ -17,7 +18,9 @@ use GibsonOS\Core\Repository\SettingRepository;
 use GibsonOS\Core\Service\DirService;
 use GibsonOS\Core\Service\EnvService;
 use GibsonOS\Core\Utility\JsonUtility;
+use JsonException;
 use Psr\Log\LoggerInterface;
+use ReflectionException;
 
 abstract class AbstractInstall implements InstallInterface
 {
@@ -36,7 +39,7 @@ abstract class AbstractInstall implements InstallInterface
     /**
      * @throws FactoryError
      */
-    public function __construct(protected ServiceManager $serviceManagerService)
+    public function __construct(protected readonly ServiceManager $serviceManagerService)
     {
         $this->dirService = $this->serviceManagerService->get(DirService::class);
         $this->envService = $this->serviceManagerService->get(EnvService::class);
@@ -49,7 +52,7 @@ abstract class AbstractInstall implements InstallInterface
     /**
      * @throws GetError
      */
-    protected function getFiles(string $path): \Generator
+    protected function getFiles(string $path): Generator
     {
         $path = $this->dirService->addEndSlash($path);
 
@@ -88,8 +91,8 @@ abstract class AbstractInstall implements InstallInterface
     }
 
     /**
-     * @throws \JsonException
-     * @throws \ReflectionException
+     * @throws JsonException
+     * @throws ReflectionException
      * @throws SaveError
      * @throws SelectError
      */
@@ -150,8 +153,8 @@ abstract class AbstractInstall implements InstallInterface
     /**
      * @throws SaveError
      * @throws SelectError
-     * @throws \JsonException
-     * @throws \ReflectionException
+     * @throws JsonException
+     * @throws ReflectionException
      */
     protected function addApp(string $text, string $module, string $task, string $action, string $icon): self
     {

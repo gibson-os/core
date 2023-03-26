@@ -8,6 +8,7 @@ use GibsonOS\Core\Service\RequestService;
 use GibsonOS\Core\Service\TwigService;
 use GibsonOS\Core\Utility\JsonUtility;
 use GibsonOS\Core\Utility\StatusCode;
+use Throwable;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
@@ -15,7 +16,7 @@ use Twig\Error\SyntaxError;
 class ExceptionResponse implements ResponseInterface
 {
     public function __construct(
-        private \Throwable $exception,
+        private Throwable $exception,
         private RequestService $requestService,
         private TwigService $twigService,
         private StatusCode $statusCode
@@ -100,7 +101,7 @@ class ExceptionResponse implements ResponseInterface
         return [];
     }
 
-    private function getExceptionJson(\Throwable $exception): array
+    private function getExceptionJson(Throwable $exception): array
     {
         return [
             'message' => $exception->getMessage(),

@@ -6,8 +6,10 @@ namespace GibsonOS\Core\Dto\Fcm;
 use GibsonOS\Core\Enum\Middleware\Message\Priority;
 use GibsonOS\Core\Enum\Middleware\Message\Type;
 use GibsonOS\Core\Enum\Middleware\Message\Vibrate;
+use JsonException;
+use JsonSerializable;
 
-class Message implements \JsonSerializable
+class Message implements JsonSerializable
 {
     public function __construct(
         private readonly string $token,
@@ -25,7 +27,7 @@ class Message implements \JsonSerializable
     }
 
     /**
-     * @throws \JsonException
+     * @throws JsonException
      */
     public function jsonSerialize(): array
     {

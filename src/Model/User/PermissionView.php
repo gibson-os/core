@@ -5,9 +5,10 @@ namespace GibsonOS\Core\Model\User;
 
 use GibsonOS\Core\Attribute\Install\Database\View;
 use GibsonOS\Core\Model\AbstractModel;
+use JsonSerializable;
 
 #[View(self::QUERY, 'view_user_permission')]
-class PermissionView extends AbstractModel implements \JsonSerializable
+class PermissionView extends AbstractModel implements JsonSerializable
 {
     private const QUERY =
         'WITH `all_users` AS (' .
