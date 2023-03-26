@@ -13,7 +13,7 @@ class CheckPermission implements AttributeInterface
         private readonly int $permission,
         private readonly array $permissionsByRequestValues = [],
         private readonly string $permissionParameter = 'userPermission',
-        private readonly string $userParameter = 'user',
+        private readonly string $userParameter = 'permissionUser',
     ) {
     }
 
