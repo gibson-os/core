@@ -9,7 +9,7 @@ use GibsonOS\Core\Model\User;
 
 class UserRepository extends AbstractRepository
 {
-    public function __construct(#[GetTableName(User::class)] private string $userTableName)
+    public function __construct(#[GetTableName(User::class)] private readonly string $userTableName)
     {
     }
 

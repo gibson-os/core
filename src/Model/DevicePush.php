@@ -24,9 +24,6 @@ use mysqlDatabase;
 #[Table]
 class DevicePush extends AbstractModel
 {
-    #[Column(length: 16, primary: true)]
-    private string $deviceId;
-
     #[Column(length: 32, primary: true)]
     private string $module;
 
@@ -38,6 +35,9 @@ class DevicePush extends AbstractModel
 
     #[Column(length: 512, primary: true)]
     private string $foreignId;
+
+    #[Column(length: 16, primary: true)]
+    private string $deviceId;
 
     #[Column(type: Column::TYPE_TIMESTAMP, default: Column::DEFAULT_CURRENT_TIMESTAMP, attributes: [Column::ATTRIBUTE_CURRENT_TIMESTAMP])]
     private DateTimeInterface $modified;

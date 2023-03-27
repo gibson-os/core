@@ -9,7 +9,7 @@ use GibsonOS\Core\Model\Task;
 
 class TaskRepository extends AbstractRepository
 {
-    public function __construct(#[GetTableName(Task::class)] private string $taskTableName)
+    public function __construct(#[GetTableName(Task::class)] private readonly string $taskTableName)
     {
     }
 

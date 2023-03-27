@@ -23,11 +23,10 @@ use stdClass;
 class EventRepository extends AbstractRepository
 {
     public function __construct(
-        private JsonUtility $jsonUtility,
-        private DateTimeService $dateTimeService,
-        private ModelManager $modelManager,
-        #[GetTableName(Element::class)] private string $elementTableName,
-        #[GetTableName(Trigger::class)] private string $triggerTableName
+        private readonly DateTimeService $dateTimeService,
+        private readonly ModelManager $modelManager,
+        #[GetTableName(Element::class)] private readonly string $elementTableName,
+        #[GetTableName(Trigger::class)] private readonly string $triggerTableName,
     ) {
     }
 

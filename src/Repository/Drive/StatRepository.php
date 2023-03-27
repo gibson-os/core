@@ -11,8 +11,8 @@ use GibsonOS\Core\Service\DateTimeService;
 class StatRepository extends AbstractRepository
 {
     public function __construct(
-        private DateTimeService $dateTimeService,
-        #[GetTableName(Stat::class)] private string $statTableName
+        private readonly DateTimeService $dateTimeService,
+        #[GetTableName(Stat::class)] private readonly string $statTableName,
     ) {
     }
 

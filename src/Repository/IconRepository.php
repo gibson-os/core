@@ -9,7 +9,7 @@ use GibsonOS\Core\Model\Icon;
 
 class IconRepository extends AbstractRepository
 {
-    public function __construct(#[GetTableName(Icon::class)] private string $iconTableName)
+    public function __construct(#[GetTableName(Icon::class)] private readonly string $iconTableName)
     {
     }
 

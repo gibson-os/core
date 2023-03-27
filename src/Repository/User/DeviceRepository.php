@@ -10,7 +10,7 @@ use GibsonOS\Core\Repository\AbstractRepository;
 
 class DeviceRepository extends AbstractRepository
 {
-    public function __construct(#[GetTableName(Device::class)] private string $deviceTableName)
+    public function __construct(#[GetTableName(Device::class)] private readonly string $deviceTableName)
     {
     }
 

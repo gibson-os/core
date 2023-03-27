@@ -9,7 +9,7 @@ use GibsonOS\Core\Repository\AbstractRepository;
 
 class TagRepository extends AbstractRepository
 {
-    public function __construct(#[GetTableName(Tag::class)] private string $tagTableName)
+    public function __construct(#[GetTableName(Tag::class)] private readonly string $tagTableName)
     {
     }
 

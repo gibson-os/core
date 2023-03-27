@@ -15,8 +15,8 @@ class DevicePushRepository extends AbstractRepository
     public function getByDevice(Device $device, string $module, string $task, string $action, string $foreignId): DevicePush
     {
         return $this->fetchOne(
-            '`device_id`=? AND `module`=? AND `task`=? AND `action`=? AND `foreign_id`=?',
-            [$device->getId(), $module, $task, $action, $foreignId],
+            '`module`=? AND `task`=? AND `action`=? AND `foreign_id`=? AND `device_id`=?',
+            [$module, $task, $action, $foreignId, $device->getId()],
             DevicePush::class
         );
     }

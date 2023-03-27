@@ -13,7 +13,7 @@ use stdClass;
 
 class PermissionViewRepository extends AbstractRepository
 {
-    public function __construct(#[GetTableName(PermissionView::class)] private string $permissionViewName)
+    public function __construct(#[GetTableName(PermissionView::class)] private readonly string $permissionViewName)
     {
     }
 

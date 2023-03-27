@@ -19,6 +19,7 @@ use mysqlDatabase;
  * @method User     addDevices(Device[] $devices)
  */
 #[Table]
+#[Key(columns: ['user', 'password'])]
 class User extends AbstractModel implements JsonSerializable, AutoCompleteModelInterface
 {
     #[Column(attributes: [Column::ATTRIBUTE_UNSIGNED], autoIncrement: true)]

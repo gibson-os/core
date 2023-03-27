@@ -14,8 +14,8 @@ use GibsonOS\Core\Service\DateTimeService;
 class WeatherRepository extends AbstractRepository
 {
     public function __construct(
-        private DateTimeService $dateTimeService,
-        #[GetTableName(Weather::class)] private string $weatherTableName
+        private readonly DateTimeService $dateTimeService,
+        #[GetTableName(Weather::class)] private readonly string $weatherTableName,
     ) {
     }
 
@@ -50,11 +50,11 @@ class WeatherRepository extends AbstractRepository
     public function deleteBetweenDates(Location $location, DateTimeInterface $from, DateTimeInterface $to): void
     {
         $this->getTable($this->weatherTableName)
-            ->setWhere('`date` > ? AND `date` < ? AND `location_id`=?')
+            ->setWhere('`location_id`=? AND `date` > ? AND `date` < ?')
             ->setWhereParameters([
+                $location->getId(),
                 $from->format('Y-m-d H:i:s'),
                 $to->format('Y-m-d H:i:s'),
-                $location->getId(),
             ])
             ->deletePrepared()
         ;

@@ -16,7 +16,7 @@ use JsonSerializable;
  * @method Action setTask(Task $task)
  */
 #[Table]
-#[Key(unique: true, columns: ['name', 'module_id', 'task_id'])]
+#[Key(unique: true, columns: ['name', 'task_id', 'module_id'])]
 class Action extends AbstractModel implements JsonSerializable, AutoCompleteModelInterface
 {
     #[Column(attributes: [Column::ATTRIBUTE_UNSIGNED], autoIncrement: true)]

@@ -63,15 +63,18 @@ class SettingRepository extends AbstractRepository
      */
     public function getByKey(int $moduleId, ?int $userId, string $key): Setting
     {
-        $parameters = [$moduleId, $key];
+        $parameters = [$moduleId];
 
         if ($userId !== null) {
             $parameters[] = $userId;
         }
 
+        $parameters[] = $key;
+
         return $this->fetchOne(
-            '`module_id`=? AND `key`=? AND' .
-            '(`user_id` IS NULL' . ($userId === null ? '' : ' OR `user_id`=?') . ')',
+            '`module_id`=? AND ' .
+            '(`user_id` IS NULL' . ($userId === null ? '' : ' OR `user_id`=?') . ') AND ' .
+            '`key`=?',
             $parameters,
             Setting::class
         );
@@ -82,18 +85,21 @@ class SettingRepository extends AbstractRepository
      */
     public function getByKeyAndModuleName(string $moduleName, ?int $userId, string $key): Setting
     {
-        $parameters = [$moduleName, $key];
+        $parameters = [$moduleName];
 
         if ($userId !== null) {
             $parameters[] = $userId;
         }
 
+        $parameters[] = $key;
+
         $tableName = $this->settingTableName;
         $table = $this->getTable($tableName)
             ->appendJoin('module', '`' . $tableName . '`.`module_id`=`module`.`id`')
             ->setWhere(
-                '`module`.`name`=? AND `' . $tableName . '`.`key`=? AND ' .
-                '(`' . $tableName . '`.`user_id` IS NULL' . ($userId === null ? '' : ' OR `' . $tableName . '`.`user_id`=?') . ')'
+                '`module`.`name`=? AND ' .
+                '(`' . $tableName . '`.`user_id` IS NULL' . ($userId === null ? '' : ' OR `' . $tableName . '`.`user_id`=?') . ') AND . ' .
+                '`' . $tableName . '`.`key`=?'
             )
             ->setWhereParameters($parameters)
             ->setOrderBy('`user_id` DESC')

@@ -10,7 +10,7 @@ use GibsonOS\Core\Repository\AbstractRepository;
 
 class PermissionRepository extends AbstractRepository
 {
-    public function __construct(#[GetTableName(Permission::class)] private string $permissionTableName)
+    public function __construct(#[GetTableName(Permission::class)] private readonly string $permissionTableName)
     {
     }
 

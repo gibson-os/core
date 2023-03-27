@@ -16,7 +16,7 @@ use JsonSerializable;
  * @method Setting   setModule(Module $module)
  */
 #[Table]
-#[Key(unique: true, columns: ['user_id', 'module_id', 'key'])]
+#[Key(unique: true, columns: ['module_id', 'user_id', 'key'])]
 class Setting extends AbstractModel implements JsonSerializable
 {
     #[Column(attributes: [Column::ATTRIBUTE_UNSIGNED], autoIncrement: true)]
