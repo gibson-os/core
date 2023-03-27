@@ -157,7 +157,7 @@ class ModelManager
                 $exception->setModel($model);
 
                 if ($newTransaction) {
-                    $this->mysqlDatabase->commit();
+                    $this->mysqlDatabase->rollback();
                 }
 
                 throw $exception;
