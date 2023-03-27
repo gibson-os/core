@@ -35,10 +35,10 @@ class DesktopController extends AbstractController
         ItemRepository $itemRepository,
         #[GetSetting(self::APPS_KEY)] ?Setting $apps,
         #[GetSetting(self::TOOLS_KEY)] ?Setting $tools,
-        User $user,
+        User $permissionUser,
     ): AjaxResponse {
         return $this->returnSuccess([
-            self::DESKTOP_KEY => $itemRepository->getByUser($user),
+            self::DESKTOP_KEY => $itemRepository->getByUser($permissionUser),
             self::APPS_KEY => JsonUtility::decode($apps?->getValue() ?: '[]'),
             self::TOOLS_KEY => JsonUtility::decode($tools?->getValue() ?: '[]'),
         ]);
@@ -54,7 +54,7 @@ class DesktopController extends AbstractController
         ModelManager $modelManager,
         ItemRepository $itemRepository,
         #[GetMappedModels(Item::class)] array $items,
-        User $user
+        User $permissionUser
     ): AjaxResponse {
         $position = 0;
         $itemIds = [];
@@ -62,13 +62,13 @@ class DesktopController extends AbstractController
         foreach ($items as $item) {
             $modelManager->saveWithoutChildren(
                 $item
-                    ->setUser($user)
+                    ->setUser($permissionUser)
                     ->setPosition($position++)
             );
             $itemIds[] = $item->getId();
         }
 
-        $itemRepository->deleteByIdsNot($user, $itemIds);
+        $itemRepository->deleteByIdsNot($permissionUser, $itemIds);
 
         return $this->returnSuccess($items);
     }
@@ -83,7 +83,7 @@ class DesktopController extends AbstractController
         ModelManager $modelManager,
         ItemRepository $itemRepository,
         #[GetMappedModels(Item::class)] array $items,
-        User $user
+        User $permissionUser
     ): AjaxResponse {
         $nextPosition = -1;
 
@@ -94,7 +94,7 @@ class DesktopController extends AbstractController
 
             if ($nextPosition === -1) {
                 try {
-                    $nextPosition = $itemRepository->getLastPosition($user)->getPosition() + 1;
+                    $nextPosition = $itemRepository->getLastPosition($permissionUser)->getPosition() + 1;
                 } catch (SelectError) {
                     $nextPosition = 0;
                 }
@@ -104,13 +104,13 @@ class DesktopController extends AbstractController
         }
 
         $itemRepository->updatePosition(
-            $user,
+            $permissionUser,
             min(array_map(fn (Item $item): int => $item->getPosition(), $items)),
             count($items),
         );
 
         foreach ($items as $item) {
-            $modelManager->saveWithoutChildren($item->setUser($user));
+            $modelManager->saveWithoutChildren($item->setUser($permissionUser));
         }
 
         return $this->returnSuccess($items);
