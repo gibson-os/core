@@ -25,7 +25,7 @@ class DesktopControllerTest extends FunctionalTest
     {
         $user = $this->addUser();
 
-        $this->checkAjaxResponse(
+        $this->checkSuccessResponse(
             $this->desktopController->index(
                 $this->serviceManager->get(ItemRepository::class),
                 null,
@@ -50,7 +50,7 @@ class DesktopControllerTest extends FunctionalTest
                 ->setUser($user)
         );
 
-        $this->checkAjaxResponse(
+        $this->checkSuccessResponse(
             $this->desktopController->index(
                 $this->serviceManager->get(ItemRepository::class),
                 (new Setting())->setValue('{"arthur":"dent"}'),
@@ -89,7 +89,7 @@ class DesktopControllerTest extends FunctionalTest
             'position' => 0,
             'parameters' => null,
         ];
-        $this->checkAjaxResponse(
+        $this->checkSuccessResponse(
             $this->desktopController->save(
                 $modelManager,
                 $this->serviceManager->get(ItemRepository::class),
@@ -106,7 +106,7 @@ class DesktopControllerTest extends FunctionalTest
             ),
             [$item],
         );
-        $this->checkAjaxResponse(
+        $this->checkSuccessResponse(
             $this->desktopController->index(
                 $this->serviceManager->get(ItemRepository::class),
                 null,
@@ -130,7 +130,7 @@ class DesktopControllerTest extends FunctionalTest
             'position' => 0,
             'parameters' => ['zaphod' => 'bebblebrox'],
         ];
-        $this->checkAjaxResponse(
+        $this->checkSuccessResponse(
             $this->desktopController->save(
                 $modelManager,
                 $this->serviceManager->get(ItemRepository::class),
@@ -148,7 +148,7 @@ class DesktopControllerTest extends FunctionalTest
             ),
             [$item],
         );
-        $this->checkAjaxResponse(
+        $this->checkSuccessResponse(
             $this->desktopController->index(
                 $this->serviceManager->get(ItemRepository::class),
                 null,
@@ -179,7 +179,7 @@ class DesktopControllerTest extends FunctionalTest
             'position' => 0,
             'parameters' => null,
         ];
-        $this->checkAjaxResponse(
+        $this->checkSuccessResponse(
             $this->desktopController->add(
                 $modelManager,
                 $this->serviceManager->get(ItemRepository::class),
@@ -197,7 +197,7 @@ class DesktopControllerTest extends FunctionalTest
             ),
             [$items[0]],
         );
-        $this->checkAjaxResponse(
+        $this->checkSuccessResponse(
             $this->desktopController->index(
                 $this->serviceManager->get(ItemRepository::class),
                 null,
@@ -231,7 +231,7 @@ class DesktopControllerTest extends FunctionalTest
             'position' => 2,
             'parameters' => ['zaphod2' => 'bebblebrox2'],
         ];
-        $this->checkAjaxResponse(
+        $this->checkSuccessResponse(
             $this->desktopController->add(
                 $modelManager,
                 $this->serviceManager->get(ItemRepository::class),
@@ -259,7 +259,7 @@ class DesktopControllerTest extends FunctionalTest
             ),
             [$items[1], $items[2]],
         );
-        $this->checkAjaxResponse(
+        $this->checkSuccessResponse(
             $this->desktopController->index(
                 $this->serviceManager->get(ItemRepository::class),
                 null,

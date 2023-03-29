@@ -160,7 +160,7 @@ abstract class AbstractRepository
             ->setWhereParameters($parameters)
         ;
 
-        return $table->selectAggregatePrepared($function);
+        return $table->selectAggregatePrepared($function) ?: null;
     }
 
     protected function getTable(string $tableName, mysqlDatabase $database = null): mysqlTable

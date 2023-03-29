@@ -29,7 +29,7 @@ class DriveControllerTest extends FunctionalTest
 
         $response = $this->driveController->index($driveRepository, $smartAttributeRepository, $statRepository);
 
-        $this->checkAjaxResponse($response, []);
+        $this->checkSuccessResponse($response, []);
 
         $body = json_decode($response->getBody(), true);
 
