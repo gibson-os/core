@@ -9,6 +9,7 @@ use GibsonOS\Core\Exception\ArgumentError;
 use GibsonOS\Core\Exception\CommandError;
 use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Service\CommandService;
+use GibsonOS\Core\Service\LockService;
 use GibsonOS\Core\Service\ProcessService;
 use GibsonOS\Core\Store\CommandStore;
 use GibsonOS\Mock\Service\TestCommand;
@@ -16,6 +17,7 @@ use GibsonOS\Mock\Service\TestInvalidOptionCommand;
 use GibsonOS\Mock\Service\TestRequiresArgumentCommand;
 use GibsonOS\Test\Unit\Core\UnitTest;
 use Prophecy\Prophecy\ObjectProphecy;
+use Throwable;
 
 class CommandServiceTest extends UnitTest
 {
@@ -23,16 +25,20 @@ class CommandServiceTest extends UnitTest
 
     private CommandStore|ObjectProphecy $commandStore;
 
+    private LockService|ObjectProphecy $lockService;
+
     protected function _before()
     {
         $this->processService = $this->prophesize(ProcessService::class);
         $this->serviceManager->setService(ProcessService::class, $this->processService);
         $this->commandStore = $this->prophesize(CommandStore::class);
+        $this->lockService = $this->prophesize(LockService::class);
         $this->serviceManager->setService(CommandStore::class, $this->commandStore->reveal());
         $this->serviceManager->setService(CommandService::class, new CommandService(
             $this->serviceManager,
             $this->processService->reveal(),
             $this->serviceManager->get(ReflectionManager::class),
+            $this->lockService->reveal(),
         ));
     }
 
@@ -84,7 +90,7 @@ class CommandServiceTest extends UnitTest
     {
         $commandService = $this->serviceManager->get(CommandService::class);
 
-        $this->expectException(\Throwable::class);
+        $this->expectException(Throwable::class);
         $commandService->execute(TestCommand::class, options: ['marvin' => 42]);
     }
 
