@@ -5,8 +5,8 @@ namespace GibsonOS\Core\Service;
 
 use Exception;
 use GibsonOS\Core\Exception\DateTimeError;
-use GibsonOS\Core\Exception\Flock\LockError;
-use GibsonOS\Core\Exception\Flock\UnlockError;
+use GibsonOS\Core\Exception\Lock\LockException;
+use GibsonOS\Core\Exception\Lock\UnlockException;
 use GibsonOS\Core\Exception\Model\DeleteError;
 use GibsonOS\Core\Exception\Model\SaveError;
 use GibsonOS\Core\Exception\Repository\SelectError;
@@ -26,7 +26,7 @@ class LockService
     }
 
     /**
-     * @throws LockError
+     * @throws LockException
      * @throws JsonException
      */
     public function lock(string $name = null): void
@@ -34,7 +34,7 @@ class LockService
         $name = $this->getName($name);
 
         if ($this->isLocked($name)) {
-            throw new LockError('Lock exists!');
+            throw new LockException('Lock exists!');
         }
 
         try {
@@ -44,12 +44,12 @@ class LockService
                     ->setPid(getmypid())
             );
         } catch (SaveError|Exception) {
-            throw new LockError('Can not save lock!');
+            throw new LockException('Can not save lock!');
         }
     }
 
     /**
-     * @throws LockError
+     * @throws LockException
      * @throws JsonException
      * @throws ReflectionException
      */
@@ -62,7 +62,7 @@ class LockService
 
             if ($this->processService->pidExists($lock->getPid())) {
                 if (!$this->processService->kill($lock->getPid())) {
-                    throw new LockError(sprintf('Can not kill process %d!', $lock->getPid()));
+                    throw new LockException(sprintf('Can not kill process %d!', $lock->getPid()));
                 }
 
                 $lock = (new Lock())->setName($name);
@@ -74,12 +74,12 @@ class LockService
         try {
             $this->modelManager->save($lock->setPid(getmypid()));
         } catch (SaveError) {
-            throw new LockError('Can not save lock!');
+            throw new LockException('Can not save lock!');
         }
     }
 
     /**
-     * @throws UnlockError
+     * @throws UnlockException
      * @throws JsonException
      */
     public function unlock(string $name = null): void
@@ -90,7 +90,7 @@ class LockService
             $lock = $this->lockRepository->getByName($name);
             $this->modelManager->delete($lock);
         } catch (SelectError|DeleteError) {
-            throw new UnlockError();
+            throw new UnlockException();
         }
     }
 
@@ -127,7 +127,7 @@ class LockService
     {
         try {
             $this->lock($name);
-        } catch (LockError) {
+        } catch (LockException) {
             usleep(10);
             $this->waitUnlockToLock($name);
         }
@@ -165,7 +165,7 @@ class LockService
     }
 
     /**
-     * @throws LockError
+     * @throws LockException
      */
     public function shouldStop(string $name = null): bool
     {
@@ -174,7 +174,7 @@ class LockService
         try {
             return $this->lockRepository->getByName($name)->shouldStop();
         } catch (SelectError) {
-            throw new LockError('Can not save lock!');
+            throw new LockException('Can not save lock!');
         }
     }
 

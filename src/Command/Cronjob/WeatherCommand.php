@@ -5,18 +5,16 @@ namespace GibsonOS\Core\Command\Cronjob;
 
 use DateTime;
 use DateTimeZone;
+use GibsonOS\Core\Attribute\Command\Lock;
 use GibsonOS\Core\Attribute\Install\Cronjob;
 use GibsonOS\Core\Command\AbstractCommand;
 use GibsonOS\Core\Exception\DateTimeError;
-use GibsonOS\Core\Exception\Flock\LockError;
-use GibsonOS\Core\Exception\Flock\UnlockError;
 use GibsonOS\Core\Exception\Model\SaveError;
 use GibsonOS\Core\Exception\WeatherError;
 use GibsonOS\Core\Manager\ModelManager;
 use GibsonOS\Core\Repository\Weather\LocationRepository;
 use GibsonOS\Core\Repository\WeatherRepository;
 use GibsonOS\Core\Service\DateTimeService;
-use GibsonOS\Core\Service\LockService;
 use GibsonOS\Core\Service\WeatherService;
 use JsonException;
 use Psr\Log\LoggerInterface;
@@ -26,6 +24,7 @@ use ReflectionException;
  * @description Collect weather information of required locations
  */
 #[Cronjob(seconds: '40')]
+#[Lock('weatherCommand')]
 class WeatherCommand extends AbstractCommand
 {
     public function __construct(
@@ -35,7 +34,6 @@ class WeatherCommand extends AbstractCommand
         private readonly WeatherRepository $weatherRepository,
         private readonly DateTimeService $dateTimeService,
         private readonly ModelManager $modelManager,
-        private readonly LockService $lockService
     ) {
         parent::__construct($logger);
     }
@@ -43,16 +41,12 @@ class WeatherCommand extends AbstractCommand
     /**
      * @throws DateTimeError
      * @throws JsonException
-     * @throws LockError
      * @throws SaveError
-     * @throws UnlockError
      * @throws WeatherError
      * @throws ReflectionException
      */
     protected function run(): int
     {
-        $this->lockService->lock();
-
         foreach ($this->locationRepository->getToUpdate() as $location) {
             $lastRun = $this->dateTimeService->get();
             /** @var DateTime $oldLastRun */
@@ -84,8 +78,6 @@ class WeatherCommand extends AbstractCommand
                     ->setLastRun($lastRun)
             );
         }
-
-        $this->lockService->unlock();
 
         return self::SUCCESS;
     }

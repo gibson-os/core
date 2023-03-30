@@ -1,12 +1,12 @@
 <?php
 declare(strict_types=1);
 
-namespace GibsonOS\Core\Exception\Flock;
+namespace GibsonOS\Core\Exception\Lock;
 
 use GibsonOS\Core\Exception\AbstractException;
 use Throwable;
 
-class UnlockError extends AbstractException
+class UnlockException extends AbstractException
 {
     public function __construct($message = 'Flock existiert nicht!', $code = 0, Throwable $previous = null)
     {

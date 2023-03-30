@@ -9,9 +9,9 @@ use Psr\Log\LoggerInterface;
 
 abstract class AbstractCommand implements CommandInterface
 {
-    protected const SUCCESS = 0;
+    public const SUCCESS = 0;
 
-    protected const ERROR = 255;
+    public const ERROR = 255;
 
     #[Option('Set verbose level warning')]
     protected bool $v = false;

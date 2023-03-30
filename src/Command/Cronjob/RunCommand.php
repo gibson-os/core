@@ -7,8 +7,8 @@ use DateTime;
 use GibsonOS\Core\Attribute\Command\Argument;
 use GibsonOS\Core\Command\AbstractCommand;
 use GibsonOS\Core\Exception\DateTimeError;
-use GibsonOS\Core\Exception\Flock\LockError;
-use GibsonOS\Core\Exception\Flock\UnlockError;
+use GibsonOS\Core\Exception\Lock\LockException;
+use GibsonOS\Core\Exception\Lock\UnlockException;
 use GibsonOS\Core\Exception\Model\SaveError;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Repository\LockRepository;
@@ -39,9 +39,9 @@ class RunCommand extends AbstractCommand
     }
 
     /**
-     * @throws LockError
+     * @throws LockException
      * @throws SelectError
-     * @throws UnlockError
+     * @throws UnlockException
      * @throws DateTimeError
      * @throws SaveError
      * @throws JsonException
@@ -50,7 +50,7 @@ class RunCommand extends AbstractCommand
     {
         try {
             $this->lockService->unlock(self::FLOCK_NAME_NEW . $this->user);
-        } catch (UnlockError) {
+        } catch (UnlockException) {
             // Lock not exist
         }
 

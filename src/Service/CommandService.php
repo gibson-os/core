@@ -4,14 +4,19 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Service;
 
 use GibsonOS\Core\Attribute\Command\Argument;
+use GibsonOS\Core\Attribute\Command\Lock;
 use GibsonOS\Core\Attribute\Command\Option;
+use GibsonOS\Core\Command\AbstractCommand;
 use GibsonOS\Core\Command\CommandInterface;
 use GibsonOS\Core\Exception\ArgumentError;
 use GibsonOS\Core\Exception\CommandError;
 use GibsonOS\Core\Exception\FactoryError;
+use GibsonOS\Core\Exception\Lock\LockException;
+use GibsonOS\Core\Exception\Lock\UnlockException;
 use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Manager\ServiceManager;
 use GibsonOS\Core\Store\CommandStore;
+use JsonException;
 use ReflectionAttribute;
 use ReflectionClass;
 use ReflectionException;
@@ -22,6 +27,7 @@ class CommandService
         private readonly ServiceManager $serviceManager,
         private readonly ProcessService $processService,
         private readonly ReflectionManager $reflectionManager,
+        private readonly LockService $lockService,
     ) {
     }
 
@@ -33,16 +39,41 @@ class CommandService
      * @throws FactoryError
      * @throws ReflectionException
      * @throws ArgumentError
+     * @throws JsonException
      */
     public function execute(string $commandClassname, array $arguments = [], array $options = []): int
     {
         /** @var CommandInterface $command */
         $command = $this->serviceManager->create($commandClassname);
         $reflectionClass = $this->reflectionManager->getReflectionClass($commandClassname);
+        $lockAttributes = $reflectionClass->getAttributes(Lock::class, ReflectionAttribute::IS_INSTANCEOF);
+        $lockAttribute = null;
+
+        if (count($lockAttributes) === 1) {
+            /** @var Lock $lockAttribute */
+            $lockAttribute = $lockAttributes[0]->newInstance();
+
+            try {
+                $this->lockService->lock($lockAttribute->getName());
+            } catch (LockException) {
+                return AbstractCommand::ERROR;
+            }
+        }
+
         $this->setArguments($command, $reflectionClass, $arguments);
         $this->setOptions($command, $reflectionClass, $options);
 
-        return $command->execute();
+        $return = $command->execute();
+
+        if ($lockAttribute !== null) {
+            try {
+                $this->lockService->unlock($lockAttribute->getName());
+            } catch (UnlockException) {
+                return AbstractCommand::ERROR;
+            }
+        }
+
+        return $return;
     }
 
     /**

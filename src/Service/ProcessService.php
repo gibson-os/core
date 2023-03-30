@@ -63,6 +63,9 @@ class ProcessService
 
     public function pidExists(int $pid): bool
     {
-        return file_exists('/proc/' . $pid);
+        return function_exists('posix_getpgid')
+            ? posix_getpgid($pid) !== false
+            : file_exists('/proc/' . $pid)
+        ;
     }
 }
