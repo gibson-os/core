@@ -226,7 +226,7 @@ class ModuleService
 
             $actionIds[] = $action->getId() ?? 0;
 
-            $this->permissionRepository->deleteByAction($action->getName());
+            $this->permissionRepository->deleteByAction($action);
 
             foreach ($this->reflectionManager->getAttributes($reflectionMethod, CheckPermission::class) as $checkPermission) {
                 $this->modelManager->save(
@@ -372,7 +372,7 @@ class ModuleService
 
             $substr = mb_substr($file, $start, $length);
             preg_match_all('/\$this-\>checkPermission\((.+?)\)/si', $substr, $permissions);
-            $this->permissionRepository->deleteByAction($action->getName());
+            $this->permissionRepository->deleteByAction($action);
 
             foreach ($permissions[1] as $permissionString) {
                 $permission = null;

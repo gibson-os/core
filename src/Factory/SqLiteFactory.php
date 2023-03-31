@@ -8,7 +8,7 @@ use GibsonOS\Core\Service\SqLiteService;
 
 class SqLiteFactory
 {
-    public function __construct(private FileService $fileService)
+    public function __construct(private readonly FileService $fileService)
     {
     }
 

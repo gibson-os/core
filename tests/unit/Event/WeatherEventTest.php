@@ -10,12 +10,12 @@ use GibsonOS\Core\Model\Weather;
 use GibsonOS\Core\Model\Weather\Location;
 use GibsonOS\Core\Repository\WeatherRepository;
 use GibsonOS\Core\Service\EventService;
-use Prophecy\PhpUnit\ProphecyTrait;
+use GibsonOS\Test\Unit\Core\ModelManagerTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 
 class WeatherEventTest extends Unit
 {
-    use ProphecyTrait;
+    use ModelManagerTrait;
 
     private EventService|ObjectProphecy $eventService;
 
@@ -27,6 +27,7 @@ class WeatherEventTest extends Unit
 
     protected function _before(): void
     {
+        $this->loadModelManager();
         $this->eventService = $this->prophesize(EventService::class);
         $this->reflectionManager = $this->prophesize(ReflectionManager::class);
         $this->weatherRepository = $this->prophesize(WeatherRepository::class);

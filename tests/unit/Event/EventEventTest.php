@@ -5,30 +5,27 @@ namespace GibsonOS\Test\Unit\Core\Event;
 
 use Codeception\Test\Unit;
 use GibsonOS\Core\Event\EventEvent;
-use GibsonOS\Core\Manager\ModelManager;
 use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Model\Event;
 use GibsonOS\Core\Service\EventService;
-use Prophecy\PhpUnit\ProphecyTrait;
+use GibsonOS\Test\Unit\Core\ModelManagerTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 
 class EventEventTest extends Unit
 {
-    use ProphecyTrait;
+    use ModelManagerTrait;
 
     private EventService|ObjectProphecy $eventService;
 
     private ReflectionManager|ObjectProphecy $reflectionManager;
 
-    private ModelManager|ObjectProphecy $modelManager;
-
     private EventEvent $eventEvent;
 
     protected function _before(): void
     {
+        $this->loadModelManager();
         $this->eventService = $this->prophesize(EventService::class);
         $this->reflectionManager = $this->prophesize(ReflectionManager::class);
-        $this->modelManager = $this->prophesize(ModelManager::class);
 
         $this->eventEvent = new EventEvent(
             $this->eventService->reveal(),

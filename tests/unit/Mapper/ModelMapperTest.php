@@ -14,21 +14,23 @@ use GibsonOS\Mock\Dto\Mapper\IntEnum;
 use GibsonOS\Mock\Dto\Mapper\MapModel;
 use GibsonOS\Mock\Dto\Mapper\MapModelChild;
 use GibsonOS\Mock\Dto\Mapper\MapModelParent;
+use GibsonOS\Test\Unit\Core\ModelManagerTrait;
 use JsonException;
 use mysqlDatabase;
-use Prophecy\PhpUnit\ProphecyTrait;
 use ReflectionException;
 use Throwable;
 use ValueError;
 
 class ModelMapperTest extends Unit
 {
-    use ProphecyTrait;
+    use ModelManagerTrait;
 
     private ModelMapper $modelMapper;
 
     protected function _before(): void
     {
+        $this->loadModelManager();
+
         $this->modelMapper = new ModelMapper(
             new ServiceManager(),
             new ReflectionManager(),

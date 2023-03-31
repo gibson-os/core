@@ -12,13 +12,13 @@ use GibsonOS\Core\Model\Event;
 use GibsonOS\Core\Model\Event\Element;
 use GibsonOS\Core\Service\EventService;
 use GibsonOS\Mock\Service\TestEvent;
-use Prophecy\PhpUnit\ProphecyTrait;
+use GibsonOS\Test\Unit\Core\ModelManagerTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 use Throwable;
 
 class EventTest extends Unit
 {
-    use ProphecyTrait;
+    use ModelManagerTrait;
 
     private TestEvent $testEvent;
 
@@ -32,6 +32,7 @@ class EventTest extends Unit
 
     protected function _before()
     {
+        $this->loadModelManager();
         $this->eventService = $this->prophesize(EventService::class);
 
         $this->testEvent = new TestEvent(

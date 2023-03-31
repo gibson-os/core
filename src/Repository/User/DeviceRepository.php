@@ -32,14 +32,6 @@ class DeviceRepository extends AbstractRepository
 
     /**
      * @throws SelectError
-     */
-    public function getByCryptedToken(string $cryptedToken, string $salt, string $secret): Device
-    {
-        return $this->fetchOne('MD5(CONCAT(`token`, ?, ?)=?', [$salt, $secret, $cryptedToken], Device::class);
-    }
-
-    /**
-     * @throws SelectError
      *
      * @return Device[]
      */

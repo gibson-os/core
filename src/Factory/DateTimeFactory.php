@@ -13,29 +13,31 @@ class DateTimeFactory
 
     public static function get(): DateTimeService
     {
-        if (self::$instance === null) {
-            $env = new EnvService();
-
-            try {
-                $timezone = $env->getString('timezone');
-            } catch (GetError) {
-                $timezone = null;
-            }
-
-            try {
-                $latitude = $env->getFloat('date_latitude');
-            } catch (GetError) {
-                $latitude = null;
-            }
-
-            try {
-                $longitude = $env->getFloat('date_longitude');
-            } catch (GetError) {
-                $longitude = null;
-            }
-
-            self::$instance = new DateTimeService($timezone, $latitude, $longitude);
+        if (self::$instance !== null) {
+            return self::$instance;
         }
+
+        $env = new EnvService();
+
+        try {
+            $timezone = $env->getString('timezone');
+        } catch (GetError) {
+            $timezone = null;
+        }
+
+        try {
+            $latitude = $env->getFloat('date_latitude');
+        } catch (GetError) {
+            $latitude = null;
+        }
+
+        try {
+            $longitude = $env->getFloat('date_longitude');
+        } catch (GetError) {
+            $longitude = null;
+        }
+
+        self::$instance = new DateTimeService($timezone, $latitude, $longitude);
 
         return self::$instance;
     }
