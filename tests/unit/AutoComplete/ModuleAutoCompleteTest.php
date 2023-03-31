@@ -15,14 +15,13 @@ class ModuleAutoCompleteTest extends UnitAutoCompleteTest
     protected function _before()
     {
         $this->moduleRepository = $this->prophesize(ModuleRepository::class);
-        $this->serviceManager->setService(ModuleRepository::class, $this->moduleRepository->reveal());
 
         parent::_before();
     }
 
-    protected function getAutoCompleteClassName(): string
+    protected function getAutoComplete(): ModuleAutoComplete
     {
-        return ModuleAutoComplete::class;
+        return new ModuleAutoComplete($this->moduleRepository->reveal());
     }
 
     public function testGetByNamePart(): void
@@ -37,12 +36,22 @@ class ModuleAutoCompleteTest extends UnitAutoCompleteTest
 
     public function testGetById(): void
     {
-        $module = new Module();
+        $module = new Module($this->mysqlDatabase->reveal());
         $this->moduleRepository->getById(42)
             ->shouldBeCalledOnce()
             ->willReturn($module)
         ;
 
         $this->assertEquals($module, $this->autoComplete->getById('42', []));
+    }
+
+    protected function getValueField(): string
+    {
+        return 'id';
+    }
+
+    protected function getDisplayField(): string
+    {
+        return 'name';
     }
 }

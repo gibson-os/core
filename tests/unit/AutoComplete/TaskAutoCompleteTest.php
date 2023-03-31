@@ -15,14 +15,13 @@ class TaskAutoCompleteTest extends UnitAutoCompleteTest
     protected function _before()
     {
         $this->taskRepository = $this->prophesize(TaskRepository::class);
-        $this->serviceManager->setService(TaskRepository::class, $this->taskRepository->reveal());
 
         parent::_before();
     }
 
-    protected function getAutoCompleteClassName(): string
+    protected function getAutoComplete(): TaskAutoComplete
     {
-        return TaskAutoComplete::class;
+        return new TaskAutoComplete($this->taskRepository->reveal());
     }
 
     public function testGetByNamePart(): void
@@ -42,12 +41,22 @@ class TaskAutoCompleteTest extends UnitAutoCompleteTest
 
     public function testGetById(): void
     {
-        $task = new Task();
+        $task = new Task($this->mysqlDatabase->reveal());
         $this->taskRepository->getById(42)
             ->shouldBeCalledOnce()
             ->willReturn($task)
         ;
 
         $this->assertEquals($task, $this->autoComplete->getById('42', []));
+    }
+
+    protected function getValueField(): string
+    {
+        return 'id';
+    }
+
+    protected function getDisplayField(): string
+    {
+        return 'name';
     }
 }

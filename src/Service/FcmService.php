@@ -5,6 +5,8 @@ namespace GibsonOS\Core\Service;
 
 use GibsonOS\Core\Dto\Fcm\Message;
 use GibsonOS\Core\Event\FcmEvent;
+use GibsonOS\Core\Exception\MiddlewareException;
+use GibsonOS\Core\Exception\Model\SaveError;
 use GibsonOS\Core\Exception\WebException;
 use GibsonOS\Core\Repository\User\DeviceRepository;
 use GibsonOS\Core\Utility\StatusCode;
@@ -20,8 +22,10 @@ class FcmService
     }
 
     /**
-     * @throws WebException
      * @throws JsonException
+     * @throws WebException
+     * @throws MiddlewareException
+     * @throws SaveError
      */
     public function pushMessage(Message $message): FcmService
     {

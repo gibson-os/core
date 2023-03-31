@@ -3,47 +3,52 @@ declare(strict_types=1);
 
 namespace GibsonOS\Test\Unit\Core\Archive;
 
+use Codeception\Test\Unit;
 use GibsonOS\Core\Archive\ZipArchive;
 use GibsonOS\Core\Exception\ArchiveException;
-use GibsonOS\Test\Unit\Core\UnitTest;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 use ZipArchive as StandardZipArchive;
 
-class ZipArchiveTest extends UnitTest
+class ZipArchiveTest extends Unit
 {
-    private StandardZipArchive|ObjectProphecy $zipArchive;
+    use ProphecyTrait;
+
+    private ZipArchive $zipArchive;
+
+    private StandardZipArchive|ObjectProphecy $standardZipArchive;
 
     protected function _before(): void
     {
-        $this->zipArchive = $this->prophesize(StandardZipArchive::class);
-        $this->serviceManager->setService(StandardZipArchive::class, $this->zipArchive->reveal());
+        $this->standardZipArchive = $this->prophesize(StandardZipArchive::class);
+
+        $this->zipArchive = new ZipArchive($this->standardZipArchive->reveal());
     }
 
     public function testPackFiles(): void
     {
-        $this->zipArchive->open('marvin.zip', StandardZipArchive::CREATE)
+        $this->standardZipArchive->open('marvin.zip', StandardZipArchive::CREATE)
             ->shouldBeCalledOnce()
             ->willReturn(true)
         ;
-        $this->zipArchive->addFile('trillian.pdf')
+        $this->standardZipArchive->addFile('trillian.pdf')
             ->shouldBeCalledOnce()
             ->willReturn(true)
         ;
-        $this->zipArchive->addFile('arthur.txt')
+        $this->standardZipArchive->addFile('arthur.txt')
             ->shouldBeCalledOnce()
             ->willReturn(true)
         ;
-        $this->zipArchive->addFile('dent.gif')
+        $this->standardZipArchive->addFile('dent.gif')
             ->shouldBeCalledOnce()
             ->willReturn(true)
         ;
-        $this->zipArchive->close()
+        $this->standardZipArchive->close()
             ->shouldBeCalledOnce()
             ->willReturn(true)
         ;
 
-        $zipArchive = $this->serviceManager->get(ZipArchive::class);
-        $zipArchive->packFiles('marvin.zip', [
+        $this->zipArchive->packFiles('marvin.zip', [
             'trillian.pdf',
             'arthur.txt',
             'dent.gif',
@@ -52,46 +57,46 @@ class ZipArchiveTest extends UnitTest
 
     public function testPackFilesOpenError(): void
     {
-        $this->zipArchive->open('marvin.zip', StandardZipArchive::CREATE)
+        $this->standardZipArchive->open('marvin.zip', StandardZipArchive::CREATE)
             ->shouldBeCalledOnce()
             ->willReturn(StandardZipArchive::ER_OPEN)
         ;
 
         $this->expectException(ArchiveException::class);
-        $this->serviceManager->get(ZipArchive::class)->packFiles('marvin.zip', ['arthur.txt']);
+        $this->zipArchive->packFiles('marvin.zip', ['arthur.txt']);
     }
 
     public function testPackFilesAddError(): void
     {
-        $this->zipArchive->open('marvin.zip', StandardZipArchive::CREATE)
+        $this->standardZipArchive->open('marvin.zip', StandardZipArchive::CREATE)
             ->shouldBeCalledOnce()
             ->willReturn(true)
         ;
-        $this->zipArchive->addFile('arthur.txt')
+        $this->standardZipArchive->addFile('arthur.txt')
             ->shouldBeCalledOnce()
             ->willReturn(false)
         ;
 
         $this->expectException(ArchiveException::class);
-        $this->serviceManager->get(ZipArchive::class)->packFiles('marvin.zip', ['arthur.txt']);
+        $this->zipArchive->packFiles('marvin.zip', ['arthur.txt']);
     }
 
     public function testPackFilesCloseError(): void
     {
-        $this->zipArchive->open('marvin.zip', StandardZipArchive::CREATE)
+        $this->standardZipArchive->open('marvin.zip', StandardZipArchive::CREATE)
             ->shouldBeCalledOnce()
             ->willReturn(true)
         ;
-        $this->zipArchive->addFile('arthur.txt')
+        $this->standardZipArchive->addFile('arthur.txt')
             ->shouldBeCalledOnce()
             ->willReturn(true)
         ;
-        $this->zipArchive->close()
+        $this->standardZipArchive->close()
             ->shouldBeCalledOnce()
             ->willReturn(false)
         ;
 
         $this->expectException(ArchiveException::class);
-        $this->serviceManager->get(ZipArchive::class)->packFiles('marvin.zip', ['arthur.txt']);
+        $this->zipArchive->packFiles('marvin.zip', ['arthur.txt']);
     }
 }

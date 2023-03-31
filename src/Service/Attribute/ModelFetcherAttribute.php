@@ -37,7 +37,6 @@ class ModelFetcherAttribute implements AttributeServiceInterface, ParameterAttri
      * @throws ReflectionException
      * @throws JsonException
      * @throws MapperException
-     * @throws RequestError
      */
     public function replace(
         AttributeInterface $attribute,

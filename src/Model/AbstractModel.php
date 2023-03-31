@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Model;
 
 use GibsonOS\Core\Attribute\Install\Database\Table;
-use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Factory\DateTimeFactory;
 use GibsonOS\Core\Service\DateTimeService;
 use GibsonOS\Core\Utility\JsonUtility;
@@ -55,9 +54,6 @@ abstract class AbstractModel implements ModelInterface
 
     private ?string $tableName = null;
 
-    /**
-     * @throws GetError
-     */
     public function __construct(mysqlDatabase $database = null)
     {
         $this->dateTime = DateTimeFactory::get();

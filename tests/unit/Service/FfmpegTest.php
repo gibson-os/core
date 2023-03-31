@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace GibsonOS\Test\Unit\Core\Service;
 
+use Codeception\Test\Unit;
+use DateTime;
 use GibsonOS\Core\Dto\Ffmpeg\Media;
 use GibsonOS\Core\Dto\Image as ImageDto;
 use GibsonOS\Core\Exception\Ffmpeg\ConvertStatusError;
@@ -14,38 +16,26 @@ use GibsonOS\Core\Service\FileService;
 use GibsonOS\Core\Service\ImageService;
 use GibsonOS\Core\Service\ProcessService;
 use GibsonOS\Mock\Dto\Ffmpeg\Media as MediaMock;
-use GibsonOS\Test\Unit\Core\UnitTest;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
+use UnitTester;
 
-class FfmpegTest extends UnitTest
+class FfmpegTest extends Unit
 {
     use ProphecyTrait;
 
-    protected \UnitTester $tester;
+    protected UnitTester $tester;
 
     private FfmpegService $ffmpeg;
 
-    /**
-     * @var ObjectProphecy|DateTimeService
-     */
-    private $dateTime;
+    private DateTimeService|ObjectProphecy $dateTime;
 
-    /**
-     * @var ObjectProphecy|FileService
-     */
-    private $file;
+    private FileService|ObjectProphecy $fileService;
 
-    /**
-     * @var ObjectProphecy|ProcessService
-     */
-    private $process;
+    private ProcessService|ObjectProphecy $processService;
 
-    /**
-     * @var ObjectProphecy|ImageService
-     */
-    private $image;
+    private ImageService|ObjectProphecy $imageService;
 
     private string $ffmpegPath;
 
@@ -55,7 +45,7 @@ class FfmpegTest extends UnitTest
 
     private string $logFilename;
 
-    private string$logPath;
+    private string $logPath;
 
     private string $defaultCommand;
 
@@ -63,9 +53,9 @@ class FfmpegTest extends UnitTest
     {
         $this->ffmpegPath = 'path/to/ffmpeg';
         $this->dateTime = $this->prophesize(DateTimeService::class);
-        $this->file = $this->prophesize(FileService::class);
-        $this->process = $this->prophesize(ProcessService::class);
-        $this->image = $this->prophesize(ImageService::class);
+        $this->fileService = $this->prophesize(FileService::class);
+        $this->processService = $this->prophesize(ProcessService::class);
+        $this->imageService = $this->prophesize(ImageService::class);
         $this->inputVideoFilename = '/name/from/file.vid';
         $this->outputVideoFilename = '/name/to/file.vid';
         $this->logFilename = 'ffmpegfile.vid';
@@ -83,9 +73,9 @@ class FfmpegTest extends UnitTest
             $this->ffmpegPath,
             'path/to/ffprobe',
             $this->dateTime->reveal(),
-            $this->file->reveal(),
-            $this->process->reveal(),
-            $this->image->reveal()
+            $this->fileService->reveal(),
+            $this->processService->reveal(),
+            $this->imageService->reveal()
         );
     }
 
@@ -118,16 +108,16 @@ class FfmpegTest extends UnitTest
         $this->expectException(FileNotFound::class);
 
         $file = $this->initTestGetFileMetaDataString($filename);
-        $this->file->exists($this->inputVideoFilename)
+        $this->fileService->exists($this->inputVideoFilename)
             ->willReturn(false)
         ;
-        $this->file->isReadable($this->inputVideoFilename)
+        $this->fileService->isReadable($this->inputVideoFilename)
             ->shouldNotBeCalled()
         ;
-        $this->process->open($this->ffmpegPath . ' -i ' . escapeshellarg($this->inputVideoFilename), 'r')
+        $this->processService->open($this->ffmpegPath . ' -i ' . escapeshellarg($this->inputVideoFilename), 'r')
             ->shouldNotBeCalled()
         ;
-        $this->process->close($file)
+        $this->processService->close($file)
             ->shouldNotBeCalled()
         ;
         fclose($file);
@@ -146,13 +136,13 @@ class FfmpegTest extends UnitTest
         $this->expectException(FileNotFound::class);
 
         $file = $this->initTestGetFileMetaDataString($filename);
-        $this->file->isReadable($this->inputVideoFilename)
+        $this->fileService->isReadable($this->inputVideoFilename)
             ->willReturn(false)
         ;
-        $this->process->open($this->ffmpegPath . ' -i ' . escapeshellarg($this->inputVideoFilename), 'r')
+        $this->processService->open($this->ffmpegPath . ' -i ' . escapeshellarg($this->inputVideoFilename), 'r')
             ->shouldNotBeCalled()
         ;
-        $this->process->close($file)
+        $this->processService->close($file)
             ->shouldNotBeCalled()
         ;
         fclose($file);
@@ -172,7 +162,7 @@ class FfmpegTest extends UnitTest
         $this->expectException(FileNotFound::class);
 
         $media = $this->initTestConvert();
-        $this->file->exists($this->outputVideoFilename)
+        $this->fileService->exists($this->outputVideoFilename)
             ->willReturn(false)
         ;
 
@@ -184,10 +174,10 @@ class FfmpegTest extends UnitTest
         $media = $this->initTestConvert();
         $media->selectVideoStream('v1');
 
-        $this->process->execute($this->defaultCommand)
+        $this->processService->execute($this->defaultCommand)
             ->shouldNotBeCalled()
         ;
-        $this->process->execute(sprintf(
+        $this->processService->execute(sprintf(
             '%s -i %s -map v1 -c:v "codec" -sn %s > %s 2> %s',
             $this->ffmpegPath,
             escapeshellarg($this->inputVideoFilename),
@@ -213,10 +203,10 @@ class FfmpegTest extends UnitTest
         $media = $this->initTestConvert();
         $media->selectAudioStream('a3');
 
-        $this->process->execute($this->defaultCommand)
+        $this->processService->execute($this->defaultCommand)
             ->shouldNotBeCalled()
         ;
-        $this->process->execute(sprintf(
+        $this->processService->execute(sprintf(
             '%s -i %s -map a3 -c:a "codec" %s > %s 2> %s',
             $this->ffmpegPath,
             escapeshellarg($this->inputVideoFilename),
@@ -251,10 +241,10 @@ class FfmpegTest extends UnitTest
         $media->selectVideoStream('v2');
         $media->selectSubtitleStream('s4');
 
-        $this->process->execute($this->defaultCommand)
+        $this->processService->execute($this->defaultCommand)
             ->shouldNotBeCalled()
         ;
-        $this->process->execute(sprintf(
+        $this->processService->execute(sprintf(
             '%s -i %s -map v2 -c:v "codec" -vf subtitles=\'%s\':si=3 %s > %s 2> %s',
             $this->ffmpegPath,
             escapeshellarg($this->inputVideoFilename),
@@ -273,10 +263,10 @@ class FfmpegTest extends UnitTest
     {
         $media = $this->initTestConvert();
 
-        $this->process->execute($this->defaultCommand)
+        $this->processService->execute($this->defaultCommand)
             ->shouldNotBeCalled()
         ;
-        $this->process->execute(sprintf(
+        $this->processService->execute(sprintf(
             '%s -i %s -arthur "dent" -mouse "answer" %s > %s 2> %s',
             $this->ffmpegPath,
             escapeshellarg($this->inputVideoFilename),
@@ -309,17 +299,17 @@ class FfmpegTest extends UnitTest
         int $seconds,
         int $microseconds
     ): void {
-        $this->file->exists(sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'ffmpeg' . $this->logFilename)
+        $this->fileService->exists(sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'ffmpeg' . $this->logFilename)
             ->willReturn(true)
             ->shouldBeCalledOnce()
         ;
-        $this->file->readLastLine(sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'ffmpeg' . $this->logFilename)
+        $this->fileService->readLastLine(sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'ffmpeg' . $this->logFilename)
             ->willReturn($lastLine)
             ->shouldBeCalledOnce()
         ;
 
         $this->dateTime->get($time)
-            ->willReturn(new \DateTime($time))
+            ->willReturn(new DateTime($time))
             ->shouldBeCalledOnce()
         ;
 
@@ -340,7 +330,7 @@ class FfmpegTest extends UnitTest
     {
         $this->expectException(FileNotFound::class);
 
-        $this->file->exists(sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'ffmpeg' . $this->logFilename)
+        $this->fileService->exists(sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'ffmpeg' . $this->logFilename)
             ->willReturn(false)
             ->shouldBeCalledOnce()
         ;
@@ -352,11 +342,11 @@ class FfmpegTest extends UnitTest
     {
         $this->expectException(ConvertStatusError::class);
 
-        $this->file->exists(sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'ffmpeg' . $this->logFilename)
+        $this->fileService->exists(sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'ffmpeg' . $this->logFilename)
             ->willReturn(true)
             ->shouldBeCalledOnce()
         ;
-        $this->file->readLastLine(sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'ffmpeg' . $this->logFilename)
+        $this->fileService->readLastLine(sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'ffmpeg' . $this->logFilename)
             ->willReturn('Unwarscheinlichkeits Drive')
             ->shouldBeCalledOnce()
         ;
@@ -368,7 +358,7 @@ class FfmpegTest extends UnitTest
     {
         $frameNumber = '00:17:03.23';
 
-        $this->process->execute(Argument::containingString(sprintf(
+        $this->processService->execute(Argument::containingString(sprintf(
             '%s -ss %s -i %s -an -r 1 -vframes 1 -f image2 %s',
             $this->ffmpegPath,
             $frameNumber,
@@ -379,7 +369,7 @@ class FfmpegTest extends UnitTest
         ;
 
         $image = new ImageDto(imagecreate(1, 1));
-        $this->image->load(Argument::containingString(sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'tmpFrame'))
+        $this->imageService->load(Argument::containingString(sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'tmpFrame'))
             ->willReturn($image)
             ->shouldBeCalledOnce()
         ;
@@ -1302,21 +1292,21 @@ At least one output file must be specified
 
     private function initTestGetFileMetaDataString(string $filename)
     {
-        $this->file->exists($this->inputVideoFilename)
+        $this->fileService->exists($this->inputVideoFilename)
             ->willReturn(true)
             ->shouldBeCalledOnce()
         ;
-        $this->file->isReadable($this->inputVideoFilename)
+        $this->fileService->isReadable($this->inputVideoFilename)
             ->willReturn(true)
             ->shouldBeCalledOnce()
         ;
 
         $file = fopen($filename, 'r');
-        $this->process->open($this->ffmpegPath . ' -i ' . escapeshellarg($this->inputVideoFilename), 'r')
+        $this->processService->open($this->ffmpegPath . ' -i ' . escapeshellarg($this->inputVideoFilename), 'r')
             ->willReturn($file)
             ->shouldBeCalledOnce()
         ;
-        $this->process->close($file)
+        $this->processService->close($file)
             ->shouldBeCalledOnce()
         ;
 
@@ -1383,19 +1373,19 @@ At least one output file must be specified
 
     private function initTestConvert($command = null): Media
     {
-        $this->file->getFilename($this->outputVideoFilename)
+        $this->fileService->getFilename($this->outputVideoFilename)
             ->willReturn('file.vid')
             ->shouldBeCalledOnce()
         ;
-        $this->file->exists($this->outputVideoFilename)
+        $this->fileService->exists($this->outputVideoFilename)
             ->willReturn(true)
             ->shouldBeCalledOnce()
         ;
-        $this->file->delete(sys_get_temp_dir(), $this->logFilename)
+        $this->fileService->delete(sys_get_temp_dir(), $this->logFilename)
             ->shouldBeCalledOnce()
         ;
 
-        $this->process->execute($this->defaultCommand)
+        $this->processService->execute($this->defaultCommand)
             ->shouldBeCalledOnce()
         ;
 

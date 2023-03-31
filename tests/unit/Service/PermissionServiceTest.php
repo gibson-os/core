@@ -17,10 +17,7 @@ class PermissionServiceTest extends Unit
 
     private PermissionService $permissionService;
 
-    /**
-     * @var ObjectProphecy|PermissionViewRepository
-     */
-    private $permissionViewRepository;
+    private ObjectProphecy|PermissionViewRepository $permissionViewRepository;
 
     protected function _before(): void
     {

@@ -3,16 +3,16 @@ declare(strict_types=1);
 
 namespace GibsonOS\Test\Unit\Core\Service\Command;
 
+use Codeception\Test\Unit;
 use GibsonOS\Core\Service\Command\TableService;
-use GibsonOS\Test\Unit\Core\UnitTest;
 
-class TableServiceTest extends UnitTest
+class TableServiceTest extends Unit
 {
     private TableService $tableService;
 
     protected function _before(): void
     {
-        $this->tableService = $this->serviceManager->get(TableService::class);
+        $this->tableService = new TableService();
     }
 
     /**

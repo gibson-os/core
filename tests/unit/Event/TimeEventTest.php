@@ -3,77 +3,90 @@ declare(strict_types=1);
 
 namespace GibsonOS\Test\Unit\Core\Event;
 
+use Codeception\Test\Unit;
+use DateTime;
 use GibsonOS\Core\Event\TimeEvent;
+use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Service\DateTimeService;
-use GibsonOS\Test\Unit\Core\UnitTest;
+use GibsonOS\Core\Service\EventService;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 
-class TimeEventTest extends UnitTest
+class TimeEventTest extends Unit
 {
+    use ProphecyTrait;
+
+    private EventService|ObjectProphecy $eventService;
+
+    private ReflectionManager|ObjectProphecy $reflectionManager;
+
     private DateTimeService|ObjectProphecy $dateTimeService;
+
+    private TimeEvent $timeEvent;
 
     protected function _before(): void
     {
+        $this->eventService = $this->prophesize(EventService::class);
+        $this->reflectionManager = $this->prophesize(ReflectionManager::class);
         $this->dateTimeService = $this->prophesize(DateTimeService::class);
-        $this->serviceManager->setService(DateTimeService::class, $this->dateTimeService->reveal());
+
+        $this->timeEvent = new TimeEvent(
+            $this->eventService->reveal(),
+            $this->reflectionManager->reveal(),
+            $this->dateTimeService->reveal(),
+        );
     }
 
     public function testSleep(): void
     {
-        $now = (new \DateTime())->getTimestamp();
-        $timeEvent = $this->serviceManager->get(TimeEvent::class);
-        $timeEvent->sleep(1);
-        $this->assertEquals($now + 1, (new \DateTime())->getTimestamp());
+        $now = (new DateTime())->getTimestamp();
+        $this->timeEvent->sleep(1);
+        $this->assertEquals($now + 1, (new DateTime())->getTimestamp());
     }
 
     public function testUsleep(): void
     {
-        $now = (int) (new \DateTime())->format('u');
-        $timeEvent = $this->serviceManager->get(TimeEvent::class);
-        $timeEvent->usleep(42);
-        $this->assertGreaterThanOrEqual($now + 42, (int) (new \DateTime())->format('u'));
+        $now = (int) (new DateTime())->format('u');
+        $this->timeEvent->usleep(42);
+        $this->assertGreaterThanOrEqual($now + 42, (int) (new DateTime())->format('u'));
     }
 
     public function testBetween(): void
     {
-        $beforeYesterday = new \DateTime('-2 day');
-        $yesterday = new \DateTime('-1 day');
-        $tomorrow = new \DateTime('+1 day');
-        $timeEvent = $this->serviceManager->get(TimeEvent::class);
+        $beforeYesterday = new DateTime('-2 day');
+        $yesterday = new DateTime('-1 day');
+        $tomorrow = new DateTime('+1 day');
 
         $this->dateTimeService->get()
             ->shouldBeCalledTimes(3)
-            ->willReturn(new \DateTime())
+            ->willReturn(new DateTime())
         ;
 
-        $this->assertTrue($timeEvent->between($yesterday, $tomorrow));
-        $this->assertFalse($timeEvent->between($tomorrow, $yesterday));
-        $this->assertFalse($timeEvent->between($beforeYesterday, $yesterday));
+        $this->assertTrue($this->timeEvent->between($yesterday, $tomorrow));
+        $this->assertFalse($this->timeEvent->between($tomorrow, $yesterday));
+        $this->assertFalse($this->timeEvent->between($beforeYesterday, $yesterday));
     }
 
     public function testGetDateParts(): void
     {
-        $timeEvent = $this->serviceManager->get(TimeEvent::class);
-
         $this->dateTimeService->get()
             ->shouldBeCalledTimes(7)
-            ->willReturn(new \DateTime('2020-02-20 21:22:23'))
+            ->willReturn(new DateTime('2020-02-20 21:22:23'))
         ;
 
-        $this->assertEquals(2020, $timeEvent->year());
-        $this->assertEquals(2, $timeEvent->month());
-        $this->assertEquals(20, $timeEvent->dayOfMonth());
-        $this->assertEquals(4, $timeEvent->dayOfWeek());
-        $this->assertEquals(21, $timeEvent->hour());
-        $this->assertEquals(22, $timeEvent->minute());
-        $this->assertEquals(23, $timeEvent->second());
+        $this->assertEquals(2020, $this->timeEvent->year());
+        $this->assertEquals(2, $this->timeEvent->month());
+        $this->assertEquals(20, $this->timeEvent->dayOfMonth());
+        $this->assertEquals(4, $this->timeEvent->dayOfWeek());
+        $this->assertEquals(21, $this->timeEvent->hour());
+        $this->assertEquals(22, $this->timeEvent->minute());
+        $this->assertEquals(23, $this->timeEvent->second());
     }
 
     public function testIsDay(): void
     {
-        $timeEvent = $this->serviceManager->get(TimeEvent::class);
-        $dayDate = new \DateTime('2020-02-20 09:22:23');
-        $nightDate = new \DateTime('2020-02-20 21:22:23');
+        $dayDate = new DateTime('2020-02-20 09:22:23');
+        $nightDate = new DateTime('2020-02-20 21:22:23');
         $this->dateTimeService->get()
             ->shouldBeCalledTimes(2)
             ->willReturn($dayDate, $nightDate)
@@ -85,7 +98,7 @@ class TimeEventTest extends UnitTest
         ;
         $this->dateTimeService->get('@42')
             ->shouldBeCalledOnce()
-            ->willReturn(new \DateTime('2020-02-20 06:00:00'))
+            ->willReturn(new DateTime('2020-02-20 06:00:00'))
         ;
         $this->dateTimeService->getSunset($dayDate)
             ->shouldBeCalledOnce()
@@ -93,9 +106,9 @@ class TimeEventTest extends UnitTest
         ;
         $this->dateTimeService->get('@24')
             ->shouldBeCalledOnce()
-            ->willReturn(new \DateTime('2020-02-20 18:00:00'))
+            ->willReturn(new DateTime('2020-02-20 18:00:00'))
         ;
-        $this->assertTrue($timeEvent->isDay());
+        $this->assertTrue($this->timeEvent->isDay());
 
         $this->dateTimeService->getSunrise($nightDate)
             ->shouldBeCalledOnce()
@@ -103,7 +116,7 @@ class TimeEventTest extends UnitTest
         ;
         $this->dateTimeService->get('@4242')
             ->shouldBeCalledOnce()
-            ->willReturn(new \DateTime('2020-02-20 06:00:00'))
+            ->willReturn(new DateTime('2020-02-20 06:00:00'))
         ;
         $this->dateTimeService->getSunset($nightDate)
             ->shouldBeCalledOnce()
@@ -111,16 +124,15 @@ class TimeEventTest extends UnitTest
         ;
         $this->dateTimeService->get('@2424')
             ->shouldBeCalledOnce()
-            ->willReturn(new \DateTime('2020-02-20 18:00:00'))
+            ->willReturn(new DateTime('2020-02-20 18:00:00'))
         ;
-        $this->assertFalse($timeEvent->isDay());
+        $this->assertFalse($this->timeEvent->isDay());
     }
 
     public function testIsNight(): void
     {
-        $timeEvent = $this->serviceManager->get(TimeEvent::class);
-        $dayDate = new \DateTime('2020-02-20 09:22:23');
-        $nightDate = new \DateTime('2020-02-20 21:22:23');
+        $dayDate = new DateTime('2020-02-20 09:22:23');
+        $nightDate = new DateTime('2020-02-20 21:22:23');
         $this->dateTimeService->get()
             ->shouldBeCalledTimes(2)
             ->willReturn($dayDate, $nightDate)
@@ -132,7 +144,7 @@ class TimeEventTest extends UnitTest
         ;
         $this->dateTimeService->get('@42')
             ->shouldBeCalledOnce()
-            ->willReturn(new \DateTime('2020-02-20 06:00:00'))
+            ->willReturn(new DateTime('2020-02-20 06:00:00'))
         ;
         $this->dateTimeService->getSunset($dayDate)
             ->shouldBeCalledOnce()
@@ -140,9 +152,9 @@ class TimeEventTest extends UnitTest
         ;
         $this->dateTimeService->get('@24')
             ->shouldBeCalledOnce()
-            ->willReturn(new \DateTime('2020-02-20 18:00:00'))
+            ->willReturn(new DateTime('2020-02-20 18:00:00'))
         ;
-        $this->assertFalse($timeEvent->isNight());
+        $this->assertFalse($this->timeEvent->isNight());
 
         $this->dateTimeService->getSunrise($nightDate)
             ->shouldBeCalledOnce()
@@ -150,7 +162,7 @@ class TimeEventTest extends UnitTest
         ;
         $this->dateTimeService->get('@4242')
             ->shouldBeCalledOnce()
-            ->willReturn(new \DateTime('2020-02-20 06:00:00'))
+            ->willReturn(new DateTime('2020-02-20 06:00:00'))
         ;
         $this->dateTimeService->getSunset($nightDate)
             ->shouldBeCalledOnce()
@@ -158,8 +170,8 @@ class TimeEventTest extends UnitTest
         ;
         $this->dateTimeService->get('@2424')
             ->shouldBeCalledOnce()
-            ->willReturn(new \DateTime('2020-02-20 18:00:00'))
+            ->willReturn(new DateTime('2020-02-20 18:00:00'))
         ;
-        $this->assertTrue($timeEvent->isNight());
+        $this->assertTrue($this->timeEvent->isNight());
     }
 }

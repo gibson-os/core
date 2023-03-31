@@ -15,14 +15,13 @@ class UserAutoCompleteTest extends UnitAutoCompleteTest
     protected function _before()
     {
         $this->userRepository = $this->prophesize(UserRepository::class);
-        $this->serviceManager->setService(UserRepository::class, $this->userRepository->reveal());
 
         parent::_before();
     }
 
-    protected function getAutoCompleteClassName(): string
+    protected function getAutoComplete(): UserAutoComplete
     {
-        return UserAutoComplete::class;
+        return new UserAutoComplete($this->userRepository->reveal());
     }
 
     public function testGetByNamePart(): void
@@ -37,12 +36,22 @@ class UserAutoCompleteTest extends UnitAutoCompleteTest
 
     public function testGetById(): void
     {
-        $user = new User();
+        $user = new User($this->mysqlDatabase->reveal());
         $this->userRepository->getById(42)
             ->shouldBeCalledOnce()
             ->willReturn($user)
         ;
 
         $this->assertEquals($user, $this->autoComplete->getById('42', []));
+    }
+
+    protected function getValueField(): string
+    {
+        return 'id';
+    }
+
+    protected function getDisplayField(): string
+    {
+        return 'user';
     }
 }

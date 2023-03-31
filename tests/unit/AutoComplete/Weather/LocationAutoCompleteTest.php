@@ -16,14 +16,13 @@ class LocationAutoCompleteTest extends UnitAutoCompleteTest
     protected function _before()
     {
         $this->locationRepository = $this->prophesize(LocationRepository::class);
-        $this->serviceManager->setService(LocationRepository::class, $this->locationRepository->reveal());
 
         parent::_before();
     }
 
-    protected function getAutoCompleteClassName(): string
+    protected function getAutoComplete(): LocationAutoComplete
     {
-        return LocationAutoComplete::class;
+        return new LocationAutoComplete($this->locationRepository->reveal());
     }
 
     public function testGetByNamePart(): void
@@ -44,12 +43,22 @@ class LocationAutoCompleteTest extends UnitAutoCompleteTest
 
     public function testGetById(): void
     {
-        $location = new Location();
+        $location = new Location($this->mysqlDatabase->reveal());
         $this->locationRepository->getById(42)
             ->shouldBeCalledOnce()
             ->willReturn($location)
         ;
 
         $this->assertEquals($location, $this->autoComplete->getById('42', []));
+    }
+
+    protected function getValueField(): string
+    {
+        return 'id';
+    }
+
+    protected function getDisplayField(): string
+    {
+        return 'name';
     }
 }

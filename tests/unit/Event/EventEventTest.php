@@ -3,88 +3,99 @@ declare(strict_types=1);
 
 namespace GibsonOS\Test\Unit\Core\Event;
 
+use Codeception\Test\Unit;
 use GibsonOS\Core\Event\EventEvent;
+use GibsonOS\Core\Manager\ModelManager;
+use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Model\Event;
 use GibsonOS\Core\Service\EventService;
-use GibsonOS\Test\Unit\Core\UnitTest;
-use Prophecy\Argument;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 
-class EventEventTest extends UnitTest
+class EventEventTest extends Unit
 {
+    use ProphecyTrait;
+
     private EventService|ObjectProphecy $eventService;
+
+    private ReflectionManager|ObjectProphecy $reflectionManager;
+
+    private ModelManager|ObjectProphecy $modelManager;
+
+    private EventEvent $eventEvent;
 
     protected function _before(): void
     {
         $this->eventService = $this->prophesize(EventService::class);
-        $this->serviceManager->setService(EventService::class, $this->eventService->reveal());
+        $this->reflectionManager = $this->prophesize(ReflectionManager::class);
+        $this->modelManager = $this->prophesize(ModelManager::class);
+
+        $this->eventEvent = new EventEvent(
+            $this->eventService->reveal(),
+            $this->reflectionManager->reveal(),
+            $this->modelManager->reveal(),
+        );
     }
 
     public function testActivate(): void
     {
-        $eventEvent = $this->serviceManager->get(EventEvent::class);
         $event = (new Event())->setActive(false);
         $this->assertFalse($event->isActive());
 
-        $this->modelManager->saveWithoutChildren(Argument::Any())
+        $this->modelManager->saveWithoutChildren($event)
             ->shouldBeCalledOnce()
         ;
 
-        $eventEvent->activate($event);
+        $this->eventEvent->activate($event);
         $this->assertTrue($event->isActive());
     }
 
     public function testIsActive(): void
     {
-        $eventEvent = $this->serviceManager->get(EventEvent::class);
-
         $event = (new Event())->setActive(true);
         $this->assertTrue($event->isActive());
-        $this->assertTrue($eventEvent->isActive($event));
+        $this->assertTrue($this->eventEvent->isActive($event));
 
         $event->setActive(false);
         $this->assertFalse($event->isActive());
-        $this->assertFalse($eventEvent->isActive($event));
+        $this->assertFalse($this->eventEvent->isActive($event));
     }
 
     public function testDeactivate(): void
     {
-        $eventEvent = $this->serviceManager->get(EventEvent::class);
         $event = (new Event())->setActive(true);
         $this->assertTrue($event->isActive());
 
-        $this->modelManager->saveWithoutChildren(Argument::Any())
+        $this->modelManager->saveWithoutChildren($event)
             ->shouldBeCalledOnce()
         ;
 
-        $eventEvent->deactivate($event);
+        $this->eventEvent->deactivate($event);
         $this->assertFalse($event->isActive());
     }
 
     public function testStart(): void
     {
         $event = new Event();
-        $eventEvent = $this->serviceManager->get(EventEvent::class);
 
         $this->eventService->runEvent($event, false)
             ->shouldBeCalledOnce()
         ;
-        $eventEvent->start($event, false);
+        $this->eventEvent->start($event, false);
 
         $this->eventService->runEvent($event, true)
             ->shouldBeCalledOnce()
         ;
-        $eventEvent->start($event, true);
+        $this->eventEvent->start($event, true);
     }
 
     public function testStop(): void
     {
         $event = new Event();
-        $eventEvent = $this->serviceManager->get(EventEvent::class);
 
         $this->eventService->stop($event)
             ->shouldBeCalledOnce()
         ;
-        $eventEvent->stop($event);
+        $this->eventEvent->stop($event);
     }
 }

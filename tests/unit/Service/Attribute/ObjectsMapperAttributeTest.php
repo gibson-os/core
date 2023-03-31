@@ -3,19 +3,45 @@ declare(strict_types=1);
 
 namespace GibsonOS\Test\Unit\Core\Service\Attribute;
 
+use Codeception\Test\Unit;
 use GibsonOS\Core\Attribute\GetObjects;
+use GibsonOS\Core\Manager\ReflectionManager;
+use GibsonOS\Core\Manager\ServiceManager;
+use GibsonOS\Core\Mapper\ObjectMapper;
+use GibsonOS\Core\Service\Attribute\ObjectMapperAttribute;
 use GibsonOS\Core\Service\Attribute\ObjectsMapperAttribute;
+use GibsonOS\Core\Service\RequestService;
 use GibsonOS\Mock\Dto\Mapper\MapObject;
 use GibsonOS\Mock\Dto\Mapper\StringEnum;
-use GibsonOS\Test\Unit\Core\UnitTest;
+use Prophecy\PhpUnit\ProphecyTrait;
+use Prophecy\Prophecy\ObjectProphecy;
+use ReflectionFunction;
 
-class ObjectsMapperAttributeTest extends UnitTest
+class ObjectsMapperAttributeTest extends Unit
 {
+    use ProphecyTrait;
+
     private ObjectsMapperAttribute $objectsMapperAttribute;
+
+    private RequestService|ObjectProphecy $requestService;
 
     protected function _before(): void
     {
-        $this->objectsMapperAttribute = $this->serviceManager->get(ObjectsMapperAttribute::class);
+        $this->requestService = $this->prophesize(RequestService::class);
+        $reflectionManager = new ReflectionManager();
+        $objectMapper = new ObjectMapper(
+            new ServiceManager(),
+            $reflectionManager,
+        );
+
+        $this->objectsMapperAttribute = new ObjectsMapperAttribute(
+            new ObjectMapperAttribute(
+                $objectMapper,
+                $this->requestService->reveal(),
+                $reflectionManager,
+            ),
+            $objectMapper,
+        );
     }
 
     /**
@@ -27,7 +53,7 @@ class ObjectsMapperAttributeTest extends UnitTest
         callable $function,
         array $return
     ): void {
-        $reflectionFunction = new \ReflectionFunction($function);
+        $reflectionFunction = new ReflectionFunction($function);
 
         foreach ($parameters as $key => $value) {
             $this->requestService->getRequestValue($key)

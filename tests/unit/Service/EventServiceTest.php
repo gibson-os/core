@@ -3,8 +3,11 @@ declare(strict_types=1);
 
 namespace GibsonOS\Test\Unit\Core\Service;
 
+use Codeception\Test\Unit;
+use DateTime;
 use GibsonOS\Core\Manager\ModelManager;
 use GibsonOS\Core\Manager\ReflectionManager;
+use GibsonOS\Core\Manager\ServiceManager;
 use GibsonOS\Core\Model\Event;
 use GibsonOS\Core\Model\Event\Element;
 use GibsonOS\Core\Repository\EventRepository;
@@ -12,27 +15,34 @@ use GibsonOS\Core\Service\CommandService;
 use GibsonOS\Core\Service\DateTimeService;
 use GibsonOS\Core\Service\Event\ElementService;
 use GibsonOS\Core\Service\EventService;
+use GibsonOS\Core\Service\LoggerService;
 use GibsonOS\Core\Service\ProcessService;
 use GibsonOS\Mock\Service\TestEvent;
-use GibsonOS\Test\Unit\Core\UnitTest;
+use GibsonOS\Test\Unit\Core\ModelManagerTrait;
+use mysqlDatabase;
 use Prophecy\Argument;
-use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Log\LoggerInterface;
 
-class EventServiceTest extends UnitTest
+class EventServiceTest extends Unit
 {
-    use ProphecyTrait;
+    use ModelManagerTrait;
 
     private EventService $eventService;
 
-    /**
-     * @var ObjectProphecy|EventRepository
-     */
-    private $eventRepository;
+    private EventRepository|ObjectProphecy $eventRepository;
+
+    private ServiceManager $serviceManager;
 
     protected function _before(): void
     {
+        $this->loadModelManager();
+
+        $this->serviceManager = new ServiceManager();
+        $this->serviceManager->setInterface(LoggerInterface::class, LoggerService::class);
+        $this->serviceManager->setService(mysqlDatabase::class, $this->mysqlDatabase->reveal());
+        $this->serviceManager->setService(ModelManager::class, $this->modelManager->reveal());
+
         $this->eventRepository = $this->prophesize(EventRepository::class);
         $this->eventService = new EventService(
             $this->serviceManager,
@@ -52,7 +62,7 @@ class EventServiceTest extends UnitTest
         $this->eventRepository->getTimeControlled(
             TestEvent::class,
             TestEvent::TRIGGER_MARVIN,
-            Argument::type(\DateTime::class)
+            Argument::type(DateTime::class)
         )
             ->shouldBeCalledOnce()
             ->willReturn([])
@@ -60,7 +70,7 @@ class EventServiceTest extends UnitTest
         $this->eventRepository->getTimeControlled(
             TestEvent::class,
             TestEvent::TRIGGER_FORD,
-            Argument::type(\DateTime::class)
+            Argument::type(DateTime::class)
         )
             ->shouldBeCalledOnce()
             ->willReturn([])
@@ -114,18 +124,20 @@ class EventServiceTest extends UnitTest
 
     public function getTestData(): array
     {
+        $mysqlDatabase = $this->prophesize(mysqlDatabase::class);
+
         return [
             'Simple Event' => [
-                (new Event())
+                (new Event($mysqlDatabase->reveal()))
                     ->setAsync(false)
                     ->setElements([
-                        (new Element())
+                        (new Element($mysqlDatabase->reveal()))
                             ->setClass(TestEvent::class)
                             ->setMethod('test')
                             ->setParameters(['arthur' => 'dent']),
                     ])
                     ->setTriggers([
-                        (new Event\Trigger())
+                        (new Event\Trigger($mysqlDatabase->reveal()))
                             ->setClass(TestEvent::class)
                             ->setTrigger(TestEvent::TRIGGER_FORD),
                     ]),

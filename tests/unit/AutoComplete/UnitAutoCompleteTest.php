@@ -3,25 +3,30 @@ declare(strict_types=1);
 
 namespace GibsonOS\Test\Unit\Core\AutoComplete;
 
+use Codeception\Test\Unit;
 use GibsonOS\Core\AutoComplete\AutoCompleteInterface;
-use GibsonOS\Test\Unit\Core\UnitTest;
+use GibsonOS\Test\Unit\Core\ModelManagerTrait;
 
-abstract class UnitAutoCompleteTest extends UnitTest
+abstract class UnitAutoCompleteTest extends Unit
 {
+    use ModelManagerTrait;
+
     protected AutoCompleteInterface $autoComplete;
 
-    /**
-     * @return class-string
-     */
-    abstract protected function getAutoCompleteClassName(): string;
+    abstract protected function getAutoComplete(): AutoCompleteInterface;
 
     abstract public function testGetByNamePart(): void;
 
     abstract public function testGetById(): void;
 
+    abstract protected function getValueField(): string;
+
+    abstract protected function getDisplayField(): string;
+
     protected function _before()
     {
-        $this->autoComplete = $this->serviceManager->get($this->getAutoCompleteClassName(), AutoCompleteInterface::class);
+        $this->loadModelManager();
+        $this->autoComplete = $this->getAutoComplete();
     }
 
     public function testGetModel(): void
@@ -46,5 +51,15 @@ abstract class UnitAutoCompleteTest extends UnitTest
         $this->assertNotFalse($modelPath, sprintf('JS model "%s" not found', $model));
 
         $this->assertNotFalse(mb_strpos(file_get_contents($modelPath), "Ext.define('" . $model . "'"));
+    }
+
+    public function testGetValueField(): void
+    {
+        $this->assertEquals($this->getValueField(), $this->autoComplete->getValueField());
+    }
+
+    public function testGetDisplayField(): void
+    {
+        $this->assertEquals($this->getDisplayField(), $this->autoComplete->getDisplayField());
     }
 }

@@ -3,37 +3,52 @@ declare(strict_types=1);
 
 namespace GibsonOS\Test\Unit\Core\Mapper;
 
+use Codeception\Test\Unit;
+use GibsonOS\Core\Exception\FactoryError;
+use GibsonOS\Core\Exception\MapperException;
 use GibsonOS\Core\Manager\ReflectionManager;
+use GibsonOS\Core\Manager\ServiceManager;
 use GibsonOS\Core\Mapper\ModelMapper;
 use GibsonOS\Core\Utility\JsonUtility;
 use GibsonOS\Mock\Dto\Mapper\IntEnum;
 use GibsonOS\Mock\Dto\Mapper\MapModel;
 use GibsonOS\Mock\Dto\Mapper\MapModelChild;
 use GibsonOS\Mock\Dto\Mapper\MapModelParent;
-use GibsonOS\Test\Unit\Core\UnitTest;
+use JsonException;
+use mysqlDatabase;
+use Prophecy\PhpUnit\ProphecyTrait;
+use ReflectionException;
+use Throwable;
+use ValueError;
 
-class ModelMapperTest extends UnitTest
+class ModelMapperTest extends Unit
 {
+    use ProphecyTrait;
+
     private ModelMapper $modelMapper;
 
     protected function _before(): void
     {
         $this->modelMapper = new ModelMapper(
-            $this->serviceManager,
-            $this->serviceManager->get(ReflectionManager::class)
+            new ServiceManager(),
+            new ReflectionManager(),
         );
     }
 
     /**
      * @dataProvider getTestData
      *
-     * @throws \JsonException
+     * @throws JsonException
+     * @throws ReflectionException
+     * @throws Throwable
+     * @throws FactoryError
+     * @throws MapperException
      */
     public function testMapToObject(array $properties, string $exception = null): void
     {
         try {
             $object = $this->modelMapper->mapToObject(MapModel::class, $properties);
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             if ($exception !== $e::class) {
                 throw $e;
             }
@@ -100,6 +115,8 @@ class ModelMapperTest extends UnitTest
 
     public function getTestData(): array
     {
+        $mysqlDatabase = $this->prophesize(mysqlDatabase::class);
+
         return [
             'only defaults' => [['stringEnumValue' => 'ja', 'intValue' => 1]],
             'only defaults with parent' => [
@@ -186,8 +203,8 @@ class ModelMapperTest extends UnitTest
             ],
             'with non object value' => [['stringEnumValue' => 'ja', 'intValue' => 1, 'foo' => 'bar']],
             'with missing value' => [['stringEnumValue' => 'ja']],
-            'with wrong enum value' => [['stringEnumValue' => 'Trilian', 'intValue' => 1], \ValueError::class],
-            'with wrong enum type' => [['stringEnumValue' => ['ja'], 'intValue' => 1], \ReflectionException::class],
+            'with wrong enum value' => [['stringEnumValue' => 'Trilian', 'intValue' => 1], ValueError::class],
+            'with wrong enum type' => [['stringEnumValue' => ['ja'], 'intValue' => 1], ReflectionException::class],
             'with int value as string' => [['stringEnumValue' => 'ja', 'intValue' => '1']],
             'with int enum value as string' => [
                 [
@@ -205,8 +222,8 @@ class ModelMapperTest extends UnitTest
                 [
                     'stringEnumValue' => 'nein',
                     'intValue' => 42,
-                    'parent' => (new MapModelParent())->setOptions(['foo' => 'bar']),
-                    'childObjects' => [(new MapModelChild())->setNullableIntEnumValue(IntEnum::DEFINED)],
+                    'parent' => (new MapModelParent($mysqlDatabase->reveal()))->setOptions(['foo' => 'bar']),
+                    'childObjects' => [(new MapModelChild($mysqlDatabase->reveal()))->setNullableIntEnumValue(IntEnum::DEFINED)],
                 ],
             ],
             'with parent object id' => [

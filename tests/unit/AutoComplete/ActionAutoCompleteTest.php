@@ -15,14 +15,13 @@ class ActionAutoCompleteTest extends UnitAutoCompleteTest
     protected function _before()
     {
         $this->actionRepository = $this->prophesize(ActionRepository::class);
-        $this->serviceManager->setService(ActionRepository::class, $this->actionRepository->reveal());
 
         parent::_before();
     }
 
-    protected function getAutoCompleteClassName(): string
+    protected function getAutoComplete(): ActionAutoComplete
     {
-        return ActionAutoComplete::class;
+        return new ActionAutoComplete($this->actionRepository->reveal());
     }
 
     public function testGetByNamePart(): void
@@ -42,12 +41,22 @@ class ActionAutoCompleteTest extends UnitAutoCompleteTest
 
     public function testGetById(): void
     {
-        $action = new Action();
+        $action = new Action($this->mysqlDatabase->reveal());
         $this->actionRepository->getById(42)
             ->shouldBeCalledOnce()
             ->willReturn($action)
         ;
 
         $this->assertEquals($action, $this->autoComplete->getById('42', []));
+    }
+
+    protected function getValueField(): string
+    {
+        return 'id';
+    }
+
+    protected function getDisplayField(): string
+    {
+        return 'name';
     }
 }

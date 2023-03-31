@@ -3,20 +3,67 @@ declare(strict_types=1);
 
 namespace GibsonOS\Test\Unit\Core\Service\Attribute;
 
+use Codeception\Test\Unit;
 use GibsonOS\Core\Attribute\GetMappedModels;
+use GibsonOS\Core\Manager\ReflectionManager;
+use GibsonOS\Core\Manager\ServiceManager;
+use GibsonOS\Core\Mapper\ModelMapper;
+use GibsonOS\Core\Mapper\ObjectMapper;
+use GibsonOS\Core\Service\Attribute\ModelsFetcherAttribute;
 use GibsonOS\Core\Service\Attribute\ModelsMapperAttribute;
+use GibsonOS\Core\Service\Attribute\ObjectMapperAttribute;
+use GibsonOS\Core\Service\RequestService;
+use GibsonOS\Core\Service\SessionService;
 use GibsonOS\Mock\Dto\Mapper\MapModel;
 use GibsonOS\Mock\Dto\Mapper\MapModelChild;
 use GibsonOS\Mock\Dto\Mapper\StringEnum;
-use GibsonOS\Test\Unit\Core\UnitTest;
+use GibsonOS\Test\Unit\Core\ModelManagerTrait;
+use mysqlDatabase;
+use Prophecy\Prophecy\ObjectProphecy;
+use ReflectionFunction;
 
-class ModelsMapperAttributeTest extends UnitTest
+class ModelsMapperAttributeTest extends Unit
 {
+    use ModelManagerTrait;
+
     private ModelsMapperAttribute $modelsMapperAttribute;
+
+    private RequestService|ObjectProphecy $requestService;
+
+    private SessionService|ObjectProphecy $sessionService;
 
     protected function _before(): void
     {
-        $this->modelsMapperAttribute = $this->serviceManager->get(ModelsMapperAttribute::class);
+        $this->loadModelManager();
+        $this->requestService = $this->prophesize(RequestService::class);
+        $this->sessionService = $this->prophesize(SessionService::class);
+        $reflectionManager = new ReflectionManager();
+        $serviceManager = new ServiceManager();
+        $objectMapperAttribute = new ObjectMapperAttribute(
+            new ObjectMapper(
+                $serviceManager,
+                $reflectionManager,
+            ),
+            $this->requestService->reveal(),
+            $reflectionManager,
+        );
+
+        $this->modelsMapperAttribute = new ModelsMapperAttribute(
+            new ModelMapper(
+                $serviceManager,
+                $reflectionManager,
+            ),
+            $reflectionManager,
+            new ModelsFetcherAttribute(
+                $this->mysqlDatabase->reveal(),
+                $this->modelManager->reveal(),
+                $reflectionManager,
+                $this->sessionService->reveal(),
+                $objectMapperAttribute,
+            ),
+            $this->sessionService->reveal(),
+            $objectMapperAttribute,
+        );
     }
 
     /**
@@ -30,7 +77,7 @@ class ModelsMapperAttributeTest extends UnitTest
         callable $function,
         array $return
     ): void {
-        $reflectionFunction = new \ReflectionFunction($function);
+        $reflectionFunction = new ReflectionFunction($function);
 
         foreach ($parameters as $key => $value) {
             $this->requestService->getRequestValue($key)
@@ -43,7 +90,27 @@ class ModelsMapperAttributeTest extends UnitTest
         }
 
         if (count($ids) > 0) {
-            $this->database->execute(
+            $this->mysqlDatabase->getDatabaseName()
+                ->shouldBeCalledOnce()
+                ->willReturn('galaxy')
+            ;
+            $this->mysqlDatabase->sendQuery('SHOW FIELDS FROM `galaxy`.`gibson_o_s_mock_dto_mapper_map_model`')
+                ->shouldBeCalledOnce()
+                ->willReturn(true)
+            ;
+            $this->mysqlDatabase->fetchRow()
+                ->shouldBeCalledTimes(6)
+                ->willReturn(
+                    ['id', 'bigint(20) unsigned', 'NO', 'PRI', null, 'auto_increment'],
+                    ['nullable_int_value', 'bigint(20)', 'YES', '', null, ''],
+                    ['string_enum_value', 'enum(\'NO\', \'YES\')', 'NO', '', null, ''],
+                    ['int_value', 'bigint(20)', 'NO', '', null, ''],
+                    ['parent_id', 'bigint(20) unsigned', 'YES', '', null, ''],
+                    null,
+                )
+            ;
+
+            $this->mysqlDatabase->execute(
                 'SELECT `gibson_o_s_mock_dto_mapper_map_model`.`id`, `gibson_o_s_mock_dto_mapper_map_model`.`nullable_int_value`, `gibson_o_s_mock_dto_mapper_map_model`.`string_enum_value`, `gibson_o_s_mock_dto_mapper_map_model`.`int_value`, `gibson_o_s_mock_dto_mapper_map_model`.`parent_id` ' .
                 'FROM `galaxy`.`gibson_o_s_mock_dto_mapper_map_model` ' .
                 'WHERE (`id`=?) OR (`id`=?)',
@@ -52,7 +119,7 @@ class ModelsMapperAttributeTest extends UnitTest
                 ->shouldBeCalledOnce()
                 ->willReturn(true)
             ;
-            $this->database->fetchAssocList()
+            $this->mysqlDatabase->fetchAssocList()
                 ->shouldBeCalledOnce()
                 ->willReturn($modelsValues)
             ;
@@ -66,6 +133,8 @@ class ModelsMapperAttributeTest extends UnitTest
 
     public function getData(): array
     {
+        $mysqlDatabase = $this->prophesize(mysqlDatabase::class);
+
         return [
             'OK' => [
                 new GetMappedModels(MapModel::class),
@@ -77,12 +146,12 @@ class ModelsMapperAttributeTest extends UnitTest
                 ],
                 function (array $models) { return $models; },
                 [
-                    (new MapModel())
+                    (new MapModel($mysqlDatabase->reveal()))
                         ->setId(24)
                         ->setStringEnumValue(StringEnum::YES)
                         ->setIntValue(142)
                         ->setChildObjects([]),
-                    (new MapModel())
+                    (new MapModel($mysqlDatabase->reveal()))
                         ->setId(42)
                         ->setStringEnumValue(StringEnum::NO)
                         ->setNullableIntValue(7)
@@ -102,12 +171,12 @@ class ModelsMapperAttributeTest extends UnitTest
                 [],
                 function (array $models = []) { return $models; },
                 [
-                    (new MapModel())
+                    (new MapModel($mysqlDatabase->reveal()))
                         ->setId(24)
                         ->setStringEnumValue(StringEnum::YES)
                         ->setIntValue(142)
                         ->setChildObjects([]),
-                    (new MapModel())
+                    (new MapModel($mysqlDatabase->reveal()))
                         ->setId(42)
                         ->setStringEnumValue(StringEnum::NO)
                         ->setNullableIntValue(7)
@@ -141,13 +210,13 @@ class ModelsMapperAttributeTest extends UnitTest
                 ],
                 function (array $models = []) { return $models; },
                 [
-                    (new MapModel())
+                    (new MapModel($mysqlDatabase->reveal()))
                         ->setId(24)
                         ->setStringEnumValue(StringEnum::YES)
                         ->setNullableIntValue(9)
                         ->setIntValue(142)
                         ->setChildObjects([]),
-                    (new MapModel())
+                    (new MapModel($mysqlDatabase->reveal()))
                         ->setId(42)
                         ->setStringEnumValue(StringEnum::NO)
                         ->setIntValue(421)
@@ -169,13 +238,13 @@ class ModelsMapperAttributeTest extends UnitTest
                 ],
                 function (array $models = []) { return $models; },
                 [
-                    (new MapModel())
+                    (new MapModel($mysqlDatabase->reveal()))
                         ->setId(24)
                         ->setStringEnumValue(StringEnum::YES)
                         ->setIntValue(142)
                         ->setParentId(42)
                         ->setChildObjects([]),
-                    (new MapModel())
+                    (new MapModel($mysqlDatabase->reveal()))
                         ->setId(42)
                         ->setStringEnumValue(StringEnum::NO)
                         ->setNullableIntValue(7)
@@ -198,15 +267,15 @@ class ModelsMapperAttributeTest extends UnitTest
                 ],
                 function (array $models = []) { return $models; },
                 [
-                    (new MapModel())
+                    (new MapModel($mysqlDatabase->reveal()))
                         ->setId(24)
                         ->setStringEnumValue(StringEnum::YES)
                         ->setIntValue(142)
                         ->setChildObjects([
-                            (new MapModelChild())->setId(42),
-                            (new MapModelChild())->setId(7),
+                            (new MapModelChild($mysqlDatabase->reveal()))->setId(42),
+                            (new MapModelChild($mysqlDatabase->reveal()))->setId(7),
                         ]),
-                    (new MapModel())
+                    (new MapModel($mysqlDatabase->reveal()))
                         ->setId(42)
                         ->setStringEnumValue(StringEnum::NO)
                         ->setNullableIntValue(7)

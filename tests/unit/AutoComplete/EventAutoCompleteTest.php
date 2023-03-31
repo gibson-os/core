@@ -15,14 +15,13 @@ class EventAutoCompleteTest extends UnitAutoCompleteTest
     protected function _before()
     {
         $this->eventRepository = $this->prophesize(EventRepository::class);
-        $this->serviceManager->setService(EventRepository::class, $this->eventRepository->reveal());
 
         parent::_before();
     }
 
-    protected function getAutoCompleteClassName(): string
+    protected function getAutoComplete(): EventAutoComplete
     {
-        return EventAutoComplete::class;
+        return new EventAutoComplete($this->eventRepository->reveal());
     }
 
     public function testGetByNamePart(): void
@@ -43,12 +42,22 @@ class EventAutoCompleteTest extends UnitAutoCompleteTest
 
     public function testGetById(): void
     {
-        $event = new Event();
+        $event = new Event($this->mysqlDatabase->reveal());
         $this->eventRepository->getById(42)
             ->shouldBeCalledOnce()
             ->willReturn($event)
         ;
 
         $this->assertEquals($event, $this->autoComplete->getById('42', []));
+    }
+
+    protected function getValueField(): string
+    {
+        return 'id';
+    }
+
+    protected function getDisplayField(): string
+    {
+        return 'name';
     }
 }

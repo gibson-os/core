@@ -3,41 +3,51 @@ declare(strict_types=1);
 
 namespace GibsonOS\Test\Unit\Core\Mapper;
 
+use Codeception\Test\Unit;
 use GibsonOS\Core\Exception\FactoryError;
+use GibsonOS\Core\Exception\MapperException;
 use GibsonOS\Core\Manager\ReflectionManager;
+use GibsonOS\Core\Manager\ServiceManager;
 use GibsonOS\Core\Mapper\ObjectMapper;
 use GibsonOS\Core\Utility\JsonUtility;
 use GibsonOS\Mock\Dto\Mapper\IntEnum;
 use GibsonOS\Mock\Dto\Mapper\MapObject;
 use GibsonOS\Mock\Dto\Mapper\MapObjectChild;
 use GibsonOS\Mock\Dto\Mapper\MapObjectParent;
-use GibsonOS\Test\Unit\Core\UnitTest;
+use JsonException;
+use Prophecy\PhpUnit\ProphecyTrait;
+use ReflectionException;
+use Throwable;
+use ValueError;
 
-class ObjectMapperTest extends UnitTest
+class ObjectMapperTest extends Unit
 {
+    use ProphecyTrait;
+
     private ObjectMapper $objectMapper;
 
-    /**
-     * @throws FactoryError
-     */
     protected function _before(): void
     {
         $this->objectMapper = new ObjectMapper(
-            $this->serviceManager,
-            $this->serviceManager->get(ReflectionManager::class)
+            new ServiceManager(),
+            new ReflectionManager(),
         );
     }
 
     /**
      * @dataProvider getTestData
      *
-     * @throws \JsonException
+     * @throws JsonException
+     * @throws ReflectionException
+     * @throws Throwable
+     * @throws FactoryError
+     * @throws MapperException
      */
     public function testMapToObject(array $properties, string $exception = null): void
     {
         try {
             $object = $this->objectMapper->mapToObject(MapObject::class, $properties);
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             if ($exception !== $e::class) {
                 throw $e;
             }
@@ -117,7 +127,7 @@ class ObjectMapperTest extends UnitTest
                     'intValue' => 1,
                     'childObjects' => '{"stringValue": "Marvin"}',
                 ],
-                \ReflectionException::class,
+                ReflectionException::class,
             ],
             'only defaults with corrupt child' => [
                 [
@@ -125,7 +135,7 @@ class ObjectMapperTest extends UnitTest
                     'intValue' => 1,
                     'childObjects' => ['stringValue' => 'Marvin'],
                 ],
-                \ReflectionException::class,
+                ReflectionException::class,
             ],
             'all values' => [
                 [
@@ -167,9 +177,9 @@ class ObjectMapperTest extends UnitTest
                 ],
             ],
             'with non object value' => [['stringEnumValue' => 'ja', 'intValue' => 1, 'foo' => 'bar']],
-            'with missing value' => [['stringEnumValue' => 'ja'], \ReflectionException::class],
-            'with wrong enum value' => [['stringEnumValue' => 'Trilian', 'intValue' => 1], \ValueError::class],
-            'with wrong enum type' => [['stringEnumValue' => ['ja'], 'intValue' => 1], \ReflectionException::class],
+            'with missing value' => [['stringEnumValue' => 'ja'], ReflectionException::class],
+            'with wrong enum value' => [['stringEnumValue' => 'Trilian', 'intValue' => 1], ValueError::class],
+            'with wrong enum type' => [['stringEnumValue' => ['ja'], 'intValue' => 1], ReflectionException::class],
             'with int value as string' => [['stringEnumValue' => 'ja', 'intValue' => '1']],
             'with int enum value as string' => [
                 [
