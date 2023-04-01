@@ -9,7 +9,7 @@ use GibsonOS\Core\Model\Action;
 
 class ActionRepository extends AbstractRepository
 {
-    public function __construct(#[GetTableName(Action::class)] private string $actionTableName)
+    public function __construct(#[GetTableName(Action::class)] private readonly string $actionTableName)
     {
     }
 

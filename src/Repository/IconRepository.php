@@ -21,6 +21,9 @@ class IconRepository extends AbstractRepository
         return $this->fetchOne('`id`=?', [$id], Icon::class);
     }
 
+    /**
+     * @throws SelectError
+     */
     public function findByIds(array $ids): array
     {
         return $this->fetchAll(
@@ -32,7 +35,7 @@ class IconRepository extends AbstractRepository
 
     public function deleteByIds(array $ids): bool
     {
-        $table = $this->getTable(Icon::class);
+        $table = $this->getTable($this->iconTableName);
         $table
             ->setWhere('`id` IN (' . $table->getParametersString($ids) . ')')
             ->setWhereParameters($ids)
