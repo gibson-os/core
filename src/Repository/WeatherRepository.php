@@ -41,15 +41,16 @@ class WeatherRepository extends AbstractRepository
         }
 
         return $this->fetchOne(
-            '`location_id`=? AND date<=?',
+            '`location_id`=? AND `date`<=?',
             [$location->getId(), $dateTime->format('Y-m-d H:i:s')],
-            Weather::class
+            Weather::class,
+            '`date` DESC'
         );
     }
 
-    public function deleteBetweenDates(Location $location, DateTimeInterface $from, DateTimeInterface $to): void
+    public function deleteBetweenDates(Location $location, DateTimeInterface $from, DateTimeInterface $to): bool
     {
-        $this->getTable($this->weatherTableName)
+        return $this->getTable($this->weatherTableName)
             ->setWhere('`location_id`=? AND `date` > ? AND `date` < ?')
             ->setWhereParameters([
                 $location->getId(),
