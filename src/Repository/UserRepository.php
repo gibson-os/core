@@ -52,9 +52,6 @@ class UserRepository extends AbstractRepository
 
     public function getCount(): int
     {
-        $table = $this->getTable($this->userTableName);
-        $table->selectPrepared(false, 'COUNT(`id`)');
-
-        return (int) $table->connection->fetchResult();
+        return (int) ($this->getAggregate('COUNT(`id`)', User::class) ?? [0])[0];
     }
 }

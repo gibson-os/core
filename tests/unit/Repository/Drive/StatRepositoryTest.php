@@ -27,7 +27,7 @@ class StatRepositoryTest extends Unit
             ->shouldBeCalledOnce()
             ->willReturn('marvin')
         ;
-        $this->mysqlDatabase->sendQuery('SHOW FIELDS FROM `marvin`.`drive_stat`')
+        $this->mysqlDatabase->sendQuery('SHOW FIELDS FROM `marvin`.`system_drive_stat`')
             ->shouldBeCalledOnce()
             ->willReturn(true)
         ;
@@ -40,16 +40,13 @@ class StatRepositoryTest extends Unit
             )
         ;
 
-        $this->statRepository = new StatRepository(
-            $this->dateTimeService->reveal(),
-            'drive_stat',
-        );
+        $this->statRepository = new StatRepository($this->dateTimeService->reveal());
     }
 
     public function testGetTimeRange(): void
     {
         $this->mysqlDatabase->execute(
-            'SELECT MIN(`added`) AS `min`, MAX(`added`) AS `max` FROM `marvin`.`drive_stat`',
+            'SELECT MIN(`added`) AS `min`, MAX(`added`) AS `max` FROM `marvin`.`system_drive_stat`',
             [],
         )
             ->shouldBeCalledOnce()
@@ -84,7 +81,7 @@ class StatRepositoryTest extends Unit
     public function testGetTimeRangeEmpty(): void
     {
         $this->mysqlDatabase->execute(
-            'SELECT MIN(`added`) AS `min`, MAX(`added`) AS `max` FROM `marvin`.`drive_stat`',
+            'SELECT MIN(`added`) AS `min`, MAX(`added`) AS `max` FROM `marvin`.`system_drive_stat`',
             [],
         )
             ->shouldBeCalledOnce()

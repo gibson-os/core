@@ -147,11 +147,14 @@ abstract class AbstractRepository
         return $this->getModels($table, $modelClassName);
     }
 
+    /**
+     * @param class-string<ModelInterface> $modelClassName
+     */
     protected function getAggregate(
         string $function,
-        string $where,
-        array $parameters,
-        string $modelClassName = ModelInterface::class
+        string $modelClassName,
+        string $where = '',
+        array $parameters = [],
     ): ?array {
         /** @var ModelInterface $model */
         $model = new $modelClassName();

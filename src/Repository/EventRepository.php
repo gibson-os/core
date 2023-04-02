@@ -6,27 +6,20 @@ namespace GibsonOS\Core\Repository;
 use DateTimeInterface;
 use GibsonOS\Core\Attribute\GetTableName;
 use GibsonOS\Core\Dto\Event\Command;
-use GibsonOS\Core\Exception\Model\SaveError;
-use GibsonOS\Core\Exception\Repository\DeleteError;
 use GibsonOS\Core\Exception\Repository\SelectError;
-use GibsonOS\Core\Manager\ModelManager;
 use GibsonOS\Core\Model\Event;
 use GibsonOS\Core\Model\Event\Element;
 use GibsonOS\Core\Model\Event\Trigger;
 use GibsonOS\Core\Service\DateTimeService;
 use GibsonOS\Core\Utility\JsonUtility;
-use JsonException;
 use mysqlTable;
-use ReflectionException;
 use stdClass;
 
 class EventRepository extends AbstractRepository
 {
     public function __construct(
         private readonly DateTimeService $dateTimeService,
-        private readonly ModelManager $modelManager,
         #[GetTableName(Element::class)] private readonly string $elementTableName,
-        #[GetTableName(Trigger::class)] private readonly string $triggerTableName,
     ) {
     }
 
@@ -131,129 +124,6 @@ class EventRepository extends AbstractRepository
     }
 
     /**
-     * @param int[]|null $notIds
-     *
-     * @throws DeleteError
-     */
-    public function deleteElements(Event $event, ?array $notIds): void
-    {
-        $table = $this->getTable($this->elementTableName)
-            ->setWhere(
-                (
-                    empty($notIds)
-                    ? ''
-                    : '`id` NOT IN (' . implode(', ', array_fill(0, count($notIds), '?')) . ') AND '
-                ) . '`event_id`=?'
-            )
-        ;
-
-        if (!empty($notIds)) {
-            $table->setWhereParameters($notIds);
-        }
-
-        $table->addWhereParameter($event->getId());
-
-        if (!$table->deletePrepared()) {
-            throw (new DeleteError())->setTable($table);
-        }
-    }
-
-    /**
-     * @param int[] $elementIds
-     *
-     * @throws JsonException
-     * @throws ReflectionException
-     * @throws SaveError
-     *
-     * @return int[]
-     */
-    public function saveElements(Event $event, array $elements, int $parentId = null, array $elementIds = []): array
-    {
-        $order = 0;
-
-        foreach ($elements as $element) {
-            $elementModel = (new Event\Element())
-                ->setId($element['id'])
-                ->setEvent($event)
-                ->setParentId($parentId)
-                ->setClass($element['className'])
-                ->setMethod($element['method'])
-                ->setCommand($element['command'] === null ? null : Command::from($element['command']))
-                ->setParameters($element['parameters'] ?? [])
-                ->setReturns($element['returns'] ?? [])
-                ->setOrder($order++)
-            ;
-            $this->modelManager->save($elementModel);
-            $elementIds[] = $elementModel->getId() ?? 0;
-            $elementIds = $this->saveElements($event, $element['children'], $elementModel->getId() ?? 0, $elementIds);
-        }
-
-        return $elementIds;
-    }
-
-    /**
-     * @param int[]|null $notIds
-     *
-     * @throws DeleteError
-     */
-    public function deleteTriggers(Event $event, ?array $notIds): void
-    {
-        $table = $this->getTable($this->triggerTableName)
-            ->setWhere(
-                (
-                    empty($notIds)
-                    ? ''
-                    : '`id` NOT IN (' . implode(', ', array_fill(0, count($notIds), '?')) . ') AND '
-                ) . '`event_id`=?'
-            )
-        ;
-
-        if (!empty($notIds)) {
-            $table->setWhereParameters($notIds);
-        }
-
-        $table->addWhereParameter($event->getId());
-
-        if (!$table->deletePrepared()) {
-            throw (new DeleteError())->setTable($table);
-        }
-    }
-
-    /**
-     * @throws SaveError
-     * @throws ReflectionException
-     * @throws JsonException
-     *
-     * @return int[]
-     */
-    public function saveTriggers(Event $event, array $triggers): array
-    {
-        $triggerIds = [];
-
-        foreach ($triggers as $priority => $trigger) {
-            $triggerModel = (new Trigger())
-                ->setId($trigger['id'])
-                ->setEvent($event)
-                ->setClass($trigger['className'])
-                ->setParameters($trigger['parameters'])
-                ->setTrigger($trigger['trigger'])
-                ->setWeekday($trigger['weekday'])
-                ->setDay($trigger['day'])
-                ->setMonth($trigger['month'])
-                ->setYear($trigger['year'])
-                ->setHour($trigger['hour'])
-                ->setMinute($trigger['minute'])
-                ->setSecond($trigger['second'])
-                ->setPriority($priority)
-            ;
-            $this->modelManager->save($triggerModel);
-            $triggerIds[] = $triggerModel->getId() ?? 0;
-        }
-
-        return $triggerIds;
-    }
-
-    /**
      * @param stdClass[] $events
      *
      * @return Event[]
@@ -321,6 +191,6 @@ class EventRepository extends AbstractRepository
             $elementModels[$event->elementId] = $elementModel;
         }
 
-        return $models;
+        return array_values($models);
     }
 }
