@@ -115,7 +115,6 @@ class EventService
      * @throws JsonException
      * @throws SaveError
      * @throws EventException
-     * @throws ReflectionException
      */
     public function runEvent(Event $event, bool $async): void
     {
@@ -132,13 +131,13 @@ class EventService
                 ->setPid(getmypid())
                 ->setLastRun($this->dateTimeService->get())
         );
-        $startTime = (int) microtime();
+        $startTime = (int) (microtime(true) * 1000000);
         $this->elementService->runElements($event->getElements(), $event);
         $this->modelManager->saveWithoutChildren(
             $event
                 ->setPid(null)
                 ->setLastRun($this->dateTimeService->get())
-                ->setRuntime(((int) microtime()) - $startTime)
+                ->setRuntime(((int) (microtime(true) * 1000000)) - $startTime)
         );
     }
 

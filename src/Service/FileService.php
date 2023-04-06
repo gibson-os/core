@@ -43,14 +43,14 @@ class FileService
                 $this->dirService->create($to);
             }
 
-//            $chmod = $this->getPerms($from);
-//            $this->setPerms($to, $chmod);
-//
-//            $owner = $this->getOwner($from);
-//            $this->setOwner($to, $owner);
-//
-//            $group = $this->getGroup($from);
-//            $this->setGroup($to, $group);
+            //            $chmod = $this->getPerms($from);
+            //            $this->setPerms($to, $chmod);
+            //
+            //            $owner = $this->getOwner($from);
+            //            $this->setOwner($to, $owner);
+            //
+            //            $group = $this->getGroup($from);
+            //            $this->setGroup($to, $group);
 
             foreach ($this->dirService->getFiles($from) as $path) {
                 $filename = $this->getFilename($path);
@@ -78,14 +78,14 @@ class FileService
                 $this->dirService->create($to);
             }
 
-//            $chmod = $this->getPerms($from);
-//            $this->setPerms($to, $chmod);
-//
-//            $owner = $this->getOwner($from);
-//            $this->setOwner($to, $owner);
-//
-//            $group = $this->getGroup($from);
-//            $this->setGroup($to, $group);
+            //            $chmod = $this->getPerms($from);
+            //            $this->setPerms($to, $chmod);
+            //
+            //            $owner = $this->getOwner($from);
+            //            $this->setOwner($to, $owner);
+            //
+            //            $group = $this->getGroup($from);
+            //            $this->setGroup($to, $group);
 
             foreach ($this->dirService->getFiles($from) as $path) {
                 $filename = $this->getFilename($path);

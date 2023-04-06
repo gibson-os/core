@@ -40,77 +40,77 @@ class DriveStatCommand extends AbstractCommand
                     continue;
                 }
 
-//                switch (mb_strtolower(trim($keyValue[0]))) {
-//                    case 'serialno':
-//                        $System->system_driveTable->serial->setValue($keyValue[1]);
-//
-//                        break;
-//                    case 'fwrev':
-//                        $System->system_driveTable->fw_rev->setValue($keyValue[1]);
-//
-//                        break;
-//                    case 'rawchs':
-//                        $System->system_driveTable->raw_chs->setValue($keyValue[1]);
-//
-//                        break;
-//                    case 'trksize':
-//                        $System->system_driveTable->track_size->setValue($keyValue[1]);
-//
-//                        break;
-//                    case 'sectsize':
-//                        $System->system_driveTable->sect_size->setValue($keyValue[1]);
-//
-//                        break;
-//                    case 'eccbytes':
-//                        $System->system_driveTable->ecc_bytes->setValue($keyValue[1]);
-//
-//                        break;
-//                    case 'bufftype':
-//                        $System->system_driveTable->buff_type->setValue($keyValue[1]);
-//
-//                        break;
-//                    case 'buffsize':
-//                        $System->system_driveTable->buff_size->setValue($keyValue[1]);
-//
-//                        break;
-//                    case 'maxmultsect':
-//                        $System->system_driveTable->max_mult_sect->setValue($keyValue[1]);
-//
-//                        break;
-//                    case 'multsect':
-//                        $System->system_driveTable->mult_sect->setValue($keyValue[1]);
-//
-//                        break;
-//                    case 'curchs':
-//                        $System->system_driveTable->cur_chs->setValue($keyValue[1]);
-//
-//                        break;
-//                    case 'cursects':
-//                        $System->system_driveTable->cur_sects->setValue($keyValue[1]);
-//
-//                        break;
-//                    case 'lbasects':
-//                        $System->system_driveTable->lba_sects->setValue($keyValue[1]);
-//
-//                        break;
-//                    case 'iordy':
-//                        $System->system_driveTable->io_rdy->setValue($keyValue[1]);
-//
-//                        break;
-//                    case 'tpio':
-//                        $System->system_driveTable->t_pio->setValue($keyValue[1]);
-//
-//                        break;
-//                    case 'tdma':
-//                        $System->system_driveTable->t_dma->setValue($keyValue[1]);
-//
-//                        break;
-//                    default:
-//                        $property = mb_strtolower(trim($keyValue[0]));
-//                        $System->system_driveTable->{$property}->setValue($keyValue[1]);
-//
-//                        break;
-//                }
+                //                switch (mb_strtolower(trim($keyValue[0]))) {
+                //                    case 'serialno':
+                //                        $System->system_driveTable->serial->setValue($keyValue[1]);
+                //
+                //                        break;
+                //                    case 'fwrev':
+                //                        $System->system_driveTable->fw_rev->setValue($keyValue[1]);
+                //
+                //                        break;
+                //                    case 'rawchs':
+                //                        $System->system_driveTable->raw_chs->setValue($keyValue[1]);
+                //
+                //                        break;
+                //                    case 'trksize':
+                //                        $System->system_driveTable->track_size->setValue($keyValue[1]);
+                //
+                //                        break;
+                //                    case 'sectsize':
+                //                        $System->system_driveTable->sect_size->setValue($keyValue[1]);
+                //
+                //                        break;
+                //                    case 'eccbytes':
+                //                        $System->system_driveTable->ecc_bytes->setValue($keyValue[1]);
+                //
+                //                        break;
+                //                    case 'bufftype':
+                //                        $System->system_driveTable->buff_type->setValue($keyValue[1]);
+                //
+                //                        break;
+                //                    case 'buffsize':
+                //                        $System->system_driveTable->buff_size->setValue($keyValue[1]);
+                //
+                //                        break;
+                //                    case 'maxmultsect':
+                //                        $System->system_driveTable->max_mult_sect->setValue($keyValue[1]);
+                //
+                //                        break;
+                //                    case 'multsect':
+                //                        $System->system_driveTable->mult_sect->setValue($keyValue[1]);
+                //
+                //                        break;
+                //                    case 'curchs':
+                //                        $System->system_driveTable->cur_chs->setValue($keyValue[1]);
+                //
+                //                        break;
+                //                    case 'cursects':
+                //                        $System->system_driveTable->cur_sects->setValue($keyValue[1]);
+                //
+                //                        break;
+                //                    case 'lbasects':
+                //                        $System->system_driveTable->lba_sects->setValue($keyValue[1]);
+                //
+                //                        break;
+                //                    case 'iordy':
+                //                        $System->system_driveTable->io_rdy->setValue($keyValue[1]);
+                //
+                //                        break;
+                //                    case 'tpio':
+                //                        $System->system_driveTable->t_pio->setValue($keyValue[1]);
+                //
+                //                        break;
+                //                    case 'tdma':
+                //                        $System->system_driveTable->t_dma->setValue($keyValue[1]);
+                //
+                //                        break;
+                //                    default:
+                //                        $property = mb_strtolower(trim($keyValue[0]));
+                //                        $System->system_driveTable->{$property}->setValue($keyValue[1]);
+                //
+                //                        break;
+                //                }
             }
         }
 
