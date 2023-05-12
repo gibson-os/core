@@ -35,6 +35,7 @@ class ActionStore extends AbstractDatabaseStore
         foreach (parent::getList() as $action) {
             $data = $action->jsonSerialize();
             $data['id'] = 'a' . $data['id'];
+            $data['name'] = $data['method'] . ' ' . $data['name'];
             $data['leaf'] = true;
 
             yield $data;

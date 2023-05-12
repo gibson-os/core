@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Model\User;
 
 use GibsonOS\Core\Attribute\Install\Database\View;
+use GibsonOS\Core\Enum\HttpMethod;
 use GibsonOS\Core\Model\AbstractModel;
 use JsonSerializable;
 
@@ -50,7 +51,8 @@ class PermissionView extends AbstractModel implements JsonSerializable
             'CAST(`p`.`task_id` AS UNSIGNED) `task_id`, ' .
             '`p`.`task_name`, ' .
             'CAST(`p`.`action_id` AS UNSIGNED) `action_id`, ' .
-            '`p`.`action_name` ' .
+            '`p`.`action_name`, ' .
+            '`p`.`action_method` ' .
         'FROM (' .
             '(' .
                 'SELECT DISTINCT ' .
@@ -67,7 +69,8 @@ class PermissionView extends AbstractModel implements JsonSerializable
                     'NULL `task_id`, ' .
                     'NULL `task_name`, ' .
                     'NULL `action_id`, ' .
-                    'NULL `action_name` ' .
+                    'NULL `action_name`, ' .
+                    'NULL `action_method` ' .
                 'FROM `module` `m` ' .
                 'JOIN `all_users` `u` ON 1 ' .
                 'LEFT JOIN `max_role_permission` `mrp` ON ' .
@@ -104,7 +107,8 @@ class PermissionView extends AbstractModel implements JsonSerializable
                     '`t`.`id` `task_id`, ' .
                     '`t`.`name` `task_name`, ' .
                     'NULL `action_id`, ' .
-                    'NULL `action_name` ' .
+                    'NULL `action_name`, ' .
+                    'NULL `action_method` ' .
                 'FROM `module` `m` ' .
                 'LEFT JOIN `task` `t` ON `m`.`id` = `t`.`module_id` ' .
                 'JOIN `all_users` `u` ON 1 ' .
@@ -158,7 +162,8 @@ class PermissionView extends AbstractModel implements JsonSerializable
                     '`t`.`id` `task_id`, ' .
                     '`t`.`name` `task_name`, ' .
                     '`a`.`id` `action_id`, ' .
-                    '`a`.`name` `action_name` ' .
+                    '`a`.`name` `action_name`, ' .
+                    '`a`.`method` `action_method` ' .
                 'FROM `module` `m` ' .
                 'LEFT JOIN `task` `t` ON `m`.`id` = `t`.`module_id` ' .
                 'LEFT JOIN `action` `a` ON `t`.`id` = `a`.`task_id` ' .
@@ -225,6 +230,8 @@ class PermissionView extends AbstractModel implements JsonSerializable
     private ?int $actionId = null;
 
     private ?string $actionName = null;
+
+    private ?HttpMethod $actionMethod = null;
 
     public function getUserId(): ?int
     {
@@ -394,6 +401,18 @@ class PermissionView extends AbstractModel implements JsonSerializable
         return $this;
     }
 
+    public function getActionMethod(): ?HttpMethod
+    {
+        return $this->actionMethod;
+    }
+
+    public function setActionMethod(?HttpMethod $actionMethod): PermissionView
+    {
+        $this->actionMethod = $actionMethod;
+
+        return $this;
+    }
+
     public function jsonSerialize(): array
     {
         return [
@@ -411,6 +430,7 @@ class PermissionView extends AbstractModel implements JsonSerializable
             'taskName' => $this->getTaskName(),
             'actionId' => $this->getActionId(),
             'actionName' => $this->getActionName(),
+            'actionMethod' => $this->getActionMethod()?->value,
         ];
     }
 }

@@ -127,7 +127,7 @@ class MiddlewareService
      */
     private function getNewToken(): void
     {
-        if ($this->middlewareUrl === null) {
+        if ($this->middlewareUrl === null || $this->middlewareUrl === '' || $this->middlewareUrl === '/') {
             throw new InvalidArgumentException('Middleware URL not set');
         }
 

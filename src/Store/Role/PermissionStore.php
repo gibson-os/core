@@ -63,7 +63,7 @@ class PermissionStore extends AbstractDatabaseStore
                 ->appendJoinLeft(sprintf('`%s` `m`', $this->moduleTableName), '`m`.`id`=?')
                 ->appendJoinLeft(
                     sprintf('`%s` `upm`', $this->permissionTableName),
-                    sprintf('`%s`.`id`=`upm`.`role_id` AND `upm`.`module`=`m`.`name` AND `upm`.`task` IS NULL', $this->tableName),
+                    sprintf('`%s`.`id`=`upm`.`role_id` AND `upm`.`module_id`=`m`.`id` AND `upm`.`task_id` IS NULL', $this->tableName),
                 )
             ;
 
@@ -85,12 +85,12 @@ class PermissionStore extends AbstractDatabaseStore
                 ->appendJoinLeft(sprintf('`%s` `t`', $this->taskTableName), '`t`.`id`=?')
                 ->appendJoinLeft(
                     sprintf('`%s` `upt`', $this->permissionTableName),
-                    sprintf('`%s`.`id`=`upt`.`role_id` AND `upt`.`task`=`t`.`name` AND `upt`.`action` IS NULL', $this->tableName),
+                    sprintf('`%s`.`id`=`upt`.`role_id` AND `upt`.`task_id`=`t`.`id` AND `upt`.`action_id` IS NULL', $this->tableName),
                 )
                 ->appendJoinLeft(sprintf('`%s` `m`', $this->moduleTableName), '`m`.`id`=`t`.`module_id`')
                 ->appendJoinLeft(
                     sprintf('`%s` `upm`', $this->permissionTableName),
-                    sprintf('`%s`.`id`=`upm`.`role_id` AND `upm`.`module`=`m`.`name` AND `upm`.`task` IS NULL', $this->tableName),
+                    sprintf('`%s`.`id`=`upm`.`role_id` AND `upm`.`module_id`=`m`.`id` AND `upm`.`task_id` IS NULL', $this->tableName),
                 )
             ;
 
@@ -112,17 +112,17 @@ class PermissionStore extends AbstractDatabaseStore
                 ->appendJoinLeft(sprintf('`%s` `a`', $this->actionTableName), '`a`.`id`=?')
                 ->appendJoinLeft(
                     sprintf('`%s` `upa`', $this->permissionTableName),
-                    sprintf('`%s`.`id`=`upa`.`role_id` AND `upa`.`action`=`a`.`name`', $this->tableName)
+                    sprintf('`%s`.`id`=`upa`.`role_id` AND `upa`.`action_id`=`a`.`id`', $this->tableName)
                 )
                 ->appendJoinLeft(sprintf('`%s` `t`', $this->taskTableName), '`t`.`id`=`a`.`task_id`')
                 ->appendJoinLeft(
                     sprintf('`%s` `upt`', $this->permissionTableName),
-                    sprintf('`%s`.`id`=`upt`.`role_id` AND `upt`.`task`=`t`.`name` AND `upt`.`action` IS NULL', $this->tableName)
+                    sprintf('`%s`.`id`=`upt`.`role_id` AND `upt`.`task_id`=`t`.`id` AND `upt`.`action_id` IS NULL', $this->tableName)
                 )
                 ->appendJoinLeft(sprintf('`%s` `m`', $this->moduleTableName), '`m`.`id`=`t`.`module_id`')
                 ->appendJoinLeft(
                     sprintf('`%s` `upm`', $this->permissionTableName),
-                    sprintf('`%s`.`id`=`upm`.`role_id` AND `upm`.`module`=`m`.`name` AND `upm`.`task` IS NULL', $this->tableName)
+                    sprintf('`%s`.`id`=`upm`.`role_id` AND `upm`.`module_id`=`m`.`id` AND `upm`.`task_id` IS NULL', $this->tableName)
                 )
             ;
 

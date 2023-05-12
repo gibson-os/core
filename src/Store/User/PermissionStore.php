@@ -58,8 +58,8 @@ class PermissionStore extends AbstractStore
                 sprintf(
                     'LEFT JOIN `%s` `upm` ON ' .
                     '`u`.`id`=IFNULL(`upm`.`user_id`, 0) AND ' .
-                    '`upm`.`module`=`m`.`name` ' .
-                    'AND `upm`.`task` IS NULL',
+                    '`upm`.`module_id`=`m`.`id` ' .
+                    'AND `upm`.`task_id` IS NULL',
                     $this->permissionTableName
                 ),
             ];
@@ -82,16 +82,16 @@ class PermissionStore extends AbstractStore
                 sprintf(
                     'LEFT JOIN `%s` `upt` ON ' .
                     '`u`.`id`=IFNULL(`upt`.`user_id`, 0) AND ' .
-                    '`upt`.`task`=`t`.`name` AND ' .
-                    '`upt`.`action` IS NULL',
+                    '`upt`.`task_id`=`t`.`id` AND ' .
+                    '`upt`.`action_id` IS NULL',
                     $this->permissionTableName
                 ),
                 sprintf('LEFT JOIN `%s` `m` ON `m`.`id`=`t`.`module_id`', $this->moduleTableName),
                 sprintf(
                     'LEFT JOIN `%s` `upm` ON ' .
                     '`u`.`id`=IFNULL(`upm`.`user_id`, 0) AND ' .
-                    '`upm`.`module`=`m`.`name` ' .
-                    'AND `upm`.`task` IS NULL',
+                    '`upm`.`module_id`=`m`.`id` ' .
+                    'AND `upm`.`task_id` IS NULL',
                     $this->permissionTableName
                 ),
             ];
@@ -114,23 +114,23 @@ class PermissionStore extends AbstractStore
                 sprintf(
                     'LEFT JOIN `%s` `upa` ON ' .
                     '`u`.`id`=IFNULL(`upa`.`user_id`, 0) AND ' .
-                    '`upa`.`action`=`a`.`name`',
+                    '`upa`.`action_id`=`a`.`id`',
                     $this->permissionTableName
                 ),
                 sprintf('LEFT JOIN `%s` `t` ON `t`.`id`=`a`.`task_id`', $this->taskTableName),
                 sprintf(
                     'LEFT JOIN `%s` `upt` ON ' .
                     '`u`.`id`=IFNULL(`upt`.`user_id`, 0) AND ' .
-                    '`upt`.`task`=`t`.`name` AND ' .
-                    '`upt`.`action` IS NULL',
+                    '`upt`.`task_id`=`t`.`id` AND ' .
+                    '`upt`.`action_id` IS NULL',
                     $this->permissionTableName
                 ),
                 sprintf('LEFT JOIN `%s` `m` ON `m`.`id`=`t`.`module_id`', $this->moduleTableName),
                 sprintf(
                     'LEFT JOIN `%s` `upm` ON ' .
                     '`u`.`id`=IFNULL(`upm`.`user_id`, 0) AND ' .
-                    '`upm`.`module`=`m`.`name` AND ' .
-                    '`upm`.`task` IS NULL',
+                    '`upm`.`module_id`=`m`.`id` AND ' .
+                    '`upm`.`task_id` IS NULL',
                     $this->permissionTableName
                 ),
             ];
