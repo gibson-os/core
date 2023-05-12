@@ -36,7 +36,7 @@ class CommandServiceTest extends Unit
 
     private CommandService $commandService;
 
-    protected function _before()
+    protected function _before(): void
     {
         $this->processService = $this->prophesize(ProcessService::class);
         $this->commandStore = $this->prophesize(CommandStore::class);

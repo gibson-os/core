@@ -89,6 +89,7 @@ class CronjobService
     /**
      * @throws SaveError
      * @throws JsonException
+     * @throws ReflectionException
      */
     public function run(string $user): void
     {
