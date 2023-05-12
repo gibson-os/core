@@ -86,6 +86,7 @@ Ext.define('GibsonOS.module.core.event.Grid', {
 
                 GibsonOS.Ajax.request({
                     url: baseDir + 'core/event/delete',
+                    method: 'DELETE',
                     params: {
                         eventId: records[0].get('id')
                     },

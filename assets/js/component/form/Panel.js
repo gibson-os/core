@@ -69,6 +69,7 @@ Ext.define('GibsonOS.module.core.component.form.Panel', {
 
         GibsonOS.Ajax.request({
             url: url,
+            method: 'GET',
             params: params,
             success(response) {
                 const data = Ext.decode(response.responseText).data;

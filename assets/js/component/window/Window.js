@@ -146,6 +146,7 @@ Ext.define('GibsonOS.module.core.window.Window', {
 
         GibsonOS.Ajax.request({
             url: baseDir + 'core/setting/window',
+            method: 'GET',
             withoutFailure: true,
             params: {
                 id: this.getId(),

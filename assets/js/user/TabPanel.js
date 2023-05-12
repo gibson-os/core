@@ -25,6 +25,7 @@ Ext.define('GibsonOS.module.core.user.TabPanel', {
         me.on('render', function(panel) {
             GibsonOS.Ajax.request({
                 url: baseDir + 'core/user/settings',
+                method: 'GET',
                 params: {
                     id: panel.gos.data.userId ? panel.gos.data.userId : 0
                 },
