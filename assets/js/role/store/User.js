@@ -5,6 +5,7 @@ Ext.define('GibsonOS.module.core.role.store.User', {
     autoLoad: false,
     proxy: {
         type: 'gosDataProxyAjax',
-        url: baseDir + 'core/role/users'
+        url: baseDir + 'core/role/users',
+        method: 'GET'
     }
 });

@@ -17,7 +17,8 @@ function coreDriveIndex()
     var gridStore = new GibsonOS.data.Store({
         proxy: {
             type: 'gosDataProxyAjax',
-            url: baseDir + 'core/drive/index'
+            url: baseDir + 'core/drive',
+            method: 'GET'
         },
         model: 'coreDriveIndexGridModel',
         listeners: {

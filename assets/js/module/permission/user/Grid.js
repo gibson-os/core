@@ -13,7 +13,8 @@ Ext.define('GibsonOS.module.core.module.permission.user.Grid', {
 
         me.store.on('update', (store, record) => {
             GibsonOS.Ajax.request({
-                url: baseDir + 'core/user/savePermission',
+                url: baseDir + 'core/user/permission',
+                method: 'POST',
                 params: {
                     id: record.get('id'),
                     userId: record.get('userId'),

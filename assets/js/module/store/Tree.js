@@ -5,6 +5,7 @@ Ext.define('GibsonOS.module.core.module.store.Tree', {
     model: 'GibsonOS.module.core.module.model.Module',
     proxy: {
         type: 'gosDataProxyAjax',
-        url: baseDir + 'core/module/index'
+        url: baseDir + 'core/module',
+        method: 'GET'
     }
 });

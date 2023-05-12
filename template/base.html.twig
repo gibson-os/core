@@ -53,7 +53,7 @@
         Ext.onReady(() => {
             {% set moduleName = request.getModuleName() %}
             {% set taskName = request.getTaskName() %}
-            {% set actionName = request.getActionName() %}
+            {% set actionName = request.getActionName() is empty ? 'index' : request.getActionName() %}
             {% if session.getWithDefault('login', false) != true %}
                 {% set taskName = 'user' %}
                 {% set actionName = 'login' %}

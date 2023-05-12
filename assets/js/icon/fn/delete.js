@@ -21,7 +21,7 @@ GibsonOS.define('GibsonOS.module.core.icon.fn.delete', function(records, success
                 });
 
                 GibsonOS.Ajax.request({
-                    url: baseDir + 'core/icon/delete',
+                    url: baseDir + 'core/icon',
                     method: 'DELETE',
                     params: {
                         ids: Ext.encode(ids)

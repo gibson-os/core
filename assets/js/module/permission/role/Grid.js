@@ -13,7 +13,8 @@ Ext.define('GibsonOS.module.core.module.permission.role.Grid', {
 
         me.store.on('update', (store, record) => {
             GibsonOS.Ajax.request({
-                url: baseDir + 'core/role/savePermission',
+                url: baseDir + 'core/role/permission',
+                method: 'POST',
                 params: {
                     id: record.get('id'),
                     roleId: record.get('roleId'),

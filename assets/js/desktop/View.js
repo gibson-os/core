@@ -193,7 +193,8 @@ Ext.define('GibsonOS.module.core.desktop.View', {
         });
 
         GibsonOS.Ajax.request({
-            url: baseDir + 'core/desktop/save',
+            url: baseDir + 'core/desktop',
+            method: 'POST',
             params: {
                 items: Ext.encode(records)
             },

@@ -62,7 +62,8 @@ Ext.define('GibsonOS.module.core.user.App', {
                 text: 'Nein'
             }]
         },{
-            url: baseDir + 'core/user/delete',
+            url: baseDir + 'core/user',
+            method: 'DELETE',
             params: {
                 id: record.get('id')
             },

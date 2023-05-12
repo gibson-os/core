@@ -22,8 +22,6 @@ use ReflectionException;
 class DeviceController extends AbstractController
 {
     /**
-     * @throws JsonException
-     * @throws ReflectionException
      * @throws SaveError
      * @throws SelectError
      * @throws RequestError

@@ -19,7 +19,7 @@ class DriveController extends AbstractController
      * @throws SelectError
      */
     #[CheckPermission(Permission::READ)]
-    public function getIndex(
+    public function get(
         DriveRepository $driveRepository,
         SmartAttributeRepository $smartAttributeRepository,
         StatRepository $statRepository

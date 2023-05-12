@@ -4,6 +4,7 @@ Ext.define('GibsonOS.module.core.cronjob.store.Cronjob', {
     model: 'GibsonOS.module.core.cronjob.model.Cronjob',
     proxy: {
         type: 'gosDataProxyAjax',
-        url: baseDir + 'core/cronjob/index'
+        url: baseDir + 'core/cronjob',
+        method: 'GET'
     }
 });

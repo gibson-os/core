@@ -4,6 +4,7 @@ Ext.define('GibsonOS.module.core.user.store.User', {
     model: 'GibsonOS.module.core.user.model.User',
     proxy: {
         type: 'gosDataProxyAjax',
-        url: baseDir + 'core/user/index'
+        url: baseDir + 'core/user',
+        method: 'GET'
     }
 });

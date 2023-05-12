@@ -4,6 +4,7 @@ Ext.define('GibsonOS.module.core.role.store.Role', {
     model: 'GibsonOS.module.core.role.model.Role',
     proxy: {
         type: 'gosDataProxyAjax',
-        url: baseDir + 'core/role/index'
+        url: baseDir + 'core/role',
+        method: 'GET'
     }
 });

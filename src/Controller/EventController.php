@@ -40,7 +40,7 @@ class EventController extends AbstractController
      * @throws SelectError
      */
     #[CheckPermission(Permission::READ)]
-    public function getIndex(
+    public function get(
         EventStore $eventStore,
         int $start = 0,
         int $limit = 0,
@@ -132,7 +132,7 @@ class EventController extends AbstractController
     }
 
     #[CheckPermission(Permission::WRITE)]
-    public function postSave(
+    public function post(
         EventRepository $eventRepository,
         ModelManager $modelManager,
         #[GetMappedModel] Event $event
@@ -239,7 +239,7 @@ class EventController extends AbstractController
      * @throws JsonException
      */
     #[CheckPermission(Permission::DELETE)]
-    public function deleteDelete(ModelManager $modelManager, #[GetModel(['id' => 'eventId'])] Event $event): AjaxResponse
+    public function delete(ModelManager $modelManager, #[GetModel(['id' => 'eventId'])] Event $event): AjaxResponse
     {
         $modelManager->delete($event);
 

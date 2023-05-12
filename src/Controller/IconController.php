@@ -33,7 +33,7 @@ class IconController extends AbstractController
      * @throws ReflectionException
      */
     #[CheckPermission(Permission::READ)]
-    public function getIndex(IconStore $iconStore, TagStore $tagStore, array $tags = []): AjaxResponse
+    public function get(IconStore $iconStore, TagStore $tagStore, array $tags = []): AjaxResponse
     {
         $iconStore->setTags($tags);
         /** @var Traversable $icons */
@@ -57,7 +57,7 @@ class IconController extends AbstractController
      */
     #[CheckPermission(Permission::WRITE)]
     #[AlwaysAjaxResponse]
-    public function postSave(
+    public function post(
         ImageService $imageService,
         IconService $iconService,
         IconStore $iconStore,
@@ -92,7 +92,7 @@ class IconController extends AbstractController
     }
 
     #[CheckPermission(Permission::DELETE)]
-    public function deleteDelete(IconRepository $iconRepository, array $ids, IconService $iconService): AjaxResponse
+    public function delete(IconRepository $iconRepository, array $ids, IconService $iconService): AjaxResponse
     {
         $iconRepository->startTransaction();
 

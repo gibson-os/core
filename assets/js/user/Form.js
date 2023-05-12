@@ -81,7 +81,8 @@ Ext.define('GibsonOS.module.core.user.Form', {
                         id: form.gos.data.userId ? form.gos.data.userId : 0,
                         add: form.gos.data.add ? form.gos.data.add : false
                     },
-                    url: baseDir + 'core/user/save',
+                    url: baseDir + 'core/user',
+                    method: 'POST',
                     success: function(formAction, action) {
                         if (form.gos.data.success) {
                             form.gos.data.success(form, action);

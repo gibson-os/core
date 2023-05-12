@@ -37,7 +37,7 @@ class UserController extends AbstractController
      * @throws ReflectionException
      */
     #[CheckPermission(Permission::MANAGE + Permission::READ)]
-    public function getIndex(UserStore $userStore): AjaxResponse
+    public function get(UserStore $userStore): AjaxResponse
     {
         return $this->returnSuccess($userStore->getList());
     }
@@ -130,7 +130,7 @@ class UserController extends AbstractController
      * @todo Model mapping?
      */
     #[CheckPermission(Permission::WRITE, ['add' => Permission::WRITE + Permission::MANAGE])]
-    public function postSave(
+    public function post(
         UserService $userService,
         UserRepository $userRepository,
         #[GetMappedModel] User $user,
@@ -165,7 +165,7 @@ class UserController extends AbstractController
      * @throws PermissionDenied
      */
     #[CheckPermission(Permission::DELETE, ['id' => Permission::DELETE + Permission::MANAGE])]
-    public function deleteDeleteDevice(
+    public function deleteDevice(
         DeviceRepository $deviceRepository,
         #[GetModel] User $user,
         array $devices,
@@ -181,7 +181,7 @@ class UserController extends AbstractController
      * @throws DeleteError
      */
     #[CheckPermission(Permission::MANAGE + Permission::WRITE)]
-    public function postSavePermission(
+    public function postPermission(
         ModelManager $modelManager,
         #[GetMappedModel] Permission $permission,
         #[GetModel] Permission $originalPermission = null,
@@ -220,7 +220,7 @@ class UserController extends AbstractController
      * @throws JsonException
      */
     #[CheckPermission(Permission::MANAGE + Permission::DELETE)]
-    public function deleteDelete(ModelManager $modelManager, #[GetModel] User $user): AjaxResponse
+    public function delete(ModelManager $modelManager, #[GetModel] User $user): AjaxResponse
     {
         $modelManager->delete($user);
 

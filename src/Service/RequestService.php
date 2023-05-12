@@ -28,7 +28,7 @@ class RequestService
 
         $this->moduleName = array_shift($queryParams) ?: 'core';
         $this->taskName = array_shift($queryParams) ?: 'index';
-        $this->actionName = array_shift($queryParams) ?: 'index';
+        $this->actionName = array_shift($queryParams) ?: '';
         $this->queryString = implode('/', $queryParams);
 
         $params = [];

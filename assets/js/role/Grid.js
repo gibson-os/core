@@ -40,7 +40,8 @@ Ext.define('GibsonOS.module.core.role.Grid', {
                 text: 'Nein'
             }]
         },{
-            url: baseDir + 'core/role/delete',
+            url: baseDir + 'core/role',
+            method: 'DELETE',
             params: {
                 id: record.get('id')
             },
@@ -58,7 +59,8 @@ Ext.define('GibsonOS.module.core.role.Grid', {
 
         me.store.on('update', (store, record) => {
             GibsonOS.Ajax.request({
-                url: baseDir + 'core/role/save',
+                url: baseDir + 'core/role',
+                method: 'POST',
                 params: {
                     id: record.get('id'),
                     name: record.get('name')

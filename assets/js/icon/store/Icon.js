@@ -5,6 +5,7 @@ Ext.define('GibsonOS.module.core.icon.store.Icon', {
     autoLoad: true,
     proxy: {
         type: 'gosDataProxyAjax',
-        url: baseDir + 'core/icon/index'
+        url: baseDir + 'core/icon',
+        method: 'GET'
     }
 });

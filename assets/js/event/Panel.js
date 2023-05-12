@@ -120,7 +120,8 @@ Ext.define('GibsonOS.module.core.event.Panel', {
 
         form.submit({
             xtype: 'gosFormActionAction',
-            url: baseDir + 'core/event/save',
+            url: baseDir + 'core/event',
+            method: 'POST',
             params: {
                 elements: Ext.encode(elements),
                 triggers: Ext.encode(triggers)

@@ -31,7 +31,7 @@ class RoleController extends AbstractController
      * @throws ReflectionException
      */
     #[CheckPermission(UserPermission::MANAGE + UserPermission::READ)]
-    public function getIndex(
+    public function get(
         RoleStore $roleStore,
         int $start = 0,
         int $limit = 0,
@@ -47,7 +47,7 @@ class RoleController extends AbstractController
      * @throws SaveError
      */
     #[CheckPermission(UserPermission::MANAGE + UserPermission::WRITE)]
-    public function postSave(
+    public function post(
         ModelManager $modelManager,
         #[GetMappedModel] Role $role,
     ): AjaxResponse {
@@ -61,7 +61,7 @@ class RoleController extends AbstractController
      * @throws JsonException
      */
     #[CheckPermission(UserPermission::MANAGE + UserPermission::DELETE)]
-    public function deleteDelete(
+    public function delete(
         ModelManager $modelManager,
         #[GetModel] Role $role,
     ): AjaxResponse {
@@ -74,7 +74,7 @@ class RoleController extends AbstractController
      * @throws SaveError
      */
     #[CheckPermission(UserPermission::MANAGE + UserPermission::WRITE)]
-    public function postSavePermission(
+    public function postPermission(
         ModelManager $modelManager,
         #[GetMappedModel] Permission $permission,
     ): AjaxResponse {
@@ -109,7 +109,7 @@ class RoleController extends AbstractController
      * @throws SaveError
      */
     #[CheckPermission(UserPermission::MANAGE + UserPermission::WRITE)]
-    public function postSaveUser(
+    public function postUser(
         #[GetMappedModel] Role\User $roleUser,
         ModelManager $modelManager,
     ): AjaxResponse {
@@ -123,7 +123,7 @@ class RoleController extends AbstractController
      * @throws JsonException
      */
     #[CheckPermission(UserPermission::MANAGE + UserPermission::DELETE)]
-    public function deleteDeleteUsers(
+    public function deleteUsers(
         #[GetModels(Role\User::class)] array $users,
         ModelManager $modelManager
     ): AjaxResponse {

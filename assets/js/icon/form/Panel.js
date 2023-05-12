@@ -52,7 +52,8 @@ Ext.define('GibsonOS.module.core.icon.form.Panel', {
             handler: function() {
                 formPanel.getForm().submit({
                     xtype: 'gosFormActionAction',
-                    url: baseDir + 'core/icon/save',
+                    url: baseDir + 'core/icon',
+                    method: 'POST',
                     params: {
                         id: formPanel.gos.data.record ? formPanel.gos.data.record.get('id') : null
                     },

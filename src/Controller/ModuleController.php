@@ -25,7 +25,7 @@ class ModuleController extends AbstractController
      * @throws ReflectionException
      */
     #[CheckPermission(Permission::MANAGE + Permission::READ)]
-    public function getIndex(
+    public function get(
         ModuleStore $moduleStore,
         TaskStore $taskStore,
         ActionStore $actionStore,

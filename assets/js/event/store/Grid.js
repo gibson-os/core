@@ -7,7 +7,8 @@ Ext.define('GibsonOS.module.core.event.store.Grid', {
 
         me.proxy = {
             type: 'gosDataProxyAjax',
-            url: baseDir + 'core/event/index'
+            url: baseDir + 'core/event',
+            method: 'GET'
         };
 
         me.callParent(arguments);
