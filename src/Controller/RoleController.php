@@ -30,7 +30,7 @@ class RoleController extends AbstractController
      * @throws ReflectionException
      */
     #[CheckPermission(UserPermission::MANAGE + UserPermission::READ)]
-    public function index(
+    public function getIndex(
         RoleStore $roleStore,
         int $start = 0,
         int $limit = 0,
@@ -46,7 +46,7 @@ class RoleController extends AbstractController
      * @throws SaveError
      */
     #[CheckPermission(UserPermission::MANAGE + UserPermission::WRITE)]
-    public function save(
+    public function postSave(
         ModelManager $modelManager,
         #[GetMappedModel] Role $role,
     ): AjaxResponse {
@@ -60,7 +60,7 @@ class RoleController extends AbstractController
      * @throws JsonException
      */
     #[CheckPermission(UserPermission::MANAGE + UserPermission::DELETE)]
-    public function delete(
+    public function deleteDelete(
         ModelManager $modelManager,
         #[GetModel] Role $role,
     ): AjaxResponse {
@@ -73,7 +73,7 @@ class RoleController extends AbstractController
      * @throws SaveError
      */
     #[CheckPermission(UserPermission::MANAGE + UserPermission::WRITE)]
-    public function savePermission(
+    public function postSavePermission(
         ModelManager $modelManager,
         #[GetMappedModel] Permission $permission,
     ): AjaxResponse {
@@ -88,7 +88,7 @@ class RoleController extends AbstractController
      * @throws ReflectionException
      */
     #[CheckPermission(UserPermission::MANAGE + UserPermission::READ)]
-    public function users(
+    public function getUsers(
         UserStore $userStore,
         #[GetModel] Role $role,
         int $start = 0,
@@ -108,7 +108,7 @@ class RoleController extends AbstractController
      * @throws SaveError
      */
     #[CheckPermission(UserPermission::MANAGE + UserPermission::WRITE)]
-    public function saveUser(
+    public function postSaveUser(
         #[GetMappedModel] Role\User $roleUser,
         ModelManager $modelManager,
     ): AjaxResponse {
@@ -122,7 +122,7 @@ class RoleController extends AbstractController
      * @throws JsonException
      */
     #[CheckPermission(UserPermission::MANAGE + UserPermission::DELETE)]
-    public function deleteUsers(
+    public function deleteDeleteUsers(
         #[GetModels(Role\User::class)] array $users,
         ModelManager $modelManager
     ): AjaxResponse {
@@ -134,7 +134,7 @@ class RoleController extends AbstractController
     }
 
     #[CheckPermission(UserPermission::MANAGE + UserPermission::READ)]
-    public function permissions(
+    public function getPermissions(
         PermissionStore $permissionStore,
         PermissionRepository $permissionRepository,
         string $node

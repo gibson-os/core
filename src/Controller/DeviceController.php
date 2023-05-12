@@ -28,7 +28,7 @@ class DeviceController extends AbstractController
      * @throws SelectError
      * @throws RequestError
      */
-    public function addPush(
+    public function postAddPush(
         ModelManager $modelManager,
         DeviceRepository $deviceRepository,
         #[GetModel(['name' => 'module'])] Module $module,
@@ -56,7 +56,7 @@ class DeviceController extends AbstractController
      * @throws RequestError
      * @throws SelectError
      */
-    public function removePush(
+    public function deletePush(
         ModelManager $modelManager,
         DeviceRepository $deviceRepository,
         DevicePushRepository $devicePushRepository,
@@ -84,7 +84,7 @@ class DeviceController extends AbstractController
      * @throws SaveError
      * @throws SelectError
      */
-    public function updateToken(
+    public function postUpdateToken(
         ModelManager $modelManager,
         DeviceRepository $deviceRepository,
         string $fcmToken

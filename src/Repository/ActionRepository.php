@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Repository;
 
 use GibsonOS\Core\Attribute\GetTableName;
+use GibsonOS\Core\Enum\HttpMethod;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\Action;
 
@@ -42,9 +43,13 @@ class ActionRepository extends AbstractRepository
     /**
      * @throws SelectError
      */
-    public function getByNameAndTaskId(string $name, int $taskId): Action
+    public function getByNameAndTaskId(string $name, HttpMethod $method, int $taskId): Action
     {
-        return $this->fetchOne('`name`=? AND `task_id`=?', [$name, $taskId], Action::class);
+        return $this->fetchOne(
+            '`name`=? AND `method`=? AND `task_id`=?',
+            [$name, $method->name, $taskId],
+            Action::class,
+        );
     }
 
     public function deleteByIdsNot(array $ids): bool

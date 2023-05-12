@@ -8,7 +8,6 @@ use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Service\CssService;
 use GibsonOS\Core\Service\Response\Response;
-use GibsonOS\Core\Utility\StatusCode;
 
 class CssController extends AbstractController
 {
@@ -17,7 +16,7 @@ class CssController extends AbstractController
      * @throws DateTimeError
      * @throws GetError
      */
-    public function index(CssService $cssService, string $module = 'all', string $task = 'all'): Response
+    public function getIndex(CssService $cssService, string $module = 'all', string $task = 'all'): Response
     {
         $userId = $this->sessionService->getUserId();
 
@@ -34,6 +33,6 @@ class CssController extends AbstractController
 
     private function getResponse(string $body): Response
     {
-        return new Response($body, StatusCode::OK, ['Content-Type' => ' text/css; charset=UTF-8']);
+        return new Response($body, headers: ['Content-Type' => ' text/css; charset=UTF-8']);
     }
 }

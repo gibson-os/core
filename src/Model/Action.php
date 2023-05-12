@@ -7,6 +7,7 @@ use GibsonOS\Core\Attribute\Install\Database\Column;
 use GibsonOS\Core\Attribute\Install\Database\Constraint;
 use GibsonOS\Core\Attribute\Install\Database\Key;
 use GibsonOS\Core\Attribute\Install\Database\Table;
+use GibsonOS\Core\Enum\HttpMethod;
 use JsonSerializable;
 
 /**
@@ -16,7 +17,7 @@ use JsonSerializable;
  * @method Action setTask(Task $task)
  */
 #[Table]
-#[Key(unique: true, columns: ['name', 'task_id', 'module_id'])]
+#[Key(unique: true, columns: ['name', 'method', 'task_id', 'module_id'])]
 class Action extends AbstractModel implements JsonSerializable, AutoCompleteModelInterface
 {
     #[Column(attributes: [Column::ATTRIBUTE_UNSIGNED], autoIncrement: true)]
@@ -24,6 +25,9 @@ class Action extends AbstractModel implements JsonSerializable, AutoCompleteMode
 
     #[Column(length: 32)]
     private string $name;
+
+    #[Column]
+    private HttpMethod $method;
 
     #[Column(attributes: [Column::ATTRIBUTE_UNSIGNED])]
     private int $moduleId;
@@ -57,6 +61,18 @@ class Action extends AbstractModel implements JsonSerializable, AutoCompleteMode
     public function setName(string $name): Action
     {
         $this->name = $name;
+
+        return $this;
+    }
+
+    public function getMethod(): HttpMethod
+    {
+        return $this->method;
+    }
+
+    public function setMethod(HttpMethod $method): Action
+    {
+        $this->method = $method;
 
         return $this;
     }

@@ -22,7 +22,7 @@ class CronjobController extends AbstractController
      * @throws ReflectionException
      */
     #[CheckPermission(Permission::READ)]
-    public function index(CronjobStore $cronjobStore, int $limit = 100, int $start = 0, array $sort = []): AjaxResponse
+    public function getIndex(CronjobStore $cronjobStore, int $limit = 100, int $start = 0, array $sort = []): AjaxResponse
     {
         $cronjobStore->setLimit($limit, $start);
         $cronjobStore->setSortByExt($sort);
@@ -36,7 +36,7 @@ class CronjobController extends AbstractController
      * @throws ReflectionException
      */
     #[CheckPermission(Permission::READ)]
-    public function times(
+    public function getTimes(
         TimeStore $timeStore,
         #[GetModel] Cronjob $cronjob,
     ): AjaxResponse {

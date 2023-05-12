@@ -19,7 +19,7 @@ class DriveController extends AbstractController
      * @throws SelectError
      */
     #[CheckPermission(Permission::READ)]
-    public function index(
+    public function getIndex(
         DriveRepository $driveRepository,
         SmartAttributeRepository $smartAttributeRepository,
         StatRepository $statRepository
@@ -40,7 +40,7 @@ class DriveController extends AbstractController
      * @throws SelectError
      */
     #[CheckPermission(Permission::READ)]
-    public function chart(
+    public function getChart(
         DriveStore $driveStore,
         DateTimeService $dateTimeService,
         string $from = null,

@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Service;
 
 use GibsonOS\Core\Attribute\CheckPermission;
+use GibsonOS\Core\Enum\HttpMethod;
 use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\Model\SaveError;
 use GibsonOS\Core\Exception\Repository\SelectError;
@@ -69,11 +70,10 @@ class ModuleService
     {
         try {
             $result = $this->scanModules();
-            $oldResult = $this->scanOldModules();
 
-            $this->actionRepository->deleteByIdsNot(array_merge($result['actionIds'], $oldResult['actionIds']));
-            $this->taskRepository->deleteByIdsNot(array_merge($result['taskIds'], $oldResult['taskIds']));
-            $this->moduleRepository->deleteByIdsNot(array_merge($result['moduleIds'], $oldResult['moduleIds']));
+            $this->actionRepository->deleteByIdsNot($result['actionIds']);
+            $this->taskRepository->deleteByIdsNot($result['taskIds']);
+            $this->moduleRepository->deleteByIdsNot($result['moduleIds']);
         } catch (ReflectionException $e) {
             throw new GetError($e->getMessage());
         }
@@ -208,16 +208,26 @@ class ModuleService
         $actionIds = [];
 
         foreach ($reflectionClass->getMethods(ReflectionMethod::IS_PUBLIC) as $reflectionMethod) {
-            if (mb_strpos($reflectionMethod->getName(), '__') === 0) {
+            $methodName = $reflectionMethod->getName();
+
+            if (mb_strpos($methodName, '__') === 0) {
                 continue;
             }
 
+            if (!preg_match('/([a-z]*)(.*)/', $methodName, $hits)) {
+                continue;
+            }
+
+            $method = HttpMethod::from($hits[1]);
+            $name = lcfirst($hits[2]);
+
             try {
-                $action = $this->actionRepository->getByNameAndTaskId($reflectionMethod->getName(), $task->getId() ?? 0);
+                $action = $this->actionRepository->getByNameAndTaskId($name, $method, $task->getId() ?? 0);
             } catch (SelectError) {
-                $this->logger->info(sprintf('New action %s', $reflectionMethod->getName()));
+                $this->logger->info(sprintf('New action %s', $methodName));
                 $action = (new Action())
-                    ->setName($reflectionMethod->getName())
+                    ->setName($name)
+                    ->setMethod($method)
                     ->setModule($module)
                     ->setTask($task)
                 ;
@@ -242,153 +252,6 @@ class ModuleService
                             ->setPermission($permission)
                     );
                 }
-            }
-        }
-
-        return $actionIds;
-    }
-
-    /**
-     * @throws GetError
-     * @throws JsonException
-     * @throws ReflectionException
-     * @throws SaveError
-     *
-     * @return array{moduleIds: array<int>, taskIds: array<int>, actionIds: array<int>}
-     *
-     * @deprecated
-     */
-    private function scanOldModules(): array
-    {
-        $moduleIds = [];
-        $taskIds = [];
-        $actionIds = [];
-
-        foreach ($this->dirService->getFiles($this->oldPath) as $dir) {
-            if (!is_dir($dir)) {
-                continue;
-            }
-
-            $pos = mb_strrpos($dir, '/') ?: -1;
-            $moduleName = mb_substr($dir, $pos + 1);
-
-            try {
-                $module = $this->moduleRepository->getByName($moduleName);
-            } catch (SelectError) {
-                $module = (new Module())->setName($moduleName);
-                $this->modelManager->save($module);
-            }
-
-            $moduleIds[] = $module->getId() ?? 0;
-            $result = $this->scanOldTasks($module, $dir);
-            $taskIds = array_merge($taskIds, $result['taskIds']);
-            $actionIds = array_merge($actionIds, $result['actionIds']);
-        }
-
-        return [
-            'moduleIds' => $moduleIds,
-            'taskIds' => $taskIds,
-            'actionIds' => $actionIds,
-        ];
-    }
-
-    /**
-     * @throws GetError
-     * @throws JsonException
-     * @throws ReflectionException
-     * @throws SaveError
-     *
-     * @return array{taskIds: array<int>, actionIds: array<int>}
-     *
-     * @deprecated
-     */
-    private function scanOldTasks(Module $module, string $path): array
-    {
-        $taskIds = [];
-        $actionIds = [];
-
-        foreach ($this->dirService->getFiles($path, '*.php') as $filename) {
-            $pos = mb_strrpos($filename, '/') ?: -1;
-            $taskName = mb_substr($filename, $pos + 1);
-            $pos = mb_strpos($taskName, '.');
-            $taskName = strtolower(mb_substr($taskName, 0, $pos ?: null));
-            $taskName = str_replace('controller', '', $taskName);
-
-            try {
-                $task = $this->taskRepository->getByNameAndModuleId($taskName, $module->getId() ?? 0);
-            } catch (SelectError) {
-                $task = (new Task())
-                    ->setName($taskName)
-                    ->setModule($module)
-                ;
-                $this->modelManager->save($task);
-            }
-
-            $taskIds[] = $task->getId() ?? 0;
-            $actionIds = array_merge($this->scanOldActions($module, $task, $filename), $actionIds);
-        }
-
-        return [
-            'taskIds' => $taskIds,
-            'actionIds' => $actionIds,
-        ];
-    }
-
-    /**
-     * @throws JsonException
-     * @throws ReflectionException
-     * @throws SaveError
-     *
-     * @return int[]
-     *
-     * @deprecated
-     */
-    private function scanOldActions(Module $module, Task $task, string $filename): array
-    {
-        $actionIds = [];
-        $file = file_get_contents($filename) ?: '';
-        preg_match_all('/\spublic function ([^_][^\(]+).../si', $file, $actions);
-
-        foreach ($actions[1] as $index => $actionName) {
-            try {
-                $action = $this->actionRepository->getByNameAndTaskId($actionName, $task->getId() ?? 0);
-            } catch (SelectError) {
-                $action = (new Action())
-                    ->setName($actionName)
-                    ->setTask($task)
-                    ->setModule($module)
-                ;
-                $this->modelManager->save($action);
-            }
-
-            $actionIds[] = $action->getId() ?? 0;
-            $start = (mb_strpos($file, $actions[0][$index]) ?: 0) + mb_strlen($actions[0][$index]);
-
-            if (mb_strpos(mb_substr($file, $start), ' function ')) {
-                $length = mb_strpos(mb_substr($file, $start), ' function ') ?: null;
-            } else {
-                $length = null;
-            }
-
-            $substr = mb_substr($file, $start, $length);
-            preg_match_all('/\$this-\>checkPermission\((.+?)\)/si', $substr, $permissions);
-            $this->permissionRepository->deleteByAction($action);
-
-            foreach ($permissions[1] as $permissionString) {
-                $permission = null;
-                eval(
-                    'use GibsonOS\Core\Model\Permission;' .
-                    '$permission = ' . $permissionString . ';'
-                );
-
-                if ($permission === null) {
-                    continue;
-                }
-
-                (new Action\Permission())
-                    ->setActionId($action->getId())
-                    ->setPermission($permission)
-                ;
             }
         }
 

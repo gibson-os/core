@@ -15,7 +15,7 @@ class IndexController extends AbstractController
     /**
      * @throws JsonException
      */
-    public function index(
+    public function getIndex(
         DesktopController $desktopController,
         ItemRepository $itemRepository,
         #[GetSetting(DesktopController::APPS_KEY)] ?Setting $apps,
@@ -25,6 +25,6 @@ class IndexController extends AbstractController
             return $this->returnSuccess();
         }
 
-        return $desktopController->index($itemRepository, $apps, $tools, $this->sessionService->getUser() ?? new User());
+        return $desktopController->getIndex($itemRepository, $apps, $tools, $this->sessionService->getUser() ?? new User());
     }
 }

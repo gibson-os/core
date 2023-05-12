@@ -6,6 +6,7 @@ namespace GibsonOS\Core\Controller;
 use GibsonOS\Core\Attribute\CheckPermission;
 use GibsonOS\Core\Attribute\GetMappedModel;
 use GibsonOS\Core\Attribute\GetModel;
+use GibsonOS\Core\Enum\HttpStatusCode;
 use GibsonOS\Core\Exception\Model\DeleteError;
 use GibsonOS\Core\Exception\Model\SaveError;
 use GibsonOS\Core\Exception\PermissionDenied;
@@ -24,7 +25,6 @@ use GibsonOS\Core\Service\Response\ResponseInterface;
 use GibsonOS\Core\Service\UserService;
 use GibsonOS\Core\Store\User\PermissionStore;
 use GibsonOS\Core\Store\UserStore;
-use GibsonOS\Core\Utility\StatusCode;
 use JsonException;
 use ReflectionException;
 
@@ -36,7 +36,7 @@ class UserController extends AbstractController
      * @throws ReflectionException
      */
     #[CheckPermission(Permission::MANAGE + Permission::READ)]
-    public function index(UserStore $userStore): AjaxResponse
+    public function getIndex(UserStore $userStore): AjaxResponse
     {
         return $this->returnSuccess($userStore->getList());
     }
@@ -44,7 +44,7 @@ class UserController extends AbstractController
     /**
      * @throws UserError
      */
-    public function login(
+    public function postLogin(
         UserService $userService,
         ?string $username,
         ?string $password
@@ -62,7 +62,7 @@ class UserController extends AbstractController
      * @throws SelectError
      */
     #[CheckPermission(Permission::READ, ['id' => Permission::READ + Permission::MANAGE])]
-    public function settings(
+    public function getSettings(
         DeviceRepository $deviceRepository,
         #[GetModel] User $user = null
     ): AjaxResponse {
@@ -84,7 +84,7 @@ class UserController extends AbstractController
      * @throws SaveError
      * @throws UserError
      */
-    public function appLogin(
+    public function postAppLogin(
         UserService $userService,
         string $model,
         string $username,
@@ -92,7 +92,7 @@ class UserController extends AbstractController
         string $fcmToken
     ): AjaxResponse {
         if (empty($password) || empty($username)) {
-            return $this->returnFailure('Login Error', StatusCode::UNAUTHORIZED);
+            return $this->returnFailure('Login Error', HttpStatusCode::UNAUTHORIZED);
         }
 
         $user = $userService->login($username, $password);
@@ -107,7 +107,7 @@ class UserController extends AbstractController
     }
 
     #[CheckPermission(Permission::WRITE)]
-    public function logout(UserService $userService): ResponseInterface
+    public function postLogout(UserService $userService): ResponseInterface
     {
         $userService->logout();
 
@@ -115,7 +115,7 @@ class UserController extends AbstractController
     }
 
     #[CheckPermission(Permission::READ)]
-    public function sessionRefresh(): AjaxResponse
+    public function getSessionRefresh(): AjaxResponse
     {
         return $this->returnSuccess();
     }
@@ -129,7 +129,7 @@ class UserController extends AbstractController
      * @todo Model mapping?
      */
     #[CheckPermission(Permission::WRITE, ['add' => Permission::WRITE + Permission::MANAGE])]
-    public function save(
+    public function postSave(
         UserService $userService,
         UserRepository $userRepository,
         #[GetMappedModel] User $user,
@@ -164,7 +164,7 @@ class UserController extends AbstractController
      * @throws PermissionDenied
      */
     #[CheckPermission(Permission::DELETE, ['id' => Permission::DELETE + Permission::MANAGE])]
-    public function deleteDevice(
+    public function deleteDeleteDevice(
         DeviceRepository $deviceRepository,
         #[GetModel] User $user,
         array $devices,
@@ -180,7 +180,7 @@ class UserController extends AbstractController
      * @throws DeleteError
      */
     #[CheckPermission(Permission::MANAGE + Permission::WRITE)]
-    public function savePermission(
+    public function postSavePermission(
         ModelManager $modelManager,
         #[GetMappedModel] Permission $permission,
         #[GetModel] Permission $originalPermission = null,
@@ -204,7 +204,7 @@ class UserController extends AbstractController
      * @throws SaveError
      */
     #[CheckPermission(Permission::WRITE)]
-    public function updateFcmToken(
+    public function postUpdateFcmToken(
         ModelManager $modelManager,
         #[GetModel(['token' => 'token'])] Device $device,
         string $fcmToken,
@@ -219,7 +219,7 @@ class UserController extends AbstractController
      * @throws JsonException
      */
     #[CheckPermission(Permission::MANAGE + Permission::DELETE)]
-    public function delete(ModelManager $modelManager, #[GetModel] User $user): AjaxResponse
+    public function deleteDelete(ModelManager $modelManager, #[GetModel] User $user): AjaxResponse
     {
         $modelManager->delete($user);
 
@@ -232,7 +232,7 @@ class UserController extends AbstractController
      * @throws ReflectionException
      */
     #[CheckPermission(Permission::MANAGE + Permission::READ)]
-    public function permissions(
+    public function getPermissions(
         PermissionStore $permissionStore,
         PermissionRepository $permissionRepository,
         string $node

@@ -10,7 +10,11 @@ use GibsonOS\Core\Exception\ControllerError;
 use GibsonOS\Core\Exception\FactoryError;
 use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\MapperException;
+use GibsonOS\Core\Exception\MiddlewareException;
+use GibsonOS\Core\Exception\Model\SaveError;
+use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Exception\RequestError;
+use GibsonOS\Core\Exception\WebException;
 use GibsonOS\Core\Manager\ModelManager;
 use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Manager\ServiceManager;
@@ -24,7 +28,7 @@ use GibsonOS\Core\Service\Response\ExceptionResponse;
 use GibsonOS\Core\Service\Response\ResponseInterface;
 use GibsonOS\Core\Service\Response\TwigResponse;
 use GibsonOS\Core\Utility\JsonUtility;
-use GibsonOS\Core\Utility\StatusCode;
+use InvalidArgumentException;
 use JsonException;
 use OutOfBoundsException;
 use ReflectionException;
@@ -32,21 +36,23 @@ use ReflectionMethod;
 use ReflectionNamedType;
 use Throwable;
 
-class ControllerService
+readonly class ControllerService
 {
     private readonly Setting $chromecastReceiverAppId;
 
+    /**
+     * @throws SelectError
+     */
     public function __construct(
-        private readonly ServiceManager $serviceManagerService,
-        private readonly RequestService $requestService,
-        private readonly StatusCode $statusCode,
-        private readonly TwigService $twigService,
-        private readonly EnvService $envService,
-        private readonly AttributeService $attributeService,
-        private readonly ObjectMapperAttribute $objectMapperAttribute,
-        private readonly ReflectionManager $reflectionManager,
-        private readonly MiddlewareService $middlewareService,
-        private readonly ModelManager $modelManager,
+        private ServiceManager $serviceManagerService,
+        private RequestService $requestService,
+        private TwigService $twigService,
+        private EnvService $envService,
+        private AttributeService $attributeService,
+        private ObjectMapperAttribute $objectMapperAttribute,
+        private ReflectionManager $reflectionManager,
+        private MiddlewareService $middlewareService,
+        private ModelManager $modelManager,
         ModuleRepository $moduleRepository,
         #[GetSetting('chromecastReceiverAppId', 'core')] Setting $chromecastReceiverAppId = null,
     ) {
@@ -60,7 +66,7 @@ class ControllerService
     public function runAction(): void
     {
         $controllerName = $this->getControllerClassname();
-        $action = $this->requestService->getActionName();
+        $action = mb_strtolower($this->requestService->getMethod()) . ucfirst($this->requestService->getActionName());
 
         try {
             $controller = $this->serviceManagerService->get($controllerName);
@@ -71,7 +77,6 @@ class ControllerService
                 new ControllerError(sprintf('Controller %s not found!', $controllerName), 404, $e),
                 $this->requestService,
                 $this->twigService,
-                $this->statusCode
             ));
 
             return;
@@ -84,7 +89,6 @@ class ControllerService
                 new ControllerError(sprintf('Action %s::%s not exists!', $controllerName, $action), 404, $e),
                 $this->requestService,
                 $this->twigService,
-                $this->statusCode
             ));
 
             return;
@@ -95,7 +99,6 @@ class ControllerService
                 new ControllerError(sprintf('Action %s::%s is not public!', $controllerName, $action), 405),
                 $this->requestService,
                 $this->twigService,
-                $this->statusCode
             ));
 
             return;
@@ -129,7 +132,7 @@ class ControllerService
                 }
             }
         } catch (Throwable $e) {
-            $response = new ExceptionResponse($e, $this->requestService, $this->twigService, $this->statusCode);
+            $response = new ExceptionResponse($e, $this->requestService, $this->twigService);
         }
 
         $this->outputResponse($response);
@@ -138,6 +141,10 @@ class ControllerService
     /**
      * @throws FactoryError
      * @throws GetError
+     * @throws JsonException
+     * @throws MiddlewareException
+     * @throws SaveError
+     * @throws WebException
      */
     private function renderTemplate(): TwigResponse
     {
@@ -147,7 +154,7 @@ class ControllerService
                 $this->chromecastReceiverAppId
                     ->setValue(JsonUtility::decode($response->getBody()->getContent())['data'])
                 ;
-            } catch (\InvalidArgumentException) {
+            } catch (InvalidArgumentException) {
                 $this->chromecastReceiverAppId->setValue('');
             }
 
@@ -155,24 +162,16 @@ class ControllerService
         }
 
         $now = time();
+        $serverDate = date_sun_info(
+            $now,
+            $this->envService->getFloat('DATE_LATITUDE'),
+            $this->envService->getFloat('DATE_LONGITUDE'),
+        );
+        $serverDate['now'] = $now;
         $context = [
             'baseDir' => preg_replace('|^(.*/).+?$|', '$1', $_SERVER['SCRIPT_NAME'] ?? ''),
             'domain' => strtolower($_SERVER['REQUEST_SCHEME'] ?? '') . '://' . ($_SERVER['HTTP_HOST'] ?? ''),
-            'serverDate' => [
-                'now' => $now,
-                'sunrise' => date_sunrise(
-                    $now,
-                    SUNFUNCS_RET_TIMESTAMP,
-                    $this->envService->getFloat('DATE_LATITUDE'),
-                    $this->envService->getFloat('DATE_LONGITUDE')
-                ),
-                'sunset' => date_sunset(
-                    $now,
-                    SUNFUNCS_RET_TIMESTAMP,
-                    $this->envService->getFloat('DATE_LATITUDE'),
-                    $this->envService->getFloat('DATE_LONGITUDE')
-                ),
-            ],
+            'serverDate' => $serverDate,
             'request' => $this->requestService,
             'session' => $this->serviceManagerService->get(SessionService::class),
             'chromecastReceiverAppId' => $this->chromecastReceiverAppId->getValue(),
@@ -186,13 +185,12 @@ class ControllerService
     private function outputResponse(ResponseInterface $response): void
     {
         try {
-            header($this->statusCode->getStatusHeader($response->getCode()));
+            header($response->getCode()->getStatusHeader());
         } catch (OutOfBoundsException $exception) {
             $this->outputResponse(new ExceptionResponse(
                 $exception,
                 $this->requestService,
                 $this->twigService,
-                $this->statusCode
             ));
 
             return;

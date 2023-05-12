@@ -20,7 +20,7 @@ class SettingController extends AbstractController
      * @throws JsonException
      */
     #[CheckPermission(Permission::READ)]
-    public function window(
+    public function getWindow(
         PermissionService $permissionService,
         SettingRepository $settingRepository,
         string $id,

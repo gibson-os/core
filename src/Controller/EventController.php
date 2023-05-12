@@ -40,7 +40,7 @@ class EventController extends AbstractController
      * @throws SelectError
      */
     #[CheckPermission(Permission::READ)]
-    public function index(
+    public function getIndex(
         EventStore $eventStore,
         int $start = 0,
         int $limit = 0,
@@ -62,7 +62,7 @@ class EventController extends AbstractController
      * @throws SelectError
      */
     #[CheckPermission(Permission::READ)]
-    public function elements(
+    public function getElements(
         ElementStore $elementStore,
         #[GetModel(['id' => 'eventId'])] Event $event = null,
         string $node = null
@@ -83,7 +83,7 @@ class EventController extends AbstractController
      * @throws GetError
      */
     #[CheckPermission(Permission::READ)]
-    public function classNames(ClassNameStore $classNameStore): AjaxResponse
+    public function getClassNames(ClassNameStore $classNameStore): AjaxResponse
     {
         return $this->returnSuccess($classNameStore->getList());
     }
@@ -95,7 +95,7 @@ class EventController extends AbstractController
      * @throws ReflectionException
      */
     #[CheckPermission(Permission::READ)]
-    public function methods(MethodStore $methodStore, string $className): AjaxResponse
+    public function getMethods(MethodStore $methodStore, string $className): AjaxResponse
     {
         $methodStore->setClassName($className);
 
@@ -109,7 +109,7 @@ class EventController extends AbstractController
      * @throws ReflectionException
      */
     #[CheckPermission(Permission::READ)]
-    public function classTriggers(ClassTriggerStore $classTriggerStore, string $className): AjaxResponse
+    public function getClassTriggers(ClassTriggerStore $classTriggerStore, string $className): AjaxResponse
     {
         $classTriggerStore->setClassName($className);
 
@@ -124,7 +124,7 @@ class EventController extends AbstractController
      * @throws ReflectionException
      */
     #[CheckPermission(Permission::READ)]
-    public function triggers(TriggerStore $triggerStore, #[GetModel(['id' => 'eventId'])] Event $event): AjaxResponse
+    public function getTriggers(TriggerStore $triggerStore, #[GetModel(['id' => 'eventId'])] Event $event): AjaxResponse
     {
         $triggerStore->setEvent($event);
 
@@ -132,7 +132,7 @@ class EventController extends AbstractController
     }
 
     #[CheckPermission(Permission::WRITE)]
-    public function save(
+    public function postSave(
         EventRepository $eventRepository,
         ModelManager $modelManager,
         #[GetMappedModel] Event $event
@@ -160,7 +160,7 @@ class EventController extends AbstractController
      * @throws SaveError
      */
     #[CheckPermission(Permission::WRITE)]
-    public function copy(
+    public function postCopy(
         mysqlDatabase $database,
         ModelManager $modelManager,
         #[GetModels(Event::class)] array $events
@@ -227,7 +227,7 @@ class EventController extends AbstractController
      * @throws ReflectionException
      */
     #[CheckPermission(Permission::WRITE)]
-    public function run(EventService $eventService, #[GetModel(['id' => 'eventId'])] Event $event): AjaxResponse
+    public function postRun(EventService $eventService, #[GetModel(['id' => 'eventId'])] Event $event): AjaxResponse
     {
         $eventService->runEvent($event, true);
 
@@ -239,7 +239,7 @@ class EventController extends AbstractController
      * @throws JsonException
      */
     #[CheckPermission(Permission::DELETE)]
-    public function delete(ModelManager $modelManager, #[GetModel(['id' => 'eventId'])] Event $event): AjaxResponse
+    public function deleteDelete(ModelManager $modelManager, #[GetModel(['id' => 'eventId'])] Event $event): AjaxResponse
     {
         $modelManager->delete($event);
 

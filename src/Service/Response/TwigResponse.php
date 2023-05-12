@@ -3,21 +3,22 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Service\Response;
 
+use GibsonOS\Core\Enum\HttpStatusCode;
 use GibsonOS\Core\Service\TwigService;
-use GibsonOS\Core\Utility\StatusCode;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
 
 class TwigResponse implements ResponseInterface
 {
-    private array $headers;
-
     private array $variables = [];
 
-    public function __construct(private TwigService $twigService, private string $template, private int $code = StatusCode::OK, array $headers = [])
-    {
-        $this->headers = $headers;
+    public function __construct(
+        private readonly TwigService $twigService,
+        private readonly string $template,
+        private readonly HttpStatusCode $code = HttpStatusCode::OK,
+        private readonly array $headers = []
+    ) {
     }
 
     public function getHeaders(): array
@@ -40,7 +41,7 @@ class TwigResponse implements ResponseInterface
         return [];
     }
 
-    public function getCode(): int
+    public function getCode(): HttpStatusCode
     {
         return $this->code;
     }

@@ -3,9 +3,11 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Service\Response;
 
+use GibsonOS\Core\Enum\HttpStatusCode;
+
 interface ResponseInterface
 {
-    public function getCode(): int;
+    public function getCode(): HttpStatusCode;
 
     public function getHeaders(): array;
 

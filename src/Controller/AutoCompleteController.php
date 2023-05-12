@@ -19,7 +19,7 @@ class AutoCompleteController extends AbstractController
      * @throws FactoryError
      */
     #[CheckPermission(Permission::READ)]
-    public function autoComplete(
+    public function getAutoComplete(
         ServiceManager $serviceManagerService,
         RequestService $requestService,
         string $autoCompleteClassname,

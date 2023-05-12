@@ -3,15 +3,15 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Service\Response;
 
-use GibsonOS\Core\Utility\StatusCode;
+use GibsonOS\Core\Enum\HttpStatusCode;
 
 class RedirectResponse implements ResponseInterface
 {
-    public function __construct(private string $url, private int $code = StatusCode::MOVED_PERMANENTLY)
+    public function __construct(private string $url, private HttpStatusCode $code = HttpStatusCode::MOVED_PERMANENTLY)
     {
     }
 
-    public function getCode(): int
+    public function getCode(): HttpStatusCode
     {
         return $this->code;
     }

@@ -31,7 +31,7 @@ class DesktopController extends AbstractController
      * @throws SelectError
      */
     #[CheckPermission(Permission::READ)]
-    public function index(
+    public function getIndex(
         ItemRepository $itemRepository,
         #[GetSetting(self::APPS_KEY)] ?Setting $apps,
         #[GetSetting(self::TOOLS_KEY)] ?Setting $tools,
@@ -50,7 +50,7 @@ class DesktopController extends AbstractController
      * @throws SaveError
      */
     #[CheckPermission(Permission::WRITE)]
-    public function save(
+    public function postSave(
         ModelManager $modelManager,
         ItemRepository $itemRepository,
         #[GetMappedModels(Item::class)] array $items,
@@ -79,7 +79,7 @@ class DesktopController extends AbstractController
      * @throws SaveError
      */
     #[CheckPermission(Permission::WRITE)]
-    public function add(
+    public function postAdd(
         ModelManager $modelManager,
         ItemRepository $itemRepository,
         #[GetMappedModels(Item::class)] array $items,

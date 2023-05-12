@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace GibsonOS\Test\Unit\Core\Repository;
 
 use Codeception\Test\Unit;
+use GibsonOS\Core\Enum\HttpMethod;
 use GibsonOS\Core\Repository\ActionRepository;
 use GibsonOS\Test\Unit\Core\ModelManagerTrait;
 
@@ -102,8 +103,8 @@ class ActionRepositoryTest extends Unit
     public function testGetByNameAndTaskId(): void
     {
         $this->mysqlDatabase->execute(
-            'SELECT `action`.`name` FROM `marvin`.`action` WHERE `name`=? AND `task_id`=? LIMIT 1',
-            ['galaxy', 42],
+            'SELECT `action`.`name` FROM `marvin`.`action` WHERE `name`=? AND `method`=? AND `task_id`=? LIMIT 1',
+            ['galaxy', 'GET', 42],
         )
             ->shouldBeCalledOnce()
             ->willReturn(true)
@@ -115,7 +116,7 @@ class ActionRepositoryTest extends Unit
             ]])
         ;
 
-        $action = $this->actionRepository->getByNameAndTaskId('galaxy', 42);
+        $action = $this->actionRepository->getByNameAndTaskId('galaxy', HttpMethod::GET, 42);
 
         $this->assertEquals('galaxy', $action->getName());
     }

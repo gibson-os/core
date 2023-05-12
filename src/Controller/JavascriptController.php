@@ -7,7 +7,6 @@ use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Service\JavascriptService;
 use GibsonOS\Core\Service\Response\Response;
-use GibsonOS\Core\Utility\StatusCode;
 
 class JavascriptController extends AbstractController
 {
@@ -15,7 +14,7 @@ class JavascriptController extends AbstractController
      * @throws SelectError
      * @throws GetError
      */
-    public function index(
+    public function getIndex(
         JavascriptService $javaScriptService,
         string $module = 'all',
         string $task = 'all',
@@ -36,6 +35,6 @@ class JavascriptController extends AbstractController
 
     private function getResponse(string $body): Response
     {
-        return new Response($body, StatusCode::OK, ['Content-Type' => ' application/javascript; charset=UTF-8']);
+        return new Response($body, headers: ['Content-Type' => ' application/javascript; charset=UTF-8']);
     }
 }

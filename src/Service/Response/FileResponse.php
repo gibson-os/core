@@ -3,16 +3,16 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Service\Response;
 
+use GibsonOS\Core\Enum\HttpStatusCode;
 use GibsonOS\Core\Exception\RequestError;
 use GibsonOS\Core\Exception\ResponseError;
 use GibsonOS\Core\Service\RequestService;
-use GibsonOS\Core\Utility\StatusCode;
 
 class FileResponse implements ResponseInterface
 {
     private string $type = 'application/octet-stream';
 
-    private int $code = StatusCode::OK;
+    private HttpStatusCode $code = HttpStatusCode::OK;
 
     private ?string $disposition = 'attachment';
 
@@ -26,7 +26,7 @@ class FileResponse implements ResponseInterface
 
     private int $size;
 
-    public function __construct(private RequestService $requestService, private string $filename)
+    public function __construct(private readonly RequestService $requestService, private readonly string $filename)
     {
         $this->size = (int) filesize($filename);
         $this->endSize = $this->size;
@@ -48,13 +48,13 @@ class FileResponse implements ResponseInterface
             $this->endSize = (int) $ranges[1];
             $this->startSize = (int) $ranges[0];
 
-            $this->setCode(StatusCode::PARTIAL_CONTENT);
+            $this->setCode(HttpStatusCode::PARTIAL_CONTENT);
         } catch (RequestError) {
             // Range not exists
         }
     }
 
-    public function getCode(): int
+    public function getCode(): HttpStatusCode
     {
         return $this->code;
     }
@@ -131,7 +131,7 @@ class FileResponse implements ResponseInterface
         return $this;
     }
 
-    public function setCode(int $code): FileResponse
+    public function setCode(HttpStatusCode $code): FileResponse
     {
         $this->code = $code;
 

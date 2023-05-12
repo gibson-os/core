@@ -3,35 +3,34 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Service\Response;
 
+use GibsonOS\Core\Enum\HttpStatusCode;
 use GibsonOS\Core\Exception\AbstractException;
 use GibsonOS\Core\Service\RequestService;
 use GibsonOS\Core\Service\TwigService;
 use GibsonOS\Core\Utility\JsonUtility;
-use GibsonOS\Core\Utility\StatusCode;
+use JsonException;
 use Throwable;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
+use ValueError;
 
-class ExceptionResponse implements ResponseInterface
+readonly class ExceptionResponse implements ResponseInterface
 {
     public function __construct(
         private Throwable $exception,
         private RequestService $requestService,
         private TwigService $twigService,
-        private StatusCode $statusCode
     ) {
     }
 
-    public function getCode(): int
+    public function getCode(): HttpStatusCode
     {
-        $code = (int) ($this->exception->getCode() ?: 500);
-
-        if (!$this->statusCode->isValidCode($code)) {
-            $code = StatusCode::BAD_REQUEST;
+        try {
+            return HttpStatusCode::from($this->exception->getCode() ?: 500);
+        } catch (ValueError) {
+            return HttpStatusCode::BAD_REQUEST;
         }
-
-        return $code;
     }
 
     public function getHeaders(): array
@@ -49,9 +48,11 @@ class ExceptionResponse implements ResponseInterface
      * @throws LoaderError
      * @throws RuntimeError
      * @throws SyntaxError
+     * @throws JsonException
      */
     public function getBody(): string
     {
+
         error_log($this->exception->getMessage());
         $traces = explode(PHP_EOL, $this->exception->getTraceAsString());
 

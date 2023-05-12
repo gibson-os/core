@@ -3,13 +3,13 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Service\Response;
 
-use GibsonOS\Core\Utility\StatusCode;
+use GibsonOS\Core\Enum\HttpStatusCode;
 
 class Response implements ResponseInterface
 {
     private array $headers;
 
-    public function __construct(private string $body, private int $code = StatusCode::OK, array $headers = [])
+    public function __construct(private string $body, private HttpStatusCode $code = HttpStatusCode::OK, array $headers = [])
     {
         $this->headers = $headers;
     }
@@ -29,7 +29,7 @@ class Response implements ResponseInterface
         return [];
     }
 
-    public function getCode(): int
+    public function getCode(): HttpStatusCode
     {
         return $this->code;
     }

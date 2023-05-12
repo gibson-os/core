@@ -15,7 +15,7 @@ use GibsonOS\Core\Store\WeatherStore;
 
 class WeatherController extends AbstractController
 {
-    public function locations(): AjaxResponse
+    public function getLocations(): AjaxResponse
     {
         return $this->returnSuccess();
     }
@@ -24,7 +24,7 @@ class WeatherController extends AbstractController
      * @throws SelectError
      */
     #[CheckPermission(Permission::READ)]
-    public function weather(
+    public function getWeather(
         WeatherStore $weatherStore,
         DateTimeService $dateTimeService,
         #[GetModel(['id' => 'locationId'])] Location $location

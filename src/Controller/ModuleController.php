@@ -25,7 +25,7 @@ class ModuleController extends AbstractController
      * @throws ReflectionException
      */
     #[CheckPermission(Permission::MANAGE + Permission::READ)]
-    public function index(
+    public function getIndex(
         ModuleStore $moduleStore,
         TaskStore $taskStore,
         ActionStore $actionStore,
@@ -54,7 +54,7 @@ class ModuleController extends AbstractController
      * @throws ReflectionException
      */
     #[CheckPermission(Permission::MANAGE + Permission::WRITE)]
-    public function scan(ModuleService $moduleService, ModuleStore $moduleStore): AjaxResponse
+    public function postScan(ModuleService $moduleService, ModuleStore $moduleStore): AjaxResponse
     {
         $moduleService->scan();
 
@@ -67,7 +67,7 @@ class ModuleController extends AbstractController
      * @throws ReflectionException
      */
     #[CheckPermission(Permission::MANAGE + Permission::READ)]
-    public function setting(SettingStore $settingStore, int $moduleId): AjaxResponse
+    public function getSetting(SettingStore $settingStore, int $moduleId): AjaxResponse
     {
         $settingStore->setModuleId($moduleId);
 

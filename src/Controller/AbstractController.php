@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Controller;
 
+use GibsonOS\Core\Enum\HttpStatusCode;
 use GibsonOS\Core\Service\RequestService;
 use GibsonOS\Core\Service\Response\AjaxResponse;
 use GibsonOS\Core\Service\Response\TwigResponse;
@@ -40,7 +41,7 @@ abstract class AbstractController
         return new AjaxResponse($return);
     }
 
-    protected function returnFailure($message, int $code = 400): AjaxResponse
+    protected function returnFailure($message, HttpStatusCode $code = HttpStatusCode::BAD_REQUEST): AjaxResponse
     {
         return new AjaxResponse([
             'success' => false,

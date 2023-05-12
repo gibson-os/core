@@ -3,19 +3,18 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Service\Response;
 
+use GibsonOS\Core\Enum\HttpStatusCode;
 use GibsonOS\Core\Utility\JsonUtility;
-use GibsonOS\Core\Utility\StatusCode;
 
-class AjaxResponse implements ResponseInterface
+readonly class AjaxResponse implements ResponseInterface
 {
-    /**
-     * @param mixed $body
-     */
-    public function __construct(private $body, private int $code = StatusCode::OK)
-    {
+    public function __construct(
+        private mixed $body,
+        private HttpStatusCode $code = HttpStatusCode::OK
+    ) {
     }
 
-    public function getCode(): int
+    public function getCode(): HttpStatusCode
     {
         return $this->code;
     }

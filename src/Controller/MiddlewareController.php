@@ -22,7 +22,7 @@ class MiddlewareController extends AbstractController
      * @throws SelectError
      */
     #[CheckMiddlewarePermission(Permission::WRITE)]
-    public function confirm(
+    public function postConfirm(
         string $token,
         ModuleRepository $moduleRepository,
         ModelManager $modelManager,
