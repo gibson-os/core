@@ -7,9 +7,9 @@ use GibsonOS\Core\Attribute\GetTableName;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\Task;
 
-class TaskRepository extends AbstractRepository
+readonly class TaskRepository extends AbstractRepository
 {
-    public function __construct(#[GetTableName(Task::class)] private readonly string $taskTableName)
+    public function __construct(#[GetTableName(Task::class)] private string $taskTableName)
     {
     }
 

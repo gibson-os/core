@@ -27,6 +27,7 @@ use GibsonOS\Core\Store\User\PermissionStore;
 use GibsonOS\Core\Store\UserStore;
 use JsonException;
 use ReflectionException;
+use Traversable;
 
 class UserController extends AbstractController
 {
@@ -252,10 +253,13 @@ class UserController extends AbstractController
             $permissionStore->setModuleId((int) $node);
         }
 
+        /** @var Traversable $permissions */
+        $permissions = $permissionStore->getList();
+
         return new AjaxResponse([
             'success' => true,
             'failure' => false,
-            'data' => [...$permissionStore->getList()],
+            'data' => iterator_to_array($permissions),
             'requiredPermissions' => $requiredPermissions,
         ]);
     }

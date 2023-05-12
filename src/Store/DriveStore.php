@@ -8,6 +8,9 @@ use GibsonOS\Core\Attribute\GetTableName;
 use GibsonOS\Core\Model\Drive;
 use mysqlDatabase;
 
+/**
+ * @extends AbstractDatabaseStore<Drive>
+ */
 class DriveStore extends AbstractDatabaseStore
 {
     private int $attributeId = 194;
@@ -120,6 +123,9 @@ class DriveStore extends AbstractDatabaseStore
         return $this;
     }
 
+    /**
+     * @return array
+     */
     public function getList(): iterable
     {
         $this->table->select(

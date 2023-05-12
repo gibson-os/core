@@ -11,9 +11,9 @@ use GibsonOS\Core\Repository\AbstractRepository;
 use mysqlTable;
 use stdClass;
 
-class PermissionViewRepository extends AbstractRepository
+readonly class PermissionViewRepository extends AbstractRepository
 {
-    public function __construct(#[GetTableName(PermissionView::class)] private readonly string $permissionViewName)
+    public function __construct(#[GetTableName(PermissionView::class)] private string $permissionViewName)
     {
     }
 
@@ -54,7 +54,7 @@ class PermissionViewRepository extends AbstractRepository
         $table = $this
             ->getTable($this->permissionViewName)
             ->setLimit(1)
-            ->setOrderBy('`user_id` DESC, `module` DESC')
+            ->setOrderBy('`user_id` DESC, `permission_module_id` DESC')
         ;
         $table->setWhere(
             $this->getUserIdWhere($table, $userId) . ' AND ' .
@@ -81,7 +81,7 @@ class PermissionViewRepository extends AbstractRepository
         $table = $this
             ->getTable($this->permissionViewName)
             ->setLimit(1)
-            ->setOrderBy('`user_id` DESC, `task` DESC, `module` DESC')
+            ->setOrderBy('`user_id` DESC, `permission_task_id` DESC, `permission_module_id` DESC')
         ;
         $table->setWhere(
             $this->getUserIdWhere($table, $userId) . ' AND ' .
@@ -108,7 +108,7 @@ class PermissionViewRepository extends AbstractRepository
         $table = $this
             ->getTable($this->permissionViewName)
             ->setLimit(1)
-            ->setOrderBy('`user_id` DESC, `action` DESC, `task` DESC, `module` DESC')
+            ->setOrderBy('`user_id` DESC, `permission_action_id` DESC, `permission_task_id` DESC, `permission_module_id` DESC')
         ;
         $table->setWhere(
             $this->getUserIdWhere($table, $userId) . ' AND ' .

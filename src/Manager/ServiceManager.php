@@ -37,20 +37,20 @@ class ServiceManager
 
     public function __construct()
     {
-        $this->services[self::class] = $this;
+        $this->setService(self::class, $this);
 
         $this->reflectionManager = new ReflectionManager();
-        $this->services[ReflectionManager::class] = $this->reflectionManager;
+        $this->setService(ReflectionManager::class, $this->reflectionManager);
 
         $this->attributeService = new AttributeService($this, $this->reflectionManager);
-        $this->services[AttributeService::class] = $this->attributeService;
+        $this->setService(AttributeService::class, $this->attributeService);
     }
 
     /**
      * @template T
      *
-     * @param class-string<T>      $classname
-     * @param class-string<T>|null $instanceOf
+     * @param class-string<T>   $classname
+     * @param class-string|null $instanceOf
      *
      * @throws FactoryError
      *

@@ -218,7 +218,7 @@ class ModuleService
                 continue;
             }
 
-            $method = HttpMethod::from($hits[1]);
+            $method = HttpMethod::from(mb_strtoupper($hits[1]));
             $name = lcfirst($hits[2]);
 
             try {

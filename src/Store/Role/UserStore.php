@@ -11,6 +11,9 @@ use GibsonOS\Core\Model\User as BaseUser;
 use GibsonOS\Core\Store\AbstractDatabaseStore;
 use mysqlDatabase;
 
+/**
+ * @extends AbstractDatabaseStore<User>
+ */
 class UserStore extends AbstractDatabaseStore
 {
     private Role $role;

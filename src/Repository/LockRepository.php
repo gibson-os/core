@@ -6,7 +6,7 @@ namespace GibsonOS\Core\Repository;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\Lock;
 
-class LockRepository extends AbstractRepository
+readonly class LockRepository extends AbstractRepository
 {
     /**
      * @throws SelectError

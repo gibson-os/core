@@ -6,6 +6,7 @@ namespace GibsonOS\Core\Service;
 use GibsonOS\Core\Dto\Web\Body;
 use GibsonOS\Core\Dto\Web\Request;
 use GibsonOS\Core\Dto\Web\Response;
+use GibsonOS\Core\Enum\HttpStatusCode;
 use GibsonOS\Core\Exception\WebException;
 use Psr\Log\LoggerInterface;
 
@@ -123,7 +124,7 @@ class WebService
 
         return new Response(
             $request,
-            $httpCode,
+            HttpStatusCode::from($httpCode),
             $headers,
             (new Body())->setResource($responseHandle, $length),
             $cookieFile

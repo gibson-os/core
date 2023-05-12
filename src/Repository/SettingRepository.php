@@ -7,9 +7,9 @@ use GibsonOS\Core\Attribute\GetTableName;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\Setting;
 
-class SettingRepository extends AbstractRepository
+readonly class SettingRepository extends AbstractRepository
 {
-    public function __construct(#[GetTableName(Setting::class)] private readonly string $settingTableName)
+    public function __construct(#[GetTableName(Setting::class)] private string $settingTableName)
     {
     }
 

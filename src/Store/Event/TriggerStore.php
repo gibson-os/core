@@ -15,6 +15,9 @@ use JsonException;
 use mysqlDatabase;
 use ReflectionException;
 
+/**
+ * @extends AbstractDatabaseStore<Trigger>
+ */
 class TriggerStore extends AbstractDatabaseStore
 {
     private Event $event;

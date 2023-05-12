@@ -23,8 +23,8 @@ class UserData extends AbstractInstall implements PriorityInterface, SingleInsta
 {
     public function __construct(
         ServiceManager $serviceManagerService,
-        private UserRepository $userRepository,
-        private UserService $userService
+        private readonly UserRepository $userRepository,
+        private readonly UserService $userService
     ) {
         parent::__construct($serviceManagerService);
     }
@@ -57,7 +57,7 @@ class UserData extends AbstractInstall implements PriorityInterface, SingleInsta
             $this->modelManager->save(
                 (new User\Permission())
                     ->setUser($user)
-                    ->setModuleModel($module)
+                    ->setModule($module)
                     ->setPermission($permissionAll)
             );
         }

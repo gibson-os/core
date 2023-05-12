@@ -6,6 +6,9 @@ namespace GibsonOS\Core\Store;
 use DateTimeInterface;
 use GibsonOS\Core\Model\Weather;
 
+/**
+ * @extends AbstractDatabaseStore<Weather>
+ */
 class WeatherStore extends AbstractDatabaseStore
 {
     private int $locationId;

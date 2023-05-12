@@ -5,6 +5,9 @@ namespace GibsonOS\Core\Store;
 
 use GibsonOS\Core\Model\Role;
 
+/**
+ * @extends AbstractDatabaseStore<Role>
+ */
 class RoleStore extends AbstractDatabaseStore
 {
     protected function getModelClassName(): string

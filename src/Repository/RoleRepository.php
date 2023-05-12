@@ -6,7 +6,7 @@ namespace GibsonOS\Core\Repository;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\Role;
 
-class RoleRepository extends AbstractRepository
+readonly class RoleRepository extends AbstractRepository
 {
     /**
      * @throws SelectError

@@ -28,13 +28,13 @@ class PermissionView extends AbstractModel implements JsonSerializable
         '), `max_role_permission` AS (' .
             'SELECT ' .
                 '`ru`.`user_id` AS `user_id`, ' .
-                '`rp`.`module` AS `module`, ' .
-                '`rp`.`task` AS `task`, ' .
-                '`rp`.`action` AS `action`, ' .
+                '`rp`.`module_id` AS `module_id`, ' .
+                '`rp`.`task_id` AS `task_id`, ' .
+                '`rp`.`action_id` AS `action_id`, ' .
                 'MAX(`rp`.`permission`) AS `permission` ' .
             'FROM `role_user` `ru` ' .
             'JOIN `role_permission` `rp` ON `rp`.`role_id` = `ru`.`role_id` ' .
-            'GROUP BY `ru`.`user_id`, `rp`.`module`, `rp`.`task`, `rp`.`action`' .
+            'GROUP BY `ru`.`user_id`, `rp`.`module_id`, `rp`.`task_id`, `rp`.`action_id`' .
         ') ' .
         'SELECT ' .
             'CAST(`p`.`user_id` AS UNSIGNED) `user_id`, ' .
@@ -42,9 +42,9 @@ class PermissionView extends AbstractModel implements JsonSerializable
             '`p`.`user_host`, ' .
             '`p`.`user_ip`, ' .
             'CAST(`p`.`permission` AS UNSIGNED) `permission`, ' .
-            '`p`.`module`, ' .
-            '`p`.`task`, ' .
-            '`p`.`action`, ' .
+            '`p`.`permission_module_id`, ' .
+            '`p`.`permission_task_id`, ' .
+            '`p`.`permission_action_id`, ' .
             '`p`.`module_id`, ' .
             '`p`.`module_name`, ' .
             'CAST(`p`.`task_id` AS UNSIGNED) `task_id`, ' .
@@ -59,9 +59,9 @@ class PermissionView extends AbstractModel implements JsonSerializable
                     '`u`.`host` `user_host`, ' .
                     '`u`.`ip` `user_ip`, ' .
                     'IFNULL(`upm`.`permission`, IFNULL(`mrp`.`permission`, ' . Permission::DENIED . ')) `permission`, ' .
-                    '`upm`.`module` `module`, ' .
-                    '`upm`.`task` `task`, ' .
-                    '`upm`.`action` `action`, ' .
+                    '`upm`.`module_id` `permission_module_id`, ' .
+                    '`upm`.`task_id` `permission_task_id`, ' .
+                    '`upm`.`action_id` `permission_action_id`, ' .
                     '`m`.`id` `module_id`, ' .
                     '`m`.`name` `module_name`, ' .
                     'NULL `task_id`, ' .
@@ -72,14 +72,14 @@ class PermissionView extends AbstractModel implements JsonSerializable
                 'JOIN `all_users` `u` ON 1 ' .
                 'LEFT JOIN `max_role_permission` `mrp` ON ' .
                     '`u`.`id`=`mrp`.`user_id` AND ' .
-                    '`mrp`.`module`=`m`.`name` AND ' .
-                    '`mrp`.`task` IS NULL AND ' .
-                    '`mrp`.`action` IS NULL ' .
+                    '`mrp`.`module_id`=`m`.`id` AND ' .
+                    '`mrp`.`task_id` IS NULL AND ' .
+                    '`mrp`.`action_id` IS NULL ' .
                 'LEFT JOIN `user_permission` `upm` ON ' .
                     '`u`.`id`=IFNULL(`upm`.`user_id`, 0) AND ' .
-                    '`upm`.`module`=`m`.`name` AND ' .
-                    '`upm`.`task` IS NULL AND ' .
-                    '`upm`.`action` IS NULL ' .
+                    '`upm`.`module_id`=`m`.`id` AND ' .
+                    '`upm`.`task_id` IS NULL AND ' .
+                    '`upm`.`action_id` IS NULL ' .
             ') UNION ALL (' .
                 'SELECT DISTINCT ' .
                     '`u`.`id` `user_id`, ' .
@@ -96,9 +96,9 @@ class PermissionView extends AbstractModel implements JsonSerializable
                             ')' .
                         ')' .
                     ') `permission`, ' .
-                    'IFNULL(`upt`.`module`, `upm`.`module`) `module`, ' .
-                    'IFNULL(`upt`.`task`, `upm`.`task`) `task`, ' .
-                    'IFNULL(`upt`.`action`, `upm`.`action`) `action`, ' .
+                    'IFNULL(`upt`.`module_id`, `upm`.`module_id`) `module_id`, ' .
+                    'IFNULL(`upt`.`task_id`, `upm`.`task_id`) `task_id`, ' .
+                    'IFNULL(`upt`.`action_id`, `upm`.`action_id`) `action_id`, ' .
                     '`m`.`id` `module_id`, ' .
                     '`m`.`name` `module_name`, ' .
                     '`t`.`id` `task_id`, ' .
@@ -110,24 +110,24 @@ class PermissionView extends AbstractModel implements JsonSerializable
                 'JOIN `all_users` `u` ON 1 ' .
                 'LEFT JOIN `max_role_permission` `mrpm` ON ' .
                     '`u`.`id`=`mrpm`.`user_id` AND ' .
-                    '`mrpm`.`module`=`m`.`name` AND ' .
-                    '`mrpm`.`task` IS NULL AND ' .
-                    '`mrpm`.`action` IS NULL ' .
+                    '`mrpm`.`module_id`=`m`.`id` AND ' .
+                    '`mrpm`.`task_id` IS NULL AND ' .
+                    '`mrpm`.`action_id` IS NULL ' .
                 'LEFT JOIN `user_permission` `upm` ON ' .
                     '`u`.`id`=IFNULL(`upm`.`user_id`, 0) AND ' .
-                    '`upm`.`module`=`m`.`name` AND ' .
-                    '`upm`.`task` IS NULL AND ' .
-                    '`upm`.`action` IS NULL ' .
+                    '`upm`.`module_id`=`m`.`id` AND ' .
+                    '`upm`.`task_id` IS NULL AND ' .
+                    '`upm`.`action_id` IS NULL ' .
                 'LEFT JOIN `max_role_permission` `mrpt` ON ' .
                     '`u`.`id`=`mrpt`.`user_id` AND ' .
-                    '`mrpt`.`module`=`m`.`name` AND ' .
-                    '`mrpt`.`task`=`t`.`name` AND ' .
-                    '`mrpt`.`action` IS NULL ' .
+                    '`mrpt`.`module_id`=`m`.`id` AND ' .
+                    '`mrpt`.`task_id`=`t`.`id` AND ' .
+                    '`mrpt`.`action_id` IS NULL ' .
                 'LEFT JOIN `user_permission` `upt` ON ' .
                     '`u`.`id`=IFNULL(`upt`.`user_id`, 0) AND ' .
-                    '`upt`.`module`=`m`.`name` AND ' .
-                    '`upt`.`task`=`t`.`name` AND ' .
-                    '`upt`.`action` IS NULL ' .
+                    '`upt`.`module_id`=`m`.`id` AND ' .
+                    '`upt`.`task_id`=`t`.`id` AND ' .
+                    '`upt`.`action_id` IS NULL ' .
             ') UNION ALL (' .
                 'SELECT DISTINCT ' .
                     '`u`.`id` `user_id`, ' .
@@ -150,9 +150,9 @@ class PermissionView extends AbstractModel implements JsonSerializable
                             ')' .
                         ')' .
                     ') `permission`, ' .
-                    'IFNULL(`upa`.`module`, IFNULL(`upt`.`module`, `upm`.`module`)) `module`, ' .
-                    'IFNULL(`upa`.`task`, IFNULL(`upt`.`task`, `upm`.`task`)) `task`, ' .
-                    'IFNULL(`upa`.`action`, IFNULL(`upt`.`action`, `upm`.`action`)) `action`, ' .
+                    'IFNULL(`upa`.`module_id`, IFNULL(`upt`.`module_id`, `upm`.`module_id`)) `module_id`, ' .
+                    'IFNULL(`upa`.`task_id`, IFNULL(`upt`.`task_id`, `upm`.`task_id`)) `task_id`, ' .
+                    'IFNULL(`upa`.`action_id`, IFNULL(`upt`.`action_id`, `upm`.`action_id`)) `action_id`, ' .
                     '`m`.`id` `module_id`, ' .
                     '`m`.`name` `module_name`, ' .
                     '`t`.`id` `task_id`, ' .
@@ -165,34 +165,34 @@ class PermissionView extends AbstractModel implements JsonSerializable
                 'JOIN `all_users` `u` ON 1 ' .
                 'LEFT JOIN `max_role_permission` `mrpm` ON ' .
                     '`u`.`id`=`mrpm`.`user_id` AND ' .
-                    '`mrpm`.`module`=`m`.`name` AND ' .
-                    '`mrpm`.`task` IS NULL AND ' .
-                    '`mrpm`.`action` IS NULL ' .
+                    '`mrpm`.`module_id`=`m`.`id` AND ' .
+                    '`mrpm`.`task_id` IS NULL AND ' .
+                    '`mrpm`.`action_id` IS NULL ' .
                 'LEFT JOIN `user_permission` `upm` ON ' .
                     '`u`.`id`=IFNULL(`upm`.`user_id`, 0) AND ' .
-                    '`upm`.`module`=`m`.`name` AND ' .
-                    '`upm`.`task` IS NULL AND ' .
-                    '`upm`.`action` IS NULL ' .
+                    '`upm`.`module_id`=`m`.`id` AND ' .
+                    '`upm`.`task_id` IS NULL AND ' .
+                    '`upm`.`action_id` IS NULL ' .
                 'LEFT JOIN `max_role_permission` `mrpt` ON ' .
                     '`u`.`id`=`mrpt`.`user_id` AND ' .
-                    '`mrpt`.`module`=`m`.`name` AND ' .
-                    '`mrpt`.`task`=`t`.`name` AND ' .
-                    '`mrpt`.`action` IS NULL ' .
+                    '`mrpt`.`module_id`=`m`.`id` AND ' .
+                    '`mrpt`.`task_id`=`t`.`id` AND ' .
+                    '`mrpt`.`action_id` IS NULL ' .
                 'LEFT JOIN `user_permission` `upt` ON ' .
                     '`u`.`id`=IFNULL(`upt`.`user_id`, 0) AND ' .
-                    '`upt`.`module`=`m`.`name` AND ' .
-                    '`upt`.`task`=`t`.`name` AND ' .
-                    '`upt`.`action` IS NULL ' .
+                    '`upt`.`module_id`=`m`.`id` AND ' .
+                    '`upt`.`task_id`=`t`.`id` AND ' .
+                    '`upt`.`action_id` IS NULL ' .
                 'LEFT JOIN `max_role_permission` `mrpa` ON ' .
                     '`u`.`id`=`mrpa`.`user_id` AND ' .
-                    '`mrpa`.`module`=`m`.`name` AND ' .
-                    '`mrpa`.`task`=`t`.`name` AND ' .
-                    '`mrpa`.`action`=`a`.`name` ' .
+                    '`mrpa`.`module_id`=`m`.`id` AND ' .
+                    '`mrpa`.`task_id`=`t`.`id` AND ' .
+                    '`mrpa`.`action_id`=`a`.`id` ' .
                 'LEFT JOIN `user_permission` `upa` ON ' .
                     '`u`.`id`=IFNULL(`upa`.`user_id`, 0) AND ' .
-                    '`upa`.`module`=`m`.`name` AND ' .
-                    '`upa`.`task`=`t`.`name` AND ' .
-                    '`upa`.`action`=`a`.`name` ' .
+                    '`upa`.`module_id`=`m`.`id` AND ' .
+                    '`upa`.`task_id`=`t`.`id` AND ' .
+                    '`upa`.`action_id`=`a`.`id` ' .
             ')' .
         ') `p`' .
         'ORDER BY `p`.`user_id` DESC'

@@ -9,7 +9,7 @@ use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\Cronjob;
 use mysqlTable;
 
-class CronjobRepository extends AbstractRepository
+readonly class CronjobRepository extends AbstractRepository
 {
     public function __construct(
         #[GetTableName(Cronjob::class)] private string $cronjobTableName,

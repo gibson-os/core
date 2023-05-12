@@ -5,6 +5,9 @@ namespace GibsonOS\Core\Store;
 
 use GibsonOS\Core\Model\Module;
 
+/**
+ * @extends AbstractDatabaseStore<Module>
+ */
 class ModuleStore extends AbstractDatabaseStore
 {
     protected function getDefaultOrder(): string

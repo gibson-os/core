@@ -11,7 +11,7 @@ use mysqlDatabase;
 use mysqlRegistry;
 use mysqlTable;
 
-abstract class AbstractRepository
+abstract readonly class AbstractRepository
 {
     public function startTransaction(mysqlDatabase $database = null): void
     {

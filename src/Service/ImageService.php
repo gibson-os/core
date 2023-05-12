@@ -19,12 +19,12 @@ class ImageService
 
     public function getWidth(Image $image): int
     {
-        return (int) imagesx($image->getImage());
+        return imagesx($image->getImage()) ?: 0;
     }
 
     public function getHeight(Image $image): int
     {
-        return (int) imagesy($image->getImage());
+        return imagesy($image->getImage()) ?: 0;
     }
 
     /**
@@ -57,7 +57,7 @@ class ImageService
 
     public function getTransparentColor(Image $image): int
     {
-        return (int) imagecolortransparent($image->getImage());
+        return imagecolortransparent($image->getImage());
     }
 
     public function setTransparentColor(Image $image, int $color): void

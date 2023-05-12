@@ -5,6 +5,9 @@ namespace GibsonOS\Core\Store;
 
 use GibsonOS\Core\Model\Event;
 
+/**
+ * @extends AbstractDatabaseStore<Event>
+ */
 class EventStore extends AbstractDatabaseStore
 {
     protected function getModelClassName(): string

@@ -17,28 +17,28 @@ use GibsonOS\Core\Model\User\Permission as UserPermission;
 /**
  * @method Role        getRole()
  * @method Permission  setRole(Role $role)
- * @method Module      getModuleModel()
- * @method Permission  setModuleModel(Module $module)
- * @method Task|null   getTaskModel()
- * @method Permission  setTaskModel(?Task $task)
- * @method Action|null getActionModel()
- * @method Permission  setActionModel(?Action $action)
+ * @method Module      getModule()
+ * @method Permission  setModule(Module $module)
+ * @method Task|null   getTask()
+ * @method Permission  setTask(?Task $task)
+ * @method Action|null getAction()
+ * @method Permission  setAction(?Action $action)
  */
 #[Table]
-#[Key(unique: true, columns: ['module', 'task', 'action', 'role_id'])]
+#[Key(unique: true, columns: ['module_id', 'task_id', 'action_id', 'role_id'])]
 class Permission extends AbstractModel
 {
     #[Column(attributes: [Column::ATTRIBUTE_UNSIGNED], autoIncrement: true)]
     private ?int $id = null;
 
-    #[Column(length: 32)]
-    private string $module;
+    #[Column(attributes: [Column::ATTRIBUTE_UNSIGNED])]
+    private int $moduleId;
 
-    #[Column(length: 32)]
-    private ?string $task = null;
+    #[Column(attributes: [Column::ATTRIBUTE_UNSIGNED])]
+    private ?int $taskId = null;
 
-    #[Column(length: 32)]
-    private ?string $action = null;
+    #[Column(attributes: [Column::ATTRIBUTE_UNSIGNED])]
+    private ?int $actionId = null;
 
     #[Column(attributes: [Column::ATTRIBUTE_UNSIGNED])]
     private int $roleId;
@@ -49,14 +49,14 @@ class Permission extends AbstractModel
     #[Constraint]
     protected Role $role;
 
-    #[Constraint(parentColumn: 'name', ownColumn: 'module')]
-    protected Module $moduleModel;
+    #[Constraint]
+    protected Module $module;
 
-    #[Constraint(parentColumn: 'name', ownColumn: 'task')]
-    protected ?Task $taskModel;
+    #[Constraint]
+    protected ?Task $task;
 
-    #[Constraint(parentColumn: 'name', ownColumn: 'action')]
-    protected ?Action $actionModel;
+    #[Constraint]
+    protected ?Action $action;
 
     public function getId(): ?int
     {
@@ -70,38 +70,38 @@ class Permission extends AbstractModel
         return $this;
     }
 
-    public function getModule(): string
+    public function getModuleId(): int
     {
-        return $this->module;
+        return $this->moduleId;
     }
 
-    public function setModule(string $module): Permission
+    public function setModuleId(int $moduleId): Permission
     {
-        $this->module = $module;
+        $this->moduleId = $moduleId;
 
         return $this;
     }
 
-    public function getTask(): ?string
+    public function getTaskId(): ?int
     {
-        return $this->task;
+        return $this->taskId;
     }
 
-    public function setTask(?string $task): Permission
+    public function setTaskId(?int $taskId): Permission
     {
-        $this->task = $task;
+        $this->taskId = $taskId;
 
         return $this;
     }
 
-    public function getAction(): ?string
+    public function getActionId(): ?int
     {
-        return $this->action;
+        return $this->actionId;
     }
 
-    public function setAction(?string $action): Permission
+    public function setActionId(?int $actionId): Permission
     {
-        $this->action = $action;
+        $this->actionId = $actionId;
 
         return $this;
     }

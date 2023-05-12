@@ -7,11 +7,11 @@ use GibsonOS\Core\Attribute\GetTableName;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\Drive;
 
-class DriveRepository extends AbstractRepository
+readonly class DriveRepository extends AbstractRepository
 {
     public function __construct(
-        #[GetTableName(Drive::class)] private readonly string $driveTableName,
-        #[GetTableName(Drive\Stat::class)] private readonly string $driveStatTableName
+        #[GetTableName(Drive::class)] private string $driveTableName,
+        #[GetTableName(Drive\Stat::class)] private string $driveStatTableName
     ) {
     }
 

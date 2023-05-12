@@ -3,21 +3,17 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Repository\Weather;
 
-use GibsonOS\Core\Attribute\GetTableName;
 use GibsonOS\Core\Exception\Repository\SelectError;
-use GibsonOS\Core\Manager\ModelManager;
 use GibsonOS\Core\Model\Weather\Location;
 use GibsonOS\Core\Repository\AbstractRepository;
 use GibsonOS\Core\Service\DateTimeService;
 use Psr\Log\LoggerInterface;
 
-class LocationRepository extends AbstractRepository
+readonly class LocationRepository extends AbstractRepository
 {
     public function __construct(
-        private readonly DateTimeService $dateTimeService,
-        private readonly LoggerInterface $logger,
-        private readonly ModelManager $modelManager,
-        #[GetTableName(Location::class)] private readonly string $locationTableName
+        private DateTimeService $dateTimeService,
+        private LoggerInterface $logger,
     ) {
     }
 

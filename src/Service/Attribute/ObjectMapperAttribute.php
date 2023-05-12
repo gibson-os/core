@@ -5,13 +5,13 @@ namespace GibsonOS\Core\Service\Attribute;
 
 use GibsonOS\Core\Attribute\AttributeInterface;
 use GibsonOS\Core\Attribute\GetObject;
+use GibsonOS\Core\Enum\HttpStatusCode;
 use GibsonOS\Core\Exception\FactoryError;
 use GibsonOS\Core\Exception\MapperException;
 use GibsonOS\Core\Exception\RequestError;
 use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Mapper\ObjectMapper;
 use GibsonOS\Core\Service\RequestService;
-use GibsonOS\Core\Utility\StatusCode;
 use JsonException;
 use ReflectionException;
 use ReflectionMethod;
@@ -151,7 +151,7 @@ class ObjectMapperAttribute implements AttributeServiceInterface, ParameterAttri
 
                     return $reflectionProperty->getDefaultValue();
                 } catch (ReflectionException $exception2) {
-                    throw new MapperException($exception2->getMessage(), StatusCode::BAD_REQUEST, $exception);
+                    throw new MapperException($exception2->getMessage(), HttpStatusCode::BAD_REQUEST->value, $exception);
                 }
             }
         }

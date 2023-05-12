@@ -3,7 +3,9 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Dto\Web;
 
-class Response
+use GibsonOS\Core\Enum\HttpStatusCode;
+
+readonly class Response
 {
     /**
      * @var array<string, string>
@@ -13,8 +15,13 @@ class Response
     /**
      * @param array<string, string> $headers
      */
-    public function __construct(private Request $request, private int $statusCode, array $headers, private Body $body, private string $cookieFile)
-    {
+    public function __construct(
+        private Request $request,
+        private HttpStatusCode $statusCode,
+        array $headers,
+        private Body $body,
+        private string $cookieFile
+    ) {
         $this->headers = $headers;
     }
 
@@ -23,7 +30,7 @@ class Response
         return $this->request;
     }
 
-    public function getStatusCode(): int
+    public function getStatusCode(): HttpStatusCode
     {
         return $this->statusCode;
     }

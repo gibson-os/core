@@ -15,11 +15,11 @@ use GibsonOS\Core\Utility\JsonUtility;
 use mysqlTable;
 use stdClass;
 
-class EventRepository extends AbstractRepository
+readonly class EventRepository extends AbstractRepository
 {
     public function __construct(
-        private readonly DateTimeService $dateTimeService,
-        #[GetTableName(Element::class)] private readonly string $elementTableName,
+        private DateTimeService $dateTimeService,
+        #[GetTableName(Element::class)] private string $elementTableName,
     ) {
     }
 

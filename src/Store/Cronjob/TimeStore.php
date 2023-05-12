@@ -7,6 +7,9 @@ use GibsonOS\Core\Model\Cronjob;
 use GibsonOS\Core\Model\Cronjob\Time;
 use GibsonOS\Core\Store\AbstractDatabaseStore;
 
+/**
+ * @extends AbstractDatabaseStore<Time>
+ */
 class TimeStore extends AbstractDatabaseStore
 {
     private const PARTS = [

@@ -6,6 +6,9 @@ namespace GibsonOS\Core\Store\Icon;
 use GibsonOS\Core\Model\Icon\Tag;
 use GibsonOS\Core\Store\AbstractDatabaseStore;
 
+/**
+ * @extends AbstractDatabaseStore<Tag>
+ */
 class TagStore extends AbstractDatabaseStore
 {
     protected function getModelClassName(): string
@@ -29,6 +32,9 @@ class TagStore extends AbstractDatabaseStore
         $this->table->setGroupBy('`tag`');
     }
 
+    /**
+     * @return iterable<array>
+     */
     public function getList(): iterable
     {
         $this->table->selectPrepared(false, '`tag`, COUNT(`icon_id`) AS `count`');

@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Store;
 
-use Generator;
 use GibsonOS\Core\Attribute\GetClassNames;
 use GibsonOS\Core\Attribute\Install\Cronjob;
 use GibsonOS\Core\Command\CommandInterface;
@@ -12,6 +11,7 @@ use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Service\CommandService;
 use ReflectionAttribute;
 use ReflectionException;
+use Traversable;
 
 class CommandStore extends AbstractStore
 {
@@ -28,9 +28,9 @@ class CommandStore extends AbstractStore
     /**
      * @throws ReflectionException
      *
-     * @return Generator<Command>
+     * @return Traversable<Command>
      */
-    public function getList(): Generator
+    public function getList(): Traversable
     {
         foreach ($this->classStrings as $classString) {
             $reflectionClass = $this->reflectionManager->getReflectionClass($classString);

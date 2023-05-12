@@ -7,9 +7,9 @@ use GibsonOS\Core\Model\Drive\Stat;
 use GibsonOS\Core\Repository\AbstractRepository;
 use GibsonOS\Core\Service\DateTimeService;
 
-class StatRepository extends AbstractRepository
+readonly class StatRepository extends AbstractRepository
 {
-    public function __construct(private readonly DateTimeService $dateTimeService)
+    public function __construct(private DateTimeService $dateTimeService)
     {
     }
 

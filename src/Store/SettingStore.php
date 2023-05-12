@@ -5,6 +5,9 @@ namespace GibsonOS\Core\Store;
 
 use GibsonOS\Core\Model\Setting;
 
+/**
+ * @extends AbstractDatabaseStore<Setting>
+ */
 class SettingStore extends AbstractDatabaseStore
 {
     private ?int $userId = null;

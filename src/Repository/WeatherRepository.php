@@ -11,11 +11,11 @@ use GibsonOS\Core\Model\Weather;
 use GibsonOS\Core\Model\Weather\Location;
 use GibsonOS\Core\Service\DateTimeService;
 
-class WeatherRepository extends AbstractRepository
+readonly class WeatherRepository extends AbstractRepository
 {
     public function __construct(
-        private readonly DateTimeService $dateTimeService,
-        #[GetTableName(Weather::class)] private readonly string $weatherTableName,
+        private DateTimeService $dateTimeService,
+        #[GetTableName(Weather::class)] private string $weatherTableName,
     ) {
     }
 

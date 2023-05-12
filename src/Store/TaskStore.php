@@ -3,8 +3,14 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Store;
 
+use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\Task;
+use JsonException;
+use ReflectionException;
 
+/**
+ * @extends AbstractDatabaseStore<Task>
+ */
 class TaskStore extends AbstractDatabaseStore
 {
     private ?int $moduleId = null;
@@ -26,6 +32,13 @@ class TaskStore extends AbstractDatabaseStore
         return '`name`';
     }
 
+    /**
+     * @throws SelectError
+     * @throws JsonException
+     * @throws ReflectionException
+     *
+     * @return iterable<array>
+     */
     public function getList(): iterable
     {
         /** @var Task $task */

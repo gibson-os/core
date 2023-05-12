@@ -9,9 +9,9 @@ use GibsonOS\Core\Model\Desktop\Item;
 use GibsonOS\Core\Model\User;
 use GibsonOS\Core\Repository\AbstractRepository;
 
-class ItemRepository extends AbstractRepository
+readonly class ItemRepository extends AbstractRepository
 {
-    public function __construct(#[GetTableName(Item::class)] private readonly string $itemTableName)
+    public function __construct(#[GetTableName(Item::class)] private string $itemTableName)
     {
     }
 

@@ -189,7 +189,7 @@ class MediaService
         ];
 
         for ($i = 1; $i < count($rawValues) - 1; ++$i) {
-            $duration += $rawValues[$i] * $durationMultiplier[$i];
+            $duration += $rawValues[$i] * ($durationMultiplier[$i] ?? 0);
         }
 
         $media->setDuration($duration);

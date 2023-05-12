@@ -5,6 +5,9 @@ namespace GibsonOS\Core\Store;
 
 use GibsonOS\Core\Model\Action;
 
+/**
+ * @extends AbstractDatabaseStore<Action>
+ */
 class ActionStore extends AbstractDatabaseStore
 {
     private ?int $taskId = null;

@@ -8,6 +8,7 @@ use GibsonOS\Core\Attribute\GetSetting;
 use GibsonOS\Core\Dto\Web\Body;
 use GibsonOS\Core\Dto\Web\Request;
 use GibsonOS\Core\Dto\Web\Response;
+use GibsonOS\Core\Enum\HttpStatusCode;
 use GibsonOS\Core\Exception\MiddlewareException;
 use GibsonOS\Core\Exception\Model\SaveError;
 use GibsonOS\Core\Exception\Repository\SelectError;
@@ -16,7 +17,6 @@ use GibsonOS\Core\Manager\ModelManager;
 use GibsonOS\Core\Model\Setting;
 use GibsonOS\Core\Repository\ModuleRepository;
 use GibsonOS\Core\Repository\SettingRepository;
-use GibsonOS\Core\Utility\StatusCode;
 use InvalidArgumentException;
 use JsonException;
 
@@ -89,7 +89,7 @@ class MiddlewareService
             $response = $this->webService->get($request);
         }
 
-        if ($response->getStatusCode() === StatusCode::UNAUTHORIZED) {
+        if ($response->getStatusCode() === HttpStatusCode::UNAUTHORIZED) {
             $this->getNewToken();
             $request->setHeader('X-GibsonOs-Token', $this->middlewareToken->getValue());
 
@@ -107,11 +107,11 @@ class MiddlewareService
     {
         $statusCode = $response->getStatusCode();
 
-        if ($statusCode < StatusCode::OK || $statusCode > StatusCode::PERMANENT_REDIRECT) {
+        if ($statusCode->value < HttpStatusCode::OK->value || $statusCode->value > HttpStatusCode::PERMANENT_REDIRECT->value) {
             throw new MiddlewareException(sprintf(
                 'Response error! URL %s. Code %d. Response: %s',
                 $request->getUrl(),
-                $statusCode,
+                $statusCode->value,
                 $response->getBody()->getContent(),
             ));
         }
@@ -143,10 +143,10 @@ class MiddlewareService
                 ->setHeaders(['X-Requested-With' => 'XMLHttpRequest'])
         );
 
-        if ($response->getStatusCode() !== StatusCode::OK) {
+        if ($response->getStatusCode() !== HttpStatusCode::OK) {
             throw new MiddlewareException(sprintf(
                 'Response error. Code %d. Response: %s',
-                $response->getStatusCode(),
+                $response->getStatusCode()->value,
                 $response->getBody()->getContent(),
             ));
         }

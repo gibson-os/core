@@ -7,6 +7,9 @@ use GibsonOS\Core\Attribute\GetTableName;
 use GibsonOS\Core\Model\Icon;
 use mysqlDatabase;
 
+/**
+ * @extends AbstractDatabaseStore<Icon>
+ */
 class IconStore extends AbstractDatabaseStore
 {
     /**

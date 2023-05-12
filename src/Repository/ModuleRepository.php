@@ -7,7 +7,7 @@ use GibsonOS\Core\Attribute\GetTableName;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\Module;
 
-class ModuleRepository extends AbstractRepository
+readonly class ModuleRepository extends AbstractRepository
 {
     public function __construct(#[GetTableName(Module::class)] private string $moduleTableName)
     {

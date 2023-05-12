@@ -140,7 +140,7 @@ abstract class AbstractInstall implements InstallInterface
             array_key_exists(2, $hits) &&
             !in_array($hits[2], $types)
         ) {
-            return throw new InstallException(sprintf(
+            throw new InstallException(sprintf(
                 '"%s" is no valid value! Possible: %s',
                 $hits[2],
                 implode(', ', $types)

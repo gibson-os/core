@@ -5,6 +5,9 @@ namespace GibsonOS\Core\Store;
 
 use GibsonOS\Core\Model\Cronjob;
 
+/**
+ * @extends AbstractDatabaseStore<Cronjob>
+ */
 class CronjobStore extends AbstractDatabaseStore
 {
     protected function getModelClassName(): string

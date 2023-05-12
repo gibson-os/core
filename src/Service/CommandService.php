@@ -302,6 +302,10 @@ class CommandService
     /**
      * @throws FactoryError
      * @throws ReflectionException
+     *
+     * @psalm-suppress InvalidReturnStatement
+     * @psalm-suppress InvalidReturnType
+     * @psalm-suppress InvalidArrayOffset
      */
     private function getPossibleCommands(): array
     {

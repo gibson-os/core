@@ -14,6 +14,9 @@ use GibsonOS\Core\Model\User\Permission as UserPermission;
 use GibsonOS\Core\Store\AbstractDatabaseStore;
 use mysqlDatabase;
 
+/**
+ * @extends AbstractDatabaseStore<Role>
+ */
 class PermissionStore extends AbstractDatabaseStore
 {
     private ?int $moduleId = null;
@@ -145,6 +148,11 @@ class PermissionStore extends AbstractDatabaseStore
         ;
     }
 
+    /**
+     * @throws SelectError
+     *
+     * @return iterable<string[]>
+     */
     protected function getModels(): iterable
     {
         if ($this->table->selectPrepared() === false) {

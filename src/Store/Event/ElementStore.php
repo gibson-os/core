@@ -15,6 +15,9 @@ use JsonException;
 use mysqlDatabase;
 use ReflectionException;
 
+/**
+ * @extends AbstractDatabaseStore<Element>
+ */
 class ElementStore extends AbstractDatabaseStore
 {
     public function __construct(

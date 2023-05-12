@@ -3,16 +3,11 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Repository;
 
-use GibsonOS\Core\Attribute\GetTableName;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\User;
 
-class UserRepository extends AbstractRepository
+readonly class UserRepository extends AbstractRepository
 {
-    public function __construct(#[GetTableName(User::class)] private readonly string $userTableName)
-    {
-    }
-
     /**
      * @throws SelectError
      */

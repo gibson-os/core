@@ -77,11 +77,11 @@ abstract class AbstractDatabaseStore extends AbstractStore
     }
 
     /**
-     * @throws JsonException
      * @throws ReflectionException
      * @throws SelectError
+     * @throws JsonException
      *
-     * @return T[]|iterable
+     * @return array|iterable<T>
      */
     public function getList(): iterable
     {
@@ -207,7 +207,7 @@ abstract class AbstractDatabaseStore extends AbstractStore
      * @throws ReflectionException
      * @throws SelectError
      *
-     * @return iterable<T>
+     * @return array|iterable<T>
      */
     protected function getModels(): iterable
     {
