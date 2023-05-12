@@ -9,7 +9,7 @@ use GibsonOS\Core\Repository\AbstractRepository;
 use GibsonOS\Core\Service\DateTimeService;
 use Psr\Log\LoggerInterface;
 
-readonly class LocationRepository extends AbstractRepository
+class LocationRepository extends AbstractRepository
 {
     public function __construct(
         private DateTimeService $dateTimeService,

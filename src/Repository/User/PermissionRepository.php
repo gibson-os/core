@@ -10,7 +10,7 @@ use GibsonOS\Core\Model\Task;
 use GibsonOS\Core\Model\User\Permission;
 use GibsonOS\Core\Repository\AbstractRepository;
 
-readonly class PermissionRepository extends AbstractRepository
+class PermissionRepository extends AbstractRepository
 {
     /**
      * @throws SelectError

@@ -8,7 +8,7 @@ use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\User\Device;
 use GibsonOS\Core\Repository\AbstractRepository;
 
-readonly class DeviceRepository extends AbstractRepository
+class DeviceRepository extends AbstractRepository
 {
     public function __construct(#[GetTableName(Device::class)] private string $deviceTableName)
     {

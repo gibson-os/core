@@ -9,7 +9,7 @@ use GibsonOS\Core\Model\Action;
 use GibsonOS\Core\Model\Action\Permission;
 use GibsonOS\Core\Repository\AbstractRepository;
 
-readonly class PermissionRepository extends AbstractRepository
+class PermissionRepository extends AbstractRepository
 {
     public function __construct(#[GetTableName(Permission::class)] private string $permissionTableName)
     {

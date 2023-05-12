@@ -15,7 +15,7 @@ use GibsonOS\Core\Utility\JsonUtility;
 use mysqlTable;
 use stdClass;
 
-readonly class EventRepository extends AbstractRepository
+class EventRepository extends AbstractRepository
 {
     public function __construct(
         private DateTimeService $dateTimeService,

@@ -28,9 +28,8 @@ class PermissionViewRepositoryTest extends Unit
             ->willReturn(true)
         ;
         $this->mysqlDatabase->fetchRow()
-            ->shouldBeCalledTimes(3)
+            ->shouldBeCalledTimes(2)
             ->willReturn(
-                ['module', 'varchar(42)', 'NO', '', null, ''],
                 ['permission', 'bigint(42)', 'NO', '', null, ''],
                 null
             )
@@ -143,7 +142,7 @@ class PermissionViewRepositoryTest extends Unit
     public function testGetPermissionByModule(): void
     {
         $this->mysqlDatabase->execute(
-            'SELECT `view_user_permission`.`module`, `view_user_permission`.`permission` FROM `marvin`.`view_user_permission` WHERE IFNULL(`user_id`, ?)=? AND `module_name`=? AND `task_name` IS NULL AND `action_name` IS NULL ORDER BY `user_id` DESC, `module` DESC LIMIT 1',
+            'SELECT `view_user_permission`.`permission` FROM `marvin`.`view_user_permission` WHERE IFNULL(`user_id`, ?)=? AND `module_name`=? AND `task_name` IS NULL AND `action_name` IS NULL ORDER BY `user_id` DESC, `permission_module_id` DESC LIMIT 1',
             [0, 0, 'galaxy'],
         )
             ->shouldBeCalledOnce()
@@ -152,21 +151,19 @@ class PermissionViewRepositoryTest extends Unit
         $this->mysqlDatabase->fetchAssocList()
             ->shouldBeCalledOnce()
             ->willReturn([[
-                'module' => 'galaxy',
-                'permission' => '1',
+                'permission' => '4',
             ]])
         ;
 
         $permission = $this->permissionViewRepository->getPermissionByModule('galaxy');
 
-        $this->assertEquals('galaxy', $permission->getModule());
-        $this->assertEquals(1, $permission->getPermission());
+        $this->assertEquals(4, $permission->getPermission());
     }
 
     public function testGetPermissionByModuleWithUserId(): void
     {
         $this->mysqlDatabase->execute(
-            'SELECT `view_user_permission`.`module`, `view_user_permission`.`permission` FROM `marvin`.`view_user_permission` WHERE IFNULL(`user_id`, ?)=? AND `module_name`=? AND `task_name` IS NULL AND `action_name` IS NULL ORDER BY `user_id` DESC, `module` DESC LIMIT 1',
+            'SELECT `view_user_permission`.`permission` FROM `marvin`.`view_user_permission` WHERE IFNULL(`user_id`, ?)=? AND `module_name`=? AND `task_name` IS NULL AND `action_name` IS NULL ORDER BY `user_id` DESC, `permission_module_id` DESC LIMIT 1',
             [42, 42, 'galaxy'],
         )
             ->shouldBeCalledOnce()
@@ -175,21 +172,19 @@ class PermissionViewRepositoryTest extends Unit
         $this->mysqlDatabase->fetchAssocList()
             ->shouldBeCalledOnce()
             ->willReturn([[
-                'module' => 'galaxy',
                 'permission' => '1',
             ]])
         ;
 
         $permission = $this->permissionViewRepository->getPermissionByModule('galaxy', 42);
 
-        $this->assertEquals('galaxy', $permission->getModule());
         $this->assertEquals(1, $permission->getPermission());
     }
 
     public function testGetPermissionByModuleEmpty(): void
     {
         $this->mysqlDatabase->execute(
-            'SELECT `view_user_permission`.`module`, `view_user_permission`.`permission` FROM `marvin`.`view_user_permission` WHERE IFNULL(`user_id`, ?)=? AND `module_name`=? AND `task_name` IS NULL AND `action_name` IS NULL ORDER BY `user_id` DESC, `module` DESC LIMIT 1',
+            'SELECT `view_user_permission`.`permission` FROM `marvin`.`view_user_permission` WHERE IFNULL(`user_id`, ?)=? AND `module_name`=? AND `task_name` IS NULL AND `action_name` IS NULL ORDER BY `user_id` DESC, `permission_module_id` DESC LIMIT 1',
             [42, 42, 'galaxy'],
         )
             ->shouldBeCalledOnce()
@@ -203,7 +198,7 @@ class PermissionViewRepositoryTest extends Unit
     public function testGetPermissionByTask(): void
     {
         $this->mysqlDatabase->execute(
-            'SELECT `view_user_permission`.`module`, `view_user_permission`.`permission` FROM `marvin`.`view_user_permission` WHERE IFNULL(`user_id`, ?)=? AND `module_name`=? AND `task_name`=? AND `action_name` IS NULL ORDER BY `user_id` DESC, `task` DESC, `module` DESC LIMIT 1',
+            'SELECT `view_user_permission`.`permission` FROM `marvin`.`view_user_permission` WHERE IFNULL(`user_id`, ?)=? AND `module_name`=? AND `task_name`=? AND `action_name` IS NULL ORDER BY `user_id` DESC, `permission_task_id` DESC, `permission_module_id` DESC LIMIT 1',
             [0, 0, 'galaxy', 'ford'],
         )
             ->shouldBeCalledOnce()
@@ -219,14 +214,13 @@ class PermissionViewRepositoryTest extends Unit
 
         $permission = $this->permissionViewRepository->getPermissionByTask('galaxy', 'ford');
 
-        $this->assertEquals('galaxy', $permission->getModule());
         $this->assertEquals(1, $permission->getPermission());
     }
 
     public function testGetPermissionByTaskWithUserId(): void
     {
         $this->mysqlDatabase->execute(
-            'SELECT `view_user_permission`.`module`, `view_user_permission`.`permission` FROM `marvin`.`view_user_permission` WHERE IFNULL(`user_id`, ?)=? AND `module_name`=? AND `task_name`=? AND `action_name` IS NULL ORDER BY `user_id` DESC, `task` DESC, `module` DESC LIMIT 1',
+            'SELECT `view_user_permission`.`permission` FROM `marvin`.`view_user_permission` WHERE IFNULL(`user_id`, ?)=? AND `module_name`=? AND `task_name`=? AND `action_name` IS NULL ORDER BY `user_id` DESC, `permission_task_id` DESC, `permission_module_id` DESC LIMIT 1',
             [42, 42, 'galaxy', 'ford'],
         )
             ->shouldBeCalledOnce()
@@ -242,14 +236,13 @@ class PermissionViewRepositoryTest extends Unit
 
         $permission = $this->permissionViewRepository->getPermissionByTask('galaxy', 'ford', 42);
 
-        $this->assertEquals('galaxy', $permission->getModule());
         $this->assertEquals(1, $permission->getPermission());
     }
 
     public function testGetPermissionByTaskEmpty(): void
     {
         $this->mysqlDatabase->execute(
-            'SELECT `view_user_permission`.`module`, `view_user_permission`.`permission` FROM `marvin`.`view_user_permission` WHERE IFNULL(`user_id`, ?)=? AND `module_name`=? AND `task_name`=? AND `action_name` IS NULL ORDER BY `user_id` DESC, `task` DESC, `module` DESC LIMIT 1',
+            'SELECT `view_user_permission`.`permission` FROM `marvin`.`view_user_permission` WHERE IFNULL(`user_id`, ?)=? AND `module_name`=? AND `task_name`=? AND `action_name` IS NULL ORDER BY `user_id` DESC, `permission_task_id` DESC, `permission_module_id` DESC LIMIT 1',
             [42, 42, 'galaxy', 'ford'],
         )
             ->shouldBeCalledOnce()
@@ -263,7 +256,7 @@ class PermissionViewRepositoryTest extends Unit
     public function testGetPermissionByAction(): void
     {
         $this->mysqlDatabase->execute(
-            'SELECT `view_user_permission`.`module`, `view_user_permission`.`permission` FROM `marvin`.`view_user_permission` WHERE IFNULL(`user_id`, ?)=? AND `module_name`=? AND `task_name`=? AND `action_name`=? ORDER BY `user_id` DESC, `action` DESC, `task` DESC, `module` DESC LIMIT 1',
+            'SELECT `view_user_permission`.`permission` FROM `marvin`.`view_user_permission` WHERE IFNULL(`user_id`, ?)=? AND `module_name`=? AND `task_name`=? AND `action_name`=? ORDER BY `user_id` DESC, `permission_action_id` DESC, `permission_task_id` DESC, `permission_module_id` DESC LIMIT 1',
             [0, 0, 'galaxy', 'ford', 'prefect'],
         )
             ->shouldBeCalledOnce()
@@ -279,14 +272,13 @@ class PermissionViewRepositoryTest extends Unit
 
         $permission = $this->permissionViewRepository->getPermissionByAction('galaxy', 'ford', 'prefect');
 
-        $this->assertEquals('galaxy', $permission->getModule());
         $this->assertEquals(1, $permission->getPermission());
     }
 
     public function testGetPermissionByActionWithUserId(): void
     {
         $this->mysqlDatabase->execute(
-            'SELECT `view_user_permission`.`module`, `view_user_permission`.`permission` FROM `marvin`.`view_user_permission` WHERE IFNULL(`user_id`, ?)=? AND `module_name`=? AND `task_name`=? AND `action_name`=? ORDER BY `user_id` DESC, `action` DESC, `task` DESC, `module` DESC LIMIT 1',
+            'SELECT `view_user_permission`.`permission` FROM `marvin`.`view_user_permission` WHERE IFNULL(`user_id`, ?)=? AND `module_name`=? AND `task_name`=? AND `action_name`=? ORDER BY `user_id` DESC, `permission_action_id` DESC, `permission_task_id` DESC, `permission_module_id` DESC LIMIT 1',
             [42, 42, 'galaxy', 'ford', 'prefect'],
         )
             ->shouldBeCalledOnce()
@@ -302,14 +294,13 @@ class PermissionViewRepositoryTest extends Unit
 
         $permission = $this->permissionViewRepository->getPermissionByAction('galaxy', 'ford', 'prefect', 42);
 
-        $this->assertEquals('galaxy', $permission->getModule());
         $this->assertEquals(1, $permission->getPermission());
     }
 
     public function testGetPermissionByActionEmpty(): void
     {
         $this->mysqlDatabase->execute(
-            'SELECT `view_user_permission`.`module`, `view_user_permission`.`permission` FROM `marvin`.`view_user_permission` WHERE IFNULL(`user_id`, ?)=? AND `module_name`=? AND `task_name`=? AND `action_name`=? ORDER BY `user_id` DESC, `action` DESC, `task` DESC, `module` DESC LIMIT 1',
+            'SELECT `view_user_permission`.`permission` FROM `marvin`.`view_user_permission` WHERE IFNULL(`user_id`, ?)=? AND `module_name`=? AND `task_name`=? AND `action_name`=? ORDER BY `user_id` DESC, `permission_action_id` DESC, `permission_task_id` DESC, `permission_module_id` DESC LIMIT 1',
             [42, 42, 'galaxy', 'ford', 'prefect'],
         )
             ->shouldBeCalledOnce()

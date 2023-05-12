@@ -7,7 +7,7 @@ use GibsonOS\Core\Attribute\GetTableName;
 use GibsonOS\Core\Model\Icon\Tag;
 use GibsonOS\Core\Repository\AbstractRepository;
 
-readonly class TagRepository extends AbstractRepository
+class TagRepository extends AbstractRepository
 {
     public function __construct(#[GetTableName(Tag::class)] private string $tagTableName)
     {

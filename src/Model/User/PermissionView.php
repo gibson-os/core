@@ -208,11 +208,11 @@ class PermissionView extends AbstractModel implements JsonSerializable
 
     private int $permission = Permission::DENIED;
 
-    private ?string $module = null;
+    private ?int $permissionModuleId = null;
 
-    private ?string $task = null;
+    private ?int $permissionTaskId = null;
 
-    private ?string $action = null;
+    private ?int $permissionActionId = null;
 
     private int $moduleId;
 
@@ -286,38 +286,38 @@ class PermissionView extends AbstractModel implements JsonSerializable
         return $this;
     }
 
-    public function getModule(): ?string
+    public function getPermissionModuleId(): ?int
     {
-        return $this->module;
+        return $this->permissionModuleId;
     }
 
-    public function setModule(?string $module): PermissionView
+    public function setPermissionModuleId(?int $permissionModuleId): PermissionView
     {
-        $this->module = $module;
+        $this->permissionModuleId = $permissionModuleId;
 
         return $this;
     }
 
-    public function getTask(): ?string
+    public function getPermissionTaskId(): ?int
     {
-        return $this->task;
+        return $this->permissionTaskId;
     }
 
-    public function setTask(?string $task): PermissionView
+    public function setPermissionTaskId(?int $permissionTaskId): PermissionView
     {
-        $this->task = $task;
+        $this->permissionTaskId = $permissionTaskId;
 
         return $this;
     }
 
-    public function getAction(): ?string
+    public function getPermissionActionId(): ?int
     {
-        return $this->action;
+        return $this->permissionActionId;
     }
 
-    public function setAction(?string $action): PermissionView
+    public function setPermissionActionId(?int $permissionActionId): PermissionView
     {
-        $this->action = $action;
+        $this->permissionActionId = $permissionActionId;
 
         return $this;
     }

@@ -8,7 +8,7 @@ use GibsonOS\Core\Enum\HttpMethod;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\Action;
 
-readonly class ActionRepository extends AbstractRepository
+class ActionRepository extends AbstractRepository
 {
     public function __construct(#[GetTableName(Action::class)] private string $actionTableName)
     {

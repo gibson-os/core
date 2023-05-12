@@ -4,6 +4,9 @@ declare(strict_types=1);
 namespace GibsonOS\Test\Unit\Core\Repository\User;
 
 use Codeception\Test\Unit;
+use GibsonOS\Core\Model\Action;
+use GibsonOS\Core\Model\Module;
+use GibsonOS\Core\Model\Task;
 use GibsonOS\Core\Repository\User\PermissionRepository;
 use GibsonOS\Test\Unit\Core\ModelManagerTrait;
 
@@ -26,9 +29,8 @@ class PermissionRepositoryTest extends Unit
             ->willReturn(true)
         ;
         $this->mysqlDatabase->fetchRow()
-            ->shouldBeCalledTimes(3)
+            ->shouldBeCalledTimes(2)
             ->willReturn(
-                ['module', 'varchar(42)', 'NO', '', null, ''],
                 ['permission', 'bigint(42)', 'NO', '', null, ''],
                 null
             )
@@ -40,8 +42,8 @@ class PermissionRepositoryTest extends Unit
     public function testGetByModuleTaskAndAction(): void
     {
         $this->mysqlDatabase->execute(
-            'SELECT `user_permission`.`module`, `user_permission`.`permission` FROM `marvin`.`user_permission` WHERE `module`=? AND `task`=? AND `action`=? AND IFNULL(`user_id`, ?)=? LIMIT 1',
-            ['marvin', 'arthur', 'dent', 0, 0],
+            'SELECT `user_permission`.`permission` FROM `marvin`.`user_permission` WHERE `module_id`=? AND `task_id`=? AND `action_id`=? AND IFNULL(`user_id`, ?)=? LIMIT 1',
+            [42, 420, 4242, 0, 0],
         )
             ->shouldBeCalledOnce()
             ->willReturn(true)
@@ -49,22 +51,24 @@ class PermissionRepositoryTest extends Unit
         $this->mysqlDatabase->fetchAssocList()
             ->shouldBeCalledOnce()
             ->willReturn([[
-                'module' => 'galaxy',
-                'permission' => '1',
+                'permission' => '4',
             ]])
         ;
 
-        $permission = $this->permissionRepository->getByModuleTaskAndAction('marvin', 'arthur', 'dent');
+        $permission = $this->permissionRepository->getByModuleTaskAndAction(
+            (new Module())->setId(42),
+            (new Task())->setId(420),
+            (new Action())->setId(4242)
+        );
 
-        $this->assertEquals('galaxy', $permission->getModule());
-        $this->assertEquals(1, $permission->getPermission());
+        $this->assertEquals(4, $permission->getPermission());
     }
 
     public function testGetByModuleTaskAndActionWithUserId(): void
     {
         $this->mysqlDatabase->execute(
-            'SELECT `user_permission`.`module`, `user_permission`.`permission` FROM `marvin`.`user_permission` WHERE `module`=? AND `task`=? AND `action`=? AND IFNULL(`user_id`, ?)=? LIMIT 1',
-            ['marvin', 'arthur', 'dent', 0, 42],
+            'SELECT `user_permission`.`permission` FROM `marvin`.`user_permission` WHERE `module_id`=? AND `task_id`=? AND `action_id`=? AND IFNULL(`user_id`, ?)=? LIMIT 1',
+            [42, 420, 4242, 0, 4200],
         )
             ->shouldBeCalledOnce()
             ->willReturn(true)
@@ -72,22 +76,25 @@ class PermissionRepositoryTest extends Unit
         $this->mysqlDatabase->fetchAssocList()
             ->shouldBeCalledOnce()
             ->willReturn([[
-                'module' => 'galaxy',
-                'permission' => '1',
+                'permission' => '4',
             ]])
         ;
 
-        $permission = $this->permissionRepository->getByModuleTaskAndAction('marvin', 'arthur', 'dent', 42);
+        $permission = $this->permissionRepository->getByModuleTaskAndAction(
+            (new Module())->setId(42),
+            (new Task())->setId(420),
+            (new Action())->setId(4242),
+            4200
+        );
 
-        $this->assertEquals('galaxy', $permission->getModule());
-        $this->assertEquals(1, $permission->getPermission());
+        $this->assertEquals(4, $permission->getPermission());
     }
 
     public function testGetByModuleAndTask(): void
     {
         $this->mysqlDatabase->execute(
-            'SELECT `user_permission`.`module`, `user_permission`.`permission` FROM `marvin`.`user_permission` WHERE `module`=? AND `task`=? AND `action` IS NULL AND IFNULL(`user_id`, ?)=? LIMIT 1',
-            ['marvin', 'arthur', 0, 0],
+            'SELECT `user_permission`.`permission` FROM `marvin`.`user_permission` WHERE `module_id`=? AND `task_id`=? AND `action_id` IS NULL AND IFNULL(`user_id`, ?)=? LIMIT 1',
+            [42, 420, 0, 0],
         )
             ->shouldBeCalledOnce()
             ->willReturn(true)
@@ -95,22 +102,23 @@ class PermissionRepositoryTest extends Unit
         $this->mysqlDatabase->fetchAssocList()
             ->shouldBeCalledOnce()
             ->willReturn([[
-                'module' => 'galaxy',
-                'permission' => '1',
+                'permission' => '4',
             ]])
         ;
 
-        $permission = $this->permissionRepository->getByModuleAndTask('marvin', 'arthur');
+        $permission = $this->permissionRepository->getByModuleAndTask(
+            (new Module())->setId(42),
+            (new Task())->setId(420),
+        );
 
-        $this->assertEquals('galaxy', $permission->getModule());
-        $this->assertEquals(1, $permission->getPermission());
+        $this->assertEquals(4, $permission->getPermission());
     }
 
     public function testGetByModuleAndTaskWithUserId(): void
     {
         $this->mysqlDatabase->execute(
-            'SELECT `user_permission`.`module`, `user_permission`.`permission` FROM `marvin`.`user_permission` WHERE `module`=? AND `task`=? AND `action` IS NULL AND IFNULL(`user_id`, ?)=? LIMIT 1',
-            ['marvin', 'arthur', 0, 42],
+            'SELECT `user_permission`.`permission` FROM `marvin`.`user_permission` WHERE `module_id`=? AND `task_id`=? AND `action_id` IS NULL AND IFNULL(`user_id`, ?)=? LIMIT 1',
+            [42, 420, 0, 4242],
         )
             ->shouldBeCalledOnce()
             ->willReturn(true)
@@ -118,14 +126,16 @@ class PermissionRepositoryTest extends Unit
         $this->mysqlDatabase->fetchAssocList()
             ->shouldBeCalledOnce()
             ->willReturn([[
-                'module' => 'galaxy',
-                'permission' => '1',
+                'permission' => '4',
             ]])
         ;
 
-        $permission = $this->permissionRepository->getByModuleAndTask('marvin', 'arthur', 42);
+        $permission = $this->permissionRepository->getByModuleAndTask(
+            (new Module())->setId(42),
+            (new Task())->setId(420),
+            4242
+        );
 
-        $this->assertEquals('galaxy', $permission->getModule());
-        $this->assertEquals(1, $permission->getPermission());
+        $this->assertEquals(4, $permission->getPermission());
     }
 }

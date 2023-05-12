@@ -12,7 +12,7 @@ class ActionAutoCompleteTest extends UnitAutoCompleteTest
 {
     private ActionRepository|ObjectProphecy $actionRepository;
 
-    protected function _before()
+    protected function _before(): void
     {
         $this->actionRepository = $this->prophesize(ActionRepository::class);
 

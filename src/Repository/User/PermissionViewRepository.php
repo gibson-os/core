@@ -11,7 +11,7 @@ use GibsonOS\Core\Repository\AbstractRepository;
 use mysqlTable;
 use stdClass;
 
-readonly class PermissionViewRepository extends AbstractRepository
+class PermissionViewRepository extends AbstractRepository
 {
     public function __construct(#[GetTableName(PermissionView::class)] private string $permissionViewName)
     {

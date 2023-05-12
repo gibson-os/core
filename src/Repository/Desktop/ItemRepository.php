@@ -9,7 +9,7 @@ use GibsonOS\Core\Model\Desktop\Item;
 use GibsonOS\Core\Model\User;
 use GibsonOS\Core\Repository\AbstractRepository;
 
-readonly class ItemRepository extends AbstractRepository
+class ItemRepository extends AbstractRepository
 {
     public function __construct(#[GetTableName(Item::class)] private string $itemTableName)
     {

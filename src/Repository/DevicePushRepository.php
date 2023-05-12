@@ -7,7 +7,7 @@ use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\DevicePush;
 use GibsonOS\Core\Model\User\Device;
 
-readonly class DevicePushRepository extends AbstractRepository
+class DevicePushRepository extends AbstractRepository
 {
     /**
      * @throws SelectError

@@ -6,7 +6,7 @@ namespace GibsonOS\Core\Repository;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\SmartAttribute;
 
-readonly class SmartAttributeRepository extends AbstractRepository
+class SmartAttributeRepository extends AbstractRepository
 {
     /**
      * @throws SelectError

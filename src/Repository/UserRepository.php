@@ -6,7 +6,7 @@ namespace GibsonOS\Core\Repository;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\User;
 
-readonly class UserRepository extends AbstractRepository
+class UserRepository extends AbstractRepository
 {
     /**
      * @throws SelectError

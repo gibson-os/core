@@ -11,7 +11,7 @@ use GibsonOS\Core\Model\Weather;
 use GibsonOS\Core\Model\Weather\Location;
 use GibsonOS\Core\Service\DateTimeService;
 
-readonly class WeatherRepository extends AbstractRepository
+class WeatherRepository extends AbstractRepository
 {
     public function __construct(
         private DateTimeService $dateTimeService,

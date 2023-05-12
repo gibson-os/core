@@ -7,7 +7,7 @@ use GibsonOS\Core\Attribute\GetTableName;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\Task;
 
-readonly class TaskRepository extends AbstractRepository
+class TaskRepository extends AbstractRepository
 {
     public function __construct(#[GetTableName(Task::class)] private string $taskTableName)
     {

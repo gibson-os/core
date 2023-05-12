@@ -7,7 +7,7 @@ use GibsonOS\Core\Attribute\GetTableName;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\Icon;
 
-readonly class IconRepository extends AbstractRepository
+class IconRepository extends AbstractRepository
 {
     public function __construct(#[GetTableName(Icon::class)] private string $iconTableName)
     {
