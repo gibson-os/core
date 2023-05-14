@@ -140,6 +140,10 @@ class ModelFetcherAttribute implements AttributeServiceInterface, ParameterAttri
                     );
                 }
             }
+
+            if ($conditionParts[0] === 'value') {
+                $values[] = $conditionParts[1];
+            }
         }
 
         return $values;

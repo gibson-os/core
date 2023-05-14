@@ -123,6 +123,10 @@ class ModelMapperAttribute extends ObjectMapperAttribute
             }
         }
 
+        if ($conditionParts[0] === 'value') {
+            return $conditionParts[1];
+        }
+
         // Muss noch aufgebohrt werden
         return null;
     }
