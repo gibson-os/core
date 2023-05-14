@@ -5,24 +5,18 @@ namespace GibsonOS\Core\Dto\Web;
 
 use GibsonOS\Core\Enum\HttpStatusCode;
 
-readonly class Response
+class Response
 {
-    /**
-     * @var array<string, string>
-     */
-    private array $headers;
-
     /**
      * @param array<string, string> $headers
      */
     public function __construct(
-        private Request $request,
-        private HttpStatusCode $statusCode,
-        array $headers,
-        private Body $body,
-        private string $cookieFile
+        private readonly Request $request,
+        private readonly HttpStatusCode $statusCode,
+        private readonly array $headers,
+        private readonly Body $body,
+        private readonly string $cookieFile
     ) {
-        $this->headers = $headers;
     }
 
     public function getRequest(): Request
