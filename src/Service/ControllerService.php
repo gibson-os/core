@@ -150,7 +150,7 @@ readonly class ControllerService
     {
         if ($this->chromecastReceiverAppId->getId() === null) {
             try {
-                $response = $this->middlewareService->send('chromecast', 'getReceiverAppId');
+                $response = $this->middlewareService->send('chromecast', 'receiverAppId');
                 $this->chromecastReceiverAppId
                     ->setValue(JsonUtility::decode($response->getBody()->getContent())['data'])
                 ;
