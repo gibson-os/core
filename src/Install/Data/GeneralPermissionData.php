@@ -6,6 +6,7 @@ namespace GibsonOS\Core\Install\Data;
 use Generator;
 use GibsonOS\Core\Dto\Install\Success;
 use GibsonOS\Core\Enum\HttpMethod;
+use GibsonOS\Core\Enum\Permission as PermissionEnum;
 use GibsonOS\Core\Exception\Model\SaveError;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Install\AbstractInstall;
@@ -50,7 +51,7 @@ class GeneralPermissionData extends AbstractInstall implements PriorityInterface
                     ->setModule($coreModule)
                     ->setTask($userTask)
                     ->setAction($loginAction)
-                    ->setPermission(Permission::READ)
+                    ->setPermission(PermissionEnum::READ->value)
             );
         }
 
@@ -61,7 +62,7 @@ class GeneralPermissionData extends AbstractInstall implements PriorityInterface
                 (new Permission())
                     ->setModule($coreModule)
                     ->setTask($middlewareTask)
-                    ->setPermission(Permission::READ + Permission::WRITE)
+                    ->setPermission(PermissionEnum::READ->value + PermissionEnum::WRITE->value)
             );
         }
 

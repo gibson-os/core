@@ -5,6 +5,7 @@ namespace GibsonOS\Core\Install\Data;
 
 use Generator;
 use GibsonOS\Core\Dto\Install\Input;
+use GibsonOS\Core\Enum\Permission;
 use GibsonOS\Core\Exception\Model\SaveError;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Exception\UserError;
@@ -46,7 +47,7 @@ class UserData extends AbstractInstall implements PriorityInterface, SingleInsta
         yield $passwordInput = new Input('What should the password be?');
         yield $passwordRepeatInput = new Input('Repeat password');
 
-        $permissionAll = User\Permission::READ + User\Permission::WRITE + User\Permission::DELETE + User\Permission::MANAGE;
+        $permissionAll = Permission::READ->value + Permission::WRITE->value + Permission::DELETE->value + Permission::MANAGE->value;
         $user = $this->userService->save(
             (new User())->setUser($usernameInput->getValue() ?? ''),
             $passwordInput->getValue() ?? '',

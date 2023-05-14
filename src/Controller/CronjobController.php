@@ -5,9 +5,9 @@ namespace GibsonOS\Core\Controller;
 
 use GibsonOS\Core\Attribute\CheckPermission;
 use GibsonOS\Core\Attribute\GetModel;
+use GibsonOS\Core\Enum\Permission;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\Cronjob;
-use GibsonOS\Core\Model\User\Permission;
 use GibsonOS\Core\Service\Response\AjaxResponse;
 use GibsonOS\Core\Store\Cronjob\TimeStore;
 use GibsonOS\Core\Store\CronjobStore;
@@ -21,7 +21,7 @@ class CronjobController extends AbstractController
      * @throws JsonException
      * @throws ReflectionException
      */
-    #[CheckPermission(Permission::READ)]
+    #[CheckPermission([Permission::READ])]
     public function get(CronjobStore $cronjobStore, int $limit = 100, int $start = 0, array $sort = []): AjaxResponse
     {
         $cronjobStore->setLimit($limit, $start);
@@ -35,7 +35,7 @@ class CronjobController extends AbstractController
      * @throws JsonException
      * @throws ReflectionException
      */
-    #[CheckPermission(Permission::READ)]
+    #[CheckPermission([Permission::READ])]
     public function getTimes(
         TimeStore $timeStore,
         #[GetModel] Cronjob $cronjob,

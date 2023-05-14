@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Service;
 
+use GibsonOS\Core\Enum\Permission as PermissionEnum;
 use GibsonOS\Core\Exception\Repository\SelectError;
-use GibsonOS\Core\Model\User\Permission;
 use GibsonOS\Core\Repository\User\PermissionViewRepository;
 
 class PermissionService
@@ -48,8 +48,8 @@ class PermissionService
     public function checkPermission(int $requiredPermission, int $permission): bool
     {
         if (
-            $requiredPermission !== Permission::DENIED &&
-            ($permission & Permission::DENIED)
+            $requiredPermission !== PermissionEnum::DENIED->value &&
+            ($permission & PermissionEnum::DENIED->value)
         ) {
             return false;
         }
@@ -59,27 +59,27 @@ class PermissionService
 
     public function isDenied(string $module, string $task = null, string $action = null, int $userId = null): bool
     {
-        return $this->hasPermission(Permission::DENIED, $module, $task, $action, $userId);
+        return $this->hasPermission(PermissionEnum::DENIED->value, $module, $task, $action, $userId);
     }
 
     public function hasReadPermission(string $module, string $task = null, string $action = null, int $userId = null): bool
     {
-        return $this->hasPermission(Permission::READ, $module, $task, $action, $userId);
+        return $this->hasPermission(PermissionEnum::READ->value, $module, $task, $action, $userId);
     }
 
     public function hasWritePermission(string $module, string $task = null, string $action = null, int $userId = null): bool
     {
-        return $this->hasPermission(Permission::WRITE, $module, $task, $action, $userId);
+        return $this->hasPermission(PermissionEnum::WRITE->value, $module, $task, $action, $userId);
     }
 
     public function hasDeletePermission(string $module, string $task = null, string $action = null, int $userId = null): bool
     {
-        return $this->hasPermission(Permission::DELETE, $module, $task, $action, $userId);
+        return $this->hasPermission(PermissionEnum::DELETE->value, $module, $task, $action, $userId);
     }
 
     public function hasManagePermission(string $module, string $task = null, string $action = null, int $userId = null): bool
     {
-        return $this->hasPermission(Permission::MANAGE, $module, $task, $action, $userId);
+        return $this->hasPermission(PermissionEnum::MANAGE->value, $module, $task, $action, $userId);
     }
 
     /**
@@ -112,7 +112,7 @@ class PermissionService
             try {
                 $permissions['permission'] = $this->getPermission($module, $task, $action, $userId);
             } catch (SelectError) {
-                $permissions['permission'] = Permission::DENIED;
+                $permissions['permission'] = PermissionEnum::DENIED->value;
             }
         }
 

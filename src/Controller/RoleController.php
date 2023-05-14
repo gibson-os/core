@@ -7,13 +7,13 @@ use GibsonOS\Core\Attribute\CheckPermission;
 use GibsonOS\Core\Attribute\GetMappedModel;
 use GibsonOS\Core\Attribute\GetModel;
 use GibsonOS\Core\Attribute\GetModels;
+use GibsonOS\Core\Enum\Permission;
 use GibsonOS\Core\Exception\Model\DeleteError;
 use GibsonOS\Core\Exception\Model\SaveError;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Manager\ModelManager;
 use GibsonOS\Core\Model\Role;
-use GibsonOS\Core\Model\Role\Permission;
-use GibsonOS\Core\Model\User\Permission as UserPermission;
+use GibsonOS\Core\Model\Role\Permission as RolePermission;
 use GibsonOS\Core\Repository\Action\PermissionRepository;
 use GibsonOS\Core\Service\Response\AjaxResponse;
 use GibsonOS\Core\Store\Role\PermissionStore;
@@ -30,7 +30,7 @@ class RoleController extends AbstractController
      * @throws JsonException
      * @throws ReflectionException
      */
-    #[CheckPermission(UserPermission::MANAGE + UserPermission::READ)]
+    #[CheckPermission([Permission::MANAGE, Permission::READ])]
     public function get(
         RoleStore $roleStore,
         int $start = 0,
@@ -46,7 +46,7 @@ class RoleController extends AbstractController
     /**
      * @throws SaveError
      */
-    #[CheckPermission(UserPermission::MANAGE + UserPermission::WRITE)]
+    #[CheckPermission([Permission::MANAGE, Permission::WRITE])]
     public function post(
         ModelManager $modelManager,
         #[GetMappedModel] Role $role,
@@ -60,7 +60,7 @@ class RoleController extends AbstractController
      * @throws DeleteError
      * @throws JsonException
      */
-    #[CheckPermission(UserPermission::MANAGE + UserPermission::DELETE)]
+    #[CheckPermission([Permission::MANAGE, Permission::DELETE])]
     public function delete(
         ModelManager $modelManager,
         #[GetModel] Role $role,
@@ -73,10 +73,10 @@ class RoleController extends AbstractController
     /**
      * @throws SaveError
      */
-    #[CheckPermission(UserPermission::MANAGE + UserPermission::WRITE)]
+    #[CheckPermission([Permission::MANAGE, Permission::WRITE])]
     public function postPermission(
         ModelManager $modelManager,
-        #[GetMappedModel] Permission $permission,
+        #[GetMappedModel] RolePermission $permission,
     ): AjaxResponse {
         $modelManager->saveWithoutChildren($permission);
 
@@ -88,7 +88,7 @@ class RoleController extends AbstractController
      * @throws JsonException
      * @throws ReflectionException
      */
-    #[CheckPermission(UserPermission::MANAGE + UserPermission::READ)]
+    #[CheckPermission([Permission::MANAGE, Permission::READ])]
     public function getUsers(
         UserStore $userStore,
         #[GetModel] Role $role,
@@ -108,7 +108,7 @@ class RoleController extends AbstractController
     /**
      * @throws SaveError
      */
-    #[CheckPermission(UserPermission::MANAGE + UserPermission::WRITE)]
+    #[CheckPermission([Permission::MANAGE, Permission::WRITE])]
     public function postUser(
         #[GetMappedModel] Role\User $roleUser,
         ModelManager $modelManager,
@@ -122,7 +122,7 @@ class RoleController extends AbstractController
      * @throws DeleteError
      * @throws JsonException
      */
-    #[CheckPermission(UserPermission::MANAGE + UserPermission::DELETE)]
+    #[CheckPermission([Permission::MANAGE, Permission::DELETE])]
     public function deleteUsers(
         #[GetModels(Role\User::class)] array $users,
         ModelManager $modelManager
@@ -134,7 +134,7 @@ class RoleController extends AbstractController
         return $this->returnSuccess();
     }
 
-    #[CheckPermission(UserPermission::MANAGE + UserPermission::READ)]
+    #[CheckPermission([Permission::MANAGE, Permission::READ])]
     public function getPermissions(
         PermissionStore $permissionStore,
         PermissionRepository $permissionRepository,

@@ -7,6 +7,7 @@ use GibsonOS\Core\Attribute\Install\Database\Column;
 use GibsonOS\Core\Attribute\Install\Database\Constraint;
 use GibsonOS\Core\Attribute\Install\Database\Key;
 use GibsonOS\Core\Attribute\Install\Database\Table;
+use GibsonOS\Core\Enum\Permission as PermissionEnum;
 use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Model\Action;
 use GibsonOS\Core\Model\Module;
@@ -27,16 +28,6 @@ use GibsonOS\Core\Model\User;
 #[Key(unique: true, columns: ['module_id', 'task_id', 'action_id', 'user_id'])]
 class Permission extends AbstractModel
 {
-    public const DENIED = 1;  // 00001
-
-    public const READ = 2;    // 00010
-
-    public const WRITE = 4;   // 00100
-
-    public const DELETE = 8;  // 01000
-
-    public const MANAGE = 16;
-
     #[Column(attributes: [Column::ATTRIBUTE_UNSIGNED], autoIncrement: true)]
     private ?int $id = null;
 
@@ -53,7 +44,7 @@ class Permission extends AbstractModel
     private ?int $userId = null;
 
     #[Column(type: Column::TYPE_TINYINT, length: 2, attributes: [Column::ATTRIBUTE_UNSIGNED])]
-    private int $permission = self::DENIED;
+    private int $permission = PermissionEnum::DENIED->value;
 
     #[Constraint]
     protected ?User $user;

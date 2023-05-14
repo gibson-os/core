@@ -5,6 +5,7 @@ namespace GibsonOS\Core\Service;
 
 use GibsonOS\Core\Attribute\CheckPermission;
 use GibsonOS\Core\Enum\HttpMethod;
+use GibsonOS\Core\Enum\Permission;
 use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\Model\SaveError;
 use GibsonOS\Core\Exception\Repository\SelectError;
@@ -27,11 +28,6 @@ class ModuleService
 {
     private string $vendorPath;
 
-    /**
-     * @deprecated
-     */
-    private string $oldPath;
-
     public function __construct(
         private readonly ModuleRepository $moduleRepository,
         private readonly TaskRepository $taskRepository,
@@ -47,17 +43,6 @@ class ModuleService
             '..' . DIRECTORY_SEPARATOR .
             '..' . DIRECTORY_SEPARATOR .
             '..' . DIRECTORY_SEPARATOR
-        ) . DIRECTORY_SEPARATOR;
-
-        $this->oldPath = realpath(
-            dirname(__FILE__) . DIRECTORY_SEPARATOR .
-            '..' . DIRECTORY_SEPARATOR .
-            '..' . DIRECTORY_SEPARATOR .
-            '..' . DIRECTORY_SEPARATOR .
-            '..' . DIRECTORY_SEPARATOR .
-            '..' . DIRECTORY_SEPARATOR .
-            'includes' . DIRECTORY_SEPARATOR .
-            'module' . DIRECTORY_SEPARATOR
         ) . DIRECTORY_SEPARATOR;
     }
 
@@ -242,19 +227,31 @@ class ModuleService
                 $this->modelManager->save(
                     (new Action\Permission())
                         ->setAction($action)
-                        ->setPermission($checkPermission->getPermission())
+                        ->setPermission($this->getPermissionSum($checkPermission->getPermissions()))
                 );
 
-                foreach ($checkPermission->getPermissionsByRequestValues() as $permission) {
+                foreach ($checkPermission->getPermissionsByRequestValues() as $permissions) {
                     $this->modelManager->save(
                         (new Action\Permission())
                             ->setAction($action)
-                            ->setPermission($permission)
+                            ->setPermission($this->getPermissionSum($permissions))
                     );
                 }
             }
         }
 
         return $actionIds;
+    }
+
+    /**
+     * @param Permission[] $permissions
+     */
+    private function getPermissionSum(array $permissions): int
+    {
+
+        return array_sum(array_map(
+            static fn (Permission $permission): int => $permission->value,
+            $permissions,
+        ));
     }
 }

@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace GibsonOS\Test\Unit\Core\Service;
 
 use Codeception\Test\Unit;
-use GibsonOS\Core\Model\User\Permission;
+use GibsonOS\Core\Enum\Permission;
 use GibsonOS\Core\Model\User\PermissionView;
 use GibsonOS\Core\Repository\User\PermissionViewRepository;
 use GibsonOS\Core\Service\PermissionService;
@@ -88,7 +88,7 @@ class PermissionServiceTest extends Unit
         $this->prophesizeGetPermission($permission, $module, $task, $action);
         $this->assertEquals(
             $denied,
-            $this->permissionService->hasPermission(Permission::DENIED, $module, $task, $action, 42)
+            $this->permissionService->hasPermission(Permission::DENIED->value, $module, $task, $action, 42)
         );
     }
 
@@ -109,7 +109,7 @@ class PermissionServiceTest extends Unit
         $this->prophesizeGetPermission($permission, $module, $task, $action);
         $this->assertEquals(
             $read,
-            $this->permissionService->hasPermission(Permission::READ, $module, $task, $action, 42)
+            $this->permissionService->hasPermission(Permission::READ->value, $module, $task, $action, 42)
         );
     }
 
@@ -130,7 +130,7 @@ class PermissionServiceTest extends Unit
         $this->prophesizeGetPermission($permission, $module, $task, $action);
         $this->assertEquals(
             $write,
-            $this->permissionService->hasPermission(Permission::WRITE, $module, $task, $action, 42)
+            $this->permissionService->hasPermission(Permission::WRITE->value, $module, $task, $action, 42)
         );
     }
 
@@ -151,7 +151,7 @@ class PermissionServiceTest extends Unit
         $this->prophesizeGetPermission($permission, $module, $task, $action);
         $this->assertEquals(
             $delete,
-            $this->permissionService->hasPermission(Permission::DELETE, $module, $task, $action, 42)
+            $this->permissionService->hasPermission(Permission::DELETE->value, $module, $task, $action, 42)
         );
     }
 
@@ -172,7 +172,7 @@ class PermissionServiceTest extends Unit
         $this->prophesizeGetPermission($permission, $module, $task, $action);
         $this->assertEquals(
             $manage,
-            $this->permissionService->hasPermission(Permission::MANAGE, $module, $task, $action, 42)
+            $this->permissionService->hasPermission(Permission::MANAGE->value, $module, $task, $action, 42)
         );
     }
 
@@ -294,29 +294,29 @@ class PermissionServiceTest extends Unit
             $data[$text . $permissions[$i][1] . ' Module'] = [
                 $permissions[$i][0] + $startPermission,
                 (bool) ($denied + $permissions[$i][2]),
-                $denied + $permissions[$i][2] === 1 ? false : (bool) ($read + $permissions[$i][3]),
-                $denied + $permissions[$i][2] === 1 ? false : (bool) ($write + $permissions[$i][4]),
-                $denied + $permissions[$i][2] === 1 ? false : (bool) ($delete + $permissions[$i][5]),
-                $denied + $permissions[$i][2] === 1 ? false : (bool) ($manage + $permissions[$i][6]),
+                !($denied + $permissions[$i][2] === 1) && ($read + $permissions[$i][3] > 0),
+                !($denied + $permissions[$i][2] === 1) && ($write + $permissions[$i][4] > 0),
+                !($denied + $permissions[$i][2] === 1) && ($delete + $permissions[$i][5] > 0),
+                !($denied + $permissions[$i][2] === 1) && ($manage + $permissions[$i][6] > 0),
                 'herz',
             ];
             $data[$text . $permissions[$i][1] . ' Task'] = [
                 $permissions[$i][0] + $startPermission,
                 (bool) ($denied + $permissions[$i][2]),
-                $denied + $permissions[$i][2] === 1 ? false : (bool) ($read + $permissions[$i][3]),
-                $denied + $permissions[$i][2] === 1 ? false : (bool) ($write + $permissions[$i][4]),
-                $denied + $permissions[$i][2] === 1 ? false : (bool) ($delete + $permissions[$i][5]),
-                $denied + $permissions[$i][2] === 1 ? false : (bool) ($manage + $permissions[$i][6]),
+                !($denied + $permissions[$i][2] === 1) && ($read + $permissions[$i][3] > 0),
+                !($denied + $permissions[$i][2] === 1) && ($write + $permissions[$i][4] > 0),
+                !($denied + $permissions[$i][2] === 1) && ($delete + $permissions[$i][5] > 0),
+                !($denied + $permissions[$i][2] === 1) && ($manage + $permissions[$i][6] > 0),
                 'herz',
                 'aus',
             ];
             $data[$text . $permissions[$i][1] . ' Action'] = [
                 $permissions[$i][0] + $startPermission,
                 (bool) ($denied + $permissions[$i][2]),
-                $denied + $permissions[$i][2] === 1 ? false : (bool) ($read + $permissions[$i][3]),
-                $denied + $permissions[$i][2] === 1 ? false : (bool) ($write + $permissions[$i][4]),
-                $denied + $permissions[$i][2] === 1 ? false : (bool) ($delete + $permissions[$i][5]),
-                $denied + $permissions[$i][2] === 1 ? false : (bool) ($manage + $permissions[$i][6]),
+                !($denied + $permissions[$i][2] === 1) && ($read + $permissions[$i][3] > 0),
+                !($denied + $permissions[$i][2] === 1) && ($write + $permissions[$i][4] > 0),
+                !($denied + $permissions[$i][2] === 1) && ($delete + $permissions[$i][5] > 0),
+                !($denied + $permissions[$i][2] === 1) && ($manage + $permissions[$i][6] > 0),
                 'herz',
                 'aus',
                 'gold',

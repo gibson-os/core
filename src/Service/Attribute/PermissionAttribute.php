@@ -5,6 +5,7 @@ namespace GibsonOS\Core\Service\Attribute;
 
 use GibsonOS\Core\Attribute\AttributeInterface;
 use GibsonOS\Core\Attribute\CheckPermission;
+use GibsonOS\Core\Enum\Permission;
 use GibsonOS\Core\Exception\LoginRequired;
 use GibsonOS\Core\Exception\PermissionDenied;
 use GibsonOS\Core\Exception\Repository\SelectError;
@@ -33,12 +34,12 @@ class PermissionAttribute extends AbstractActionAttributeService
             return $parameters;
         }
 
-        $requiredPermission = $attribute->getPermission();
+        $requiredPermission = $this->getPermissionSum($attribute->getPermissions());
 
-        foreach ($attribute->getPermissionsByRequestValues() as $requestKey => $requestPermission) {
+        foreach ($attribute->getPermissionsByRequestValues() as $requestKey => $requestPermissions) {
             try {
                 $this->requestService->getRequestValue($requestKey);
-                $requiredPermission = $requestPermission;
+                $requiredPermission = $this->getPermissionSum($requestPermissions);
             } catch (RequestError) {
                 // do nothing
             }
@@ -72,5 +73,17 @@ class PermissionAttribute extends AbstractActionAttributeService
         }
 
         return [$attribute->getPermissionParameter(), $attribute->getUserParameter()];
+    }
+
+    /**
+     * @param Permission[] $permissions
+     */
+    private function getPermissionSum(array $permissions): int
+    {
+
+        return array_sum(array_map(
+            static fn (Permission $permission): int => $permission->value,
+            $permissions,
+        ));
     }
 }

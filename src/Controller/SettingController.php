@@ -4,8 +4,8 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Controller;
 
 use GibsonOS\Core\Attribute\CheckPermission;
+use GibsonOS\Core\Enum\Permission;
 use GibsonOS\Core\Exception\Repository\SelectError;
-use GibsonOS\Core\Model\User\Permission;
 use GibsonOS\Core\Repository\SettingRepository;
 use GibsonOS\Core\Service\PermissionService;
 use GibsonOS\Core\Service\Response\AjaxResponse;
@@ -19,7 +19,7 @@ class SettingController extends AbstractController
      *
      * @throws JsonException
      */
-    #[CheckPermission(Permission::READ)]
+    #[CheckPermission([Permission::READ])]
     public function getWindow(
         PermissionService $permissionService,
         SettingRepository $settingRepository,

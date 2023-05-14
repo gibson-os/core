@@ -7,12 +7,12 @@ use GibsonOS\Core\Attribute\Install\Database\Column;
 use GibsonOS\Core\Attribute\Install\Database\Constraint;
 use GibsonOS\Core\Attribute\Install\Database\Key;
 use GibsonOS\Core\Attribute\Install\Database\Table;
+use GibsonOS\Core\Enum\Permission as PermissionEnum;
 use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Model\Action;
 use GibsonOS\Core\Model\Module;
 use GibsonOS\Core\Model\Role;
 use GibsonOS\Core\Model\Task;
-use GibsonOS\Core\Model\User\Permission as UserPermission;
 
 /**
  * @method Role        getRole()
@@ -44,7 +44,7 @@ class Permission extends AbstractModel
     private int $roleId;
 
     #[Column(type: Column::TYPE_TINYINT, length: 2, attributes: [Column::ATTRIBUTE_UNSIGNED])]
-    private int $permission = UserPermission::DENIED;
+    private int $permission = PermissionEnum::DENIED->value;
 
     #[Constraint]
     protected Role $role;

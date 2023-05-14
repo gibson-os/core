@@ -8,6 +8,7 @@ use GibsonOS\Core\Attribute\CheckPermission;
 use GibsonOS\Core\Attribute\GetMappedModel;
 use GibsonOS\Core\Attribute\GetModel;
 use GibsonOS\Core\Attribute\GetModels;
+use GibsonOS\Core\Enum\Permission;
 use GibsonOS\Core\Exception\DateTimeError;
 use GibsonOS\Core\Exception\EventException;
 use GibsonOS\Core\Exception\FactoryError;
@@ -20,7 +21,6 @@ use GibsonOS\Core\Model\Event;
 use GibsonOS\Core\Model\Event\Element;
 use GibsonOS\Core\Model\Event\Event\Tag;
 use GibsonOS\Core\Model\Event\Trigger;
-use GibsonOS\Core\Model\User\Permission;
 use GibsonOS\Core\Repository\EventRepository;
 use GibsonOS\Core\Service\EventService;
 use GibsonOS\Core\Service\Response\AjaxResponse;
@@ -39,7 +39,7 @@ class EventController extends AbstractController
     /**
      * @throws SelectError
      */
-    #[CheckPermission(Permission::READ)]
+    #[CheckPermission([Permission::READ])]
     public function get(
         EventStore $eventStore,
         int $start = 0,
@@ -61,7 +61,7 @@ class EventController extends AbstractController
      * @throws ReflectionException
      * @throws SelectError
      */
-    #[CheckPermission(Permission::READ)]
+    #[CheckPermission([Permission::READ])]
     public function getElements(
         ElementStore $elementStore,
         #[GetModel(['id' => 'eventId'])] Event $event = null,
@@ -82,7 +82,7 @@ class EventController extends AbstractController
     /**
      * @throws GetError
      */
-    #[CheckPermission(Permission::READ)]
+    #[CheckPermission([Permission::READ])]
     public function getClassNames(ClassNameStore $classNameStore): AjaxResponse
     {
         return $this->returnSuccess($classNameStore->getList());
@@ -94,7 +94,7 @@ class EventController extends AbstractController
      * @throws FactoryError
      * @throws ReflectionException
      */
-    #[CheckPermission(Permission::READ)]
+    #[CheckPermission([Permission::READ])]
     public function getMethods(MethodStore $methodStore, string $className): AjaxResponse
     {
         $methodStore->setClassName($className);
@@ -108,7 +108,7 @@ class EventController extends AbstractController
      * @throws FactoryError
      * @throws ReflectionException
      */
-    #[CheckPermission(Permission::READ)]
+    #[CheckPermission([Permission::READ])]
     public function getClassTriggers(ClassTriggerStore $classTriggerStore, string $className): AjaxResponse
     {
         $classTriggerStore->setClassName($className);
@@ -123,7 +123,7 @@ class EventController extends AbstractController
      * @throws JsonException
      * @throws ReflectionException
      */
-    #[CheckPermission(Permission::READ)]
+    #[CheckPermission([Permission::READ])]
     public function getTriggers(TriggerStore $triggerStore, #[GetModel(['id' => 'eventId'])] Event $event): AjaxResponse
     {
         $triggerStore->setEvent($event);
@@ -131,7 +131,7 @@ class EventController extends AbstractController
         return $this->returnSuccess($triggerStore->getList());
     }
 
-    #[CheckPermission(Permission::WRITE)]
+    #[CheckPermission([Permission::WRITE])]
     public function post(
         EventRepository $eventRepository,
         ModelManager $modelManager,
@@ -159,7 +159,7 @@ class EventController extends AbstractController
      * @throws ReflectionException
      * @throws SaveError
      */
-    #[CheckPermission(Permission::WRITE)]
+    #[CheckPermission([Permission::WRITE])]
     public function postCopy(
         mysqlDatabase $database,
         ModelManager $modelManager,
@@ -226,7 +226,7 @@ class EventController extends AbstractController
      * @throws EventException
      * @throws ReflectionException
      */
-    #[CheckPermission(Permission::WRITE)]
+    #[CheckPermission([Permission::WRITE])]
     public function postRun(EventService $eventService, #[GetModel(['id' => 'eventId'])] Event $event): AjaxResponse
     {
         $eventService->runEvent($event, true);
@@ -238,7 +238,7 @@ class EventController extends AbstractController
      * @throws DeleteError
      * @throws JsonException
      */
-    #[CheckPermission(Permission::DELETE)]
+    #[CheckPermission([Permission::DELETE])]
     public function delete(ModelManager $modelManager, #[GetModel(['id' => 'eventId'])] Event $event): AjaxResponse
     {
         $modelManager->delete($event);

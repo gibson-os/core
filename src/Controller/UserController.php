@@ -7,6 +7,7 @@ use GibsonOS\Core\Attribute\CheckPermission;
 use GibsonOS\Core\Attribute\GetMappedModel;
 use GibsonOS\Core\Attribute\GetModel;
 use GibsonOS\Core\Enum\HttpStatusCode;
+use GibsonOS\Core\Enum\Permission;
 use GibsonOS\Core\Exception\Model\DeleteError;
 use GibsonOS\Core\Exception\Model\SaveError;
 use GibsonOS\Core\Exception\PermissionDenied;
@@ -15,7 +16,6 @@ use GibsonOS\Core\Exception\UserError;
 use GibsonOS\Core\Manager\ModelManager;
 use GibsonOS\Core\Model\User;
 use GibsonOS\Core\Model\User\Device;
-use GibsonOS\Core\Model\User\Permission;
 use GibsonOS\Core\Repository\Action\PermissionRepository;
 use GibsonOS\Core\Repository\User\DeviceRepository;
 use GibsonOS\Core\Repository\UserRepository;
@@ -36,7 +36,7 @@ class UserController extends AbstractController
      * @throws JsonException
      * @throws ReflectionException
      */
-    #[CheckPermission(Permission::MANAGE + Permission::READ)]
+    #[CheckPermission([Permission::MANAGE, Permission::READ])]
     public function get(UserStore $userStore): AjaxResponse
     {
         return $this->returnSuccess($userStore->getList());
@@ -62,7 +62,7 @@ class UserController extends AbstractController
     /**
      * @throws SelectError
      */
-    #[CheckPermission(Permission::READ, ['id' => Permission::READ + Permission::MANAGE])]
+    #[CheckPermission([Permission::READ], ['id' => [Permission::READ, Permission::MANAGE]])]
     public function getSettings(
         DeviceRepository $deviceRepository,
         #[GetModel] User $user = null
@@ -107,7 +107,7 @@ class UserController extends AbstractController
         ]);
     }
 
-    #[CheckPermission(Permission::WRITE)]
+    #[CheckPermission([Permission::WRITE])]
     public function postLogout(UserService $userService): ResponseInterface
     {
         $userService->logout();
@@ -115,7 +115,7 @@ class UserController extends AbstractController
         return new RedirectResponse($this->requestService->getBaseDir());
     }
 
-    #[CheckPermission(Permission::READ)]
+    #[CheckPermission([Permission::READ])]
     public function getSessionRefresh(): AjaxResponse
     {
         return $this->returnSuccess();
@@ -129,7 +129,7 @@ class UserController extends AbstractController
      *
      * @todo Model mapping?
      */
-    #[CheckPermission(Permission::WRITE, ['add' => Permission::WRITE + Permission::MANAGE])]
+    #[CheckPermission([Permission::WRITE], ['add' => [Permission::WRITE, Permission::MANAGE]])]
     public function post(
         UserService $userService,
         UserRepository $userRepository,
@@ -164,7 +164,7 @@ class UserController extends AbstractController
     /**
      * @throws PermissionDenied
      */
-    #[CheckPermission(Permission::DELETE, ['id' => Permission::DELETE + Permission::MANAGE])]
+    #[CheckPermission([Permission::DELETE], ['id' => [Permission::DELETE, Permission::MANAGE]])]
     public function deleteDevice(
         DeviceRepository $deviceRepository,
         #[GetModel] User $user,
@@ -180,11 +180,11 @@ class UserController extends AbstractController
      * @throws SaveError
      * @throws DeleteError
      */
-    #[CheckPermission(Permission::MANAGE + Permission::WRITE)]
+    #[CheckPermission([Permission::MANAGE, Permission::WRITE])]
     public function postPermission(
         ModelManager $modelManager,
-        #[GetMappedModel] Permission $permission,
-        #[GetModel] Permission $originalPermission = null,
+        #[GetMappedModel] User\Permission $permission,
+        #[GetModel] User\Permission $originalPermission = null,
     ): AjaxResponse {
         if ($permission->getPermission() === 0) {
             if ($originalPermission === null) {
@@ -204,7 +204,7 @@ class UserController extends AbstractController
     /**
      * @throws SaveError
      */
-    #[CheckPermission(Permission::WRITE)]
+    #[CheckPermission([Permission::WRITE])]
     public function postUpdateFcmToken(
         ModelManager $modelManager,
         #[GetModel(['token' => 'token'])] Device $device,
@@ -219,7 +219,7 @@ class UserController extends AbstractController
      * @throws DeleteError
      * @throws JsonException
      */
-    #[CheckPermission(Permission::MANAGE + Permission::DELETE)]
+    #[CheckPermission([Permission::MANAGE, Permission::DELETE])]
     public function delete(ModelManager $modelManager, #[GetModel] User $user): AjaxResponse
     {
         $modelManager->delete($user);
@@ -232,7 +232,7 @@ class UserController extends AbstractController
      * @throws JsonException
      * @throws ReflectionException
      */
-    #[CheckPermission(Permission::MANAGE + Permission::READ)]
+    #[CheckPermission([Permission::MANAGE, Permission::READ])]
     public function getPermissions(
         PermissionStore $permissionStore,
         PermissionRepository $permissionRepository,

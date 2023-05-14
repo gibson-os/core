@@ -6,13 +6,13 @@ namespace GibsonOS\Core\Controller;
 use GibsonOS\Core\Attribute\CheckPermission;
 use GibsonOS\Core\Attribute\GetMappedModels;
 use GibsonOS\Core\Attribute\GetSetting;
+use GibsonOS\Core\Enum\Permission;
 use GibsonOS\Core\Exception\Model\SaveError;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Manager\ModelManager;
 use GibsonOS\Core\Model\Desktop\Item;
 use GibsonOS\Core\Model\Setting;
 use GibsonOS\Core\Model\User;
-use GibsonOS\Core\Model\User\Permission;
 use GibsonOS\Core\Repository\Desktop\ItemRepository;
 use GibsonOS\Core\Service\Response\AjaxResponse;
 use GibsonOS\Core\Utility\JsonUtility;
@@ -30,7 +30,7 @@ class DesktopController extends AbstractController
      * @throws JsonException
      * @throws SelectError
      */
-    #[CheckPermission(Permission::READ)]
+    #[CheckPermission([Permission::READ])]
     public function get(
         ItemRepository $itemRepository,
         #[GetSetting(self::APPS_KEY)] ?Setting $apps,
@@ -49,7 +49,7 @@ class DesktopController extends AbstractController
      *
      * @throws SaveError
      */
-    #[CheckPermission(Permission::WRITE)]
+    #[CheckPermission([Permission::WRITE])]
     public function post(
         ModelManager $modelManager,
         ItemRepository $itemRepository,
@@ -78,7 +78,7 @@ class DesktopController extends AbstractController
      *
      * @throws SaveError
      */
-    #[CheckPermission(Permission::WRITE)]
+    #[CheckPermission([Permission::WRITE])]
     public function postAdd(
         ModelManager $modelManager,
         ItemRepository $itemRepository,

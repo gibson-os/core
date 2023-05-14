@@ -4,10 +4,10 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Controller;
 
 use GibsonOS\Core\Attribute\CheckPermission;
+use GibsonOS\Core\Enum\Permission;
 use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\Model\SaveError;
 use GibsonOS\Core\Exception\Repository\SelectError;
-use GibsonOS\Core\Model\User\Permission;
 use GibsonOS\Core\Service\ModuleService;
 use GibsonOS\Core\Service\Response\AjaxResponse;
 use GibsonOS\Core\Store\ActionStore;
@@ -24,7 +24,7 @@ class ModuleController extends AbstractController
      * @throws JsonException
      * @throws ReflectionException
      */
-    #[CheckPermission(Permission::MANAGE + Permission::READ)]
+    #[CheckPermission([Permission::MANAGE, Permission::READ])]
     public function get(
         ModuleStore $moduleStore,
         TaskStore $taskStore,
@@ -53,7 +53,7 @@ class ModuleController extends AbstractController
      * @throws JsonException
      * @throws ReflectionException
      */
-    #[CheckPermission(Permission::MANAGE + Permission::WRITE)]
+    #[CheckPermission([Permission::MANAGE, Permission::WRITE])]
     public function postScan(ModuleService $moduleService, ModuleStore $moduleStore): AjaxResponse
     {
         $moduleService->scan();
@@ -66,7 +66,7 @@ class ModuleController extends AbstractController
      * @throws JsonException
      * @throws ReflectionException
      */
-    #[CheckPermission(Permission::MANAGE + Permission::READ)]
+    #[CheckPermission([Permission::MANAGE, Permission::READ])]
     public function getSetting(SettingStore $settingStore, int $moduleId): AjaxResponse
     {
         $settingStore->setModuleId($moduleId);

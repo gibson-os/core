@@ -4,8 +4,8 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Controller;
 
 use GibsonOS\Core\Attribute\CheckPermission;
+use GibsonOS\Core\Enum\Permission;
 use GibsonOS\Core\Exception\Repository\SelectError;
-use GibsonOS\Core\Model\User\Permission;
 use GibsonOS\Core\Repository\Drive\StatRepository;
 use GibsonOS\Core\Repository\DriveRepository;
 use GibsonOS\Core\Repository\SmartAttributeRepository;
@@ -18,7 +18,7 @@ class DriveController extends AbstractController
     /**
      * @throws SelectError
      */
-    #[CheckPermission(Permission::READ)]
+    #[CheckPermission([Permission::READ])]
     public function get(
         DriveRepository $driveRepository,
         SmartAttributeRepository $smartAttributeRepository,
@@ -39,7 +39,7 @@ class DriveController extends AbstractController
     /**
      * @throws SelectError
      */
-    #[CheckPermission(Permission::READ)]
+    #[CheckPermission([Permission::READ])]
     public function getChart(
         DriveStore $driveStore,
         DateTimeService $dateTimeService,

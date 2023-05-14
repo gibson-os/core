@@ -5,6 +5,7 @@ namespace GibsonOS\Core\Store\User;
 
 use Generator;
 use GibsonOS\Core\Attribute\GetTableName;
+use GibsonOS\Core\Enum\Permission as PermissionEnum;
 use GibsonOS\Core\Model\Action;
 use GibsonOS\Core\Model\Module;
 use GibsonOS\Core\Model\Task;
@@ -69,7 +70,7 @@ class PermissionStore extends AbstractStore
             $selects[] = '`upm`.`id` `id`';
             $selects[] = '`upm`.`permission` `permission`';
             $selects[] = 'NULL `parentId`';
-            $selects[] = sprintf('%d `parentPermission`', Permission::DENIED);
+            $selects[] = sprintf('%d `parentPermission`', PermissionEnum::DENIED->value);
             $selects[] = 'NULL `taskPermissionId`';
             $selects[] = 'NULL `taskPermission`';
             $selects[] = 'NULL `actionPermissionId`';
@@ -101,7 +102,7 @@ class PermissionStore extends AbstractStore
             $selects[] = '`upt`.`id` `id`';
             $selects[] = '`upt`.`permission` `permission`';
             $selects[] = '`upm`.`id` `parentId`';
-            $selects[] = sprintf('IFNULL(`upm`.`permission`, %d) `parentPermission`', Permission::DENIED);
+            $selects[] = sprintf('IFNULL(`upm`.`permission`, %d) `parentPermission`', PermissionEnum::DENIED->value);
             $selects[] = '`upt`.`id` `taskPermissionId`';
             $selects[] = '`upt`.`permission` `taskPermission`';
             $selects[] = 'NULL `actionPermissionId`';
@@ -142,7 +143,7 @@ class PermissionStore extends AbstractStore
             $selects[] = 'IFNULL(`upt`.`id`, `upm`.`id`) `parentId`';
             $selects[] = sprintf(
                 'IFNULL(IFNULL(`upt`.`permission`, `upm`.`permission`), %d) `parentPermission`',
-                Permission::DENIED,
+                PermissionEnum::DENIED->value,
             );
             $selects[] = '`upt`.`id` `taskPermissionId`';
             $selects[] = '`upt`.`permission` `taskPermission`';

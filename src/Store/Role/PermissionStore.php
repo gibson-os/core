@@ -4,13 +4,13 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Store\Role;
 
 use GibsonOS\Core\Attribute\GetTableName;
+use GibsonOS\Core\Enum\Permission as PermissionEnum;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\Action;
 use GibsonOS\Core\Model\Module;
 use GibsonOS\Core\Model\Role;
 use GibsonOS\Core\Model\Role\Permission;
 use GibsonOS\Core\Model\Task;
-use GibsonOS\Core\Model\User\Permission as UserPermission;
 use GibsonOS\Core\Store\AbstractDatabaseStore;
 use mysqlDatabase;
 
@@ -73,7 +73,7 @@ class PermissionStore extends AbstractDatabaseStore
             $selects[] = '`upm`.`id` `id`';
             $selects[] = '`upm`.`permission` `permission`';
             $selects[] = 'NULL `parentId`';
-            $selects[] = sprintf('%d `parentPermission`', UserPermission::DENIED);
+            $selects[] = sprintf('%d `parentPermission`', PermissionEnum::DENIED->value);
             $selects[] = 'NULL `taskPermissionId`';
             $selects[] = 'NULL `taskPermission`';
             $selects[] = 'NULL `actionPermissionId`';
@@ -100,7 +100,7 @@ class PermissionStore extends AbstractDatabaseStore
             $selects[] = '`upt`.`id` `id`';
             $selects[] = '`upt`.`permission` `permission`';
             $selects[] = '`upm`.`id` `parentId`';
-            $selects[] = sprintf('IFNULL(`upm`.`permission`, %d) `parentPermission`', UserPermission::DENIED);
+            $selects[] = sprintf('IFNULL(`upm`.`permission`, %d) `parentPermission`', PermissionEnum::DENIED->value);
             $selects[] = '`upt`.`id` `taskPermissionId`';
             $selects[] = '`upt`.`permission` `taskPermission`';
             $selects[] = 'NULL `actionPermissionId`';
@@ -134,7 +134,7 @@ class PermissionStore extends AbstractDatabaseStore
             $selects[] = 'IFNULL(`upt`.`id`, `upm`.`id`) `parentId`';
             $selects[] = sprintf(
                 'IFNULL(IFNULL(`upt`.`permission`, `upm`.`permission`), %d) `parentPermission`',
-                UserPermission::DENIED,
+                PermissionEnum::DENIED->value,
             );
             $selects[] = '`upt`.`id` `taskPermissionId`';
             $selects[] = '`upt`.`permission` `taskPermission`';

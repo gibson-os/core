@@ -5,6 +5,7 @@ namespace GibsonOS\Core\Model\User;
 
 use GibsonOS\Core\Attribute\Install\Database\View;
 use GibsonOS\Core\Enum\HttpMethod;
+use GibsonOS\Core\Enum\Permission as PermissionEnum;
 use GibsonOS\Core\Model\AbstractModel;
 use JsonSerializable;
 
@@ -60,7 +61,7 @@ class PermissionView extends AbstractModel implements JsonSerializable
                     '`u`.`user` `user_name`, ' .
                     '`u`.`host` `user_host`, ' .
                     '`u`.`ip` `user_ip`, ' .
-                    'IFNULL(`upm`.`permission`, IFNULL(`mrp`.`permission`, ' . Permission::DENIED . ')) `permission`, ' .
+                    'IFNULL(`upm`.`permission`, IFNULL(`mrp`.`permission`, ' . PermissionEnum::DENIED->value . ')) `permission`, ' .
                     '`upm`.`module_id` `permission_module_id`, ' .
                     '`upm`.`task_id` `permission_task_id`, ' .
                     '`upm`.`action_id` `permission_action_id`, ' .
@@ -95,7 +96,7 @@ class PermissionView extends AbstractModel implements JsonSerializable
                             '`upm`.`permission`, ' .
                             'IFNULL(' .
                                 '`mrpt`.`permission`, ' .
-                                'IFNULL(`mrpm`.`permission`, ' . Permission::DENIED . ')' .
+                                'IFNULL(`mrpm`.`permission`, ' . PermissionEnum::DENIED->value . ')' .
                             ')' .
                         ')' .
                     ') `permission`, ' .
@@ -148,7 +149,7 @@ class PermissionView extends AbstractModel implements JsonSerializable
                                     '`mrpa`.`permission`, ' .
                                     'IFNULL(' .
                                         '`mrpt`.`permission`, 
-                                        IFNULL(`mrpm`.`permission`, ' . Permission::DENIED . ')' .
+                                        IFNULL(`mrpm`.`permission`, ' . PermissionEnum::DENIED->value . ')' .
                                     ')' .
                                 ')' .
                             ')' .
@@ -211,7 +212,7 @@ class PermissionView extends AbstractModel implements JsonSerializable
 
     private ?string $userIp = null;
 
-    private int $permission = Permission::DENIED;
+    private int $permission = PermissionEnum::DENIED->value;
 
     private ?int $permissionModuleId = null;
 

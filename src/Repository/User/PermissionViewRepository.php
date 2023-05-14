@@ -4,8 +4,8 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Repository\User;
 
 use GibsonOS\Core\Attribute\GetTableName;
+use GibsonOS\Core\Enum\Permission;
 use GibsonOS\Core\Exception\Repository\SelectError;
-use GibsonOS\Core\Model\User\Permission;
 use GibsonOS\Core\Model\User\PermissionView;
 use GibsonOS\Core\Repository\AbstractRepository;
 use mysqlTable;
@@ -32,7 +32,7 @@ class PermissionViewRepository extends AbstractRepository
                 '`task_id` IS NOT NULL' .
                 ($module === null ? '' : ' AND `module_name`=?')
             )
-            ->setWhereParameters([$userId ?? 0, $userId ?? 0, Permission::DENIED])
+            ->setWhereParameters([$userId ?? 0, $userId ?? 0, Permission::DENIED->value])
         ;
 
         if ($module !== null) {
