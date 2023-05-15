@@ -15,7 +15,8 @@
     "ext-openssl": "*",
     "google/auth": "^1.18",
     "smalot/pdfparser": "^2.2",
-    "psr/log": "*"
+    "psr/log": "*",
+    "phpmailer/phpmailer": "^6.8"
   },
   "require-dev": {
     "codeception/codeception": "^5.0",
