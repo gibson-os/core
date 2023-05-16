@@ -95,6 +95,63 @@ class SettingRepository extends AbstractRepository
     /**
      * @throws SelectError
      */
+    public function getByKeyValueAndModuleName(string $moduleName, string $key, string $value): Setting
+    {
+        $tableName = $this->settingTableName;
+        $table = $this->getTable($tableName)
+            ->appendJoin('module', '`' . $tableName . '`.`module_id`=`module`.`id`')
+            ->setWhere('`module`.`name`=? AND `' . $tableName . '`.`key`=? AND `' . $tableName . '`.`value`=?')
+            ->setWhereParameters([$moduleName, $key, $value])
+            ->setLimit(1)
+        ;
+
+        if (!$table->selectPrepared()) {
+            $exception = new SelectError(sprintf(
+                'Einstellung mit dem Key "%s" konnte nicht geladen werden!',
+                $key
+            ));
+            $exception->setTable($table);
+
+            throw $exception;
+        }
+
+        return $this->getModel($table, Setting::class);
+    }
+
+    /**
+     * @throws SelectError
+     *
+     * @return Setting[]
+     */
+    public function getAllByKey(int $moduleId, string $key): array
+    {
+        return $this->fetchAll(
+            '`module_id`=? AND `key`=?',
+            [$moduleId, $key],
+            Setting::class
+        );
+    }
+
+    /**
+     * @throws SelectError
+     *
+     * @return Setting[]
+     */
+    public function getAllByKeyAndModuleName(string $moduleName, string $key): array
+    {
+        $tableName = $this->settingTableName;
+        $table = $this->getTable($tableName)
+            ->appendJoin('module', '`' . $tableName . '`.`module_id`=`module`.`id`')
+            ->setWhere('`module`.`name`=? AND `' . $tableName . '`.`key`=?')
+            ->setWhereParameters([$moduleName, $key])
+        ;
+
+        return $this->getModels($table, Setting::class);
+    }
+
+    /**
+     * @throws SelectError
+     */
     public function getByKeyAndModuleName(string $moduleName, ?int $userId, string $key): Setting
     {
         $parameters = [$moduleName];
