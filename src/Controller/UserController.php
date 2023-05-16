@@ -10,7 +10,6 @@ use GibsonOS\Core\Enum\HttpStatusCode;
 use GibsonOS\Core\Enum\Permission;
 use GibsonOS\Core\Exception\Model\DeleteError;
 use GibsonOS\Core\Exception\Model\SaveError;
-use GibsonOS\Core\Exception\PermissionDenied;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Exception\UserError;
 use GibsonOS\Core\Manager\ModelManager;
@@ -161,9 +160,6 @@ class UserController extends AbstractController
         ));
     }
 
-    /**
-     * @throws PermissionDenied
-     */
     #[CheckPermission([Permission::DELETE], ['id' => [Permission::DELETE, Permission::MANAGE]])]
     public function deleteDevice(
         DeviceRepository $deviceRepository,
@@ -229,8 +225,6 @@ class UserController extends AbstractController
 
     /**
      * @throws SelectError
-     * @throws JsonException
-     * @throws ReflectionException
      */
     #[CheckPermission([Permission::MANAGE, Permission::READ])]
     public function getPermissions(

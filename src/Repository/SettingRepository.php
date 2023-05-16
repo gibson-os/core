@@ -83,6 +83,18 @@ class SettingRepository extends AbstractRepository
     /**
      * @throws SelectError
      */
+    public function getByKeyAndValue(int $moduleId, string $key, string $value): Setting
+    {
+        return $this->fetchOne(
+            '`module_id`=? AND `key`=? AND `value`=?',
+            [$moduleId, $key, $value],
+            Setting::class
+        );
+    }
+
+    /**
+     * @throws SelectError
+     */
     public function getByKeyAndModuleName(string $moduleName, ?int $userId, string $key): Setting
     {
         $parameters = [$moduleName];
