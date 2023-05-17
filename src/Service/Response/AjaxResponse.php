@@ -21,7 +21,7 @@ readonly class AjaxResponse implements ResponseInterface
 
     public function getHeaders(): array
     {
-        return ['Content-Type' => 'text/json; charset=UTF-8'];
+        return ['Content-Type' => 'application/json; charset=UTF-8'];
     }
 
     public function getBody(): string

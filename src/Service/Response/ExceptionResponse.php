@@ -38,7 +38,7 @@ readonly class ExceptionResponse implements ResponseInterface
         $headers = [];
 
         if ($this->requestService->isAjax()) {
-            $headers['Content-Type'] = 'text/json; charset=UTF-8';
+            $headers['Content-Type'] = 'application/json; charset=UTF-8';
         }
 
         return $headers;
