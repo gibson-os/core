@@ -16,7 +16,8 @@ Ext.define('GibsonOS.module.core.user.App', {
     enableContextMenu: true,
     addButton: {
         requiredPermission: {
-            action: 'save',
+            action: '',
+            method: 'POST',
             permission: GibsonOS.Permission.MANAGE + GibsonOS.Permission.WRITE
         }
     },
@@ -42,7 +43,8 @@ Ext.define('GibsonOS.module.core.user.App', {
     },
     deleteButton: {
         requiredPermission: {
-            action: 'delete',
+            action: '',
+            method: 'DELETE',
             permission: GibsonOS.Permission.MANAGE + GibsonOS.Permission.DELETE
         }
     },

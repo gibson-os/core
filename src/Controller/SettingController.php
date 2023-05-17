@@ -15,7 +15,7 @@ use JsonException;
 class SettingController extends AbstractController
 {
     /**
-     * @param array<string, array{permissionRequired: bool, items: array}> $requiredPermissions
+     * @param array<string, array{permissionRequired: bool, method: string, items: array}> $requiredPermissions
      *
      * @throws JsonException
      */

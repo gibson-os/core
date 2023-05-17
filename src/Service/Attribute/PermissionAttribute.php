@@ -5,6 +5,7 @@ namespace GibsonOS\Core\Service\Attribute;
 
 use GibsonOS\Core\Attribute\AttributeInterface;
 use GibsonOS\Core\Attribute\CheckPermission;
+use GibsonOS\Core\Enum\HttpMethod;
 use GibsonOS\Core\Enum\Permission;
 use GibsonOS\Core\Exception\LoginRequired;
 use GibsonOS\Core\Exception\PermissionDenied;
@@ -49,6 +50,7 @@ class PermissionAttribute extends AbstractActionAttributeService
             $this->requestService->getModuleName(),
             $this->requestService->getTaskName(),
             $this->requestService->getActionName(),
+            HttpMethod::from($this->requestService->getMethod()),
             $this->sessionService->getUserId()
         );
 

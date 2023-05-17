@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Service;
 
 use GibsonOS\Core\Dto\Css;
-use GibsonOS\Core\Exception\DateTimeError;
 use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Repository\User\PermissionViewRepository;
@@ -47,23 +46,15 @@ class CssService
             ));
         }
 
-        $content = '';
-
-        foreach ($files as $file) {
-            $content .= $file;
-        }
-
-        return $content;
+        return implode('', $files);
     }
 
     /**
      * @throws GetError
-     * @throws SelectError
-     * @throws DateTimeError
      */
     public function getByUserIdAndTask(?int $userId, string $module, string $task): string
     {
-        if ($this->permissionService->isDenied($module, $task, null, $userId)) {
+        if ($this->permissionService->isDenied($module, $task, userId: $userId)) {
             return '';
         }
 
@@ -76,13 +67,7 @@ class CssService
             $task . DIRECTORY_SEPARATOR
         );
 
-        $content = '';
-
-        foreach ($files as $file) {
-            $content .= $file;
-        }
-
-        return $content;
+        return implode('', $files);
     }
 
     /**

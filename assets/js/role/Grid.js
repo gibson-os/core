@@ -9,7 +9,8 @@ Ext.define('GibsonOS.module.core.role.Grid', {
     }],
     addButton: {
         requiredPermission: {
-            action: 'save',
+            action: '',
+            method: 'POST',
             permission: GibsonOS.Permission.MANAGE + GibsonOS.Permission.WRITE
         }
     },
@@ -21,7 +22,8 @@ Ext.define('GibsonOS.module.core.role.Grid', {
     },
     deleteButton: {
         requiredPermission: {
-            action: 'delete',
+            action: '',
+            method: 'DELETE',
             permission: GibsonOS.Permission.MANAGE + GibsonOS.Permission.DELETE
         }
     },

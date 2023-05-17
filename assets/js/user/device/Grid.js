@@ -33,7 +33,8 @@ Ext.define('GibsonOS.module.core.user.device.Grid', {
             itemId: 'coreUserDeviceDeleteButton',
             disabled: true,
             requiredPermission: {
-                action: 'deletedevice',
+                action: 'deleteDevice',
+                method: 'DELETE',
                 permission: permissionDelete
             },
             handler: function() {

@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Service;
 
+use GibsonOS\Core\Enum\HttpMethod;
 use GibsonOS\Core\Enum\Permission as PermissionEnum;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Repository\User\PermissionViewRepository;
@@ -16,17 +17,28 @@ class PermissionService
     /**
      * @throws SelectError
      */
-    public function getPermission(string $module, string $task = null, string $action = null, int $userId = null): int
-    {
+    public function getPermission(
+        string $module,
+        string $task = null,
+        string $action = null,
+        HttpMethod $method = null,
+        int $userId = null
+    ): int {
         if ($task === null) {
             return $this->permissionViewRepository->getPermissionByModule($module, $userId)->getPermission();
         }
 
-        if ($action === null) {
+        if ($action === null || $method === null) {
             return $this->permissionViewRepository->getPermissionByTask($module, $task, $userId)->getPermission();
         }
 
-        return $this->permissionViewRepository->getPermissionByAction($module, $task, $action, $userId)->getPermission();
+        return $this->permissionViewRepository->getPermissionByAction(
+            $module,
+            $task,
+            $action,
+            $method,
+            $userId
+        )->getPermission();
     }
 
     public function hasPermission(
@@ -34,10 +46,11 @@ class PermissionService
         string $module,
         string $task = null,
         string $action = null,
-        int $userId = null
+        HttpMethod $method = null,
+        int $userId = null,
     ): bool {
         try {
-            $permissionValue = $this->getPermission($module, $task, $action, $userId);
+            $permissionValue = $this->getPermission($module, $task, $action, $method, $userId);
         } catch (SelectError) {
             return false;
         }
@@ -57,33 +70,58 @@ class PermissionService
         return ($permission & $requiredPermission) === $requiredPermission;
     }
 
-    public function isDenied(string $module, string $task = null, string $action = null, int $userId = null): bool
-    {
-        return $this->hasPermission(PermissionEnum::DENIED->value, $module, $task, $action, $userId);
+    public function isDenied(
+        string $module,
+        string $task = null,
+        string $action = null,
+        HttpMethod $method = null,
+        int $userId = null
+    ): bool {
+        return $this->hasPermission(PermissionEnum::DENIED->value, $module, $task, $action, $method, $userId);
     }
 
-    public function hasReadPermission(string $module, string $task = null, string $action = null, int $userId = null): bool
-    {
-        return $this->hasPermission(PermissionEnum::READ->value, $module, $task, $action, $userId);
+    public function hasReadPermission(
+        string $module,
+        string $task = null,
+        string $action = null,
+        HttpMethod $method = null,
+        int $userId = null
+    ): bool {
+        return $this->hasPermission(PermissionEnum::READ->value, $module, $task, $action, $method, $userId);
     }
 
-    public function hasWritePermission(string $module, string $task = null, string $action = null, int $userId = null): bool
-    {
-        return $this->hasPermission(PermissionEnum::WRITE->value, $module, $task, $action, $userId);
+    public function hasWritePermission(
+        string $module,
+        string $task = null,
+        string $action = null,
+        HttpMethod $method = null,
+        int $userId = null
+    ): bool {
+        return $this->hasPermission(PermissionEnum::WRITE->value, $module, $task, $action, $method, $userId);
     }
 
-    public function hasDeletePermission(string $module, string $task = null, string $action = null, int $userId = null): bool
-    {
-        return $this->hasPermission(PermissionEnum::DELETE->value, $module, $task, $action, $userId);
+    public function hasDeletePermission(
+        string $module,
+        string $task = null,
+        string $action = null,
+        HttpMethod $method = null,
+        int $userId = null
+    ): bool {
+        return $this->hasPermission(PermissionEnum::DELETE->value, $module, $task, $action, $method, $userId);
     }
 
-    public function hasManagePermission(string $module, string $task = null, string $action = null, int $userId = null): bool
-    {
-        return $this->hasPermission(PermissionEnum::MANAGE->value, $module, $task, $action, $userId);
+    public function hasManagePermission(
+        string $module,
+        string $task = null,
+        string $action = null,
+        HttpMethod $method = null,
+        int $userId = null
+    ): bool {
+        return $this->hasPermission(PermissionEnum::MANAGE->value, $module, $task, $action, $method, $userId);
     }
 
     /**
-     * @param array<string, array{permissionRequired: bool, items: array}> $requiredPermissions
+     * @param array<string, array{permissionRequired: bool, method: string, items: array}> $requiredPermissions
      */
     public function getRequiredPermissions(array $requiredPermissions, ?int $userId): array
     {
@@ -97,7 +135,7 @@ class PermissionService
     }
 
     /**
-     * @param array{permissionRequired: bool, items: array} $permissionItem
+     * @param array{permissionRequired: bool, method: string, items: array} $permissionItem
      */
     private function getRequiredPermissionItem(
         array $permissionItem,
@@ -110,7 +148,13 @@ class PermissionService
 
         if ($permissionItem['permissionRequired'] ?? false) {
             try {
-                $permissions['permission'] = $this->getPermission($module, $task, $action, $userId);
+                $permissions['permission'] = $this->getPermission(
+                    $module,
+                    $task,
+                    $action,
+                    HttpMethod::from(strtoupper($permissionItem['method'])),
+                    $userId,
+                );
             } catch (SelectError) {
                 $permissions['permission'] = PermissionEnum::DENIED->value;
             }
@@ -133,7 +177,7 @@ class PermissionService
                     $userId,
                     $module,
                     $itemTask,
-                    $itemAction
+                    $itemAction,
                 );
             }
         }

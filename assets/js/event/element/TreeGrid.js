@@ -86,14 +86,16 @@ Ext.define('GibsonOS.module.core.event.element.TreeGrid', {
 
         me.addButton = {
             requiredPermission: {
-                action: 'save',
+                action: '',
+                method: 'POST',
                 permission: GibsonOS.Permission.WRITE
             }
         };
         me.deleteButton = {
             requiredPermission: {
-                action: 'save',
-                permission: GibsonOS.Permission.WRITE
+                action: '',
+                method: 'DELETE',
+                permission: GibsonOS.Permission.DELETE
             }
         };
 

@@ -111,7 +111,8 @@ Ext.define('GibsonOS.module.core.component.form.Panel', {
                     requiredPermission: {
                         module: button.module,
                         task: button.task,
-                        action: button.action
+                        action: button.action,
+                        method: 'POST'
                     },
                     url: baseDir + button.module + '/' + button.task + '/' + button.action,
                     params: button.parameters,

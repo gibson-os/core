@@ -42,6 +42,8 @@ class UserController extends AbstractController
     }
 
     /**
+     * @throws ReflectionException
+     * @throws SaveError
      * @throws UserError
      */
     public function postLogin(
@@ -83,6 +85,7 @@ class UserController extends AbstractController
     /**
      * @throws SaveError
      * @throws UserError
+     * @throws ReflectionException
      */
     public function postAppLogin(
         UserService $userService,
@@ -121,7 +124,6 @@ class UserController extends AbstractController
     }
 
     /**
-     * @throws JsonException
      * @throws ReflectionException
      * @throws SaveError
      * @throws UserError
@@ -175,6 +177,7 @@ class UserController extends AbstractController
      * @throws JsonException
      * @throws SaveError
      * @throws DeleteError
+     * @throws ReflectionException
      */
     #[CheckPermission([Permission::MANAGE, Permission::WRITE])]
     public function postPermission(
@@ -199,6 +202,7 @@ class UserController extends AbstractController
 
     /**
      * @throws SaveError
+     * @throws ReflectionException
      */
     #[CheckPermission([Permission::WRITE])]
     public function postUpdateFcmToken(

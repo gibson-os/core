@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Service;
 
+use DateTimeImmutable;
 use Exception;
 use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\Model\SaveError;
@@ -10,9 +11,9 @@ use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Exception\UserError;
 use GibsonOS\Core\Manager\ModelManager;
 use GibsonOS\Core\Model\User;
+use GibsonOS\Core\Model\User\Device;
 use GibsonOS\Core\Repository\User\DeviceRepository;
 use GibsonOS\Core\Repository\UserRepository;
-use JsonException;
 use ReflectionException;
 
 class UserService
@@ -29,12 +30,15 @@ class UserService
     }
 
     /**
+     * @throws ReflectionException
+     * @throws SaveError
      * @throws UserError
      */
     public function login(string $username, string $password): User
     {
         try {
             $user = $this->userRepository->getByUsernameAndPassword($username, $this->hashPassword($password));
+            $this->modelManager->saveWithoutChildren($user->setLastLogin(new DateTimeImmutable()));
             $this->sessionService->login($user);
 
             return $user;
@@ -44,13 +48,17 @@ class UserService
     }
 
     /**
+     * @throws ReflectionException
+     * @throws SaveError
      * @throws UserError
      */
-    public function deviceLogin(string $token): User\Device
+    public function deviceLogin(string $token): Device
     {
         try {
             $device = $this->deviceRepository->getByToken($token);
-            $this->sessionService->login($device->getUser());
+            $user = $device->getUser();
+            $this->modelManager->saveWithoutChildren($user->setLastLogin(new DateTimeImmutable()));
+            $this->sessionService->login($user);
 
             return $device;
         } catch (SelectError $e) {
@@ -62,7 +70,7 @@ class UserService
      * @throws SaveError
      * @throws Exception
      */
-    public function addDevice(User $user, string $model, string $fcmToken = null): User\Device
+    public function addDevice(User $user, string $model, string $fcmToken = null): Device
     {
         // @todo remove after app release
         while (true) {
@@ -75,7 +83,7 @@ class UserService
             }
         }
 
-        $device = (new User\Device())
+        $device = (new Device())
             ->setId($id) // @todo change to int value
             ->setUser($user)
             ->setModel($model)
@@ -95,7 +103,6 @@ class UserService
     /**
      * @throws SaveError
      * @throws UserError
-     * @throws JsonException
      * @throws ReflectionException
      */
     public function save(

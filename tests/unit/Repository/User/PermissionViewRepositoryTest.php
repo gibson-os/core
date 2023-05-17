@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace GibsonOS\Test\Unit\Core\Repository\User;
 
 use Codeception\Test\Unit;
+use GibsonOS\Core\Enum\HttpMethod;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Repository\User\PermissionViewRepository;
 use GibsonOS\Test\Unit\Core\ModelManagerTrait;
@@ -256,8 +257,8 @@ class PermissionViewRepositoryTest extends Unit
     public function testGetPermissionByAction(): void
     {
         $this->mysqlDatabase->execute(
-            'SELECT `view_user_permission`.`permission` FROM `marvin`.`view_user_permission` WHERE IFNULL(`user_id`, ?)=? AND `module_name`=? AND `task_name`=? AND `action_name`=? ORDER BY `user_id` DESC, `permission_action_id` DESC, `permission_task_id` DESC, `permission_module_id` DESC LIMIT 1',
-            [0, 0, 'galaxy', 'ford', 'prefect'],
+            'SELECT `view_user_permission`.`permission` FROM `marvin`.`view_user_permission` WHERE IFNULL(`user_id`, ?)=? AND `module_name`=? AND `task_name`=? AND `action_name`=? AND `action_method`=? ORDER BY `user_id` DESC, `permission_action_id` DESC, `permission_task_id` DESC, `permission_module_id` DESC LIMIT 1',
+            [0, 0, 'galaxy', 'ford', 'prefect', 'HEAD'],
         )
             ->shouldBeCalledOnce()
             ->willReturn(true)
@@ -270,7 +271,12 @@ class PermissionViewRepositoryTest extends Unit
             ]])
         ;
 
-        $permission = $this->permissionViewRepository->getPermissionByAction('galaxy', 'ford', 'prefect');
+        $permission = $this->permissionViewRepository->getPermissionByAction(
+            'galaxy',
+            'ford',
+            'prefect',
+            HttpMethod::HEAD,
+        );
 
         $this->assertEquals(1, $permission->getPermission());
     }
@@ -278,8 +284,8 @@ class PermissionViewRepositoryTest extends Unit
     public function testGetPermissionByActionWithUserId(): void
     {
         $this->mysqlDatabase->execute(
-            'SELECT `view_user_permission`.`permission` FROM `marvin`.`view_user_permission` WHERE IFNULL(`user_id`, ?)=? AND `module_name`=? AND `task_name`=? AND `action_name`=? ORDER BY `user_id` DESC, `permission_action_id` DESC, `permission_task_id` DESC, `permission_module_id` DESC LIMIT 1',
-            [42, 42, 'galaxy', 'ford', 'prefect'],
+            'SELECT `view_user_permission`.`permission` FROM `marvin`.`view_user_permission` WHERE IFNULL(`user_id`, ?)=? AND `module_name`=? AND `task_name`=? AND `action_name`=? AND `action_method`=? ORDER BY `user_id` DESC, `permission_action_id` DESC, `permission_task_id` DESC, `permission_module_id` DESC LIMIT 1',
+            [42, 42, 'galaxy', 'ford', 'prefect', 'HEAD'],
         )
             ->shouldBeCalledOnce()
             ->willReturn(true)
@@ -292,7 +298,13 @@ class PermissionViewRepositoryTest extends Unit
             ]])
         ;
 
-        $permission = $this->permissionViewRepository->getPermissionByAction('galaxy', 'ford', 'prefect', 42);
+        $permission = $this->permissionViewRepository->getPermissionByAction(
+            'galaxy',
+            'ford',
+            'prefect',
+            HttpMethod::HEAD,
+            42
+        );
 
         $this->assertEquals(1, $permission->getPermission());
     }
@@ -300,14 +312,20 @@ class PermissionViewRepositoryTest extends Unit
     public function testGetPermissionByActionEmpty(): void
     {
         $this->mysqlDatabase->execute(
-            'SELECT `view_user_permission`.`permission` FROM `marvin`.`view_user_permission` WHERE IFNULL(`user_id`, ?)=? AND `module_name`=? AND `task_name`=? AND `action_name`=? ORDER BY `user_id` DESC, `permission_action_id` DESC, `permission_task_id` DESC, `permission_module_id` DESC LIMIT 1',
-            [42, 42, 'galaxy', 'ford', 'prefect'],
+            'SELECT `view_user_permission`.`permission` FROM `marvin`.`view_user_permission` WHERE IFNULL(`user_id`, ?)=? AND `module_name`=? AND `task_name`=? AND `action_name`=? AND `action_method`=? ORDER BY `user_id` DESC, `permission_action_id` DESC, `permission_task_id` DESC, `permission_module_id` DESC LIMIT 1',
+            [42, 42, 'galaxy', 'ford', 'prefect', 'HEAD'],
         )
             ->shouldBeCalledOnce()
             ->willReturn(0)
         ;
 
         $this->expectException(SelectError::class);
-        $this->permissionViewRepository->getPermissionByAction('galaxy', 'ford', 'prefect', 42);
+        $this->permissionViewRepository->getPermissionByAction(
+            'galaxy',
+            'ford',
+            'prefect',
+            HttpMethod::HEAD,
+            42
+        );
     }
 }

@@ -11,7 +11,8 @@ Ext.define('GibsonOS.module.core.icon.form.Panel', {
             name: 'name',
             value: this.gos.data.record ? this.gos.data.record.get('name') : null,
             requiredPermission: {
-                action: 'save',
+                action: '',
+                method: 'POST',
                 permission: GibsonOS.Permission.WRITE
             }
         },{
@@ -20,7 +21,8 @@ Ext.define('GibsonOS.module.core.icon.form.Panel', {
             name: 'tags',
             value: this.gos.data.record ? this.gos.data.record.get('tags') : null,
             requiredPermission: {
-                action: 'save',
+                action: '',
+                method: 'POST',
                 permission: GibsonOS.Permission.WRITE
             }
         },{
@@ -29,7 +31,8 @@ Ext.define('GibsonOS.module.core.icon.form.Panel', {
             name: 'icon',
             disabled: !!this.gos.data.record,
             requiredPermission: {
-                action: 'save',
+                action: '',
+                method: 'POST',
                 permission: GibsonOS.Permission.WRITE
             }
         },{
@@ -38,7 +41,8 @@ Ext.define('GibsonOS.module.core.icon.form.Panel', {
             name: 'iconIco',
             disabled: !!this.gos.data.record,
             requiredPermission: {
-                action: 'save',
+                action: '',
+                method: 'POST',
                 permission: GibsonOS.Permission.WRITE
             }
         }];
@@ -46,7 +50,8 @@ Ext.define('GibsonOS.module.core.icon.form.Panel', {
             xtype: 'gosButton',
             text: 'Speichern',
             requiredPermission: {
-                action: 'save',
+                action: '',
+                method: 'POST',
                 permission: GibsonOS.Permission.WRITE
             },
             handler: function() {

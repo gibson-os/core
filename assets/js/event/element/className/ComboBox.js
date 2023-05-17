@@ -8,6 +8,7 @@ Ext.define('GibsonOS.module.core.event.element.className.ComboBox', {
         module: 'core',
         task: 'event',
         action: 'classNames',
+        method: 'GET',
         permission: GibsonOS.Permission.READ
     },
     initComponent: function() {

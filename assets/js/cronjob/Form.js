@@ -3,8 +3,9 @@ Ext.define('GibsonOS.module.core.crontab.Form', {
     alias: ['widget.gosModuleCoreCronjobForm'],
     requiredPermission: {
         module: 'core',
-        task: 'crontab',
-        action: 'save'
+        task: 'cronjob',
+        action: '',
+        method: 'POST'
     },
     defaults: {
         border: false,

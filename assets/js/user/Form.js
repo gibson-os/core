@@ -27,7 +27,8 @@ Ext.define('GibsonOS.module.core.user.Form', {
             name: 'user',
             fieldLabel: 'Benutzername',
             requiredPermission: {
-                action: 'save',
+                action: '',
+                method: 'POST',
                 permission: GibsonOS.Permission.WRITE + GibsonOS.Permission.MANAGE
             }
         },{
@@ -36,7 +37,8 @@ Ext.define('GibsonOS.module.core.user.Form', {
             name: 'host',
             fieldLabel: 'Host',
             requiredPermission: {
-                action: 'save',
+                action: '',
+                method: 'POST',
                 permission: GibsonOS.Permission.WRITE + GibsonOS.Permission.MANAGE
             }
         },{
@@ -45,7 +47,8 @@ Ext.define('GibsonOS.module.core.user.Form', {
             name: 'ip',
             fieldLabel: 'IP',
             requiredPermission: {
-                action: 'save',
+                action: '',
+                method: 'POST',
                 permission: GibsonOS.Permission.WRITE + GibsonOS.Permission.MANAGE
             }
         },{
@@ -54,7 +57,8 @@ Ext.define('GibsonOS.module.core.user.Form', {
             fieldLabel: 'Passwort',
             inputType: 'password',
             requiredPermission: {
-                action: 'save',
+                action: '',
+                method: 'POST',
                 permission: permissionWrite
             }
         },{
@@ -63,14 +67,16 @@ Ext.define('GibsonOS.module.core.user.Form', {
             fieldLabel: 'Passwort widerholen',
             inputType: 'password',
             requiredPermission: {
-                action: 'save',
+                action: '',
+                method: 'POST',
                 permission: permissionWrite
             }
         }];
         this.buttons = [{
             xtype: 'gosButton',
             requiredPermission: {
-                action: 'save',
+                action: '',
+                method: 'POST',
                 permission: permissionWrite
             },
             text: 'Speichern',

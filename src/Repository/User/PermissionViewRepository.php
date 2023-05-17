@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Repository\User;
 
 use GibsonOS\Core\Attribute\GetTableName;
+use GibsonOS\Core\Enum\HttpMethod;
 use GibsonOS\Core\Enum\Permission;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\User\PermissionView;
@@ -103,8 +104,13 @@ class PermissionViewRepository extends AbstractRepository
     /**
      * @throws SelectError
      */
-    public function getPermissionByAction(string $module, string $task, string $action, int $userId = null): PermissionView
-    {
+    public function getPermissionByAction(
+        string $module,
+        string $task,
+        string $action,
+        HttpMethod $method,
+        int $userId = null
+    ): PermissionView {
         $table = $this
             ->getTable($this->permissionViewName)
             ->setLimit(1)
@@ -114,7 +120,7 @@ class PermissionViewRepository extends AbstractRepository
             $this->getUserIdWhere($table, $userId) . ' AND ' .
             $this->getModuleWhere($table, $module) . ' AND ' .
             $this->getTaskWhere($table, $task) . ' AND ' .
-            $this->getActionWhere($table, $action)
+            $this->getActionWhere($table, $action, $method)
         );
 
         if (!$table->selectPrepared()) {
@@ -141,11 +147,12 @@ class PermissionViewRepository extends AbstractRepository
         return '`task_name`=?';
     }
 
-    private function getActionWhere(mysqlTable $table, string $action): string
+    private function getActionWhere(mysqlTable $table, string $action, HttpMethod $method): string
     {
         $table->addWhereParameter($action);
+        $table->addWhereParameter($method->value);
 
-        return '`action_name`=?';
+        return '`action_name`=? AND `action_method`=?';
     }
 
     private function getUserIdWhere(mysqlTable $table, int $userId = null): string

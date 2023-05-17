@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace GibsonOS\Test\Unit\Core\Service;
 
 use Codeception\Test\Unit;
+use GibsonOS\Core\Enum\HttpMethod;
 use GibsonOS\Core\Enum\Permission;
 use GibsonOS\Core\Model\User\PermissionView;
 use GibsonOS\Core\Repository\User\PermissionViewRepository;
@@ -38,18 +39,26 @@ class PermissionServiceTest extends Unit
         bool $manage,
         string $module,
         string $task = null,
-        string $action = null
+        string $action = null,
+        HttpMethod $method = null,
     ): void {
-        $this->prophesizeGetPermission($permission, $module, $task, $action);
+        $this->prophesizeGetPermission($permission, $module, $task, $action, $method);
 
-        $this->assertEquals($permission, $this->permissionService->getPermission($module, $task, $action, 42));
+        $this->assertEquals($permission, $this->permissionService->getPermission(
+            $module,
+            $task,
+            $action,
+            $method,
+            42
+        ));
     }
 
     private function prophesizeGetPermission(
         int $permission,
         string $module,
         string $task = null,
-        string $action = null
+        string $action = null,
+        HttpMethod $method = null,
     ): void {
         $permissionModel = $this->prophesize(PermissionView::class);
         $permissionModel->getPermission()
@@ -65,7 +74,7 @@ class PermissionServiceTest extends Unit
             ->shouldBeCalledTimes($task !== null && $action === null ? 1 : 0)
             ->willReturn($permissionModel->reveal())
         ;
-        $this->permissionViewRepository->getPermissionByAction($module, $task, $action, 42)
+        $this->permissionViewRepository->getPermissionByAction($module, $task, $action, $method, 42)
             ->shouldBeCalledTimes($action === null ? 0 : 1)
             ->willReturn($permissionModel->reveal())
         ;
@@ -83,12 +92,13 @@ class PermissionServiceTest extends Unit
         bool $manage,
         string $module,
         string $task = null,
-        string $action = null
+        string $action = null,
+        HttpMethod $method = null,
     ): void {
-        $this->prophesizeGetPermission($permission, $module, $task, $action);
+        $this->prophesizeGetPermission($permission, $module, $task, $action, $method);
         $this->assertEquals(
             $denied,
-            $this->permissionService->hasPermission(Permission::DENIED->value, $module, $task, $action, 42)
+            $this->permissionService->hasPermission(Permission::DENIED->value, $module, $task, $action, $method, 42)
         );
     }
 
@@ -104,12 +114,13 @@ class PermissionServiceTest extends Unit
         bool $manage,
         string $module,
         string $task = null,
-        string $action = null
+        string $action = null,
+        HttpMethod $method = null,
     ): void {
-        $this->prophesizeGetPermission($permission, $module, $task, $action);
+        $this->prophesizeGetPermission($permission, $module, $task, $action, $method);
         $this->assertEquals(
             $read,
-            $this->permissionService->hasPermission(Permission::READ->value, $module, $task, $action, 42)
+            $this->permissionService->hasPermission(Permission::READ->value, $module, $task, $action, $method, 42)
         );
     }
 
@@ -125,12 +136,13 @@ class PermissionServiceTest extends Unit
         bool $manage,
         string $module,
         string $task = null,
-        string $action = null
+        string $action = null,
+        HttpMethod $method = null,
     ): void {
-        $this->prophesizeGetPermission($permission, $module, $task, $action);
+        $this->prophesizeGetPermission($permission, $module, $task, $action, $method);
         $this->assertEquals(
             $write,
-            $this->permissionService->hasPermission(Permission::WRITE->value, $module, $task, $action, 42)
+            $this->permissionService->hasPermission(Permission::WRITE->value, $module, $task, $action, $method, 42)
         );
     }
 
@@ -146,12 +158,13 @@ class PermissionServiceTest extends Unit
         bool $manage,
         string $module,
         string $task = null,
-        string $action = null
+        string $action = null,
+        HttpMethod $method = null,
     ): void {
-        $this->prophesizeGetPermission($permission, $module, $task, $action);
+        $this->prophesizeGetPermission($permission, $module, $task, $action, $method);
         $this->assertEquals(
             $delete,
-            $this->permissionService->hasPermission(Permission::DELETE->value, $module, $task, $action, 42)
+            $this->permissionService->hasPermission(Permission::DELETE->value, $module, $task, $action, $method, 42)
         );
     }
 
@@ -167,12 +180,13 @@ class PermissionServiceTest extends Unit
         bool $manage,
         string $module,
         string $task = null,
-        string $action = null
+        string $action = null,
+        HttpMethod $method = null,
     ): void {
-        $this->prophesizeGetPermission($permission, $module, $task, $action);
+        $this->prophesizeGetPermission($permission, $module, $task, $action, $method);
         $this->assertEquals(
             $manage,
-            $this->permissionService->hasPermission(Permission::MANAGE->value, $module, $task, $action, 42)
+            $this->permissionService->hasPermission(Permission::MANAGE->value, $module, $task, $action, $method, 42)
         );
     }
 
@@ -188,10 +202,11 @@ class PermissionServiceTest extends Unit
         bool $manage,
         string $module,
         string $task = null,
-        string $action = null
+        string $action = null,
+        HttpMethod $method = null,
     ): void {
-        $this->prophesizeGetPermission($permission, $module, $task, $action);
-        $this->assertEquals($denied, $this->permissionService->isDenied($module, $task, $action, 42));
+        $this->prophesizeGetPermission($permission, $module, $task, $action, $method);
+        $this->assertEquals($denied, $this->permissionService->isDenied($module, $task, $action, $method, 42));
     }
 
     /**
@@ -206,10 +221,11 @@ class PermissionServiceTest extends Unit
         bool $manage,
         string $module,
         string $task = null,
-        string $action = null
+        string $action = null,
+        HttpMethod $method = null,
     ): void {
-        $this->prophesizeGetPermission($permission, $module, $task, $action);
-        $this->assertEquals($read, $this->permissionService->hasReadPermission($module, $task, $action, 42));
+        $this->prophesizeGetPermission($permission, $module, $task, $action, $method);
+        $this->assertEquals($read, $this->permissionService->hasReadPermission($module, $task, $action, $method, 42));
     }
 
     /**
@@ -224,10 +240,11 @@ class PermissionServiceTest extends Unit
         bool $manage,
         string $module,
         string $task = null,
-        string $action = null
+        string $action = null,
+        HttpMethod $method = null,
     ): void {
-        $this->prophesizeGetPermission($permission, $module, $task, $action);
-        $this->assertEquals($write, $this->permissionService->hasWritePermission($module, $task, $action, 42));
+        $this->prophesizeGetPermission($permission, $module, $task, $action, $method);
+        $this->assertEquals($write, $this->permissionService->hasWritePermission($module, $task, $action, $method, 42));
     }
 
     /**
@@ -242,10 +259,11 @@ class PermissionServiceTest extends Unit
         bool $manage,
         string $module,
         string $task = null,
-        string $action = null
+        string $action = null,
+        HttpMethod $method = null,
     ): void {
-        $this->prophesizeGetPermission($permission, $module, $task, $action);
-        $this->assertEquals($delete, $this->permissionService->hasDeletePermission($module, $task, $action, 42));
+        $this->prophesizeGetPermission($permission, $module, $task, $action, $method);
+        $this->assertEquals($delete, $this->permissionService->hasDeletePermission($module, $task, $action, $method, 42));
     }
 
     /**
@@ -260,10 +278,11 @@ class PermissionServiceTest extends Unit
         bool $manage,
         string $module,
         string $task = null,
-        string $action = null
+        string $action = null,
+        HttpMethod $method = null,
     ): void {
-        $this->prophesizeGetPermission($permission, $module, $task, $action);
-        $this->assertEquals($manage, $this->permissionService->hasManagePermission($module, $task, $action, 42));
+        $this->prophesizeGetPermission($permission, $module, $task, $action, $method);
+        $this->assertEquals($manage, $this->permissionService->hasManagePermission($module, $task, $action, $method, 42));
     }
 
     public function getPermissionData(): array
@@ -320,6 +339,7 @@ class PermissionServiceTest extends Unit
                 'herz',
                 'aus',
                 'gold',
+                HttpMethod::HEAD,
             ];
             $data = array_merge($data, $this->getPermissionList(
                 $i + 1,

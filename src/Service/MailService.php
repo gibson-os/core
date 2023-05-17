@@ -7,7 +7,6 @@ use Exception;
 use GibsonOS\Core\Dto\Mail;
 use GibsonOS\Core\Exception\MailException;
 use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\SMTP;
 
 class MailService
 {
@@ -16,7 +15,6 @@ class MailService
         $mailer = new PHPMailer(true);
 
         try {
-            $mailer->SMTPDebug = SMTP::DEBUG_SERVER;
             $mailer->isSMTP();
             $mailer->Host = $mail->getHost();
             $mailer->Port = $mail->getPort();

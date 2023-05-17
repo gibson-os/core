@@ -24,7 +24,8 @@ Ext.define('GibsonOS.module.core.icon.Panel', {
             xtype: 'gosButton',
             iconCls: 'icon_system system_add',
             requiredPermission: {
-                action: 'save',
+                action: '',
+                method: 'POST',
                 permission: GibsonOS.Permission.WRITE
             },
             handler: function() {
@@ -37,7 +38,8 @@ Ext.define('GibsonOS.module.core.icon.Panel', {
             iconCls: 'icon_system system_edit',
             disabled: true,
             requiredPermission: {
-                action: 'save',
+                action: '',
+                method: 'POST',
                 permission: GibsonOS.Permission.WRITE
             },
             handler: function() {
@@ -56,7 +58,8 @@ Ext.define('GibsonOS.module.core.icon.Panel', {
             itemId: 'coreIconDeleteButton',
             iconCls: 'icon_system system_delete',
             requiredPermission: {
-                action: 'delete',
+                action: '',
+                method: 'DELETE',
                 permission: GibsonOS.Permission.DELETE
             },
             disabled: true,

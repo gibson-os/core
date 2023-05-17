@@ -24,7 +24,8 @@ Ext.define('GibsonOS.module.core.event.Panel', {
         me.addButton = {
             iconCls: 'icon_system system_save',
             requiredPermission: {
-                action: 'save',
+                action: '',
+                method: 'POST',
                 permission: GibsonOS.Permission.READ
             }
         };
