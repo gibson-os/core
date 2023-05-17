@@ -69,9 +69,12 @@ class ModelManager
 
     /**
      * @throws SaveError
+     * @throws ReflectionException
      */
     public function saveWithoutChildren(ModelInterface $model): void
     {
+        $childrenList = $this->getChildrenList($model);
+
         try {
             $mysqlTable = $this->setToMysqlTable($model);
             $mysqlTable->save();
@@ -92,10 +95,16 @@ class ModelManager
 
             throw $exception;
         }
+
+        foreach ($childrenList as $children) {
+            foreach ($children->getModels() as $childrenModel) {
+                $setter = 'set' . ucfirst($children->getConstraint()->getParentColumn());
+                $childrenModel->$setter($model);
+            }
+        }
     }
 
     /**
-     * @throws JsonException
      * @throws ReflectionException
      * @throws SaveError
      */
@@ -108,36 +117,7 @@ class ModelManager
             $this->mysqlDatabase->startTransaction();
         }
 
-        $reflectionClass = $this->reflectionManager->getReflectionClass($model);
-        $childrenList = [];
-
-        foreach ($reflectionClass->getProperties() as $reflectionProperty) {
-            $constraintAttribute = $this->reflectionManager->getAttribute(
-                $reflectionProperty,
-                Constraint::class,
-                ReflectionAttribute::IS_INSTANCEOF
-            );
-
-            if ($constraintAttribute === null) {
-                continue;
-            }
-
-            $getter = 'get' . ucfirst($reflectionProperty->getName());
-
-            if ($this->reflectionManager->getTypeName($reflectionProperty) !== 'array') {
-                $setter = 'set' . ucfirst($reflectionProperty->getName());
-                $model->$setter($model->$getter());
-
-                continue;
-            }
-
-            $childrenList[] = new Children(
-                $reflectionProperty,
-                $constraintAttribute,
-                $model->$getter(),
-                $model
-            );
-        }
+        $childrenList = $this->getChildrenList($model);
 
         try {
             $this->saveWithoutChildren($model);
@@ -326,7 +306,7 @@ class ModelManager
 
         if ($parentModelClassName === null) {
             throw new ReflectionException(
-                'Property "parentModelClassName" of constraint attribute  is not set!'
+                'Property "parentModelClassName" of constraint attribute is not set!'
             );
         }
 
@@ -364,13 +344,12 @@ class ModelManager
             $childrenWheres[] = sprintf('(%s)', implode(' AND ', $primaryWheres));
         }
 
-        if (count($childrenWheres)) {
+        if (count($childrenWheres) > 0) {
             $where .= ' AND (' . implode(' AND ', $childrenWheres) . ')';
         }
 
         $mysqlTable
             ->setWhere($where)
-            ->setOrderBy($constraintAttribute->getOrderBy())
             ->deletePrepared()
         ;
     }
@@ -412,5 +391,46 @@ class ModelManager
         $this->primaryColumns[$className] = $primaryColumns;
 
         return $primaryColumns;
+    }
+
+    /**
+     * @throws ReflectionException
+     *
+     * @return Children[]
+     */
+    private function getChildrenList(ModelInterface $model): array
+    {
+        $childrenList = [];
+        $reflectionClass = $this->reflectionManager->getReflectionClass($model);
+
+        foreach ($reflectionClass->getProperties() as $reflectionProperty) {
+            $constraintAttribute = $this->reflectionManager->getAttribute(
+                $reflectionProperty,
+                Constraint::class,
+                ReflectionAttribute::IS_INSTANCEOF
+            );
+
+            if ($constraintAttribute === null) {
+                continue;
+            }
+
+            $getter = 'get' . ucfirst($reflectionProperty->getName());
+
+            if ($this->reflectionManager->getTypeName($reflectionProperty) !== 'array') {
+                $setter = 'set' . ucfirst($reflectionProperty->getName());
+                $model->$setter($model->$getter());
+
+                continue;
+            }
+
+            $childrenList[] = new Children(
+                $reflectionProperty,
+                $constraintAttribute,
+                $model->$getter(),
+                $model
+            );
+        }
+
+        return $childrenList;
     }
 }

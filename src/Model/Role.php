@@ -38,7 +38,7 @@ class Role extends AbstractModel implements JsonSerializable
     /**
      * @var RoleUser[]
      */
-    #[Constraint('role', Permission::class)]
+    #[Constraint('role', RoleUser::class)]
     protected array $users;
 
     public function getId(): ?int
