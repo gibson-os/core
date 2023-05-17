@@ -92,7 +92,7 @@ class ModuleService
                 $module = $this->moduleRepository->getByName($moduleName);
             } catch (SelectError) {
                 $module = (new Module())->setName($moduleName);
-                $this->modelManager->save($module);
+                $this->modelManager->saveWithoutChildren($module);
             }
 
             $moduleIds[] = $module->getId() ?? 0;
@@ -167,7 +167,7 @@ class ModuleService
                     ->setName($taskName)
                     ->setModule($module)
                 ;
-                $this->modelManager->save($task);
+                $this->modelManager->saveWithoutChildren($task);
             }
 
             $taskIds[] = $task->getId() ?? 0;
@@ -216,7 +216,7 @@ class ModuleService
                     ->setModule($module)
                     ->setTask($task)
                 ;
-                $this->modelManager->save($action);
+                $this->modelManager->saveWithoutChildren($action);
             }
 
             $actionIds[] = $action->getId() ?? 0;
@@ -224,14 +224,14 @@ class ModuleService
             $this->permissionRepository->deleteByAction($action);
 
             foreach ($this->reflectionManager->getAttributes($reflectionMethod, CheckPermission::class) as $checkPermission) {
-                $this->modelManager->save(
+                $this->modelManager->saveWithoutChildren(
                     (new Action\Permission())
                         ->setAction($action)
                         ->setPermission($this->getPermissionSum($checkPermission->getPermissions()))
                 );
 
                 foreach ($checkPermission->getPermissionsByRequestValues() as $permissions) {
-                    $this->modelManager->save(
+                    $this->modelManager->saveWithoutChildren(
                         (new Action\Permission())
                             ->setAction($action)
                             ->setPermission($this->getPermissionSum($permissions))
@@ -248,7 +248,6 @@ class ModuleService
      */
     private function getPermissionSum(array $permissions): int
     {
-
         return array_sum(array_map(
             static fn (Permission $permission): int => $permission->value,
             $permissions,
