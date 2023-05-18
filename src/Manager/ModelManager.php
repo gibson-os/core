@@ -10,6 +10,7 @@ use GibsonOS\Core\Dto\Model\Children;
 use GibsonOS\Core\Dto\Model\PrimaryColumn;
 use GibsonOS\Core\Exception\Model\DeleteError;
 use GibsonOS\Core\Exception\Model\SaveError;
+use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Model\ModelInterface;
 use GibsonOS\Core\Service\Attribute\TableAttribute;
 use GibsonOS\Core\Service\DateTimeService;
@@ -414,10 +415,16 @@ class ModelManager
                 continue;
             }
 
-            $getter = 'get' . ucfirst($reflectionProperty->getName());
+            $propertyName = $reflectionProperty->getName();
+            $getter = 'get' . ucfirst($propertyName);
 
             if ($this->reflectionManager->getTypeName($reflectionProperty) !== 'array') {
-                $setter = 'set' . ucfirst($reflectionProperty->getName());
+                $setter = 'set' . ucfirst($propertyName);
+
+                if ($model instanceof AbstractModel && !$model->isConstraintLoaded($propertyName)) {
+                    continue;
+                }
+
                 $model->$setter($model->$getter());
 
                 continue;

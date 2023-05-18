@@ -72,9 +72,14 @@ trait ConstraintTrait
         };
     }
 
+    public function isConstraintLoaded(string $propertyName): bool
+    {
+        return array_key_exists($propertyName, $this->loadedConstraints);
+    }
+
     private function unloadConstraint(string $propertyName): AbstractModel
     {
-        if (array_key_exists($propertyName, $this->loadedConstraints)) {
+        if ($this->isConstraintLoaded($propertyName)) {
             unset($this->loadedConstraints[$propertyName]);
         }
 
@@ -119,7 +124,7 @@ trait ConstraintTrait
         $ownColumn = $this->transformFieldName($constraintAttribute->getOwnColumn() ?? $propertyName . 'Id');
         $value = $this->getConstraintValue($reflectionProperty, 'get' . ucfirst($ownColumn));
 
-        if (array_key_exists($propertyName, $this->loadedConstraints) && $this->loadedConstraints[$propertyName] === $value) {
+        if ($this->isConstraintLoaded($propertyName) && $this->loadedConstraints[$propertyName] === $value) {
             return $this->$propertyName;
         }
 
@@ -169,7 +174,7 @@ trait ConstraintTrait
         $value = $this->{'get' . ucfirst($ownColumn)}();
         $propertyName = $reflectionProperty->getName();
 
-        if (array_key_exists($propertyName, $this->loadedConstraints) && $this->loadedConstraints[$propertyName] === $value) {
+        if ($this->isConstraintLoaded($propertyName) && $this->loadedConstraints[$propertyName] === $value) {
             return $this->$propertyName;
         }
 
