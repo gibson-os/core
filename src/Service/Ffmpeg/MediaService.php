@@ -86,8 +86,8 @@ class MediaService
         }
 
         if (
-            $media->getSelectedAudioStreamId() === null &&
-            $media->hasAudio()
+            $media->getSelectedAudioStreamId() === null
+            && $media->hasAudio()
         ) {
             $streamIds = array_keys($media->getAudioStreams());
             $media->selectAudioStream($streamIds[0]);

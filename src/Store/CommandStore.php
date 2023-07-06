@@ -36,9 +36,9 @@ class CommandStore extends AbstractStore
             $reflectionClass = $this->reflectionManager->getReflectionClass($classString);
 
             if (
-                $reflectionClass->isAbstract() ||
-                $reflectionClass->isInterface() ||
-                !is_subclass_of($classString, CommandInterface::class)
+                $reflectionClass->isAbstract()
+                || $reflectionClass->isInterface()
+                || !is_subclass_of($classString, CommandInterface::class)
             ) {
                 continue;
             }

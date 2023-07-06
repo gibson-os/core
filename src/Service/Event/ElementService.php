@@ -182,8 +182,6 @@ class ElementService
      * @throws FactoryError
      * @throws ReflectionException
      * @throws JsonException
-     *
-     * @return mixed
      */
     private function runFunction(Element $element, Event $event)
     {

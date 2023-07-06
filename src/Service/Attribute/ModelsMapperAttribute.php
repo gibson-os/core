@@ -120,8 +120,8 @@ class ModelsMapperAttribute implements AttributeServiceInterface, ParameterAttri
                 $setter = 'set' . ucfirst($reflectionProperty->getName());
 
                 if (
-                    reset($values) === null &&
-                    !$this->reflectionManager->allowsNull($reflectionProperty)
+                    reset($values) === null
+                    && !$this->reflectionManager->allowsNull($reflectionProperty)
                 ) {
                     continue;
                 }

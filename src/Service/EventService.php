@@ -273,8 +273,8 @@ class EventService
 
         foreach ($event->getTriggers() as $eventTrigger) {
             if (
-                $eventTrigger->getTrigger() !== $trigger &&
-                $eventTrigger->getClass() !== $className
+                $eventTrigger->getTrigger() !== $trigger
+                && $eventTrigger->getClass() !== $className
             ) {
                 continue;
             }

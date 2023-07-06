@@ -146,8 +146,8 @@ trait ConstraintTrait
         }
 
         if (
-            !$propertyValue instanceof $parentModelClassName ||
-            $parentModel->{'get' . $fieldName}() !== $value
+            !$propertyValue instanceof $parentModelClassName
+            || $parentModel->{'get' . $fieldName}() !== $value
         ) {
             $this->$propertyName = $this->loadForeignRecord(
                 $parentModel,

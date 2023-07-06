@@ -121,8 +121,6 @@ class RequestService
 
     /**
      * @throws RequestError
-     *
-     * @return mixed
      */
     public function getRequestValue(string $key)
     {

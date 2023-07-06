@@ -68,8 +68,8 @@ class EventController extends AbstractController
         string $node = null
     ): AjaxResponse {
         if (
-            $event === null ||
-            ($node !== null && $node !== 'NaN')
+            $event === null
+            || ($node !== null && $node !== 'NaN')
         ) {
             return $this->returnSuccess([]);
         }

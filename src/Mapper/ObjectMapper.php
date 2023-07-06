@@ -169,9 +169,9 @@ class ObjectMapper implements ObjectMapperInterface
         }
 
         if (
-            $values === null &&
-            $reflectionObject instanceof ReflectionParameter &&
-            !$reflectionObject->allowsNull()
+            $values === null
+            && $reflectionObject instanceof ReflectionParameter
+            && !$reflectionObject->allowsNull()
         ) {
             return $this->reflectionManager->getDefaultValue($reflectionObject);
         }

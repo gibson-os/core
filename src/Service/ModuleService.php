@@ -153,9 +153,9 @@ class ModuleService
             }
 
             if (
-                $reflectionClass->isAbstract() ||
-                $reflectionClass->isInterface() ||
-                $reflectionClass->isTrait()
+                $reflectionClass->isAbstract()
+                || $reflectionClass->isInterface()
+                || $reflectionClass->isTrait()
             ) {
                 continue;
             }

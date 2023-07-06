@@ -8,7 +8,6 @@ Ext.define('GibsonOS.module.core.desktop.store.View', {
         me.proxy = {
             type: 'gosDataProxyAjax',
             url: baseDir + 'core/desktop',
-            method: 'GET',
             reader: {
                 type: 'gosDataReaderJson',
                 root: 'data.desktop'

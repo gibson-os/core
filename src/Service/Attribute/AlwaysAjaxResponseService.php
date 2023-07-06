@@ -14,8 +14,8 @@ class AlwaysAjaxResponseService extends AbstractActionAttributeService
     public function postExecute(AttributeInterface $attribute, ResponseInterface $response): void
     {
         if (
-            !$response instanceof AjaxResponse &&
-            !$response instanceof ExceptionResponse
+            !$response instanceof AjaxResponse
+            && !$response instanceof ExceptionResponse
         ) {
             throw new ResponseError(sprintf(
                 'Response must be an instance of %s or %s. Is instance of %s',

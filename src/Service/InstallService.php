@@ -94,8 +94,8 @@ class InstallService
                 $moduleName = preg_replace('/.*\/(.*)/', '$1', $module);
 
                 if (
-                    ($installer->getModule() !== null && $installer->getModule() !== $moduleName) ||
-                    in_array($installer::class, $installedSingleInstallers)
+                    ($installer->getModule() !== null && $installer->getModule() !== $moduleName)
+                    || in_array($installer::class, $installedSingleInstallers)
                 ) {
                     continue;
                 }

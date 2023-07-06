@@ -214,8 +214,8 @@ class TypeService
         $type = $this->getFileType(strtolower($path));
 
         if (
-            $type === null ||
-            !array_key_exists($type, self::TYPE_CATEGORIES)
+            $type === null
+            || !array_key_exists($type, self::TYPE_CATEGORIES)
         ) {
             return null;
         }
@@ -231,8 +231,8 @@ class TypeService
         $category = $this->getCategory($path);
 
         if (
-            $category === null ||
-            !in_array($category, self::THUMB_TYPES)
+            $category === null
+            || !in_array($category, self::THUMB_TYPES)
         ) {
             return null;
         }

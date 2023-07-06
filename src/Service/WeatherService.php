@@ -56,8 +56,8 @@ class WeatherService
         $data = JsonUtility::decode($response->getBody()->getContent());
 
         if (
-            abs($location->getLatitude() - $data['lat']) >= .0001 ||
-            abs($location->getLongitude() - $data['lon']) >= .0001
+            abs($location->getLatitude() - $data['lat']) >= .0001
+            || abs($location->getLongitude() - $data['lon']) >= .0001
         ) {
             throw new WeatherError(
                 'Coordinates from location ' . $location->getName() .

@@ -128,8 +128,8 @@ class TimeEvent extends AbstractEvent
         $now = $this->dateTimeService->get();
 
         return
-            $now >= $this->dateTimeService->get('@' . $this->dateTimeService->getSunrise($now)) &&
-            $now < $this->dateTimeService->get('@' . $this->dateTimeService->getSunset($now))
+            $now >= $this->dateTimeService->get('@' . $this->dateTimeService->getSunrise($now))
+            && $now < $this->dateTimeService->get('@' . $this->dateTimeService->getSunset($now))
         ;
     }
 

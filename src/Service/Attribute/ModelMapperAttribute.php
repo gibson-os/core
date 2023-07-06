@@ -190,8 +190,8 @@ class ModelMapperAttribute extends ObjectMapperAttribute
             }
 
             if (
-                $values === null &&
-                (!$this->reflectionManager->allowsNull($reflectionProperty) || $model->$idGetter() !== null)
+                $values === null
+                && (!$this->reflectionManager->allowsNull($reflectionProperty) || $model->$idGetter() !== null)
             ) {
                 continue;
             }

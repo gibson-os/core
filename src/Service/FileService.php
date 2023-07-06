@@ -181,8 +181,8 @@ class FileService
     public function save(string $path, string $data, bool $overwrite = false): void
     {
         if (
-            !$overwrite &&
-            file_exists($path)
+            !$overwrite
+            && file_exists($path)
         ) {
             throw new FileExistsError(sprintf('Datei %s existiert bereits!', $path));
         }
@@ -220,13 +220,13 @@ class FileService
      *
      * @todo Refactor to files only array or null
      */
-    public function delete(string $dir, string|array|null $files = null): void
+    public function delete(string $dir, string|array $files = null): void
     {
         $dir = $this->dirService->addEndSlash($dir);
 
         if (
-            is_array($files) ||
-            $files === null
+            is_array($files)
+            || $files === null
         ) {
             $deleteDir = false;
 
@@ -343,9 +343,9 @@ class FileService
         }
 
         while (
-            $char !== false &&
-            $char !== "\n" &&
-            $char !== "\r"
+            $char !== false
+            && $char !== "\n"
+            && $char !== "\r"
         ) {
             $line = $char . $line;
             fseek($file, $cursor--, SEEK_END);

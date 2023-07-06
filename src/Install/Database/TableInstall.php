@@ -167,8 +167,8 @@ class TableInstall extends AbstractInstall implements PriorityInterface
                 }
 
                 if (
-                    $columnAttribute->getType() === Column::TYPE_ENUM &&
-                    count($columnAttribute->getValues()) === 0
+                    $columnAttribute->getType() === Column::TYPE_ENUM
+                    && count($columnAttribute->getValues()) === 0
                 ) {
                     $type = $this->reflectionManager->getNonBuiltinTypeName($reflectionProperty);
                     $this->reflectionManager->getReflectionEnum($type);
@@ -372,8 +372,8 @@ class TableInstall extends AbstractInstall implements PriorityInterface
         }
 
         if (
-            $column->Default !== ($default === Column::DEFAULT_CURRENT_TIMESTAMP ? 'current_timestamp()' : $default) &&
-            !($columnAttribute->getType() === Column::TYPE_TIMESTAMP && $default === null)
+            $column->Default !== ($default === Column::DEFAULT_CURRENT_TIMESTAMP ? 'current_timestamp()' : $default)
+            && !($columnAttribute->getType() === Column::TYPE_TIMESTAMP && $default === null)
         ) {
             return true;
         }

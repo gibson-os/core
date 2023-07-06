@@ -84,8 +84,8 @@ class ImageService
         }
 
         if (
-            $type != 'string' &&
-            !$this->fileService->exists($filename)
+            $type != 'string'
+            && !$this->fileService->exists($filename)
         ) {
             throw new FileNotFound(sprintf('Bild %s existiert nicht!', $filename));
         }

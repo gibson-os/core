@@ -61,8 +61,8 @@ class PermissionService
     public function checkPermission(int $requiredPermission, int $permission): bool
     {
         if (
-            $requiredPermission !== PermissionEnum::DENIED->value &&
-            ($permission & PermissionEnum::DENIED->value)
+            $requiredPermission !== PermissionEnum::DENIED->value
+            && ($permission & PermissionEnum::DENIED->value)
         ) {
             return false;
         }
@@ -152,7 +152,7 @@ class PermissionService
                     $module,
                     $task,
                     $action,
-                    HttpMethod::from(strtoupper($permissionItem['method'])),
+                    isset($permissionItem['method']) ? HttpMethod::from(strtoupper($permissionItem['method'])) : null,
                     $userId,
                 );
             } catch (SelectError) {

@@ -128,8 +128,8 @@ abstract class AbstractInstall implements InstallInterface
         preg_match('/(\d+)(\w*)/', $value, $hits);
 
         if (
-            count($hits) < 2 ||
-            !is_numeric($hits[1])
+            count($hits) < 2
+            || !is_numeric($hits[1])
         ) {
             throw new InstallException(sprintf('Value "%s" is no number!', $hits[1]));
         }
@@ -137,8 +137,8 @@ abstract class AbstractInstall implements InstallInterface
         $types = ['k', 'kb', 'm', 'mb', 'g', 'gb'];
 
         if (
-            array_key_exists(2, $hits) &&
-            !in_array($hits[2], $types)
+            array_key_exists(2, $hits)
+            && !in_array($hits[2], $types)
         ) {
             throw new InstallException(sprintf(
                 '"%s" is no valid value! Possible: %s',
@@ -172,9 +172,9 @@ abstract class AbstractInstall implements InstallInterface
 
         foreach ($apps as $existingApp) {
             if (
-                $module === $existingApp['module'] &&
-                $task === $existingApp['task'] &&
-                $action === $existingApp['action']
+                $module === $existingApp['module']
+                && $task === $existingApp['task']
+                && $action === $existingApp['action']
             ) {
                 return $this;
             }

@@ -35,9 +35,6 @@ class SessionService
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
     public function get(string $key)
     {
         if (!isset($this->data[$key])) {
@@ -63,8 +60,6 @@ class SessionService
 
     /**
      * @param mixed|null $default
-     *
-     * @return mixed
      */
     public function getWithDefault(string $key, $default = null)
     {

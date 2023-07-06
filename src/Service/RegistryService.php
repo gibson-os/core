@@ -39,8 +39,6 @@ class RegistryService
 
     /**
      * @throws GetError
-     *
-     * @return mixed
      */
     public function get(string $key)
     {
@@ -51,9 +49,6 @@ class RegistryService
         throw new GetError(sprintf('Schlüssel "%s" nicht in der Registry gefunden', $key));
     }
 
-    /**
-     * @param mixed $value
-     */
     public function set(string $key, $value): void
     {
         $this->registry[$key] = $value;

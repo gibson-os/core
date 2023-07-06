@@ -74,8 +74,8 @@ class TimeStore extends AbstractDatabaseStore
             $newGroupedCronjobs = $this->groupByPart($cronjobs, $part);
 
             if (
-                empty($groupedCronjobs) ||
-                count($groupedCronjobs) > count($newGroupedCronjobs)
+                empty($groupedCronjobs)
+                || count($groupedCronjobs) > count($newGroupedCronjobs)
             ) {
                 $groupedCronjobs = $newGroupedCronjobs;
                 $selectedPart = $part;

@@ -68,9 +68,9 @@ class ConnectInstall extends AbstractInstall implements PriorityInterface, Singl
         $mysqlUserDatabase = new mysqlDatabase($host, $user, $password);
 
         if (
-            !$mysqlUserDatabase->openDB() &&
-            !$mysqlDatabase->sendQuery("CREATE USER '" . $user . "'@'%' IDENTIFIED BY '" . $password . "'") &&
-            !$mysqlDatabase->sendQuery("GRANT USAGE ON *.* TO  '" . $user . "'@'%' IDENTIFIED BY '" . $password . "' WITH MAX_QUERIES_PER_HOUR 0 MAX_CONNECTIONS_PER_HOUR 0 MAX_UPDATES_PER_HOUR 0 MAX_USER_CONNECTIONS 0")
+            !$mysqlUserDatabase->openDB()
+            && !$mysqlDatabase->sendQuery("CREATE USER '" . $user . "'@'%' IDENTIFIED BY '" . $password . "'")
+            && !$mysqlDatabase->sendQuery("GRANT USAGE ON *.* TO  '" . $user . "'@'%' IDENTIFIED BY '" . $password . "' WITH MAX_QUERIES_PER_HOUR 0 MAX_CONNECTIONS_PER_HOUR 0 MAX_UPDATES_PER_HOUR 0 MAX_USER_CONNECTIONS 0")
         ) {
             throw new InstallException(sprintf(
                 'MySQL User "%s" could not be created! Error: %s',
@@ -80,8 +80,8 @@ class ConnectInstall extends AbstractInstall implements PriorityInterface, Singl
         }
 
         if (
-            !$mysqlUserDatabase->useDatabase($database) &&
-            !$mysqlDatabase->sendQuery('GRANT SELECT, INSERT, UPDATE, DELETE ON `' . $database . "`.* TO '" . $user . "'@'%'")
+            !$mysqlUserDatabase->useDatabase($database)
+            && !$mysqlDatabase->sendQuery('GRANT SELECT, INSERT, UPDATE, DELETE ON `' . $database . "`.* TO '" . $user . "'@'%'")
         ) {
             throw new InstallException(sprintf(
                 'MySQL User "%s" could not be connected with "%s"! Error: %s',

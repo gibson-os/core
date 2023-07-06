@@ -63,8 +63,8 @@ class ServiceManager
         }
 
         if (
-            !class_exists($classname) &&
-            !interface_exists($classname)
+            !class_exists($classname)
+            && !interface_exists($classname)
         ) {
             throw new FactoryError(sprintf('Class or interface %s does not exists', $classname));
         }
@@ -215,8 +215,8 @@ class ServiceManager
     private function checkInstanceOf(object $class, string $className = null): void
     {
         if (
-            $className !== null &&
-            !is_subclass_of($class, $className)
+            $className !== null
+            && !is_subclass_of($class, $className)
         ) {
             throw new FactoryError(sprintf('%s is no instance of %s', $class::class, $className));
         }
@@ -286,8 +286,8 @@ class ServiceManager
                 $parameterType = $reflectionParameter->getType();
 
                 if (
-                    $parameterType instanceof ReflectionNamedType &&
-                    !$parameterType->isBuiltin()
+                    $parameterType instanceof ReflectionNamedType
+                    && !$parameterType->isBuiltin()
                 ) {
                     $parameters[$name] = $this->get($parameterType->getName());
 

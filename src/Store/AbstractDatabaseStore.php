@@ -109,8 +109,8 @@ abstract class AbstractDatabaseStore extends AbstractStore
         }
 
         if (
-            empty($count) ||
-            !isset($count[0])
+            empty($count)
+            || !isset($count[0])
         ) {
             return 0;
         }

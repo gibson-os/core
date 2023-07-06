@@ -31,8 +31,8 @@ class ServiceAttribute implements ParameterAttributeInterface, AttributeServiceI
         ReflectionParameter $reflectionParameter
     ): array {
         if (
-            !$attribute instanceof GetServices &&
-            !$attribute instanceof GetClassNames
+            !$attribute instanceof GetServices
+            && !$attribute instanceof GetClassNames
         ) {
             return [];
         }

@@ -196,8 +196,8 @@ class ReflectionManager
         $reflectionProperty = $this->getPropertyByParameter($reflectionParameter);
 
         if (
-            $reflectionProperty !== null &&
-            $reflectionProperty->hasDefaultValue()
+            $reflectionProperty !== null
+            && $reflectionProperty->hasDefaultValue()
         ) {
             return $reflectionProperty->getDefaultValue();
         }
@@ -338,9 +338,9 @@ class ReflectionManager
             'string' => !is_array($value) ? (string) $value : JsonUtility::encode($value),
             'array' => !is_array($value) ? (array) JsonUtility::decode((string) $value) : $value,
             'bool' => !is_array($value) && (
-                mb_strtolower((string) $value) === 'true' ||
-                (is_numeric((string) $value) && ((int) $value)) ||
-                (is_bool($value) && $value)
+                mb_strtolower((string) $value) === 'true'
+                || (is_numeric((string) $value) && ((int) $value))
+                || (is_bool($value) && $value)
             ),
             default => throw new ReflectionException(sprintf(
                 'Type "%s" of %s "%s" for "%s%s" is not allowed!',

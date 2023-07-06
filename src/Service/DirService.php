@@ -14,8 +14,8 @@ class DirService
     public function create(string $dir, int $mode = 0770): void
     {
         if (
-            file_exists($dir) ||
-            !mkdir($dir, $mode, true)
+            file_exists($dir)
+            || !mkdir($dir, $mode, true)
         ) {
             throw new CreateError(sprintf('Ordner "%s" konnte nicht angelegt werden!', $dir));
         }
@@ -40,8 +40,8 @@ class DirService
         $lastSlashPosition = mb_strrpos($dir, $slash);
 
         if (
-            $lastSlashPosition !== 0 &&
-            $lastSlashPosition === mb_strlen($dir) - $slashLength
+            $lastSlashPosition !== 0
+            && $lastSlashPosition === mb_strlen($dir) - $slashLength
         ) {
             return mb_substr($dir, 0, 0 - $slashLength);
         }

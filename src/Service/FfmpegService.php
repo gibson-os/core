@@ -38,8 +38,8 @@ class FfmpegService
     public function getFileMetaDataString(string $filename): string
     {
         if (
-            !$this->file->exists($filename) ||
-            !$this->file->isReadable($filename)
+            !$this->file->exists($filename)
+            || !$this->file->isReadable($filename)
         ) {
             throw new FileNotFound(sprintf('Datei %s existiert nicht!', $filename));
         }
@@ -80,8 +80,8 @@ class FfmpegService
         $optionString .= '-i ' . escapeshellarg($media->getFilename()) . ' ';
 
         if (
-            $audioCodec !== null &&
-            $media->getSelectedAudioStreamId() !== null
+            $audioCodec !== null
+            && $media->getSelectedAudioStreamId() !== null
         ) {
             $optionString .=
                 '-map ' . $media->getSelectedAudioStreamId() . ' ' .
@@ -92,8 +92,8 @@ class FfmpegService
         }
 
         if (
-            $videoCodec !== null &&
-            $media->getSelectedVideoStreamId() !== null
+            $videoCodec !== null
+            && $media->getSelectedVideoStreamId() !== null
         ) {
             $optionString .=
                 '-map ' . $media->getSelectedVideoStreamId() . ' ' .
@@ -199,8 +199,8 @@ class FfmpegService
     public function getChecksum(string $filename): string
     {
         if (
-            !$this->file->exists($filename) ||
-            !$this->file->isReadable($filename)
+            !$this->file->exists($filename)
+            || !$this->file->isReadable($filename)
         ) {
             throw new FfmpegException(sprintf('File %s not found!', $filename));
         }

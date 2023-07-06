@@ -78,8 +78,6 @@ class SqLiteService
 
     /**
      * @throws ExecuteError
-     *
-     * @return mixed
      */
     public function querySingle(string $query)
     {
@@ -125,8 +123,8 @@ class SqLiteService
         }
 
         if (
-            file_exists($this->filename) &&
-            !is_writable($this->filename)
+            file_exists($this->filename)
+            && !is_writable($this->filename)
         ) {
             return false;
         }
@@ -137,8 +135,8 @@ class SqLiteService
     public function isReadable(): bool
     {
         if (
-            !file_exists($this->filename) ||
-            !is_readable($this->filename)
+            !file_exists($this->filename)
+            || !is_readable($this->filename)
         ) {
             return false;
         }

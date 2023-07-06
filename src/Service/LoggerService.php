@@ -94,14 +94,14 @@ class LoggerService implements LoggerInterface
         $callerPosition = $context['callerPosition'] ?? 1;
         $message =
             $this->getLevelColor($level) . ' ' . $this->getLevelPrefix($level) .
-            ($this->debug ? $caller[$callerPosition]['file'] . ':' . $caller[$callerPosition]['line'] . ' ' : '') . "\033[0m " .
+            ($this->debug ? ($caller[$callerPosition]['file'] ?? '') . ':' . ($caller[$callerPosition]['line'] ?? '') . ' ' : '') . "\033[0m " .
             var_export($message, true)
         ;
 
         if (
-            $this->debug &&
-            isset($context['exception']) &&
-            $context['exception'] instanceof Throwable
+            $this->debug
+            && isset($context['exception'])
+            && $context['exception'] instanceof Throwable
         ) {
             $message .=
                 PHP_EOL . $this->getLevelColor($level) . PHP_EOL . PHP_EOL .

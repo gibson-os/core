@@ -66,9 +66,6 @@ abstract class AbstractException extends Exception
         return $this;
     }
 
-    /**
-     * @param mixed $value
-     */
     public function setExtraParameter(string $key, $value): AbstractException
     {
         $this->extraParameters[$key] = $value;

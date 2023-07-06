@@ -122,8 +122,8 @@ abstract class AbstractEvent
             }
 
             if (
-                !$methodParameter instanceof AutoCompleteParameter ||
-                $parameters[$parameterName] instanceof AutoCompleteModelInterface
+                !$methodParameter instanceof AutoCompleteParameter
+                || $parameters[$parameterName] instanceof AutoCompleteModelInterface
             ) {
                 $newParameters[] = $parameters[$parameterName];
 
@@ -136,8 +136,8 @@ abstract class AbstractEvent
                 $toKey = $listenerAttribute->getToKey();
 
                 if (
-                    $listenerAttribute->getForKey() !== $parameterName ||
-                    !isset($parameters[$toKey])
+                    $listenerAttribute->getForKey() !== $parameterName
+                    || !isset($parameters[$toKey])
                 ) {
                     continue;
                 }

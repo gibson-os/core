@@ -285,8 +285,8 @@ readonly class ControllerService
             $parameterType = $reflectionParameter->getType();
 
             if (
-                $parameterType instanceof ReflectionNamedType &&
-                !$parameterType->isBuiltin()
+                $parameterType instanceof ReflectionNamedType
+                && !$parameterType->isBuiltin()
             ) {
                 $typeName = $parameterType->getName();
 

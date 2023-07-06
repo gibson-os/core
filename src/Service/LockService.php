@@ -186,6 +186,6 @@ class LockService
 
         $caller = debug_backtrace();
 
-        return str_replace(DIRECTORY_SEPARATOR, '', $caller[1]['file']);
+        return str_replace(DIRECTORY_SEPARATOR, '', $caller[1]['file'] ?? '');
     }
 }

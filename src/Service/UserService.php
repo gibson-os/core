@@ -111,8 +111,8 @@ class UserService
         string $passwordRepeat,
     ): User {
         if (
-            !empty($password) ||
-            !empty($passwordRepeat)
+            !empty($password)
+            || !empty($passwordRepeat)
         ) {
             if ($password != $passwordRepeat) {
                 throw new UserError('Password not equal');

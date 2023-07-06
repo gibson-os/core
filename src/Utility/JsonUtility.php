@@ -8,8 +8,6 @@ use JsonException;
 class JsonUtility
 {
     /**
-     * @param mixed $value
-     *
      * @throws JsonException
      */
     public static function encode($value, int $flags = JSON_UNESCAPED_UNICODE + JSON_THROW_ON_ERROR): string
@@ -19,8 +17,6 @@ class JsonUtility
 
     /**
      * @throws JsonException
-     *
-     * @return mixed
      */
     public static function decode(string $json, int $flags = JSON_THROW_ON_ERROR)
     {
@@ -29,8 +25,6 @@ class JsonUtility
 
     /**
      * @throws JsonException
-     *
-     * @return mixed
      */
     public static function decodeNotAssoc(string $json, int $flags = JSON_THROW_ON_ERROR)
     {
