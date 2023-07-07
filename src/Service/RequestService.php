@@ -122,7 +122,7 @@ class RequestService
     /**
      * @throws RequestError
      */
-    public function getRequestValue(string $key)
+    public function getRequestValue(string $key): mixed
     {
         if (!isset($this->requestValues[$key])) {
             throw new RequestError(sprintf('Request key "%s" not exists!', $key));

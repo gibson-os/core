@@ -14,6 +14,7 @@ use GibsonOS\Core\Manager\ServiceManager;
 use GibsonOS\Core\Service\CommandService;
 use GibsonOS\Core\Service\LockService;
 use GibsonOS\Core\Service\LoggerService;
+use GibsonOS\Core\Service\NewRelicService;
 use GibsonOS\Core\Service\ProcessService;
 use GibsonOS\Core\Store\CommandStore;
 use GibsonOS\Mock\Service\TestCommand;
@@ -34,6 +35,8 @@ class CommandServiceTest extends Unit
 
     private LockService|ObjectProphecy $lockService;
 
+    private NewRelicService|ObjectProphecy $newRelicService;
+
     private CommandService $commandService;
 
     protected function _before(): void
@@ -41,16 +44,22 @@ class CommandServiceTest extends Unit
         $this->processService = $this->prophesize(ProcessService::class);
         $this->commandStore = $this->prophesize(CommandStore::class);
         $this->lockService = $this->prophesize(LockService::class);
+        $this->newRelicService = $this->prophesize(NewRelicService::class);
         $serviceManager = new ServiceManager();
         $serviceManager->setInterface(LoggerInterface::class, LoggerService::class);
         $serviceManager->setService(ModelManager::class, $this->prophesize(ModelManager::class)->reveal());
         $serviceManager->setService(CommandStore::class, $this->commandStore->reveal());
+
+        $this->newRelicService->isLoaded()
+            ->willReturn(false)
+        ;
 
         $this->commandService = new CommandService(
             $serviceManager,
             $this->processService->reveal(),
             new ReflectionManager(),
             $this->lockService->reveal(),
+            $this->newRelicService->reveal(),
         );
     }
 

@@ -6,6 +6,7 @@ namespace GibsonOS\Core\Service;
 use GibsonOS\Core\Attribute\AlwaysAjaxResponse;
 use GibsonOS\Core\Attribute\GetSetting;
 use GibsonOS\Core\Dto\Attribute;
+use GibsonOS\Core\Enum\NewRelicPrefix;
 use GibsonOS\Core\Exception\ControllerError;
 use GibsonOS\Core\Exception\FactoryError;
 use GibsonOS\Core\Exception\GetError;
@@ -55,6 +56,7 @@ readonly class ControllerService
         private ModelManager $modelManager,
         ModuleRepository $moduleRepository,
         #[GetSetting('chromecastReceiverAppId', 'core')] Setting $chromecastReceiverAppId = null,
+        private NewRelicService $newRelicService,
     ) {
         $this->chromecastReceiverAppId = $chromecastReceiverAppId
             ?? (new Setting())
@@ -67,6 +69,15 @@ readonly class ControllerService
     {
         $controllerName = $this->getControllerClassname();
         $action = mb_strtolower($this->requestService->getMethod()) . ucfirst($this->requestService->getActionName());
+
+        if ($this->newRelicService->isLoaded()) {
+            $this->newRelicService->setTransactionName(sprintf(
+                '%s::%s',
+                $controllerName,
+                $action,
+            ));
+            $this->newRelicService->setCustomParameters($this->requestService->getRequestValues(), NewRelicPrefix::REQUEST_VALUE);
+        }
 
         try {
             $controller = $this->serviceManagerService->get($controllerName);

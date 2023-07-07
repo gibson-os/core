@@ -8,6 +8,7 @@ use GibsonOS\Core\Attribute\Command\Lock;
 use GibsonOS\Core\Attribute\Command\Option;
 use GibsonOS\Core\Command\AbstractCommand;
 use GibsonOS\Core\Command\CommandInterface;
+use GibsonOS\Core\Enum\NewRelicPrefix;
 use GibsonOS\Core\Exception\ArgumentError;
 use GibsonOS\Core\Exception\CommandError;
 use GibsonOS\Core\Exception\FactoryError;
@@ -21,13 +22,14 @@ use ReflectionAttribute;
 use ReflectionClass;
 use ReflectionException;
 
-class CommandService
+readonly class CommandService
 {
     public function __construct(
-        private readonly ServiceManager $serviceManager,
-        private readonly ProcessService $processService,
-        private readonly ReflectionManager $reflectionManager,
-        private readonly LockService $lockService,
+        private ServiceManager $serviceManager,
+        private ProcessService $processService,
+        private ReflectionManager $reflectionManager,
+        private LockService $lockService,
+        private NewRelicService $newRelicService,
     ) {
     }
 
@@ -48,6 +50,12 @@ class CommandService
         $reflectionClass = $this->reflectionManager->getReflectionClass($commandClassname);
         $lockAttributes = $reflectionClass->getAttributes(Lock::class, ReflectionAttribute::IS_INSTANCEOF);
         $lockAttribute = null;
+
+        if ($this->newRelicService->isLoaded()) {
+            $this->newRelicService->setTransactionName($commandClassname);
+            $this->newRelicService->setCustomParameters($arguments, NewRelicPrefix::COMMAND_ARGUMENT);
+            $this->newRelicService->setCustomParameters($options, NewRelicPrefix::COMMAND_OPTION);
+        }
 
         if (count($lockAttributes) === 1) {
             /** @var Lock $lockAttribute */
