@@ -8,6 +8,7 @@ use GibsonOS\Core\Attribute\GetSetting;
 use GibsonOS\Core\Dto\Web\Body;
 use GibsonOS\Core\Dto\Web\Request;
 use GibsonOS\Core\Dto\Web\Response;
+use GibsonOS\Core\Enum\HttpMethod;
 use GibsonOS\Core\Enum\HttpStatusCode;
 use GibsonOS\Core\Exception\MiddlewareException;
 use GibsonOS\Core\Exception\Model\SaveError;
@@ -58,7 +59,7 @@ class MiddlewareService
      * @throws WebException
      * @throws JsonException
      */
-    public function send(string $task, string $action, array $parameters = [], string $body = null): Response
+    public function send(string $task, string $action, array $parameters = [], string $body = null, HttpMethod $method = null): Response
     {
         if ($this->middlewareUrl === null) {
             throw new InvalidArgumentException('Middleware URL not set');
@@ -83,7 +84,7 @@ class MiddlewareService
             $request->setBody((new Body())->setContent($body, strlen($body)));
         }
 
-        if (count($parameters) || $body !== null) {
+        if ($method !== HttpMethod::GET || count($parameters) || $body !== null) {
             $response = $this->webService->post($request);
         } else {
             $response = $this->webService->get($request);
