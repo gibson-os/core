@@ -40,7 +40,7 @@ class NewRelicService
     public function setCustomParameters(array $values, NewRelicPrefix $prefix = NewRelicPrefix::NONE): void
     {
         foreach ($values as $key => $value) {
-            if (!is_bool($value) && !is_float($value) && !is_int($value) && is_string($value)) {
+            if (!is_bool($value) && !is_float($value) && !is_int($value) && !is_string($value)) {
                 $value = JsonUtility::encode($value);
             }
 
