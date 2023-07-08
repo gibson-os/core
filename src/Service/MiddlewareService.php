@@ -84,11 +84,13 @@ class MiddlewareService
             $request->setBody((new Body())->setContent($body, strlen($body)));
         }
 
-        if ($method !== HttpMethod::GET || count($parameters) || $body !== null) {
-            $response = $this->webService->post($request);
-        } else {
-            $response = $this->webService->get($request);
-        }
+        $response = match ($method) {
+            HttpMethod::POST => $this->webService->post($request),
+            HttpMethod::GET => $this->webService->get($request),
+            default => (count($parameters) || $body !== null)
+                ? $this->webService->post($request)
+                : $this->webService->get($request)
+        };
 
         if ($response->getStatusCode() === HttpStatusCode::UNAUTHORIZED) {
             $this->getNewToken();

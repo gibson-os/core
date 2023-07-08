@@ -55,9 +55,6 @@ class WebService
 
         $port = $request->getPort();
         $url = $request->getUrl();
-        $this->logger->debug('Call ' . $method . ' ' . $url . '::' . $port);
-        $curl = curl_init($url);
-        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $method);
         $parameters = $request->getParameters();
 
         try {
@@ -65,8 +62,6 @@ class WebService
         } catch (WebException) {
             $requestBody = null;
         }
-
-        $headers = $request->getHeaders();
 
         if (count($parameters) > 0) {
             if (!empty($requestBody)) {
@@ -76,10 +71,23 @@ class WebService
             $requestBody = http_build_query($parameters);
         }
 
+        if ($method !== 'POST' && $requestBody !== null) {
+            $url .= '?' . $requestBody;
+        }
+
+        $this->logger->debug('Call ' . $method . ' ' . $url . '::' . $port);
+        $curl = curl_init($url);
+        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $method);
+
+        $headers = $request->getHeaders();
+
         if (!empty($requestBody)) {
             $this->logger->debug('With body: ' . $requestBody);
             $headers['Content-Length'] = (string) strlen($requestBody);
-            curl_setopt($curl, CURLOPT_POSTFIELDS, $requestBody);
+
+            if ($method === 'POST') {
+                curl_setopt($curl, CURLOPT_POSTFIELDS, $requestBody);
+            }
         }
 
         if (count($headers) > 0) {
