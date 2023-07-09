@@ -18,6 +18,18 @@ class CronjobRepository extends AbstractRepository
     }
 
     /**
+     * @throws SelectError
+     */
+    public function getByCommandAndUser(string $classname, string $user): Cronjob
+    {
+        return $this->fetchOne(
+            '`classname`=`? AND `user`=?',
+            [$classname, $user],
+            Cronjob::class,
+        );
+    }
+
+    /**
      * @return Cronjob[]
      */
     public function getRunnableByUser(DateTimeInterface $dateTime, string $user): array

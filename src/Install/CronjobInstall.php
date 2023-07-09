@@ -22,8 +22,8 @@ class CronjobInstall extends AbstractInstall implements PriorityInterface
 {
     public function __construct(
         ServiceManager $serviceManagerService,
-        private AttributeService $attributeService,
-        private ReflectionManager $reflectionManager
+        private readonly AttributeService $attributeService,
+        private readonly ReflectionManager $reflectionManager
     ) {
         parent::__construct($serviceManagerService);
     }
