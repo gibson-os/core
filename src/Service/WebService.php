@@ -81,13 +81,10 @@ class WebService
 
         $headers = $request->getHeaders();
 
-        if (!empty($requestBody)) {
+        if (!empty($requestBody) && $method === 'POST') {
             $this->logger->debug('With body: ' . $requestBody);
             $headers['Content-Length'] = (string) strlen($requestBody);
-
-            if ($method === 'POST') {
-                curl_setopt($curl, CURLOPT_POSTFIELDS, $requestBody);
-            }
+            curl_setopt($curl, CURLOPT_POSTFIELDS, $requestBody);
         }
 
         if (count($headers) > 0) {
