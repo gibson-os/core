@@ -172,13 +172,25 @@ class PermissionService
                     $itemAction = $key;
                 }
 
-                $permissions['items'][$key] = $this->getRequiredPermissionItem(
+                $permission = $this->getRequiredPermissionItem(
                     $item,
                     $userId,
                     $module,
                     $itemTask,
                     $itemAction,
                 );
+
+                if (!isset($item['method'])) {
+                    $permissions['items'][$key] = $permission;
+
+                    continue;
+                }
+
+                if (!isset($permissions['items'][$key])) {
+                    $permissions['items'][$key] = [];
+                }
+
+                $permissions['items'][$key][$item['method']] = $permission;
             }
         }
 

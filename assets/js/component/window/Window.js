@@ -38,6 +38,7 @@ Ext.define('GibsonOS.module.core.window.Window', {
                     module: null,
                     task: null,
                     action: null,
+                    method: null,
                     permission: permission
                 };
             }
@@ -48,6 +49,7 @@ Ext.define('GibsonOS.module.core.window.Window', {
                     module: element.requiredPermission.module ? element.requiredPermission.module : permission.module,
                     task: element.requiredPermission.task ? element.requiredPermission.task : permission.task,
                     action: element.requiredPermission.action ? element.requiredPermission.action : permission.action,
+                    method: element.requiredPermission.method ? element.requiredPermission.method : permission.method,
                     permission: element.requiredPermission.permission ? element.requiredPermission.permission : permission.permission
                 };
 
@@ -71,7 +73,8 @@ Ext.define('GibsonOS.module.core.window.Window', {
 
                         if (permission.action) {
                             permissionsAjax[permission.module].items[permission.task].items[permission.action] = {
-                                permissionRequired: true
+                                permissionRequired: true,
+                                method: permission.method
                             }
                         } else {
                             permissionsAjax[permission.module].items[permission.task].permissionRequired = true;
@@ -141,7 +144,7 @@ Ext.define('GibsonOS.module.core.window.Window', {
                 return permissions[permission.module].items[permission.task].permission;
             }
 
-            return permissions[permission.module].items[permission.task].items[permission.action].permission;
+            return permissions[permission.module].items[permission.task].items[permission.action][permission.method].permission;
         };
 
         GibsonOS.Ajax.request({
