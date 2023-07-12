@@ -54,6 +54,7 @@ class PermissionStore extends AbstractDatabaseStore
             sprintf('`%s`.`name` `roleName`', $this->tableName),
             '`upm`.`id` `modulePermissionId`',
             '`upm`.`permission` `modulePermission`',
+            '`m`.`id` `moduleId`',
             '`m`.`name` `moduleName`',
         ];
         $parameters = [];
@@ -68,7 +69,9 @@ class PermissionStore extends AbstractDatabaseStore
             ;
 
             $parameters = [$this->moduleId];
+            $selects[] = 'NULL `taskId`';
             $selects[] = 'NULL `taskName`';
+            $selects[] = 'NULL `actionId`';
             $selects[] = 'NULL `actionName`';
             $selects[] = '`upm`.`id` `id`';
             $selects[] = '`upm`.`permission` `permission`';
@@ -95,7 +98,9 @@ class PermissionStore extends AbstractDatabaseStore
             ;
 
             $parameters = [$this->taskId];
+            $selects[] = '`t`.`id` `taskId`';
             $selects[] = '`t`.`name` `taskName`';
+            $selects[] = 'NULL `actionId`';
             $selects[] = 'NULL `actionName`';
             $selects[] = '`upt`.`id` `id`';
             $selects[] = '`upt`.`permission` `permission`';
@@ -127,7 +132,9 @@ class PermissionStore extends AbstractDatabaseStore
             ;
 
             $parameters = [$this->actionId];
+            $selects[] = '`t`.`id` `taskId`';
             $selects[] = '`t`.`name` `taskName`';
+            $selects[] = '`a`.`id` `actionId`';
             $selects[] = '`a`.`name` `actionName`';
             $selects[] = '`upa`.`id` `id`';
             $selects[] = '`upa`.`permission` `permission`';

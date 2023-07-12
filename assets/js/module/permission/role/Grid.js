@@ -19,9 +19,9 @@ Ext.define('GibsonOS.module.core.module.permission.role.Grid', {
                     id: record.get('id'),
                     roleId: record.get('roleId'),
                     permission: record.get('permission'),
-                    module: record.get('moduleName'),
-                    task: record.get('taskName'),
-                    action: record.get('actionName')
+                    moduleId: record.get('moduleId'),
+                    taskId: record.get('taskId'),
+                    actionId: record.get('actionId')
                 },
                 success() {
                     me.store.load();

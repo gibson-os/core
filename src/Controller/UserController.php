@@ -110,7 +110,7 @@ class UserController extends AbstractController
     }
 
     #[CheckPermission([Permission::WRITE])]
-    public function postLogout(UserService $userService): ResponseInterface
+    public function getLogout(UserService $userService): ResponseInterface
     {
         $userService->logout();
 
