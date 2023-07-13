@@ -20,6 +20,7 @@ use GibsonOS\Core\Repository\ModuleRepository;
 use GibsonOS\Core\Repository\TaskRepository;
 use JsonException;
 use Psr\Log\LoggerInterface;
+use ReflectionAttribute;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionMethod;
@@ -223,7 +224,7 @@ class ModuleService
 
             $this->permissionRepository->deleteByAction($action);
 
-            foreach ($this->reflectionManager->getAttributes($reflectionMethod, CheckPermission::class) as $checkPermission) {
+            foreach ($this->reflectionManager->getAttributes($reflectionMethod, CheckPermission::class, ReflectionAttribute::IS_INSTANCEOF) as $checkPermission) {
                 $this->modelManager->saveWithoutChildren(
                     (new Action\Permission())
                         ->setAction($action)
