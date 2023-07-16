@@ -105,7 +105,7 @@ class WebService
 
         $this->logger->debug('Call ' . ($method?->value ?? '') . ' ' . $url . '::' . $port);
         $curl = curl_init($url);
-        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $method);
+        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $method?->value);
 
         $headers = $request->getHeaders();
 
