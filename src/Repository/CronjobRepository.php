@@ -23,7 +23,7 @@ class CronjobRepository extends AbstractRepository
     public function getByCommandAndUser(string $classname, string $user): Cronjob
     {
         return $this->fetchOne(
-            '`classname`=? AND `user`=?',
+            '`command`=? AND `user`=?',
             [$classname, $user],
             Cronjob::class,
         );
