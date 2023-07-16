@@ -3,21 +3,17 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Service;
 
+use CurlHandle;
 use GibsonOS\Core\Dto\Web\Body;
 use GibsonOS\Core\Dto\Web\Request;
 use GibsonOS\Core\Dto\Web\Response;
+use GibsonOS\Core\Enum\HttpMethod;
 use GibsonOS\Core\Enum\HttpStatusCode;
 use GibsonOS\Core\Exception\WebException;
 use Psr\Log\LoggerInterface;
 
 class WebService
 {
-    private const METHOD_GET = 'GET';
-
-    private const METHOD_POST = 'POST';
-
-    private const METHOD_HEAD = 'HEAD';
-
     public function __construct(private readonly LoggerInterface $logger)
     {
     }
@@ -27,7 +23,7 @@ class WebService
      */
     public function get(Request $request): Response
     {
-        return $this->request($request, self::METHOD_GET);
+        return $this->request($request, HttpMethod::GET);
     }
 
     /**
@@ -35,7 +31,7 @@ class WebService
      */
     public function post(Request $request): Response
     {
-        return $this->request($request, self::METHOD_POST);
+        return $this->request($request, HttpMethod::POST);
     }
 
     /**
@@ -43,16 +39,48 @@ class WebService
      */
     public function head(Request $request): Response
     {
-        return $this->request($request, self::METHOD_HEAD);
+        return $this->request($request, HttpMethod::HEAD);
     }
 
     /**
      * @throws WebException
      */
-    private function request(Request $request, string $method): Response
+    public function requestWithOutput(Request $request): CurlHandle
     {
-        $responseHandle = fopen('php://memory', 'r+');
+        $curl = $this->initRequest($request);
+        $this->setCookieFile($request, $curl);
 
+        curl_setopt($curl, CURLOPT_HEADER, 1);
+
+        if (!curl_exec($curl)) {
+            throw new WebException(curl_error($curl));
+        }
+
+        return $curl;
+    }
+
+    /**
+     * @throws WebException
+     */
+    public function request(Request $request, HttpMethod $method = null): Response
+    {
+        $curl = $this->initRequest($request, $method);
+
+        $responseHandle = fopen('php://memory', 'r+');
+        curl_setopt($curl, CURLOPT_FILE, $responseHandle);
+
+        $cookieFile = $this->setCookieFile($request, $curl);
+
+        if (!curl_exec($curl)) {
+            throw new WebException(curl_error($curl));
+        }
+
+        return $this->getResponse($request, $curl, $responseHandle, $cookieFile);
+    }
+
+    private function initRequest(Request $request, HttpMethod $method = null): CurlHandle
+    {
+        $method ??= $request->getMethod();
         $port = $request->getPort();
         $url = $request->getUrl();
         $parameters = $request->getParameters();
@@ -71,17 +99,17 @@ class WebService
             $requestBody = http_build_query($parameters);
         }
 
-        if ($method !== 'POST' && $requestBody !== null) {
+        if ($method !== HttpMethod::POST && $requestBody !== null) {
             $url .= '?' . $requestBody;
         }
 
-        $this->logger->debug('Call ' . $method . ' ' . $url . '::' . $port);
+        $this->logger->debug('Call ' . ($method?->value ?? '') . ' ' . $url . '::' . $port);
         $curl = curl_init($url);
         curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $method);
 
         $headers = $request->getHeaders();
 
-        if (!empty($requestBody) && $method === 'POST') {
+        if (!empty($requestBody) && $method === HttpMethod::POST) {
             $this->logger->debug('With body: ' . $requestBody);
             $headers['Content-Length'] = (string) strlen($requestBody);
             curl_setopt($curl, CURLOPT_POSTFIELDS, $requestBody);
@@ -100,8 +128,12 @@ class WebService
         curl_setopt($curl, CURLOPT_ENCODING, 'gzip');
         curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
         curl_setopt($curl, CURLOPT_PORT, $port);
-        curl_setopt($curl, CURLOPT_FILE, $responseHandle);
 
+        return $curl;
+    }
+
+    private function setCookieFile(Request $request, CurlHandle $curl): string
+    {
         $cookieFile = $request->getCookieFile();
 
         if ($cookieFile !== null) {
@@ -112,13 +144,23 @@ class WebService
         $this->logger->debug('Cookies saved in: ' . $cookieFile);
         curl_setopt($curl, CURLOPT_COOKIEJAR, $cookieFile);
 
-        if (!curl_exec($curl)) {
-            throw new WebException(curl_error($curl));
-        }
+        return $cookieFile;
+    }
 
-        rewind($responseHandle);
+    /**
+     * @param resource $responseHandle
+     *
+     * @throws WebException
+     */
+    private function getResponse(
+        Request $request,
+        CurlHandle $curl,
+        $responseHandle,
+        string $cookieFile,
+    ): Response {
         $httpCode = (int) curl_getinfo($curl, CURLINFO_HTTP_CODE);
         curl_close($curl);
+        rewind($responseHandle);
         $length = fstat($responseHandle)['size'];
 
         if ($length <= 0) {
@@ -130,7 +172,7 @@ class WebService
         return new Response(
             $request,
             HttpStatusCode::from($httpCode),
-            $headers,
+            $request->getHeaders(),
             (new Body())->setResource($responseHandle, $length),
             $cookieFile
         );

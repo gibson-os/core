@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Dto\Web;
 
+use GibsonOS\Core\Enum\HttpMethod;
+
 class Request
 {
     private int $port = 80;
@@ -20,6 +22,8 @@ class Request
     private ?Body $body = null;
 
     private ?string $cookieFile = null;
+
+    private ?HttpMethod $method = null;
 
     public function __construct(private string $url)
     {
@@ -131,6 +135,18 @@ class Request
     public function setCookieFile(?string $cookieFile): Request
     {
         $this->cookieFile = $cookieFile;
+
+        return $this;
+    }
+
+    public function getMethod(): ?HttpMethod
+    {
+        return $this->method;
+    }
+
+    public function setMethod(?HttpMethod $method): Request
+    {
+        $this->method = $method;
 
         return $this;
     }
