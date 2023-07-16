@@ -12,8 +12,8 @@ use mysqlTable;
 class CronjobRepository extends AbstractRepository
 {
     public function __construct(
-        #[GetTableName(Cronjob::class)] private string $cronjobTableName,
-        #[GetTableName(Cronjob\Time::class)] private string $cronjobTimeTableName,
+        #[GetTableName(Cronjob::class)] private readonly string $cronjobTableName,
+        #[GetTableName(Cronjob\Time::class)] private readonly string $cronjobTimeTableName,
     ) {
     }
 
@@ -23,7 +23,7 @@ class CronjobRepository extends AbstractRepository
     public function getByCommandAndUser(string $classname, string $user): Cronjob
     {
         return $this->fetchOne(
-            '`classname`=`? AND `user`=?',
+            '`classname`=? AND `user`=?',
             [$classname, $user],
             Cronjob::class,
         );
