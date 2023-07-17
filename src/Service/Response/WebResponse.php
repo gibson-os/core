@@ -3,33 +3,46 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Service\Response;
 
-use CurlHandle;
+use GibsonOS\Core\Dto\Web\Body;
 use GibsonOS\Core\Dto\Web\Request;
+use GibsonOS\Core\Dto\Web\Response as ResponseDto;
+use GibsonOS\Core\Enum\HttpMethod;
 use GibsonOS\Core\Enum\HttpStatusCode;
 use GibsonOS\Core\Exception\WebException;
 use GibsonOS\Core\Service\WebService;
 
 class WebResponse implements ResponseInterface
 {
-    private ?CurlHandle $curlHandle = null;
+    private ?ResponseDto $headResponse = null;
 
     public function __construct(
         private readonly Request $request,
         private readonly WebService $webService,
+        private ?array $headers = null,
+        private ?HttpStatusCode $statusCode = null,
     ) {
     }
 
     public function getCode(): HttpStatusCode
     {
-        return $this->curlHandle === null
-            ? HttpStatusCode::PROCESSING
-            : HttpStatusCode::from((int) curl_getinfo($this->curlHandle, CURLINFO_HTTP_CODE))
-        ;
+        if ($this->statusCode !== null) {
+            return $this->statusCode;
+        }
+
+        $this->statusCode = $this->getHeadResponse()->getStatusCode();
+
+        return $this->statusCode;
     }
 
     public function getHeaders(): array
     {
-        return [];
+        if ($this->headers !== null) {
+            return $this->headers;
+        }
+
+        $this->headers = $this->getHeadResponse()->getHeaders();
+
+        return $this->headers;
     }
 
     /**
@@ -37,7 +50,7 @@ class WebResponse implements ResponseInterface
      */
     public function getBody(): string
     {
-        $this->curlHandle = $this->webService->requestWithOutput($this->request);
+        $this->webService->requestWithOutput($this->request);
 
         return '';
     }
@@ -45,5 +58,23 @@ class WebResponse implements ResponseInterface
     public function getRequiredHeaders(): array
     {
         return [];
+    }
+
+    private function getHeadResponse(): ResponseDto
+    {
+        if ($this->headResponse !== null) {
+            return $this->headResponse;
+        }
+
+        $headRequest = clone $this->request;
+        $headRequest->setMethod(HttpMethod::HEAD);
+
+        try {
+            $this->headResponse = $this->webService->request($headRequest);
+        } catch (WebException $exception) {
+            $this->headResponse = new ResponseDto($headRequest, HttpStatusCode::NOT_FOUND, [], new Body(), '');
+        }
+
+        return $this->headResponse;
     }
 }
