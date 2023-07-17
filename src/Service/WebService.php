@@ -50,8 +50,6 @@ class WebService
         $curl = $this->initRequest($request);
         $this->setCookieFile($request, $curl);
 
-        curl_setopt($curl, CURLOPT_HEADER, 1);
-
         if (!curl_exec($curl)) {
             throw new WebException(curl_error($curl));
         }
@@ -68,6 +66,7 @@ class WebService
 
         $responseHandle = fopen('php://memory', 'r+');
         curl_setopt($curl, CURLOPT_FILE, $responseHandle);
+        curl_setopt($curl, CURLOPT_HEADER, true);
 
         $cookieFile = $this->setCookieFile($request, $curl);
 
@@ -115,6 +114,10 @@ class WebService
             curl_setopt($curl, CURLOPT_POSTFIELDS, $requestBody);
         }
 
+        if ($method === HttpMethod::HEAD) {
+            curl_setopt($curl, CURLOPT_NOBODY, true);
+        }
+
         if (count($headers) > 0) {
             $curlHeaders = [];
 
@@ -158,12 +161,13 @@ class WebService
         $responseHandle,
         string $cookieFile,
     ): Response {
-        $httpCode = (int) curl_getinfo($curl, CURLINFO_HTTP_CODE);
+        $httpCode = HttpStatusCode::from((int) curl_getinfo($curl, CURLINFO_HTTP_CODE));
+        $headerSize = curl_getinfo($curl, CURLINFO_HEADER_SIZE);
         curl_close($curl);
         rewind($responseHandle);
-        $length = fstat($responseHandle)['size'];
+        $length = fstat($responseHandle)['size'] - $headerSize;
 
-        if ($length <= 0) {
+        if ($length <= 0 && $request->getMethod() !== HttpMethod::HEAD) {
             throw new WebException('No response length! Length: ' . $length);
         }
 
@@ -171,10 +175,29 @@ class WebService
 
         return new Response(
             $request,
-            HttpStatusCode::from($httpCode),
-            $request->getHeaders(),
+            $httpCode,
+            $this->getHeaders(fread($responseHandle, $headerSize)),
             (new Body())->setResource($responseHandle, $length),
             $cookieFile
         );
+    }
+
+    private function getHeaders(string $headerContent): array
+    {
+        $headers = [];
+        $headerRows = explode("\r\n\r\n", $headerContent);
+
+        for ($index = 0; $index < count($headerRows) - 1; ++$index) {
+            foreach (explode("\r\n", $headerRows[$index]) as $i => $line) {
+                if ($i === 0) {
+                    continue;
+                }
+
+                list($key, $value) = explode(': ', $line);
+                $headers[$key] = $value;
+            }
+        }
+
+        return $headers;
     }
 }
