@@ -22,9 +22,16 @@ class OpenTelemetryInstall extends AbstractInstall implements PriorityInterface,
             return;
         }
 
+        yield $protocolInput = $this->getEnvInput('OTEL_EXPORTER_OTLP_PROTOCOL', 'Which OpenTelemetry exporter protocol should be used?');
+
         yield (new Configuration('Open Telemetry settings saved!'))
             ->setValue('OTEL_EXPORTER_OTLP_ENDPOINT', $endpointInput->getValue() ?? '')
+            ->setValue('OTEL_EXPORTER_OTLP_PROTOCOL', $protocolInput->getValue() ?? '')
             ->setValue('OTEL_SERVICE_NAME', $this->envService->getString('APP_NAME'))
+            ->setValue('OTEL_PHP_AUTOLOAD_ENABLED', 'true')
+            ->setValue('OTEL_TRACES_EXPORTER', 'otlp')
+            ->setValue('OTEL_PROPAGATORS', 'baggage,tracecontext')
+//            ->setValue('OTEL_PHP_DETECTORS', 'all')
         ;
     }
 
