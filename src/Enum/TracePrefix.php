@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Enum;
 
-enum NewRelicPrefix: string
+enum TracePrefix: string
 {
     case NONE = '';
     case COMMAND_ARGUMENT = 'app.command.argument.';

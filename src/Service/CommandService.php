@@ -8,7 +8,7 @@ use GibsonOS\Core\Attribute\Command\Lock;
 use GibsonOS\Core\Attribute\Command\Option;
 use GibsonOS\Core\Command\AbstractCommand;
 use GibsonOS\Core\Command\CommandInterface;
-use GibsonOS\Core\Enum\NewRelicPrefix;
+use GibsonOS\Core\Enum\TracePrefix;
 use GibsonOS\Core\Exception\ArgumentError;
 use GibsonOS\Core\Exception\CommandError;
 use GibsonOS\Core\Exception\FactoryError;
@@ -29,7 +29,7 @@ readonly class CommandService
         private ProcessService $processService,
         private ReflectionManager $reflectionManager,
         private LockService $lockService,
-        private NewRelicService $newRelicService,
+        private TracerService $tracerService,
     ) {
     }
 
@@ -51,11 +51,11 @@ readonly class CommandService
         $lockAttributes = $reflectionClass->getAttributes(Lock::class, ReflectionAttribute::IS_INSTANCEOF);
         $lockAttribute = null;
 
-        if ($this->newRelicService->isLoaded()) {
-            $this->newRelicService->setTransactionName($commandClassname);
-            $this->newRelicService->setCustomParameters($arguments, NewRelicPrefix::COMMAND_ARGUMENT);
-            $this->newRelicService->setCustomParameters($options, NewRelicPrefix::COMMAND_OPTION);
-        }
+        $this->tracerService
+            ->setTransactionName($commandClassname)
+            ->setCustomParameters($arguments, TracePrefix::COMMAND_ARGUMENT)
+            ->setCustomParameters($options, TracePrefix::COMMAND_OPTION)
+        ;
 
         if (count($lockAttributes) === 1) {
             /** @var Lock $lockAttribute */

@@ -6,7 +6,7 @@ namespace GibsonOS\Core\Service;
 use GibsonOS\Core\Attribute\AlwaysAjaxResponse;
 use GibsonOS\Core\Attribute\GetSetting;
 use GibsonOS\Core\Dto\Attribute;
-use GibsonOS\Core\Enum\NewRelicPrefix;
+use GibsonOS\Core\Enum\TracePrefix;
 use GibsonOS\Core\Exception\ControllerError;
 use GibsonOS\Core\Exception\FactoryError;
 use GibsonOS\Core\Exception\GetError;
@@ -56,7 +56,7 @@ readonly class ControllerService
         private ModelManager $modelManager,
         ModuleRepository $moduleRepository,
         #[GetSetting('chromecastReceiverAppId', 'core')] Setting $chromecastReceiverAppId = null,
-        private NewRelicService $newRelicService,
+        private TracerService $tracerService,
     ) {
         $this->chromecastReceiverAppId = $chromecastReceiverAppId
             ?? (new Setting())
@@ -70,14 +70,10 @@ readonly class ControllerService
         $controllerName = $this->getControllerClassname();
         $action = mb_strtolower($this->requestService->getMethod()) . ucfirst($this->requestService->getActionName());
 
-        if ($this->newRelicService->isLoaded()) {
-            $this->newRelicService->setTransactionName(sprintf(
-                '%s::%s',
-                $controllerName,
-                $action,
-            ));
-            $this->newRelicService->setCustomParameters($this->requestService->getRequestValues(), NewRelicPrefix::REQUEST_VALUE);
-        }
+        $this->tracerService
+            ->setTransactionName(sprintf('%s::%s', $controllerName, $action))
+            ->setCustomParameters($this->requestService->getRequestValues(), TracePrefix::REQUEST_VALUE)
+        ;
 
         try {
             $controller = $this->serviceManagerService->get($controllerName);
@@ -120,6 +116,10 @@ readonly class ControllerService
             $parameters = $this->getParameters($reflectionMethod, $attributes);
             $parameters = $this->preExecuteAttributes($attributes, $parameters, $reflectionMethod->getParameters());
             $parameters = $this->cleanParameters($reflectionMethod, $parameters);
+            $this->tracerService->addSpan(
+                sprintf('%s->%s', $controller::class, $action),
+                ['app.action.parameters' => $parameters],
+            );
             /** @var ResponseInterface $response */
             $response = $controller->$action(...$parameters);
             $this->postExecuteAttributes($attributes, $response);

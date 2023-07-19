@@ -16,7 +16,11 @@
     "google/auth": "^1.18",
     "smalot/pdfparser": "^2.2",
     "psr/log": "*",
-    "phpmailer/phpmailer": "^6.8"
+    "phpmailer/phpmailer": "^6.8",
+    "open-telemetry/sdk": "^0.0.17",
+    "open-telemetry/exporter-otlp": "^0.0.17",
+    "php-http/guzzle7-adapter": "^1.0",
+    "guzzlehttp/psr7": "^2.5"
   },
   "require-dev": {
     "codeception/codeception": "^5.0",
@@ -60,7 +64,8 @@
   "config": {
     "allow-plugins": {
       "composer/package-versions-deprecated": true,
-      "captainhook/plugin-composer": true
+      "captainhook/plugin-composer": true,
+      "php-http/discovery": true
     }
   }
 }
