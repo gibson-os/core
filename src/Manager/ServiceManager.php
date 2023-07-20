@@ -9,6 +9,7 @@ use GibsonOS\Core\Service\Attribute\ParameterAttributeInterface;
 use GibsonOS\Core\Service\AttributeService;
 use GibsonOS\Core\Service\DirService;
 
+use GibsonOS\Core\Service\TracerService;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionMethod;
@@ -31,9 +32,9 @@ class ServiceManager
      */
     private array $abstracts = [];
 
-    private AttributeService $attributeService;
+    private readonly AttributeService $attributeService;
 
-    private ReflectionManager $reflectionManager;
+    private readonly ReflectionManager $reflectionManager;
 
     public function __construct()
     {
@@ -58,6 +59,9 @@ class ServiceManager
      */
     public function get(string $classname, string $instanceOf = null): object
     {
+        $tracerService = $this->getTracerService();
+        $tracerService?->startSpan(sprintf('get %s', $classname), ['app.instanceof' => $instanceOf]);
+
         if (\mb_strpos($classname, '\\') === 0) {
             $classname = substr($classname, 1);
         }
@@ -66,13 +70,17 @@ class ServiceManager
             !class_exists($classname)
             && !interface_exists($classname)
         ) {
-            throw new FactoryError(sprintf('Class or interface %s does not exists', $classname));
+            $exception = new FactoryError(sprintf('Class or interface %s does not exists', $classname));
+            $tracerService?->stopSpan($exception);
+
+            throw $exception;
         }
 
         if (isset($this->services[$classname])) {
             $this->checkInstanceOf($this->services[$classname], $instanceOf);
             /** @var T $class */
             $class = $this->services[$classname];
+            $tracerService?->stopSpan();
 
             return $class;
         }
@@ -83,11 +91,15 @@ class ServiceManager
             $this->services[$classname] = $class;
 
             $this->checkInstanceOf($class, $instanceOf);
+            $tracerService?->stopSpan();
 
             return $class;
         }
 
-        throw new FactoryError(sprintf('Class %s could not be created', $classname));
+        $exception = new FactoryError(sprintf('Class %s could not be created', $classname));
+        $tracerService?->stopSpan($exception);
+
+        throw $exception;
     }
 
     /**
@@ -374,5 +386,16 @@ class ServiceManager
         }
 
         return $newParameters;
+    }
+
+    private function getTracerService(): ?TracerService
+    {
+        $tracerService = $this->services[TracerService::class] ?? null;
+
+        if ($tracerService instanceof TracerService) {
+            return $tracerService;
+        }
+
+        return null;
     }
 }

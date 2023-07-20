@@ -3,52 +3,89 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\OpenTelemetry\Instrumentation;
 
-use GibsonOS\Core\Utility\JsonUtility;
+use GibsonOS\Core\Service\OpenTelemetry\InstrumentationService;
+use GibsonOS\Core\Service\OpenTelemetry\SpanService;
 use mysqli;
+use mysqli_stmt;
 use OpenTelemetry\API\Common\Instrumentation\CachedInstrumentation;
-use OpenTelemetry\API\Trace\Span;
 use OpenTelemetry\API\Trace\SpanKind;
-use OpenTelemetry\API\Trace\StatusCode;
-use OpenTelemetry\Context\Context;
-
-use function OpenTelemetry\Instrumentation\hook;
-
-use Throwable;
 
 class MysqliInstrumentation implements InstrumentationInterface
 {
+    public function __construct(
+        private readonly InstrumentationService $instrumentationService,
+        private readonly SpanService $spanService,
+    ) {
+    }
+
     public function __invoke(): void
     {
         $instrumentation = new CachedInstrumentation('mysqli');
 
-        hook(
-            mysqli::class,
-            'query',
-            pre: function (
-                mysqli $mysqli,
-                array $params,
-                string $class,
-                string $function,
-                ?string $filename,
-                ?int $lineno,
-            ) use ($instrumentation) {
-                $span = $instrumentation->tracer()->spanBuilder('Mysqli query')->setSpanKind(SpanKind::KIND_CLIENT)->startSpan();
-                error_log(JsonUtility::encode($params));
-                $parent = Context::getCurrent();
-                Context::storage()->attach($span->storeInContext($parent));
-            },
-            post: function (mysqli $mysqli, array $params, mixed $statement, ?Throwable $exception) {
-                $scope = Context::storage()->scope();
-                $scope->detach();
-                $span = Span::fromContext($scope->context());
-
-                if ($exception) {
-                    $span->recordException($exception);
-                    $span->setStatus(StatusCode::STATUS_ERROR);
+        $this->instrumentationService
+            ->addHook(
+                $instrumentation,
+                mysqli::class,
+                'query',
+                function (
+                    mysqli $mysqli,
+                    array $params,
+                    string $class,
+                    string $function,
+                    ?string $fileName,
+                    ?int $lineNumber,
+                ) use ($instrumentation): void {
+                    $this->spanService->buildFromInstrumentation(
+                        $instrumentation,
+                        sprintf('send query: %s', $params[0]),
+                        $fileName,
+                        $lineNumber,
+                        SpanKind::KIND_CLIENT,
+                    );
                 }
-
-                $span->end();
-            }
-        );
+            )
+            ->addHook(
+                $instrumentation,
+                mysqli::class,
+                'prepare',
+                function (
+                    mysqli $mysqli,
+                    array $params,
+                    string $class,
+                    string $function,
+                    ?string $fileName,
+                    ?int $lineNumber,
+                ) use ($instrumentation): void {
+                    $this->spanService->buildFromInstrumentation(
+                        $instrumentation,
+                        sprintf('prepare query: %s', $params[0]),
+                        $fileName,
+                        $lineNumber,
+                        SpanKind::KIND_CLIENT,
+                    );
+                }
+            )
+            ->addHook(
+                $instrumentation,
+                mysqli_stmt::class,
+                'execute',
+                function (
+                    mysqli_stmt $mysqliStatement,
+                    array $params,
+                    string $class,
+                    string $function,
+                    ?string $fileName,
+                    ?int $lineNumber,
+                ) use ($instrumentation): void {
+                    $this->spanService->buildFromInstrumentation(
+                        $instrumentation,
+                        'execute query',
+                        $fileName,
+                        $lineNumber,
+                        SpanKind::KIND_CLIENT,
+                    );
+                }
+            )
+        ;
     }
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Tracer;
 
 use GibsonOS\Core\Enum\TracePrefix;
+use Throwable;
 
 abstract class AbstractTracer
 {
@@ -22,7 +23,12 @@ abstract class AbstractTracer
         return $this;
     }
 
-    public function addSpan(string $spanName, array $attributes): self
+    public function startSpan(string $spanName, array $attributes): self
+    {
+        return $this;
+    }
+
+    public function stopSpan(Throwable $exception = null): self
     {
         return $this;
     }

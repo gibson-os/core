@@ -6,6 +6,7 @@ namespace GibsonOS\Core\Service;
 use GibsonOS\Core\Attribute\GetServices;
 use GibsonOS\Core\Enum\TracePrefix;
 use GibsonOS\Core\Tracer\AbstractTracer;
+use Throwable;
 
 class TracerService
 {
@@ -13,7 +14,7 @@ class TracerService
      * @param AbstractTracer[] $tracers
      */
     public function __construct(
-        #[GetServices(['*/src/Tracer'], AbstractTracer::class)] private readonly array $tracers,
+        #[GetServices(['core/src/Tracer'], AbstractTracer::class)] private readonly array $tracers,
     ) {
     }
 
@@ -56,11 +57,22 @@ class TracerService
     /**
      * @param array<string, mixed> $attributes
      */
-    public function addSpan(string $spanName, array $attributes): TracerService
+    public function startSpan(string $spanName, array $attributes): TracerService
     {
         foreach ($this->tracers as $tracer) {
             if ($tracer->isLoaded()) {
-                $tracer->addSpan($spanName, $attributes);
+                $tracer->startSpan($spanName, $attributes);
+            }
+        }
+
+        return $this;
+    }
+
+    public function stopSpan(Throwable $exception = null): TracerService
+    {
+        foreach ($this->tracers as $tracer) {
+            if ($tracer->isLoaded()) {
+                $tracer->stopSpan($exception);
             }
         }
 

@@ -116,10 +116,7 @@ readonly class ControllerService
             $parameters = $this->getParameters($reflectionMethod, $attributes);
             $parameters = $this->preExecuteAttributes($attributes, $parameters, $reflectionMethod->getParameters());
             $parameters = $this->cleanParameters($reflectionMethod, $parameters);
-            $this->tracerService->addSpan(
-                sprintf('%s->%s', $controller::class, $action),
-                ['app.action.parameters' => $parameters],
-            );
+
             /** @var ResponseInterface $response */
             $response = $controller->$action(...$parameters);
             $this->postExecuteAttributes($attributes, $response);
