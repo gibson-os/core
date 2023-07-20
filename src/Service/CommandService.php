@@ -55,6 +55,7 @@ readonly class CommandService
             ->setTransactionName($commandClassname)
             ->setCustomParameters($arguments, TracePrefix::COMMAND_ARGUMENT)
             ->setCustomParameters($options, TracePrefix::COMMAND_OPTION)
+            ->setCustomParameter('app.command', true)
         ;
 
         if (count($lockAttributes) === 1) {

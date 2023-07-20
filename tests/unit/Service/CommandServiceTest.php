@@ -77,6 +77,10 @@ class CommandServiceTest extends Unit
             ->shouldBeCalledOnce()
             ->willReturn($this->tracerService->reveal())
         ;
+        $this->tracerService->setCustomParameter('app.command', true)
+            ->shouldBeCalledOnce()
+            ->willReturn($this->tracerService->reveal())
+        ;
 
         $this->assertEquals($expected, $this->commandService->execute($commandClassName, $arguments, $options));
     }
@@ -107,6 +111,10 @@ class CommandServiceTest extends Unit
             ->shouldBeCalledOnce()
             ->willReturn($this->tracerService->reveal())
         ;
+        $this->tracerService->setCustomParameter('app.command', true)
+            ->shouldBeCalledOnce()
+            ->willReturn($this->tracerService->reveal())
+        ;
 
         $this->expectException(ArgumentError::class);
         $this->commandService->execute(TestCommand::class, ['galaxy' => 42]);
@@ -123,6 +131,10 @@ class CommandServiceTest extends Unit
             ->willReturn($this->tracerService->reveal())
         ;
         $this->tracerService->setCustomParameters([], TracePrefix::COMMAND_OPTION)
+            ->shouldBeCalledOnce()
+            ->willReturn($this->tracerService->reveal())
+        ;
+        $this->tracerService->setCustomParameter('app.command', true)
             ->shouldBeCalledOnce()
             ->willReturn($this->tracerService->reveal())
         ;
@@ -145,6 +157,10 @@ class CommandServiceTest extends Unit
             ->shouldBeCalledOnce()
             ->willReturn($this->tracerService->reveal())
         ;
+        $this->tracerService->setCustomParameter('app.command', true)
+            ->shouldBeCalledOnce()
+            ->willReturn($this->tracerService->reveal())
+        ;
 
         $this->expectException(ArgumentError::class);
         $this->commandService->execute(TestCommand::class, options: ['trillian' => true]);
@@ -161,6 +177,10 @@ class CommandServiceTest extends Unit
             ->willReturn($this->tracerService->reveal())
         ;
         $this->tracerService->setCustomParameters(['marvin' => true], TracePrefix::COMMAND_OPTION)
+            ->shouldBeCalledOnce()
+            ->willReturn($this->tracerService->reveal())
+        ;
+        $this->tracerService->setCustomParameter('app.command', true)
             ->shouldBeCalledOnce()
             ->willReturn($this->tracerService->reveal())
         ;
