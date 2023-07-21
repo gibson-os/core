@@ -16,8 +16,8 @@ use ReflectionParameter;
 class ServiceAttribute implements ParameterAttributeInterface, AttributeServiceInterface
 {
     public function __construct(
-        private ServiceManager $serviceManagerService,
-        private DirService $dirService
+        private readonly ServiceManager $serviceManagerService,
+        private readonly DirService $dirService
     ) {
     }
 
