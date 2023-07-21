@@ -7,8 +7,10 @@ use DateTime;
 use GibsonOS\Core\Dto\Cronjob\Time;
 use GibsonOS\Core\Dto\Cronjob\TimePart;
 use GibsonOS\Core\Exception\Model\SaveError;
+use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Manager\ModelManager;
 use GibsonOS\Core\Model\Cronjob;
+use GibsonOS\Core\Repository\Cronjob\TimeRepository;
 use GibsonOS\Core\Repository\CronjobRepository;
 use GibsonOS\Core\Utility\JsonUtility;
 use JsonException;
@@ -20,6 +22,7 @@ class CronjobService
     public function __construct(
         private readonly ModelManager $modelManager,
         private readonly CronjobRepository $cronjobRepository,
+        private readonly TimeRepository $timeRepository,
         private readonly CommandService $commandService,
         private readonly LoggerInterface $logger,
     ) {
@@ -45,17 +48,25 @@ class CronjobService
         array $arguments = [],
         array $options = []
     ): void {
-        $cronjob = (new Cronjob())
-            ->setCommand($command)
-            ->setArguments(JsonUtility::encode($arguments))
-            ->setOptions(JsonUtility::encode($options))
-            ->setUser($user)
-            ->setActive(true)
-        ;
-        $this->modelManager->save($cronjob);
+        try {
+            $cronjob = $this->cronjobRepository->getByCommandAndUser($command, $user);
+        } catch (SelectError) {
+            $cronjob = (new Cronjob())
+                ->setCommand($command)
+                ->setArguments(JsonUtility::encode($arguments))
+                ->setOptions(JsonUtility::encode($options))
+                ->setUser($user)
+                ->setActive(true)
+            ;
+            $this->modelManager->saveWithoutChildren($cronjob);
+        }
+
+        if ($this->timeRepository->hasTimes($cronjob)) {
+            return;
+        }
 
         $times = $this->getCombinedTimes(
-            $this->getTimesFromString($hours),
+            $this->getTimesFromString($hours, 23),
             $this->getTimesFromString($minutes),
             $this->getTimesFromString($seconds),
             $this->getTimesFromString($daysOfMonth, 31, 1),
