@@ -6,6 +6,7 @@ namespace GibsonOS\Core\Service\OpenTelemetry;
 use InvalidArgumentException;
 use OpenTelemetry\API\Common\Instrumentation\CachedInstrumentation;
 use OpenTelemetry\API\Trace\Span;
+use OpenTelemetry\API\Trace\SpanContextInterface;
 use OpenTelemetry\API\Trace\SpanInterface;
 use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\API\Trace\StatusCode;
@@ -56,17 +57,23 @@ class SpanService
         string $fileName = null,
         int $lineNumber = null,
         int $spanKind = SpanKind::KIND_INTERNAL,
+        SpanContextInterface $link = null
     ): SpanInterface {
         if ($spanName === '') {
             throw new InvalidArgumentException('Span name is empty!');
         }
 
-        $span = $instrumentation
+        $spanBuilder = $instrumentation
             ->tracer()
             ->spanBuilder($spanName)
             ->setSpanKind($spanKind)
-            ->startSpan()
         ;
+
+        if ($link !== null) {
+            $spanBuilder->addLink($link);
+        }
+
+        $span = $spanBuilder->startSpan();
 
         if ($fileName !== null) {
             $span->setAttribute('app.fileName', $fileName);
@@ -79,5 +86,15 @@ class SpanService
         Context::storage()->attach($span->storeInContext(Context::getCurrent()));
 
         return $span;
+    }
+
+    public function getTraceId(): ?string
+    {
+        return $this->getCurrentSpan()?->getContext()->getTraceId();
+    }
+
+    public function getSpanId(): ?string
+    {
+        return $this->getCurrentSpan()?->getContext()->getSpanId();
     }
 }

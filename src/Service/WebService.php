@@ -10,12 +10,15 @@ use GibsonOS\Core\Dto\Web\Response;
 use GibsonOS\Core\Enum\HttpMethod;
 use GibsonOS\Core\Enum\HttpStatusCode;
 use GibsonOS\Core\Exception\WebException;
+use GibsonOS\Core\Service\OpenTelemetry\SpanService;
 use Psr\Log\LoggerInterface;
 
 class WebService
 {
-    public function __construct(private readonly LoggerInterface $logger)
-    {
+    public function __construct(
+        private readonly LoggerInterface $logger,
+        private readonly SpanService $spanService,
+    ) {
     }
 
     /**
@@ -107,6 +110,8 @@ class WebService
         curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $method?->value);
 
         $headers = $request->getHeaders();
+        $headers['X-OpenTelemetry-traceId'] = $this->spanService->getTraceId();
+        $headers['X-OpenTelemetry-spanId'] = $this->spanService->getSpanId();
 
         if (!empty($requestBody) && $method === HttpMethod::POST) {
             $this->logger->debug('With body: ' . $requestBody);
@@ -118,16 +123,13 @@ class WebService
             curl_setopt($curl, CURLOPT_NOBODY, true);
         }
 
-        if (count($headers) > 0) {
-            $curlHeaders = [];
+        $curlHeaders = [];
 
-            foreach ($headers as $headerKey => $headerValue) {
-                $curlHeaders[] = $headerKey . ': ' . $headerValue;
-            }
-
-            curl_setopt($curl, CURLOPT_HTTPHEADER, $curlHeaders);
+        foreach ($headers as $headerKey => $headerValue) {
+            $curlHeaders[] = $headerKey . ': ' . $headerValue;
         }
 
+        curl_setopt($curl, CURLOPT_HTTPHEADER, $curlHeaders);
         curl_setopt($curl, CURLOPT_ENCODING, 'gzip');
         curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
         curl_setopt($curl, CURLOPT_PORT, $port);

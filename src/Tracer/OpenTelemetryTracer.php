@@ -6,12 +6,16 @@ namespace GibsonOS\Core\Tracer;
 
 use GibsonOS\Core\Attribute\GetEnv;
 use GibsonOS\Core\Attribute\GetServices;
+use GibsonOS\Core\Enum\TracePrefix;
+use GibsonOS\Core\Exception\RequestError;
 use GibsonOS\Core\OpenTelemetry\Instrumentation\InstrumentationInterface;
 use GibsonOS\Core\Service\OpenTelemetry\SpanService;
+use GibsonOS\Core\Service\RequestService;
 use OpenTelemetry\API\Common\Instrumentation\CachedInstrumentation;
 use OpenTelemetry\API\Common\Instrumentation\Configurator;
 use OpenTelemetry\API\Common\Instrumentation\Globals;
 use OpenTelemetry\API\Trace\Propagation\TraceContextPropagator;
+use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\API\Trace\SpanInterface;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Contrib\Otlp\OtlpHttpTransportFactory;
@@ -33,6 +37,7 @@ class OpenTelemetryTracer extends AbstractTracer
 
     public function __construct(
         private readonly SpanService $spanService,
+        private readonly RequestService $requestService,
         #[GetEnv('OTEL_EXPORTER_OTLP_ENDPOINT')] private readonly ?string $endpoint,
         #[GetServices(['core/src/OpenTelemetry/Instrumentation'], InstrumentationInterface::class)] private readonly array $instrumentations,
     ) {
@@ -64,8 +69,21 @@ class OpenTelemetryTracer extends AbstractTracer
                 ->withPropagator($propagator);
         });
 
+        try {
+            $link = SpanContext::create(
+                $this->requestService->getHeader('X-OpenTelemetry-traceId'),
+                $this->requestService->getHeader('X-OpenTelemetry-spanId'),
+            );
+        } catch (RequestError) {
+            $link = null;
+        }
+
         $this->instrumentation = new CachedInstrumentation('gibsonOS');
-        $this->rootSpan = $this->spanService->buildFromInstrumentation($this->instrumentation, 'root');
+        $this->rootSpan = $this->spanService->buildFromInstrumentation(
+            $this->instrumentation,
+            'root',
+            link: $link,
+        );
         Context::storage()->attach($this->rootSpan->storeInContext(Context::getCurrent()));
 
         ShutdownHandler::register(function (): void {
@@ -95,20 +113,23 @@ class OpenTelemetryTracer extends AbstractTracer
     public function setCustomParameter(string $key, mixed $value): OpenTelemetryTracer
     {
         if ($key !== '') {
-            $this->spanService->getCurrentSpan()?->setAttribute($key, $value);
+            $this->rootSpan->setAttribute($key, $value);
         }
 
         return $this;
     }
 
-    public function startSpan(string $spanName, array $attributes = []): OpenTelemetryTracer
+    public function startSpan(string $spanName, array $attributes = [], TracePrefix $prefix = TracePrefix::NONE): OpenTelemetryTracer
     {
         if ($spanName === '') {
             return $this;
         }
 
-        $this->spanService->buildFromInstrumentation($this->instrumentation, $spanName);
-        $this->setCustomParameters($attributes);
+        $span = $this->spanService->buildFromInstrumentation($this->instrumentation, $spanName);
+
+        foreach ($attributes as $key => $attribute) {
+            $span->setAttribute($prefix->value . $key, $attribute);
+        }
 
         return $this;
     }

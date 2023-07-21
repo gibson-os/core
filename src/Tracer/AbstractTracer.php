@@ -23,7 +23,7 @@ abstract class AbstractTracer
         return $this;
     }
 
-    public function startSpan(string $spanName, array $attributes): self
+    public function startSpan(string $spanName, array $attributes, TracePrefix $prefix = TracePrefix::NONE): self
     {
         return $this;
     }
