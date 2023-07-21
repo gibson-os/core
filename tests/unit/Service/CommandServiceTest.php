@@ -15,6 +15,7 @@ use GibsonOS\Core\Manager\ServiceManager;
 use GibsonOS\Core\Service\CommandService;
 use GibsonOS\Core\Service\LockService;
 use GibsonOS\Core\Service\LoggerService;
+use GibsonOS\Core\Service\OpenTelemetry\SpanService;
 use GibsonOS\Core\Service\ProcessService;
 use GibsonOS\Core\Service\TracerService;
 use GibsonOS\Core\Store\CommandStore;
@@ -38,6 +39,8 @@ class CommandServiceTest extends Unit
 
     private TracerService|ObjectProphecy $tracerService;
 
+    private SpanService|ObjectProphecy $spanService;
+
     private CommandService $commandService;
 
     protected function _before(): void
@@ -46,6 +49,7 @@ class CommandServiceTest extends Unit
         $this->commandStore = $this->prophesize(CommandStore::class);
         $this->lockService = $this->prophesize(LockService::class);
         $this->tracerService = $this->prophesize(TracerService::class);
+        $this->spanService = $this->prophesize(SpanService::class);
         $serviceManager = new ServiceManager();
         $serviceManager->setInterface(LoggerInterface::class, LoggerService::class);
         $serviceManager->setService(ModelManager::class, $this->prophesize(ModelManager::class)->reveal());
@@ -57,6 +61,7 @@ class CommandServiceTest extends Unit
             new ReflectionManager(),
             $this->lockService->reveal(),
             $this->tracerService->reveal(),
+            $this->spanService->reveal(),
         );
     }
 

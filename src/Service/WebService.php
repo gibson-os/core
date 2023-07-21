@@ -110,8 +110,13 @@ class WebService
         curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $method?->value);
 
         $headers = $request->getHeaders();
-        $headers['X-OpenTelemetry-traceId'] = $this->spanService->getTraceId();
-        $headers['X-OpenTelemetry-spanId'] = $this->spanService->getSpanId();
+        $traceId = $this->spanService->getTraceId();
+        $spanId = $this->spanService->getSpanId();
+
+        if ($traceId !== null && $spanId !== null) {
+            $headers['X-OpenTelemetry-traceId'] = $traceId;
+            $headers['X-OpenTelemetry-spanId'] = $spanId;
+        }
 
         if (!empty($requestBody) && $method === HttpMethod::POST) {
             $this->logger->debug('With body: ' . $requestBody);

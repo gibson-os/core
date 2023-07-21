@@ -16,20 +16,26 @@ use GibsonOS\Core\Exception\Lock\LockException;
 use GibsonOS\Core\Exception\Lock\UnlockException;
 use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Manager\ServiceManager;
+use GibsonOS\Core\Service\OpenTelemetry\SpanService;
 use GibsonOS\Core\Store\CommandStore;
 use JsonException;
 use ReflectionAttribute;
 use ReflectionClass;
 use ReflectionException;
 
-readonly class CommandService
+class CommandService
 {
+    private array $arguments = [];
+
+    private array $options = [];
+
     public function __construct(
-        private ServiceManager $serviceManager,
-        private ProcessService $processService,
-        private ReflectionManager $reflectionManager,
-        private LockService $lockService,
-        private TracerService $tracerService,
+        private readonly ServiceManager $serviceManager,
+        private readonly ProcessService $processService,
+        private readonly ReflectionManager $reflectionManager,
+        private readonly LockService $lockService,
+        private readonly TracerService $tracerService,
+        private readonly SpanService $spanService,
     ) {
     }
 
@@ -69,8 +75,8 @@ readonly class CommandService
             }
         }
 
-        $this->setArguments($command, $reflectionClass, $arguments);
-        $this->setOptions($command, $reflectionClass, $options);
+        $this->setCommandArguments($command, $reflectionClass, $arguments);
+        $this->setCommandOptions($command, $reflectionClass, $options);
 
         $return = $command->execute();
 
@@ -99,6 +105,14 @@ readonly class CommandService
                 DIRECTORY_SEPARATOR . '..' .
                 DIRECTORY_SEPARATOR . '..'
         ) . DIRECTORY_SEPARATOR . 'bin' . DIRECTORY_SEPARATOR . 'command';
+
+        $traceId = $this->spanService->getTraceId();
+        $spanId = $this->spanService->getSpanId();
+
+        if ($traceId !== null && $spanId !== null) {
+            $arguments['openTelemetryTraceId'] = $traceId;
+            $arguments['openTelemetrySpanId'] = $spanId;
+        }
 
         $this->processService->executeAsync(
             $commandPath . ' ' . escapeshellarg($commandName) . ' ' .
@@ -174,9 +188,22 @@ readonly class CommandService
         throw new CommandError('No Command found!');
     }
 
-    public function getArguments(array $arguments): array
+    public function getArguments(): array
     {
-        $argumentList = [];
+        return $this->arguments;
+    }
+
+    /**
+     * @return bool[]
+     */
+    public function getOptions(): array
+    {
+        return $this->options;
+    }
+
+    public function setArguments(array $arguments): CommandService
+    {
+        $this->arguments = [];
 
         foreach ($arguments as $argument) {
             if (mb_strpos($argument, '--') !== 0) {
@@ -184,18 +211,15 @@ readonly class CommandService
             }
 
             $argumentArray = explode('=', $argument);
-            $argumentList[mb_substr($argumentArray[0], 2)] = $argumentArray[1] ?? null;
+            $this->arguments[mb_substr($argumentArray[0], 2)] = $argumentArray[1] ?? null;
         }
 
-        return $argumentList;
+        return $this;
     }
 
-    /**
-     * @return bool[]
-     */
-    public function getOptions(array $options): array
+    public function setOptions(array $options): CommandService
     {
-        $optionList = [];
+        $this->options = [];
 
         foreach ($options as $option) {
             if (mb_strpos($option, '--') === 0 || mb_strpos($option, '-') !== 0) {
@@ -203,10 +227,10 @@ readonly class CommandService
             }
 
             $optionName = mb_substr($option, 1);
-            $optionList[$optionName] = true;
+            $this->options[$optionName] = true;
         }
 
-        return $optionList;
+        return $this;
     }
 
     /**
@@ -214,7 +238,7 @@ readonly class CommandService
      *
      * @throws ArgumentError
      */
-    private function setArguments(CommandInterface $command, ReflectionClass $reflectionClass, array $arguments): void
+    private function setCommandArguments(CommandInterface $command, ReflectionClass $reflectionClass, array $arguments): void
     {
         $argumentProperties = [];
 
@@ -264,7 +288,7 @@ readonly class CommandService
      *
      * @throws ArgumentError
      */
-    private function setOptions(CommandInterface $command, ReflectionClass $reflectionClass, array $options): void
+    private function setCommandOptions(CommandInterface $command, ReflectionClass $reflectionClass, array $options): void
     {
         $optionsProperties = [];
 

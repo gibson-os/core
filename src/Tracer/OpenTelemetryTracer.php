@@ -9,6 +9,7 @@ use GibsonOS\Core\Attribute\GetServices;
 use GibsonOS\Core\Enum\TracePrefix;
 use GibsonOS\Core\Exception\RequestError;
 use GibsonOS\Core\OpenTelemetry\Instrumentation\InstrumentationInterface;
+use GibsonOS\Core\Service\CommandService;
 use GibsonOS\Core\Service\OpenTelemetry\SpanService;
 use GibsonOS\Core\Service\RequestService;
 use OpenTelemetry\API\Common\Instrumentation\CachedInstrumentation;
@@ -38,6 +39,7 @@ class OpenTelemetryTracer extends AbstractTracer
     public function __construct(
         private readonly SpanService $spanService,
         private readonly RequestService $requestService,
+        private readonly CommandService $commandService,
         #[GetEnv('OTEL_EXPORTER_OTLP_ENDPOINT')] private readonly ?string $endpoint,
         #[GetServices(['core/src/OpenTelemetry/Instrumentation'], InstrumentationInterface::class)] private readonly array $instrumentations,
     ) {
@@ -76,6 +78,14 @@ class OpenTelemetryTracer extends AbstractTracer
             );
         } catch (RequestError) {
             $link = null;
+            $arguments = $this->commandService->getArguments();
+
+            if (isset($arguments['openTelemetryTraceId'], $arguments['openTelemetrySpanId'])) {
+                $link = SpanContext::create(
+                    $arguments['openTelemetryTraceId'],
+                    $arguments['openTelemetrySpanId'],
+                );
+            }
         }
 
         $this->instrumentation = new CachedInstrumentation('gibsonOS');
