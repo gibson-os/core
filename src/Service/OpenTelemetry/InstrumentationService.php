@@ -28,14 +28,14 @@ class InstrumentationService
         $pre ??= function (
             ?object $object,
             array $params,
-            string $class,
+            ?string $class,
             string $function,
             ?string $fileName,
             ?int $lineNumber,
         ) use ($instrumentation): void {
             $this->spanService->buildFromInstrumentation(
                 $instrumentation,
-                sprintf('%s::%s', $object::class, $function),
+                sprintf('%s%s', $object === null ? '' : $object::class . '::', $function),
                 $fileName,
                 $lineNumber
             );

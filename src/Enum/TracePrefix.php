@@ -9,4 +9,5 @@ enum TracePrefix: string
     case COMMAND_ARGUMENT = 'app.command.argument.';
     case COMMAND_OPTION = 'app.command.option.';
     case REQUEST_VALUE = 'app.request.value.';
+    case FILE = 'app.file.';
 }
