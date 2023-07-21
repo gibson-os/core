@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Command;
 
+use GibsonOS\Core\Attribute\Command\Argument;
 use GibsonOS\Core\Attribute\Command\Option;
 use GibsonOS\Core\Service\LoggerService;
 use Psr\Log\LoggerInterface;
@@ -24,6 +25,12 @@ abstract class AbstractCommand implements CommandInterface
 
     #[Option('Add debug information to log messages')]
     protected bool $debug = false;
+
+    #[Argument('OpenTelemetry span ID')]
+    protected ?string $openTelemetrySpanId = null;
+
+    #[Argument('OpenTelemetry trace ID')]
+    protected ?string $openTelemetryTraceId = null;
 
     public function __construct(protected LoggerInterface $logger)
     {
@@ -73,6 +80,20 @@ abstract class AbstractCommand implements CommandInterface
     public function setDebug(bool $debug): AbstractCommand
     {
         $this->debug = $debug;
+
+        return $this;
+    }
+
+    public function setOpenTelemetrySpanId(?string $openTelemetrySpanId): AbstractCommand
+    {
+        $this->openTelemetrySpanId = $openTelemetrySpanId;
+
+        return $this;
+    }
+
+    public function setOpenTelemetryTraceId(?string $openTelemetryTraceId): AbstractCommand
+    {
+        $this->openTelemetryTraceId = $openTelemetryTraceId;
 
         return $this;
     }
