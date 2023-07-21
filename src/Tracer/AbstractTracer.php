@@ -12,18 +12,18 @@ abstract class AbstractTracer
 
     abstract public function setTransactionName(string $transactionName): self;
 
-    abstract public function setCustomParameter(string $key, mixed $value): self;
+    abstract public function setCustomParameter(string $key, mixed $value, TracePrefix $prefix = TracePrefix::APP): self;
 
-    public function setCustomParameters(array $values, TracePrefix $prefix = TracePrefix::NONE): self
+    public function setCustomParameters(array $values, TracePrefix $prefix = TracePrefix::APP): self
     {
         foreach ($values as $key => $value) {
-            $this->setCustomParameter($prefix->value . $key, $value);
+            $this->setCustomParameter($key, $value, $prefix);
         }
 
         return $this;
     }
 
-    public function startSpan(string $spanName, array $attributes, TracePrefix $prefix = TracePrefix::NONE): self
+    public function startSpan(string $spanName, array $attributes, TracePrefix $prefix = TracePrefix::APP): self
     {
         return $this;
     }

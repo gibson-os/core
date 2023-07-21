@@ -77,7 +77,7 @@ class CommandServiceTest extends Unit
             ->shouldBeCalledOnce()
             ->willReturn($this->tracerService->reveal())
         ;
-        $this->tracerService->setCustomParameter('app.command', true)
+        $this->tracerService->setCustomParameter('command', true)
             ->shouldBeCalledOnce()
             ->willReturn($this->tracerService->reveal())
         ;
@@ -111,7 +111,7 @@ class CommandServiceTest extends Unit
             ->shouldBeCalledOnce()
             ->willReturn($this->tracerService->reveal())
         ;
-        $this->tracerService->setCustomParameter('app.command', true)
+        $this->tracerService->setCustomParameter('command', true)
             ->shouldBeCalledOnce()
             ->willReturn($this->tracerService->reveal())
         ;
@@ -134,7 +134,7 @@ class CommandServiceTest extends Unit
             ->shouldBeCalledOnce()
             ->willReturn($this->tracerService->reveal())
         ;
-        $this->tracerService->setCustomParameter('app.command', true)
+        $this->tracerService->setCustomParameter('command', true)
             ->shouldBeCalledOnce()
             ->willReturn($this->tracerService->reveal())
         ;
@@ -157,7 +157,7 @@ class CommandServiceTest extends Unit
             ->shouldBeCalledOnce()
             ->willReturn($this->tracerService->reveal())
         ;
-        $this->tracerService->setCustomParameter('app.command', true)
+        $this->tracerService->setCustomParameter('command', true)
             ->shouldBeCalledOnce()
             ->willReturn($this->tracerService->reveal())
         ;
@@ -180,7 +180,7 @@ class CommandServiceTest extends Unit
             ->shouldBeCalledOnce()
             ->willReturn($this->tracerService->reveal())
         ;
-        $this->tracerService->setCustomParameter('app.command', true)
+        $this->tracerService->setCustomParameter('command', true)
             ->shouldBeCalledOnce()
             ->willReturn($this->tracerService->reveal())
         ;

@@ -29,11 +29,11 @@ class TracerService
         return $this;
     }
 
-    public function setCustomParameter(string $key, mixed $value): TracerService
+    public function setCustomParameter(string $key, mixed $value, TracePrefix $prefix = TracePrefix::APP): TracerService
     {
         foreach ($this->tracers as $tracer) {
             if ($tracer->isLoaded()) {
-                $tracer->setCustomParameter($key, $value);
+                $tracer->setCustomParameter($key, $value, $prefix);
             }
         }
 
@@ -43,7 +43,7 @@ class TracerService
     /**
      * @param array<string, mixed> $values
      */
-    public function setCustomParameters(array $values, TracePrefix $prefix = TracePrefix::NONE): TracerService
+    public function setCustomParameters(array $values, TracePrefix $prefix = TracePrefix::APP): TracerService
     {
         foreach ($this->tracers as $tracer) {
             if ($tracer->isLoaded()) {

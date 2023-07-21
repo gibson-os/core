@@ -110,16 +110,16 @@ class OpenTelemetryTracer extends AbstractTracer
         return $this;
     }
 
-    public function setCustomParameter(string $key, mixed $value): OpenTelemetryTracer
+    public function setCustomParameter(string $key, mixed $value, TracePrefix $prefix = TracePrefix::APP): OpenTelemetryTracer
     {
         if ($key !== '') {
-            $this->rootSpan->setAttribute($key, $value);
+            $this->rootSpan->setAttribute($prefix->value . $key, $value);
         }
 
         return $this;
     }
 
-    public function startSpan(string $spanName, array $attributes = [], TracePrefix $prefix = TracePrefix::NONE): OpenTelemetryTracer
+    public function startSpan(string $spanName, array $attributes = [], TracePrefix $prefix = TracePrefix::APP): OpenTelemetryTracer
     {
         if ($spanName === '') {
             return $this;

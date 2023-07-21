@@ -73,7 +73,7 @@ readonly class ControllerService
         $this->tracerService
             ->setTransactionName(sprintf('%s::%s', $controllerName, $action))
             ->setCustomParameters($this->requestService->getRequestValues(), TracePrefix::REQUEST_VALUE)
-            ->setCustomParameter('app.controller', true)
+            ->setCustomParameter('controller', true)
         ;
 
         try {
