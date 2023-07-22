@@ -195,6 +195,11 @@ class UserController extends AbstractController
             return $this->returnSuccess();
         }
 
+        $permission
+            ->setTaskId($permission->getTaskId() === 0 ? null : $permission->getTaskId())
+            ->setActionId($permission->getActionId() === 0 ? null : $permission->getActionId())
+            ->setUserId($permission->getUserId() === 0 ? null : $permission->getUserId())
+        ;
         $modelManager->saveWithoutChildren($permission);
 
         return $this->returnSuccess();
