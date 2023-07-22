@@ -86,6 +86,10 @@ class CommandServiceTest extends Unit
             ->shouldBeCalledOnce()
             ->willReturn($this->tracerService->reveal())
         ;
+        $this->tracerService->setCustomParameter('statusCode', $expected)
+            ->shouldBeCalledOnce()
+            ->willReturn($this->tracerService->reveal())
+        ;
 
         $this->assertEquals($expected, $this->commandService->execute($commandClassName, $arguments, $options));
     }

@@ -84,6 +84,8 @@ class CommandService
             }
         }
 
+        $this->tracerService->setCustomParameter('statusCode', $return);
+
         return $return;
     }
 

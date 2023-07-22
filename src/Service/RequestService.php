@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Service;
 
 use GibsonOS\Core\Exception\RequestError;
+use GibsonOS\Core\Utility\JsonUtility;
 
 class RequestService
 {
@@ -56,6 +57,7 @@ class RequestService
             $_GET,
             $_POST,
             $params,
+            $this->getJsonBody(),
             $_COOKIE,
             $files
         );
@@ -148,5 +150,27 @@ class RequestService
     public function getQueryString(): string
     {
         return $this->queryString;
+    }
+
+    private function getJsonBody(): array
+    {
+        if (mb_strtolower($_SERVER['CONTENT_TYPE'] ?? '') === 'application/json') {
+
+            $body = file_get_contents('php://input');
+
+            if (empty($body)) {
+                return [];
+            }
+
+            $parameters = JsonUtility::decode($body);
+
+            if (!is_array($parameters)) {
+                return [];
+            }
+
+            return $parameters;
+        }
+
+        return [];
     }
 }

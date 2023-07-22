@@ -74,6 +74,7 @@ readonly class ControllerService
             ->setTransactionName(sprintf('%s::%s', $controllerName, $action))
             ->setCustomParameters($this->requestService->getRequestValues(), TracePrefix::REQUEST_VALUE)
             ->setCustomParameter('controller', true)
+            ->setCustomParameter('method', $this->requestService->getMethod())
         ;
 
         try {
@@ -154,6 +155,7 @@ readonly class ControllerService
      * @throws MiddlewareException
      * @throws SaveError
      * @throws WebException
+     * @throws ReflectionException
      */
     private function renderTemplate(): TwigResponse
     {
@@ -214,6 +216,8 @@ readonly class ControllerService
                 header($headerName . ': ' . $headerValue, $index === 0);
             }
         }
+
+        $this->tracerService->setCustomParameter('statusCode', $response->getCode()->value);
 
         echo $response->getBody();
     }

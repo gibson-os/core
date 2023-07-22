@@ -60,7 +60,7 @@ class ServiceManager
     public function get(string $classname, string $instanceOf = null): object
     {
         $tracerService = $this->getTracerService();
-        $tracerService?->startSpan(sprintf('get %s', $classname), ['app.instanceof' => $instanceOf]);
+        $tracerService?->startSpan(sprintf('get %s', $classname), ['instanceof' => $instanceOf]);
 
         if (\mb_strpos($classname, '\\') === 0) {
             $classname = substr($classname, 1);
