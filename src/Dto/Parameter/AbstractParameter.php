@@ -27,7 +27,7 @@ abstract class AbstractParameter implements JsonSerializable
 
     private ?string $operator = null;
 
-    private mixed $value;
+    private mixed $value = null;
 
     abstract protected function getTypeConfig(): array;
 
