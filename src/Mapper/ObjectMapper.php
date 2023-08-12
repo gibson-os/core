@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Mapper;
 
+use DateTimeInterface;
 use GibsonOS\Core\Attribute\ObjectMapper as ObjectMapperAttribute;
 use GibsonOS\Core\Exception\FactoryError;
 use GibsonOS\Core\Exception\MapperException;
@@ -160,6 +161,10 @@ class ObjectMapper implements ObjectMapperInterface
                         'float' => (float) $values,
                     });
                 }
+            }
+
+            if (is_subclass_of($typeName, DateTimeInterface::class)) {
+                return new $typeName($values);
             }
 
             return $mapper->mapToObject(
