@@ -54,6 +54,14 @@ class MailService
             $mailer->Body = $mail->getHtml();
             $mailer->AltBody = $mail->getPlain();
 
+            foreach ($mail->getAttachments() as $attachment) {
+                $mailer->addStringAttachment(
+                    $attachment->getContent(),
+                    $attachment->getFilename(),
+                    disposition: $attachment->getDisposition(),
+                );
+            }
+
             $mailer->send();
         } catch (Exception $exception) {
             throw new MailException(

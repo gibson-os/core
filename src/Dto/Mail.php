@@ -4,14 +4,16 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Dto;
 
 use GibsonOS\Core\Dto\Mail\Address;
+use GibsonOS\Core\Dto\Mail\Attachment;
 use GibsonOS\Core\Enum\SmtpEncryption;
 
 class Mail
 {
     /**
-     * @param Address[] $to
-     * @param Address[] $cc
-     * @param Address[] $bcc
+     * @param Address[]    $to
+     * @param Address[]    $cc
+     * @param Address[]    $bcc
+     * @param Attachment[] $attachments
      */
     public function __construct(
         private string $subject,
@@ -27,6 +29,7 @@ class Mail
         private array $cc = [],
         private array $bcc = [],
         private ?Address $replyTo = null,
+        private array $attachments = [],
     ) {
     }
 
@@ -182,6 +185,24 @@ class Mail
     public function setReplyTo(?Address $replyTo): Mail
     {
         $this->replyTo = $replyTo;
+
+        return $this;
+    }
+
+    /**
+     * @return Attachment[]
+     */
+    public function getAttachments(): array
+    {
+        return $this->attachments;
+    }
+
+    /**
+     * @param Attachment[] $attachments
+     */
+    public function setAttachments(array $attachments): Mail
+    {
+        $this->attachments = $attachments;
 
         return $this;
     }
