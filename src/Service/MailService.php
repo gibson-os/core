@@ -53,7 +53,6 @@ class MailService
 
             $mailer->isHTML();
             $mailer->Subject = $mail->getSubject();
-            $mailer->Body = $mail->getHtml();
             $mailer->AltBody = $mail->getPlain();
 
             foreach ($mail->getAttachments() as $attachment) {
@@ -72,6 +71,7 @@ class MailService
                 );
             }
 
+            $mailer->msgHTML($mail->getHtml());
             $mailer->send();
         } catch (Exception $exception) {
             throw new MailException(
