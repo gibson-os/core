@@ -21,6 +21,8 @@ class MailService
             $mailer->SMTPAuth = true;
             $mailer->Username = $mail->getUsername();
             $mailer->Password = $mail->getPassword();
+            $mailer->CharSet = 'UTF-8';
+            $mailer->Encoding = 'base64';
 
             $smtpEncryption = $mail->getEncryption();
 
