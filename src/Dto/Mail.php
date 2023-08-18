@@ -14,6 +14,7 @@ class Mail
      * @param Address[]    $cc
      * @param Address[]    $bcc
      * @param Attachment[] $attachments
+     * @param Attachment[] $images
      */
     public function __construct(
         private string $subject,
@@ -30,6 +31,7 @@ class Mail
         private array $bcc = [],
         private ?Address $replyTo = null,
         private array $attachments = [],
+        private array $images = [],
     ) {
     }
 
@@ -203,6 +205,24 @@ class Mail
     public function setAttachments(array $attachments): Mail
     {
         $this->attachments = $attachments;
+
+        return $this;
+    }
+
+    /**
+     * @return Attachment[]
+     */
+    public function getImages(): array
+    {
+        return $this->images;
+    }
+
+    /**
+     * @param Attachment[] $images
+     */
+    public function setImages(array $images): Mail
+    {
+        $this->images = $images;
 
         return $this;
     }

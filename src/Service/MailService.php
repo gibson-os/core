@@ -64,6 +64,14 @@ class MailService
                 );
             }
 
+            foreach ($mail->getImages() as $image) {
+                $mailer->addStringEmbeddedImage(
+                    $image->getContent(),
+                    $image->getFilename(),
+                    disposition: $image->getDisposition(),
+                );
+            }
+
             $mailer->send();
         } catch (Exception $exception) {
             throw new MailException(
