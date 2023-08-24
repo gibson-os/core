@@ -22,7 +22,6 @@ class MailService
             $mailer->Username = $mail->getUsername();
             $mailer->Password = $mail->getPassword();
             $mailer->CharSet = 'UTF-8';
-            $mailer->Encoding = 'base64';
 
             $smtpEncryption = $mail->getEncryption();
 
@@ -51,15 +50,13 @@ class MailService
                 $mailer->addBCC($bcc->getAddress(), $bcc->getName());
             }
 
-            $mailer->isHTML();
             $mailer->Subject = $mail->getSubject();
-            $mailer->AltBody = $mail->getPlain();
 
             foreach ($mail->getAttachments() as $attachment) {
                 $mailer->addStringAttachment(
                     $attachment->getContent(),
                     $attachment->getFilename(),
-                    disposition: $attachment->getDisposition(),
+                    disposition: $attachment->getDisposition()->value,
                 );
             }
 
@@ -67,11 +64,13 @@ class MailService
                 $mailer->addStringEmbeddedImage(
                     $image->getContent(),
                     $image->getFilename(),
-                    disposition: $image->getDisposition(),
+                    $image->getFilename(),
+                    disposition: $image->getDisposition()->value,
                 );
             }
 
             $mailer->msgHTML($mail->getHtml());
+            $mailer->AltBody = $mail->getPlain() ?: $mailer->AltBody;
             $mailer->send();
         } catch (Exception $exception) {
             throw new MailException(
