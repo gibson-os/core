@@ -46,18 +46,7 @@ class ManipulateService extends DrawService
         $newImage = $this->create($width, $height);
 
         if (
-            !imagecopyresampled(
-                $newImage->getImage(),
-                $image->getImage(),
-                0,
-                0,
-                0,
-                0,
-                $width,
-                $height,
-                $this->getWidth($image),
-                $this->getHeight($image)
-            )
+            !imagecopyresampled($newImage->getImage(), $image->getImage(), 0, 0, 0, 0, $width, $height, $this->getWidth($image), $this->getHeight($image))
         ) {
             return false;
         }
@@ -94,12 +83,7 @@ class ManipulateService extends DrawService
         $manipulate = $this->create($width, $height);
         $this->fillTransparent($manipulate);
 
-        if ($this->copy(
-            $image,
-            $manipulate,
-            0,
-            (int) (($height - $this->getHeight($image)) / 2)
-        ) === false) {
+        if ($this->copy($image, $manipulate, 0, (int) (($height - $this->getHeight($image)) / 2)) === false) {
             return false;
         }
 
@@ -116,11 +100,7 @@ class ManipulateService extends DrawService
         $manipulate = $this->create($width, $height);
         $this->fillTransparent($manipulate);
 
-        if ($this->copy(
-            $image,
-            $manipulate,
-            (int) (($width - $this->getWidth($image)) / 2)
-        ) === false) {
+        if ($this->copy($image, $manipulate, (int) (($width - $this->getWidth($image)) / 2)) === false) {
             return false;
         }
 
@@ -132,14 +112,8 @@ class ManipulateService extends DrawService
     /**
      * @throws CreateError
      */
-    public function crop(
-        Image $image,
-        int $width,
-        int $height,
-        int $startX = null,
-        int $startY = null,
-        int $color = null
-    ): bool {
+    public function crop(Image $image, int $width, int $height, int $startX = null, int $startY = null, int $color = null): bool
+    {
         if ($startX === null) {
             $startX = (int) (($this->getWidth($image) - $width) / 2);
         }
@@ -153,18 +127,7 @@ class ManipulateService extends DrawService
             $this->filledRectangle($draw, $color);
         }
 
-        if (imagecopyresampled(
-            $draw->getImage(),
-            $image->getImage(),
-            0,
-            0,
-            $startX,
-            $startY,
-            $width,
-            $height,
-            $width,
-            $height
-        ) === false) {
+        if (imagecopyresampled($draw->getImage(), $image->getImage(), 0, 0, $startX, $startY, $width, $height, $width, $height) === false) {
             return false;
         }
 
@@ -205,18 +168,8 @@ class ManipulateService extends DrawService
         return false;
     }
 
-    public function copy(
-        Image $sourceImage,
-        Image $destinationImage,
-        int $destX = 0,
-        int $destY = 0,
-        int $srcX = 0,
-        int $srcY = 0,
-        int $srcWidth = -1,
-        int $srcHeight = -1,
-        int $dstWidth = -1,
-        int $dstHeight = -1
-    ): bool {
+    public function copy(Image $sourceImage, Image $destinationImage, int $destX = 0, int $destY = 0, int $srcX = 0, int $srcY = 0, int $srcWidth = -1, int $srcHeight = -1, int $dstWidth = -1, int $dstHeight = -1): bool
+    {
         if ($srcWidth === -1) {
             $srcWidth = $this->getWidth($sourceImage);
         }
@@ -233,17 +186,6 @@ class ManipulateService extends DrawService
             $dstHeight = $this->getHeight($sourceImage);
         }
 
-        return imagecopyresampled(
-            $destinationImage->getImage(),
-            $sourceImage->getImage(),
-            $destX,
-            $destY,
-            $srcX,
-            $srcY,
-            $dstWidth,
-            $dstHeight,
-            $srcWidth,
-            $srcHeight
-        );
+        return imagecopyresampled($destinationImage->getImage(), $sourceImage->getImage(), $destX, $destY, $srcX, $srcY, $dstWidth, $dstHeight, $srcWidth, $srcHeight);
     }
 }

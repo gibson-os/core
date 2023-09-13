@@ -31,14 +31,18 @@ class MiddlewareService
      * @throws SelectError
      */
     public function __construct(
-        #[GetEnv('MIDDLEWARE_URL')] private readonly ?string $middlewareUrl,
-        #[GetEnv('WEB_URL')] private readonly string $webUrl,
+        #[GetEnv('MIDDLEWARE_URL')]
+        private readonly ?string $middlewareUrl,
+        #[GetEnv('WEB_URL')]
+        private readonly string $webUrl,
         private readonly WebService $webService,
         private readonly ModelManager $modelManager,
         private readonly SettingRepository $settingRepository,
         ModuleRepository $moduleRepository,
-        #[GetSetting('middlewareToken', 'core')] Setting $middlewareToken = null,
-        #[GetSetting('middlewareSecret', 'core')] Setting $middlewareSecret = null,
+        #[GetSetting('middlewareToken', 'core')]
+        Setting $middlewareToken = null,
+        #[GetSetting('middlewareSecret', 'core')]
+        Setting $middlewareSecret = null,
     ) {
         $module = $moduleRepository->getByName('core');
         $this->middlewareToken = $middlewareToken
@@ -89,7 +93,7 @@ class MiddlewareService
             HttpMethod::GET => $this->webService->get($request),
             default => (count($parameters) || $body !== null)
                 ? $this->webService->post($request)
-                : $this->webService->get($request)
+                : $this->webService->get($request),
         };
 
         if ($response->getStatusCode() === HttpStatusCode::UNAUTHORIZED) {
@@ -135,7 +139,7 @@ class MiddlewareService
         }
 
         $this->modelManager->saveWithoutChildren(
-            $this->middlewareSecret->setValue(mb_substr(base64_encode(random_bytes(190)), 0, 256))
+            $this->middlewareSecret->setValue(mb_substr(base64_encode(random_bytes(190)), 0, 256)),
         );
         $response = $this->webService->post(
             (new Request(sprintf('%smiddleware/instance/newToken', $this->middlewareUrl)))
@@ -143,7 +147,7 @@ class MiddlewareService
                     'url' => $this->webUrl,
                     'secret' => $this->middlewareSecret->getValue(),
                 ])
-                ->setHeaders(['X-Requested-With' => 'XMLHttpRequest'])
+                ->setHeaders(['X-Requested-With' => 'XMLHttpRequest']),
         );
 
         if ($response->getStatusCode() !== HttpStatusCode::OK) {
@@ -157,7 +161,7 @@ class MiddlewareService
         $this->middlewareToken = $this->settingRepository->getByKeyAndModuleName(
             'core',
             null,
-            'middlewareToken'
+            'middlewareToken',
         );
     }
 }

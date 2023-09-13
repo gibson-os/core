@@ -18,7 +18,8 @@ class MiddlewarePermissionAttributeService extends AbstractActionAttributeServic
     public function __construct(
         private readonly PermissionAttribute $permissionAttribute,
         private readonly RequestService $requestService,
-        #[GetSetting('middlewareSecret', 'core')] private readonly Setting $middlewareSecret,
+        #[GetSetting('middlewareSecret', 'core')]
+        private readonly Setting $middlewareSecret,
     ) {
     }
 

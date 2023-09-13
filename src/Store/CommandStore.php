@@ -21,7 +21,8 @@ class CommandStore extends AbstractStore
     public function __construct(
         private readonly CommandService $commandService,
         private readonly ReflectionManager $reflectionManager,
-        #[GetClassNames(['*/src/Command'])] private readonly array $classStrings,
+        #[GetClassNames(['*/src/Command'])]
+        private readonly array $classStrings,
     ) {
     }
 
@@ -59,8 +60,8 @@ class CommandStore extends AbstractStore
                 $this->reflectionManager->getAttributes(
                     $reflectionClass,
                     Cronjob::class,
-                    ReflectionAttribute::IS_INSTANCEOF
-                )
+                    ReflectionAttribute::IS_INSTANCEOF,
+                ),
             );
         }
     }

@@ -29,7 +29,7 @@ class IconRepository extends AbstractRepository
         return $this->fetchAll(
             '`id` IN (' . $this->getTable($this->iconTableName)->getParametersString($ids) . ')',
             $ids,
-            Icon::class
+            Icon::class,
         );
     }
 

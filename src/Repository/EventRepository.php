@@ -19,7 +19,8 @@ class EventRepository extends AbstractRepository
 {
     public function __construct(
         private DateTimeService $dateTimeService,
-        #[GetTableName(Element::class)] private string $elementTableName,
+        #[GetTableName(Element::class)]
+        private string $elementTableName,
     ) {
     }
 
@@ -65,7 +66,7 @@ class EventRepository extends AbstractRepository
                 '(`event_trigger`.`year` IS NULL OR `event_trigger`.`year`=?) AND ' .
                 '(`event_trigger`.`hour` IS NULL OR `event_trigger`.`hour`=?) AND ' .
                 '(`event_trigger`.`minute` IS NULL OR `event_trigger`.`minute`=?) AND ' .
-                '(`event_trigger`.`second` IS NULL OR `event_trigger`.`second`=?)'
+                '(`event_trigger`.`second` IS NULL OR `event_trigger`.`second`=?)',
             )
             ->setWhereParameters([
                 1,
@@ -117,7 +118,7 @@ class EventRepository extends AbstractRepository
             '`event_trigger`.`year` AS `triggerYear`, ' .
             '`event_trigger`.`hour` AS `triggerHour`, ' .
             '`event_trigger`.`minute` AS `triggerMinute`, ' .
-            '`event_trigger`.`priority` AS `triggerPriority`'
+            '`event_trigger`.`priority` AS `triggerPriority`',
         );
 
         return $table;

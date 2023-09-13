@@ -23,7 +23,7 @@ class ObjectMapperAttribute implements AttributeServiceInterface, ParameterAttri
     public function __construct(
         protected ObjectMapper $objectMapper,
         protected RequestService $requestService,
-        protected ReflectionManager $reflectionManager
+        protected ReflectionManager $reflectionManager,
     ) {
     }
 
@@ -115,7 +115,7 @@ class ObjectMapperAttribute implements AttributeServiceInterface, ParameterAttri
 
     public function getMappingKey(
         GetObject $attribute,
-        ReflectionParameter|ReflectionProperty $reflectionObject
+        ReflectionParameter|ReflectionProperty $reflectionObject,
     ): string {
         $parameterName = $reflectionObject->getName();
 
@@ -127,7 +127,7 @@ class ObjectMapperAttribute implements AttributeServiceInterface, ParameterAttri
      */
     public function getParameterFromRequest(
         ReflectionParameter $reflectionParameter,
-        string $requestKey = null
+        string $requestKey = null,
     ): string|int|float|bool|null|array|object {
         try {
             $value = $this->requestService->getRequestValue($requestKey ?? $reflectionParameter->getName());
@@ -145,7 +145,7 @@ class ObjectMapperAttribute implements AttributeServiceInterface, ParameterAttri
                     if ($reflectionProperty === null || !$reflectionProperty->hasDefaultValue()) {
                         throw new MapperException(sprintf(
                             'Parameter "%s" is not in request!',
-                            $requestKey ?? $reflectionParameter->getName()
+                            $requestKey ?? $reflectionParameter->getName(),
                         ), 0, $exception);
                     }
 

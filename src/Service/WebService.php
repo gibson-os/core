@@ -185,7 +185,7 @@ class WebService
             $httpCode,
             $this->getHeaders(fread($responseHandle, $headerSize)),
             (new Body())->setResource($responseHandle, $length),
-            $cookieFile
+            $cookieFile,
         );
     }
 

@@ -17,11 +17,7 @@ class PermissionRepository extends AbstractRepository
      */
     public function getByModuleTaskAndAction(Module $module, Task $task, Action $action, int $userId = null): Permission
     {
-        return $this->fetchOne(
-            '`module_id`=? AND `task_id`=? AND `action_id`=? AND IFNULL(`user_id`, ?)=?',
-            [$module->getId(), $task->getId(), $action->getId(), 0, $userId ?? 0],
-            Permission::class
-        );
+        return $this->fetchOne('`module_id`=? AND `task_id`=? AND `action_id`=? AND IFNULL(`user_id`, ?)=?', [$module->getId(), $task->getId(), $action->getId(), 0, $userId ?? 0], Permission::class);
     }
 
     /**
@@ -29,10 +25,6 @@ class PermissionRepository extends AbstractRepository
      */
     public function getByModuleAndTask(Module $module, Task $task, int $userId = null): Permission
     {
-        return $this->fetchOne(
-            '`module_id`=? AND `task_id`=? AND `action_id` IS NULL AND IFNULL(`user_id`, ?)=?',
-            [$module->getId(), $task->getId(), 0, $userId ?? 0],
-            Permission::class
-        );
+        return $this->fetchOne('`module_id`=? AND `task_id`=? AND `action_id` IS NULL AND IFNULL(`user_id`, ?)=?', [$module->getId(), $task->getId(), 0, $userId ?? 0], Permission::class);
     }
 }

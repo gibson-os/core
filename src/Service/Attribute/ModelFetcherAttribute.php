@@ -41,13 +41,13 @@ class ModelFetcherAttribute implements AttributeServiceInterface, ParameterAttri
     public function replace(
         AttributeInterface $attribute,
         array $parameters,
-        ReflectionParameter $reflectionParameter
+        ReflectionParameter $reflectionParameter,
     ): ?AbstractModel {
         if (!$attribute instanceof GetModel) {
             throw new MapperException(sprintf(
                 'Attribute "%s" is not an instance of "%s"!',
                 $attribute::class,
-                GetModel::class
+                GetModel::class,
             ));
         }
 
@@ -58,7 +58,7 @@ class ModelFetcherAttribute implements AttributeServiceInterface, ParameterAttri
             throw new InvalidArgumentException(sprintf(
                 'Model "%s" is no instance of "%s"!',
                 $model::class,
-                ModelInterface::class
+                ModelInterface::class,
             ));
         }
 
@@ -72,7 +72,7 @@ class ModelFetcherAttribute implements AttributeServiceInterface, ParameterAttri
             ->setWhereParameters($whereParameters)
             ->setWhere(implode(' AND ', array_map(
                 fn (string $field): string => '`' . $field . '`=?',
-                array_keys($attribute->getConditions())
+                array_keys($attribute->getConditions()),
             )))
             ->setLimit(1)
         ;
@@ -84,7 +84,7 @@ class ModelFetcherAttribute implements AttributeServiceInterface, ParameterAttri
                 'Model query of type "%s" for parameter "%s" has errors! Error: %s',
                 $modelClassName,
                 $reflectionParameter->getName(),
-                $table->connection->error()
+                $table->connection->error(),
             )))->setTable($table);
         }
 
@@ -96,7 +96,7 @@ class ModelFetcherAttribute implements AttributeServiceInterface, ParameterAttri
             throw (new SelectError(sprintf(
                 'Model of type "%s" for parameter "%s" not found!',
                 $modelClassName,
-                $reflectionParameter->getName()
+                $reflectionParameter->getName(),
             )))->setTable($table);
         }
 
@@ -136,7 +136,7 @@ class ModelFetcherAttribute implements AttributeServiceInterface, ParameterAttri
                     $reflectionClass = $this->reflectionManager->getReflectionClass($value);
                     $values[] = $this->reflectionManager->getProperty(
                         $reflectionClass->getProperty($conditionParts[2]),
-                        $value
+                        $value,
                     );
                 }
             }

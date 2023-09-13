@@ -11,7 +11,7 @@ class Listener
     public function __construct(
         private readonly string $forKey,
         private readonly string $toKey,
-        private readonly array $options
+        private readonly array $options,
     ) {
     }
 

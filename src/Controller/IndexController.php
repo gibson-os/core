@@ -18,8 +18,10 @@ class IndexController extends AbstractController
     public function get(
         DesktopController $desktopController,
         ItemRepository $itemRepository,
-        #[GetSetting(DesktopController::APPS_KEY)] ?Setting $apps,
-        #[GetSetting(DesktopController::TOOLS_KEY)] ?Setting $tools
+        #[GetSetting(DesktopController::APPS_KEY)]
+        ?Setting $apps,
+        #[GetSetting(DesktopController::TOOLS_KEY)]
+        ?Setting $tools,
     ): AjaxResponse {
         if (!$this->sessionService->isLogin()) {
             return $this->returnSuccess();

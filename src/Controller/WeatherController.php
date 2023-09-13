@@ -24,11 +24,9 @@ class WeatherController extends AbstractController
      * @throws SelectError
      */
     #[CheckPermission([Permission::READ])]
-    public function getWeather(
-        WeatherStore $weatherStore,
-        DateTimeService $dateTimeService,
-        #[GetModel(['id' => 'locationId'])] Location $location
-    ): AjaxResponse {
+    public function getWeather(WeatherStore $weatherStore, DateTimeService $dateTimeService, #[GetModel(['id' => 'locationId'])]
+        Location $location): AjaxResponse
+    {
         $weatherStore
             ->setLocationId($location->getId() ?? 0)
             ->setDate($dateTimeService->get('now', new DateTimeZone($location->getTimezone())))

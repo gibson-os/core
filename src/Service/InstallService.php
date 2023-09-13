@@ -38,7 +38,8 @@ class InstallService
         private readonly DirService $dirService,
         private readonly FileService $fileService,
         private readonly EnvService $envService,
-        #[GetServices(['*/src/Install'], InstallInterface::class)] private readonly array $installers,
+        #[GetServices(['*/src/Install'], InstallInterface::class)]
+        private readonly array $installers,
     ) {
     }
 
@@ -54,7 +55,7 @@ class InstallService
         $modules = $this->getModules();
         $moduleNames = array_map(
             static fn (string $module): string => preg_replace('/.*\/(.*)/', '$1', $module),
-            $modules
+            $modules,
         );
         $parts = self::PARTS;
 
@@ -63,7 +64,7 @@ class InstallService
                 throw new InstallException(sprintf(
                     'Module "%s" not exists. Existing modules: %s!',
                     $module,
-                    implode(', ', $moduleNames)
+                    implode(', ', $moduleNames),
                 ));
             }
 
@@ -75,7 +76,7 @@ class InstallService
                 throw new InstallException(sprintf(
                     'Part "%s" not exists. Existing parts: %s!',
                     $part,
-                    implode(', ', self::PARTS)
+                    implode(', ', self::PARTS),
                 ));
             }
 
@@ -126,7 +127,7 @@ class InstallService
                     '..' . DIRECTORY_SEPARATOR .
                     '..' . DIRECTORY_SEPARATOR .
                     '..' . DIRECTORY_SEPARATOR .
-                    '..' . DIRECTORY_SEPARATOR
+                    '..' . DIRECTORY_SEPARATOR,
             ) . DIRECTORY_SEPARATOR . '.env';
 
             if (!$this->fileService->isWritable($envFilename, true)) {
@@ -151,7 +152,7 @@ class InstallService
             file_put_contents($envFilename, array_merge($oldEnvEntries, array_map(
                 fn (string $key, string $value): string => $key . '=' . $value . PHP_EOL,
                 array_keys($configuration),
-                array_values($configuration)
+                array_values($configuration),
             )));
 
             yield new Success('Configuration file written!');
@@ -169,7 +170,7 @@ class InstallService
             dirname(__FILE__) . DIRECTORY_SEPARATOR .
             '..' . DIRECTORY_SEPARATOR .
             '..' . DIRECTORY_SEPARATOR .
-            '..' . DIRECTORY_SEPARATOR
+            '..' . DIRECTORY_SEPARATOR,
         ) . DIRECTORY_SEPARATOR;
         $modules = [];
 

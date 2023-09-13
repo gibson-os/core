@@ -49,7 +49,7 @@ class UserController extends AbstractController
     public function postLogin(
         UserService $userService,
         ?string $username,
-        ?string $password
+        ?string $password,
     ): RedirectResponse {
         if (empty($password) || empty($username)) {
             return new RedirectResponse($this->requestService->getBaseDir());
@@ -66,7 +66,8 @@ class UserController extends AbstractController
     #[CheckPermission([Permission::READ], ['id' => [Permission::READ, Permission::MANAGE]])]
     public function getSettings(
         DeviceRepository $deviceRepository,
-        #[GetModel] User $user = null
+        #[GetModel]
+        User $user = null,
     ): AjaxResponse {
         if ($user === null) {
             $user = $this->sessionService->getUser();
@@ -92,7 +93,7 @@ class UserController extends AbstractController
         string $model,
         string $username,
         string $password,
-        string $fcmToken
+        string $fcmToken,
     ): AjaxResponse {
         if (empty($password) || empty($username)) {
             return $this->returnFailure('Login Error', HttpStatusCode::UNAUTHORIZED);
@@ -134,7 +135,8 @@ class UserController extends AbstractController
     public function post(
         UserService $userService,
         UserRepository $userRepository,
-        #[GetMappedModel] User $user,
+        #[GetMappedModel]
+        User $user,
         string $password,
         string $passwordRepeat,
         bool $add = false,
@@ -165,7 +167,8 @@ class UserController extends AbstractController
     #[CheckPermission([Permission::DELETE], ['id' => [Permission::DELETE, Permission::MANAGE]])]
     public function deleteDevice(
         DeviceRepository $deviceRepository,
-        #[GetModel] User $user,
+        #[GetModel]
+        User $user,
         array $devices,
     ): AjaxResponse {
         $deviceRepository->deleteByIds($devices, $user->getId());
@@ -182,8 +185,10 @@ class UserController extends AbstractController
     #[CheckPermission([Permission::MANAGE, Permission::WRITE])]
     public function postPermission(
         ModelManager $modelManager,
-        #[GetMappedModel] User\Permission $permission,
-        #[GetModel] User\Permission $originalPermission = null,
+        #[GetMappedModel]
+        User\Permission $permission,
+        #[GetModel]
+        User\Permission $originalPermission = null,
     ): AjaxResponse {
         if ($permission->getPermission() === 0) {
             if ($originalPermission === null) {
@@ -212,7 +217,8 @@ class UserController extends AbstractController
     #[CheckPermission([Permission::WRITE])]
     public function postUpdateFcmToken(
         ModelManager $modelManager,
-        #[GetModel(['token' => 'token'])] Device $device,
+        #[GetModel(['token' => 'token'])]
+        Device $device,
         string $fcmToken,
     ): AjaxResponse {
         $modelManager->saveWithoutChildren($device->setFcmToken($fcmToken));
@@ -239,7 +245,7 @@ class UserController extends AbstractController
     public function getPermissions(
         PermissionStore $permissionStore,
         PermissionRepository $permissionRepository,
-        string $node
+        string $node,
     ): AjaxResponse {
         $requiredPermissions = [];
 

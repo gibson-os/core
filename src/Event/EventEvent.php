@@ -23,7 +23,7 @@ class EventEvent extends AbstractEvent
     public function __construct(
         EventService $eventService,
         ReflectionManager $reflectionManager,
-        private readonly ModelManager $modelManager
+        private readonly ModelManager $modelManager,
     ) {
         parent::__construct($eventService, $reflectionManager);
     }
@@ -62,8 +62,10 @@ class EventEvent extends AbstractEvent
      */
     #[Event\Method('Starten')]
     public function start(
-        #[Event\Parameter(EventParameter::class)] EventModel $event,
-        #[Event\Parameter(BoolParameter::class, 'Asynchron')] bool $async
+        #[Event\Parameter(EventParameter::class)]
+        EventModel $event,
+        #[Event\Parameter(BoolParameter::class, 'Asynchron')]
+        bool $async,
     ): void {
         $this->eventService->runEvent($event, $async);
     }

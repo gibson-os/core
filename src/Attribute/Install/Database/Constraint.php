@@ -27,7 +27,7 @@ class Constraint
         private ?string $ownColumn = null,
         private ?string $where = null,
         private array $whereParameters = [],
-        private ?string $orderBy = null
+        private ?string $orderBy = null,
     ) {
     }
 

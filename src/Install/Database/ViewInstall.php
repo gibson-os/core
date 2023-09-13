@@ -23,7 +23,7 @@ class ViewInstall extends AbstractInstall implements PriorityInterface
     public function __construct(
         ServiceManager $serviceManagerService,
         private mysqlDatabase $mysqlDatabase,
-        private ReflectionManager $reflectionManager
+        private ReflectionManager $reflectionManager,
     ) {
         parent::__construct($serviceManagerService);
     }
@@ -58,7 +58,7 @@ class ViewInstall extends AbstractInstall implements PriorityInterface
                 throw new InstallException(sprintf(
                     'Drop view "%s" failed! Error: %s',
                     $viewName,
-                    $this->mysqlDatabase->error()
+                    $this->mysqlDatabase->error(),
                 ));
             }
 
@@ -69,7 +69,7 @@ class ViewInstall extends AbstractInstall implements PriorityInterface
                 throw new InstallException(sprintf(
                     'Create view "%s" failed! Error: %s',
                     $viewName,
-                    $this->mysqlDatabase->error()
+                    $this->mysqlDatabase->error(),
                 ));
             }
 

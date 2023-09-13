@@ -55,7 +55,8 @@ readonly class ControllerService
         private MiddlewareService $middlewareService,
         private ModelManager $modelManager,
         ModuleRepository $moduleRepository,
-        #[GetSetting('chromecastReceiverAppId', 'core')] Setting $chromecastReceiverAppId = null,
+        #[GetSetting('chromecastReceiverAppId', 'core')]
+        Setting $chromecastReceiverAppId = null,
         private TracerService $tracerService,
     ) {
         $this->chromecastReceiverAppId = $chromecastReceiverAppId
@@ -125,7 +126,7 @@ readonly class ControllerService
 
             $alwaysAjaxAttributes = $this->attributeService->getAttributesByClassName(
                 $reflectionMethod,
-                AlwaysAjaxResponse::class
+                AlwaysAjaxResponse::class,
             );
 
             if (count($alwaysAjaxAttributes) === 0) {
@@ -239,7 +240,7 @@ readonly class ControllerService
                     'Required header %s has value %s. Required value is %s!',
                     $requiredHeader,
                     $headerValue,
-                    $requiredValue
+                    $requiredValue,
                 ));
             }
         }
@@ -268,7 +269,7 @@ readonly class ControllerService
 
             $attributeParameters = array_merge(
                 $attributeParameters,
-                $attributeService->usedParameters($attribute->getAttribute())
+                $attributeService->usedParameters($attribute->getAttribute()),
             );
         }
 
@@ -288,7 +289,7 @@ readonly class ControllerService
                     $parameters[$name] = $attributeService->replace(
                         $attribute->getAttribute(),
                         $parameters,
-                        $reflectionParameter
+                        $reflectionParameter,
                     );
                 }
 
@@ -332,7 +333,7 @@ readonly class ControllerService
                         $typeName,
                         $name,
                         $reflectionMethod->getDeclaringClass()->getName(),
-                        $reflectionMethod->getName()
+                        $reflectionMethod->getName(),
                     ), 0, $e);
                 }
 

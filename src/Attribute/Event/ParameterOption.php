@@ -11,7 +11,7 @@ class ParameterOption
     public function __construct(
         private readonly string $parameterKey,
         private readonly string $optionKey,
-        private readonly mixed $optionValue
+        private readonly mixed $optionValue,
     ) {
     }
 

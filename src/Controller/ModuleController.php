@@ -29,7 +29,7 @@ class ModuleController extends AbstractController
         ModuleStore $moduleStore,
         TaskStore $taskStore,
         ActionStore $actionStore,
-        string $node = 'root'
+        string $node = 'root',
     ): AjaxResponse {
         if ($node === 'root') {
             return $this->returnSuccess($moduleStore->getList());

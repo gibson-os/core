@@ -51,7 +51,7 @@ class GeneralPermissionData extends AbstractInstall implements PriorityInterface
                     ->setModule($coreModule)
                     ->setTask($userTask)
                     ->setAction($loginAction)
-                    ->setPermission(PermissionEnum::READ->value)
+                    ->setPermission(PermissionEnum::READ->value),
             );
         }
 
@@ -62,7 +62,7 @@ class GeneralPermissionData extends AbstractInstall implements PriorityInterface
                 (new Permission())
                     ->setModule($coreModule)
                     ->setTask($middlewareTask)
-                    ->setPermission(PermissionEnum::READ->value + PermissionEnum::WRITE->value)
+                    ->setPermission(PermissionEnum::READ->value + PermissionEnum::WRITE->value),
             );
         }
 

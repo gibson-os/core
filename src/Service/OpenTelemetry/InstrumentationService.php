@@ -37,7 +37,7 @@ class InstrumentationService
                 $instrumentation,
                 sprintf('%s%s', $object === null ? '' : $object::class . '::', $function),
                 $fileName,
-                $lineNumber
+                $lineNumber,
             );
         };
         $post ??= function (?object $object, array $params, mixed $statement, ?Throwable $exception): void {
@@ -49,7 +49,7 @@ class InstrumentationService
             $className,
             $functionName,
             pre: $pre,
-            post: $post
+            post: $post,
         );
 
         return $this;

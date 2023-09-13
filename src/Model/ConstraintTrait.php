@@ -40,7 +40,7 @@ trait ConstraintTrait
                 if (!is_array($arguments[0])) {
                     throw new InvalidArgumentException(sprintf(
                         'Argument for "set%s" is no array',
-                        ucfirst($propertyName)
+                        ucfirst($propertyName),
                     ));
                 }
 
@@ -65,8 +65,8 @@ trait ConstraintTrait
                     : throw new InvalidArgumentException(sprintf(
                         'Argument for "set%s" is no instance of "%s"',
                         ucfirst($propertyName),
-                        AbstractModel::class
-                    ))
+                        AbstractModel::class,
+                    )),
             ),
             'unload' => $this->unloadConstraint($propertyName),
         };
@@ -93,14 +93,14 @@ trait ConstraintTrait
     {
         $constraintAttributes = $reflectionProperty->getAttributes(
             Constraint::class,
-            ReflectionAttribute::IS_INSTANCEOF
+            ReflectionAttribute::IS_INSTANCEOF,
         );
 
         if (count($constraintAttributes) === 0) {
             throw new ReflectionException(sprintf(
                 'Property "%s" has no "%s" attribute!',
                 $reflectionProperty->getName(),
-                Constraint::class
+                Constraint::class,
             ));
         }
 
@@ -116,7 +116,7 @@ trait ConstraintTrait
     private function getConstraint(
         Constraint $constraintAttribute,
         ReflectionProperty $reflectionProperty,
-        string $propertyTypeName
+        string $propertyTypeName,
     ): ?AbstractModel {
         $parentColumn = $constraintAttribute->getParentColumn();
         $fieldName = $this->transformFieldName($parentColumn);
@@ -154,7 +154,7 @@ trait ConstraintTrait
                 $value,
                 $parentColumn,
                 $constraintAttribute->getWhere(),
-                $constraintAttribute->getWhereParameters()
+                $constraintAttribute->getWhereParameters(),
             ) ?? ($reflectionProperty->getType()?->allowsNull() ? null : $parentModel);
         }
 
@@ -184,7 +184,7 @@ trait ConstraintTrait
             throw new ReflectionException(sprintf(
                 'Property "parentModelClassName" of constraint attribute for property "%s::%s" is not set!',
                 $reflectionProperty->getDeclaringClass()->getName(),
-                $reflectionProperty->getName()
+                $reflectionProperty->getName(),
             ));
         }
 
@@ -201,7 +201,7 @@ trait ConstraintTrait
                 $constraintAttribute->getParentColumn() . '_id',
                 $constraintAttribute->getWhere(),
                 $constraintAttribute->getWhereParameters(),
-                $constraintAttribute->getOrderBy()
+                $constraintAttribute->getOrderBy(),
             ));
         }
 
@@ -214,11 +214,11 @@ trait ConstraintTrait
     private function setConstraint(
         Constraint $constraintAttribute,
         ReflectionProperty $reflectionProperty,
-        ?AbstractModel $model
+        ?AbstractModel $model,
     ): AbstractModel {
         $propertyName = $reflectionProperty->getName();
         $ownColumn = ucfirst(
-            $this->transformFieldName($constraintAttribute->getOwnColumn() ?? $propertyName . 'Id')
+            $this->transformFieldName($constraintAttribute->getOwnColumn() ?? $propertyName . 'Id'),
         );
         $fieldName = $this->transformFieldName($constraintAttribute->getParentColumn());
         $value = $model?->{'get' . ucfirst($fieldName)}();
@@ -247,12 +247,12 @@ trait ConstraintTrait
     private function setConstraints(
         Constraint $constraintAttribute,
         ReflectionProperty $reflectionProperty,
-        array $models
+        array $models,
     ): self {
         $fieldName = $this->transformFieldName($constraintAttribute->getParentColumn());
         $value = $this->getConstraintValue(
             $reflectionProperty,
-            'get' . ucfirst($constraintAttribute->getOwnColumn() ?? 'id')
+            'get' . ucfirst($constraintAttribute->getOwnColumn() ?? 'id'),
         );
         $this->setRelations($models, $fieldName, $value);
 
@@ -271,13 +271,13 @@ trait ConstraintTrait
     private function addConstraints(
         Constraint $constraintAttribute,
         ReflectionProperty $reflectionProperty,
-        array $models
+        array $models,
     ): self {
         $this->getConstraints($constraintAttribute, $reflectionProperty);
         $fieldName = $this->transformFieldName($constraintAttribute->getParentColumn());
         $value = $this->getConstraintValue(
             $reflectionProperty,
-            'get' . ucfirst($constraintAttribute->getOwnColumn() ?? 'id')
+            'get' . ucfirst($constraintAttribute->getOwnColumn() ?? 'id'),
         );
         $this->setRelations($models, $fieldName, $value);
 
@@ -314,7 +314,7 @@ trait ConstraintTrait
                 throw new ReflectionException(sprintf(
                     'Property "%s" of class "%s" is initialized an has no default value!',
                     $reflectionIdProperty->getName(),
-                    $model::class
+                    $model::class,
                 ));
             }
 
@@ -345,7 +345,7 @@ trait ConstraintTrait
         string|int|float $value,
         string $foreignField = 'id',
         string $where = null,
-        array $whereParameters = []
+        array $whereParameters = [],
     ): ?AbstractModel {
         $mysqlTable = new mysqlTable($this->database, $model->getTableName());
         $mysqlTable
@@ -375,7 +375,7 @@ trait ConstraintTrait
         string $foreignField,
         string $where = null,
         array $whereParameters = [],
-        string $orderBy = null
+        string $orderBy = null,
     ): array {
         $models = [];
 

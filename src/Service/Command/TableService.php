@@ -45,9 +45,6 @@ class TableService
 
     private function getRow(array $content, array $columnsLength): string
     {
-        return sprintf(
-            implode(' | ', array_map(fn (int $length): string => '%-' . $length . 's', $columnsLength)),
-            ...$content
-        ) . PHP_EOL;
+        return sprintf(implode(' | ', array_map(fn (int $length): string => '%-' . $length . 's', $columnsLength)), ...$content) . PHP_EOL;
     }
 }

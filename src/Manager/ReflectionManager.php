@@ -76,11 +76,8 @@ class ReflectionManager
      *
      * @return T[]
      */
-    public function getAttributes(
-        ReflectionClass|ReflectionParameter|ReflectionProperty|ReflectionMethod|ReflectionClassConstant $reflectionObject,
-        string $attributeClassName,
-        int $flags = 0
-    ): array {
+    public function getAttributes(ReflectionClass|ReflectionParameter|ReflectionProperty|ReflectionMethod|ReflectionClassConstant $reflectionObject, string $attributeClassName, int $flags = 0): array
+    {
         $attributes = [];
 
         foreach ($reflectionObject->getAttributes($attributeClassName, $flags) as $attribute) {
@@ -99,11 +96,8 @@ class ReflectionManager
      *
      * @return T|null
      */
-    public function getAttribute(
-        ReflectionClass|ReflectionParameter|ReflectionProperty|ReflectionMethod|ReflectionClassConstant $reflectionObject,
-        string $attributeClassName,
-        int $flags = 0
-    ): ?object {
+    public function getAttribute(ReflectionClass|ReflectionParameter|ReflectionProperty|ReflectionMethod|ReflectionClassConstant $reflectionObject, string $attributeClassName, int $flags = 0): ?object
+    {
         $attributes = $this->getAttributes($reflectionObject, $attributeClassName, $flags);
 
         if (count($attributes) === 1) {
@@ -124,19 +118,13 @@ class ReflectionManager
     /**
      * @param class-string $attributeClassName
      */
-    public function hasAttribute(
-        ReflectionClass|ReflectionParameter|ReflectionProperty|ReflectionMethod|ReflectionClassConstant $reflectionObject,
-        string $attributeClassName,
-        int $flags = 0
-    ): bool {
+    public function hasAttribute(ReflectionClass|ReflectionParameter|ReflectionProperty|ReflectionMethod|ReflectionClassConstant $reflectionObject, string $attributeClassName, int $flags = 0): bool
+    {
         return count($reflectionObject->getAttributes($attributeClassName, $flags)) > 0;
     }
 
-    public function setProperty(
-        ReflectionProperty $reflectionProperty,
-        object $object,
-        string|int|float|bool|null|array|object $value
-    ): bool {
+    public function setProperty(ReflectionProperty $reflectionProperty, object $object, string|int|float|bool|null|array|object $value): bool
+    {
         $propertyName = $reflectionProperty->getName();
         $setter = 'set' . ucfirst($propertyName);
 
@@ -155,10 +143,8 @@ class ReflectionManager
         return false;
     }
 
-    public function getProperty(
-        ReflectionProperty $reflectionProperty,
-        object $object
-    ): string|int|float|bool|null|array|object {
+    public function getProperty(ReflectionProperty $reflectionProperty, object $object): string|int|float|bool|null|array|object
+    {
         $propertyName = $reflectionProperty->getName();
 
         foreach (self::GETTER_PREFIXES as $getterPrefix) {
@@ -173,11 +159,7 @@ class ReflectionManager
             return $object->$propertyName;
         }
 
-        throw new ReflectionException(sprintf(
-            'Property "%s" of class "%s" has no getter or is not public!',
-            $propertyName,
-            $reflectionProperty->getDeclaringClass()->getName()
-        ));
+        throw new ReflectionException(sprintf('Property "%s" of class "%s" has no getter or is not public!', $propertyName, $reflectionProperty->getDeclaringClass()->getName()));
     }
 
     /**
@@ -202,11 +184,7 @@ class ReflectionManager
             return $reflectionProperty->getDefaultValue();
         }
 
-        throw new ReflectionException(sprintf(
-            'Parameter "%s" of class "%s" has no default value!',
-            $reflectionParameter->getName(),
-            $reflectionParameter->getDeclaringClass()?->getName() ?? 'null'
-        ));
+        throw new ReflectionException(sprintf('Parameter "%s" of class "%s" has no default value!', $reflectionParameter->getName(), $reflectionParameter->getDeclaringClass()?->getName() ?? 'null'));
     }
 
     /**
@@ -217,10 +195,7 @@ class ReflectionManager
         $reflectionClass = $reflectionParameter->getDeclaringClass();
 
         if (!$reflectionClass) {
-            throw new ReflectionException(sprintf(
-                'Parameter "%s" has no class!',
-                $reflectionParameter->getName()
-            ));
+            throw new ReflectionException(sprintf('Parameter "%s" has no class!', $reflectionParameter->getName()));
         }
 
         foreach ($reflectionClass->getProperties() as $reflectionProperty) {
@@ -255,26 +230,15 @@ class ReflectionManager
         $typeName = $this->getTypeName($reflectionObject);
 
         if ($typeName === null) {
-            throw new ReflectionException(sprintf(
-                'Type for "%s" does not exists!',
-                $reflectionObject->getName()
-            ));
+            throw new ReflectionException(sprintf('Type for "%s" does not exists!', $reflectionObject->getName()));
         }
 
         if ($this->isBuiltin($reflectionObject)) {
-            throw new ReflectionException(sprintf(
-                'Type "%s" for "%s" is build in!',
-                $typeName,
-                $reflectionObject->getName()
-            ));
+            throw new ReflectionException(sprintf('Type "%s" for "%s" is build in!', $typeName, $reflectionObject->getName()));
         }
 
         if (!class_exists($typeName)) {
-            throw new ReflectionException(sprintf(
-                'Class "%s" for "%s" does not exists!',
-                $typeName,
-                $reflectionObject->getName()
-            ));
+            throw new ReflectionException(sprintf('Class "%s" for "%s" does not exists!', $typeName, $reflectionObject->getName()));
         }
 
         return $typeName;
@@ -300,10 +264,8 @@ class ReflectionManager
      * @throws ReflectionException
      * @throws JsonException
      */
-    public function castValue(
-        ReflectionProperty|ReflectionParameter $reflectionObject,
-        int|float|bool|string|null|array $value
-    ): int|float|bool|string|null|array|object {
+    public function castValue(ReflectionProperty|ReflectionParameter $reflectionObject, int|float|bool|string|null|array $value): int|float|bool|string|null|array|object
+    {
         if (!$this->isBuiltin($reflectionObject)) {
             return $value;
         }
@@ -337,19 +299,10 @@ class ReflectionManager
             'float' => is_numeric($value) ? (float) $value : null,
             'string' => !is_array($value) ? (string) $value : JsonUtility::encode($value),
             'array' => !is_array($value) ? (array) JsonUtility::decode((string) $value) : $value,
-            'bool' => !is_array($value) && (
-                mb_strtolower((string) $value) === 'true'
+            'bool' => !is_array($value) && (mb_strtolower((string) $value) === 'true'
                 || (is_numeric((string) $value) && ((int) $value))
-                || (is_bool($value) && $value)
-            ),
-            default => throw new ReflectionException(sprintf(
-                'Type "%s" of %s "%s" for "%s%s" is not allowed!',
-                $this->getTypeName($reflectionObject) ?? 'null',
-                $reflectionObject instanceof ReflectionParameter ? 'parameter' : 'property',
-                $reflectionObject->getName(),
-                $reflectionObject->getDeclaringClass()?->getName() ?? 'null',
-                $reflectionObject instanceof ReflectionParameter ? '::' . $reflectionObject->getDeclaringFunction()->getName() : ''
-            ))
+                || (is_bool($value) && $value)),
+            default => throw new ReflectionException(sprintf('Type "%s" of %s "%s" for "%s%s" is not allowed!', $this->getTypeName($reflectionObject) ?? 'null', $reflectionObject instanceof ReflectionParameter ? 'parameter' : 'property', $reflectionObject->getName(), $reflectionObject->getDeclaringClass()?->getName() ?? 'null', $reflectionObject instanceof ReflectionParameter ? '::' . $reflectionObject->getDeclaringFunction()->getName() : '')),
         };
     }
 }

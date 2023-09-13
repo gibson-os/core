@@ -44,7 +44,7 @@ class WeatherService
         $this->eventService->fire(
             WeatherEvent::class,
             WeatherEvent::TRIGGER_BEFORE_LOAD,
-            ['location' => $location]
+            ['location' => $location],
         );
 
         try {
@@ -62,14 +62,14 @@ class WeatherService
             throw new WeatherError(
                 'Coordinates from location ' . $location->getName() .
                 ' (lat: ' . $location->getLatitude() . ', lon: ' . $location->getLongitude() . ') not equal with response' .
-                ' (lat: ' . $data['lat'] . ', lon: ' . $data['lon'] . ')'
+                ' (lat: ' . $data['lat'] . ', lon: ' . $data['lon'] . ')',
             );
         }
 
         if ($data['timezone'] !== $location->getTimezone()) {
             throw new WeatherError(
                 'Timezone ' . $location->getTimezone() . ' from location ' . $location->getName() .
-                ' not equal with ' . $data['timezone']
+                ' not equal with ' . $data['timezone'],
             );
         }
 
@@ -82,7 +82,7 @@ class WeatherService
 
             try {
                 $hourlyWeather->setId(
-                    $this->weatherRepository->getByDate($location, $hourlyWeather->getDate())->getId()
+                    $this->weatherRepository->getByDate($location, $hourlyWeather->getDate())->getId(),
                 );
             } catch (SelectError) {
             }
@@ -98,7 +98,7 @@ class WeatherService
         $this->eventService->fire(
             WeatherEvent::class,
             WeatherEvent::TRIGGER_AFTER_LOAD,
-            $eventParameters
+            $eventParameters,
         );
     }
 
@@ -113,8 +113,8 @@ class WeatherService
                 'https://' . $this->envService->getString('OPENWEATHERMAP_URL') .
                 'onecall?lat=' . $latitude . '&lon=' . $longitude .
                 '&appid=' . $this->envService->getString('OPENWEATHERMAP_API_KEY') .
-                '&units=metric&lang=de&exclude=minutely,daily'
-            )
+                '&units=metric&lang=de&exclude=minutely,daily',
+            ),
         );
     }
 }

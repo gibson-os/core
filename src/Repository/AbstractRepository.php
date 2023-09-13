@@ -97,7 +97,7 @@ abstract class AbstractRepository
         string $where,
         array $parameters,
         string $modelClassName,
-        string $orderBy = null
+        string $orderBy = null,
     ): ModelInterface {
         /** @var ModelInterface $model */
         $model = new $modelClassName();
@@ -133,7 +133,7 @@ abstract class AbstractRepository
         string $modelClassName,
         int $limit = null,
         int $offset = null,
-        string $orderBy = null
+        string $orderBy = null,
     ): array {
         /** @var ModelInterface $model */
         $model = new $modelClassName();

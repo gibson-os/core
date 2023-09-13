@@ -46,7 +46,7 @@ class CronjobService
         string $months,
         string $years,
         array $arguments = [],
-        array $options = []
+        array $options = [],
     ): void {
         try {
             $cronjob = $this->cronjobRepository->getByCommandAndUser($command, $user);
@@ -72,7 +72,7 @@ class CronjobService
             $this->getTimesFromString($daysOfMonth, 31, 1),
             $this->getTimesFromString($daysOfWeek, 6),
             $this->getTimesFromString($months, 12, 1),
-            $this->getTimesFromString($years, 9999)
+            $this->getTimesFromString($years, 9999),
         );
 
         foreach ($times as $time) {
@@ -92,7 +92,7 @@ class CronjobService
                     ->setFromMonth($time->getMonth()->getFrom())
                     ->setToMonth($time->getMonth()->getTo())
                     ->setFromYear($time->getYear()->getFrom())
-                    ->setToYear($time->getYear()->getTo())
+                    ->setToYear($time->getYear()->getTo()),
             );
         }
     }
@@ -114,7 +114,7 @@ class CronjobService
             $this->commandService->executeAsync(
                 $cronjob->getCommand(),
                 empty($arguments) ? [] : (array) JsonUtility::decode($arguments),
-                empty($options) ? [] : (array) JsonUtility::decode($options)
+                empty($options) ? [] : (array) JsonUtility::decode($options),
             );
 
             $cronjob->setLastRun($dateTime);
@@ -139,7 +139,7 @@ class CronjobService
             $fromAndToValue = explode('-', $part);
             $times[] = new TimePart(
                 (int) $fromAndToValue[0],
-                (int) (count($fromAndToValue) === 1 ? $fromAndToValue[0] : $fromAndToValue[1])
+                (int) (count($fromAndToValue) === 1 ? $fromAndToValue[0] : $fromAndToValue[1]),
             );
         }
 
@@ -164,7 +164,7 @@ class CronjobService
         array $daysOfMonth,
         array $daysOfWeek,
         array $months,
-        array $years
+        array $years,
     ): array {
         $combinedTimes = [];
 

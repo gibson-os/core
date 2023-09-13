@@ -22,7 +22,7 @@ class DriveController extends AbstractController
     public function get(
         DriveRepository $driveRepository,
         SmartAttributeRepository $smartAttributeRepository,
-        StatRepository $statRepository
+        StatRepository $statRepository,
     ): AjaxResponse {
         $range = $statRepository->getTimeRange();
 
@@ -47,7 +47,7 @@ class DriveController extends AbstractController
         string $fromTime = null,
         string $to = null,
         string $toTime = null,
-        int $attributeId = 194
+        int $attributeId = 194,
     ): AjaxResponse {
         $driveStore
             ->setAttributeId($attributeId)

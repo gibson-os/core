@@ -21,7 +21,7 @@ class CryptInstall extends AbstractInstall implements PriorityInterface, SingleI
             yield $hashAlgorithmInput = $this->getEnvInput(
                 'PASSWORD_HASH_ALGO',
                 implode(PHP_EOL, hash_algos()) . PHP_EOL .
-                    'Which hash algorithm should be used?'
+                    'Which hash algorithm should be used?',
             );
             $hashAlgorithm = $hashAlgorithmInput->getValue() ?? '';
 
@@ -49,7 +49,7 @@ class CryptInstall extends AbstractInstall implements PriorityInterface, SingleI
             yield $cryptAlgorithmInput = $this->getEnvInput(
                 'CRYPT_ALGO',
                 implode(PHP_EOL, openssl_get_cipher_methods()) . PHP_EOL .
-                'Which crypt algorithm should be used?'
+                'Which crypt algorithm should be used?',
             );
             $cryptAlgorithm = $cryptAlgorithmInput->getValue() ?? '';
 

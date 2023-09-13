@@ -44,7 +44,7 @@ class EventController extends AbstractController
         EventStore $eventStore,
         int $start = 0,
         int $limit = 0,
-        array $sort = []
+        array $sort = [],
     ): AjaxResponse {
         $eventStore->setLimit($limit, $start);
         $eventStore->setSortByExt($sort);
@@ -64,8 +64,9 @@ class EventController extends AbstractController
     #[CheckPermission([Permission::READ])]
     public function getElements(
         ElementStore $elementStore,
-        #[GetModel(['id' => 'eventId'])] Event $event = null,
-        string $node = null
+        #[GetModel(['id' => 'eventId'])]
+        Event $event = null,
+        string $node = null,
     ): AjaxResponse {
         if (
             $event === null
@@ -135,7 +136,8 @@ class EventController extends AbstractController
     public function post(
         EventRepository $eventRepository,
         ModelManager $modelManager,
-        #[GetMappedModel] Event $event
+        #[GetMappedModel]
+        Event $event,
     ): AjaxResponse {
         $eventRepository->startTransaction();
 
@@ -163,7 +165,8 @@ class EventController extends AbstractController
     public function postCopy(
         mysqlDatabase $database,
         ModelManager $modelManager,
-        #[GetModels(Event::class)] array $events
+        #[GetModels(Event::class)]
+        array $events,
     ): AjaxResponse {
         $database->startTransaction();
 
@@ -184,11 +187,11 @@ class EventController extends AbstractController
                     ->setElements($this->removeElementIds($elements))
                     ->setTriggers(array_map(
                         fn (Trigger $trigger): Trigger => $trigger->setId(null),
-                        $triggers
+                        $triggers,
                     ))
                     ->setTags(array_map(
                         fn (Tag $tag): Tag => $tag->setId(null),
-                        $tags
+                        $tags,
                     ))
                 ;
 
@@ -214,7 +217,7 @@ class EventController extends AbstractController
             fn (Element $element): Element => $element
                 ->setId(null)
                 ->setChildren($this->removeElementIds($element->getChildren())),
-            $elements
+            $elements,
         );
     }
 

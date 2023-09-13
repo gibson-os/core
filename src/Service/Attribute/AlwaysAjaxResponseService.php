@@ -21,7 +21,7 @@ class AlwaysAjaxResponseService extends AbstractActionAttributeService
                 'Response must be an instance of %s or %s. Is instance of %s',
                 AjaxResponse::class,
                 ExceptionResponse::class,
-                get_class($response)
+                get_class($response),
             ));
         }
     }

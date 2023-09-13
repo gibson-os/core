@@ -15,7 +15,7 @@ class Response
         private readonly HttpStatusCode $statusCode,
         private readonly array $headers,
         private readonly Body $body,
-        private readonly string $cookieFile
+        private readonly string $cookieFile,
     ) {
     }
 

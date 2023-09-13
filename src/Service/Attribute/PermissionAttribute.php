@@ -20,7 +20,7 @@ class PermissionAttribute extends AbstractActionAttributeService
     public function __construct(
         private readonly PermissionService $permissionService,
         private readonly RequestService $requestService,
-        private readonly SessionService $sessionService
+        private readonly SessionService $sessionService,
     ) {
     }
 
@@ -51,7 +51,7 @@ class PermissionAttribute extends AbstractActionAttributeService
             $this->requestService->getTaskName(),
             $this->requestService->getActionName(),
             HttpMethod::from($this->requestService->getMethod()),
-            $this->sessionService->getUserId()
+            $this->sessionService->getUserId(),
         );
 
         if ($this->permissionService->checkPermission($requiredPermission, $permission)) {

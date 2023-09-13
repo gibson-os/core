@@ -51,14 +51,8 @@ class SpanService
     /**
      * @psalm-param SpanKind::KIND_* $spanKind
      */
-    public function buildFromInstrumentation(
-        CachedInstrumentation $instrumentation,
-        string $spanName,
-        string $fileName = null,
-        int $lineNumber = null,
-        int $spanKind = SpanKind::KIND_INTERNAL,
-        SpanContextInterface $link = null
-    ): SpanInterface {
+    public function buildFromInstrumentation(CachedInstrumentation $instrumentation, string $spanName, string $fileName = null, int $lineNumber = null, int $spanKind = SpanKind::KIND_INTERNAL, SpanContextInterface $link = null): SpanInterface
+    {
         if ($spanName === '') {
             throw new InvalidArgumentException('Span name is empty!');
         }

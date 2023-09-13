@@ -46,7 +46,7 @@ abstract class AbstractCommand implements CommandInterface
                     $this->vvv ? LoggerService::LEVEL_DEBUG : (
                         $this->vv ? LoggerService::LEVEL_INFO :
                         ($this->v ? LoggerService::LEVEL_WARNING : LoggerService::LEVEL_ERROR)
-                    )
+                    ),
                 )
                 ->setWriteOut(true)
                 ->setDebug($this->debug)

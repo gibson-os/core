@@ -64,7 +64,7 @@ class ModelManager
         private readonly DateTimeService $dateTimeService,
         private readonly JsonUtility $jsonUtility,
         private readonly ReflectionManager $reflectionManager,
-        private readonly TableAttribute $tableAttribute
+        private readonly TableAttribute $tableAttribute,
     ) {
     }
 
@@ -202,7 +202,7 @@ class ModelManager
                         break;
                     case self::TYPE_DATE_TIME:
                         $model->$setter($this->dateTimeService->get(
-                            strtoupper((string) $value) === 'CURRENT_TIMESTAMP()' ? 'now' : (string) $value
+                            strtoupper((string) $value) === 'CURRENT_TIMESTAMP()' ? 'now' : (string) $value,
                         ));
 
                         break;
@@ -224,7 +224,7 @@ class ModelManager
                             $model->$setter(constant(sprintf(
                                 '%s::%s',
                                 $typeName,
-                                $fieldObject->getValue() ?? ''
+                                $fieldObject->getValue() ?? '',
                             )));
 
                             break;
@@ -307,7 +307,7 @@ class ModelManager
 
         if ($parentModelClassName === null) {
             throw new ReflectionException(
-                'Property "parentModelClassName" of constraint attribute is not set!'
+                'Property "parentModelClassName" of constraint attribute is not set!',
             );
         }
 
@@ -317,7 +317,7 @@ class ModelManager
         $where = sprintf(
             '(%s`%s_id`=?)',
             $where === null ? '' : '(' . $where . ') AND ',
-            $constraintAttribute->getParentColumn()
+            $constraintAttribute->getParentColumn(),
         );
         $mysqlTable = (new mysqlTable($this->mysqlDatabase, $tableName))
             ->setWhereParameters($constraintAttribute->getWhereParameters())
@@ -337,7 +337,7 @@ class ModelManager
                 $primaryWheres[] = sprintf('`%s`!=?', $columnName);
                 $getter = 'get' . ucfirst($this->transformFieldName(
                     $primaryColumn->getColumn()->getName() ??
-                    $primaryColumn->getReflectionProperty()->getName()
+                    $primaryColumn->getReflectionProperty()->getName(),
                 ));
                 $mysqlTable->addWhereParameter($childrenModel->$getter());
             }
@@ -375,7 +375,7 @@ class ModelManager
             $columnAttribute = $this->reflectionManager->getAttribute(
                 $reflectionProperty,
                 Column::class,
-                ReflectionAttribute::IS_INSTANCEOF
+                ReflectionAttribute::IS_INSTANCEOF,
             );
 
             if ($columnAttribute === null) {
@@ -408,7 +408,7 @@ class ModelManager
             $constraintAttribute = $this->reflectionManager->getAttribute(
                 $reflectionProperty,
                 Constraint::class,
-                ReflectionAttribute::IS_INSTANCEOF
+                ReflectionAttribute::IS_INSTANCEOF,
             );
 
             if ($constraintAttribute === null) {
@@ -434,7 +434,7 @@ class ModelManager
                 $reflectionProperty,
                 $constraintAttribute,
                 $model->$getter(),
-                $model
+                $model,
             );
         }
 

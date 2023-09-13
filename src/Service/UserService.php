@@ -138,7 +138,7 @@ class UserService
         try {
             return hash(
                 $this->envService->getString('PASSWORD_HASH_ALGO'),
-                $this->envService->getString('PASSWORD_HASH_SALT') . $password
+                $this->envService->getString('PASSWORD_HASH_SALT') . $password,
             );
         } catch (GetError $e) {
             throw new UserError($e->getMessage(), 0, $e);

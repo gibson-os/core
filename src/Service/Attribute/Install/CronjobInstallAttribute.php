@@ -16,7 +16,8 @@ class CronjobInstallAttribute implements InstallAttributeInterface, AttributeSer
 {
     public function __construct(
         private readonly CronjobService $cronjobService,
-        #[GetEnv('APACHE_USER')] private readonly string $apacheUser
+        #[GetEnv('APACHE_USER')]
+        private readonly string $apacheUser,
     ) {
     }
 
@@ -43,7 +44,7 @@ class CronjobInstallAttribute implements InstallAttributeInterface, AttributeSer
             $attribute->getMonths(),
             $attribute->getYears(),
             $attribute->getArguments(),
-            $attribute->getOptions()
+            $attribute->getOptions(),
         );
     }
 }

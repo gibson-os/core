@@ -95,8 +95,8 @@ abstract class AbstractModel implements ModelInterface
                 str_replace(
                     'Core\\',
                     '',
-                    preg_replace('/.*\\\\(.+?)\\\\.*Model\\\\/', '$1\\', $this::class)
-                )
+                    preg_replace('/.*\\\\(.+?)\\\\.*Model\\\\/', '$1\\', $this::class),
+                ),
             ));
         } catch (ReflectionException) {
         }
@@ -150,7 +150,7 @@ abstract class AbstractModel implements ModelInterface
                         break;
                     case self::TYPE_DATE_TIME:
                         $this->$setter($this->dateTime->get(
-                            strtoupper((string) $value) === 'CURRENT_TIMESTAMP()' ? 'now' : (string) $value
+                            strtoupper((string) $value) === 'CURRENT_TIMESTAMP()' ? 'now' : (string) $value,
                         ));
 
                         break;
@@ -172,7 +172,7 @@ abstract class AbstractModel implements ModelInterface
                             $this->$setter(constant(sprintf(
                                 '%s::%s',
                                 $typeName,
-                                $fieldObject->getValue() ?? ''
+                                $fieldObject->getValue() ?? '',
                             )));
 
                             break;

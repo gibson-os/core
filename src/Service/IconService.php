@@ -26,7 +26,8 @@ class IconService
         private readonly TagRepository $tagRepository,
         private readonly FileService $fileService,
         private readonly ModelManager $modelManager,
-        #[GetSetting('custom_icon_path', 'core')] Setting $customIconPath,
+        #[GetSetting('custom_icon_path', 'core')]
+        Setting $customIconPath,
     ) {
         $this->iconPath = $customIconPath->getValue();
     }
@@ -47,13 +48,13 @@ class IconService
             $this->modelManager->save($icon);
             $this->fileService->copy(
                 $imageFilename,
-                $this->iconPath . DIRECTORY_SEPARATOR . 'icon' . $icon->getId() . '.' . $icon->getOriginalType()
+                $this->iconPath . DIRECTORY_SEPARATOR . 'icon' . $icon->getId() . '.' . $icon->getOriginalType(),
             );
 
             if (!empty($iconFilename)) {
                 $this->fileService->copy(
                     $iconFilename,
-                    $this->iconPath . DIRECTORY_SEPARATOR . 'icon' . $icon->getId() . '.ico'
+                    $this->iconPath . DIRECTORY_SEPARATOR . 'icon' . $icon->getId() . '.ico',
                 );
             }
 
@@ -63,7 +64,7 @@ class IconService
                 $this->modelManager->save(
                     (new Icon\Tag())
                         ->setIcon($icon)
-                        ->setTag(trim($tag))
+                        ->setTag(trim($tag)),
                 );
             }
         } catch (Throwable $exception) {

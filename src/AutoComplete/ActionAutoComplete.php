@@ -22,7 +22,7 @@ class ActionAutoComplete implements AutoCompleteInterface
     {
         return $this->actionRepository->findByName(
             $namePart,
-            isset($parameters['taskId']) ? (int) $parameters['taskId'] : null
+            isset($parameters['taskId']) ? (int) $parameters['taskId'] : null,
         );
     }
 

@@ -26,7 +26,7 @@ class KeyInstall extends AbstractInstall implements PriorityInterface
         ServiceManager $serviceManagerService,
         private mysqlDatabase $mysqlDatabase,
         private TableAttribute $tableAttribute,
-        private ReflectionManager $reflectionManager
+        private ReflectionManager $reflectionManager,
     ) {
         parent::__construct($serviceManagerService);
     }
@@ -59,7 +59,7 @@ class KeyInstall extends AbstractInstall implements PriorityInterface
                 if (count($keyAttribute->getColumns()) === 0) {
                     throw new InstallException(sprintf(
                         'Key attribute for model "%s" has no columns defined!',
-                        $className
+                        $className,
                     ));
                 }
 
@@ -72,7 +72,7 @@ class KeyInstall extends AbstractInstall implements PriorityInterface
                         throw new InstallException(sprintf(
                             'Key attribute for property "%s::%s" is not empty!',
                             $className,
-                            $reflectionProperty->getName()
+                            $reflectionProperty->getName(),
                         ));
                     }
 
@@ -95,14 +95,14 @@ class KeyInstall extends AbstractInstall implements PriorityInterface
             ;
             $parameters = array_merge(
                 [$this->envService->getString('MYSQL_DATABASE'), $tableName],
-                $installedKeys
+                $installedKeys,
             );
 
             if (!$this->mysqlDatabase->execute($query, $parameters)) {
                 throw new InstallException(sprintf(
                     'Show indexes from table "%s" failed! Error: %s',
                     $tableName,
-                    $this->mysqlDatabase->error()
+                    $this->mysqlDatabase->error(),
                 ));
             }
 
@@ -115,7 +115,7 @@ class KeyInstall extends AbstractInstall implements PriorityInterface
                         'Drop index "%s" from table "%s" failed! Error: %s',
                         $index->Key_name,
                         $tableName,
-                        $this->mysqlDatabase->error()
+                        $this->mysqlDatabase->error(),
                     ));
                 }
             }
@@ -135,7 +135,7 @@ class KeyInstall extends AbstractInstall implements PriorityInterface
             throw new InstallException(sprintf(
                 'Get indexes for table "%s" failed! Error: %s',
                 $tableName,
-                $this->mysqlDatabase->error()
+                $this->mysqlDatabase->error(),
             ));
         }
 
@@ -157,7 +157,7 @@ class KeyInstall extends AbstractInstall implements PriorityInterface
                 'Add key "%s" for table "%s" failed! Error: %s',
                 $name,
                 $tableName,
-                $this->mysqlDatabase->error()
+                $this->mysqlDatabase->error(),
             ));
         }
 

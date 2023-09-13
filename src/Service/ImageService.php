@@ -126,7 +126,7 @@ class ImageService
     public static function getMimeTypeByFilename(string $filename): string
     {
         return image_type_to_mime_type(
-            constant('IMG_' . strtoupper(self::getImageTypeByFilename($filename)))
+            constant('IMG_' . strtoupper(self::getImageTypeByFilename($filename))),
         );
     }
 
@@ -189,7 +189,7 @@ class ImageService
         try {
             $this->fileService->delete(
                 $this->fileService->getDir($image->getFilename()),
-                $this->fileService->getFilename($image->getFilename())
+                $this->fileService->getFilename($image->getFilename()),
             );
         } catch (FileNotFound) {
         }

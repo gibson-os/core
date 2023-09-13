@@ -26,7 +26,7 @@ class ModelsFetcherAttribute implements AttributeServiceInterface, ParameterAttr
         private readonly ModelManager $modelManager,
         private readonly ReflectionManager $reflectionManager,
         private readonly SessionService $sessionService,
-        private readonly ObjectMapperAttribute $objectMapperAttribute
+        private readonly ObjectMapperAttribute $objectMapperAttribute,
     ) {
     }
 
@@ -41,13 +41,13 @@ class ModelsFetcherAttribute implements AttributeServiceInterface, ParameterAttr
     public function replace(
         AttributeInterface $attribute,
         array $parameters,
-        ReflectionParameter $reflectionParameter
+        ReflectionParameter $reflectionParameter,
     ): ?array {
         if (!$attribute instanceof GetModels) {
             throw new MapperException(sprintf(
                 'Attribute "%s" is not an instance of "%s"!',
                 $attribute::class,
-                GetModels::class
+                GetModels::class,
             ));
         }
 
@@ -58,7 +58,7 @@ class ModelsFetcherAttribute implements AttributeServiceInterface, ParameterAttr
             throw new InvalidArgumentException(sprintf(
                 'Model "%s" is no instance of "%s"!',
                 $model::class,
-                ModelInterface::class
+                ModelInterface::class,
             ));
         }
 
@@ -74,11 +74,11 @@ class ModelsFetcherAttribute implements AttributeServiceInterface, ParameterAttr
         foreach (is_array($parameterFromRequest) ? $parameterFromRequest : [] as $requestValue) {
             array_push(
                 $whereParameters,
-                ...$this->getWhereValuesForModel($attribute, $requestValue, $parameters)
+                ...$this->getWhereValuesForModel($attribute, $requestValue, $parameters),
             );
             $where[] = implode(' AND ', array_map(
                 fn (string $field): string => '`' . $field . '`=?',
-                array_keys($attribute->getConditions())
+                array_keys($attribute->getConditions()),
             ));
         }
 
@@ -97,7 +97,7 @@ class ModelsFetcherAttribute implements AttributeServiceInterface, ParameterAttr
                 'Model query of type "%s" for parameter "%s" has errors! Error: %s',
                 $modelClassName,
                 $reflectionParameter->getName(),
-                $table->connection->error()
+                $table->connection->error(),
             )))->setTable($table);
         }
 
@@ -151,7 +151,7 @@ class ModelsFetcherAttribute implements AttributeServiceInterface, ParameterAttr
                     $reflectionClass = $this->reflectionManager->getReflectionClass($value);
                     $values[] = $this->reflectionManager->getProperty(
                         $reflectionClass->getProperty($conditionParts[2]),
-                        $value
+                        $value,
                     );
                 }
 
@@ -170,7 +170,7 @@ class ModelsFetcherAttribute implements AttributeServiceInterface, ParameterAttr
                 $reflectionClass = $this->reflectionManager->getReflectionClass($object);
                 $values[] = $this->reflectionManager->getProperty(
                     $reflectionClass->getProperty($conditionParts[1]),
-                    $object
+                    $object,
                 );
             }
         }

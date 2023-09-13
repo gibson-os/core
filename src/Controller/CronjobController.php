@@ -38,7 +38,8 @@ class CronjobController extends AbstractController
     #[CheckPermission([Permission::READ])]
     public function getTimes(
         TimeStore $timeStore,
-        #[GetModel] Cronjob $cronjob,
+        #[GetModel]
+        Cronjob $cronjob,
     ): AjaxResponse {
         $timeStore->setCronjob($cronjob);
 

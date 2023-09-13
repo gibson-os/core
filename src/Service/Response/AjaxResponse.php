@@ -10,7 +10,7 @@ readonly class AjaxResponse implements ResponseInterface
 {
     public function __construct(
         private mixed $body,
-        private HttpStatusCode $code = HttpStatusCode::OK
+        private HttpStatusCode $code = HttpStatusCode::OK,
     ) {
     }
 

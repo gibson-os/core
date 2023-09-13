@@ -11,7 +11,7 @@ class GetSetting implements AttributeInterface
 {
     public function __construct(
         private readonly string $key,
-        private readonly ?string $module = null
+        private readonly ?string $module = null,
     ) {
     }
 

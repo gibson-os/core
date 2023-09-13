@@ -30,7 +30,7 @@ class IconInstall extends AbstractInstall implements PriorityInterface
             'htdocs' . DIRECTORY_SEPARATOR .
             'img' . DIRECTORY_SEPARATOR .
             'icons' . DIRECTORY_SEPARATOR .
-            'custom' . DIRECTORY_SEPARATOR
+            'custom' . DIRECTORY_SEPARATOR,
         ) . DIRECTORY_SEPARATOR;
 
         if (!file_exists($customIconPath)) {

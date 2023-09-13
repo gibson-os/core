@@ -33,8 +33,10 @@ class DesktopController extends AbstractController
     #[CheckPermission([Permission::READ])]
     public function get(
         ItemRepository $itemRepository,
-        #[GetSetting(self::APPS_KEY)] ?Setting $apps,
-        #[GetSetting(self::TOOLS_KEY)] ?Setting $tools,
+        #[GetSetting(self::APPS_KEY)]
+        ?Setting $apps,
+        #[GetSetting(self::TOOLS_KEY)]
+        ?Setting $tools,
         User $permissionUser,
     ): AjaxResponse {
         return $this->returnSuccess([
@@ -53,8 +55,9 @@ class DesktopController extends AbstractController
     public function post(
         ModelManager $modelManager,
         ItemRepository $itemRepository,
-        #[GetMappedModels(Item::class)] array $items,
-        User $permissionUser
+        #[GetMappedModels(Item::class)]
+        array $items,
+        User $permissionUser,
     ): AjaxResponse {
         $position = 0;
         $itemIds = [];
@@ -63,7 +66,7 @@ class DesktopController extends AbstractController
             $modelManager->saveWithoutChildren(
                 $item
                     ->setUser($permissionUser)
-                    ->setPosition($position++)
+                    ->setPosition($position++),
             );
             $itemIds[] = $item->getId();
         }
@@ -82,8 +85,9 @@ class DesktopController extends AbstractController
     public function postAdd(
         ModelManager $modelManager,
         ItemRepository $itemRepository,
-        #[GetMappedModels(Item::class)] array $items,
-        User $permissionUser
+        #[GetMappedModels(Item::class)]
+        array $items,
+        User $permissionUser,
     ): AjaxResponse {
         $nextPosition = -1;
 

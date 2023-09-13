@@ -101,7 +101,7 @@ class CommandService
                 DIRECTORY_SEPARATOR . '..' .
                 DIRECTORY_SEPARATOR . '..' .
                 DIRECTORY_SEPARATOR . '..' .
-                DIRECTORY_SEPARATOR . '..'
+                DIRECTORY_SEPARATOR . '..',
         ) . DIRECTORY_SEPARATOR . 'bin' . DIRECTORY_SEPARATOR . 'command';
 
         $traceId = $this->spanService->getTraceId();
@@ -119,7 +119,7 @@ class CommandService
             }, $arguments, array_keys($arguments))) . ' ' .
             implode(' ', array_map(function ($item) {
                 return escapeshellarg('-' . $item);
-            }, $options))
+            }, $options)),
         );
     }
 
@@ -150,6 +150,11 @@ class CommandService
             }
 
             $commandNameParts = str_replace(':', '\\', $argument);
+
+            if (!is_string($commandNameParts)) {
+                throw new CommandError('Command name parts is no string!');
+            }
+
             $commandNameParts = array_map('ucfirst', explode('\\', $commandNameParts));
             $module = array_shift($commandNameParts);
 
@@ -199,7 +204,7 @@ class CommandService
             if (!$this->reflectionManager->hasAttribute(
                 $reflectionProperty,
                 Argument::class,
-                ReflectionAttribute::IS_INSTANCEOF
+                ReflectionAttribute::IS_INSTANCEOF,
             )) {
                 continue;
             }
@@ -231,7 +236,7 @@ class CommandService
                 '%s "%s" not allowed! Possible arguments: "%s"',
                 count($arguments) > 1 ? 'Arguments' : 'Argument',
                 implode('", "', array_keys($arguments)),
-                implode('", "', $argumentProperties)
+                implode('", "', $argumentProperties),
             ));
         }
     }
@@ -249,7 +254,7 @@ class CommandService
             if (!$this->reflectionManager->hasAttribute(
                 $reflectionProperty,
                 Option::class,
-                ReflectionAttribute::IS_INSTANCEOF
+                ReflectionAttribute::IS_INSTANCEOF,
             )) {
                 continue;
             }
@@ -261,7 +266,7 @@ class CommandService
                 throw new ArgumentError(sprintf(
                     'Option "%s" is type "%s" must be "bool"!',
                     $name,
-                    $typeName ?? 'null'
+                    $typeName ?? 'null',
                 ));
             }
 
@@ -280,7 +285,7 @@ class CommandService
                 '%s "%s" not allowed! Possible options: "%s"',
                 count($options) > 1 ? 'Options' : 'Option',
                 implode('", "', array_keys($options)),
-                implode('", "', $optionsProperties)
+                implode('", "', $optionsProperties),
             ));
         }
     }
@@ -333,7 +338,7 @@ class CommandService
             throw new CommandError(sprintf(
                 '%s is not unique! Possible is: %s',
                 $keyPart,
-                implode(', ', array_keys($parts))
+                implode(', ', array_keys($parts)),
             ));
         }
 

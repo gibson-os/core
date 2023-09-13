@@ -10,8 +10,10 @@ use GibsonOS\Core\Model\Drive;
 class DriveRepository extends AbstractRepository
 {
     public function __construct(
-        #[GetTableName(Drive::class)] private string $driveTableName,
-        #[GetTableName(Drive\Stat::class)] private string $driveStatTableName
+        #[GetTableName(Drive::class)]
+        private string $driveTableName,
+        #[GetTableName(Drive\Stat::class)]
+        private string $driveStatTableName,
     ) {
     }
 

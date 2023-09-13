@@ -14,9 +14,12 @@ class DateTimeService
     private ?DateTimeZone $timezone;
 
     public function __construct(
-        #[GetEnv('timezone')] ?string $timezone,
-        #[GetEnv('date_latitude')] private readonly ?float $latitude,
-        #[GetEnv('date_longitude')] private readonly ?float $longitude,
+        #[GetEnv('timezone')]
+        ?string $timezone,
+        #[GetEnv('date_latitude')]
+        private readonly ?float $latitude,
+        #[GetEnv('date_longitude')]
+        private readonly ?float $longitude,
     ) {
         $this->timezone = $timezone === null ? null : new DateTimeZone($timezone);
     }
@@ -32,7 +35,7 @@ class DateTimeService
             error_log(sprintf(
                 'Es kann keine Datums Objekt mit "%s" für die Zeitzone "%s" angelegt werden',
                 $time,
-                $this->timezone?->getName() ?? 'none'
+                $this->timezone?->getName() ?? 'none',
             ));
 
             return new DateTime();
@@ -52,7 +55,7 @@ class DateTimeService
             $dateTime->getTimestamp(),
             SUNFUNCS_RET_TIMESTAMP,
             $this->latitude ?? 0.0,
-            $this->longitude ?? 0.0
+            $this->longitude ?? 0.0,
         );
     }
 
@@ -62,7 +65,7 @@ class DateTimeService
             $dateTime->getTimestamp(),
             SUNFUNCS_RET_TIMESTAMP,
             $this->latitude ?? 0.0,
-            $this->longitude ?? 0.0
+            $this->longitude ?? 0.0,
         );
     }
 }

@@ -17,7 +17,7 @@ class ServiceAttribute implements ParameterAttributeInterface, AttributeServiceI
 {
     public function __construct(
         private readonly ServiceManager $serviceManagerService,
-        private readonly DirService $dirService
+        private readonly DirService $dirService,
     ) {
     }
 
@@ -28,7 +28,7 @@ class ServiceAttribute implements ParameterAttributeInterface, AttributeServiceI
     public function replace(
         AttributeInterface $attribute,
         array $parameters,
-        ReflectionParameter $reflectionParameter
+        ReflectionParameter $reflectionParameter,
     ): array {
         if (
             !$attribute instanceof GetServices
@@ -44,7 +44,7 @@ class ServiceAttribute implements ParameterAttributeInterface, AttributeServiceI
             '..' . DIRECTORY_SEPARATOR .
             '..' . DIRECTORY_SEPARATOR .
             '..' . DIRECTORY_SEPARATOR .
-            'gibson-os'
+            'gibson-os',
         ) . DIRECTORY_SEPARATOR;
         $classes = [];
         $dirs = [];
@@ -75,14 +75,14 @@ class ServiceAttribute implements ParameterAttributeInterface, AttributeServiceI
                 $classes,
                 $attribute instanceof GetServices
                     ? $this->serviceManagerService->getAll($vendorPath . lcfirst($dir), $attribute->getInstanceOf())
-                    : $this->serviceManagerService->getClassNames($vendorPath . lcfirst($dir))
+                    : $this->serviceManagerService->getClassNames($vendorPath . lcfirst($dir)),
             );
         }
 
         if ($attribute instanceof GetServices) {
             usort(
                 $classes,
-                fn ($a, $b) => ($b instanceof PriorityInterface ? $b->getPriority() : 0) <=> ($a instanceof PriorityInterface ? $a->getPriority() : 0)
+                fn ($a, $b) => ($b instanceof PriorityInterface ? $b->getPriority() : 0) <=> ($a instanceof PriorityInterface ? $a->getPriority() : 0),
             );
         }
 

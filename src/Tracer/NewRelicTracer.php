@@ -11,8 +11,10 @@ use GibsonOS\Core\Utility\JsonUtility;
 class NewRelicTracer extends AbstractTracer
 {
     public function __construct(
-        #[GetEnv('APP_NAME')] ?string $appName,
-        #[GetEnv('NEW_RELIC_LICENSE')] ?string $license,
+        #[GetEnv('APP_NAME')]
+        ?string $appName,
+        #[GetEnv('NEW_RELIC_LICENSE')]
+        ?string $license,
     ) {
         if ($this->isLoaded() && $appName !== null && $license !== null) {
             newrelic_set_appname($appName, $license);

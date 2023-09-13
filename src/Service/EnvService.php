@@ -96,11 +96,7 @@ class EnvService
             }
 
             if (!putenv($row)) {
-                throw new SetError(sprintf(
-                    'Environment variable ("%s") from file "%s" could not be set!',
-                    $row,
-                    $filename
-                ));
+                throw new SetError(sprintf('Environment variable ("%s") from file "%s" could not be set!', $row, $filename));
             }
         }
 

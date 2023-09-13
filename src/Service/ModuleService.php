@@ -43,7 +43,7 @@ class ModuleService
             dirname(__FILE__) . DIRECTORY_SEPARATOR .
             '..' . DIRECTORY_SEPARATOR .
             '..' . DIRECTORY_SEPARATOR .
-            '..' . DIRECTORY_SEPARATOR
+            '..' . DIRECTORY_SEPARATOR,
         ) . DIRECTORY_SEPARATOR;
     }
 
@@ -99,7 +99,7 @@ class ModuleService
             $moduleIds[] = $module->getId() ?? 0;
             $result = $this->scanTasks(
                 $module,
-                $dir . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'Controller' . DIRECTORY_SEPARATOR
+                $dir . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'Controller' . DIRECTORY_SEPARATOR,
             );
             $taskIds = array_merge($taskIds, $result['taskIds']);
             $actionIds = array_merge($actionIds, $result['actionIds']);
@@ -140,7 +140,7 @@ class ModuleService
             $classname = ucfirst(str_replace('.php', '', str_replace(
                 DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'Controller' . DIRECTORY_SEPARATOR,
                 '\\Controller\\',
-                $classname
+                $classname,
             )));
             /** @var class-string $fqClassname */
             $fqClassname = 'GibsonOS\\Module\\' . $classname;
@@ -228,14 +228,14 @@ class ModuleService
                 $this->modelManager->saveWithoutChildren(
                     (new Action\Permission())
                         ->setAction($action)
-                        ->setPermission($this->getPermissionSum($checkPermission->getPermissions()))
+                        ->setPermission($this->getPermissionSum($checkPermission->getPermissions())),
                 );
 
                 foreach ($checkPermission->getPermissionsByRequestValues() as $permissions) {
                     $this->modelManager->saveWithoutChildren(
                         (new Action\Permission())
                             ->setAction($action)
-                            ->setPermission($this->getPermissionSum($permissions))
+                            ->setPermission($this->getPermissionSum($permissions)),
                     );
                 }
             }

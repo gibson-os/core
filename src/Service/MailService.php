@@ -53,30 +53,18 @@ class MailService
             $mailer->Subject = $mail->getSubject();
 
             foreach ($mail->getAttachments() as $attachment) {
-                $mailer->addStringAttachment(
-                    $attachment->getContent(),
-                    $attachment->getFilename(),
-                    disposition: $attachment->getDisposition()->value,
-                );
+                $mailer->addStringAttachment($attachment->getContent(), $attachment->getFilename(), disposition: $attachment->getDisposition()->value);
             }
 
             foreach ($mail->getImages() as $image) {
-                $mailer->addStringEmbeddedImage(
-                    $image->getContent(),
-                    $image->getFilename(),
-                    $image->getFilename(),
-                    disposition: $image->getDisposition()->value,
-                );
+                $mailer->addStringEmbeddedImage($image->getContent(), $image->getFilename(), $image->getFilename(), disposition: $image->getDisposition()->value);
             }
 
             $mailer->msgHTML($mail->getHtml());
             $mailer->AltBody = $mail->getPlain() ?: $mailer->AltBody;
             $mailer->send();
         } catch (Exception $exception) {
-            throw new MailException(
-                sprintf('Mail could not be sent. Error: %s', $mailer->ErrorInfo),
-                previous: $exception,
-            );
+            throw new MailException(sprintf('Mail could not be sent. Error: %s', $mailer->ErrorInfo), previous: $exception);
         }
     }
 }

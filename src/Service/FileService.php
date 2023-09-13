@@ -260,7 +260,7 @@ class FileService
 
         passthru(sprintf(
             'rm %s -fR > /dev/null 2> /dev/null',
-            escapeshellarg($dir . $files)
+            escapeshellarg($dir . $files),
         ), $return);
 
         if ($return != 0) {

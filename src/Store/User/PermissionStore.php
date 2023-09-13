@@ -23,12 +23,17 @@ class PermissionStore extends AbstractStore
     private ?int $actionId = null;
 
     public function __construct(
-        #[GetTableName(User::class)] private readonly string $userTableName,
-        #[GetTableName(Permission::class)] private readonly string $permissionTableName,
-        #[GetTableName(Module::class)] private readonly string $moduleTableName,
-        #[GetTableName(Task::class)] private readonly string $taskTableName,
-        #[GetTableName(Action::class)] private readonly string $actionTableName,
-        private readonly mysqlDatabase $mysqlDatabase
+        #[GetTableName(User::class)]
+        private readonly string $userTableName,
+        #[GetTableName(Permission::class)]
+        private readonly string $permissionTableName,
+        #[GetTableName(Module::class)]
+        private readonly string $moduleTableName,
+        #[GetTableName(Task::class)]
+        private readonly string $taskTableName,
+        #[GetTableName(Action::class)]
+        private readonly string $actionTableName,
+        private readonly mysqlDatabase $mysqlDatabase,
     ) {
     }
 
@@ -62,7 +67,7 @@ class PermissionStore extends AbstractStore
                     '`u`.`id`=IFNULL(`upm`.`user_id`, 0) AND ' .
                     '`upm`.`module_id`=`m`.`id` ' .
                     'AND `upm`.`task_id` IS NULL',
-                    $this->permissionTableName
+                    $this->permissionTableName,
                 ),
             ];
             $parameters = [$this->moduleId];
@@ -88,7 +93,7 @@ class PermissionStore extends AbstractStore
                     '`u`.`id`=IFNULL(`upt`.`user_id`, 0) AND ' .
                     '`upt`.`task_id`=`t`.`id` AND ' .
                     '`upt`.`action_id` IS NULL',
-                    $this->permissionTableName
+                    $this->permissionTableName,
                 ),
                 sprintf('LEFT JOIN `%s` `m` ON `m`.`id`=`t`.`module_id`', $this->moduleTableName),
                 sprintf(
@@ -96,7 +101,7 @@ class PermissionStore extends AbstractStore
                     '`u`.`id`=IFNULL(`upm`.`user_id`, 0) AND ' .
                     '`upm`.`module_id`=`m`.`id` ' .
                     'AND `upm`.`task_id` IS NULL',
-                    $this->permissionTableName
+                    $this->permissionTableName,
                 ),
             ];
             $parameters = [$this->taskId];
@@ -121,7 +126,7 @@ class PermissionStore extends AbstractStore
                     'LEFT JOIN `%s` `upa` ON ' .
                     '`u`.`id`=IFNULL(`upa`.`user_id`, 0) AND ' .
                     '`upa`.`action_id`=`a`.`id`',
-                    $this->permissionTableName
+                    $this->permissionTableName,
                 ),
                 sprintf('LEFT JOIN `%s` `t` ON `t`.`id`=`a`.`task_id`', $this->taskTableName),
                 sprintf(
@@ -129,7 +134,7 @@ class PermissionStore extends AbstractStore
                     '`u`.`id`=IFNULL(`upt`.`user_id`, 0) AND ' .
                     '`upt`.`task_id`=`t`.`id` AND ' .
                     '`upt`.`action_id` IS NULL',
-                    $this->permissionTableName
+                    $this->permissionTableName,
                 ),
                 sprintf('LEFT JOIN `%s` `m` ON `m`.`id`=`t`.`module_id`', $this->moduleTableName),
                 sprintf(
@@ -137,7 +142,7 @@ class PermissionStore extends AbstractStore
                     '`u`.`id`=IFNULL(`upm`.`user_id`, 0) AND ' .
                     '`upm`.`module_id`=`m`.`id` AND ' .
                     '`upm`.`task_id` IS NULL',
-                    $this->permissionTableName
+                    $this->permissionTableName,
                 ),
             ];
             $parameters = [$this->actionId];

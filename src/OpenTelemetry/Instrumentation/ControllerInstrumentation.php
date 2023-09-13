@@ -20,7 +20,7 @@ class ControllerInstrumentation implements InstrumentationInterface
         $this->instrumentationService->addHook(
             $instrumentation,
             ControllerService::class,
-            'runAction'
+            'runAction',
         );
     }
 }

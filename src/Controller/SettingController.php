@@ -24,13 +24,13 @@ class SettingController extends AbstractController
         PermissionService $permissionService,
         SettingRepository $settingRepository,
         string $id,
-        array $requiredPermissions = []
+        array $requiredPermissions = [],
     ): AjaxResponse {
         try {
             $windowSettings = $settingRepository->getByKeyAndModuleName(
                 $this->requestService->getModuleName(),
                 $this->sessionService->getUserId(),
-                $id . '_window'
+                $id . '_window',
             );
         } catch (SelectError) {
             $windowSettings = null;
@@ -40,7 +40,7 @@ class SettingController extends AbstractController
             'settings' => JsonUtility::decode($windowSettings === null ? '[]' : $windowSettings->getValue()),
             'permissions' => $permissionService->getRequiredPermissions(
                 $requiredPermissions,
-                $this->sessionService->getUserId()
+                $this->sessionService->getUserId(),
             ),
         ]);
     }

@@ -14,7 +14,8 @@ class TracerService
      * @param AbstractTracer[] $tracers
      */
     public function __construct(
-        #[GetServices(['core/src/Tracer'], AbstractTracer::class)] private readonly array $tracers,
+        #[GetServices(['core/src/Tracer'], AbstractTracer::class)]
+        private readonly array $tracers,
     ) {
     }
 

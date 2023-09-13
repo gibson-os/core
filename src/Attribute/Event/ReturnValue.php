@@ -17,7 +17,7 @@ class ReturnValue
         private readonly string $className,
         private readonly ?string $title = null,
         private readonly array $options = [],
-        private readonly ?string $key = null
+        private readonly ?string $key = null,
     ) {
     }
 

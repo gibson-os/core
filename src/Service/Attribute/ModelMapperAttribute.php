@@ -30,7 +30,7 @@ class ModelMapperAttribute extends ObjectMapperAttribute
         RequestService $requestService,
         ReflectionManager $reflectionManager,
         private readonly ModelFetcherAttribute $modelFetcherAttribute,
-        private readonly SessionService $sessionService
+        private readonly SessionService $sessionService,
     ) {
         parent::__construct($objectMapper, $requestService, $reflectionManager);
     }
@@ -49,7 +49,7 @@ class ModelMapperAttribute extends ObjectMapperAttribute
             throw new MapperException(sprintf(
                 'Attribute "%s" is not an instance of "%s"!',
                 $attribute::class,
-                GetMappedModel::class
+                GetMappedModel::class,
             ));
         }
 
@@ -57,7 +57,7 @@ class ModelMapperAttribute extends ObjectMapperAttribute
             $model = $this->modelFetcherAttribute->replace(
                 new GetModel($attribute->getConditions()),
                 $parameters,
-                $reflectionParameter
+                $reflectionParameter,
             );
         } catch (SelectError) {
             $modelClassName = $this->reflectionManager->getNonBuiltinTypeName($reflectionParameter);
@@ -77,13 +77,13 @@ class ModelMapperAttribute extends ObjectMapperAttribute
             throw new MapperException(sprintf(
                 'Model "%s" is not an instance of "%s"!',
                 $model::class,
-                AbstractModel::class
+                AbstractModel::class,
             ));
         }
 
         $this->objectMapper->setObjectValues(
             $model,
-            $this->getObjectParameters($attribute, $model::class, $parameters)
+            $this->getObjectParameters($attribute, $model::class, $parameters),
         );
         $this->loadConstraints($model, $attribute, $parameters);
 
@@ -118,7 +118,7 @@ class ModelMapperAttribute extends ObjectMapperAttribute
             if (is_object($value)) {
                 return $this->reflectionManager->getProperty(
                     $reflectionProperty,
-                    $value
+                    $value,
                 );
             }
         }
@@ -148,7 +148,7 @@ class ModelMapperAttribute extends ObjectMapperAttribute
             $constraintAttribute = $this->reflectionManager->getAttribute(
                 $reflectionProperty,
                 Constraint::class,
-                ReflectionAttribute::IS_INSTANCEOF
+                ReflectionAttribute::IS_INSTANCEOF,
             );
 
             if ($constraintAttribute === null) {
@@ -182,10 +182,10 @@ class ModelMapperAttribute extends ObjectMapperAttribute
                                     $value === null ? 'null' : (string) $value,
                                     $parentModelClassName,
                                     $model::class,
-                                    $setter
+                                    $setter,
                                 ))
                         ),
-                    $typeName === 'array' ? $values : [$propertyName => $values]
+                    $typeName === 'array' ? $values : [$propertyName => $values],
                 );
             }
 

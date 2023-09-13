@@ -17,7 +17,7 @@ class DevicePushRepository extends AbstractRepository
         return $this->fetchOne(
             '`module`=? AND `task`=? AND `action`=? AND `foreign_id`=? AND `device_id`=?',
             [$module, $task, $action, $foreignId, $device->getId()],
-            DevicePush::class
+            DevicePush::class,
         );
     }
 
@@ -31,7 +31,7 @@ class DevicePushRepository extends AbstractRepository
         return $this->fetchAll(
             '`module`=? AND `task`=? AND `action`=? AND `foreign_id`=?',
             [$module, $task, $action, $foreignId],
-            DevicePush::class
+            DevicePush::class,
         );
     }
 }

@@ -51,12 +51,12 @@ abstract class AbstractEvent
         if (!$this->reflectionManager->hasAttribute(
             $reflectionMethod,
             Method::class,
-            ReflectionAttribute::IS_INSTANCEOF
+            ReflectionAttribute::IS_INSTANCEOF,
         )) {
             throw new EventException(sprintf(
                 'Method "%s" has no "%s" attribute',
                 $reflectionMethod->getName(),
-                Method::class
+                Method::class,
             ));
         }
 
@@ -84,7 +84,7 @@ abstract class AbstractEvent
             $parameterAttribute = $this->reflectionManager->getAttribute(
                 $reflectionParameter,
                 Parameter::class,
-                ReflectionAttribute::IS_INSTANCEOF
+                ReflectionAttribute::IS_INSTANCEOF,
             );
 
             if ($parameterAttribute === null) {
@@ -103,7 +103,7 @@ abstract class AbstractEvent
         /** @var Listener[] $listenerAttributes */
         $listenerAttributes = $this->reflectionManager->getAttributes(
             $reflectionMethod->getDeclaringClass(),
-            Listener::class
+            Listener::class,
         );
         array_push(
             $listenerAttributes,
@@ -148,7 +148,7 @@ abstract class AbstractEvent
 
             $newParameters[] = $methodParameter->getAutoComplete()->getById(
                 (string) $parameters[$parameterName],
-                $extendedParameters
+                $extendedParameters,
             );
         }
 

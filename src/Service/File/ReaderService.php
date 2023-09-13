@@ -13,7 +13,8 @@ class ReaderService
      * @param ReaderInterface[] $readers
      */
     public function __construct(
-        #[GetServices(['core/src/Service/File/Reader'], ReaderInterface::class)] private readonly array $readers
+        #[GetServices(['core/src/Service/File/Reader'], ReaderInterface::class)]
+        private readonly array $readers,
     ) {
     }
 

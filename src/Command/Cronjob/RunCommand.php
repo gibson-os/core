@@ -33,7 +33,7 @@ class RunCommand extends AbstractCommand
         private readonly CronjobService $cronjobService,
         private readonly LockService $lockService,
         private readonly LockRepository $lockRepository,
-        LoggerInterface $logger
+        LoggerInterface $logger,
     ) {
         parent::__construct($logger);
     }

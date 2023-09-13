@@ -24,7 +24,7 @@ class ElementStore extends AbstractDatabaseStore
         private readonly ClassNameStore $classNameStore,
         private readonly MethodStore $methodStore,
         private readonly ModelManager $modelManager,
-        mysqlDatabase $database = null
+        mysqlDatabase $database = null,
     ) {
         parent::__construct($database);
     }

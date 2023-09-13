@@ -13,7 +13,7 @@ class Trigger
      */
     public function __construct(
         private readonly string $title,
-        private readonly array $parameters = []
+        private readonly array $parameters = [],
     ) {
     }
 

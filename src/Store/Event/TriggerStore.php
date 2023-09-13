@@ -26,7 +26,7 @@ class TriggerStore extends AbstractDatabaseStore
         private readonly ClassTriggerStore $classTriggerStore,
         private readonly ClassNameStore $classNameStore,
         private readonly ModelManager $modelManager,
-        mysqlDatabase $database = null
+        mysqlDatabase $database = null,
     ) {
         parent::__construct($database);
     }

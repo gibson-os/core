@@ -40,7 +40,7 @@ class ConnectInstall extends AbstractInstall implements PriorityInterface, Singl
         if (!$mysqlDatabase->openDB()) {
             throw new InstallException(sprintf(
                 'Database connection can not be established! Error: %s',
-                $mysqlDatabase->error()
+                $mysqlDatabase->error(),
             ));
         }
 
@@ -52,7 +52,7 @@ class ConnectInstall extends AbstractInstall implements PriorityInterface, Singl
                 throw new InstallException(sprintf(
                     'Database "%s" could not be created! Error: %s',
                     $database,
-                    $mysqlDatabase->error()
+                    $mysqlDatabase->error(),
                 ));
             }
 
@@ -60,7 +60,7 @@ class ConnectInstall extends AbstractInstall implements PriorityInterface, Singl
                 throw new InstallException(sprintf(
                     'Database "%s" could not be open! Error: %s',
                     $database,
-                    $mysqlDatabase->error()
+                    $mysqlDatabase->error(),
                 ));
             }
         }
@@ -75,7 +75,7 @@ class ConnectInstall extends AbstractInstall implements PriorityInterface, Singl
             throw new InstallException(sprintf(
                 'MySQL User "%s" could not be created! Error: %s',
                 $user,
-                $mysqlDatabase->error()
+                $mysqlDatabase->error(),
             ));
         }
 
@@ -87,7 +87,7 @@ class ConnectInstall extends AbstractInstall implements PriorityInterface, Singl
                 'MySQL User "%s" could not be connected with "%s"! Error: %s',
                 $user,
                 $database,
-                $mysqlDatabase->error()
+                $mysqlDatabase->error(),
             ));
         }
 

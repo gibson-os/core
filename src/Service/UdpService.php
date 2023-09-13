@@ -61,7 +61,7 @@ class UdpService
             'Send UDP message "%s" to %s:%d',
             $message->getMessage(),
             $message->getIp(),
-            $message->getPort()
+            $message->getPort(),
         ));
 
         $sendReturn = socket_sendto(
@@ -70,7 +70,7 @@ class UdpService
             strlen($message->getMessage()),
             0,
             $message->getIp(),
-            $message->getPort()
+            $message->getPort(),
         );
 
         if ($sendReturn === -1) {

@@ -12,8 +12,10 @@ use mysqlTable;
 class CronjobRepository extends AbstractRepository
 {
     public function __construct(
-        #[GetTableName(Cronjob::class)] private readonly string $cronjobTableName,
-        #[GetTableName(Cronjob\Time::class)] private readonly string $cronjobTimeTableName,
+        #[GetTableName(Cronjob::class)]
+        private readonly string $cronjobTableName,
+        #[GetTableName(Cronjob\Time::class)]
+        private readonly string $cronjobTimeTableName,
     ) {
     }
 
@@ -52,10 +54,9 @@ class CronjobRepository extends AbstractRepository
                     $this->getTimePart($table, 'hour', (int) $dateTime->format('H')) . ', \':\', ' .
                     $this->getTimePart($table, 'minute', (int) $dateTime->format('i')) . ', \':\', ' .
                     $this->getTimePart($table, 'second', (int) $dateTime->format('s')) .
-                ')) BETWEEN UNIX_TIMESTAMP(COALESCE(`' . $tableName . '`.`last_run`, `' . $tableName . '`.`added`)) AND  ' .
+                ')) BETWEEN UNIX_TIMESTAMP(COALESCE(`' . $tableName . '`.`last_run`, `' . $tableName . '`.`added`)) AND ' .
                 $this->getTimeAsUnixTimestampFunction($table, $dateTime) . ' AND ' .
-                $this->getTimePart($table, 'day_of_week', (int) $dateTime->format('w')) .
-                $this->getFirstRunBetweenPart($table, $dateTime)
+                $this->getDayOfWeekPart($table, (int) $dateTime->format('w')),
             )
         ;
 
@@ -66,36 +67,11 @@ class CronjobRepository extends AbstractRepository
         }
     }
 
-    private function getFirstRunBetweenPart(mysqlTable $table, DateTimeInterface $dateTime): string
-    {
-        $tableName = $this->cronjobTableName;
-        $table
-            ->addWhereParameter((int) $dateTime->format('w'))
-            ->addWhereParameter((int) $dateTime->format('w'))
-            ->addWhereParameter((int) $dateTime->format('w'))
-            ->addWhereParameter((int) $dateTime->format('w'))
-        ;
-
-        return
-            ' BETWEEN ' .
-                'IF(' .
-                    'DATE_FORMAT(COALESCE(`' . $tableName . '`.`last_run`, `' . $tableName . '`.`added`), \'%w\') < ?, ' .
-                    'DATE_FORMAT(COALESCE(`' . $tableName . '`.`last_run`, `' . $tableName . '`.`added`), \'%w\'), ' .
-                    '?' .
-                ') AND ' .
-                    'IF(' .
-                    'DATE_FORMAT(COALESCE(`' . $tableName . '`.`last_run`, `' . $tableName . '`.`added`), \'%w\') > ?, ' .
-                    'DATE_FORMAT(COALESCE(`' . $tableName . '`.`last_run`, `' . $tableName . '`.`added`), \'%w\'), ' .
-                    '?' .
-                ')'
-        ;
-    }
-
     private function getTimeAsUnixTimestampFunction(mysqlTable $table, DateTimeInterface $dateTime): string
     {
         $table->addWhereParameter(
             ((int) $dateTime->format('Y')) . '-' . ((int) $dateTime->format('n')) . '-' . ((int) $dateTime->format('j')) . ' ' .
-            ((int) $dateTime->format('H')) . ':' . ((int) $dateTime->format('i')) . ':' . ((int) $dateTime->format('s'))
+            ((int) $dateTime->format('H')) . ':' . ((int) $dateTime->format('i')) . ':' . ((int) $dateTime->format('s')),
         );
 
         return 'UNIX_TIMESTAMP(?)';
@@ -120,5 +96,13 @@ class CronjobRepository extends AbstractRepository
                 ')' .
             ')'
         ;
+    }
+
+    private function getDayOfWeekPart(mysqlTable $table, int $value): string
+    {
+        $tableName = $this->cronjobTimeTableName;
+        $table->addWhereParameter($value);
+
+        return '? BETWEEN `' . $tableName . '`.`from_day_of_week` AND `' . $tableName . '`.`to_day_of_week`';
     }
 }

@@ -9,9 +9,12 @@ use GibsonOS\Core\Exception\FileNotFound;
 class CryptService
 {
     public function __construct(
-        #[GetEnv('CRYPT_INITIALIZATION_VECTOR')] private readonly string $cryptInitializationVector,
-        #[GetEnv('CRYPT_ALGO')] private readonly string $cryptAlgo,
-        #[GetEnv('CRYPT_SALT')] private readonly string $cryptSalt,
+        #[GetEnv('CRYPT_INITIALIZATION_VECTOR')]
+        private readonly string $cryptInitializationVector,
+        #[GetEnv('CRYPT_ALGO')]
+        private readonly string $cryptAlgo,
+        #[GetEnv('CRYPT_SALT')]
+        private readonly string $cryptSalt,
     ) {
     }
 
@@ -20,7 +23,7 @@ class CryptService
         $initializationVector = substr(
             $this->cryptInitializationVector,
             0,
-            (int) openssl_cipher_iv_length($this->cryptAlgo)
+            (int) openssl_cipher_iv_length($this->cryptAlgo),
         );
 
         return openssl_encrypt($data, $this->cryptAlgo, $this->cryptSalt, 0, $initializationVector);
@@ -63,7 +66,7 @@ class CryptService
         $initializationVector = substr(
             $this->cryptInitializationVector,
             0,
-            (int) openssl_cipher_iv_length($this->cryptAlgo)
+            (int) openssl_cipher_iv_length($this->cryptAlgo),
         );
 
         return openssl_decrypt($data, $this->cryptAlgo, $this->cryptSalt, 0, $initializationVector);

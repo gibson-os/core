@@ -40,8 +40,10 @@ class OpenTelemetryTracer extends AbstractTracer
         private readonly SpanService $spanService,
         private readonly RequestService $requestService,
         private readonly ArgumentService $argumentService,
-        #[GetEnv('OTEL_EXPORTER_OTLP_ENDPOINT')] private readonly ?string $endpoint,
-        #[GetServices(['core/src/OpenTelemetry/Instrumentation'], InstrumentationInterface::class)] private readonly array $instrumentations,
+        #[GetEnv('OTEL_EXPORTER_OTLP_ENDPOINT')]
+        private readonly ?string $endpoint,
+        #[GetServices(['core/src/OpenTelemetry/Instrumentation'], InstrumentationInterface::class)]
+        private readonly array $instrumentations,
     ) {
         if (!$this->isLoaded()) {
             return;
@@ -50,7 +52,7 @@ class OpenTelemetryTracer extends AbstractTracer
         /** @var TransportInterface<'application/x-protobuf'> $transport */
         $transport = (new OtlpHttpTransportFactory())->create(
             sprintf('%s/v1/traces', $this->endpoint ?? ''),
-            'application/x-protobuf'
+            'application/x-protobuf',
         );
         $spanProcessor = new BatchSpanProcessor(
             new SpanExporter($transport),

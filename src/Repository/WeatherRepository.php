@@ -15,7 +15,8 @@ class WeatherRepository extends AbstractRepository
 {
     public function __construct(
         private DateTimeService $dateTimeService,
-        #[GetTableName(Weather::class)] private string $weatherTableName,
+        #[GetTableName(Weather::class)]
+        private string $weatherTableName,
     ) {
     }
 
@@ -27,7 +28,7 @@ class WeatherRepository extends AbstractRepository
         return $this->fetchOne(
             '`location_id`=? AND date=?',
             [$location->getId(), $date->format('Y-m-d H:i:s')],
-            Weather::class
+            Weather::class,
         );
     }
 
@@ -44,7 +45,7 @@ class WeatherRepository extends AbstractRepository
             '`location_id`=? AND `date`<=?',
             [$location->getId(), $dateTime->format('Y-m-d H:i:s')],
             Weather::class,
-            '`date` DESC'
+            '`date` DESC',
         );
     }
 

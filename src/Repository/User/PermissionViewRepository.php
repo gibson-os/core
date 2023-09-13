@@ -31,7 +31,7 @@ class PermissionViewRepository extends AbstractRepository
                 'IFNULL(`user_id`, ?)=? AND ' .
                 '`permission`>? AND ' .
                 '`task_id` IS NOT NULL' .
-                ($module === null ? '' : ' AND `module_name`=?')
+                ($module === null ? '' : ' AND `module_name`=?'),
             )
             ->setWhereParameters([$userId ?? 0, $userId ?? 0, Permission::DENIED->value])
         ;
@@ -61,7 +61,7 @@ class PermissionViewRepository extends AbstractRepository
             $this->getUserIdWhere($table, $userId) . ' AND ' .
             $this->getModuleWhere($table, $module) . ' AND ' .
             '`task_name` IS NULL AND ' .
-            '`action_name` IS NULL'
+            '`action_name` IS NULL',
         );
 
         if (!$table->selectPrepared()) {
@@ -88,7 +88,7 @@ class PermissionViewRepository extends AbstractRepository
             $this->getUserIdWhere($table, $userId) . ' AND ' .
             $this->getModuleWhere($table, $module) . ' AND ' .
             $this->getTaskWhere($table, $task) . ' AND ' .
-            '`action_name` IS NULL'
+            '`action_name` IS NULL',
         );
 
         if (!$table->selectPrepared()) {
@@ -109,7 +109,7 @@ class PermissionViewRepository extends AbstractRepository
         string $task,
         string $action,
         HttpMethod $method,
-        int $userId = null
+        int $userId = null,
     ): PermissionView {
         $table = $this
             ->getTable($this->permissionViewName)
@@ -120,7 +120,7 @@ class PermissionViewRepository extends AbstractRepository
             $this->getUserIdWhere($table, $userId) . ' AND ' .
             $this->getModuleWhere($table, $module) . ' AND ' .
             $this->getTaskWhere($table, $task) . ' AND ' .
-            $this->getActionWhere($table, $action, $method)
+            $this->getActionWhere($table, $action, $method),
         );
 
         if (!$table->selectPrepared()) {

@@ -106,7 +106,7 @@ class MediaService
         string $outputFilename,
         string $videoCodec = null,
         string $audioCodec = null,
-        array $options = []
+        array $options = [],
     ): void {
         $this->ffmpeg->convert($media, $outputFilename, $videoCodec, $audioCodec, $options);
     }
@@ -137,7 +137,7 @@ class MediaService
     {
         if ($second > $media->getDuration()) {
             throw new OutOfRangeException(
-                'Sekunde ' . $second . ' ist größer als ' . $media->getDuration() . '!'
+                'Sekunde ' . $second . ' ist größer als ' . $media->getDuration() . '!',
             );
         }
 
@@ -160,13 +160,13 @@ class MediaService
 
         if ($frameNumber > $media->getFrames()) {
             throw new OutOfRangeException(
-                'Frame Nummer ' . $frameNumber . ' ist größer als ' . $media->getFrames() . '!'
+                'Frame Nummer ' . $frameNumber . ' ist größer als ' . $media->getFrames() . '!',
             );
         }
 
         try {
             $date = (new DateTime('01.01.2000 00:00:00'))->add(
-                new DateInterval('PT' . (int) ($frameNumber / $media->getSelectedVideoStream()->getFps()) . 'S')
+                new DateInterval('PT' . (int) ($frameNumber / $media->getSelectedVideoStream()->getFps()) . 'S'),
             );
         } catch (Exception) {
             throw new OutOfRangeException('Frame Nummer ' . $frameNumber . ' kann nicht addiert werden!');
@@ -174,7 +174,7 @@ class MediaService
 
         return $this->ffmpeg->getImageByFrame(
             $media->getFilename(),
-            $date->format('H:i:s') . '.' . $frameNumber % $media->getSelectedVideoStream()->getFps()
+            $date->format('H:i:s') . '.' . $frameNumber % $media->getSelectedVideoStream()->getFps(),
         );
     }
 
@@ -263,7 +263,7 @@ class MediaService
             function (string $str) {
                 return str_replace('{%%KOMMA%%}', ',', $str);
             },
-            $properties
+            $properties,
         );
     }
 

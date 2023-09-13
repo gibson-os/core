@@ -42,7 +42,7 @@ class MysqliInstrumentation implements InstrumentationInterface
                         $lineNumber,
                         SpanKind::KIND_CLIENT,
                     );
-                }
+                },
             )
             ->addHook(
                 $instrumentation,
@@ -63,7 +63,7 @@ class MysqliInstrumentation implements InstrumentationInterface
                         $lineNumber,
                         SpanKind::KIND_CLIENT,
                     );
-                }
+                },
             )
             ->addHook(
                 $instrumentation,
@@ -84,7 +84,7 @@ class MysqliInstrumentation implements InstrumentationInterface
                         $lineNumber,
                         SpanKind::KIND_CLIENT,
                     );
-                }
+                },
             )
         ;
     }

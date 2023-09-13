@@ -20,7 +20,7 @@ class SunChangeCommand extends AbstractCommand
     public function __construct(
         private readonly DateTimeService $dateTimeService,
         private readonly EventService $eventService,
-        LoggerInterface $logger
+        LoggerInterface $logger,
     ) {
         parent::__construct($logger);
     }

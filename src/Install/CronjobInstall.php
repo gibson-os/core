@@ -23,7 +23,7 @@ class CronjobInstall extends AbstractInstall implements PriorityInterface
     public function __construct(
         ServiceManager $serviceManagerService,
         private readonly AttributeService $attributeService,
-        private readonly ReflectionManager $reflectionManager
+        private readonly ReflectionManager $reflectionManager,
     ) {
         parent::__construct($serviceManagerService);
     }
@@ -41,7 +41,7 @@ class CronjobInstall extends AbstractInstall implements PriorityInterface
             $className = $this->serviceManagerService->getNamespaceByPath($file);
             $attributes = $this->attributeService->getAttributesByClassName(
                 $this->reflectionManager->getReflectionClass($className),
-                Cronjob::class
+                Cronjob::class,
             );
 
             foreach ($attributes as $attribute) {

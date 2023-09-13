@@ -32,7 +32,7 @@ class ObjectsMapperAttribute implements AttributeServiceInterface, ParameterAttr
             throw new MapperException(sprintf(
                 'Attribute "%s" is not an instance of "%s"!',
                 $attribute::class,
-                GetObjects::class
+                GetObjects::class,
             ));
         }
 

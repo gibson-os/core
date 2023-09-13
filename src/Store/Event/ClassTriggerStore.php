@@ -80,7 +80,7 @@ class ClassTriggerStore extends AbstractStore
             $triggerAttribute = $this->reflectionManager->getAttribute(
                 $reflectionClassConstant,
                 Trigger::class,
-                ReflectionAttribute::IS_INSTANCEOF
+                ReflectionAttribute::IS_INSTANCEOF,
             );
 
             if ($triggerAttribute === null) {
@@ -93,7 +93,7 @@ class ClassTriggerStore extends AbstractStore
                 'parameters' => $this->getParameters(
                     $reflectionClass,
                     $triggerAttribute,
-                    $this->eventService->getListeners($reflectionClassConstant, $listeners)
+                    $this->eventService->getListeners($reflectionClassConstant, $listeners),
                 ),
             ];
         }
@@ -112,7 +112,7 @@ class ClassTriggerStore extends AbstractStore
     private function getParameters(
         ReflectionClass $reflectionClass,
         Trigger $triggerAttribute,
-        array $listeners = []
+        array $listeners = [],
     ): array {
         $parameters = [];
 
@@ -122,10 +122,10 @@ class ClassTriggerStore extends AbstractStore
                 $parameter['className'],
                 array_merge(
                     $this->eventService->getParameterOptions($reflectionClass, $parameter['key']),
-                    $parameter['options'] ?? []
+                    $parameter['options'] ?? [],
                 ),
                 $parameter['title'] ?? null,
-                $listeners[$parameter['key']] ?? []
+                $listeners[$parameter['key']] ?? [],
             );
         }
 

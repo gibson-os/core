@@ -15,7 +15,7 @@ abstract class AbstractController
     public function __construct(
         protected RequestService $requestService,
         protected TwigService $twigService,
-        protected SessionService $sessionService
+        protected SessionService $sessionService,
     ) {
     }
 

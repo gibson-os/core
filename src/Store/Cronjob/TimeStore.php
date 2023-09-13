@@ -40,16 +40,13 @@ class TimeStore extends AbstractDatabaseStore
     {
         $this->initTable();
 
-        $this->table->selectPrepared(
-            false,
-            'IF(`from_hour` = `to_hour`, `from_hour`, IF(`from_hour` = 0 AND `to_hour` = 23, "*", CONCAT(`from_hour`, "-", `to_hour`))) AS `hour`, ' .
+        $this->table->selectPrepared(false, 'IF(`from_hour` = `to_hour`, `from_hour`, IF(`from_hour` = 0 AND `to_hour` = 23, "*", CONCAT(`from_hour`, "-", `to_hour`))) AS `hour`, ' .
             'IF(`from_minute` = `to_minute`, `from_minute`, IF(`from_minute` = 0 AND `to_minute` = 59, "*", CONCAT(`from_minute`, "-", `to_minute`))) AS `minute`, ' .
             'IF(`from_second` = `to_second`, `from_second`, IF(`from_second` = 0 AND `to_second` = 59, "*", CONCAT(`from_second`, "-", `to_second`))) AS `second`, ' .
             'IF(`from_day_of_month` = `to_day_of_month`, `from_day_of_month`, IF(`from_day_of_month` = 1 AND `to_day_of_month` = 31, "*", CONCAT(`from_day_of_month`, "-", `to_day_of_month`))) AS `day_of_month`, ' .
             'IF(`from_day_of_week` = `to_day_of_week`, `from_day_of_week`, IF(`from_day_of_week` = 0 AND `to_day_of_week` = 6, "*", CONCAT(`from_day_of_week`, "-", `to_day_of_week`))) AS `day_of_week`, ' .
             'IF(`from_month` = `to_month`, `from_month`, IF(`from_month` = 1 AND `to_month` = 12, "*", CONCAT(`from_month`, "-", `to_month`))) AS `month`, ' .
-            'IF(`from_year` = `to_year`, `from_year`, IF(`from_year` = 0 AND `to_year` = 9999, "*", CONCAT(`from_year`, "-", `to_year`))) AS `year`'
-        );
+            'IF(`from_year` = `to_year`, `from_year`, IF(`from_year` = 0 AND `to_year` = 9999, "*", CONCAT(`from_year`, "-", `to_year`))) AS `year`');
 
         return $this->group($this->table->connection->fetchAssocList());
     }

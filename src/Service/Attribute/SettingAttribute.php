@@ -19,7 +19,7 @@ class SettingAttribute implements ParameterAttributeInterface, AttributeServiceI
         private readonly SettingRepository $settingRepository,
         private readonly RequestService $requestService,
         private readonly SessionService $sessionService,
-        private readonly ReflectionManager $reflectionManager
+        private readonly ReflectionManager $reflectionManager,
     ) {
     }
 
@@ -29,7 +29,7 @@ class SettingAttribute implements ParameterAttributeInterface, AttributeServiceI
     public function replace(
         AttributeInterface $attribute,
         array $parameters,
-        ReflectionParameter $reflectionParameter
+        ReflectionParameter $reflectionParameter,
     ): string|int|float|bool|null|array|object {
         if (!$attribute instanceof GetSetting) {
             return null;
@@ -39,7 +39,7 @@ class SettingAttribute implements ParameterAttributeInterface, AttributeServiceI
             return $this->settingRepository->getByKeyAndModuleName(
                 $attribute->getModule() ?? $this->requestService->getModuleName(),
                 $this->sessionService->getUserId(),
-                $attribute->getKey()
+                $attribute->getKey(),
             );
         } catch (SelectError) {
             return $this->reflectionManager->getDefaultValue($reflectionParameter);

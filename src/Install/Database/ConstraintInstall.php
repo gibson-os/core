@@ -27,7 +27,7 @@ class ConstraintInstall extends AbstractInstall implements PriorityInterface
         ServiceManager $serviceManagerService,
         private mysqlDatabase $mysqlDatabase,
         private TableAttribute $tableAttribute,
-        private ReflectionManager $reflectionManager
+        private ReflectionManager $reflectionManager,
     ) {
         parent::__construct($serviceManagerService);
     }
@@ -63,7 +63,7 @@ class ConstraintInstall extends AbstractInstall implements PriorityInterface
                 $constraintAttribute = $this->reflectionManager->getAttribute(
                     $reflectionProperty,
                     Constraint::class,
-                    ReflectionAttribute::IS_INSTANCEOF
+                    ReflectionAttribute::IS_INSTANCEOF,
                 );
 
                 if ($constraintAttribute === null) {
@@ -100,7 +100,7 @@ class ConstraintInstall extends AbstractInstall implements PriorityInterface
                     throw new InstallException(sprintf(
                         'Get constraints for table "%s" failed! Error: %s',
                         $tableName,
-                        $this->mysqlDatabase->error()
+                        $this->mysqlDatabase->error(),
                     ));
                 }
 
@@ -131,7 +131,7 @@ class ConstraintInstall extends AbstractInstall implements PriorityInterface
                 throw new InstallException(sprintf(
                     'Add constraints for table "%s" failed! Error: %s',
                     $tableName,
-                    $this->mysqlDatabase->error()
+                    $this->mysqlDatabase->error(),
                 ));
             }
 

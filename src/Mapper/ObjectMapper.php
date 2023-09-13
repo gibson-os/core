@@ -20,7 +20,7 @@ class ObjectMapper implements ObjectMapperInterface
 {
     public function __construct(
         private ServiceManager $serviceManagerService,
-        private ReflectionManager $reflectionManager
+        private ReflectionManager $reflectionManager,
     ) {
     }
 
@@ -84,7 +84,7 @@ class ObjectMapper implements ObjectMapperInterface
             $this->reflectionManager->setProperty(
                 $reflectionProperty,
                 $object,
-                $this->mapValueToObject($reflectionClass->getMethod('set' . ucfirst($key))->getParameters()[0], $value)
+                $this->mapValueToObject($reflectionClass->getMethod('set' . ucfirst($key))->getParameters()[0], $value),
             );
         }
 
@@ -99,7 +99,7 @@ class ObjectMapper implements ObjectMapperInterface
      */
     protected function mapValueToObject(
         ReflectionParameter|ReflectionProperty $reflectionObject,
-        int|float|string|bool|array|object|null $values
+        int|float|string|bool|array|object|null $values,
     ): int|float|string|bool|array|object|null {
         $attribute = $this->reflectionManager->getAttribute($reflectionObject, ObjectMapperAttribute::class);
 
@@ -124,7 +124,7 @@ class ObjectMapper implements ObjectMapperInterface
                 if (!is_array($values)) {
                     throw new MapperException(sprintf(
                         'Parameter for object "%s" is no array!',
-                        $objectClassName
+                        $objectClassName,
                     ));
                 }
 
@@ -132,7 +132,7 @@ class ObjectMapper implements ObjectMapperInterface
                     fn ($value) => is_object($value) ? $value : $mapper->mapToObject($objectClassName, is_array($value)
                         ? $value
                         : [$reflectionObject->getName() => $value]),
-                    $values
+                    $values,
                 );
             }
 
@@ -142,7 +142,7 @@ class ObjectMapper implements ObjectMapperInterface
                 if (is_object($values) || is_array($values)) {
                     throw new ReflectionException(sprintf(
                         'Value for enum "%s" is an array or object!',
-                        $typeName
+                        $typeName,
                     ));
                 }
 
@@ -169,7 +169,7 @@ class ObjectMapper implements ObjectMapperInterface
 
             return $mapper->mapToObject(
                 $objectClassName ?? $this->reflectionManager->getNonBuiltinTypeName($reflectionObject),
-                is_array($values) ? $values : [$reflectionObject->getName() => $values]
+                is_array($values) ? $values : [$reflectionObject->getName() => $values],
             );
         }
 

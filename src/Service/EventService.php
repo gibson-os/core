@@ -78,7 +78,7 @@ class EventService
         $this->logger->info('Fire event ' . $triggerName);
         $events = array_merge(
             $this->events[$triggerName] ?? [],
-            $this->eventRepository->getTimeControlled($className, $trigger, new DateTime())
+            $this->eventRepository->getTimeControlled($className, $trigger, new DateTime()),
         );
 
         foreach ($events as $event) {
@@ -104,7 +104,7 @@ class EventService
                 "%s: %s\n%s",
                 get_class($e),
                 $e->getMessage(),
-                $e->getTraceAsString()
+                $e->getTraceAsString(),
             ));
         }
     }
@@ -129,7 +129,7 @@ class EventService
         $this->modelManager->saveWithoutChildren(
             $event
                 ->setPid(getmypid())
-                ->setLastRun($this->dateTimeService->get())
+                ->setLastRun($this->dateTimeService->get()),
         );
         $startTime = (int) (microtime(true) * 1000000);
         $this->elementService->runElements($event->getElements(), $event);
@@ -137,7 +137,7 @@ class EventService
             $event
                 ->setPid(null)
                 ->setLastRun($this->dateTimeService->get())
-                ->setRuntime(((int) (microtime(true) * 1000000)) - $startTime)
+                ->setRuntime(((int) (microtime(true) * 1000000)) - $startTime),
         );
     }
 
@@ -160,7 +160,7 @@ class EventService
             $event
                 ->setPid(null)
                 ->setLastRun($this->dateTimeService->get())
-                ->setRuntime(null)
+                ->setRuntime(null),
         );
     }
 
@@ -174,7 +174,7 @@ class EventService
         string $className,
         array $options = [],
         string $title = null,
-        array $listeners = []
+        array $listeners = [],
     ): AbstractParameter {
         $reflectionClass = $this->reflectionManager->getReflectionClass($className);
         $constructor = $reflectionClass->getConstructor();
@@ -201,7 +201,7 @@ class EventService
         $parameter = $this->serviceManager->create(
             $className,
             $constructorParameters,
-            AbstractParameter::class
+            AbstractParameter::class,
         );
 
         foreach ($options as $optionName => $values) {
@@ -220,7 +220,7 @@ class EventService
         $parameterOptionAttributes = $this->reflectionManager->getAttributes(
             $reflectionClass,
             ParameterOption::class,
-            ReflectionAttribute::IS_INSTANCEOF
+            ReflectionAttribute::IS_INSTANCEOF,
         );
 
         $options = [];
@@ -238,12 +238,12 @@ class EventService
 
     public function getListeners(
         ReflectionClass|ReflectionMethod|ReflectionClassConstant $reflectionObject,
-        array $listeners = []
+        array $listeners = [],
     ): array {
         $listenerAttributes = $this->reflectionManager->getAttributes(
             $reflectionObject,
             Listener::class,
-            ReflectionAttribute::IS_INSTANCEOF
+            ReflectionAttribute::IS_INSTANCEOF,
         );
 
         foreach ($listenerAttributes as $listener) {
@@ -289,14 +289,14 @@ class EventService
                 $triggerAttribute = $this->reflectionManager->getAttribute(
                     $reflectionClassConstant,
                     Trigger::class,
-                    ReflectionAttribute::IS_INSTANCEOF
+                    ReflectionAttribute::IS_INSTANCEOF,
                 );
 
                 if ($triggerAttribute === null) {
                     throw new EventException(sprintf(
                         'Constant %s has no %s attribute',
                         $reflectionClassConstant->getName(),
-                        Trigger::class
+                        Trigger::class,
                     ));
                 }
 
@@ -314,7 +314,7 @@ class EventService
                     $triggerParameter = $this->serviceManager->create(
                         $parameter['className'],
                         $cleanParameters,
-                        AbstractParameter::class
+                        AbstractParameter::class,
                     );
 
                     if (!$triggerParameter instanceof AutoCompleteParameter) {
@@ -337,7 +337,7 @@ class EventService
                 if (!$this->elementService->getConditionResult($parameters[$parameterName], $eventParameter['operator'], $eventParameter['value'])) {
                     $this->logger->debug(
                         'Trigger parameter for event ' . $event->getId() . ' not true' .
-                        '(' . $parameters[$parameterName] . ' ' . $eventParameter['operator'] . ' ' . $eventParameter['value'] . ')'
+                        '(' . $parameters[$parameterName] . ' ' . $eventParameter['operator'] . ' ' . $eventParameter['value'] . ')',
                     );
 
                     continue 2;

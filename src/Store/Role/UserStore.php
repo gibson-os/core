@@ -19,8 +19,10 @@ class UserStore extends AbstractDatabaseStore
     private Role $role;
 
     public function __construct(
-        #[GetTableName(BaseUser::class)] private readonly string $userTableName,
-        #[GetTableName(User::class)] private readonly string $roleUserTableName,
+        #[GetTableName(BaseUser::class)]
+        private readonly string $userTableName,
+        #[GetTableName(User::class)]
+        private readonly string $roleUserTableName,
         mysqlDatabase $database = null,
     ) {
         parent::__construct($database);
@@ -51,7 +53,7 @@ class UserStore extends AbstractDatabaseStore
             ->appendJoin($this->userTableName, sprintf(
                 '`%s`.`id`=`%s`.`user_id`',
                 $this->userTableName,
-                $this->roleUserTableName
+                $this->roleUserTableName,
             ))
             ->setSelectString(sprintf(
                 '`%s`.`id` `id`, ' .
@@ -99,8 +101,8 @@ class UserStore extends AbstractDatabaseStore
                     ->setLastLogin(
                         $record['userLastLogin'] === null
                         ? null
-                        : new DateTimeImmutable($record['userLastLogin'])
-                    )
+                        : new DateTimeImmutable($record['userLastLogin']),
+                    ),
             )
         ;
     }

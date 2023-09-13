@@ -17,6 +17,7 @@ return (new PhpCsFixer\Config())
         'is_null' => true,
         'list_syntax' => ['syntax' => 'long'],
         'method_argument_space' => ['on_multiline' => 'ensure_fully_multiline'],
+        'trailing_comma_in_multiline' => ['elements' => ['arguments', 'arrays', 'match', 'parameters']],
         'no_null_property_initialization' => true,
         'echo_tag_syntax' => true,
         'no_superfluous_elseif' => true,
@@ -51,6 +52,6 @@ return (new PhpCsFixer\Config())
                 __DIR__ . DIRECTORY_SEPARATOR . 'src',
                 __DIR__ . DIRECTORY_SEPARATOR . 'tests',
             ])
-            ->name('*.php')
+            ->name('*.php'),
     )
 ;

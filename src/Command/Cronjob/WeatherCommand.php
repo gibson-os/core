@@ -66,7 +66,7 @@ class WeatherCommand extends AbstractCommand
                 $this->modelManager->save(
                     $location
                         ->setError($e->getMessage())
-                        ->setLastRun($lastRun)
+                        ->setLastRun($lastRun),
                 );
 
                 throw $e;
@@ -75,7 +75,7 @@ class WeatherCommand extends AbstractCommand
             $this->modelManager->save(
                 $location
                     ->setError(null)
-                    ->setLastRun($lastRun)
+                    ->setLastRun($lastRun),
             );
         }
 

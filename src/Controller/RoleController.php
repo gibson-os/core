@@ -49,7 +49,8 @@ class RoleController extends AbstractController
     #[CheckPermission([Permission::MANAGE, Permission::WRITE])]
     public function post(
         ModelManager $modelManager,
-        #[GetMappedModel] Role $role,
+        #[GetMappedModel]
+        Role $role,
     ): AjaxResponse {
         $modelManager->saveWithoutChildren($role);
 
@@ -63,7 +64,8 @@ class RoleController extends AbstractController
     #[CheckPermission([Permission::MANAGE, Permission::DELETE])]
     public function delete(
         ModelManager $modelManager,
-        #[GetModel] Role $role,
+        #[GetModel]
+        Role $role,
     ): AjaxResponse {
         $modelManager->delete($role);
 
@@ -76,7 +78,8 @@ class RoleController extends AbstractController
     #[CheckPermission([Permission::MANAGE, Permission::WRITE])]
     public function postPermission(
         ModelManager $modelManager,
-        #[GetMappedModel] RolePermission $permission,
+        #[GetMappedModel]
+        RolePermission $permission,
     ): AjaxResponse {
         $modelManager->saveWithoutChildren($permission);
 
@@ -91,7 +94,8 @@ class RoleController extends AbstractController
     #[CheckPermission([Permission::MANAGE, Permission::READ])]
     public function getUsers(
         UserStore $userStore,
-        #[GetModel] Role $role,
+        #[GetModel]
+        Role $role,
         int $start = 0,
         int $limit = 0,
         array $sort = [],
@@ -110,7 +114,8 @@ class RoleController extends AbstractController
      */
     #[CheckPermission([Permission::MANAGE, Permission::WRITE])]
     public function postUser(
-        #[GetMappedModel] Role\User $roleUser,
+        #[GetMappedModel]
+        Role\User $roleUser,
         ModelManager $modelManager,
     ): AjaxResponse {
         $modelManager->saveWithoutChildren($roleUser);
@@ -124,8 +129,9 @@ class RoleController extends AbstractController
      */
     #[CheckPermission([Permission::MANAGE, Permission::DELETE])]
     public function deleteUsers(
-        #[GetModels(Role\User::class)] array $users,
-        ModelManager $modelManager
+        #[GetModels(Role\User::class)]
+        array $users,
+        ModelManager $modelManager,
     ): AjaxResponse {
         foreach ($users as $user) {
             $modelManager->delete($user);
@@ -138,7 +144,7 @@ class RoleController extends AbstractController
     public function getPermissions(
         PermissionStore $permissionStore,
         PermissionRepository $permissionRepository,
-        string $node
+        string $node,
     ): AjaxResponse {
         $requiredPermissions = [];
 

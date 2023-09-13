@@ -80,7 +80,7 @@ class TableInstall extends AbstractInstall implements PriorityInterface
         ServiceManager $serviceManagerService,
         private mysqlDatabase $mysqlDatabase,
         private TableAttribute $tableAttribute,
-        private ReflectionManager $reflectionManager
+        private ReflectionManager $reflectionManager,
     ) {
         parent::__construct($serviceManagerService);
     }
@@ -115,7 +115,7 @@ class TableInstall extends AbstractInstall implements PriorityInterface
                 $columnAttribute = $this->reflectionManager->getAttribute(
                     $reflectionProperty,
                     Column::class,
-                    ReflectionAttribute::IS_INSTANCEOF
+                    ReflectionAttribute::IS_INSTANCEOF,
                 );
 
                 if ($columnAttribute === null) {
@@ -134,7 +134,7 @@ class TableInstall extends AbstractInstall implements PriorityInterface
                             ? false
                             : ($columnAttribute->isNullable() === null
                                 ? $this->reflectionManager->allowsNull($reflectionProperty)
-                                : $columnAttribute->isNullable())
+                                : $columnAttribute->isNullable()),
                     )
                     ->setDefault(
                         $columnAttribute->getDefault() === null && ($reflectionProperty->hasDefaultValue())
@@ -155,7 +155,7 @@ class TableInstall extends AbstractInstall implements PriorityInterface
                                 )
                             )
                         )
-                        : $columnAttribute->getDefault()
+                        : $columnAttribute->getDefault(),
                     )
                 ;
 
@@ -174,7 +174,7 @@ class TableInstall extends AbstractInstall implements PriorityInterface
                     $this->reflectionManager->getReflectionEnum($type);
                     $columnAttribute->setValues(array_map(
                         fn (UnitEnum $enum): string => $enum->name,
-                        $type::cases()
+                        $type::cases(),
                     ));
                 }
 
@@ -193,7 +193,7 @@ class TableInstall extends AbstractInstall implements PriorityInterface
                 throw new InstallException(sprintf(
                     'Show table "%s" failed! Error: %s',
                     $tableName,
-                    $this->mysqlDatabase->error()
+                    $this->mysqlDatabase->error(),
                 ));
             }
 
@@ -209,7 +209,7 @@ class TableInstall extends AbstractInstall implements PriorityInterface
                 throw new InstallException(sprintf(
                     'Show field from table "%s" failed! Error: %s',
                     $tableName,
-                    $this->mysqlDatabase->error()
+                    $this->mysqlDatabase->error(),
                 ));
             }
 
@@ -246,7 +246,7 @@ class TableInstall extends AbstractInstall implements PriorityInterface
                 throw new InstallException(sprintf(
                     'Modify table table "%s" failed! Error: %s',
                     $tableName,
-                    $this->mysqlDatabase->error()
+                    $this->mysqlDatabase->error(),
                 ));
             }
 
@@ -276,7 +276,7 @@ class TableInstall extends AbstractInstall implements PriorityInterface
             'array' => Column::TYPE_JSON,
             'string' => Column::TYPE_VARCHAR,
             DateTimeInterface::class, DateTime::class, DateTimeImmutable::class => Column::TYPE_DATETIME,
-            default => class_exists($type) && enum_exists($type) ? Column::TYPE_ENUM : Column::TYPE_VARCHAR
+            default => class_exists($type) && enum_exists($type) ? Column::TYPE_ENUM : Column::TYPE_VARCHAR,
         };
     }
 
@@ -289,7 +289,7 @@ class TableInstall extends AbstractInstall implements PriorityInterface
     {
         $primaryColumns = array_filter(array_map(
             static fn (Column $column): ?string => $column->isPrimary() ? $column->getName() : null,
-            $columns
+            $columns,
         ));
 
         $query =
@@ -299,8 +299,8 @@ class TableInstall extends AbstractInstall implements PriorityInterface
                     ', ',
                     array_map(
                         fn (Column $column) => $this->getColumnString($column),
-                        $columns
-                    )
+                        $columns,
+                    ),
                 ) .
                 (count($primaryColumns) > 0 ? ', PRIMARY KEY (`' . implode('`, `', $primaryColumns) . '`)' : '') .
             ') ' .
@@ -313,7 +313,7 @@ class TableInstall extends AbstractInstall implements PriorityInterface
             throw new InstallException(sprintf(
                 'Create table "%s" failed! Error: %s',
                 $table->getName() ?? '',
-                $this->mysqlDatabase->error()
+                $this->mysqlDatabase->error(),
             ));
         }
     }
@@ -328,7 +328,7 @@ class TableInstall extends AbstractInstall implements PriorityInterface
                 $type === Column::TYPE_ENUM
                     ? "('" . implode("','", $column->getValues()) . "')"
                     : ($column->getLength() === null ? ' ' : '(' . $column->getLength() . ')')
-            )
+            ),
         );
     }
 
@@ -383,11 +383,17 @@ class TableInstall extends AbstractInstall implements PriorityInterface
 
         if ($columnAttribute->getLength() === null) {
             $existingColumnType = preg_replace('/\(\d*\)/', '', $existingColumnType);
+
+            if (!is_string($existingColumnType)) {
+                return true;
+            }
         }
+
+        $extra = str_replace('()', '', $column->Extra);
 
         if ($columnAttribute->getType() !== Column::TYPE_TIMESTAMP) {
             $columnType = trim($columnType . ' ' . implode(' ', $columnAttribute->getAttributes()));
-        } elseif (mb_strtolower(str_replace('()', '', $column->Extra)) !== mb_strtolower(implode(' ', $columnAttribute->getAttributes()))) {
+        } elseif (!is_string($extra) || mb_strtolower($extra) !== mb_strtolower(implode(' ', $columnAttribute->getAttributes()))) {
             return true;
         }
 

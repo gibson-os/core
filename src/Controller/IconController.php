@@ -66,7 +66,8 @@ class IconController extends AbstractController
         string $tags,
         array $icon,
         array $iconIco = null,
-        #[GetModel] Icon $iconModel = null
+        #[GetModel]
+        Icon $iconModel = null,
     ): AjaxResponse {
         $iconModel ??= (new Icon())
             ->setName($name)
@@ -77,7 +78,7 @@ class IconController extends AbstractController
             $iconModel,
             $icon['tmp_name'],
             $iconIco === null ? null : $iconIco['tmp_name'],
-            explode(',', $tags)
+            explode(',', $tags),
         );
 
         /** @var Traversable $icons */

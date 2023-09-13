@@ -22,8 +22,10 @@ class FfmpegService
      * @throws GetError
      */
     public function __construct(
-        #[GetEnv('FFMPEG_PATH')] private readonly string $ffmpegPath,
-        #[GetEnv('FFPROBE_PATH')] private readonly string $ffprobePath,
+        #[GetEnv('FFMPEG_PATH')]
+        private readonly string $ffmpegPath,
+        #[GetEnv('FFPROBE_PATH')]
+        private readonly string $ffprobePath,
         private readonly DateTimeService $dateTime,
         private readonly FileService $file,
         private readonly ProcessService $process,
@@ -74,7 +76,7 @@ class FfmpegService
         string $outputFilename,
         string $videoCodec = null,
         string $audioCodec = null,
-        array $options = []
+        array $options = [],
     ): void {
         $optionString = $this->getOption($options, 'activation_bytes', '');
         $optionString .= '-i ' . escapeshellarg($media->getFilename()) . ' ';
@@ -120,14 +122,14 @@ class FfmpegService
             $optionString,
             escapeshellarg($outputFilename),
             escapeshellarg($logPath),
-            escapeshellarg($logPath)
+            escapeshellarg($logPath),
         ));
 
         $this->file->delete(sys_get_temp_dir(), $filename);
 
         if (!$this->file->exists($outputFilename)) {
             throw new FileNotFound(
-                sprintf('Konvertieren war nicht erfolgreich! Datei %s existiert nicht!', $outputFilename)
+                sprintf('Konvertieren war nicht erfolgreich! Datei %s existiert nicht!', $outputFilename),
             );
         }
     }
@@ -155,7 +157,7 @@ class FfmpegService
             'time=\s*(\d{2}:\d{2}:\d{2}\.\d{2})\s*' .
             'bitrate=\s*(\d*\.\d*)/',
             $content,
-            $hits
+            $hits,
         )) {
             throw new ConvertStatusError();
         }
@@ -184,7 +186,7 @@ class FfmpegService
             '-ss %s -i %s -an -r 1 -vframes 1 -f image2 %s >/dev/null 2>/dev/null',
             $frameNumber,
             escapeshellarg($filename),
-            $path
+            $path,
         ));
 
         $image = $this->image->load($path);

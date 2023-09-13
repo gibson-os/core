@@ -16,7 +16,7 @@ class ModuleInstall extends AbstractInstall implements PriorityInterface, Single
 {
     public function __construct(
         ServiceManager $serviceManagerService,
-        private ModuleService $moduleService
+        private ModuleService $moduleService,
     ) {
         parent::__construct($serviceManagerService);
     }

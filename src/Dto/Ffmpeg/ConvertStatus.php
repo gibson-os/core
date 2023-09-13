@@ -173,7 +173,7 @@ class ConvertStatus implements JsonSerializable
             throw new SetError(sprintf(
                 'Status "%s" nicht erlaubt! Erlaubt: %s',
                 $status,
-                implode(', ', self::STATUS)
+                implode(', ', self::STATUS),
             ));
         }
 

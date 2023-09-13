@@ -59,7 +59,7 @@ class RequestService
             $params,
             $this->getJsonBody(),
             $_COOKIE,
-            $files
+            $files,
         );
     }
 

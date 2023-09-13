@@ -10,7 +10,7 @@ class PrimaryColumn
 {
     public function __construct(
         private readonly ReflectionProperty $reflectionProperty,
-        private readonly Column $column
+        private readonly Column $column,
     ) {
     }
 

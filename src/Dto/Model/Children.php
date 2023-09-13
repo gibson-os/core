@@ -49,7 +49,7 @@ class Children
         $getter = 'get' . ucfirst(str_replace(
             ' ',
             '',
-            ucwords(str_replace('_', ' ', $this->constraint->getOwnColumn() ?? 'id'))
+            ucwords(str_replace('_', ' ', $this->constraint->getOwnColumn() ?? 'id')),
         ));
 
         return $this->parent->$getter();

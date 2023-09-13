@@ -30,15 +30,17 @@ class NetworkEvent extends AbstractEvent
     public function __construct(
         EventService $eventService,
         ReflectionManager $reflectionManager,
-        private readonly NetworkService $networkService
+        private readonly NetworkService $networkService,
     ) {
         parent::__construct($eventService, $reflectionManager);
     }
 
     #[Event\Method('Ping')]
     public function ping(
-        #[Event\Parameter(StringParameter::class, 'Host')] string $host,
-        #[Event\Parameter(IntParameter::class, 'Timeout')] int $timeout
+        #[Event\Parameter(StringParameter::class, 'Host')]
+        string $host,
+        #[Event\Parameter(IntParameter::class, 'Timeout')]
+        int $timeout,
     ): bool {
         return $this->networkService->ping($host, $timeout);
     }

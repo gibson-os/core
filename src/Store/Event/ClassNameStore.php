@@ -20,7 +20,8 @@ class ClassNameStore extends AbstractStore
 
     public function __construct(
         private ReflectionManager $reflectionManager,
-        #[GetClassNames(['*/src/Event'])] private array $classNames
+        #[GetClassNames(['*/src/Event'])]
+        private array $classNames,
     ) {
     }
 
@@ -60,7 +61,7 @@ class ClassNameStore extends AbstractStore
             $eventAttribute = $this->reflectionManager->getAttribute(
                 $reflectionClass,
                 Event::class,
-                ReflectionAttribute::IS_INSTANCEOF
+                ReflectionAttribute::IS_INSTANCEOF,
             );
 
             if ($eventAttribute === null) {

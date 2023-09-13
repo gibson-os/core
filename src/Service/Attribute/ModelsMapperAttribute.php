@@ -28,7 +28,7 @@ class ModelsMapperAttribute implements AttributeServiceInterface, ParameterAttri
         private readonly ReflectionManager $reflectionManager,
         private readonly ModelsFetcherAttribute $modelsFetcherAttribute,
         private readonly SessionService $sessionService,
-        private readonly ObjectMapperAttribute $objectMapperAttribute
+        private readonly ObjectMapperAttribute $objectMapperAttribute,
     ) {
     }
 
@@ -48,7 +48,7 @@ class ModelsMapperAttribute implements AttributeServiceInterface, ParameterAttri
             throw new MapperException(sprintf(
                 'Attribute "%s" is not an instance of "%s"!',
                 $attribute::class,
-                GetMappedModel::class
+                GetMappedModel::class,
             ));
         }
 
@@ -56,7 +56,7 @@ class ModelsMapperAttribute implements AttributeServiceInterface, ParameterAttri
             $fetchedModels = $this->modelsFetcherAttribute->replace(
                 new GetModels($attribute->getClassName(), $attribute->getConditions()),
                 $parameters,
-                $reflectionParameter
+                $reflectionParameter,
             );
         } catch (SelectError) {
             $fetchedModels = [];
@@ -71,11 +71,17 @@ class ModelsMapperAttribute implements AttributeServiceInterface, ParameterAttri
 
             foreach ($fetchedModels ?? [] as $fetchedModel) {
                 foreach ($attribute->getConditions() as $property => $condition) {
+                    $propertyWithSpace = str_replace('_', ' ', $property);
+
+                    if (!is_string($propertyWithSpace)) {
+                        continue;
+                    }
+
                     $modelValue = $this->reflectionManager->getProperty(
                         $this->reflectionManager->getReflectionClass($fetchedModel)->getProperty(
-                            lcfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $property))))
+                            lcfirst(str_replace(' ', '', ucwords($propertyWithSpace))),
                         ),
-                        $fetchedModel
+                        $fetchedModel,
                     );
 
                     if ($modelValue !== ($requestValues[$condition] ?? null)) {
@@ -93,7 +99,7 @@ class ModelsMapperAttribute implements AttributeServiceInterface, ParameterAttri
                 $constraintAttribute = $this->reflectionManager->getAttribute(
                     $reflectionProperty,
                     Constraint::class,
-                    ReflectionAttribute::IS_INSTANCEOF
+                    ReflectionAttribute::IS_INSTANCEOF,
                 );
 
                 if ($constraintAttribute === null) {
@@ -115,7 +121,7 @@ class ModelsMapperAttribute implements AttributeServiceInterface, ParameterAttri
                 $typeName = $this->reflectionManager->getTypeName($reflectionProperty);
                 $values = array_map(
                     fn ($value): object => is_object($value) ? $value : $this->objectMapper->mapToObject($parentModelClassName, $value),
-                    $typeName === 'array' ? $values : [$reflectionProperty->getName() => $values]
+                    $typeName === 'array' ? $values : [$reflectionProperty->getName() => $values],
                 );
                 $setter = 'set' . ucfirst($reflectionProperty->getName());
 

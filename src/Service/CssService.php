@@ -23,7 +23,7 @@ class CssService
             '..' . DIRECTORY_SEPARATOR .
             '..' . DIRECTORY_SEPARATOR .
             '..' . DIRECTORY_SEPARATOR .
-            '..'
+            '..',
         ) . DIRECTORY_SEPARATOR;
     }
 
@@ -42,7 +42,7 @@ class CssService
                 'gibson-os' . DIRECTORY_SEPARATOR .
                 $task->module . DIRECTORY_SEPARATOR .
                 'assets' . DIRECTORY_SEPARATOR .
-                'css' . DIRECTORY_SEPARATOR
+                'css' . DIRECTORY_SEPARATOR,
             ));
         }
 
@@ -64,7 +64,7 @@ class CssService
             $module . DIRECTORY_SEPARATOR .
             'assets' . DIRECTORY_SEPARATOR .
             'css' . DIRECTORY_SEPARATOR .
-            $task . DIRECTORY_SEPARATOR
+            $task . DIRECTORY_SEPARATOR,
         );
 
         return implode('', $files);

@@ -11,7 +11,7 @@ class Table
     public function __construct(
         private ?string $name = null,
         private string $engine = 'InnoDB',
-        private string $charset = 'utf8'
+        private string $charset = 'utf8',
     ) {
     }
 

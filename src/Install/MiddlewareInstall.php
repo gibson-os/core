@@ -14,7 +14,7 @@ class MiddlewareInstall extends AbstractInstall implements PriorityInterface, Si
     {
         yield $middlewareUrlInput = $this->getEnvInput(
             'MIDDLEWARE_URL',
-            'What is the middleware URL?'
+            'What is the middleware URL?',
         );
 
         $middlewareUrl = $middlewareUrlInput->getValue() ?? '';

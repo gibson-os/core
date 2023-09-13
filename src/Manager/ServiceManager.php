@@ -254,7 +254,7 @@ class ServiceManager
 
             throw new FactoryError(sprintf(
                 'Class %s is an Interface',
-                $classname
+                $classname,
             ));
         }
 
@@ -265,7 +265,7 @@ class ServiceManager
 
             throw new FactoryError(sprintf(
                 'Class %s is an Abstract class',
-                $classname
+                $classname,
             ));
         }
 
@@ -288,7 +288,7 @@ class ServiceManager
                         $parameters[$name] = $attributeService->replace(
                             $attribute->getAttribute(),
                             $parameters,
-                            $reflectionParameter
+                            $reflectionParameter,
                         );
                     }
 
@@ -312,7 +312,7 @@ class ServiceManager
                     throw new FactoryError(sprintf(
                         'Parameter %s of Class %s is no Class',
                         $reflectionParameter->getName(),
-                        $classname
+                        $classname,
                     ));
                 }
             }
@@ -381,7 +381,7 @@ class ServiceManager
         if (count($newParameters) < count($parameters)) {
             throw new FactoryError(sprintf(
                 'Following parameters not in method signature: $%s',
-                implode(', $', array_diff($parameters, $newParameters))
+                implode(', $', array_diff($parameters, $newParameters)),
             ));
         }
 

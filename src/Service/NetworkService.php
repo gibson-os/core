@@ -19,7 +19,7 @@ class NetworkService
             [
                 'host' => $host,
                 'timeout' => $timeout,
-            ]
+            ],
         );
 
         $package = "\x08\x00\x7d\x4b\x00\x00\x00\x00PingHost";
@@ -38,7 +38,7 @@ class NetworkService
                 'host' => $host,
                 'timeout' => $timeout,
                 'result' => $result,
-            ]
+            ],
         );
 
         return $result;

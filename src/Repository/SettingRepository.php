@@ -29,7 +29,7 @@ class SettingRepository extends AbstractRepository
         return $this->fetchAll(
             '`module_id`=? AND (`user_id` IS NULL' . ($userId === null ? '' : ' OR `user_id`=?') . ')',
             $parameters,
-            Setting::class
+            Setting::class,
         );
     }
 
@@ -50,7 +50,7 @@ class SettingRepository extends AbstractRepository
             ->appendJoin('module', '`' . $this->settingTableName . '`.`module_id`=`module`.`id`')
             ->setWhere(
                 '`module`.`name`=? AND ' .
-                '(`user_id` IS NULL' . ($userId === null ? '' : ' OR `user_id`=?') . ')'
+                '(`user_id` IS NULL' . ($userId === null ? '' : ' OR `user_id`=?') . ')',
             )
             ->setWhereParameters($parameters)
         ;
@@ -76,7 +76,7 @@ class SettingRepository extends AbstractRepository
             '(`user_id` IS NULL' . ($userId === null ? '' : ' OR `user_id`=?') . ') AND ' .
             '`key`=?',
             $parameters,
-            Setting::class
+            Setting::class,
         );
     }
 
@@ -88,7 +88,7 @@ class SettingRepository extends AbstractRepository
         return $this->fetchOne(
             '`module_id`=? AND `key`=? AND `value`=?',
             [$moduleId, $key, $value],
-            Setting::class
+            Setting::class,
         );
     }
 
@@ -108,7 +108,7 @@ class SettingRepository extends AbstractRepository
         if (!$table->selectPrepared()) {
             $exception = new SelectError(sprintf(
                 'Einstellung mit dem Key "%s" konnte nicht geladen werden!',
-                $key
+                $key,
             ));
             $exception->setTable($table);
 
@@ -128,7 +128,7 @@ class SettingRepository extends AbstractRepository
         return $this->fetchAll(
             '`module_id`=? AND `key`=?',
             [$moduleId, $key],
-            Setting::class
+            Setting::class,
         );
     }
 
@@ -168,7 +168,7 @@ class SettingRepository extends AbstractRepository
             ->setWhere(
                 '`module`.`name`=? AND ' .
                 '(`' . $tableName . '`.`user_id` IS NULL' . ($userId === null ? '' : ' OR `' . $tableName . '`.`user_id`=?') . ') AND . ' .
-                '`' . $tableName . '`.`key`=?'
+                '`' . $tableName . '`.`key`=?',
             )
             ->setWhereParameters($parameters)
             ->setOrderBy('`user_id` DESC')
@@ -178,7 +178,7 @@ class SettingRepository extends AbstractRepository
         if (!$table->selectPrepared()) {
             $exception = new SelectError(sprintf(
                 'Einstellung mit dem Key "%s" konnte nicht geladen werden!',
-                $key
+                $key,
             ));
             $exception->setTable($table);
 

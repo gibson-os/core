@@ -24,9 +24,11 @@ class DriveStore extends AbstractDatabaseStore
     private DateTimeInterface $toTime;
 
     public function __construct(
-        #[GetTableName(Drive\Stat::class)] private readonly string $driveStatTableName,
-        #[GetTableName(Drive\StatAttribute::class)] private readonly string $driveStatAttributeTableName,
-        mysqlDatabase $database = null
+        #[GetTableName(Drive\Stat::class)]
+        private readonly string $driveStatTableName,
+        #[GetTableName(Drive\StatAttribute::class)]
+        private readonly string $driveStatAttributeTableName,
+        mysqlDatabase $database = null,
     ) {
         parent::__construct($database);
     }
@@ -43,11 +45,11 @@ class DriveStore extends AbstractDatabaseStore
         $this->table
             ->appendJoin(
                 $this->driveStatTableName,
-                '`' . $this->tableName . '`.`id`=`' . $this->driveStatTableName . '`.`drive_id`'
+                '`' . $this->tableName . '`.`id`=`' . $this->driveStatTableName . '`.`drive_id`',
             )
             ->appendJoin(
                 $this->driveStatAttributeTableName,
-                '`' . $this->driveStatTableName . '`.`id`=`' . $this->driveStatAttributeTableName . '`.`stat_id`'
+                '`' . $this->driveStatTableName . '`.`id`=`' . $this->driveStatAttributeTableName . '`.`stat_id`',
             )
         ;
     }
@@ -74,7 +76,7 @@ class DriveStore extends AbstractDatabaseStore
         if ($this->from !== null) {
             $this->addWhere(
                 'UNIX_TIMESTAMP(`' . $this->driveStatTableName . '`.`added`)>=UNIX_TIMESTAMP(?)',
-                [$this->from->format('Y-m-d H:i:s')]
+                [$this->from->format('Y-m-d H:i:s')],
             );
         } else {
             $this->addWhere('UNIX_TIMESTAMP(`' . $this->driveStatTableName . '`.`added`)>=UNIX_TIMESTAMP(NOW())-(3600*4)-840');
@@ -83,7 +85,7 @@ class DriveStore extends AbstractDatabaseStore
         if ($this->to !== null) {
             $this->addWhere(
                 'UNIX_TIMESTAMP(`' . $this->driveStatTableName . '`.`added`)<=UNIX_TIMESTAMP(?)+60',
-                [$this->to->format('Y-m-d H:i:s')]
+                [$this->to->format('Y-m-d H:i:s')],
             );
         }
     }
@@ -133,7 +135,7 @@ class DriveStore extends AbstractDatabaseStore
             '`' . $this->tableName . '`.`serial`, '
             . '`' . $this->driveStatAttributeTableName . '`.`raw_value`, '
             . "DATE_FORMAT(`' . $this->driveStatTableName . '`.`added`, '%d.%m.%Y %H:%i') AS `date`, "
-            . "UNIX_TIMESTAMP(DATE_FORMAT(`' . $this->driveStatTableName . '`.`added`, '%Y-%m-%d %H:%i')) AS `timestamp`"
+            . "UNIX_TIMESTAMP(DATE_FORMAT(`' . $this->driveStatTableName . '`.`added`, '%Y-%m-%d %H:%i')) AS `timestamp`",
         );
 
         $data = [];

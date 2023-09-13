@@ -46,13 +46,13 @@ class WebInstrumentation implements InstrumentationInterface
                 $instrumentation,
                 WebService::class,
                 'requestWithOutput',
-                $pre
+                $pre,
             )
             ->addHook(
                 $instrumentation,
                 WebService::class,
                 'request',
-                $pre
+                $pre,
             )
         ;
     }

@@ -17,7 +17,7 @@ class ListCommand extends AbstractCommand
     public function __construct(
         private readonly CommandStore $commandStore,
         private readonly TableService $tableService,
-        LoggerInterface $logger
+        LoggerInterface $logger,
     ) {
         parent::__construct($logger);
     }
@@ -38,11 +38,11 @@ class ListCommand extends AbstractCommand
                             $cronjob->getDaysOfWeek() . ' ' .
                             $cronjob->getMonths() . ' ' .
                             $cronjob->getYears(),
-                        $command->getCronjobs()
+                        $command->getCronjobs(),
                     )),
                 ],
-                iterator_to_array($this->commandStore->getList())
-            )
+                iterator_to_array($this->commandStore->getList()),
+            ),
         ) . PHP_EOL;
 
         return self::SUCCESS;

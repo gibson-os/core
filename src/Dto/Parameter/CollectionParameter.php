@@ -27,7 +27,7 @@ class CollectionParameter extends AbstractParameter
     {
         return array_intersect(...array_map(
             fn (AbstractParameter $parameter) => $parameter->getAllowedOperators(),
-            $this->parameters
+            $this->parameters,
         ));
     }
 }

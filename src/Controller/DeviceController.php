@@ -29,10 +29,13 @@ class DeviceController extends AbstractController
     public function postAddPush(
         ModelManager $modelManager,
         DeviceRepository $deviceRepository,
-        #[GetModel(['name' => 'module'])] Module $module,
-        #[GetModel(['name' => 'task'])] Task $task,
-        #[GetModel(['name' => 'action'])] Action $action,
-        string $foreignId
+        #[GetModel(['name' => 'module'])]
+        Module $module,
+        #[GetModel(['name' => 'task'])]
+        Task $task,
+        #[GetModel(['name' => 'action'])]
+        Action $action,
+        string $foreignId,
     ): AjaxResponse {
         $deviceToken = $this->requestService->getHeader('X-Device-Token');
         $device = $deviceRepository->getByToken($deviceToken);
@@ -61,7 +64,7 @@ class DeviceController extends AbstractController
         string $module,
         string $task,
         string $action,
-        string $foreignId
+        string $foreignId,
     ): AjaxResponse {
         $deviceToken = $this->requestService->getHeader('X-Device-Token');
         $device = $deviceRepository->getByToken($deviceToken);
@@ -85,13 +88,13 @@ class DeviceController extends AbstractController
     public function postUpdateToken(
         ModelManager $modelManager,
         DeviceRepository $deviceRepository,
-        string $fcmToken
+        string $fcmToken,
     ): AjaxResponse {
         $deviceToken = $this->requestService->getHeader('X-Device-Token');
         $modelManager->save(
             $deviceRepository
                 ->getByToken($deviceToken)
-                ->setFcmToken($fcmToken)
+                ->setFcmToken($fcmToken),
         );
 
         return $this->returnSuccess();

@@ -71,7 +71,7 @@ abstract class AbstractDatabaseStore extends AbstractStore
             ->setWhereParameters($this->getWhereParameters())
             ->setLimit(
                 $this->getRows() === 0 ? null : $this->getRows(),
-                $this->getFrom() === 0 ? null : $this->getFrom()
+                $this->getFrom() === 0 ? null : $this->getFrom(),
             )
         ;
     }
@@ -101,7 +101,7 @@ abstract class AbstractDatabaseStore extends AbstractStore
         $count = $this->table->selectAggregatePrepared('COUNT(' . $this->getCountField() . ')');
         $this->table->setLimit(
             $this->getRows() === 0 ? null : $this->getRows(),
-            $this->getFrom() === 0 ? null : $this->getFrom()
+            $this->getFrom() === 0 ? null : $this->getFrom(),
         );
 
         if ($count === null) {
@@ -243,7 +243,7 @@ abstract class AbstractDatabaseStore extends AbstractStore
             $exception = new SelectError(sprintf(
                 '%s is no instance of %s',
                 $modelClassName,
-                AbstractModel::class
+                AbstractModel::class,
             ));
             $exception->setTable($this->table);
 

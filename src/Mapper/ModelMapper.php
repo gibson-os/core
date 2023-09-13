@@ -17,7 +17,7 @@ class ModelMapper extends ObjectMapper
 {
     public function __construct(
         private readonly ServiceManager $serviceManagerService,
-        private readonly ReflectionManager $reflectionManager
+        private readonly ReflectionManager $reflectionManager,
     ) {
         parent::__construct($this->serviceManagerService, $this->reflectionManager);
     }
@@ -42,7 +42,7 @@ class ModelMapper extends ObjectMapper
             $constraintAttribute = $this->reflectionManager->getAttribute(
                 $reflectionProperty,
                 Constraint::class,
-                ReflectionAttribute::IS_INSTANCEOF
+                ReflectionAttribute::IS_INSTANCEOF,
             );
             $setter = 'set' . ucfirst($key);
 
@@ -58,9 +58,9 @@ class ModelMapper extends ObjectMapper
                         $constraintAttribute->getParentModelClassName() ?? $this->reflectionManager->getNonBuiltinTypeName($reflectionProperty),
                         is_array($mapValue)
                             ? $mapValue
-                            : [$reflectionProperty->getName() => $mapValue]
+                            : [$reflectionProperty->getName() => $mapValue],
                     ),
-                    $typeName !== 'array' ? [$value] : ($value ?? [])
+                    $typeName !== 'array' ? [$value] : ($value ?? []),
                 );
 
                 $object->$setter($typeName !== 'array' ? reset($values) : $values);
@@ -72,7 +72,7 @@ class ModelMapper extends ObjectMapper
             $this->reflectionManager->setProperty(
                 $reflectionProperty,
                 $object,
-                $this->mapValueToObject($reflectionParameter, $this->reflectionManager->castValue($reflectionParameter, $value))
+                $this->mapValueToObject($reflectionParameter, $this->reflectionManager->castValue($reflectionParameter, $value)),
             );
         }
 

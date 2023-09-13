@@ -29,7 +29,7 @@ class AttributeService
      * @return Attribute[]
      */
     public function getAttributes(
-        ReflectionMethod|ReflectionClass|ReflectionParameter|ReflectionClassConstant $reflectionObject
+        ReflectionMethod|ReflectionClass|ReflectionParameter|ReflectionClassConstant $reflectionObject,
     ): array {
         return $this->getAttributesByClassName($reflectionObject, AttributeInterface::class);
     }
@@ -43,20 +43,20 @@ class AttributeService
      */
     public function getAttributesByClassName(
         ReflectionMethod|ReflectionClass|ReflectionParameter|ReflectionClassConstant $reflectionObject,
-        string $attributeClassName
+        string $attributeClassName,
     ): array {
         $attributesClasses = [];
         $attributes = $this->reflectionManager->getAttributes(
             $reflectionObject,
             $attributeClassName,
-            ReflectionAttribute::IS_INSTANCEOF
+            ReflectionAttribute::IS_INSTANCEOF,
         );
 
         foreach ($attributes as $attribute) {
             /** @var AttributeServiceInterface $attributeService */
             $attributeService = $this->serviceManagerService->get(
                 $attribute->getAttributeServiceName(),
-                AttributeServiceInterface::class
+                AttributeServiceInterface::class,
             );
 
             $attributesClasses[] = new Attribute($attribute, $attributeService);

@@ -22,7 +22,7 @@ class TaskAutoComplete implements AutoCompleteInterface
     {
         return $this->taskRepository->findByName(
             $namePart,
-            isset($parameters['moduleId']) ? (int) $parameters['moduleId'] : null
+            isset($parameters['moduleId']) ? (int) $parameters['moduleId'] : null,
         );
     }
 

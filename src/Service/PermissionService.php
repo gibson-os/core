@@ -22,7 +22,7 @@ class PermissionService
         string $task = null,
         string $action = null,
         HttpMethod $method = null,
-        int $userId = null
+        int $userId = null,
     ): int {
         if ($task === null) {
             return $this->permissionViewRepository->getPermissionByModule($module, $userId)->getPermission();
@@ -37,7 +37,7 @@ class PermissionService
             $task,
             $action,
             $method,
-            $userId
+            $userId,
         )->getPermission();
     }
 
@@ -75,7 +75,7 @@ class PermissionService
         string $task = null,
         string $action = null,
         HttpMethod $method = null,
-        int $userId = null
+        int $userId = null,
     ): bool {
         return $this->hasPermission(PermissionEnum::DENIED->value, $module, $task, $action, $method, $userId);
     }
@@ -85,7 +85,7 @@ class PermissionService
         string $task = null,
         string $action = null,
         HttpMethod $method = null,
-        int $userId = null
+        int $userId = null,
     ): bool {
         return $this->hasPermission(PermissionEnum::READ->value, $module, $task, $action, $method, $userId);
     }
@@ -95,7 +95,7 @@ class PermissionService
         string $task = null,
         string $action = null,
         HttpMethod $method = null,
-        int $userId = null
+        int $userId = null,
     ): bool {
         return $this->hasPermission(PermissionEnum::WRITE->value, $module, $task, $action, $method, $userId);
     }
@@ -105,7 +105,7 @@ class PermissionService
         string $task = null,
         string $action = null,
         HttpMethod $method = null,
-        int $userId = null
+        int $userId = null,
     ): bool {
         return $this->hasPermission(PermissionEnum::DELETE->value, $module, $task, $action, $method, $userId);
     }
@@ -115,7 +115,7 @@ class PermissionService
         string $task = null,
         string $action = null,
         HttpMethod $method = null,
-        int $userId = null
+        int $userId = null,
     ): bool {
         return $this->hasPermission(PermissionEnum::MANAGE->value, $module, $task, $action, $method, $userId);
     }

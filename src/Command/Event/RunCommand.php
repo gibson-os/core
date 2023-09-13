@@ -26,7 +26,7 @@ class RunCommand extends AbstractCommand
     public function __construct(
         private readonly EventRepository $eventRepository,
         private readonly EventService $eventService,
-        LoggerInterface $logger
+        LoggerInterface $logger,
     ) {
         parent::__construct($logger);
     }
@@ -43,7 +43,7 @@ class RunCommand extends AbstractCommand
     {
         $this->eventService->runEvent(
             $this->eventRepository->getById($this->eventId),
-            false
+            false,
         );
 
         return self::SUCCESS;

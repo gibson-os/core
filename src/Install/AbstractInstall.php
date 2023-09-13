@@ -110,7 +110,7 @@ abstract class AbstractInstall implements InstallInterface
             $setting
                 ->setModuleId($module->getId() ?? 0)
                 ->setKey($key)
-                ->setValue($value)
+                ->setValue($value),
         );
     }
 
@@ -143,7 +143,7 @@ abstract class AbstractInstall implements InstallInterface
             throw new InstallException(sprintf(
                 '"%s" is no valid value! Possible: %s',
                 $hits[2],
-                implode(', ', $types)
+                implode(', ', $types),
             ));
         }
 

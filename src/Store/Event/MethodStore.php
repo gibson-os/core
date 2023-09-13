@@ -82,7 +82,7 @@ class MethodStore extends AbstractStore
             $methodAttribute = $this->reflectionManager->getAttribute(
                 $reflectionMethod,
                 Method::class,
-                ReflectionAttribute::IS_INSTANCEOF
+                ReflectionAttribute::IS_INSTANCEOF,
             );
 
             if ($methodAttribute === null) {
@@ -94,7 +94,7 @@ class MethodStore extends AbstractStore
                 'title' => $methodAttribute->getTitle(),
                 'parameters' => $this->getParameters(
                     $reflectionMethod,
-                    $this->eventService->getListeners($reflectionMethod, $listeners)
+                    $this->eventService->getListeners($reflectionMethod, $listeners),
                 ),
                 'returns' => $this->getReturns($reflectionMethod),
             ];
@@ -117,7 +117,7 @@ class MethodStore extends AbstractStore
             $parameterAttribute = $this->reflectionManager->getAttribute(
                 $reflectionParameter,
                 Parameter::class,
-                ReflectionAttribute::IS_INSTANCEOF
+                ReflectionAttribute::IS_INSTANCEOF,
             );
 
             if ($parameterAttribute === null) {
@@ -128,7 +128,7 @@ class MethodStore extends AbstractStore
                 $reflectionParameter->getName(),
                 $reflectionMethod->getDeclaringClass(),
                 $parameterAttribute,
-                $listeners[$reflectionParameter->getName()] ?? []
+                $listeners[$reflectionParameter->getName()] ?? [],
             );
         }
 
@@ -145,14 +145,14 @@ class MethodStore extends AbstractStore
         $returnValueAttributes = $this->reflectionManager->getAttributes(
             $reflectionMethod,
             ReturnValue::class,
-            ReflectionAttribute::IS_INSTANCEOF
+            ReflectionAttribute::IS_INSTANCEOF,
         );
 
         foreach ($returnValueAttributes as $returnValue) {
             $returns[$returnValue->getKey() ?? 'return'] = $this->getParameter(
                 $returnValue->getKey() ?? 'return',
                 $reflectionMethod->getDeclaringClass(),
-                $returnValue
+                $returnValue,
             );
         }
 
@@ -167,13 +167,13 @@ class MethodStore extends AbstractStore
         string $name,
         ReflectionClass $reflectionClass,
         ReturnValue|Parameter $object,
-        array $listeners = []
+        array $listeners = [],
     ): AbstractParameter {
         return $this->eventService->getParameter(
             $object->getClassName(),
             array_merge($this->eventService->getParameterOptions($reflectionClass, $name), $object->getOptions()),
             $object->getTitle(),
-            $listeners
+            $listeners,
         );
     }
 }

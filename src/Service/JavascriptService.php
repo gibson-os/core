@@ -22,7 +22,7 @@ class JavascriptService
             '..' . DIRECTORY_SEPARATOR .
             '..' . DIRECTORY_SEPARATOR .
             '..' . DIRECTORY_SEPARATOR .
-            '..'
+            '..',
         ) . DIRECTORY_SEPARATOR;
     }
 
@@ -51,7 +51,7 @@ class JavascriptService
                 'gibson-os' . DIRECTORY_SEPARATOR .
                 $task->module . DIRECTORY_SEPARATOR .
                 'assets' . DIRECTORY_SEPARATOR .
-                'js' . DIRECTORY_SEPARATOR
+                'js' . DIRECTORY_SEPARATOR,
             ));
             $oldData .= $this->mergeFileContent($dir);
         }
@@ -94,7 +94,7 @@ class JavascriptService
                 'gibson-os' . DIRECTORY_SEPARATOR .
                 $permission->module . DIRECTORY_SEPARATOR .
                 'assets' . DIRECTORY_SEPARATOR .
-                'js' . DIRECTORY_SEPARATOR
+                'js' . DIRECTORY_SEPARATOR,
             ));
             $oldData .= $this->mergeFileContent($dir);
         }
@@ -231,7 +231,7 @@ class JavascriptService
                 'core' . DIRECTORY_SEPARATOR .
                 'assets' . DIRECTORY_SEPARATOR .
                 'js' . DIRECTORY_SEPARATOR .
-                'decorator' . DIRECTORY_SEPARATOR
+                'decorator' . DIRECTORY_SEPARATOR,
             ),
             $this->getFiles(
                 $this->vendorPath .
@@ -239,8 +239,8 @@ class JavascriptService
                 'core' . DIRECTORY_SEPARATOR .
                 'assets' . DIRECTORY_SEPARATOR .
                 'js' . DIRECTORY_SEPARATOR .
-                'component' . DIRECTORY_SEPARATOR
-            )
+                'component' . DIRECTORY_SEPARATOR,
+            ),
         );
     }
 }

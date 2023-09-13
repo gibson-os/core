@@ -10,12 +10,7 @@ class TimeRepository extends AbstractRepository
 {
     public function hasTimes(Cronjob $cronjob): bool
     {
-        $aggregates = $this->getAggregate(
-            'COUNT(`id`)',
-            Cronjob\Time::class,
-            '`cronjob_id`=?',
-            [$cronjob->getId() ?? 0],
-        );
+        $aggregates = $this->getAggregate('COUNT(`id`)', Cronjob\Time::class, '`cronjob_id`=?', [$cronjob->getId() ?? 0]);
 
         return ($aggregates === null ? null : ($aggregates[0] ?? 0)) > 0;
     }

@@ -28,7 +28,7 @@ class TimeEvent extends AbstractEvent
     public function __construct(
         EventService $eventService,
         ReflectionManager $reflectionManager,
-        private readonly DateTimeService $dateTimeService
+        private readonly DateTimeService $dateTimeService,
     ) {
         parent::__construct($eventService, $reflectionManager);
     }
@@ -38,7 +38,8 @@ class TimeEvent extends AbstractEvent
      */
     #[Event\Method('Warten (s)')]
     public function sleep(
-        #[Event\Parameter(IntParameter::class, 'Sekunden', ['range' => [1]])] int $seconds
+        #[Event\Parameter(IntParameter::class, 'Sekunden', ['range' => [1]])]
+        int $seconds,
     ): void {
         sleep($seconds);
     }
@@ -48,7 +49,8 @@ class TimeEvent extends AbstractEvent
      */
     #[Event\Method('Warten (ms)')]
     public function usleep(
-        #[Event\Parameter(IntParameter::class, 'Sekunden', ['range' => [1]])] int $microseconds
+        #[Event\Parameter(IntParameter::class, 'Sekunden', ['range' => [1]])]
+        int $microseconds,
     ): void {
         usleep($microseconds);
     }
@@ -56,8 +58,10 @@ class TimeEvent extends AbstractEvent
     #[Event\Method('Zwischen')]
     #[Event\ReturnValue(BoolParameter::class, 'Trifft zu')]
     public function between(
-        #[Event\Parameter(DateParameter::class, 'Startdatum')] DateTimeInterface $start,
-        #[Event\Parameter(DateParameter::class, 'Enddatum')] DateTimeInterface $end
+        #[Event\Parameter(DateParameter::class, 'Startdatum')]
+        DateTimeInterface $start,
+        #[Event\Parameter(DateParameter::class, 'Enddatum')]
+        DateTimeInterface $end,
     ): bool {
         $now = $this->dateTimeService->get();
 

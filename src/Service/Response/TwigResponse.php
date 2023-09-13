@@ -17,7 +17,7 @@ class TwigResponse implements ResponseInterface
         private readonly TwigService $twigService,
         private readonly string $template,
         private readonly HttpStatusCode $code = HttpStatusCode::OK,
-        private readonly array $headers = []
+        private readonly array $headers = [],
     ) {
     }
 

@@ -18,8 +18,9 @@ class IconStore extends AbstractDatabaseStore
     private array $tags = [];
 
     public function __construct(
-        #[GetTableName(Icon\Tag::class)] private string $iconTagTableName,
-        mysqlDatabase $database = null
+        #[GetTableName(Icon\Tag::class)]
+        private string $iconTagTableName,
+        mysqlDatabase $database = null,
     ) {
         parent::__construct($database);
     }
@@ -36,7 +37,7 @@ class IconStore extends AbstractDatabaseStore
         if (count($this->tags) > 0) {
             $this->table->appendJoin(
                 $this->iconTagTableName,
-                '`' . $this->iconTagTableName . '`.`icon_id` = `' . $this->tableName . '`.`id`'
+                '`' . $this->iconTagTableName . '`.`icon_id` = `' . $this->tableName . '`.`id`',
             );
         }
     }
@@ -46,7 +47,7 @@ class IconStore extends AbstractDatabaseStore
         if (count($this->tags) > 0) {
             $this->addWhere(
                 '`' . $this->iconTagTableName . '`.`tag` IN (' . $this->table->getParametersString($this->tags) . ')',
-                $this->tags
+                $this->tags,
             );
         }
     }
