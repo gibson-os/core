@@ -3,19 +3,30 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Repository;
 
-use GibsonOS\Core\Attribute\GetTableName;
+use Generator;
+use GibsonOS\Core\Attribute\GetTable;
 use GibsonOS\Core\Enum\HttpMethod;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\Action;
+use GibsonOS\Core\Service\RepositoryService;
+use MDO\Dto\Query\Where;
+use MDO\Dto\Table;
+use MDO\Exception\ClientException;
+use MDO\Query\DeleteQuery;
 
 class ActionRepository extends AbstractRepository
 {
-    public function __construct(#[GetTableName(Action::class)] private string $actionTableName)
-    {
+    public function __construct(
+        RepositoryService $repositoryService,
+        #[GetTable(Action::class)]
+        private readonly Table $actionTable,
+    ) {
+        parent::__construct($repositoryService);
     }
 
     /**
      * @throws SelectError
+     * @throws ClientException
      */
     public function getById(int $id): Action
     {
@@ -23,11 +34,12 @@ class ActionRepository extends AbstractRepository
     }
 
     /**
+     * @throws ClientException
      * @throws SelectError
      *
-     * @return Action[]
+     * @return Generator<Action>
      */
-    public function findByName(string $name, int $taskId = null): array
+    public function findByName(string $name, int $taskId = null): Generator
     {
         $where = '`name` LIKE ?';
         $parameters = [$name . '%'];
@@ -37,11 +49,12 @@ class ActionRepository extends AbstractRepository
             $parameters[] = $taskId;
         }
 
-        return $this->fetchAll($where, $parameters, Action::class);
+        yield from $this->fetchAll($where, $parameters, Action::class);
     }
 
     /**
      * @throws SelectError
+     * @throws ClientException
      */
     public function getByNameAndTaskId(string $name, HttpMethod $method, int $taskId): Action
     {
@@ -54,12 +67,19 @@ class ActionRepository extends AbstractRepository
 
     public function deleteByIdsNot(array $ids): bool
     {
-        $table = $this->getTable($this->actionTableName);
-
-        return $table
-            ->setWhere('`id` NOT IN (' . $table->getParametersString($ids) . ')')
-            ->setWhereParameters($ids)
-            ->deletePrepared()
+        $deleteQuery = (new DeleteQuery($this->actionTable))
+            ->addWhere(new Where(
+                sprintf('`id` NOT IN (%s)', $this->repositoryService->getSelectService()->getParametersString($ids)),
+                $ids,
+            ))
         ;
+
+        try {
+            $this->repositoryService->getClient()->execute($deleteQuery);
+        } catch (ClientException) {
+            return false;
+        }
+
+        return true;
     }
 }

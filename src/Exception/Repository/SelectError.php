@@ -4,35 +4,24 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Exception\Repository;
 
 use GibsonOS\Core\Exception\AbstractException;
-use mysqlTable;
+use MDO\Dto\Table;
 use Throwable;
 
 class SelectError extends AbstractException
 {
-    /**
-     * @var mysqlTable
-     */
-    private $table;
+    private Table $table;
 
     public function __construct($message = 'Abfrage war nicht erfolgreich!', $code = 0, Throwable $previous = null)
     {
         parent::__construct($message, $code, $previous);
     }
 
-    /**
-     * @return mysqlTable
-     */
-    public function getTable()
+    public function getTable(): Table
     {
         return $this->table;
     }
 
-    /**
-     * @param mysqlTable $table
-     *
-     * @return SelectError
-     */
-    public function setTable($table)
+    public function setTable(Table $table): SelectError
     {
         $this->table = $table;
 

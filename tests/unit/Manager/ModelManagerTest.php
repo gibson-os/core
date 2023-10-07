@@ -6,7 +6,7 @@ namespace GibsonOS\Test\Unit\Core\Manager;
 use Codeception\Test\Unit;
 use GibsonOS\Core\Manager\ModelManager;
 use GibsonOS\Core\Manager\ReflectionManager;
-use GibsonOS\Core\Service\Attribute\TableAttribute;
+use GibsonOS\Core\Service\Attribute\TableNameAttribute;
 use GibsonOS\Core\Service\DateTimeService;
 use GibsonOS\Core\Utility\JsonUtility;
 use GibsonOS\Mock\Model\MockModel;
@@ -49,7 +49,7 @@ class ModelManagerTest extends Unit
             ->willReturn(
                 ['id', 'bigint(20) unsigned', 'NO', 'PRI', null, 'auto_increment'],
                 ['parent_id', 'bigint(20) unsigned', 'YES', 'MUL', null, ''],
-                null
+                null,
             )
         ;
 
@@ -58,7 +58,7 @@ class ModelManagerTest extends Unit
             $this->dateTimeService->reveal(),
             $this->jsonUtility->reveal(),
             $reflectionManager,
-            new TableAttribute($reflectionManager)
+            new TableNameAttribute($reflectionManager),
         );
     }
 

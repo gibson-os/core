@@ -9,24 +9,30 @@ use GibsonOS\Core\Exception\MapperException;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Manager\ModelManager;
 use GibsonOS\Core\Manager\ReflectionManager;
+use GibsonOS\Core\Mapper\ModelMapper;
 use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Model\ModelInterface;
 use GibsonOS\Core\Service\SessionService;
 use InvalidArgumentException;
 use JsonException;
-use mysqlDatabase;
-use mysqlTable;
+use MDO\Client;
+use MDO\Dto\Query\Where;
+use MDO\Exception\ClientException;
+use MDO\Manager\TableManager;
+use MDO\Query\SelectQuery;
 use ReflectionException;
 use ReflectionParameter;
 
 class ModelsFetcherAttribute implements AttributeServiceInterface, ParameterAttributeInterface
 {
     public function __construct(
-        private readonly mysqlDatabase $mysqlDatabase,
+        private readonly Client $client,
+        private readonly TableManager $tableManager,
         private readonly ModelManager $modelManager,
         private readonly ReflectionManager $reflectionManager,
         private readonly SessionService $sessionService,
         private readonly ObjectMapperAttribute $objectMapperAttribute,
+        private readonly ModelMapper $modelMapper,
     ) {
     }
 
@@ -86,37 +92,40 @@ class ModelsFetcherAttribute implements AttributeServiceInterface, ParameterAttr
             return [];
         }
 
-        $table = (new mysqlTable($this->mysqlDatabase, $model->getTableName()))
-            ->setWhereParameters($whereParameters)
-            ->setWhere('(' . implode(') OR (', $where) . ')')
+        $table = $this->tableManager->getTable($model->getTableName());
+        $selectQuery = (new SelectQuery($table))
+            ->addWhere(new Where(sprintf('(%s)', implode(') OR (', $where)), $whereParameters))
         ;
-        $select = $table->selectPrepared();
 
-        if ($select === false) {
-            throw (new SelectError(sprintf(
-                'Model query of type "%s" for parameter "%s" has errors! Error: %s',
-                $modelClassName,
-                $reflectionParameter->getName(),
-                $table->connection->error(),
-            )))->setTable($table);
+        try {
+            $result = $this->client->execute($selectQuery);
+        } catch (ClientException $exception) {
+            throw (new SelectError(
+                sprintf(
+                    'Model query of type "%s" for parameter "%s" has errors! Error: %s',
+                    $modelClassName,
+                    $reflectionParameter->getName(),
+                    $this->client->getError(),
+                ),
+                previous: $exception,
+            ))->setTable($table);
         }
 
-        if ($select === 0) {
+        $models = [];
+
+        foreach ($result->iterateRecords() as $record) {
+            $model = new $modelClassName();
+            $this->modelManager->loadFromRecord($record, $model);
+            $models[] = $model;
+        }
+
+        if (count($models) === 0) {
             if ($reflectionParameter->allowsNull()) {
                 return null;
             }
 
             return [];
         }
-
-        $models = [];
-
-        do {
-            $this->modelManager->loadFromMysqlTable($table, $model);
-            $models[] = $model;
-            /** @var AbstractModel $model */
-            $model = new $modelClassName();
-        } while ($table->next());
 
         return $models;
     }

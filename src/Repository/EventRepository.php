@@ -4,28 +4,44 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Repository;
 
 use DateTimeInterface;
-use GibsonOS\Core\Attribute\GetTableName;
+use Generator;
+use GibsonOS\Core\Attribute\GetTable;
 use GibsonOS\Core\Dto\Event\Command;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\Event;
 use GibsonOS\Core\Model\Event\Element;
 use GibsonOS\Core\Model\Event\Trigger;
 use GibsonOS\Core\Service\DateTimeService;
+use GibsonOS\Core\Service\RepositoryService;
 use GibsonOS\Core\Utility\JsonUtility;
-use mysqlTable;
+use MDO\Dto\Query\Join;
+use MDO\Dto\Query\Where;
+use MDO\Dto\Select;
+use MDO\Dto\Table;
+use MDO\Enum\JoinType;
+use MDO\Enum\OrderDirection;
+use MDO\Exception\ClientException;
+use MDO\Query\SelectQuery;
 use stdClass;
 
 class EventRepository extends AbstractRepository
 {
     public function __construct(
-        private DateTimeService $dateTimeService,
-        #[GetTableName(Element::class)]
-        private string $elementTableName,
+        RepositoryService $repositoryService,
+        private readonly DateTimeService $dateTimeService,
+        #[GetTable(Event::class)]
+        private Table $eventTable,
+        #[GetTable(Element::class)]
+        private Table $eventElementTable,
+        #[GetTable(Trigger::class)]
+        private Table $eventTriggerTable,
     ) {
+        parent::__construct($repositoryService);
     }
 
     /**
      * @throws SelectError
+     * @throws ClientException
      */
     public function getById(int $id): Event
     {
@@ -33,11 +49,12 @@ class EventRepository extends AbstractRepository
     }
 
     /**
+     * @throws ClientException
      * @throws SelectError
      *
-     * @return Event[]
+     * @return Generator<Event>
      */
-    public function findByName(string $name, bool $onlyActive): array
+    public function findByName(string $name, bool $onlyActive): Generator
     {
         $where = '`name` LIKE ?';
         $parameters = [$name . '%'];
@@ -47,7 +64,7 @@ class EventRepository extends AbstractRepository
             $parameters[] = 1;
         }
 
-        return $this->fetchAll($where, $parameters, Event::class);
+        yield from $this->fetchAll($where, $parameters, Event::class);
     }
 
     /**
@@ -55,31 +72,18 @@ class EventRepository extends AbstractRepository
      */
     public function getTimeControlled(string $className, string $trigger, DateTimeInterface $dateTime): array
     {
-        $table = $this->initializeTable()
-            ->setWhere(
-                '`event`.`active`=? AND ' .
-                '`event_trigger`.`class`=? AND ' .
-                '`event_trigger`.`trigger`=? AND ' .
-                '(`event_trigger`.`weekday` IS NULL OR `event_trigger`.`weekday`=?) AND ' .
-                '(`event_trigger`.`day` IS NULL OR `event_trigger`.`day`=?) AND ' .
-                '(`event_trigger`.`month` IS NULL OR `event_trigger`.`month`=?) AND ' .
-                '(`event_trigger`.`year` IS NULL OR `event_trigger`.`year`=?) AND ' .
-                '(`event_trigger`.`hour` IS NULL OR `event_trigger`.`hour`=?) AND ' .
-                '(`event_trigger`.`minute` IS NULL OR `event_trigger`.`minute`=?) AND ' .
-                '(`event_trigger`.`second` IS NULL OR `event_trigger`.`second`=?)',
-            )
-            ->setWhereParameters([
-                1,
-                $className,
-                $trigger,
-                (int) $dateTime->format('w'),
-                (int) $dateTime->format('j'),
-                (int) $dateTime->format('n'),
-                (int) $dateTime->format('Y'),
-                (int) $dateTime->format('H'),
-                (int) $dateTime->format('i'),
-                (int) $dateTime->format('s'),
-            ]);
+        $query = $this->initializeQuery()
+            ->addWhere(new Where('`e`.`active`=?', [1]))
+            ->addWhere(new Where('`et`.`class`=?', [$className]))
+            ->addWhere(new Where('`et`.`trigger`=?', [$trigger]))
+            ->addWhere(new Where('`et`.`weekday` IS NULL OR `et`.`weekday`=?', [(int) $dateTime->format('w')]))
+            ->addWhere(new Where('`et`.`day` IS NULL OR `et`.`day`=?', [(int) $dateTime->format('j')]))
+            ->addWhere(new Where('`et`.`month` IS NULL OR `et`.`month`=?', [(int) $dateTime->format('n')]))
+            ->addWhere(new Where('`et`.`year` IS NULL OR `et`.`year`=?', [(int) $dateTime->format('Y')]))
+            ->addWhere(new Where('`et`.`hour` IS NULL OR `et`.`hour`=?', [(int) $dateTime->format('H')]))
+            ->addWhere(new Where('`et`.`minute` IS NULL OR `et`.`minute`=?', [(int) $dateTime->format('i')]))
+            ->addWhere(new Where('`et`.`second` IS NULL OR `et`.`second`=?', [(int) $dateTime->format('s')]))
+        ;
 
         if (!$table->selectPrepared(false)) {
             return [];
@@ -88,40 +92,22 @@ class EventRepository extends AbstractRepository
         return $this->matchModels($table->connection->fetchObjectList());
     }
 
-    private function initializeTable(): mysqlTable
+    private function initializeQuery(): SelectQuery
     {
-        $table = $this->getTable($this->elementTableName);
-        $table->appendJoinLeft('`event`', '`event_element`.`event_id`=`event`.`id`');
-        $table->appendJoinLeft('`event_trigger`', '`event_element`.`event_id`=`event_trigger`.`event_id`');
-        $table->setOrderBy('`event_trigger`.`priority` DESC, `event_element`.`parent_id`, `event_element`.`order`');
-        $table->setSelectString(
-            '`event`.`id`, ' .
-            '`event`.`name`, ' .
-            '`event`.`active`, ' .
-            '`event`.`async`, ' .
-            '`event`.`modified`, ' .
-            '`event_element`.`id` AS `elementId`, ' .
-            '`event_element`.`parent_id` AS `elementParentId`, ' .
-            '`event_element`.`order` AS `elementOrder`, ' .
-            '`event_element`.`class` AS `elementClass`, ' .
-            '`event_element`.`method` AS `elementMethod`, ' .
-            '`event_element`.`parameters` AS `elementParameters`, ' .
-            '`event_element`.`command` AS `elementCommand`, ' .
-            '`event_element`.`returns` AS `elementReturns`, ' .
-            '`event_trigger`.`id` AS `triggerId`, ' .
-            '`event_trigger`.`class` AS `triggerClass`, ' .
-            '`event_trigger`.`trigger` AS `triggerTrigger`, ' .
-            '`event_trigger`.`parameters` AS `triggerParameters`, ' .
-            '`event_trigger`.`weekday` AS `triggerWeekday`, ' .
-            '`event_trigger`.`day` AS `triggerDay`, ' .
-            '`event_trigger`.`month` AS `triggerMonth`, ' .
-            '`event_trigger`.`year` AS `triggerYear`, ' .
-            '`event_trigger`.`hour` AS `triggerHour`, ' .
-            '`event_trigger`.`minute` AS `triggerMinute`, ' .
-            '`event_trigger`.`priority` AS `triggerPriority`',
-        );
+        $selectQuery = $this->getSelectQuery($this->eventElementTable->getTableName(), 'ee')
+            ->addJoin(new Join($this->eventTable, 'e', '`e`.`id`=`ee`.`event_id`', JoinType::LEFT))
+            ->addJoin(new Join($this->eventTriggerTable, 'et', '`e`.`id`=`et`.`event_id`', JoinType::LEFT))
+            ->setOrder('`et`.`priority`', OrderDirection::DESC)
+            ->setOrder('`ee`.`parentId`')
+            ->setOrder('`ee`.`order`')
+            ->setSelects($this->repositoryService->getSelectService()->getSelects([
+                new Select($this->eventTable, 'e', 'event_'),
+                new Select($this->eventElementTable, 'ee', 'element_'),
+                new Select($this->eventTriggerTable, 'et', 'trigger_'),
+            ]))
+        ;
 
-        return $table;
+        return $selectQuery;
     }
 
     /**

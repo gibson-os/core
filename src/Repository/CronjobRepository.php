@@ -4,23 +4,32 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Repository;
 
 use DateTimeInterface;
+use Generator;
+use GibsonOS\Core\Attribute\GetTable;
 use GibsonOS\Core\Attribute\GetTableName;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\Cronjob;
-use mysqlTable;
+use GibsonOS\Core\Service\RepositoryService;
+use MDO\Dto\Query\Join;
+use MDO\Dto\Query\Where;
+use MDO\Dto\Table;
+use MDO\Exception\ClientException;
 
 class CronjobRepository extends AbstractRepository
 {
     public function __construct(
+        RepositoryService $repositoryService,
         #[GetTableName(Cronjob::class)]
         private readonly string $cronjobTableName,
-        #[GetTableName(Cronjob\Time::class)]
-        private readonly string $cronjobTimeTableName,
+        #[GetTable(Cronjob\Time::class)]
+        private readonly Table $cronjobTimeTable,
     ) {
+        parent::__construct($repositoryService);
     }
 
     /**
      * @throws SelectError
+     * @throws ClientException
      */
     public function getByCommandAndUser(string $classname, string $user): Cronjob
     {
@@ -32,77 +41,77 @@ class CronjobRepository extends AbstractRepository
     }
 
     /**
-     * @return Cronjob[]
+     * @throws ClientException
+     * @throws SelectError
+     *
+     * @return Generator<Cronjob>
      */
-    public function getRunnableByUser(DateTimeInterface $dateTime, string $user): array
+    public function getRunnableByUser(DateTimeInterface $dateTime, string $user): Generator
     {
-        $tableName = $this->cronjobTableName;
-        $timeTableName = $this->cronjobTimeTableName;
-
-        $table = $this->getTable($tableName);
-        $table
-            ->appendJoin($timeTableName, '`' . $tableName . '`.`id`=`' . $timeTableName . '`.`cronjob_id`')
-            ->setWhereParameters([$user, $dateTime->format('Y-m-d H:i:s')])
-            ->setWhere(
-                '`' . $tableName . '`.`user`=? AND ' .
-                '`' . $tableName . '`.`active`=1 AND ' .
-                '(`' . $tableName . '`.`last_run` IS NULL OR `' . $tableName . '`.`last_run` < ?) AND ' .
+        $selectQuery = $this->getSelectQuery($this->cronjobTableName, 'c')
+            ->addJoin(new Join($this->cronjobTimeTable, 'ct', '`c`.`id`=`ct`.`cronjob_id`'))
+            ->addWhere(new Where('`c`.`user`=:user', ['user' => $user]))
+            ->addWhere(new Where('`c`.`active`=:active', ['active' => 1]))
+            ->addWhere(new Where(
+                '`c`.`last_run` IS NULL OR `c`.`last_run`<:now',
+                ['now' => $dateTime->format('Y-m-d H:i:s')],
+            ))
+            ->addWhere(new Where(
                 'UNIX_TIMESTAMP(CONCAT(' .
-                    $this->getTimePart($table, 'year', (int) $dateTime->format('Y')) . ', \'-\', ' .
-                    $this->getTimePart($table, 'month', (int) $dateTime->format('n')) . ', \'-\', ' .
-                    $this->getTimePart($table, 'day_of_month', (int) $dateTime->format('j')) . ', \' \', ' .
-                    $this->getTimePart($table, 'hour', (int) $dateTime->format('H')) . ', \':\', ' .
-                    $this->getTimePart($table, 'minute', (int) $dateTime->format('i')) . ', \':\', ' .
-                    $this->getTimePart($table, 'second', (int) $dateTime->format('s')) .
-                ')) BETWEEN UNIX_TIMESTAMP(COALESCE(`' . $tableName . '`.`last_run`, `' . $tableName . '`.`added`)) AND ' .
-                $this->getTimeAsUnixTimestampFunction($table, $dateTime) . ' AND ' .
-                $this->getDayOfWeekPart($table, (int) $dateTime->format('w')),
-            )
+                    $this->getTimePart('year', 'year') . ', \'-\', ' .
+                    $this->getTimePart('month', 'month') . ', \'-\', ' .
+                    $this->getTimePart('day_of_month', 'dayOfMonth') . ', \' \', ' .
+                    $this->getTimePart('hour', 'hour') . ', \':\', ' .
+                    $this->getTimePart('minute', 'minute') . ', \':\', ' .
+                    $this->getTimePart('second', 'second') .
+                ')) BETWEEN UNIX_TIMESTAMP(COALESCE(`c`.`last_run`, `c`.`added`))',
+                [
+                    'year' => (int) $dateTime->format('Y'),
+                    'month' => (int) $dateTime->format('n'),
+                    'dayOfMonth' => (int) $dateTime->format('j'),
+                    'hour' => (int) $dateTime->format('H'),
+                    'minute' => (int) $dateTime->format('i'),
+                    'second' => (int) $dateTime->format('s'),
+                ],
+            ))
+            ->addWhere(new Where(
+                ':dayOfWeek BETWEEN `c`.`from_day_of_week` AND `c`.`to_day_of_week`',
+                ['dayOfWeek' => (int) $dateTime->format('w')],
+            ))
+            ->addWhere(new Where(
+                'UNIX_TIMESTAMP(:timestampDate)',
+                [
+                    'timestampDate' => ((int) $dateTime->format('Y')) . '-' .
+                        ((int) $dateTime->format('n')) . '-' .
+                        ((int) $dateTime->format('j')) . ' ' .
+                        ((int) $dateTime->format('H')) . ':' .
+                        ((int) $dateTime->format('i')) . ':' .
+                        ((int) $dateTime->format('s')),
+                ],
+            ))
         ;
 
-        try {
-            return $this->getModels($table, Cronjob::class);
-        } catch (SelectError) {
-            return [];
-        }
+        yield from $this->getModels($selectQuery, Cronjob::class);
     }
 
-    private function getTimeAsUnixTimestampFunction(mysqlTable $table, DateTimeInterface $dateTime): string
+    private function getTimePart(string $field, $parameterName): string
     {
-        $table->addWhereParameter(
-            ((int) $dateTime->format('Y')) . '-' . ((int) $dateTime->format('n')) . '-' . ((int) $dateTime->format('j')) . ' ' .
-            ((int) $dateTime->format('H')) . ':' . ((int) $dateTime->format('i')) . ':' . ((int) $dateTime->format('s')),
-        );
-
-        return 'UNIX_TIMESTAMP(?)';
-    }
-
-    private function getTimePart(mysqlTable $table, string $field, int $value): string
-    {
-        $tableName = $this->cronjobTimeTableName;
-        $table
-            ->addWhereParameter($value)
-            ->addWhereParameter($value)
-            ->addWhereParameter($value)
-        ;
-
-        return
+        return sprintf(
             'IF(' .
-                '? BETWEEN `' . $tableName . '`.`from_' . $field . '` AND `' . $tableName . '`.`to_' . $field . '`, ?,' .
+                '? BETWEEN `ct`.`from_%s` AND `ct`.`to_%s`, :%s,' .
                 'IF(' .
-                    '`' . $tableName . '`.`from_' . $field . '` > ?,' .
-                    '`' . $tableName . '`.`from_' . $field . '`,' .
-                    '`' . $tableName . '`.`to_' . $field . '`' .
+                    '`ct`.`from_%s` > :%s,' .
+                    '`ct`.`from_%s`,' .
+                    '`ct`.`to_%s`' .
                 ')' .
-            ')'
-        ;
-    }
-
-    private function getDayOfWeekPart(mysqlTable $table, int $value): string
-    {
-        $tableName = $this->cronjobTimeTableName;
-        $table->addWhereParameter($value);
-
-        return '? BETWEEN `' . $tableName . '`.`from_day_of_week` AND `' . $tableName . '`.`to_day_of_week`';
+            ')',
+            $field,
+            $field,
+            $parameterName,
+            $field,
+            $parameterName,
+            $field,
+            $field,
+        );
     }
 }

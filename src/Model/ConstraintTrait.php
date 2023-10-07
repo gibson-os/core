@@ -5,7 +5,11 @@ namespace GibsonOS\Core\Model;
 
 use GibsonOS\Core\Attribute\Install\Database\Constraint;
 use InvalidArgumentException;
-use mysqlTable;
+use JsonException;
+use MDO\Dto\Query\Where;
+use MDO\Enum\OrderDirection;
+use MDO\Exception\ClientException;
+use MDO\Query\SelectQuery;
 use ReflectionAttribute;
 use ReflectionClass;
 use ReflectionException;
@@ -19,6 +23,7 @@ trait ConstraintTrait
     /**
      * @param array<AbstractModel|AbstractModel[]|null> $arguments
      *
+     * @throws Throwable
      * @throws ReflectionException
      *
      * @return AbstractModel|AbstractModel[]|null
@@ -340,6 +345,11 @@ trait ConstraintTrait
         }
     }
 
+    /**
+     * @throws ReflectionException
+     * @throws JsonException
+     * @throws ClientException
+     */
     private function loadForeignRecord(
         AbstractModel $model,
         string|int|float $value,
@@ -347,24 +357,24 @@ trait ConstraintTrait
         string $where = null,
         array $whereParameters = [],
     ): ?AbstractModel {
-        $mysqlTable = new mysqlTable($this->database, $model->getTableName());
-        $mysqlTable
-            ->setWhere('`' . $foreignField . '`=?' . ($where === null ? '' : ' AND (' . $where . ')'))
-            ->setWhereParameters(array_merge([$value], $whereParameters))
+        $table = $this->modelService->getTableManager()->getTable($model->getTableName());
+        $selectQuery = (new SelectQuery($table))
+            ->addWhere(new Where(
+                sprintf('`%s`=?%s', $foreignField, $where === null ? '' : ' AND (' . $where . ')'),
+                array_merge([$value], $whereParameters),
+            ))
             ->setLimit(1)
         ;
 
-        if (!$mysqlTable->selectPrepared()) {
-            return null;
-        }
-
-        $model->loadFromMysqlTable($mysqlTable);
+        $result = $this->modelService->getClient()->execute($selectQuery);
+        $this->modelService->getModelManager()->loadFromRecord($result->iterateRecords()->current(), $model);
 
         return $model;
     }
 
     /**
-     * @param class-string<AbstractModel> $modelClassName
+     * @param class-string<AbstractModel>   $modelClassName
+     * @param array<string, OrderDirection> $orderBy
      *
      * @return AbstractModel[]
      */
@@ -375,7 +385,7 @@ trait ConstraintTrait
         string $foreignField,
         string $where = null,
         array $whereParameters = [],
-        string $orderBy = null,
+        array $orderBy = [],
     ): array {
         $models = [];
 
@@ -383,21 +393,22 @@ trait ConstraintTrait
             return $models;
         }
 
-        $mysqlTable = (new mysqlTable($this->database, $foreignTable))
-            ->setWhere('`' . $foreignField . '`=?' . ($where === null ? '' : ' AND (' . $where . ')'))
-            ->setWhereParameters(array_merge([$value], $whereParameters))
-            ->setOrderBy($orderBy)
+        $table = $this->modelService->getTableManager()->getTable($foreignTable);
+        $selectQuery = (new SelectQuery($table))
+            ->addWhere(new Where(
+                sprintf('`%s`=?%s', $foreignField, $where === null ? '' : ' AND (' . $where . ')'),
+                array_merge([$value], $whereParameters),
+            ))
+            ->setOrders($orderBy)
         ;
 
-        if (!$mysqlTable->selectPrepared()) {
-            return $models;
-        }
+        $result = $this->modelService->getClient()->execute($selectQuery);
 
-        do {
-            $model = new $modelClassName($this->database);
-            $model->loadFromMysqlTable($mysqlTable);
+        foreach ($result->iterateRecords() as $record) {
+            $model = new $modelClassName($this->modelService);
+            $this->modelService->getModelManager()->loadFromRecord($record, $model);
             $models[] = $model;
-        } while ($mysqlTable->next());
+        }
 
         return $models;
     }

@@ -2,7 +2,7 @@
   "name": "gibson-os/core",
   "require": {
     "php": " ^8.2",
-    "gibson-os/mdo": "^1.0.0",
+    "gibson-os/mdo": "^2.0.0",
     "ext-mbstring": "*",
     "ext-gd": "*",
     "ext-fileinfo": "*",

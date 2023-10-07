@@ -4,55 +4,35 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Service\Attribute;
 
 use GibsonOS\Core\Attribute\AttributeInterface;
+use GibsonOS\Core\Attribute\GetTable;
 use GibsonOS\Core\Attribute\GetTableName;
-use GibsonOS\Core\Attribute\Install\Database\Table;
-use GibsonOS\Core\Manager\ReflectionManager;
-use GibsonOS\Core\Model\ModelInterface;
-use ReflectionAttribute;
+use MDO\Exception\ClientException;
+use MDO\Manager\TableManager;
 use ReflectionException;
 use ReflectionParameter;
 
 class TableAttribute implements ParameterAttributeInterface, AttributeServiceInterface
 {
-    private array $tables = [];
-
-    public function __construct(private ReflectionManager $reflectionManager)
-    {
+    public function __construct(
+        private readonly TableNameAttribute $tableNameAttribute,
+        private readonly TableManager $tableManager,
+    ) {
     }
 
     /**
      * @throws ReflectionException
+     * @throws ClientException
      */
     public function replace(AttributeInterface $attribute, array $parameters, ReflectionParameter $reflectionParameter): mixed
     {
-        if (!$attribute instanceof GetTableName) {
+        if (!$attribute instanceof GetTable) {
             return null;
         }
 
         $modelClassName = $attribute->getModelClassName();
 
-        if (isset($this->tables[$modelClassName])) {
-            return $this->tables[$modelClassName];
-        }
-
-        $reflectionClass = $this->reflectionManager->getReflectionClass($modelClassName);
-
-        if (!$this->reflectionManager->hasAttribute($reflectionClass, Table::class, ReflectionAttribute::IS_INSTANCEOF)) {
-            return null;
-        }
-
-        /** @var ModelInterface $model */
-        $model = new $modelClassName();
-        $this->tables[$modelClassName] = $model->getTableName();
-
-        return $this->tables[$modelClassName];
-    }
-
-    public function transformName(string $name): string
-    {
-        $nameParts = explode('\\', $name);
-        $name = lcfirst(end($nameParts));
-
-        return mb_strtolower(preg_replace('/([A-Z])/', '_$1', $name));
+        return $this->tableManager->getTable(
+            $this->tableNameAttribute->replace(new GetTableName($modelClassName), $parameters, $reflectionParameter),
+        );
     }
 }

@@ -3,39 +3,41 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Repository;
 
+use Generator;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Model\ModelInterface;
-use InvalidArgumentException;
-use mysqlDatabase;
-use mysqlRegistry;
-use mysqlTable;
+use GibsonOS\Core\Service\RepositoryService;
+use MDO\Dto\Query\Where;
+use MDO\Dto\Record;
+use MDO\Enum\OrderDirection;
+use MDO\Exception\ClientException;
+use MDO\Query\SelectQuery;
 
 abstract class AbstractRepository
 {
-    public function startTransaction(mysqlDatabase $database = null): void
+    public function __construct(protected readonly RepositoryService $repositoryService)
     {
-        $database = $this->getDatabase($database);
-        $database->startTransaction();
     }
 
-    public function commit(mysqlDatabase $database = null): void
+    protected function startTransaction(): void
     {
-        $database = $this->getDatabase($database);
-        $database->commit();
+        $this->repositoryService->getClient()->startTransaction();
     }
 
-    public function rollback(mysqlDatabase $database = null): void
+    protected function commit(): void
     {
-        $database = $this->getDatabase($database);
-        $database->rollback();
+        $this->repositoryService->getClient()->commit();
     }
 
-    public function isTransaction(mysqlDatabase $database = null): bool
+    protected function rollback(): void
     {
-        $database = $this->getDatabase($database);
+        $this->repositoryService->getClient()->rollback();
+    }
 
-        return $database->isTransaction();
+    public function isTransaction(): bool
+    {
+        return $this->repositoryService->getClient()->isTransaction();
     }
 
     /**
@@ -43,30 +45,21 @@ abstract class AbstractRepository
      *
      * @param class-string<T> $modelClassName
      *
+     * @throws ClientException
      * @throws SelectError
      *
-     * @return T[]
+     * @return Generator<T>
      */
-    protected function getModels(mysqlTable $table, string $modelClassName): array
+    protected function getModels(SelectQuery $selectQuery, string $modelClassName): Generator
     {
-        if ($table->selectPrepared() === false) {
-            $exception = new SelectError($table->connection->error());
-            $exception->setTable($table);
+        $response = $this->repositoryService->getClient()->execute($selectQuery);
 
-            throw $exception;
+        foreach ($response->iterateRecords() as $record) {
+            $model = new $modelClassName($this->repositoryService->getModelService());
+            $this->repositoryService->getModelManager()->loadFromRecord($record, $model);
+
+            yield $model;
         }
-
-        $models = [];
-
-        if ($table->countRecords() === 0) {
-            return $models;
-        }
-
-        do {
-            $models[] = $this->getModel($table, $modelClassName);
-        } while ($table->next());
-
-        return $models;
     }
 
     /**
@@ -76,10 +69,10 @@ abstract class AbstractRepository
      *
      * @return T
      */
-    protected function getModel(mysqlTable $table, string $modelClassName): AbstractModel
+    protected function getModel(Record $record, string $modelClassName): AbstractModel
     {
-        $model = new $modelClassName();
-        $model->loadFromMysqlTable($table);
+        $model = new $modelClassName($this->repositoryService->getModelService());
+        $this->repositoryService->getModelManager()->loadFromRecord($record, $model);
 
         return $model;
     }
@@ -87,8 +80,10 @@ abstract class AbstractRepository
     /**
      * @template T of AbstractModel
      *
-     * @param class-string<T> $modelClassName
+     * @param class-string<T>               $modelClassName
+     * @param array<string, OrderDirection> $orderBy
      *
+     * @throws ClientException
      * @throws SelectError
      *
      * @return T
@@ -97,35 +92,38 @@ abstract class AbstractRepository
         string $where,
         array $parameters,
         string $modelClassName,
-        string $orderBy = null,
+        array $orderBy = [],
     ): ModelInterface {
-        /** @var ModelInterface $model */
-        $model = new $modelClassName();
-        $table = $this->getTable($model->getTableName())
-            ->setWhere($where)
-            ->setWhereParameters($parameters)
+        $model = new $modelClassName($this->repositoryService->getModelService());
+        $selectQuery = $this->getSelectQuery($model->getTableName())
+            ->addWhere(new Where($where, $parameters))
             ->setLimit(1)
-            ->setOrderBy($orderBy)
+            ->setOrders($orderBy)
         ;
 
-        if (!$table->selectPrepared()) {
-            $exception = new SelectError($table->connection->error() ?: 'No results!');
-            $exception->setTable($table);
+        $result = $this->repositoryService->getClient()->execute($selectQuery);
+        $record = $result->iterateRecords()->current();
+
+        if (!$record instanceof Record) {
+            $exception = new SelectError('No results!');
+            $exception->setTable($this->repositoryService->getTableManager()->getTable($model->getTableName()));
 
             throw $exception;
         }
 
-        return $this->getModel($table, $modelClassName);
+        return $this->getModel($record, $model);
     }
 
     /**
      * @template T of AbstractModel
      *
-     * @param class-string<T> $modelClassName
+     * @param class-string<T>               $modelClassName
+     * @param array<string, OrderDirection> $orderBy
      *
+     * @throws ClientException
      * @throws SelectError
      *
-     * @return T[]
+     * @return Generator<T>
      */
     protected function fetchAll(
         string $where,
@@ -133,18 +131,17 @@ abstract class AbstractRepository
         string $modelClassName,
         int $limit = null,
         int $offset = null,
-        string $orderBy = null,
-    ): array {
+        array $orderBy = [],
+    ): Generator {
         /** @var ModelInterface $model */
         $model = new $modelClassName();
-        $table = $this->getTable($model->getTableName())
-            ->setWhere($where)
-            ->setWhereParameters($parameters)
+        $selectQuery = $this->getSelectQuery($model->getTableName())
+            ->addWhere(new Where($where, $parameters))
             ->setLimit($limit, $offset)
-            ->setOrderBy($orderBy)
+            ->setOrders($orderBy)
         ;
 
-        return $this->getModels($table, $modelClassName);
+        return $this->getModels($selectQuery, $modelClassName);
     }
 
     /**
@@ -158,40 +155,25 @@ abstract class AbstractRepository
     ): ?array {
         /** @var ModelInterface $model */
         $model = new $modelClassName();
-        $table = $this->getTable($model->getTableName())
-            ->setWhere($where)
-            ->setWhereParameters($parameters)
+        $selectQuery = $this->getSelectQuery($model->getTableName())
+            ->addWhere(new Where($where, $parameters))
+            ->setSelects(['aggr' => $function])
         ;
+        $result = $this->repositoryService->getClient()->execute($selectQuery);
 
-        return $table->selectAggregatePrepared($function) ?: null;
+        return $result->iterateRecords()->current()?->get('aggr')->value();
     }
 
-    protected function getTable(string $tableName, mysqlDatabase $database = null): mysqlTable
+    /**
+     * @throws ClientException
+     */
+    protected function getSelectQuery(string $tableName, string $alias = null): SelectQuery
     {
-        $database = $this->getDatabase($database);
-
-        return new mysqlTable($database, $tableName);
+        return new SelectQuery($this->repositoryService->getTableManager()->getTable($tableName), $alias);
     }
 
-    protected function getRegexString(string $search, mysqlDatabase $database = null): string
+    protected function getRegexString(string $search): string
     {
-        $database = $this->getDatabase($database);
-
-        return $database->getUnescapedRegexString($search);
-    }
-
-    private function getDatabase(mysqlDatabase $database = null): mysqlDatabase
-    {
-        if ($database instanceof mysqlDatabase) {
-            return $database;
-        }
-
-        $database = mysqlRegistry::getInstance()->get('database');
-
-        if (!$database instanceof mysqlDatabase) {
-            throw new InvalidArgumentException('Datenbank nicht in der Registry gefunden!');
-        }
-
-        return $database;
+        return $this->repositoryService->getSelectService()->getUnescapedRegexString($search);
     }
 }

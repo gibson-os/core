@@ -5,6 +5,7 @@ namespace GibsonOS\Core\Attribute\Install\Database;
 
 use Attribute;
 use GibsonOS\Core\Model\AbstractModel;
+use MDO\Enum\OrderDirection;
 
 #[Attribute(Attribute::TARGET_PROPERTY | Attribute::IS_REPEATABLE)]
 class Constraint
@@ -16,7 +17,8 @@ class Constraint
     public const RULE_SET_DEFAULT = 'SET DEFAULT';
 
     /**
-     * @param class-string<AbstractModel> $parentModelClassName
+     * @param class-string<AbstractModel>   $parentModelClassName
+     * @param array<string, OrderDirection> $orderBy
      */
     public function __construct(
         private string $parentColumn = 'id',
@@ -27,7 +29,7 @@ class Constraint
         private ?string $ownColumn = null,
         private ?string $where = null,
         private array $whereParameters = [],
-        private ?string $orderBy = null,
+        private array $orderBy = [],
     ) {
     }
 
@@ -74,7 +76,10 @@ class Constraint
         return $this->whereParameters;
     }
 
-    public function getOrderBy(): ?string
+    /**
+     * @return array<string, OrderDirection>
+     */
+    public function getOrderBy(): array
     {
         return $this->orderBy;
     }

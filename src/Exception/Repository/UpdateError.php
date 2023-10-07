@@ -3,36 +3,25 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Exception\Repository;
 
+use GibsonOS\Core\Attribute\Install\Database\Table;
 use GibsonOS\Core\Exception\AbstractException;
-use mysqlTable;
 use Throwable;
 
 class UpdateError extends AbstractException
 {
-    /**
-     * @var mysqlTable
-     */
-    private $table;
+    private Table $table;
 
     public function __construct($message = 'Update war nicht erfolgreich!', $code = 0, Throwable $previous = null)
     {
         parent::__construct($message, $code, $previous);
     }
 
-    /**
-     * @return mysqlTable
-     */
-    public function getTable()
+    public function getTable(): Table
     {
         return $this->table;
     }
 
-    /**
-     * @param mysqlTable $table
-     *
-     * @return UpdateError
-     */
-    public function setTable($table)
+    public function setTable(Table $table): UpdateError
     {
         $this->table = $table;
 

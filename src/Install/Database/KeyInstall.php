@@ -14,7 +14,7 @@ use GibsonOS\Core\Install\AbstractInstall;
 use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Manager\ServiceManager;
 use GibsonOS\Core\Model\ModelInterface;
-use GibsonOS\Core\Service\Attribute\TableAttribute;
+use GibsonOS\Core\Service\Attribute\TableNameAttribute;
 use GibsonOS\Core\Service\InstallService;
 use GibsonOS\Core\Service\PriorityInterface;
 use mysqlDatabase;
@@ -25,7 +25,7 @@ class KeyInstall extends AbstractInstall implements PriorityInterface
     public function __construct(
         ServiceManager $serviceManagerService,
         private mysqlDatabase $mysqlDatabase,
-        private TableAttribute $tableAttribute,
+        private TableNameAttribute $tableAttribute,
         private ReflectionManager $reflectionManager,
     ) {
         parent::__construct($serviceManagerService);

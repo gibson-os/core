@@ -4,10 +4,10 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Attribute;
 
 use Attribute;
-use GibsonOS\Core\Service\Attribute\TableNameAttribute;
+use GibsonOS\Core\Service\Attribute\TableAttribute;
 
 #[Attribute(Attribute::TARGET_PARAMETER | Attribute::TARGET_PROPERTY)]
-class GetTableName implements AttributeInterface
+class GetTable implements AttributeInterface
 {
     /**
      * @param class-string $modelClassName
@@ -18,7 +18,7 @@ class GetTableName implements AttributeInterface
 
     public function getAttributeServiceName(): string
     {
-        return TableNameAttribute::class;
+        return TableAttribute::class;
     }
 
     /**

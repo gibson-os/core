@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Manager;
 
-use Exception;
 use GibsonOS\Core\Attribute\Install\Database\Column;
 use GibsonOS\Core\Attribute\Install\Database\Constraint;
 use GibsonOS\Core\Dto\Model\Children;
@@ -12,13 +11,22 @@ use GibsonOS\Core\Exception\Model\DeleteError;
 use GibsonOS\Core\Exception\Model\SaveError;
 use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Model\ModelInterface;
-use GibsonOS\Core\Service\Attribute\TableAttribute;
+use GibsonOS\Core\Service\Attribute\TableNameAttribute;
 use GibsonOS\Core\Service\DateTimeService;
 use GibsonOS\Core\Utility\JsonUtility;
 use JsonException;
+use MDO\Client;
+use MDO\Dto\Query\Where;
+use MDO\Dto\Record;
+use MDO\Dto\Value;
+use MDO\Enum\Type;
+use MDO\Exception\ClientException;
+use MDO\Manager\TableManager;
+use MDO\Query\DeleteQuery;
+use MDO\Query\ReplaceQuery;
+use MDO\Service\DeleteService;
+use MDO\Service\ReplaceService;
 use mysqlDatabase;
-use mysqlField;
-use mysqlTable;
 use ReflectionAttribute;
 use ReflectionException;
 use Throwable;
@@ -34,22 +42,22 @@ class ModelManager
     private const TYPE_DATE_TIME = 'dateTime';
 
     private const COLUMN_TYPES = [
-        'tinyint' => self::TYPE_INT,
-        'smallint' => self::TYPE_INT,
-        'int' => self::TYPE_INT,
-        'bigint' => self::TYPE_INT,
-        'time' => self::TYPE_DATE_TIME,
-        'date' => self::TYPE_DATE_TIME,
-        'datetime' => self::TYPE_DATE_TIME,
-        'timestamp' => self::TYPE_DATE_TIME,
-        'varchar' => self::TYPE_STRING,
-        'enum' => self::TYPE_STRING,
-        'text' => self::TYPE_STRING,
-        'longtext' => self::TYPE_STRING,
-        'binary' => self::TYPE_STRING,
-        'varbinary' => self::TYPE_STRING,
-        'float' => self::TYPE_FLOAT,
-        'decimal' => self::TYPE_FLOAT,
+        Type::TINYINT->value => self::TYPE_INT,
+        Type::SMALLINT->value => self::TYPE_INT,
+        Type::INT->value => self::TYPE_INT,
+        Type::BIGINT->value => self::TYPE_INT,
+        Type::TIME->value => self::TYPE_DATE_TIME,
+        Type::DATE->value => self::TYPE_DATE_TIME,
+        Type::DATETIME->value => self::TYPE_DATE_TIME,
+        Type::TIMESTAMP->value => self::TYPE_DATE_TIME,
+        Type::VARCHAR->value => self::TYPE_STRING,
+        Type::ENUM->value => self::TYPE_STRING,
+        Type::TEXT->value => self::TYPE_STRING,
+        Type::LONGTEXT->value => self::TYPE_STRING,
+        Type::BINARY->value => self::TYPE_STRING,
+        Type::VARBINARY->value => self::TYPE_STRING,
+        Type::FLOAT->value => self::TYPE_FLOAT,
+        Type::DECIMAL->value => self::TYPE_FLOAT,
     ];
 
     private const POSSIBLE_PREFIXES = ['get', 'is', 'has', 'should'];
@@ -64,33 +72,29 @@ class ModelManager
         private readonly DateTimeService $dateTimeService,
         private readonly JsonUtility $jsonUtility,
         private readonly ReflectionManager $reflectionManager,
-        private readonly TableAttribute $tableAttribute,
+        private readonly TableNameAttribute $tableAttribute,
+        private readonly TableManager $tableManager,
+        private readonly ReplaceService $replaceService,
+        private readonly DeleteService $deleteService,
+        private readonly Client $client,
     ) {
     }
 
     /**
      * @throws SaveError
      * @throws ReflectionException
+     * @throws JsonException
      */
     public function saveWithoutChildren(ModelInterface $model): void
     {
         $childrenList = $this->getChildrenList($model);
 
         try {
-            $mysqlTable = $this->setToMysqlTable($model);
-            $mysqlTable->save();
-        } catch (Exception $exception) {
-            $exception = new SaveError($exception->getMessage(), 0, $exception);
-            $exception->setModel($model);
-
-            throw $exception;
-        }
-
-        $mysqlTable->getReplacedRecord();
-
-        try {
-            $this->loadFromMysqlTable($mysqlTable, $model);
-        } catch (JsonException|ReflectionException $exception) {
+            $record = $this->setToRecord($model);
+            $replaceQuery = new ReplaceQuery($this->tableManager->getTable($model->getTableName()), $record->getValues());
+            $record = $this->replaceService->replaceAndLoadRecord($replaceQuery);
+            $this->loadFromRecord($record, $model);
+        } catch (ClientException $exception) {
             $exception = new SaveError($exception->getMessage(), 0, $exception);
             $exception->setModel($model);
 
@@ -108,14 +112,15 @@ class ModelManager
     /**
      * @throws ReflectionException
      * @throws SaveError
+     * @throws JsonException
      */
     public function save(ModelInterface $model): void
     {
         $newTransaction = false;
 
-        if (!$this->mysqlDatabase->isTransaction()) {
+        if (!$this->client->isTransaction()) {
             $newTransaction = true;
-            $this->mysqlDatabase->startTransaction();
+            $this->client->startTransaction();
         }
 
         $childrenList = $this->getChildrenList($model);
@@ -124,7 +129,7 @@ class ModelManager
             $this->saveWithoutChildren($model);
         } catch (SaveError $exception) {
             if ($newTransaction) {
-                $this->mysqlDatabase->commit();
+                $this->client->commit();
             }
 
             throw $exception;
@@ -138,7 +143,7 @@ class ModelManager
                 $exception->setModel($model);
 
                 if ($newTransaction) {
-                    $this->mysqlDatabase->rollback();
+                    $this->client->rollback();
                 }
 
                 throw $exception;
@@ -146,7 +151,7 @@ class ModelManager
         }
 
         if ($newTransaction) {
-            $this->mysqlDatabase->commit();
+            $this->client->commit();
         }
     }
 
@@ -156,10 +161,13 @@ class ModelManager
      */
     public function delete(ModelInterface $model): void
     {
-        $mysqlTable = $this->setToMysqlTable($model);
-
-        if (!$mysqlTable->deletePrepared()) {
-            $exception = new DeleteError();
+        try {
+            $this->deleteService->deleteRecord(
+                $this->tableManager->getTable($model->getTableName()),
+                $this->setToRecord($model),
+            );
+        } catch (ClientException $exception) {
+            $exception = new DeleteError(previous: $exception);
             $exception->setModel($model);
 
             throw $exception;
@@ -169,25 +177,26 @@ class ModelManager
     /**
      * @throws ReflectionException
      * @throws JsonException
+     * @throws ClientException
      */
-    public function loadFromMysqlTable(mysqlTable $mysqlTable, ModelInterface $model): void
+    public function loadFromRecord(Record $record, ModelInterface $model): void
     {
-        foreach ($mysqlTable->fields as $field) {
-            $fieldName = $this->transformFieldName($field);
+        $table = $this->tableManager->getTable($model->getTableName());
+
+        foreach ($table->getFields() as $field) {
+            $fieldName = $this->transformFieldName($field->getName());
             $setter = 'set' . $fieldName;
 
             if (!method_exists($model, $setter)) {
                 continue;
             }
 
-            /** @var mysqlField $fieldObject */
-            $fieldObject = $mysqlTable->{$field};
-            $value = $fieldObject->getValue();
+            $value = $record->get($field->getName())->getValue();
 
             if ($value === null) {
                 $model->$setter($value);
             } else {
-                switch ($this->getColumnType($fieldObject->getType())) {
+                switch ($this->getColumnType($field->getType())) {
                     case self::TYPE_INT:
                         try {
                             $model->$setter((int) $value);
@@ -224,7 +233,7 @@ class ModelManager
                             $model->$setter(constant(sprintf(
                                 '%s::%s',
                                 $typeName,
-                                $fieldObject->getValue() ?? '',
+                                $value ?? '',
                             )));
 
                             break;
@@ -240,17 +249,20 @@ class ModelManager
 
     /**
      * @throws JsonException
+     * @throws ClientException
      */
-    public function setToMysqlTable(ModelInterface $model): mysqlTable
+    public function setToRecord(ModelInterface $model): Record
     {
-        $mysqlTable = new mysqlTable($this->mysqlDatabase, $model->getTableName());
+        $values = [];
+        $table = $this->tableManager->getTable($model->getTableName());
 
-        foreach ($mysqlTable->fields as $field) {
-            $fieldName = $this->transformFieldName($field);
+        foreach ($table->getFields() as $field) {
+            $fieldName = $field->getName();
+            $transformedFieldName = $this->transformFieldName($fieldName);
             $getterPrefix = null;
 
             foreach (self::POSSIBLE_PREFIXES as $possiblePrefix) {
-                if (method_exists($model, $possiblePrefix . $fieldName)) {
+                if (method_exists($model, $possiblePrefix . $transformedFieldName)) {
                     $getterPrefix = $possiblePrefix;
 
                     break;
@@ -261,28 +273,25 @@ class ModelManager
                 continue;
             }
 
-            $value = $model->{$getterPrefix . $fieldName}();
+            $value = $model->{$getterPrefix . $transformedFieldName}();
 
             if ($value === null) {
                 continue;
             }
 
-            /** @var mysqlField $fieldObject */
-            $fieldObject = $mysqlTable->{$field};
-
-            if ($this->getColumnType($fieldObject->getType()) === self::TYPE_DATE_TIME) {
-                $fieldObject->setValue($value->format('Y-m-d H:i:s'));
-                $model->{'set' . $fieldName}($this->dateTimeService->get((string) $fieldObject->getValue()));
+            if ($this->getColumnType($field->getType()) === self::TYPE_DATE_TIME) {
+                $values[$fieldName] = new Value($value->format('Y-m-d H:i:s'));
+                $model->{'set' . $transformedFieldName}($this->dateTimeService->get((string) $values[$fieldName]->getValue()));
             } elseif (is_object($value) && enum_exists($value::class)) {
-                $fieldObject->setValue($value->name);
+                $values[$fieldName] = new Value($value->name);
             } elseif (is_array($value)) {
-                $fieldObject->setValue($this->jsonUtility->encode($value));
+                $values[$fieldName] = new Value($this->jsonUtility->encode($value));
             } else {
-                $fieldObject->setValue(is_bool($value) ? (int) $value : $value);
+                $values[$fieldName] = new Value(is_bool($value) ? (int) $value : $value);
             }
         }
 
-        return $mysqlTable;
+        return new Record($values);
     }
 
     private function transformFieldName(string $fieldName): string
@@ -290,15 +299,16 @@ class ModelManager
         return str_replace(' ', '', ucwords(str_replace('_', ' ', $fieldName)));
     }
 
-    private function getColumnType(string $type): string
+    private function getColumnType(Type $type): string
     {
-        return self::COLUMN_TYPES[preg_replace('/^(\\w*).*$/', '$1', $type)];
+        return self::COLUMN_TYPES[$type->value];
     }
 
     /**
      * @throws JsonException
      * @throws ReflectionException
      * @throws SaveError
+     * @throws ClientException
      */
     private function saveChildren(Children $children): void
     {
@@ -319,40 +329,38 @@ class ModelManager
             $where === null ? '' : '(' . $where . ') AND ',
             $constraintAttribute->getParentColumn(),
         );
-        $mysqlTable = (new mysqlTable($this->mysqlDatabase, $tableName))
-            ->setWhereParameters($constraintAttribute->getWhereParameters())
-            ->addWhereParameter($children->getParentId())
+        $parameters = $constraintAttribute->getWhereParameters();
+        $parameters[] = $children->getParentId();
+        $table = $this->tableManager->getTable($tableName);
+        $deleteQuery = (new DeleteQuery($table))
+            ->addWhere(new Where(
+                sprintf(
+                    '(%s`%s_id`=?)',
+                    $where === null ? '' : '(' . $where . ') AND ',
+                    $constraintAttribute->getParentColumn(),
+                ),
+                $parameters,
+            ))
         ;
+
         $primaryColumns = $this->getPrimaryColumns($parentModelClassName);
-        $childrenWheres = [];
 
         foreach ($children->getModels() as $childrenModel) {
             $this->save($childrenModel);
-            $primaryWheres = [];
 
             foreach ($primaryColumns as $primaryColumn) {
                 $columnName = $primaryColumn->getColumn()->getName() ??
                     $this->tableAttribute->transformName($primaryColumn->getReflectionProperty()->getName())
                 ;
-                $primaryWheres[] = sprintf('`%s`!=?', $columnName);
                 $getter = 'get' . ucfirst($this->transformFieldName(
                     $primaryColumn->getColumn()->getName() ??
                     $primaryColumn->getReflectionProperty()->getName(),
                 ));
-                $mysqlTable->addWhereParameter($childrenModel->$getter());
+                $deleteQuery->addWhere(new Where(sprintf('`%s`!=?', $columnName), [$childrenModel->$getter()]));
             }
-
-            $childrenWheres[] = sprintf('(%s)', implode(' AND ', $primaryWheres));
         }
 
-        if (count($childrenWheres) > 0) {
-            $where .= ' AND (' . implode(' AND ', $childrenWheres) . ')';
-        }
-
-        $mysqlTable
-            ->setWhere($where)
-            ->deletePrepared()
-        ;
+        $this->client->execute($deleteQuery);
     }
 
     /**
