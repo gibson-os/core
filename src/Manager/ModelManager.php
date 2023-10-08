@@ -179,7 +179,7 @@ class ModelManager
      * @throws JsonException
      * @throws ClientException
      */
-    public function loadFromRecord(Record $record, ModelInterface $model): void
+    public function loadFromRecord(Record $record, ModelInterface $model, string $prefix = ''): void
     {
         $table = $this->tableManager->getTable($model->getTableName());
 
@@ -191,7 +191,7 @@ class ModelManager
                 continue;
             }
 
-            $value = $record->get($field->getName())->getValue();
+            $value = $record->get($prefix . $field->getName())->getValue();
 
             if ($value === null) {
                 $model->$setter($value);

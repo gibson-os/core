@@ -4,15 +4,20 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Repository;
 
 use Generator;
+use GibsonOS\Core\Attribute\Install\Database\Constraint;
+use GibsonOS\Core\Dto\Model\ChildrenMapping;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Model\ModelInterface;
 use GibsonOS\Core\Service\RepositoryService;
+use JsonException;
 use MDO\Dto\Query\Where;
 use MDO\Dto\Record;
 use MDO\Enum\OrderDirection;
 use MDO\Exception\ClientException;
 use MDO\Query\SelectQuery;
+use ReflectionClass;
+use ReflectionException;
 
 abstract class AbstractRepository
 {
@@ -43,22 +48,82 @@ abstract class AbstractRepository
     /**
      * @template T of AbstractModel
      *
-     * @param class-string<T> $modelClassName
+     * @param class-string<T>   $modelClassName
+     * @param ChildrenMapping[] $children
      *
      * @throws ClientException
-     * @throws SelectError
+     * @throws JsonException
+     * @throws ReflectionException
      *
      * @return Generator<T>
      */
-    protected function getModels(SelectQuery $selectQuery, string $modelClassName): Generator
-    {
+    protected function getModels(
+        SelectQuery $selectQuery,
+        string $modelClassName,
+        string $prefix = '',
+        array $children = [],
+    ): Generator {
         $response = $this->repositoryService->getClient()->execute($selectQuery);
+        $modelService = $this->repositoryService->getModelService();
+        $reflectionManager = $this->repositoryService->getReflectionManager();
+        $modelReflection = $reflectionManager->getReflectionClass($modelClassName);
 
         foreach ($response->iterateRecords() as $record) {
-            $model = new $modelClassName($this->repositoryService->getModelService());
-            $this->repositoryService->getModelManager()->loadFromRecord($record, $model);
+            $model = new $modelClassName($modelService);
+            $this->repositoryService->getModelManager()->loadFromRecord($record, $model, $prefix);
+            $this->getChildModels($record, $model, $modelReflection, $children);
 
             yield $model;
+        }
+    }
+
+    /**
+     * @param ChildrenMapping[] $children
+     *
+     * @throws JsonException
+     * @throws ReflectionException
+     * @throws ClientException
+     */
+    private function getChildModels(
+        Record $record,
+        AbstractModel $model,
+        ReflectionClass $modelReflection,
+        array $children,
+    ): void {
+        $reflectionManager = $this->repositoryService->getReflectionManager();
+        $modelService = $this->repositoryService->getModelService();
+
+        foreach ($children as $child) {
+            $propertyName = $child->getPropertyName();
+            $propertyReflection = $modelReflection->getProperty($propertyName);
+            $isArray = false;
+
+            try {
+                $childModelClassName = $reflectionManager->getNonBuiltinTypeName($propertyReflection);
+                $setter = sprintf('set%s', ucfirst($propertyName));
+            } catch (ReflectionException) {
+                $childModelClassName = $reflectionManager
+                    ->getAttribute($propertyReflection, Constraint::class)
+                    ->getParentModelClassName()
+                ;
+                $isArray = true;
+                $setter = sprintf('add%s', ucfirst($propertyName));
+            }
+
+            $childModel = new $childModelClassName($modelService);
+            $this->repositoryService->getModelManager()->loadFromRecord($record, $childModel, $child->getPrefix());
+
+            if ($isArray) {
+                $childModel = [$childModel];
+            }
+
+            $this->getChildModels(
+                $record,
+                $childModel,
+                $reflectionManager->getReflectionClass($childModelClassName),
+                $child->getChildren(),
+            );
+            $model->$setter($childModel);
         }
     }
 
