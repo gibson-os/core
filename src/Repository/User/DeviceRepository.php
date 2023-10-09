@@ -3,19 +3,33 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Repository\User;
 
-use GibsonOS\Core\Attribute\GetTableName;
+use GibsonOS\Core\Attribute\GetTable;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\User\Device;
 use GibsonOS\Core\Repository\AbstractRepository;
+use GibsonOS\Core\Wrapper\RepositoryWrapper;
+use JsonException;
+use MDO\Dto\Query\Where;
+use MDO\Dto\Table;
+use MDO\Dto\Value;
+use MDO\Exception\ClientException;
+use MDO\Query\DeleteQuery;
+use MDO\Query\UpdateQuery;
+use ReflectionException;
 
 class DeviceRepository extends AbstractRepository
 {
-    public function __construct(#[GetTableName(Device::class)] private string $deviceTableName)
-    {
+    public function __construct(
+        RepositoryWrapper $repositoryWrapper,
+        #[GetTable(Device::class)]
+        private readonly Table $deviceTable,
+    ) {
+        parent::__construct($repositoryWrapper);
     }
 
     /**
      * @throws SelectError
+     * @throws ClientException
      */
     public function getById(string $id): Device
     {
@@ -24,6 +38,7 @@ class DeviceRepository extends AbstractRepository
 
     /**
      * @throws SelectError
+     * @throws ClientException
      */
     public function getByToken(string $token): Device
     {
@@ -31,7 +46,9 @@ class DeviceRepository extends AbstractRepository
     }
 
     /**
-     * @throws SelectError
+     * @throws ClientException
+     * @throws JsonException
+     * @throws ReflectionException
      *
      * @return Device[]
      */
@@ -40,31 +57,38 @@ class DeviceRepository extends AbstractRepository
         return $this->fetchAll('`user_id`=?', [$userId], Device::class);
     }
 
+    /**
+     * @throws ClientException
+     */
     public function deleteByIds(array $ids, int $userId = null): void
     {
-        $table = $this->getTable($this->deviceTableName)
-            ->setWhereParameters($ids)
+        $repositoryWrapper = $this->getRepositoryWrapper();
+        $deleteQuery = (new DeleteQuery($this->deviceTable))
+            ->addWhere(new Where(
+                sprintf(
+                    '`id` IN (%s)',
+                    $repositoryWrapper->getSelectService()->getParametersString($ids),
+                ),
+                $ids,
+            ))
         ;
-
-        $where = '`id` IN (' . $table->getParametersString($ids) . ')';
 
         if ($userId !== null) {
-            $where .= ' AND `user_id`=?';
-            $table->addWhereParameter($userId);
+            $deleteQuery->addWhere(new Where('`user_id`=?', [$userId]));
         }
 
-        $table
-            ->setWhere($where)
-            ->deletePrepared()
-        ;
+        $repositoryWrapper->getClient()->execute($deleteQuery);
     }
 
+    /**
+     * @throws ClientException
+     */
     public function removeFcmToken(string $fcmToken): void
     {
-        $this->getTable($this->deviceTableName)
-            ->setWhere('`fcm_token`=?')
-            ->addWhereParameter($fcmToken)
-            ->update('`fcm_token`=NULL')
+        $updateQuery = (new UpdateQuery($this->deviceTable, ['fcm_token' => new Value(null)]))
+            ->addWhere(new Where('`fcm_token`=?', [$fcmToken]))
         ;
+
+        $this->getRepositoryWrapper()->getClient()->execute($updateQuery);
     }
 }

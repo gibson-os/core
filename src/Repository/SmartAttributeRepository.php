@@ -3,13 +3,17 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Repository;
 
-use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\SmartAttribute;
+use JsonException;
+use MDO\Exception\ClientException;
+use ReflectionException;
 
 class SmartAttributeRepository extends AbstractRepository
 {
     /**
-     * @throws SelectError
+     * @throws JsonException
+     * @throws ClientException
+     * @throws ReflectionException
      *
      * @return SmartAttribute[]
      */

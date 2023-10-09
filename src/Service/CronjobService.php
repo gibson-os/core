@@ -13,6 +13,7 @@ use GibsonOS\Core\Model\Cronjob;
 use GibsonOS\Core\Repository\Cronjob\TimeRepository;
 use GibsonOS\Core\Repository\CronjobRepository;
 use GibsonOS\Core\Utility\JsonUtility;
+use GibsonOS\Core\Wrapper\ModelWrapper;
 use JsonException;
 use Psr\Log\LoggerInterface;
 use ReflectionException;
@@ -25,6 +26,7 @@ class CronjobService
         private readonly TimeRepository $timeRepository,
         private readonly CommandService $commandService,
         private readonly LoggerInterface $logger,
+        private readonly ModelWrapper $modelWrapper,
     ) {
     }
 
@@ -77,7 +79,7 @@ class CronjobService
 
         foreach ($times as $time) {
             $this->modelManager->save(
-                (new Cronjob\Time())
+                (new Cronjob\Time($this->modelWrapper))
                     ->setCronjob($cronjob)
                     ->setFromHour($time->getHour()->getFrom())
                     ->setToHour($time->getHour()->getTo())

@@ -10,8 +10,8 @@ use GibsonOS\Core\Attribute\Install\Database\Constraint;
 use GibsonOS\Core\Attribute\Install\Database\Key;
 use GibsonOS\Core\Attribute\Install\Database\Table;
 use GibsonOS\Core\Model\Weather\Location;
+use GibsonOS\Core\Wrapper\ModelWrapper;
 use JsonSerializable;
-use mysqlDatabase;
 
 /**
  * @method Location getLocation()
@@ -87,9 +87,9 @@ class Weather extends AbstractModel implements JsonSerializable
     #[Constraint]
     protected Location $location;
 
-    public function __construct(mysqlDatabase $database = null)
+    public function __construct(ModelWrapper $modelWrapper)
     {
-        parent::__construct($database);
+        parent::__construct($modelWrapper);
 
         $this->date = new DateTime();
     }

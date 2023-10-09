@@ -15,7 +15,9 @@ use GibsonOS\Core\Manager\ModelManager;
 use GibsonOS\Core\Model\Icon;
 use GibsonOS\Core\Model\Setting;
 use GibsonOS\Core\Repository\Icon\TagRepository;
+use GibsonOS\Core\Wrapper\ModelWrapper;
 use JsonException;
+use MDO\Client;
 use Throwable;
 
 class IconService
@@ -26,6 +28,8 @@ class IconService
         private readonly TagRepository $tagRepository,
         private readonly FileService $fileService,
         private readonly ModelManager $modelManager,
+        private readonly ModelWrapper $modelWrapper,
+        private readonly Client $client,
         #[GetSetting('custom_icon_path', 'core')]
         Setting $customIconPath,
     ) {
@@ -41,8 +45,7 @@ class IconService
      */
     public function save(Icon $icon, string $imageFilename, string $iconFilename = null, array $tags = []): void
     {
-        $database = $icon->getDatabase();
-        $database->startTransaction();
+        $this->client->startTransaction();
 
         try {
             $this->modelManager->save($icon);
@@ -62,18 +65,18 @@ class IconService
 
             foreach ($tags as $tag) {
                 $this->modelManager->save(
-                    (new Icon\Tag())
+                    (new Icon\Tag($this->modelWrapper))
                         ->setIcon($icon)
                         ->setTag(trim($tag)),
                 );
             }
         } catch (Throwable $exception) {
-            $database->rollback();
+            $this->client->rollback();
 
             throw $exception;
         }
 
-        $database->commit();
+        $this->client->commit();
     }
 
     /**N

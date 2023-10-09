@@ -3,25 +3,26 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Repository;
 
-use Generator;
 use GibsonOS\Core\Attribute\GetTable;
 use GibsonOS\Core\Enum\HttpMethod;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\Action;
-use GibsonOS\Core\Service\RepositoryService;
+use GibsonOS\Core\Wrapper\RepositoryWrapper;
+use JsonException;
 use MDO\Dto\Query\Where;
 use MDO\Dto\Table;
 use MDO\Exception\ClientException;
 use MDO\Query\DeleteQuery;
+use ReflectionException;
 
 class ActionRepository extends AbstractRepository
 {
     public function __construct(
-        RepositoryService $repositoryService,
+        RepositoryWrapper $repositoryWrapper,
         #[GetTable(Action::class)]
         private readonly Table $actionTable,
     ) {
-        parent::__construct($repositoryService);
+        parent::__construct($repositoryWrapper);
     }
 
     /**
@@ -35,11 +36,12 @@ class ActionRepository extends AbstractRepository
 
     /**
      * @throws ClientException
-     * @throws SelectError
+     * @throws JsonException
+     * @throws ReflectionException
      *
-     * @return Generator<Action>
+     * @return Action[]
      */
-    public function findByName(string $name, int $taskId = null): Generator
+    public function findByName(string $name, int $taskId = null): array
     {
         $where = '`name` LIKE ?';
         $parameters = [$name . '%'];
@@ -49,7 +51,7 @@ class ActionRepository extends AbstractRepository
             $parameters[] = $taskId;
         }
 
-        yield from $this->fetchAll($where, $parameters, Action::class);
+        return $this->fetchAll($where, $parameters, Action::class);
     }
 
     /**
@@ -67,15 +69,16 @@ class ActionRepository extends AbstractRepository
 
     public function deleteByIdsNot(array $ids): bool
     {
+        $repositoryWrapper = $this->getRepositoryWrapper();
         $deleteQuery = (new DeleteQuery($this->actionTable))
             ->addWhere(new Where(
-                sprintf('`id` NOT IN (%s)', $this->repositoryService->getSelectService()->getParametersString($ids)),
+                sprintf('`id` NOT IN (%s)', $repositoryWrapper->getSelectService()->getParametersString($ids)),
                 $ids,
             ))
         ;
 
         try {
-            $this->repositoryService->getClient()->execute($deleteQuery);
+            $repositoryWrapper->getClient()->execute($deleteQuery);
         } catch (ClientException) {
             return false;
         }

@@ -8,6 +8,7 @@ use GibsonOS\Core\Model\Setting;
 use GibsonOS\Core\Model\User;
 use GibsonOS\Core\Repository\Desktop\ItemRepository;
 use GibsonOS\Core\Service\Response\AjaxResponse;
+use GibsonOS\Core\Wrapper\ModelWrapper;
 use JsonException;
 
 class IndexController extends AbstractController
@@ -18,6 +19,7 @@ class IndexController extends AbstractController
     public function get(
         DesktopController $desktopController,
         ItemRepository $itemRepository,
+        ModelWrapper $modelWrapper,
         #[GetSetting(DesktopController::APPS_KEY)]
         ?Setting $apps,
         #[GetSetting(DesktopController::TOOLS_KEY)]
@@ -27,6 +29,11 @@ class IndexController extends AbstractController
             return $this->returnSuccess();
         }
 
-        return $desktopController->get($itemRepository, $apps, $tools, $this->sessionService->getUser() ?? new User());
+        return $desktopController->get(
+            $itemRepository,
+            $apps,
+            $tools,
+            $this->sessionService->getUser() ?? new User($modelWrapper),
+        );
     }
 }

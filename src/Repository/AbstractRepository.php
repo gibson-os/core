@@ -3,14 +3,14 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Repository;
 
-use Generator;
 use GibsonOS\Core\Attribute\Install\Database\Constraint;
 use GibsonOS\Core\Dto\Model\ChildrenMapping;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Model\ModelInterface;
-use GibsonOS\Core\Service\RepositoryService;
+use GibsonOS\Core\Wrapper\RepositoryWrapper;
 use JsonException;
+use MDO\Dto\Field;
 use MDO\Dto\Query\Where;
 use MDO\Dto\Record;
 use MDO\Enum\OrderDirection;
@@ -21,28 +21,33 @@ use ReflectionException;
 
 abstract class AbstractRepository
 {
-    public function __construct(protected readonly RepositoryService $repositoryService)
+    public function __construct(private readonly RepositoryWrapper $repositoryWrapper)
     {
     }
 
-    protected function startTransaction(): void
+    public function getRepositoryWrapper(): RepositoryWrapper
     {
-        $this->repositoryService->getClient()->startTransaction();
+        return $this->repositoryWrapper;
     }
 
-    protected function commit(): void
+    public function startTransaction(): void
     {
-        $this->repositoryService->getClient()->commit();
+        $this->repositoryWrapper->getClient()->startTransaction();
     }
 
-    protected function rollback(): void
+    public function commit(): void
     {
-        $this->repositoryService->getClient()->rollback();
+        $this->repositoryWrapper->getClient()->commit();
+    }
+
+    public function rollback(): void
+    {
+        $this->repositoryWrapper->getClient()->rollback();
     }
 
     public function isTransaction(): bool
     {
-        return $this->repositoryService->getClient()->isTransaction();
+        return $this->repositoryWrapper->getClient()->isTransaction();
     }
 
     /**
@@ -55,26 +60,35 @@ abstract class AbstractRepository
      * @throws JsonException
      * @throws ReflectionException
      *
-     * @return Generator<T>
+     * @return T[]
      */
     protected function getModels(
         SelectQuery $selectQuery,
         string $modelClassName,
         string $prefix = '',
         array $children = [],
-    ): Generator {
-        $response = $this->repositoryService->getClient()->execute($selectQuery);
-        $modelService = $this->repositoryService->getModelService();
-        $reflectionManager = $this->repositoryService->getReflectionManager();
+    ): array {
+        $response = $this->repositoryWrapper->getClient()->execute($selectQuery);
+        $modelService = $this->repositoryWrapper->getModelService();
+        $reflectionManager = $this->repositoryWrapper->getReflectionManager();
         $modelReflection = $reflectionManager->getReflectionClass($modelClassName);
+        $models = [];
+        $primaryKey = implode('-', array_map(
+            static fn (Field $primaryField): string => $primaryField->getName(),
+            $selectQuery->getTable()->getPrimaryFields(),
+        ));
 
-        foreach ($response->iterateRecords() as $record) {
-            $model = new $modelClassName($modelService);
-            $this->repositoryService->getModelManager()->loadFromRecord($record, $model, $prefix);
-            $this->getChildModels($record, $model, $modelReflection, $children);
+        foreach ($response?->iterateRecords() ?? [] as $record) {
+            if (!isset($models[$primaryKey])) {
+                $model = new $modelClassName($modelService);
+                $this->repositoryWrapper->getModelManager()->loadFromRecord($record, $model, $prefix);
+                $models[$primaryKey] = $model;
+            }
 
-            yield $model;
+            $this->getChildModels($record, $models[$primaryKey], $modelReflection, $children);
         }
+
+        return array_values($models);
     }
 
     /**
@@ -90,28 +104,40 @@ abstract class AbstractRepository
         ReflectionClass $modelReflection,
         array $children,
     ): void {
-        $reflectionManager = $this->repositoryService->getReflectionManager();
-        $modelService = $this->repositoryService->getModelService();
+        $reflectionManager = $this->repositoryWrapper->getReflectionManager();
+        $modelService = $this->repositoryWrapper->getModelService();
 
         foreach ($children as $child) {
             $propertyName = $child->getPropertyName();
             $propertyReflection = $modelReflection->getProperty($propertyName);
             $isArray = false;
+            $uppercasePropertyName = ucfirst($propertyName);
 
             try {
                 $childModelClassName = $reflectionManager->getNonBuiltinTypeName($propertyReflection);
-                $setter = sprintf('set%s', ucfirst($propertyName));
+                $setter = sprintf('set%s', $uppercasePropertyName);
             } catch (ReflectionException) {
                 $childModelClassName = $reflectionManager
                     ->getAttribute($propertyReflection, Constraint::class)
                     ->getParentModelClassName()
                 ;
                 $isArray = true;
-                $setter = sprintf('add%s', ucfirst($propertyName));
+                $setter = sprintf('add%s', $uppercasePropertyName);
             }
 
+            // @todo gucken ob das child model schon existiert
+            /** @var AbstractModel $childModel */
             $childModel = new $childModelClassName($modelService);
-            $this->repositoryService->getModelManager()->loadFromRecord($record, $childModel, $child->getPrefix());
+            $primaryKeys = $this->repositoryWrapper->getTableManager()->getTable($childModel->getTableName());
+
+            if ($isArray) {
+                /** @var AbstractModel $existingChild */
+                foreach ($model->{'get' . $uppercasePropertyName}() as $existingChild) {
+
+                }
+            }
+
+            $this->repositoryWrapper->getModelManager()->loadFromRecord($record, $childModel, $child->getPrefix());
 
             if ($isArray) {
                 $childModel = [$childModel];
@@ -132,12 +158,34 @@ abstract class AbstractRepository
      *
      * @param class-string<T> $modelClassName
      *
-     * @return T
+     * @throws ClientException
+     * @throws JsonException
+     * @throws ReflectionException
+     * @throws SelectError
+     *
+     * @return AbstractModel<T>
      */
-    protected function getModel(Record $record, string $modelClassName): AbstractModel
+    protected function getModel(SelectQuery $selectQuery, string $modelClassName, array $children = []): AbstractModel
     {
-        $model = new $modelClassName($this->repositoryService->getModelService());
-        $this->repositoryService->getModelManager()->loadFromRecord($record, $model);
+        $result = $this->repositoryWrapper->getClient()->execute($selectQuery);
+        $record = $result?->iterateRecords()->current();
+
+        if (!$record instanceof Record) {
+            $exception = new SelectError('No results!');
+            $exception->setTable($this->repositoryWrapper->getTableManager()->getTable($selectQuery->getTable()->getTableName()));
+
+            throw $exception;
+        }
+
+        $model = new $modelClassName($this->repositoryWrapper->getModelService());
+        $this->repositoryWrapper->getModelManager()->loadFromRecord($record, $model);
+
+        $this->getChildModels(
+            $record,
+            $model,
+            $this->repositoryWrapper->getReflectionManager()->getReflectionClass($modelClassName),
+            $children,
+        );
 
         return $model;
     }
@@ -151,32 +199,23 @@ abstract class AbstractRepository
      * @throws ClientException
      * @throws SelectError
      *
-     * @return T
+     * @return AbstractModel<T>
      */
     protected function fetchOne(
         string $where,
         array $parameters,
         string $modelClassName,
         array $orderBy = [],
+        array $children = [],
     ): ModelInterface {
-        $model = new $modelClassName($this->repositoryService->getModelService());
+        $model = new $modelClassName($this->repositoryWrapper->getModelService());
         $selectQuery = $this->getSelectQuery($model->getTableName())
             ->addWhere(new Where($where, $parameters))
             ->setLimit(1)
             ->setOrders($orderBy)
         ;
 
-        $result = $this->repositoryService->getClient()->execute($selectQuery);
-        $record = $result->iterateRecords()->current();
-
-        if (!$record instanceof Record) {
-            $exception = new SelectError('No results!');
-            $exception->setTable($this->repositoryService->getTableManager()->getTable($model->getTableName()));
-
-            throw $exception;
-        }
-
-        return $this->getModel($record, $model);
+        return $this->getModel($selectQuery, $modelClassName, $children);
     }
 
     /**
@@ -186,9 +225,10 @@ abstract class AbstractRepository
      * @param array<string, OrderDirection> $orderBy
      *
      * @throws ClientException
-     * @throws SelectError
+     * @throws JsonException
+     * @throws ReflectionException
      *
-     * @return Generator<T>
+     * @return T[]
      */
     protected function fetchAll(
         string $where,
@@ -197,7 +237,7 @@ abstract class AbstractRepository
         int $limit = null,
         int $offset = null,
         array $orderBy = [],
-    ): Generator {
+    ): array {
         /** @var ModelInterface $model */
         $model = new $modelClassName();
         $selectQuery = $this->getSelectQuery($model->getTableName())
@@ -211,22 +251,24 @@ abstract class AbstractRepository
 
     /**
      * @param class-string<ModelInterface> $modelClassName
+     *
+     * @throws ClientException
      */
-    protected function getAggregate(
-        string $function,
+    protected function getAggregations(
+        array $functions,
         string $modelClassName,
         string $where = '',
         array $parameters = [],
-    ): ?array {
+    ): Record {
         /** @var ModelInterface $model */
         $model = new $modelClassName();
         $selectQuery = $this->getSelectQuery($model->getTableName())
             ->addWhere(new Where($where, $parameters))
-            ->setSelects(['aggr' => $function])
+            ->setSelects($functions)
         ;
-        $result = $this->repositoryService->getClient()->execute($selectQuery);
+        $result = $this->repositoryWrapper->getClient()->execute($selectQuery);
 
-        return $result->iterateRecords()->current()?->get('aggr')->value();
+        return $result->iterateRecords()->current();
     }
 
     /**
@@ -234,11 +276,11 @@ abstract class AbstractRepository
      */
     protected function getSelectQuery(string $tableName, string $alias = null): SelectQuery
     {
-        return new SelectQuery($this->repositoryService->getTableManager()->getTable($tableName), $alias);
+        return new SelectQuery($this->repositoryWrapper->getTableManager()->getTable($tableName), $alias);
     }
 
     protected function getRegexString(string $search): string
     {
-        return $this->repositoryService->getSelectService()->getUnescapedRegexString($search);
+        return $this->repositoryWrapper->getSelectService()->getUnescapedRegexString($search);
     }
 }

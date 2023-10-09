@@ -3,18 +3,30 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Repository;
 
-use GibsonOS\Core\Attribute\GetTableName;
+use GibsonOS\Core\Attribute\GetTable;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\Icon;
+use GibsonOS\Core\Wrapper\RepositoryWrapper;
+use JsonException;
+use MDO\Dto\Query\Where;
+use MDO\Dto\Table;
+use MDO\Exception\ClientException;
+use MDO\Query\DeleteQuery;
+use ReflectionException;
 
 class IconRepository extends AbstractRepository
 {
-    public function __construct(#[GetTableName(Icon::class)] private string $iconTableName)
-    {
+    public function __construct(
+        RepositoryWrapper $repositoryWrapper,
+        #[GetTable(Icon::class)]
+        private readonly Table $iconTable,
+    ) {
+        parent::__construct($repositoryWrapper);
     }
 
     /**
      * @throws SelectError
+     * @throws ClientException
      */
     public function getById(int $id): Icon
     {
@@ -22,12 +34,16 @@ class IconRepository extends AbstractRepository
     }
 
     /**
-     * @throws SelectError
+     * @throws ClientException
+     * @throws JsonException
+     * @throws ReflectionException
+     *
+     * @return Icon[]
      */
     public function findByIds(array $ids): array
     {
         return $this->fetchAll(
-            '`id` IN (' . $this->getTable($this->iconTableName)->getParametersString($ids) . ')',
+            sprintf('`id` IN (%s)', $this->getRepositoryWrapper()->getSelectService()->getParametersString($ids)),
             $ids,
             Icon::class,
         );
@@ -35,12 +51,20 @@ class IconRepository extends AbstractRepository
 
     public function deleteByIds(array $ids): bool
     {
-        $table = $this->getTable($this->iconTableName);
-        $table
-            ->setWhere('`id` IN (' . $table->getParametersString($ids) . ')')
-            ->setWhereParameters($ids)
+        $repositoryWrapper = $this->getRepositoryWrapper();
+        $deleteQuery = (new DeleteQuery($this->iconTable))
+            ->addWhere(new Where(
+                sprintf('`id` IN (%s)', $repositoryWrapper->getSelectService()->getParametersString($ids)),
+                $ids,
+            ))
         ;
 
-        return $table->deletePrepared();
+        try {
+            $repositoryWrapper->getClient()->execute($deleteQuery);
+        } catch (ClientException) {
+            return false;
+        }
+
+        return true;
     }
 }

@@ -4,14 +4,13 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Repository;
 
 use DateTimeInterface;
-use Generator;
 use GibsonOS\Core\Attribute\GetTable;
 use GibsonOS\Core\Dto\Model\ChildrenMapping;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\Event;
 use GibsonOS\Core\Model\Event\Element;
 use GibsonOS\Core\Model\Event\Trigger;
-use GibsonOS\Core\Service\RepositoryService;
+use GibsonOS\Core\Wrapper\RepositoryWrapper;
 use JsonException;
 use MDO\Dto\Query\Join;
 use MDO\Dto\Query\Where;
@@ -25,7 +24,7 @@ use ReflectionException;
 class EventRepository extends AbstractRepository
 {
     public function __construct(
-        RepositoryService $repositoryService,
+        RepositoryWrapper $repositoryWrapper,
         #[GetTable(Event::class)]
         private readonly Table $eventTable,
         #[GetTable(Element::class)]
@@ -33,7 +32,7 @@ class EventRepository extends AbstractRepository
         #[GetTable(Trigger::class)]
         private readonly Table $eventTriggerTable,
     ) {
-        parent::__construct($repositoryService);
+        parent::__construct($repositoryWrapper);
     }
 
     /**
@@ -47,11 +46,12 @@ class EventRepository extends AbstractRepository
 
     /**
      * @throws ClientException
-     * @throws SelectError
+     * @throws JsonException
+     * @throws ReflectionException
      *
-     * @return Generator<Event>
+     * @return Event[]
      */
-    public function findByName(string $name, bool $onlyActive): Generator
+    public function findByName(string $name, bool $onlyActive): array
     {
         $where = '`name` LIKE ?';
         $parameters = [$name . '%'];
@@ -61,7 +61,7 @@ class EventRepository extends AbstractRepository
             $parameters[] = 1;
         }
 
-        yield from $this->fetchAll($where, $parameters, Event::class);
+        return $this->fetchAll($where, $parameters, Event::class);
     }
 
     /**
@@ -69,9 +69,9 @@ class EventRepository extends AbstractRepository
      * @throws JsonException
      * @throws ReflectionException
      *
-     * @return Generator<Event>
+     * @return Event[]
      */
-    public function getTimeControlled(string $className, string $trigger, DateTimeInterface $dateTime): Generator
+    public function getTimeControlled(string $className, string $trigger, DateTimeInterface $dateTime): array
     {
         $query = $this->getSelectQuery($this->eventElementTable->getTableName(), 'ee')
             ->addJoin(new Join($this->eventTable, 'e', '`e`.`id`=`ee`.`event_id`', JoinType::LEFT))
@@ -79,7 +79,7 @@ class EventRepository extends AbstractRepository
             ->setOrder('`et`.`priority`', OrderDirection::DESC)
             ->setOrder('`ee`.`parentId`')
             ->setOrder('`ee`.`order`')
-            ->setSelects($this->repositoryService->getSelectService()->getSelects([
+            ->setSelects($this->getRepositoryWrapper()->getSelectService()->getSelects([
                 new Select($this->eventTable, 'e', 'event_'),
                 new Select($this->eventElementTable, 'ee', 'element_'),
                 new Select($this->eventTriggerTable, 'et', 'trigger_'),
@@ -96,7 +96,7 @@ class EventRepository extends AbstractRepository
             ->addWhere(new Where('`et`.`second` IS NULL OR `et`.`second`=?', [(int) $dateTime->format('s')]))
         ;
 
-        yield from $this->getModels(
+        return $this->getModels(
             $query,
             Event::class,
             'event_',

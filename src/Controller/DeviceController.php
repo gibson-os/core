@@ -16,6 +16,7 @@ use GibsonOS\Core\Model\Task;
 use GibsonOS\Core\Repository\DevicePushRepository;
 use GibsonOS\Core\Repository\User\DeviceRepository;
 use GibsonOS\Core\Service\Response\AjaxResponse;
+use GibsonOS\Core\Wrapper\ModelWrapper;
 use JsonException;
 use ReflectionException;
 
@@ -28,6 +29,7 @@ class DeviceController extends AbstractController
      */
     public function postAddPush(
         ModelManager $modelManager,
+        ModelWrapper $modelWrapper,
         DeviceRepository $deviceRepository,
         #[GetModel(['name' => 'module'])]
         Module $module,
@@ -39,7 +41,7 @@ class DeviceController extends AbstractController
     ): AjaxResponse {
         $deviceToken = $this->requestService->getHeader('X-Device-Token');
         $device = $deviceRepository->getByToken($deviceToken);
-        $devicePush = (new DevicePush())
+        $devicePush = (new DevicePush($modelWrapper))
             ->setDevice($device)
             ->setModuleModel($module)
             ->setTaskModel($task)

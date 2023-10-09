@@ -12,6 +12,7 @@ use GibsonOS\Core\Manager\ModelManager;
 use GibsonOS\Core\Model\Setting;
 use GibsonOS\Core\Repository\ModuleRepository;
 use GibsonOS\Core\Service\Response\AjaxResponse;
+use GibsonOS\Core\Wrapper\ModelWrapper;
 
 class MiddlewareController extends AbstractController
 {
@@ -26,10 +27,11 @@ class MiddlewareController extends AbstractController
         string $token,
         ModuleRepository $moduleRepository,
         ModelManager $modelManager,
+        ModelWrapper $modelWrapper,
         #[GetSetting('middlewareToken', 'core')]
         Setting $middlewareToken = null,
     ): AjaxResponse {
-        $middlewareToken ??= (new Setting())
+        $middlewareToken ??= (new Setting($modelWrapper))
             ->setModule($moduleRepository->getByName('core'))
             ->setKey('middlewareToken')
         ;

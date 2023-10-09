@@ -41,7 +41,7 @@ class ModelManager
 
     private const TYPE_DATE_TIME = 'dateTime';
 
-    private const COLUMN_TYPES = [
+    public const COLUMN_TYPES = [
         Type::TINYINT->value => self::TYPE_INT,
         Type::SMALLINT->value => self::TYPE_INT,
         Type::INT->value => self::TYPE_INT,
@@ -191,7 +191,7 @@ class ModelManager
                 continue;
             }
 
-            $value = $record->get($prefix . $field->getName())->getValue();
+            $value = $record->get($prefix . $field->getName())?->getValue();
 
             if ($value === null) {
                 $model->$setter($value);
@@ -233,7 +233,7 @@ class ModelManager
                             $model->$setter(constant(sprintf(
                                 '%s::%s',
                                 $typeName,
-                                $value ?? '',
+                                $value,
                             )));
 
                             break;
@@ -324,11 +324,6 @@ class ModelManager
         $childrenModel = new $parentModelClassName($this->mysqlDatabase);
         $tableName = $childrenModel->getTableName();
         $where = $constraintAttribute->getWhere();
-        $where = sprintf(
-            '(%s`%s_id`=?)',
-            $where === null ? '' : '(' . $where . ') AND ',
-            $constraintAttribute->getParentColumn(),
-        );
         $parameters = $constraintAttribute->getWhereParameters();
         $parameters[] = $children->getParentId();
         $table = $this->tableManager->getTable($tableName);

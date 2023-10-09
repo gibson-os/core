@@ -29,6 +29,7 @@ use GibsonOS\Core\Service\Response\ExceptionResponse;
 use GibsonOS\Core\Service\Response\ResponseInterface;
 use GibsonOS\Core\Service\Response\TwigResponse;
 use GibsonOS\Core\Utility\JsonUtility;
+use GibsonOS\Core\Wrapper\ModelWrapper;
 use InvalidArgumentException;
 use JsonException;
 use OutOfBoundsException;
@@ -54,13 +55,14 @@ readonly class ControllerService
         private ReflectionManager $reflectionManager,
         private MiddlewareService $middlewareService,
         private ModelManager $modelManager,
+        private ModelWrapper $modelWrapper,
+        private TracerService $tracerService,
         ModuleRepository $moduleRepository,
         #[GetSetting('chromecastReceiverAppId', 'core')]
         Setting $chromecastReceiverAppId = null,
-        private TracerService $tracerService,
     ) {
         $this->chromecastReceiverAppId = $chromecastReceiverAppId
-            ?? (new Setting())
+            ?? (new Setting($this->modelWrapper))
                 ->setModule($moduleRepository->getByName('core'))
                 ->setKey('chromecastReceiverAppId')
         ;

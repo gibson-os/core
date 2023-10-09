@@ -4,27 +4,28 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Repository;
 
 use DateTimeInterface;
-use Generator;
 use GibsonOS\Core\Attribute\GetTable;
 use GibsonOS\Core\Attribute\GetTableName;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\Cronjob;
-use GibsonOS\Core\Service\RepositoryService;
+use GibsonOS\Core\Wrapper\RepositoryWrapper;
+use JsonException;
 use MDO\Dto\Query\Join;
 use MDO\Dto\Query\Where;
 use MDO\Dto\Table;
 use MDO\Exception\ClientException;
+use ReflectionException;
 
 class CronjobRepository extends AbstractRepository
 {
     public function __construct(
-        RepositoryService $repositoryService,
+        RepositoryWrapper $repositoryWrapper,
         #[GetTableName(Cronjob::class)]
         private readonly string $cronjobTableName,
         #[GetTable(Cronjob\Time::class)]
         private readonly Table $cronjobTimeTable,
     ) {
-        parent::__construct($repositoryService);
+        parent::__construct($repositoryWrapper);
     }
 
     /**
@@ -42,11 +43,12 @@ class CronjobRepository extends AbstractRepository
 
     /**
      * @throws ClientException
-     * @throws SelectError
+     * @throws JsonException
+     * @throws ReflectionException
      *
-     * @return Generator<Cronjob>
+     * @return Cronjob[]
      */
-    public function getRunnableByUser(DateTimeInterface $dateTime, string $user): Generator
+    public function getRunnableByUser(DateTimeInterface $dateTime, string $user): array
     {
         $selectQuery = $this->getSelectQuery($this->cronjobTableName, 'c')
             ->addJoin(new Join($this->cronjobTimeTable, 'ct', '`c`.`id`=`ct`.`cronjob_id`'))
@@ -91,7 +93,7 @@ class CronjobRepository extends AbstractRepository
             ))
         ;
 
-        yield from $this->getModels($selectQuery, Cronjob::class);
+        return $this->getModels($selectQuery, Cronjob::class);
     }
 
     private function getTimePart(string $field, $parameterName): string

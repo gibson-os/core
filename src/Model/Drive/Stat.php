@@ -10,7 +10,7 @@ use GibsonOS\Core\Attribute\Install\Database\Constraint;
 use GibsonOS\Core\Attribute\Install\Database\Table;
 use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Model\Drive;
-use mysqlDatabase;
+use GibsonOS\Core\Wrapper\ModelWrapper;
 
 /**
  * @method Drive getDrive()
@@ -34,9 +34,9 @@ class Stat extends AbstractModel
     #[Constraint]
     protected Drive $drive;
 
-    public function __construct(mysqlDatabase $database = null)
+    public function __construct(ModelWrapper $modelWrapper)
     {
-        parent::__construct($database);
+        parent::__construct($modelWrapper);
 
         $this->added = new DateTimeImmutable();
     }

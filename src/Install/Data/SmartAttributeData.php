@@ -98,7 +98,7 @@ class SmartAttributeData extends AbstractInstall implements PriorityInterface
     private function setSmartAttribute(int $id, string $short, string $description): SmartAttributeData
     {
         $this->logger->info(sprintf('Add smart attribute #%d "%s"', $id, $short));
-        $this->modelManager->save((new SmartAttribute())
+        $this->modelManager->save((new SmartAttribute($this->modelWrapper))
                 ->setId($id)
                 ->setShort($short)
                 ->setDescription($description));

@@ -8,8 +8,8 @@ use DateTimeInterface;
 use GibsonOS\Core\Attribute\Install\Database\Column;
 use GibsonOS\Core\Attribute\Install\Database\Key;
 use GibsonOS\Core\Attribute\Install\Database\Table;
+use GibsonOS\Core\Wrapper\ModelWrapper;
 use JsonSerializable;
-use mysqlDatabase;
 
 #[Table('system_drive')]
 class Drive extends AbstractModel implements JsonSerializable
@@ -82,9 +82,9 @@ class Drive extends AbstractModel implements JsonSerializable
     #[Column(type: Column::TYPE_TIMESTAMP, default: Column::DEFAULT_CURRENT_TIMESTAMP)]
     private DateTimeInterface $added;
 
-    public function __construct(mysqlDatabase $database = null)
+    public function __construct(ModelWrapper $modelWrapper)
     {
-        parent::__construct($database);
+        parent::__construct($modelWrapper);
 
         $this->added = new DateTimeImmutable();
     }

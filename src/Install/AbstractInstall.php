@@ -18,23 +18,27 @@ use GibsonOS\Core\Repository\SettingRepository;
 use GibsonOS\Core\Service\DirService;
 use GibsonOS\Core\Service\EnvService;
 use GibsonOS\Core\Utility\JsonUtility;
+use GibsonOS\Core\Wrapper\ModelWrapper;
 use JsonException;
+use MDO\Exception\ClientException;
 use Psr\Log\LoggerInterface;
 use ReflectionException;
 
 abstract class AbstractInstall implements InstallInterface
 {
-    protected DirService $dirService;
+    protected readonly DirService $dirService;
 
-    protected EnvService $envService;
+    protected readonly EnvService $envService;
 
-    protected SettingRepository $settingRepository;
+    protected readonly SettingRepository $settingRepository;
 
-    protected ModuleRepository $moduleRepository;
+    protected readonly ModuleRepository $moduleRepository;
 
-    protected ModelManager $modelManager;
+    protected readonly ModelManager $modelManager;
 
-    protected LoggerInterface $logger;
+    protected readonly ModelWrapper $modelWrapper;
+
+    protected readonly LoggerInterface $logger;
 
     /**
      * @throws FactoryError
@@ -46,6 +50,7 @@ abstract class AbstractInstall implements InstallInterface
         $this->settingRepository = $this->serviceManagerService->get(SettingRepository::class);
         $this->moduleRepository = $this->serviceManagerService->get(ModuleRepository::class);
         $this->modelManager = $this->serviceManagerService->get(ModelManager::class);
+        $this->modelWrapper = $this->serviceManagerService->get(ModelWrapper::class);
         $this->logger = $this->serviceManagerService->get(LoggerInterface::class);
     }
 
@@ -78,6 +83,9 @@ abstract class AbstractInstall implements InstallInterface
         return new Input($message, $value);
     }
 
+    /**
+     * @throws ClientException
+     */
     protected function getSettingInput(string $moduleName, string $key, string $message): Input
     {
         try {
@@ -91,6 +99,7 @@ abstract class AbstractInstall implements InstallInterface
     }
 
     /**
+     * @throws ClientException
      * @throws JsonException
      * @throws ReflectionException
      * @throws SaveError
@@ -103,7 +112,7 @@ abstract class AbstractInstall implements InstallInterface
         try {
             $setting = $this->settingRepository->getByKeyAndModuleName($moduleName, null, $key);
         } catch (SelectError) {
-            $setting = new Setting();
+            $setting = new Setting($this->modelWrapper);
         }
 
         $this->modelManager->save(
@@ -151,10 +160,11 @@ abstract class AbstractInstall implements InstallInterface
     }
 
     /**
-     * @throws SaveError
-     * @throws SelectError
+     * @throws ClientException
      * @throws JsonException
      * @throws ReflectionException
+     * @throws SaveError
+     * @throws SelectError
      */
     protected function addApp(string $text, string $module, string $task, string $action, string $icon): self
     {
@@ -163,7 +173,7 @@ abstract class AbstractInstall implements InstallInterface
             $apps = JsonUtility::decode($appsSetting->getValue());
         } catch (SelectError) {
             $coreModule = $this->moduleRepository->getByName('core');
-            $appsSetting = (new Setting())
+            $appsSetting = (new Setting($this->modelWrapper))
                 ->setModule($coreModule)
                 ->setKey('apps')
             ;

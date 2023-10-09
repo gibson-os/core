@@ -113,7 +113,7 @@ class ModelsFetcherAttribute implements AttributeServiceInterface, ParameterAttr
 
         $models = [];
 
-        foreach ($result->iterateRecords() as $record) {
+        foreach ($result?->iterateRecords() ?? [] as $record) {
             $model = new $modelClassName();
             $this->modelManager->loadFromRecord($record, $model);
             $models[] = $model;

@@ -116,6 +116,8 @@ trait ConstraintTrait
     }
 
     /**
+     * @throws ClientException
+     * @throws JsonException
      * @throws ReflectionException
      */
     private function getConstraint(
@@ -135,7 +137,7 @@ trait ConstraintTrait
 
         $parentModelClassName = $constraintAttribute->getParentModelClassName() ?? $propertyTypeName;
         /** @var AbstractModel $parentModel */
-        $parentModel = new $parentModelClassName($this->database);
+        $parentModel = new $parentModelClassName($this->modelWrapper);
 
         if ($value === null) {
             $this->$propertyName = $reflectionProperty->getType()?->allowsNull() ? null : $parentModel;
@@ -169,6 +171,8 @@ trait ConstraintTrait
     }
 
     /**
+     * @throws ClientException
+     * @throws JsonException
      * @throws ReflectionException
      *
      * @return AbstractModel[]
@@ -194,7 +198,7 @@ trait ConstraintTrait
         }
 
         /** @var AbstractModel $parentModel */
-        $parentModel = new $parentModelClassName($this->database);
+        $parentModel = new $parentModelClassName($this->modelWrapper);
         $this->$propertyName = [];
         $this->loadedConstraints[$propertyName] = $value;
 
@@ -271,6 +275,8 @@ trait ConstraintTrait
     /**
      * @param AbstractModel[] $models
      *
+     * @throws ClientException
+     * @throws JsonException
      * @throws ReflectionException
      */
     private function addConstraints(
@@ -357,7 +363,8 @@ trait ConstraintTrait
         string $where = null,
         array $whereParameters = [],
     ): ?AbstractModel {
-        $table = $this->modelService->getTableManager()->getTable($model->getTableName());
+        $modelWrapper = $this->getModelWrapper();
+        $table = $modelWrapper->getTableManager()->getTable($model->getTableName());
         $selectQuery = (new SelectQuery($table))
             ->addWhere(new Where(
                 sprintf('`%s`=?%s', $foreignField, $where === null ? '' : ' AND (' . $where . ')'),
@@ -366,8 +373,8 @@ trait ConstraintTrait
             ->setLimit(1)
         ;
 
-        $result = $this->modelService->getClient()->execute($selectQuery);
-        $this->modelService->getModelManager()->loadFromRecord($result->iterateRecords()->current(), $model);
+        $result = $modelWrapper->getClient()->execute($selectQuery);
+        $modelWrapper->getModelManager()->loadFromRecord($result->iterateRecords()->current(), $model);
 
         return $model;
     }
@@ -375,6 +382,10 @@ trait ConstraintTrait
     /**
      * @param class-string<AbstractModel>   $modelClassName
      * @param array<string, OrderDirection> $orderBy
+     *
+     * @throws ClientException
+     * @throws JsonException
+     * @throws ReflectionException
      *
      * @return AbstractModel[]
      */
@@ -393,7 +404,8 @@ trait ConstraintTrait
             return $models;
         }
 
-        $table = $this->modelService->getTableManager()->getTable($foreignTable);
+        $modelWrapper = $this->getModelWrapper();
+        $table = $modelWrapper->getTableManager()->getTable($foreignTable);
         $selectQuery = (new SelectQuery($table))
             ->addWhere(new Where(
                 sprintf('`%s`=?%s', $foreignField, $where === null ? '' : ' AND (' . $where . ')'),
@@ -402,11 +414,11 @@ trait ConstraintTrait
             ->setOrders($orderBy)
         ;
 
-        $result = $this->modelService->getClient()->execute($selectQuery);
+        $result = $modelWrapper->getClient()->execute($selectQuery);
 
         foreach ($result->iterateRecords() as $record) {
-            $model = new $modelClassName($this->modelService);
-            $this->modelService->getModelManager()->loadFromRecord($record, $model);
+            $model = new $modelClassName($modelWrapper);
+            $modelWrapper->getModelManager()->loadFromRecord($record, $model);
             $models[] = $model;
         }
 

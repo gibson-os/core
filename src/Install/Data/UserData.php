@@ -49,14 +49,14 @@ class UserData extends AbstractInstall implements PriorityInterface, SingleInsta
 
         $permissionAll = Permission::READ->value + Permission::WRITE->value + Permission::DELETE->value + Permission::MANAGE->value;
         $user = $this->userService->save(
-            (new User())->setUser($usernameInput->getValue() ?? ''),
+            (new User($this->modelWrapper))->setUser($usernameInput->getValue() ?? ''),
             $passwordInput->getValue() ?? '',
             $passwordRepeatInput->getValue() ?? '',
         );
 
         foreach ($this->moduleRepository->getAll() as $module) {
             $this->modelManager->save(
-                (new User\Permission())
+                (new User\Permission($this->modelWrapper))
                     ->setUser($user)
                     ->setModule($module)
                     ->setPermission($permissionAll),

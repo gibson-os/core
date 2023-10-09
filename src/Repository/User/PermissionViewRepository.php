@@ -3,102 +3,97 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Repository\User;
 
+use Generator;
 use GibsonOS\Core\Attribute\GetTableName;
 use GibsonOS\Core\Enum\HttpMethod;
 use GibsonOS\Core\Enum\Permission;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\User\PermissionView;
 use GibsonOS\Core\Repository\AbstractRepository;
-use mysqlTable;
-use stdClass;
+use GibsonOS\Core\Wrapper\RepositoryWrapper;
+use MDO\Dto\Query\Where;
+use MDO\Dto\Record;
+use MDO\Enum\OrderDirection;
+use MDO\Exception\ClientException;
 
 class PermissionViewRepository extends AbstractRepository
 {
-    public function __construct(#[GetTableName(PermissionView::class)] private string $permissionViewName)
-    {
+    public function __construct(
+        RepositoryWrapper $repositoryWrapper,
+        #[GetTableName(PermissionView::class)]
+        private string $permissionViewName,
+    ) {
+        parent::__construct($repositoryWrapper);
     }
 
     /**
+     * @throws ClientException
      * @throws SelectError
      *
-     * @return stdClass[]
+     * @return Generator<Record>
      */
-    public function getTaskList(?int $userId, string $module = null): array
+    public function getTaskList(?int $userId, string $module = null): Generator
     {
-        $table = $this->getTable($this->permissionViewName);
-        $table
-            ->setWhere(
-                'IFNULL(`user_id`, ?)=? AND ' .
-                '`permission`>? AND ' .
-                '`task_id` IS NOT NULL' .
-                ($module === null ? '' : ' AND `module_name`=?'),
-            )
-            ->setWhereParameters([$userId ?? 0, $userId ?? 0, Permission::DENIED->value])
+        $selectQuery = $this->getSelectQuery($this->permissionViewName)
+            ->setDistinct(true)
+            ->setSelects(['module' => '`module_name`', 'task' => '`task_name`'])
+            ->addWhere(new Where('IFNULL(`user_id`, :userId)=:userId', ['userId' => $userId ?? 0]))
+            ->addWhere(new Where('`permission`>:permission', ['permission' => Permission::DENIED->value]))
+            ->addWhere(new Where('`task_id` IS NOT NULL', []))
         ;
 
         if ($module !== null) {
-            $table->addWhereParameter($module);
+            $selectQuery->addWhere(new Where('`module_name`=:moduleName', ['moduleName' => $module]));
         }
 
-        if (!$table->selectPrepared(false, 'DISTINCT `module_name` AS `module`, `task_name` AS `task`')) {
-            throw (new SelectError())->setTable($table);
-        }
+        $result = $this->getRepositoryWrapper()->getClient()->execute($selectQuery);
 
-        return $table->connection->fetchObjectList();
+        return $result->iterateRecords();
     }
 
     /**
      * @throws SelectError
+     * @throws ClientException
      */
     public function getPermissionByModule(string $module, int $userId = null): PermissionView
     {
-        $table = $this
-            ->getTable($this->permissionViewName)
-            ->setLimit(1)
-            ->setOrderBy('`user_id` DESC, `permission_module_id` DESC')
-        ;
-        $table->setWhere(
-            $this->getUserIdWhere($table, $userId) . ' AND ' .
-            $this->getModuleWhere($table, $module) . ' AND ' .
+        return $this->fetchOne(
+            'IFNULL(`user_id`, :userId)=:userId AND ' .
+            '`module_name`=:moduleName AND ' .
             '`task_name` IS NULL AND ' .
             '`action_name` IS NULL',
+            [
+                'userId' => $userId,
+                'moduleName' => $module,
+            ],
+            PermissionView::class,
+            ['`user_id`' => OrderDirection::DESC, '`permission_module_id`' => OrderDirection::DESC],
         );
-
-        if (!$table->selectPrepared()) {
-            $exception = new SelectError(sprintf('Permission für %s nicht gefunden!', $module));
-            $exception->setTable($table);
-
-            throw $exception;
-        }
-
-        return $this->getModel($table, PermissionView::class);
     }
 
     /**
      * @throws SelectError
+     * @throws ClientException
      */
     public function getPermissionByTask(string $module, string $task, int $userId = null): PermissionView
     {
-        $table = $this
-            ->getTable($this->permissionViewName)
-            ->setLimit(1)
-            ->setOrderBy('`user_id` DESC, `permission_task_id` DESC, `permission_module_id` DESC')
-        ;
-        $table->setWhere(
-            $this->getUserIdWhere($table, $userId) . ' AND ' .
-            $this->getModuleWhere($table, $module) . ' AND ' .
-            $this->getTaskWhere($table, $task) . ' AND ' .
+        return $this->fetchOne(
+            'IFNULL(`user_id`, :userId)=:userId AND ' .
+            '`module_name`=:moduleName AND ' .
+            '`task_name`=:taskName AND ' .
             '`action_name` IS NULL',
+            [
+                'userId' => $userId,
+                'moduleName' => $module,
+                'taskName' => $task,
+            ],
+            PermissionView::class,
+            [
+                '`user_id`' => OrderDirection::DESC,
+                '`permission_task_id`' => OrderDirection::DESC,
+                '`permission_module_id`' => OrderDirection::DESC,
+            ],
         );
-
-        if (!$table->selectPrepared()) {
-            $exception = new SelectError(sprintf('Permission für %s/%s nicht gefunden!', $module, $task));
-            $exception->setTable($table);
-
-            throw $exception;
-        }
-
-        return $this->getModel($table, PermissionView::class);
     }
 
     /**
@@ -111,55 +106,26 @@ class PermissionViewRepository extends AbstractRepository
         HttpMethod $method,
         int $userId = null,
     ): PermissionView {
-        $table = $this
-            ->getTable($this->permissionViewName)
-            ->setLimit(1)
-            ->setOrderBy('`user_id` DESC, `permission_action_id` DESC, `permission_task_id` DESC, `permission_module_id` DESC')
-        ;
-        $table->setWhere(
-            $this->getUserIdWhere($table, $userId) . ' AND ' .
-            $this->getModuleWhere($table, $module) . ' AND ' .
-            $this->getTaskWhere($table, $task) . ' AND ' .
-            $this->getActionWhere($table, $action, $method),
+        return $this->fetchOne(
+            'IFNULL(`user_id`, :userId)=:userId AND ' .
+            '`module_name`=:moduleName AND ' .
+            '`task_name`=:taskName AND ' .
+            '`action_name`=:actionName AND ' .
+            '`action_method`=:actionMethod',
+            [
+                'userId' => $userId,
+                'moduleName' => $module,
+                'taskName' => $task,
+                'actionName' => $action,
+                'actionMethod' => $method->value,
+            ],
+            PermissionView::class,
+            [
+                '`user_id`' => OrderDirection::DESC,
+                '`permission_action_id`' => OrderDirection::DESC,
+                '`permission_task_id`' => OrderDirection::DESC,
+                '`permission_module_id`' => OrderDirection::DESC,
+            ],
         );
-
-        if (!$table->selectPrepared()) {
-            $exception = new SelectError(sprintf('Permission für %s/%s::%s nicht gefunden!', $module, $task, $action));
-            $exception->setTable($table);
-
-            throw $exception;
-        }
-
-        return $this->getModel($table, PermissionView::class);
-    }
-
-    private function getModuleWhere(mysqlTable $table, string $module): string
-    {
-        $table->addWhereParameter($module);
-
-        return '`module_name`=?';
-    }
-
-    private function getTaskWhere(mysqlTable $table, string $task): string
-    {
-        $table->addWhereParameter($task);
-
-        return '`task_name`=?';
-    }
-
-    private function getActionWhere(mysqlTable $table, string $action, HttpMethod $method): string
-    {
-        $table->addWhereParameter($action);
-        $table->addWhereParameter($method->value);
-
-        return '`action_name`=? AND `action_method`=?';
-    }
-
-    private function getUserIdWhere(mysqlTable $table, int $userId = null): string
-    {
-        $table->addWhereParameter($userId ?? 0);
-        $table->addWhereParameter($userId ?? 0);
-
-        return 'IFNULL(`user_id`, ?)=?';
     }
 }

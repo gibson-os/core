@@ -12,8 +12,8 @@ use GibsonOS\Core\Attribute\Install\Database\Table;
 use GibsonOS\Core\Model\Event\Element;
 use GibsonOS\Core\Model\Event\Event\Tag;
 use GibsonOS\Core\Model\Event\Trigger;
+use GibsonOS\Core\Wrapper\ModelWrapper;
 use JsonSerializable;
-use mysqlDatabase;
 
 /**
  * @method Element[] getElements()
@@ -75,9 +75,9 @@ class Event extends AbstractModel implements JsonSerializable, AutoCompleteModel
     #[Constraint('event', Tag::class)]
     protected array $tags = [];
 
-    public function __construct(mysqlDatabase $database = null)
+    public function __construct(ModelWrapper $modelWrapper)
     {
-        parent::__construct($database);
+        parent::__construct($modelWrapper);
 
         $this->modified = new DateTimeImmutable();
     }

@@ -6,7 +6,7 @@ namespace GibsonOS\Core\Model;
 use GibsonOS\Core\Attribute\Install\Database\Table;
 use GibsonOS\Core\Factory\DateTimeFactory;
 use GibsonOS\Core\Service\DateTimeService;
-use GibsonOS\Core\Service\ModelService;
+use GibsonOS\Core\Wrapper\ModelWrapper;
 use ReflectionAttribute;
 use ReflectionClass;
 use ReflectionException;
@@ -19,14 +19,14 @@ abstract class AbstractModel implements ModelInterface
 
     private ?string $tableName = null;
 
-    public function __construct(private readonly ModelService $modelService)
+    public function __construct(private readonly ModelWrapper $modelWrapper)
     {
         $this->dateTime = DateTimeFactory::get();
     }
 
-    public function getModelService(): ModelService
+    public function getModelWrapper(): ModelWrapper
     {
-        return $this->modelService;
+        return $this->modelWrapper;
     }
 
     public function getTableName(): string

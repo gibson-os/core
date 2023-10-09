@@ -3,11 +3,12 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Repository;
 
-use Generator;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\DevicePush;
 use GibsonOS\Core\Model\User\Device;
+use JsonException;
 use MDO\Exception\ClientException;
+use ReflectionException;
 
 class DevicePushRepository extends AbstractRepository
 {
@@ -26,13 +27,14 @@ class DevicePushRepository extends AbstractRepository
 
     /**
      * @throws ClientException
-     * @throws SelectError
+     * @throws JsonException
+     * @throws ReflectionException
      *
-     * @return Generator<DevicePush>
+     * @return DevicePush[]
      */
-    public function getAllByAction(string $module, string $task, string $action, string $foreignId): Generator
+    public function getAllByAction(string $module, string $task, string $action, string $foreignId): array
     {
-        yield from $this->fetchAll(
+        return $this->fetchAll(
             '`module`=? AND `task`=? AND `action`=? AND `foreign_id`=?',
             [$module, $task, $action, $foreignId],
             DevicePush::class,

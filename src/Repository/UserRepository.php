@@ -5,11 +5,15 @@ namespace GibsonOS\Core\Repository;
 
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\User;
+use JsonException;
+use MDO\Exception\ClientException;
+use ReflectionException;
 
 class UserRepository extends AbstractRepository
 {
     /**
      * @throws SelectError
+     * @throws ClientException
      */
     public function getById(int $id): User
     {
@@ -17,20 +21,20 @@ class UserRepository extends AbstractRepository
     }
 
     /**
-     * @throws SelectError
+     * @throws ClientException
+     * @throws JsonException
+     * @throws ReflectionException
      *
      * @return User[]
      */
     public function findByName(string $name): array
     {
-        $where = '`user` LIKE ?';
-        $parameters = [$name . '%'];
-
-        return $this->fetchAll($where, $parameters, User::class);
+        return $this->fetchAll('`user` LIKE ?', [$name . '%'], User::class);
     }
 
     /**
      * @throws SelectError
+     * @throws ClientException
      */
     public function getByUsername(string $username): User
     {
@@ -39,14 +43,18 @@ class UserRepository extends AbstractRepository
 
     /**
      * @throws SelectError
+     * @throws ClientException
      */
     public function getByUsernameAndPassword(string $username, string $passwordHash): User
     {
         return $this->fetchOne('`user`=? AND `password`=MD5(?)', [$username, $passwordHash], User::class);
     }
 
+    /**
+     * @throws ClientException
+     */
     public function getCount(): int
     {
-        return (int) ($this->getAggregate('COUNT(`id`)', User::class) ?? [0])[0];
+        return (int) $this->getAggregations(['count' => 'COUNT(`id`)'], User::class)->get('count')->getValue();
     }
 }

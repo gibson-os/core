@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace GibsonOS\Core\Service;
+namespace GibsonOS\Core\Wrapper;
 
 use GibsonOS\Core\Manager\ModelManager;
 use GibsonOS\Core\Manager\ReflectionManager;
@@ -9,13 +9,13 @@ use MDO\Client;
 use MDO\Manager\TableManager;
 use MDO\Service\SelectService;
 
-class RepositoryService
+class RepositoryWrapper
 {
     public function __construct(
         private readonly Client $client,
         private readonly ModelManager $modelManager,
         private readonly TableManager $tableManager,
-        private readonly ModelService $modelService,
+        private readonly ModelWrapper $modelService,
         private readonly SelectService $selectService,
         private readonly ReflectionManager $reflectionManager,
     ) {
@@ -36,7 +36,7 @@ class RepositoryService
         return $this->tableManager;
     }
 
-    public function getModelService(): ModelService
+    public function getModelService(): ModelWrapper
     {
         return $this->modelService;
     }

@@ -5,23 +5,32 @@ namespace GibsonOS\Core\Repository;
 
 use DateTimeInterface;
 use DateTimeZone;
-use GibsonOS\Core\Attribute\GetTableName;
+use GibsonOS\Core\Attribute\GetTable;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\Weather;
 use GibsonOS\Core\Model\Weather\Location;
 use GibsonOS\Core\Service\DateTimeService;
+use GibsonOS\Core\Wrapper\RepositoryWrapper;
+use MDO\Dto\Query\Where;
+use MDO\Dto\Table;
+use MDO\Enum\OrderDirection;
+use MDO\Exception\ClientException;
+use MDO\Query\DeleteQuery;
 
 class WeatherRepository extends AbstractRepository
 {
     public function __construct(
-        private DateTimeService $dateTimeService,
-        #[GetTableName(Weather::class)]
-        private string $weatherTableName,
+        RepositoryWrapper $repositoryWrapper,
+        private readonly DateTimeService $dateTimeService,
+        #[GetTable(Weather::class)]
+        private readonly Table $weatherTable,
     ) {
+        parent::__construct($repositoryWrapper);
     }
 
     /**
      * @throws SelectError
+     * @throws ClientException
      */
     public function getByDate(Location $location, DateTimeInterface $date): Weather
     {
@@ -34,6 +43,7 @@ class WeatherRepository extends AbstractRepository
 
     /**
      * @throws SelectError
+     * @throws ClientException
      */
     public function getByNearestDate(Location $location, DateTimeInterface $dateTime = null): Weather
     {
@@ -45,20 +55,24 @@ class WeatherRepository extends AbstractRepository
             '`location_id`=? AND `date`<=?',
             [$location->getId(), $dateTime->format('Y-m-d H:i:s')],
             Weather::class,
-            '`date` DESC',
+            ['`date`' => OrderDirection::DESC],
         );
     }
 
     public function deleteBetweenDates(Location $location, DateTimeInterface $from, DateTimeInterface $to): bool
     {
-        return $this->getTable($this->weatherTableName)
-            ->setWhere('`location_id`=? AND `date` > ? AND `date` < ?')
-            ->setWhereParameters([
-                $location->getId(),
-                $from->format('Y-m-d H:i:s'),
-                $to->format('Y-m-d H:i:s'),
-            ])
-            ->deletePrepared()
+        $deleteQuery = (new DeleteQuery($this->weatherTable))
+            ->addWhere(new Where('`location_id`=?', [$location->getId()]))
+            ->addWhere(new Where('`date`>?', [$from->format('Y-m-d H:i:s')]))
+            ->addWhere(new Where('`date`<?', [$to->format('Y-m-d H:i:s')]))
         ;
+
+        try {
+            $this->getRepositoryWrapper()->getClient()->execute($deleteQuery);
+        } catch (ClientException) {
+            return false;
+        }
+
+        return true;
     }
 }

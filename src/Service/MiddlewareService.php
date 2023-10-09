@@ -18,6 +18,7 @@ use GibsonOS\Core\Manager\ModelManager;
 use GibsonOS\Core\Model\Setting;
 use GibsonOS\Core\Repository\ModuleRepository;
 use GibsonOS\Core\Repository\SettingRepository;
+use GibsonOS\Core\Wrapper\ModelWrapper;
 use InvalidArgumentException;
 use JsonException;
 
@@ -38,6 +39,7 @@ class MiddlewareService
         private readonly WebService $webService,
         private readonly ModelManager $modelManager,
         private readonly SettingRepository $settingRepository,
+        private readonly ModelWrapper $modelWrapper,
         ModuleRepository $moduleRepository,
         #[GetSetting('middlewareToken', 'core')]
         Setting $middlewareToken = null,
@@ -46,12 +48,12 @@ class MiddlewareService
     ) {
         $module = $moduleRepository->getByName('core');
         $this->middlewareToken = $middlewareToken
-            ?? (new Setting())
+            ?? (new Setting($this->modelWrapper))
                 ->setModule($module)
                 ->setKey('middlewareToken')
         ;
         $this->middlewareSecret = $middlewareSecret
-            ?? (new Setting())
+            ?? (new Setting($this->modelWrapper))
                 ->setModule($module)
                 ->setKey('middlewareSecret')
         ;

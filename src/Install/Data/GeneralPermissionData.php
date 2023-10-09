@@ -47,7 +47,7 @@ class GeneralPermissionData extends AbstractInstall implements PriorityInterface
             $this->permissionRepository->getByModuleTaskAndAction($coreModule, $userTask, $loginAction);
         } catch (SelectError) {
             $this->modelManager->save(
-                (new Permission())
+                (new Permission($this->modelWrapper))
                     ->setModule($coreModule)
                     ->setTask($userTask)
                     ->setAction($loginAction)
@@ -59,7 +59,7 @@ class GeneralPermissionData extends AbstractInstall implements PriorityInterface
             $this->permissionRepository->getByModuleAndTask($coreModule, $middlewareTask);
         } catch (SelectError) {
             $this->modelManager->save(
-                (new Permission())
+                (new Permission($this->modelWrapper))
                     ->setModule($coreModule)
                     ->setTask($middlewareTask)
                     ->setPermission(PermissionEnum::READ->value + PermissionEnum::WRITE->value),

@@ -1,13 +1,13 @@
 <?php
 declare(strict_types=1);
 
-namespace GibsonOS\Core\Service;
+namespace GibsonOS\Core\Wrapper;
 
 use GibsonOS\Core\Manager\ModelManager;
 use MDO\Client;
 use MDO\Manager\TableManager;
 
-class ModelService
+class ModelWrapper
 {
     public function __construct(
         private readonly Client $client,

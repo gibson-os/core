@@ -7,18 +7,25 @@ use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\Weather\Location;
 use GibsonOS\Core\Repository\AbstractRepository;
 use GibsonOS\Core\Service\DateTimeService;
+use GibsonOS\Core\Wrapper\RepositoryWrapper;
+use JsonException;
+use MDO\Exception\ClientException;
 use Psr\Log\LoggerInterface;
+use ReflectionException;
 
 class LocationRepository extends AbstractRepository
 {
     public function __construct(
-        private DateTimeService $dateTimeService,
-        private LoggerInterface $logger,
+        RepositoryWrapper $repositoryWrapper,
+        private readonly DateTimeService $dateTimeService,
+        private readonly LoggerInterface $logger,
     ) {
+        parent::__construct($repositoryWrapper);
     }
 
     /**
      * @throws SelectError
+     * @throws ClientException
      */
     public function getById(int $id): Location
     {
@@ -26,7 +33,9 @@ class LocationRepository extends AbstractRepository
     }
 
     /**
-     * @throws SelectError
+     * @throws ClientException
+     * @throws JsonException
+     * @throws ReflectionException
      */
     public function findByName(string $name, bool $onlyActive): array
     {
@@ -44,7 +53,9 @@ class LocationRepository extends AbstractRepository
     }
 
     /**
-     * @throws SelectError
+     * @throws ClientException
+     * @throws JsonException
+     * @throws ReflectionException
      *
      * @return Location[]
      */

@@ -13,6 +13,7 @@ use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Manager\ModelManager;
 use GibsonOS\Core\Model\Lock;
 use GibsonOS\Core\Repository\LockRepository;
+use GibsonOS\Core\Wrapper\ModelWrapper;
 use JsonException;
 use ReflectionException;
 
@@ -22,6 +23,7 @@ class LockService
         private readonly LockRepository $lockRepository,
         private readonly ProcessService $processService,
         private readonly ModelManager $modelManager,
+        private readonly ModelWrapper $modelWrapper,
     ) {
     }
 
@@ -39,7 +41,7 @@ class LockService
 
         try {
             $this->modelManager->save(
-                (new Lock())
+                (new Lock($this->modelWrapper))
                     ->setName($name)
                     ->setPid(getmypid()),
             );
@@ -65,10 +67,10 @@ class LockService
                     throw new LockException(sprintf('Can not kill process %d!', $lock->getPid()));
                 }
 
-                $lock = (new Lock())->setName($name);
+                $lock = (new Lock($this->modelWrapper))->setName($name);
             }
         } catch (SelectError) {
-            $lock = (new Lock())->setName($name);
+            $lock = (new Lock($this->modelWrapper))->setName($name);
         }
 
         try {

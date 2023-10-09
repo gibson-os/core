@@ -9,7 +9,7 @@ use GibsonOS\Core\Attribute\Install\Database\Column;
 use GibsonOS\Core\Attribute\Install\Database\Constraint;
 use GibsonOS\Core\Attribute\Install\Database\Table;
 use GibsonOS\Core\Model\User\Device;
-use mysqlDatabase;
+use GibsonOS\Core\Wrapper\ModelWrapper;
 
 /**
  * @method Device     getDevice()
@@ -54,9 +54,9 @@ class DevicePush extends AbstractModel
     #[Constraint(parentColumn: 'name', ownColumn: 'action')]
     protected Action $actionModel;
 
-    public function __construct(mysqlDatabase $database = null)
+    public function __construct(ModelWrapper $modelWrapper)
     {
-        parent::__construct($database);
+        parent::__construct($modelWrapper);
 
         $this->modified = new DateTimeImmutable();
     }

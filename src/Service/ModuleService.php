@@ -18,6 +18,7 @@ use GibsonOS\Core\Repository\Action\PermissionRepository;
 use GibsonOS\Core\Repository\ActionRepository;
 use GibsonOS\Core\Repository\ModuleRepository;
 use GibsonOS\Core\Repository\TaskRepository;
+use GibsonOS\Core\Wrapper\ModelWrapper;
 use JsonException;
 use Psr\Log\LoggerInterface;
 use ReflectionAttribute;
@@ -38,6 +39,7 @@ class ModuleService
         private readonly ReflectionManager $reflectionManager,
         private readonly ModelManager $modelManager,
         private readonly LoggerInterface $logger,
+        private readonly ModelWrapper $modelWrapper,
     ) {
         $this->vendorPath = realpath(
             dirname(__FILE__) . DIRECTORY_SEPARATOR .
@@ -92,7 +94,7 @@ class ModuleService
             try {
                 $module = $this->moduleRepository->getByName($moduleName);
             } catch (SelectError) {
-                $module = (new Module())->setName($moduleName);
+                $module = (new Module($this->modelWrapper))->setName($moduleName);
                 $this->modelManager->saveWithoutChildren($module);
             }
 
@@ -211,7 +213,7 @@ class ModuleService
                 $action = $this->actionRepository->getByNameAndTaskId($name, $method, $task->getId() ?? 0);
             } catch (SelectError) {
                 $this->logger->info(sprintf('New action %s', $methodName));
-                $action = (new Action())
+                $action = (new Action($this->modelWrapper))
                     ->setName($name)
                     ->setMethod($method)
                     ->setModule($module)
@@ -226,14 +228,14 @@ class ModuleService
 
             foreach ($this->reflectionManager->getAttributes($reflectionMethod, CheckPermission::class, ReflectionAttribute::IS_INSTANCEOF) as $checkPermission) {
                 $this->modelManager->saveWithoutChildren(
-                    (new Action\Permission())
+                    (new Action\Permission($this->modelWrapper))
                         ->setAction($action)
                         ->setPermission($this->getPermissionSum($checkPermission->getPermissions())),
                 );
 
                 foreach ($checkPermission->getPermissionsByRequestValues() as $permissions) {
                     $this->modelManager->saveWithoutChildren(
-                        (new Action\Permission())
+                        (new Action\Permission($this->modelWrapper))
                             ->setAction($action)
                             ->setPermission($this->getPermissionSum($permissions)),
                     );

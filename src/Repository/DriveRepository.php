@@ -3,36 +3,37 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Repository;
 
-use Generator;
 use GibsonOS\Core\Attribute\GetTable;
 use GibsonOS\Core\Attribute\GetTableName;
-use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\Drive;
-use GibsonOS\Core\Service\RepositoryService;
+use GibsonOS\Core\Wrapper\RepositoryWrapper;
+use JsonException;
 use MDO\Dto\Query\Join;
 use MDO\Dto\Query\Where;
 use MDO\Dto\Table;
 use MDO\Exception\ClientException;
+use ReflectionException;
 
 class DriveRepository extends AbstractRepository
 {
     public function __construct(
-        RepositoryService $repositoryService,
+        RepositoryWrapper $repositoryWrapper,
         #[GetTableName(Drive::class)]
         private readonly string $driveTableName,
         #[GetTable(Drive\Stat::class)]
         private readonly Table $driveStatTable,
     ) {
-        parent::__construct($repositoryService);
+        parent::__construct($repositoryWrapper);
     }
 
     /**
      * @throws ClientException
-     * @throws SelectError
+     * @throws JsonException
+     * @throws ReflectionException
      *
-     * @return Generator<Drive>
+     * @return Drive[]
      */
-    public function getDrivesWithAttributes(int $secondsWithAttributes = 900): Generator
+    public function getDrivesWithAttributes(int $secondsWithAttributes = 900): array
     {
         $selectQuery = $this->getSelectQuery($this->driveTableName)
             ->addJoin(new Join($this->driveStatTable, 'ds', '`d`.`id`=`ds`.`drive_id`'))
@@ -42,6 +43,6 @@ class DriveRepository extends AbstractRepository
             ))
         ;
 
-        yield from $this->getModels($selectQuery, Drive::class);
+        return $this->getModels($selectQuery, Drive::class);
     }
 }

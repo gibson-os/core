@@ -11,7 +11,7 @@ use GibsonOS\Core\Attribute\Install\Database\Key;
 use GibsonOS\Core\Attribute\Install\Database\Table;
 use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Model\User;
-use mysqlDatabase;
+use GibsonOS\Core\Wrapper\ModelWrapper;
 
 /**
  * @method User   getUser()
@@ -48,9 +48,9 @@ class Device extends AbstractModel
     #[Constraint]
     protected User $user;
 
-    public function __construct(mysqlDatabase $database = null)
+    public function __construct(ModelWrapper $modelWrapper)
     {
-        parent::__construct($database);
+        parent::__construct($modelWrapper);
 
         $this->added = new DateTimeImmutable();
     }

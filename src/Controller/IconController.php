@@ -20,6 +20,7 @@ use GibsonOS\Core\Service\ImageService;
 use GibsonOS\Core\Service\Response\AjaxResponse;
 use GibsonOS\Core\Store\Icon\TagStore;
 use GibsonOS\Core\Store\IconStore;
+use GibsonOS\Core\Wrapper\ModelWrapper;
 use JsonException;
 use ReflectionException;
 use Throwable;
@@ -62,6 +63,7 @@ class IconController extends AbstractController
         IconService $iconService,
         IconStore $iconStore,
         TagStore $tagStore,
+        ModelWrapper $modelWrapper,
         string $name,
         string $tags,
         array $icon,
@@ -69,7 +71,7 @@ class IconController extends AbstractController
         #[GetModel]
         Icon $iconModel = null,
     ): AjaxResponse {
-        $iconModel ??= (new Icon())
+        $iconModel ??= (new Icon($modelWrapper))
             ->setName($name)
             ->setOriginalType($imageService->getImageTypeByMimeType($icon['type']))
         ;

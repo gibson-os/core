@@ -7,16 +7,19 @@ use DateTimeZone;
 use GibsonOS\Core\Model\Weather;
 use GibsonOS\Core\Model\Weather\Location;
 use GibsonOS\Core\Service\DateTimeService;
+use GibsonOS\Core\Wrapper\ModelWrapper;
 
 class WeatherMapper
 {
-    public function __construct(private DateTimeService $dateTimeService)
-    {
+    public function __construct(
+        private readonly DateTimeService $dateTimeService,
+        private readonly ModelWrapper $modelWrapper,
+    ) {
     }
 
     public function mapFromArray(array $data, Location $location): Weather
     {
-        return (new Weather())
+        return (new Weather($this->modelWrapper))
             ->setLocation($location)
             ->setDate($this->dateTimeService->get(
                 '@' . $data['dt'],

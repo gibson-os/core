@@ -3,18 +3,36 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Repository;
 
+use GibsonOS\Core\Attribute\GetTable;
 use GibsonOS\Core\Attribute\GetTableName;
 use GibsonOS\Core\Exception\Repository\SelectError;
+use GibsonOS\Core\Model\Module;
 use GibsonOS\Core\Model\Setting;
+use GibsonOS\Core\Wrapper\RepositoryWrapper;
+use JsonException;
+use MDO\Dto\Query\Join;
+use MDO\Dto\Query\Where;
+use MDO\Dto\Table;
+use MDO\Enum\OrderDirection;
+use MDO\Exception\ClientException;
+use ReflectionException;
 
 class SettingRepository extends AbstractRepository
 {
-    public function __construct(#[GetTableName(Setting::class)] private string $settingTableName)
-    {
+    public function __construct(
+        RepositoryWrapper $repositoryWrapper,
+        #[GetTableName(Setting::class)]
+        private readonly string $settingTableName,
+        #[GetTable(Module::class)]
+        private readonly Table $moduleTable,
+    ) {
+        parent::__construct($repositoryWrapper);
     }
 
     /**
-     * @throws SelectError
+     * @throws ClientException
+     * @throws JsonException
+     * @throws ReflectionException
      *
      * @return Setting[]
      */
@@ -34,32 +52,32 @@ class SettingRepository extends AbstractRepository
     }
 
     /**
-     * @throws SelectError
+     * @throws ClientException
+     * @throws JsonException
+     * @throws ReflectionException
      *
      * @return Setting[]
      */
     public function getAllByModuleName(string $moduleName, ?int $userId): array
     {
-        $parameters = [$moduleName];
+        $selectQuery = $this->getSelectQuery($this->settingTableName, 's')
+            ->addJoin(new Join($this->moduleTable, 'm', '`s`.`module_id`=`m`.`id`'))
+            ->addWhere(new Where('`m`.`name`=?', [$moduleName]))
+        ;
+        $where = new Where('`s`.`user_id` IS NULL', []);
 
         if ($userId !== null) {
-            $parameters[] = $userId;
+            $where = new Where('`s`.`user_id` IS NULL OR `s`.`user_id`=?', [$userId]);
         }
 
-        $table = $this->getTable($this->settingTableName)
-            ->appendJoin('module', '`' . $this->settingTableName . '`.`module_id`=`module`.`id`')
-            ->setWhere(
-                '`module`.`name`=? AND ' .
-                '(`user_id` IS NULL' . ($userId === null ? '' : ' OR `user_id`=?') . ')',
-            )
-            ->setWhereParameters($parameters)
-        ;
+        $selectQuery->addWhere($where);
 
-        return $this->getModels($table, Setting::class);
+        return $this->getModels($selectQuery, Setting::class);
     }
 
     /**
      * @throws SelectError
+     * @throws ClientException
      */
     public function getByKey(int $moduleId, ?int $userId, string $key): Setting
     {
@@ -82,6 +100,7 @@ class SettingRepository extends AbstractRepository
 
     /**
      * @throws SelectError
+     * @throws ClientException
      */
     public function getByKeyAndValue(int $moduleId, string $key, string $value): Setting
     {
@@ -94,32 +113,25 @@ class SettingRepository extends AbstractRepository
 
     /**
      * @throws SelectError
+     * @throws ClientException
      */
     public function getByKeyValueAndModuleName(string $moduleName, string $key, string $value): Setting
     {
-        $tableName = $this->settingTableName;
-        $table = $this->getTable($tableName)
-            ->appendJoin('module', '`' . $tableName . '`.`module_id`=`module`.`id`')
-            ->setWhere('`module`.`name`=? AND `' . $tableName . '`.`key`=? AND `' . $tableName . '`.`value`=?')
-            ->setWhereParameters([$moduleName, $key, $value])
+        $selectQuery = $this->getSelectQuery($this->settingTableName, 's')
+            ->addJoin(new Join($this->moduleTable, 'm', '`s`.`module_id`=`m`.`id`'))
+            ->addWhere(new Where('`m`.`name`=?', [$moduleName]))
+            ->addWhere(new Where('`m`.`key`=?', [$key]))
+            ->addWhere(new Where('`m`.`value`=?', [$value]))
             ->setLimit(1)
         ;
 
-        if (!$table->selectPrepared()) {
-            $exception = new SelectError(sprintf(
-                'Einstellung mit dem Key "%s" konnte nicht geladen werden!',
-                $key,
-            ));
-            $exception->setTable($table);
-
-            throw $exception;
-        }
-
-        return $this->getModel($table, Setting::class);
+        return $this->getModel($selectQuery, Setting::class);
     }
 
     /**
-     * @throws SelectError
+     * @throws ClientException
+     * @throws JsonException
+     * @throws ReflectionException
      *
      * @return Setting[]
      */
@@ -133,58 +145,43 @@ class SettingRepository extends AbstractRepository
     }
 
     /**
-     * @throws SelectError
+     * @throws ClientException
+     * @throws JsonException
+     * @throws ReflectionException
      *
      * @return Setting[]
      */
     public function getAllByKeyAndModuleName(string $moduleName, string $key): array
     {
-        $tableName = $this->settingTableName;
-        $table = $this->getTable($tableName)
-            ->appendJoin('module', '`' . $tableName . '`.`module_id`=`module`.`id`')
-            ->setWhere('`module`.`name`=? AND `' . $tableName . '`.`key`=?')
-            ->setWhereParameters([$moduleName, $key])
+        $selectQuery = $this->getSelectQuery($this->settingTableName, 's')
+            ->addJoin(new Join($this->moduleTable, 'm', '`s`.`module_id`= `m`.`id`'))
+            ->addWhere(new Where('`m`.`name`=?', [$moduleName]))
+            ->addWhere(new Where('`s`.`key`=?', [$key]))
         ;
 
-        return $this->getModels($table, Setting::class);
+        return $this->getModels($selectQuery, Setting::class);
     }
 
     /**
      * @throws SelectError
+     * @throws ClientException
      */
     public function getByKeyAndModuleName(string $moduleName, ?int $userId, string $key): Setting
     {
-        $parameters = [$moduleName];
-
-        if ($userId !== null) {
-            $parameters[] = $userId;
-        }
-
-        $parameters[] = $key;
-
-        $tableName = $this->settingTableName;
-        $table = $this->getTable($tableName)
-            ->appendJoin('module', '`' . $tableName . '`.`module_id`=`module`.`id`')
-            ->setWhere(
-                '`module`.`name`=? AND ' .
-                '(`' . $tableName . '`.`user_id` IS NULL' . ($userId === null ? '' : ' OR `' . $tableName . '`.`user_id`=?') . ') AND . ' .
-                '`' . $tableName . '`.`key`=?',
-            )
-            ->setWhereParameters($parameters)
-            ->setOrderBy('`user_id` DESC')
+        $selectQuery = $this->getSelectQuery($this->settingTableName, 's')
+            ->addJoin(new Join($this->moduleTable, 'm', '`s`.`module_id`=`m`.`id`'))
+            ->addWhere(new Where('`m`.`name`=?', [$moduleName]))
+            ->setOrder('`user_id`', OrderDirection::DESC)
             ->setLimit(1)
         ;
+        $where = new Where('`s`.`user_id` IS NULL', []);
 
-        if (!$table->selectPrepared()) {
-            $exception = new SelectError(sprintf(
-                'Einstellung mit dem Key "%s" konnte nicht geladen werden!',
-                $key,
-            ));
-            $exception->setTable($table);
-
-            throw $exception;
+        if ($userId !== null) {
+            $where = new Where('`s`.`user_id` IS NULL OR `s`.`user_id`=?', [$userId]);
         }
 
-        return $this->getModel($table, Setting::class);
+        $selectQuery->addWhere($where);
+
+        return $this->getModel($selectQuery, Setting::class);
     }
 }
