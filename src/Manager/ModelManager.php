@@ -14,6 +14,7 @@ use GibsonOS\Core\Model\ModelInterface;
 use GibsonOS\Core\Service\Attribute\TableNameAttribute;
 use GibsonOS\Core\Service\DateTimeService;
 use GibsonOS\Core\Utility\JsonUtility;
+use GibsonOS\Core\Wrapper\ModelWrapper;
 use JsonException;
 use MDO\Client;
 use MDO\Dto\Query\Where;
@@ -26,7 +27,6 @@ use MDO\Query\DeleteQuery;
 use MDO\Query\ReplaceQuery;
 use MDO\Service\DeleteService;
 use MDO\Service\ReplaceService;
-use mysqlDatabase;
 use ReflectionAttribute;
 use ReflectionException;
 use Throwable;
@@ -41,25 +41,6 @@ class ModelManager
 
     private const TYPE_DATE_TIME = 'dateTime';
 
-    public const COLUMN_TYPES = [
-        Type::TINYINT->value => self::TYPE_INT,
-        Type::SMALLINT->value => self::TYPE_INT,
-        Type::INT->value => self::TYPE_INT,
-        Type::BIGINT->value => self::TYPE_INT,
-        Type::TIME->value => self::TYPE_DATE_TIME,
-        Type::DATE->value => self::TYPE_DATE_TIME,
-        Type::DATETIME->value => self::TYPE_DATE_TIME,
-        Type::TIMESTAMP->value => self::TYPE_DATE_TIME,
-        Type::VARCHAR->value => self::TYPE_STRING,
-        Type::ENUM->value => self::TYPE_STRING,
-        Type::TEXT->value => self::TYPE_STRING,
-        Type::LONGTEXT->value => self::TYPE_STRING,
-        Type::BINARY->value => self::TYPE_STRING,
-        Type::VARBINARY->value => self::TYPE_STRING,
-        Type::FLOAT->value => self::TYPE_FLOAT,
-        Type::DECIMAL->value => self::TYPE_FLOAT,
-    ];
-
     private const POSSIBLE_PREFIXES = ['get', 'is', 'has', 'should'];
 
     /**
@@ -67,8 +48,39 @@ class ModelManager
      */
     private array $primaryColumns = [];
 
+    public const COLUMN_TYPES = [
+        Type::BIT->value => self::TYPE_INT,
+        Type::TINYINT->value => self::TYPE_INT,
+        Type::SMALLINT->value => self::TYPE_INT,
+        Type::MEDIUMINT->value => self::TYPE_INT,
+        Type::INT->value => self::TYPE_INT,
+        Type::BIGINT->value => self::TYPE_INT,
+        Type::YEAR->value => self::TYPE_DATE_TIME,
+        Type::TIME->value => self::TYPE_DATE_TIME,
+        Type::DATE->value => self::TYPE_DATE_TIME,
+        Type::DATETIME->value => self::TYPE_DATE_TIME,
+        Type::TIMESTAMP->value => self::TYPE_DATE_TIME,
+        Type::CHAR->value => self::TYPE_STRING,
+        Type::VARCHAR->value => self::TYPE_STRING,
+        Type::ENUM->value => self::TYPE_STRING,
+        Type::SET->value => self::TYPE_STRING,
+        Type::TINYTEXT->value => self::TYPE_STRING,
+        Type::TEXT->value => self::TYPE_STRING,
+        Type::MEDIUMTEXT->value => self::TYPE_STRING,
+        Type::LONGTEXT->value => self::TYPE_STRING,
+        Type::BINARY->value => self::TYPE_STRING,
+        Type::VARBINARY->value => self::TYPE_STRING,
+        Type::JSON->value => self::TYPE_STRING,
+        Type::TINYBLOB->value => self::TYPE_STRING,
+        Type::BLOB->value => self::TYPE_STRING,
+        Type::MEDIUMBLOB->value => self::TYPE_STRING,
+        Type::LONGBLOB->value => self::TYPE_STRING,
+        Type::FLOAT->value => self::TYPE_FLOAT,
+        Type::DOUBLE->value => self::TYPE_FLOAT,
+        Type::DECIMAL->value => self::TYPE_FLOAT,
+    ];
+
     public function __construct(
-        private readonly mysqlDatabase $mysqlDatabase,
         private readonly DateTimeService $dateTimeService,
         private readonly JsonUtility $jsonUtility,
         private readonly ReflectionManager $reflectionManager,
@@ -77,6 +89,7 @@ class ModelManager
         private readonly ReplaceService $replaceService,
         private readonly DeleteService $deleteService,
         private readonly Client $client,
+        private readonly ModelWrapper $modelWrapper,
     ) {
     }
 
@@ -321,7 +334,7 @@ class ModelManager
             );
         }
 
-        $childrenModel = new $parentModelClassName($this->mysqlDatabase);
+        $childrenModel = new $parentModelClassName($this->modelWrapper);
         $tableName = $childrenModel->getTableName();
         $where = $constraintAttribute->getWhere();
         $parameters = $constraintAttribute->getWhereParameters();

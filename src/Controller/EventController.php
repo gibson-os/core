@@ -31,7 +31,7 @@ use GibsonOS\Core\Store\Event\MethodStore;
 use GibsonOS\Core\Store\Event\TriggerStore;
 use GibsonOS\Core\Store\EventStore;
 use JsonException;
-use mysqlDatabase;
+use MDO\Client;
 use ReflectionException;
 
 class EventController extends AbstractController
@@ -163,12 +163,12 @@ class EventController extends AbstractController
      */
     #[CheckPermission([Permission::WRITE])]
     public function postCopy(
-        mysqlDatabase $database,
+        Client $client,
         ModelManager $modelManager,
         #[GetModels(Event::class)]
         array $events,
     ): AjaxResponse {
-        $database->startTransaction();
+        $client->startTransaction();
 
         try {
             foreach ($events as $event) {
@@ -198,12 +198,12 @@ class EventController extends AbstractController
                 $modelManager->save($event);
             }
         } catch (Exception $exception) {
-            $database->rollback();
+            $client->rollback();
 
             throw $exception;
         }
 
-        $database->commit();
+        $client->commit();
 
         return $this->returnSuccess($events[0]->getElements());
     }

@@ -55,6 +55,6 @@ class UserRepository extends AbstractRepository
      */
     public function getCount(): int
     {
-        return (int) $this->getAggregations(['count' => 'COUNT(`id`)'], User::class)->get('count')->getValue();
+        return (int) $this->getAggregations(['count' => 'COUNT(`id`)'], User::class)->get('count')?->getValue() ?? 0;
     }
 }

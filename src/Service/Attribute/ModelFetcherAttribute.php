@@ -16,19 +16,22 @@ use GibsonOS\Core\Service\RequestService;
 use GibsonOS\Core\Service\SessionService;
 use InvalidArgumentException;
 use JsonException;
-use mysqlDatabase;
-use mysqlTable;
+use MDO\Client;
+use MDO\Dto\Query\Where;
+use MDO\Manager\TableManager;
+use MDO\Query\SelectQuery;
 use ReflectionException;
 use ReflectionParameter;
 
 class ModelFetcherAttribute implements AttributeServiceInterface, ParameterAttributeInterface
 {
     public function __construct(
-        private readonly mysqlDatabase $mysqlDatabase,
+        private readonly TableManager $tableManager,
         private readonly ModelManager $modelManager,
         private readonly RequestService $requestService,
         private readonly ReflectionManager $reflectionManager,
         private readonly SessionService $sessionService,
+        private readonly Client $client,
     ) {
     }
 
@@ -68,27 +71,22 @@ class ModelFetcherAttribute implements AttributeServiceInterface, ParameterAttri
             return null;
         }
 
-        $table = (new mysqlTable($this->mysqlDatabase, $model->getTableName()))
-            ->setWhereParameters($whereParameters)
-            ->setWhere(implode(' AND ', array_map(
-                fn (string $field): string => '`' . $field . '`=?',
-                array_keys($attribute->getConditions()),
-            )))
+        $table = $this->tableManager->getTable($model->getTableName());
+        $selectQuery = (new SelectQuery($table))
+            ->addWhere(new Where(
+                implode(' AND ', array_map(
+                    fn (string $field): string => '`' . $field . '`=?',
+                    array_keys($attribute->getConditions()),
+                )),
+                $whereParameters,
+            ))
             ->setLimit(1)
         ;
 
-        $select = $table->selectPrepared();
+        $result = $this->client->execute($selectQuery);
+        $record = $result?->iterateRecords()->current();
 
-        if ($select === false) {
-            throw (new SelectError(sprintf(
-                'Model query of type "%s" for parameter "%s" has errors! Error: %s',
-                $modelClassName,
-                $reflectionParameter->getName(),
-                $table->connection->error(),
-            )))->setTable($table);
-        }
-
-        if ($select === 0) {
+        if ($record === null) {
             if ($reflectionParameter->allowsNull()) {
                 return null;
             }
@@ -100,7 +98,7 @@ class ModelFetcherAttribute implements AttributeServiceInterface, ParameterAttri
             )))->setTable($table);
         }
 
-        $this->modelManager->loadFromMysqlTable($table, $model);
+        $this->modelManager->loadFromRecord($record, $model);
 
         return $model;
     }

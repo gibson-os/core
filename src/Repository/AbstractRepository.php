@@ -119,10 +119,18 @@ abstract class AbstractRepository
             } catch (ReflectionException) {
                 $childModelClassName = $reflectionManager
                     ->getAttribute($propertyReflection, Constraint::class)
-                    ->getParentModelClassName()
+                    ?->getParentModelClassName()
                 ;
                 $isArray = true;
                 $setter = sprintf('add%s', $uppercasePropertyName);
+            }
+
+            if ($childModelClassName === null) {
+                throw new ReflectionException(sprintf(
+                    'No child class name found for property "%s::%s"',
+                    $model::class,
+                    $propertyName,
+                ));
             }
 
             // @todo gucken ob das child model schon existiert
@@ -139,16 +147,17 @@ abstract class AbstractRepository
 
             $this->repositoryWrapper->getModelManager()->loadFromRecord($record, $childModel, $child->getPrefix());
 
-            if ($isArray) {
-                $childModel = [$childModel];
-            }
-
             $this->getChildModels(
                 $record,
                 $childModel,
                 $reflectionManager->getReflectionClass($childModelClassName),
                 $child->getChildren(),
             );
+
+            if ($isArray) {
+                $childModel = [$childModel];
+            }
+
             $model->$setter($childModel);
         }
     }
@@ -163,7 +172,7 @@ abstract class AbstractRepository
      * @throws ReflectionException
      * @throws SelectError
      *
-     * @return AbstractModel<T>
+     * @return T
      */
     protected function getModel(SelectQuery $selectQuery, string $modelClassName, array $children = []): AbstractModel
     {
@@ -197,9 +206,11 @@ abstract class AbstractRepository
      * @param array<string, OrderDirection> $orderBy
      *
      * @throws ClientException
+     * @throws JsonException
+     * @throws ReflectionException
      * @throws SelectError
      *
-     * @return AbstractModel<T>
+     * @return T
      */
     protected function fetchOne(
         string $where,
@@ -207,7 +218,7 @@ abstract class AbstractRepository
         string $modelClassName,
         array $orderBy = [],
         array $children = [],
-    ): ModelInterface {
+    ): AbstractModel {
         $model = new $modelClassName($this->repositoryWrapper->getModelService());
         $selectQuery = $this->getSelectQuery($model->getTableName())
             ->addWhere(new Where($where, $parameters))
@@ -234,8 +245,8 @@ abstract class AbstractRepository
         string $where,
         array $parameters,
         string $modelClassName,
-        int $limit = null,
-        int $offset = null,
+        int $limit = 0,
+        int $offset = 0,
         array $orderBy = [],
     ): array {
         /** @var ModelInterface $model */

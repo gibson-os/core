@@ -48,7 +48,7 @@ class PermissionViewRepository extends AbstractRepository
 
         $result = $this->getRepositoryWrapper()->getClient()->execute($selectQuery);
 
-        return $result->iterateRecords();
+        return $result?->iterateRecords() ?? [];
     }
 
     /**

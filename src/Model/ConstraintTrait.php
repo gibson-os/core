@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Model;
 
 use GibsonOS\Core\Attribute\Install\Database\Constraint;
+use GibsonOS\Core\Exception\Repository\SelectError;
 use InvalidArgumentException;
 use JsonException;
 use MDO\Dto\Query\Where;
@@ -374,6 +375,11 @@ trait ConstraintTrait
         ;
 
         $result = $modelWrapper->getClient()->execute($selectQuery);
+
+        if ($result === null) {
+            throw (new SelectError('No result!'))->setTable($table);
+        }
+
         $modelWrapper->getModelManager()->loadFromRecord($result->iterateRecords()->current(), $model);
 
         return $model;
@@ -416,7 +422,7 @@ trait ConstraintTrait
 
         $result = $modelWrapper->getClient()->execute($selectQuery);
 
-        foreach ($result->iterateRecords() as $record) {
+        foreach ($result?->iterateRecords() ?? [] as $record) {
             $model = new $modelClassName($modelWrapper);
             $modelWrapper->getModelManager()->loadFromRecord($record, $model);
             $models[] = $model;
