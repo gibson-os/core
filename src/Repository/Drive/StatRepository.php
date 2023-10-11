@@ -26,8 +26,8 @@ class StatRepository extends AbstractRepository
     public function getTimeRange(): array
     {
         $aggregations = $this->getAggregations(['min' => 'MIN(`added`)', 'max' => 'MAX(`added`)'], Stat::class);
-        $min = $aggregations->get('min')?->getValue();
-        $max = $aggregations->get('max')?->getValue();
+        $min = $aggregations->get('min')->getValue();
+        $max = $aggregations->get('max')->getValue();
 
         return [
             'min' => $min === null ? 0 : $this->dateTimeService->get((string) $min)->getTimestamp(),

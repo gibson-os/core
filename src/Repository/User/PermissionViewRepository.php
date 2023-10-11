@@ -11,10 +11,12 @@ use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\User\PermissionView;
 use GibsonOS\Core\Repository\AbstractRepository;
 use GibsonOS\Core\Wrapper\RepositoryWrapper;
+use JsonException;
 use MDO\Dto\Query\Where;
 use MDO\Dto\Record;
 use MDO\Enum\OrderDirection;
 use MDO\Exception\ClientException;
+use ReflectionException;
 
 class PermissionViewRepository extends AbstractRepository
 {
@@ -28,7 +30,6 @@ class PermissionViewRepository extends AbstractRepository
 
     /**
      * @throws ClientException
-     * @throws SelectError
      *
      * @return Generator<Record>
      */
@@ -48,12 +49,14 @@ class PermissionViewRepository extends AbstractRepository
 
         $result = $this->getRepositoryWrapper()->getClient()->execute($selectQuery);
 
-        return $result?->iterateRecords() ?? [];
+        return $result?->iterateRecords() ?? new Generator();
     }
 
     /**
-     * @throws SelectError
      * @throws ClientException
+     * @throws SelectError
+     * @throws JsonException
+     * @throws ReflectionException
      */
     public function getPermissionByModule(string $module, int $userId = null): PermissionView
     {

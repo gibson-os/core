@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Service;
 
 use GibsonOS\Core\Model\User;
+use GibsonOS\Core\Wrapper\ModelWrapper;
 use OutOfBoundsException;
 
 class SessionService
@@ -14,7 +15,7 @@ class SessionService
 
     private array $data;
 
-    public function __construct()
+    public function __construct(private readonly ModelWrapper $modelWrapper)
     {
         session_start();
         /**
@@ -105,7 +106,7 @@ class SessionService
     public function getUserId(): ?int
     {
         /** @var User $user */
-        $user = $this->getWithDefault(self::USER, (new User())->setId(0));
+        $user = $this->getWithDefault(self::USER, (new User($this->modelWrapper))->setId(0));
 
         return $user->getId();
     }

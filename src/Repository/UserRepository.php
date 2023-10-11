@@ -42,8 +42,10 @@ class UserRepository extends AbstractRepository
     }
 
     /**
-     * @throws SelectError
      * @throws ClientException
+     * @throws JsonException
+     * @throws ReflectionException
+     * @throws SelectError
      */
     public function getByUsernameAndPassword(string $username, string $passwordHash): User
     {
@@ -52,9 +54,10 @@ class UserRepository extends AbstractRepository
 
     /**
      * @throws ClientException
+     * @throws SelectError
      */
     public function getCount(): int
     {
-        return (int) $this->getAggregations(['count' => 'COUNT(`id`)'], User::class)->get('count')?->getValue() ?? 0;
+        return (int) $this->getAggregations(['count' => 'COUNT(`id`)'], User::class)->get('count')->getValue();
     }
 }

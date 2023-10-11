@@ -14,6 +14,7 @@ use GibsonOS\Core\Model\User;
 use GibsonOS\Core\Model\User\Device;
 use GibsonOS\Core\Repository\User\DeviceRepository;
 use GibsonOS\Core\Repository\UserRepository;
+use GibsonOS\Core\Wrapper\ModelWrapper;
 use ReflectionException;
 
 class UserService
@@ -26,6 +27,7 @@ class UserService
         private readonly DeviceRepository $deviceRepository,
         private readonly SessionService $sessionService,
         private readonly ModelManager $modelManager,
+        private readonly ModelWrapper $modelWrapper,
     ) {
     }
 
@@ -83,7 +85,7 @@ class UserService
             }
         }
 
-        $device = (new Device())
+        $device = (new Device($this->modelWrapper))
             ->setId($id) // @todo change to int value
             ->setUser($user)
             ->setModel($model)

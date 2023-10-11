@@ -166,7 +166,7 @@ class ModuleService
             try {
                 $task = $this->taskRepository->getByNameAndModuleId($taskName, $module->getId() ?? 0);
             } catch (SelectError) {
-                $task = (new Task())
+                $task = (new Task($this->modelWrapper))
                     ->setName($taskName)
                     ->setModule($module)
                 ;

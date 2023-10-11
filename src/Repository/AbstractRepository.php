@@ -264,6 +264,7 @@ abstract class AbstractRepository
      * @param class-string<ModelInterface> $modelClassName
      *
      * @throws ClientException
+     * @throws SelectError
      */
     protected function getAggregations(
         array $functions,
@@ -278,6 +279,10 @@ abstract class AbstractRepository
             ->setSelects($functions)
         ;
         $result = $this->repositoryWrapper->getClient()->execute($selectQuery);
+
+        if ($result === null) {
+            throw new SelectError();
+        }
 
         return $result->iterateRecords()->current();
     }

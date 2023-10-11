@@ -71,16 +71,16 @@
         },
         {
             "name": "gibson-os/mdo",
-            "version": "v2.6.0",
+            "version": "v2.6.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/gibson-os/mdo.git",
-                "reference": "0081483ca1d2333b2b7b0db4f701c5db993a8d7f"
+                "reference": "9c28a9d3f693374722318caf366d01ac1cd51112"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/gibson-os/mdo/zipball/0081483ca1d2333b2b7b0db4f701c5db993a8d7f",
-                "reference": "0081483ca1d2333b2b7b0db4f701c5db993a8d7f",
+                "url": "https://api.github.com/repos/gibson-os/mdo/zipball/9c28a9d3f693374722318caf366d01ac1cd51112",
+                "reference": "9c28a9d3f693374722318caf366d01ac1cd51112",
                 "shasum": ""
             },
             "require": {
@@ -112,9 +112,9 @@
             "notification-url": "https://packagist.org/downloads/",
             "support": {
                 "issues": "https://github.com/gibson-os/mdo/issues",
-                "source": "https://github.com/gibson-os/mdo/tree/v2.6.0"
+                "source": "https://github.com/gibson-os/mdo/tree/v2.6.1"
             },
-            "time": "2023-10-09T21:13:29+00:00"
+            "time": "2023-10-11T20:06:36+00:00"
         },
         {
             "name": "google/auth",
@@ -2355,16 +2355,16 @@
         },
         {
             "name": "captainhook/captainhook",
-            "version": "5.17.3",
+            "version": "5.18.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/captainhookphp/captainhook.git",
-                "reference": "cac493cfacf14f3a2d16b4ebff9a3bc9adb4c68d"
+                "reference": "7f7b58f7aee0f61c7bef76da20bf47655f9c6ca7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/captainhookphp/captainhook/zipball/cac493cfacf14f3a2d16b4ebff9a3bc9adb4c68d",
-                "reference": "cac493cfacf14f3a2d16b4ebff9a3bc9adb4c68d",
+                "url": "https://api.github.com/repos/captainhookphp/captainhook/zipball/7f7b58f7aee0f61c7bef76da20bf47655f9c6ca7",
+                "reference": "7f7b58f7aee0f61c7bef76da20bf47655f9c6ca7",
                 "shasum": ""
             },
             "require": {
@@ -2426,7 +2426,7 @@
             ],
             "support": {
                 "issues": "https://github.com/captainhookphp/captainhook/issues",
-                "source": "https://github.com/captainhookphp/captainhook/tree/5.17.3"
+                "source": "https://github.com/captainhookphp/captainhook/tree/5.18.0"
             },
             "funding": [
                 {
@@ -2434,7 +2434,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2023-10-04T11:51:41+00:00"
+            "time": "2023-10-10T20:07:18+00:00"
         },
         {
             "name": "captainhook/plugin-composer",
@@ -2761,16 +2761,16 @@
         },
         {
             "name": "composer/pcre",
-            "version": "3.1.0",
+            "version": "3.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/composer/pcre.git",
-                "reference": "4bff79ddd77851fe3cdd11616ed3f92841ba5bd2"
+                "reference": "00104306927c7a0919b4ced2aaa6782c1e61a3c9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/composer/pcre/zipball/4bff79ddd77851fe3cdd11616ed3f92841ba5bd2",
-                "reference": "4bff79ddd77851fe3cdd11616ed3f92841ba5bd2",
+                "url": "https://api.github.com/repos/composer/pcre/zipball/00104306927c7a0919b4ced2aaa6782c1e61a3c9",
+                "reference": "00104306927c7a0919b4ced2aaa6782c1e61a3c9",
                 "shasum": ""
             },
             "require": {
@@ -2812,7 +2812,7 @@
             ],
             "support": {
                 "issues": "https://github.com/composer/pcre/issues",
-                "source": "https://github.com/composer/pcre/tree/3.1.0"
+                "source": "https://github.com/composer/pcre/tree/3.1.1"
             },
             "funding": [
                 {
@@ -2828,7 +2828,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2022-11-17T09:50:14+00:00"
+            "time": "2023-10-11T07:11:09+00:00"
         },
         {
             "name": "composer/semver",

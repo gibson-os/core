@@ -22,6 +22,7 @@ use MDO\Dto\Record;
 use MDO\Dto\Value;
 use MDO\Enum\Type;
 use MDO\Exception\ClientException;
+use MDO\Exception\RecordException;
 use MDO\Manager\TableManager;
 use MDO\Query\DeleteQuery;
 use MDO\Query\ReplaceQuery;
@@ -191,6 +192,7 @@ class ModelManager
      * @throws ReflectionException
      * @throws JsonException
      * @throws ClientException
+     * @throws RecordException
      */
     public function loadFromRecord(Record $record, ModelInterface $model, string $prefix = ''): void
     {
@@ -204,7 +206,7 @@ class ModelManager
                 continue;
             }
 
-            $value = $record->get($prefix . $field->getName())?->getValue();
+            $value = $record->get($prefix . $field->getName())->getValue();
 
             if ($value === null) {
                 $model->$setter($value);

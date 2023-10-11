@@ -40,7 +40,7 @@ class CssService
             $files = array_merge($files, $this->getFiles(
                 $this->vendorPath .
                 'gibson-os' . DIRECTORY_SEPARATOR .
-                $task->module . DIRECTORY_SEPARATOR .
+                $task->get('module')->getValue() . DIRECTORY_SEPARATOR .
                 'assets' . DIRECTORY_SEPARATOR .
                 'css' . DIRECTORY_SEPARATOR,
             ));

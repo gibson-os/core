@@ -7,6 +7,7 @@ use GibsonOS\Core\Dto\Javascript;
 use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Repository\User\PermissionViewRepository;
+use MDO\Exception\ClientException;
 
 class JavascriptService
 {
@@ -39,8 +40,8 @@ class JavascriptService
             $dir =
                 'js' . DIRECTORY_SEPARATOR .
                 'module' . DIRECTORY_SEPARATOR .
-                $task->module . DIRECTORY_SEPARATOR .
-                $task->task . DIRECTORY_SEPARATOR
+                $task->get('module')->getValue() . DIRECTORY_SEPARATOR .
+                $task->get('task')->getValue() . DIRECTORY_SEPARATOR
             ;
             /** @var Javascript[] $files */
             $files = array_merge($files, $this->getFiles($dir));
@@ -49,7 +50,7 @@ class JavascriptService
             $files = array_merge($files, $this->getFiles(
                 $this->vendorPath .
                 'gibson-os' . DIRECTORY_SEPARATOR .
-                $task->module . DIRECTORY_SEPARATOR .
+                $task->get('module')->getValue() . DIRECTORY_SEPARATOR .
                 'assets' . DIRECTORY_SEPARATOR .
                 'js' . DIRECTORY_SEPARATOR,
             ));
@@ -68,6 +69,7 @@ class JavascriptService
     /**
      * @throws GetError
      * @throws SelectError
+     * @throws ClientException
      */
     public function getByUserIdAndTask(?int $userId, string $module, string $task, bool $withDefault = true): string
     {
@@ -75,15 +77,15 @@ class JavascriptService
         $oldData = '';
 
         foreach ($this->permissionViewRepository->getTaskList($userId, $module) as $permission) {
-            if ($task !== $permission->task) {
+            if ($task !== $permission->get('task')->getValue()) {
                 continue;
             }
 
             $dir =
                 'js' . DIRECTORY_SEPARATOR .
                 'module' . DIRECTORY_SEPARATOR .
-                $permission->module . DIRECTORY_SEPARATOR .
-                $permission->task . DIRECTORY_SEPARATOR
+                $permission->get('module')->getValue() . DIRECTORY_SEPARATOR .
+                $permission->get('task')->getValue() . DIRECTORY_SEPARATOR
             ;
             /** @var Javascript[] $files */
             $files = array_merge($files, $this->getFiles($dir));
@@ -92,7 +94,7 @@ class JavascriptService
             $files = array_merge($files, $this->getFiles(
                 $this->vendorPath .
                 'gibson-os' . DIRECTORY_SEPARATOR .
-                $permission->module . DIRECTORY_SEPARATOR .
+                $permission->get('module')->getValue() . DIRECTORY_SEPARATOR .
                 'assets' . DIRECTORY_SEPARATOR .
                 'js' . DIRECTORY_SEPARATOR,
             ));

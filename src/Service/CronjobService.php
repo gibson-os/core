@@ -53,7 +53,7 @@ class CronjobService
         try {
             $cronjob = $this->cronjobRepository->getByCommandAndUser($command, $user);
         } catch (SelectError) {
-            $cronjob = (new Cronjob())
+            $cronjob = (new Cronjob($this->modelWrapper))
                 ->setCommand($command)
                 ->setArguments(JsonUtility::encode($arguments))
                 ->setOptions(JsonUtility::encode($options))
