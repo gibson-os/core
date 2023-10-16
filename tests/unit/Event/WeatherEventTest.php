@@ -41,8 +41,8 @@ class WeatherEventTest extends Unit
 
     public function testTemperature(): void
     {
-        $location = new Location();
-        $weather = (new Weather())->setTemperature(42);
+        $location = new Location($this->modelWrapper->reveal());
+        $weather = (new Weather($this->modelWrapper->reveal()))->setTemperature(42);
         $this->weatherRepository->getByNearestDate($location, null)
             ->shouldBeCalledOnce()
             ->willReturn($weather)
@@ -53,8 +53,8 @@ class WeatherEventTest extends Unit
 
     public function testFeelsLike(): void
     {
-        $location = new Location();
-        $weather = (new Weather())->setFeelsLike(42);
+        $location = new Location($this->modelWrapper->reveal());
+        $weather = (new Weather($this->modelWrapper->reveal()))->setFeelsLike(42);
         $this->weatherRepository->getByNearestDate($location, null)
             ->shouldBeCalledOnce()
             ->willReturn($weather)
@@ -65,8 +65,8 @@ class WeatherEventTest extends Unit
 
     public function testPressure(): void
     {
-        $location = new Location();
-        $weather = (new Weather())->setPressure(42);
+        $location = new Location($this->modelWrapper->reveal());
+        $weather = (new Weather($this->modelWrapper->reveal()))->setPressure(42);
         $this->weatherRepository->getByNearestDate($location, null)
             ->shouldBeCalledOnce()
             ->willReturn($weather)
@@ -77,8 +77,8 @@ class WeatherEventTest extends Unit
 
     public function testHumidity(): void
     {
-        $location = new Location();
-        $weather = (new Weather())->setHumidity(42);
+        $location = new Location($this->modelWrapper->reveal());
+        $weather = (new Weather($this->modelWrapper->reveal()))->setHumidity(42);
         $this->weatherRepository->getByNearestDate($location, null)
             ->shouldBeCalledOnce()
             ->willReturn($weather)
@@ -89,8 +89,8 @@ class WeatherEventTest extends Unit
 
     public function testDevPoint(): void
     {
-        $location = new Location();
-        $weather = (new Weather())->setDewPoint(42);
+        $location = new Location($this->modelWrapper->reveal());
+        $weather = (new Weather($this->modelWrapper->reveal()))->setDewPoint(42);
         $this->weatherRepository->getByNearestDate($location, null)
             ->shouldBeCalledOnce()
             ->willReturn($weather)
@@ -101,8 +101,8 @@ class WeatherEventTest extends Unit
 
     public function testClouds(): void
     {
-        $location = new Location();
-        $weather = (new Weather())->setClouds(42);
+        $location = new Location($this->modelWrapper->reveal());
+        $weather = (new Weather($this->modelWrapper->reveal()))->setClouds(42);
         $this->weatherRepository->getByNearestDate($location, null)
             ->shouldBeCalledOnce()
             ->willReturn($weather)
@@ -113,8 +113,8 @@ class WeatherEventTest extends Unit
 
     public function testUvIndex(): void
     {
-        $location = new Location();
-        $weather = (new Weather())->setUvIndex(42);
+        $location = new Location($this->modelWrapper->reveal());
+        $weather = (new Weather($this->modelWrapper->reveal()))->setUvIndex(42);
         $this->weatherRepository->getByNearestDate($location, null)
             ->shouldBeCalledOnce()
             ->willReturn($weather)
@@ -125,8 +125,8 @@ class WeatherEventTest extends Unit
 
     public function testWindSpeed(): void
     {
-        $location = new Location();
-        $weather = (new Weather())->setWindSpeed(42);
+        $location = new Location($this->modelWrapper->reveal());
+        $weather = (new Weather($this->modelWrapper->reveal()))->setWindSpeed(42);
         $this->weatherRepository->getByNearestDate($location, null)
             ->shouldBeCalledOnce()
             ->willReturn($weather)
@@ -137,8 +137,8 @@ class WeatherEventTest extends Unit
 
     public function testWindGust(): void
     {
-        $location = new Location();
-        $weather = (new Weather())->setWindGust(42.42);
+        $location = new Location($this->modelWrapper->reveal());
+        $weather = (new Weather($this->modelWrapper->reveal()))->setWindGust(42.42);
         $this->weatherRepository->getByNearestDate($location, null)
             ->shouldBeCalledOnce()
             ->willReturn($weather)
@@ -149,8 +149,8 @@ class WeatherEventTest extends Unit
 
     public function testWindDegree(): void
     {
-        $location = new Location();
-        $weather = (new Weather())->setWindDegree(42);
+        $location = new Location($this->modelWrapper->reveal());
+        $weather = (new Weather($this->modelWrapper->reveal()))->setWindDegree(42);
         $this->weatherRepository->getByNearestDate($location, null)
             ->shouldBeCalledOnce()
             ->willReturn($weather)
@@ -161,8 +161,8 @@ class WeatherEventTest extends Unit
 
     public function testVisibility(): void
     {
-        $location = new Location();
-        $weather = (new Weather())->setVisibility(42);
+        $location = new Location($this->modelWrapper->reveal());
+        $weather = (new Weather($this->modelWrapper->reveal()))->setVisibility(42);
         $this->weatherRepository->getByNearestDate($location, null)
             ->shouldBeCalledOnce()
             ->willReturn($weather)
@@ -173,8 +173,8 @@ class WeatherEventTest extends Unit
 
     public function testRain(): void
     {
-        $location = new Location();
-        $weather = (new Weather())->setRain(42);
+        $location = new Location($this->modelWrapper->reveal());
+        $weather = (new Weather($this->modelWrapper->reveal()))->setRain(42);
         $this->weatherRepository->getByNearestDate($location, null)
             ->shouldBeCalledOnce()
             ->willReturn($weather)
@@ -185,8 +185,8 @@ class WeatherEventTest extends Unit
 
     public function testSnow(): void
     {
-        $location = new Location();
-        $weather = (new Weather())->setSnow(42);
+        $location = new Location($this->modelWrapper->reveal());
+        $weather = (new Weather($this->modelWrapper->reveal()))->setSnow(42);
         $this->weatherRepository->getByNearestDate($location, null)
             ->shouldBeCalledOnce()
             ->willReturn($weather)

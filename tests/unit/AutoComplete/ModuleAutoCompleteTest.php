@@ -36,7 +36,7 @@ class ModuleAutoCompleteTest extends UnitAutoCompleteTest
 
     public function testGetById(): void
     {
-        $module = new Module($this->mysqlDatabase->reveal());
+        $module = new Module($this->modelWrapper->reveal());
         $this->moduleRepository->getById(42)
             ->shouldBeCalledOnce()
             ->willReturn($module)

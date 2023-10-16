@@ -36,7 +36,7 @@ class EventEventTest extends Unit
 
     public function testActivate(): void
     {
-        $event = (new Event())->setActive(false);
+        $event = (new Event($this->modelWrapper->reveal()))->setActive(false);
         $this->assertFalse($event->isActive());
 
         $this->modelManager->saveWithoutChildren($event)
@@ -49,7 +49,7 @@ class EventEventTest extends Unit
 
     public function testIsActive(): void
     {
-        $event = (new Event())->setActive(true);
+        $event = (new Event($this->modelWrapper->reveal()))->setActive(true);
         $this->assertTrue($event->isActive());
         $this->assertTrue($this->eventEvent->isActive($event));
 
@@ -60,7 +60,7 @@ class EventEventTest extends Unit
 
     public function testDeactivate(): void
     {
-        $event = (new Event())->setActive(true);
+        $event = (new Event($this->modelWrapper->reveal()))->setActive(true);
         $this->assertTrue($event->isActive());
 
         $this->modelManager->saveWithoutChildren($event)
@@ -73,7 +73,7 @@ class EventEventTest extends Unit
 
     public function testStart(): void
     {
-        $event = new Event();
+        $event = new Event($this->modelWrapper->reveal());
 
         $this->eventService->runEvent($event, false)
             ->shouldBeCalledOnce()
@@ -88,7 +88,7 @@ class EventEventTest extends Unit
 
     public function testStop(): void
     {
-        $event = new Event();
+        $event = new Event($this->modelWrapper->reveal());
 
         $this->eventService->stop($event)
             ->shouldBeCalledOnce()

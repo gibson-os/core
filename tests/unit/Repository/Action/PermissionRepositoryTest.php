@@ -6,73 +6,60 @@ namespace GibsonOS\Test\Unit\Core\Repository\Action;
 use Codeception\Test\Unit;
 use GibsonOS\Core\Model\Action;
 use GibsonOS\Core\Repository\Action\PermissionRepository;
-use GibsonOS\Test\Unit\Core\ModelManagerTrait;
+use GibsonOS\Test\Unit\Core\Repository\RepositoryTrait;
+use MDO\Dto\Field;
+use MDO\Dto\Query\Where;
+use MDO\Enum\Type;
+use MDO\Query\DeleteQuery;
+use MDO\Query\SelectQuery;
 
 class PermissionRepositoryTest extends Unit
 {
-    use ModelManagerTrait;
+    use RepositoryTrait;
 
     private PermissionRepository $permissionRepository;
 
     protected function _before()
     {
-        $this->loadModelManager();
+        $this->loadRepository(
+            'action_permission',
+            [
+                new Field('action_id', false, Type::BIGINT, '', null, '', 20),
+                new Field('permission', false, Type::BIGINT, '', null, '', 20),
+            ],
+        );
 
-        $this->mysqlDatabase->getDatabaseName()
-            ->shouldBeCalledOnce()
-            ->willReturn('marvin')
-        ;
-        $this->mysqlDatabase->sendQuery('SHOW FIELDS FROM `marvin`.`action_permission`')
-            ->shouldBeCalledOnce()
-            ->willReturn(true)
-        ;
-        $this->mysqlDatabase->fetchRow()
-            ->shouldBeCalledTimes(3)
-            ->willReturn(
-                ['action_id', 'bigint(42)', 'NO', '', null, ''],
-                ['permission', 'bigint(42)', 'NO', '', null, ''],
-                null
-            )
-        ;
-
-        $this->permissionRepository = new PermissionRepository('action_permission');
+        $this->permissionRepository = new PermissionRepository($this->repositoryWrapper->reveal(), $this->table);
     }
 
     public function testFindByActionId(): void
     {
-        $this->mysqlDatabase->execute(
-            'SELECT `action_permission`.`action_id`, `action_permission`.`permission` FROM `marvin`.`action_permission` WHERE `action_id`=?',
-            [42],
-        )
-            ->shouldBeCalledOnce()
-            ->willReturn(true)
-        ;
-        $this->mysqlDatabase->fetchAssocList()
-            ->shouldBeCalledOnce()
-            ->willReturn([[
-                'action_id' => '42',
-                'permission' => '1',
-            ]])
+        $selectQuery = (new SelectQuery($this->table))
+            ->addWhere(new Where('`action_id`=?', [42]))
         ;
 
-        $permission = $this->permissionRepository->findByActionId(42)[0];
-
-        $this->assertEquals(42, $permission->getActionId());
-        $this->assertEquals(1, $permission->getPermission());
+        $this->assertEquals(
+            $this->loadModel($selectQuery, Action\Permission::class, ''),
+            $this->permissionRepository->findByActionId(42)[0],
+        );
     }
 
     public function testDeleteByAction(): void
     {
-        $this->mysqlDatabase->execute(
-            'DELETE `action_permission` FROM `marvin`.`action_permission` WHERE `action_id`=? ',
-            [42],
-        )
+        $deleteQuery = (new DeleteQuery($this->table))
+            ->addWhere(new Where('`action_id`=?', [42]))
+        ;
+        $this->repositoryWrapper->getClient()
             ->shouldBeCalledOnce()
-            ->willReturn(true)
+            ->willReturn($this->client->reveal())
+        ;
+        $this->client->execute($deleteQuery)
+            ->shouldBeCalledOnce()
+            ->willReturn(null)
         ;
 
         $this->assertTrue($this->permissionRepository->deleteByAction(
-            (new Action($this->mysqlDatabase->reveal()))->setId(42)
+            (new Action($this->modelWrapper->reveal()))->setId(42),
         ));
     }
 }

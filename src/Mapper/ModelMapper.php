@@ -9,6 +9,7 @@ use GibsonOS\Core\Exception\MapperException;
 use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Manager\ServiceManager;
 use GibsonOS\Core\Utility\JsonUtility;
+use GibsonOS\Core\Wrapper\ModelWrapper;
 use JsonException;
 use ReflectionAttribute;
 use ReflectionException;
@@ -18,8 +19,16 @@ class ModelMapper extends ObjectMapper
     public function __construct(
         private readonly ServiceManager $serviceManagerService,
         private readonly ReflectionManager $reflectionManager,
+        private readonly ModelWrapper $modelWrapper,
     ) {
         parent::__construct($this->serviceManagerService, $this->reflectionManager);
+    }
+
+    public function mapToObject(string $className, array $properties): object
+    {
+        $properties['modelWrapper'] = $this->modelWrapper;
+
+        return parent::mapToObject($className, $properties);
     }
 
     /**

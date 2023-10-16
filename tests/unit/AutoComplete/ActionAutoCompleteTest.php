@@ -41,7 +41,7 @@ class ActionAutoCompleteTest extends UnitAutoCompleteTest
 
     public function testGetById(): void
     {
-        $action = new Action($this->mysqlDatabase->reveal());
+        $action = new Action($this->modelWrapper->reveal());
         $this->actionRepository->getById(42)
             ->shouldBeCalledOnce()
             ->willReturn($action)

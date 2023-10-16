@@ -4,67 +4,53 @@ declare(strict_types=1);
 namespace GibsonOS\Test\Unit\Core\Repository;
 
 use Codeception\Test\Unit;
+use GibsonOS\Core\Model\DevicePush;
 use GibsonOS\Core\Model\User\Device;
 use GibsonOS\Core\Repository\DevicePushRepository;
-use GibsonOS\Test\Unit\Core\ModelManagerTrait;
+use MDO\Dto\Field;
+use MDO\Dto\Query\Where;
+use MDO\Enum\Type;
+use MDO\Query\SelectQuery;
 
 class DevicePushRepositoryTest extends Unit
 {
-    use ModelManagerTrait;
+    use RepositoryTrait;
 
     private DevicePushRepository $devicePushRepository;
 
     protected function _before()
     {
-        $this->loadModelManager();
+        $this->loadRepository(
+            'device_push',
+            [
+                new Field('module', false, Type::VARCHAR, '', null, '', 42),
+                new Field('task', false, Type::VARCHAR, '', null, '', 42),
+            ],
+        );
 
-        $this->devicePushRepository = new DevicePushRepository();
-
-        $this->mysqlDatabase->getDatabaseName()
-            ->shouldBeCalledOnce()
-            ->willReturn('marvin')
-        ;
-        $this->mysqlDatabase->sendQuery('SHOW FIELDS FROM `marvin`.`device_push`')
-            ->shouldBeCalledOnce()
-            ->willReturn(true)
-        ;
-        $this->mysqlDatabase->fetchRow()
-            ->shouldBeCalledTimes(3)
-            ->willReturn(
-                ['module', 'varchar(42)', 'NO', '', null, ''],
-                ['task', 'varchar(42)', 'NO', '', null, ''],
-                null
-            )
-        ;
+        $this->devicePushRepository = new DevicePushRepository($this->repositoryWrapper->reveal());
     }
 
     public function testGetByDevice(): void
     {
-        $this->mysqlDatabase->execute(
-            'SELECT `device_push`.`module`, `device_push`.`task` FROM `marvin`.`device_push` WHERE `module`=? AND `task`=? AND `action`=? AND `foreign_id`=? AND `device_id`=? LIMIT 1',
-            ['marvin', 'arthur', 'dent', 'no hope', 'galaxy'],
-        )
-            ->shouldBeCalledOnce()
-            ->willReturn(true)
-        ;
-        $this->mysqlDatabase->fetchAssocList()
-            ->shouldBeCalledOnce()
-            ->willReturn([[
-                'module' => 'ford',
-                'task' => 'prefect',
-            ]])
+        $selectQuery = (new SelectQuery($this->table))
+            ->addWhere(new Where(
+                '`module`=? AND `task`=? AND `action`=? AND `foreign_id`=? AND `device_id`=?',
+                ['marvin', 'arthur', 'dent', 'no hope', 'galaxy'],
+            ))
+            ->setLimit(1)
         ;
 
-        $devicePush = $this->devicePushRepository->getByDevice(
-            (new Device())->setId('galaxy'),
-            'marvin',
-            'arthur',
-            'dent',
-            'no hope',
+        $this->assertEquals(
+            $this->loadModel($selectQuery, DevicePush::class),
+            $this->devicePushRepository->getByDevice(
+                (new Device($this->modelWrapper->reveal()))->setId('galaxy'),
+                'marvin',
+                'arthur',
+                'dent',
+                'no hope',
+            ),
         );
-
-        $this->assertEquals('ford', $devicePush->getModule());
-        $this->assertEquals('prefect', $devicePush->getTask());
     }
 
     public function testGetByAction(): void

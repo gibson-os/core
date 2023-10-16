@@ -12,6 +12,7 @@ use JsonException;
 use MDO\Dto\Query\Where;
 use MDO\Dto\Table;
 use MDO\Exception\ClientException;
+use MDO\Exception\RecordException;
 use MDO\Query\DeleteQuery;
 use ReflectionException;
 
@@ -26,8 +27,11 @@ class ActionRepository extends AbstractRepository
     }
 
     /**
-     * @throws SelectError
      * @throws ClientException
+     * @throws JsonException
+     * @throws ReflectionException
+     * @throws SelectError
+     * @throws RecordException
      */
     public function getById(int $id): Action
     {
@@ -35,9 +39,10 @@ class ActionRepository extends AbstractRepository
     }
 
     /**
-     * @throws ClientException
      * @throws JsonException
      * @throws ReflectionException
+     * @throws RecordException
+     * @throws ClientException
      *
      * @return Action[]
      */
@@ -55,8 +60,11 @@ class ActionRepository extends AbstractRepository
     }
 
     /**
-     * @throws SelectError
      * @throws ClientException
+     * @throws JsonException
+     * @throws RecordException
+     * @throws ReflectionException
+     * @throws SelectError
      */
     public function getByNameAndTaskId(string $name, HttpMethod $method, int $taskId): Action
     {

@@ -5,8 +5,9 @@ namespace GibsonOS\Test\Unit\Core;
 
 use GibsonOS\Core\Manager\ModelManager;
 use GibsonOS\Core\Manager\ServiceManager;
-use mysqlDatabase;
-use mysqlRegistry;
+use GibsonOS\Core\Wrapper\ModelWrapper;
+use MDO\Client;
+use MDO\Manager\TableManager;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
@@ -15,25 +16,28 @@ trait ModelManagerTrait
 {
     use ProphecyTrait;
 
-    protected mysqlDatabase|ObjectProphecy $mysqlDatabase;
+    protected Client|ObjectProphecy $client;
 
-    private ModelManager|ObjectProphecy $modelManager;
+    protected ModelWrapper|ObjectProphecy $modelWrapper;
+
+    protected ModelManager|ObjectProphecy $modelManager;
+
+    protected TableManager|ObjectProphecy $tableManager;
 
     public function loadModelManager(): void
     {
-        $this->mysqlDatabase = $this->prophesize(mysqlDatabase::class);
+        $this->client = $this->prophesize(Client::class);
+        $this->tableManager = $this->prophesize(TableManager::class);
         $this->modelManager = $this->prophesize(ModelManager::class);
-
-        mysqlRegistry::getInstance()->reset();
-        mysqlRegistry::getInstance()->set('database', $this->mysqlDatabase->reveal());
+        $this->modelWrapper = $this->prophesize(ModelWrapper::class);
 
         $serviceManager = (new ServiceManager());
-        $serviceManager->setService(mysqlDatabase::class, $this->mysqlDatabase->reveal());
-        $modelManager = $serviceManager->get(ModelManager::class);
-        $this->modelManager->loadFromMysqlTable(Argument::any(), Argument::any())
-            ->will(function (array $args) use ($modelManager): void {
-                $modelManager->loadFromMysqlTable($args[0], $args[1]);
-            })
-        ;
+        $serviceManager->setService(Client::class, $this->client->reveal());
+        //        $modelManager = $serviceManager->get(ModelManager::class);
+        //        $this->modelManager->loadFromRecord(Argument::any(), Argument::any(), Argument::any())
+        //            ->will(function (array $args) use ($modelManager): void {
+        //                $modelManager->loadFromRecord($args[0], $args[1], $args[2]);
+        //            })
+        //        ;
     }
 }

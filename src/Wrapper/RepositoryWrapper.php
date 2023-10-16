@@ -16,7 +16,7 @@ class RepositoryWrapper
         private readonly Client $client,
         private readonly ModelManager $modelManager,
         private readonly TableManager $tableManager,
-        private readonly ModelWrapper $modelService,
+        private readonly ModelWrapper $modelWrapper,
         private readonly SelectService $selectService,
         private readonly ChildrenMapper $childrenMapper,
         private readonly ChildrenQuery $childrenQuery,
@@ -38,9 +38,9 @@ class RepositoryWrapper
         return $this->tableManager;
     }
 
-    public function getModelService(): ModelWrapper
+    public function getModelWrapper(): ModelWrapper
     {
-        return $this->modelService;
+        return $this->modelWrapper;
     }
 
     public function getSelectService(): SelectService

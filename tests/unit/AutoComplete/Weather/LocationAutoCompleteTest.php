@@ -43,7 +43,7 @@ class LocationAutoCompleteTest extends UnitAutoCompleteTest
 
     public function testGetById(): void
     {
-        $location = new Location($this->mysqlDatabase->reveal());
+        $location = new Location($this->modelWrapper->reveal());
         $this->locationRepository->getById(42)
             ->shouldBeCalledOnce()
             ->willReturn($location)

@@ -19,8 +19,8 @@ use Throwable;
 class ObjectMapper implements ObjectMapperInterface
 {
     public function __construct(
-        private ServiceManager $serviceManagerService,
-        private ReflectionManager $reflectionManager,
+        private readonly ServiceManager $serviceManagerService,
+        private readonly ReflectionManager $reflectionManager,
     ) {
     }
 

@@ -41,7 +41,7 @@ class TaskAutoCompleteTest extends UnitAutoCompleteTest
 
     public function testGetById(): void
     {
-        $task = new Task($this->mysqlDatabase->reveal());
+        $task = new Task($this->modelWrapper->reveal());
         $this->taskRepository->getById(42)
             ->shouldBeCalledOnce()
             ->willReturn($task)

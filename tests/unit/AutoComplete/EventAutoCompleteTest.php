@@ -42,7 +42,7 @@ class EventAutoCompleteTest extends UnitAutoCompleteTest
 
     public function testGetById(): void
     {
-        $event = new Event($this->mysqlDatabase->reveal());
+        $event = new Event($this->modelWrapper->reveal());
         $this->eventRepository->getById(42)
             ->shouldBeCalledOnce()
             ->willReturn($event)

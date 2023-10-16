@@ -9,9 +9,20 @@ use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Service\Attribute\TableNameAttribute;
 use GibsonOS\Core\Service\DateTimeService;
 use GibsonOS\Core\Utility\JsonUtility;
+use GibsonOS\Core\Wrapper\ModelWrapper;
 use GibsonOS\Mock\Model\MockModel;
-use mysqlDatabase;
-use mysqlRegistry;
+use MDO\Client;
+use MDO\Dto\Field;
+use MDO\Dto\Query\Where;
+use MDO\Dto\Record;
+use MDO\Dto\Table;
+use MDO\Dto\Value;
+use MDO\Enum\Type;
+use MDO\Manager\TableManager;
+use MDO\Query\DeleteQuery;
+use MDO\Query\ReplaceQuery;
+use MDO\Service\DeleteService;
+use MDO\Service\ReplaceService;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 
@@ -21,69 +32,74 @@ class ModelManagerTest extends Unit
 
     private ModelManager $modelManager;
 
-    private mysqlDatabase|ObjectProphecy $mysqlDatabase;
-
     private DateTimeService|ObjectProphecy $dateTimeService;
+
+    private TableManager|ObjectProphecy $tableManager;
 
     private JsonUtility|ObjectProphecy $jsonUtility;
 
+    private ReplaceService|ObjectProphecy $replaceService;
+
+    private DeleteService|ObjectProphecy $deleteService;
+
+    private Client|ObjectProphecy $client;
+
+    private ModelWrapper|ObjectProphecy $modelWrapper;
+
+    private Table $table;
+
     protected function _before()
     {
-        $this->mysqlDatabase = $this->prophesize(mysqlDatabase::class);
         $this->dateTimeService = $this->prophesize(DateTimeService::class);
         $this->jsonUtility = $this->prophesize(JsonUtility::class);
+        $this->tableManager = $this->prophesize(TableManager::class);
+        $this->replaceService = $this->prophesize(ReplaceService::class);
+        $this->deleteService = $this->prophesize(DeleteService::class);
+        $this->client = $this->prophesize(Client::class);
+        $this->modelWrapper = $this->prophesize(ModelWrapper::class);
         $reflectionManager = new ReflectionManager();
 
-        mysqlRegistry::getInstance()->reset();
-        mysqlRegistry::getInstance()->set('database', $this->mysqlDatabase->reveal());
-
-        $this->mysqlDatabase->getDatabaseName()
+        $this->client->getDatabaseName()
             ->willReturn('galaxy')
         ;
-        $this->mysqlDatabase->sendQuery('SHOW FIELDS FROM `galaxy`.`marvin`')
+        $this->table = new Table(
+            'marvin',
+            [
+                new Field('id', false, Type::BIGINT, 'PRI', null, 'auto_increment', 20),
+                new Field('parent_id', true, Type::BIGINT, 'MUL', null, ''),
+            ],
+        );
+        $this->tableManager->getTable('marvin')
             ->shouldBeCalledOnce()
-            ->willReturn(true)
-        ;
-        $this->mysqlDatabase->fetchRow()
-            ->shouldBeCalledTimes(3)
-            ->willReturn(
-                ['id', 'bigint(20) unsigned', 'NO', 'PRI', null, 'auto_increment'],
-                ['parent_id', 'bigint(20) unsigned', 'YES', 'MUL', null, ''],
-                null,
-            )
+            ->willReturn($this->table)
         ;
 
         $this->modelManager = new ModelManager(
-            $this->mysqlDatabase->reveal(),
             $this->dateTimeService->reveal(),
             $this->jsonUtility->reveal(),
             $reflectionManager,
             new TableNameAttribute($reflectionManager),
+            $this->tableManager->reveal(),
+            $this->replaceService->reveal(),
+            $this->deleteService->reveal(),
+            $this->client->reveal(),
+            $this->modelWrapper->reveal(),
         );
     }
 
     public function testSaveWithoutChildren(): void
     {
-        $this->mysqlDatabase->execute(
-            'INSERT INTO `galaxy`.`marvin` SET `parent_id`=NULL ON DUPLICATE KEY UPDATE `parent_id`=NULL',
-            [],
-        )
-            ->shouldBeCalledOnce()
-            ->willReturn(true)
+        $replaceQuery = new ReplaceQuery($this->table, []);
+        $record = new Record(['id' => new Value(42), 'parent_id' => new Value(null)]);
+        $this->replaceService->replaceAndLoadRecord($replaceQuery)
+            ->shouldBeCalledonce()
+            ->willReturn($record)
         ;
-        $this->mysqlDatabase->execute(
-            'SELECT `marvin`.`id`, `marvin`.`parent_id` FROM `galaxy`.`marvin` WHERE `parent_id` IS NULL',
-            [],
-        )
-            ->shouldBeCalledOnce()
-            ->willReturn(true)
-        ;
-        $this->mysqlDatabase->fetchAssocList()
-            ->shouldBeCalledOnce()
-            ->willReturn([['id' => 42]])
+        $this->tableManager->getTable('marvin')
+            ->shouldBeCalledTimes(3)
         ;
 
-        $model = new MockModel($this->mysqlDatabase->reveal());
+        $model = new MockModel($this->modelWrapper->reveal());
         $this->modelManager->saveWithoutChildren($model);
 
         $this->assertEquals(42, $model->getId());
@@ -91,27 +107,18 @@ class ModelManagerTest extends Unit
 
     public function testSaveWithoutChildrenWithSetChildren(): void
     {
-        $this->mysqlDatabase->execute(
-            'INSERT INTO `galaxy`.`marvin` SET `parent_id`=NULL ON DUPLICATE KEY UPDATE `parent_id`=NULL',
-            [],
-        )
-            ->shouldBeCalledOnce()
-            ->willReturn(true)
+        $replaceQuery = new ReplaceQuery($this->table, []);
+        $record = new Record(['id' => new Value(42), 'parent_id' => new Value(null)]);
+        $this->replaceService->replaceAndLoadRecord($replaceQuery)
+            ->shouldBeCalledonce()
+            ->willReturn($record)
         ;
-        $this->mysqlDatabase->execute(
-            'SELECT `marvin`.`id`, `marvin`.`parent_id` FROM `galaxy`.`marvin` WHERE `parent_id` IS NULL',
-            [],
-        )
-            ->shouldBeCalledOnce()
-            ->willReturn(true)
-        ;
-        $this->mysqlDatabase->fetchAssocList()
-            ->shouldBeCalledOnce()
-            ->willReturn([['id' => 42]])
+        $this->tableManager->getTable('marvin')
+            ->shouldBeCalledTimes(3)
         ;
 
-        $children = new MockModel($this->mysqlDatabase->reveal());
-        $model = (new MockModel($this->mysqlDatabase->reveal()))
+        $children = new MockModel($this->modelWrapper->reveal());
+        $model = (new MockModel($this->modelWrapper->reveal()))
             ->setChildren([$children])
         ;
         $this->modelManager->saveWithoutChildren($model);
@@ -123,27 +130,18 @@ class ModelManagerTest extends Unit
 
     public function testSaveWithoutChildrenWithAddChildren(): void
     {
-        $this->mysqlDatabase->execute(
-            'INSERT INTO `galaxy`.`marvin` SET `parent_id`=NULL ON DUPLICATE KEY UPDATE `parent_id`=NULL',
-            [],
-        )
-            ->shouldBeCalledOnce()
-            ->willReturn(true)
+        $replaceQuery = new ReplaceQuery($this->table, []);
+        $record = new Record(['id' => new Value(42), 'parent_id' => new Value(null)]);
+        $this->replaceService->replaceAndLoadRecord($replaceQuery)
+            ->shouldBeCalledonce()
+            ->willReturn($record)
         ;
-        $this->mysqlDatabase->execute(
-            'SELECT `marvin`.`id`, `marvin`.`parent_id` FROM `galaxy`.`marvin` WHERE `parent_id` IS NULL',
-            [],
-        )
-            ->shouldBeCalledOnce()
-            ->willReturn(true)
-        ;
-        $this->mysqlDatabase->fetchAssocList()
-            ->shouldBeCalledOnce()
-            ->willReturn([['id' => 42]])
+        $this->tableManager->getTable('marvin')
+            ->shouldBeCalledTimes(3)
         ;
 
-        $children = new MockModel($this->mysqlDatabase->reveal());
-        $model = (new MockModel($this->mysqlDatabase->reveal()))
+        $children = new MockModel($this->modelWrapper->reveal());
+        $model = (new MockModel($this->modelWrapper->reveal()))
             ->addChildren([$children])
         ;
         $this->modelManager->saveWithoutChildren($model);
@@ -155,43 +153,29 @@ class ModelManagerTest extends Unit
 
     public function testSave(): void
     {
-        $this->mysqlDatabase->isTransaction()
+        $this->client->isTransaction()
             ->shouldBeCalledOnce()
             ->willReturn(false)
         ;
-        $this->mysqlDatabase->startTransaction()
+        $this->client->startTransaction()
             ->shouldBeCalledOnce()
         ;
-        $this->mysqlDatabase->execute(
-            'INSERT INTO `galaxy`.`marvin` SET `parent_id`=NULL ON DUPLICATE KEY UPDATE `parent_id`=NULL',
-            [],
-        )
-            ->shouldBeCalledOnce()
-            ->willReturn(true)
+        $replaceQuery = new ReplaceQuery($this->table, []);
+        $record = new Record(['id' => new Value(42), 'parent_id' => new Value(null)]);
+        $this->replaceService->replaceAndLoadRecord($replaceQuery)
+            ->shouldBeCalledonce()
+            ->willReturn($record)
         ;
-        $this->mysqlDatabase->execute(
-            'SELECT `marvin`.`id`, `marvin`.`parent_id` FROM `galaxy`.`marvin` WHERE `parent_id` IS NULL',
-            [],
-        )
-            ->shouldBeCalledOnce()
-            ->willReturn(true)
+        $this->tableManager->getTable('marvin')
+            ->shouldBeCalledTimes(4)
         ;
-        $this->mysqlDatabase->fetchAssocList()
-            ->shouldBeCalledOnce()
-            ->willReturn([['id' => 42]])
-        ;
-        $this->mysqlDatabase->execute(
-            'DELETE `marvin` FROM `galaxy`.`marvin` WHERE (`parent_id`=?) ',
-            [42],
-        )
-            ->shouldBeCalledOnce()
-            ->willReturn(true)
-        ;
-        $this->mysqlDatabase->commit()
+        $deleteQuery = (new DeleteQuery($this->table))->addWhere(new Where('`parent_id`=?', [42]));
+        $this->client->execute($deleteQuery);
+        $this->client->commit()
             ->shouldBeCalledOnce()
         ;
 
-        $model = new MockModel($this->mysqlDatabase->reveal());
+        $model = new MockModel($this->modelWrapper->reveal());
         $this->modelManager->save($model);
 
         $this->assertEquals(42, $model->getId());
@@ -199,65 +183,38 @@ class ModelManagerTest extends Unit
 
     public function testSaveWithSetChildren(): void
     {
-        $this->mysqlDatabase->isTransaction()
+        $this->client->isTransaction()
             ->shouldBeCalledTimes(2)
             ->willReturn(false, true)
         ;
-        $this->mysqlDatabase->startTransaction()
+        $this->client->startTransaction()
             ->shouldBeCalledOnce()
         ;
-        $this->mysqlDatabase->execute(
-            'INSERT INTO `galaxy`.`marvin` SET `parent_id`=NULL ON DUPLICATE KEY UPDATE `parent_id`=NULL',
-            [],
-        )
-            ->shouldBeCalledOnce()
-            ->willReturn(true)
+        $record = new Record(['id' => new Value(42), 'parent_id' => new Value(null)]);
+        $this->replaceService->replaceAndLoadRecord(new ReplaceQuery($this->table, []))
+            ->shouldBeCalledonce()
+            ->willReturn($record)
         ;
-        $this->mysqlDatabase->execute(
-            'SELECT `marvin`.`id`, `marvin`.`parent_id` FROM `galaxy`.`marvin` WHERE `parent_id` IS NULL',
-            [],
-        )
-            ->shouldBeCalledOnce()
-            ->willReturn(true)
+        $childRecord = new Record(['id' => new Value(24), 'parent_id' => new Value(42)]);
+        $this->replaceService->replaceAndLoadRecord(new ReplaceQuery($this->table, ['parent_id' => new Value(42)]))
+            ->shouldBeCalledonce()
+            ->willReturn($childRecord)
         ;
-        $this->mysqlDatabase->fetchAssocList()
-            ->shouldBeCalledTimes(2)
-            ->willReturn([['id' => 42]], [['id' => 24]])
+        $this->tableManager->getTable('marvin')
+            ->shouldBeCalledTimes(8)
         ;
-        $this->mysqlDatabase->execute(
-            'INSERT INTO `galaxy`.`marvin` SET `parent_id`=? ON DUPLICATE KEY UPDATE `parent_id`=?',
-            [42, 42],
-        )
-            ->shouldBeCalledOnce()
-            ->willReturn(true)
-        ;
-        $this->mysqlDatabase->execute(
-            'SELECT `marvin`.`id`, `marvin`.`parent_id` FROM `galaxy`.`marvin` WHERE `parent_id`=?',
-            [42],
-        )
-            ->shouldBeCalledOnce()
-            ->willReturn(true)
-        ;
-        $this->mysqlDatabase->execute(
-            'DELETE `marvin` FROM `galaxy`.`marvin` WHERE (`parent_id`=?) ',
-            [24],
-        )
-            ->shouldBeCalledOnce()
-            ->willReturn(true)
-        ;
-        $this->mysqlDatabase->execute(
-            'DELETE `marvin` FROM `galaxy`.`marvin` WHERE (`parent_id`=?) AND ((`id`!=?)) ',
-            [42, 24],
-        )
-            ->shouldBeCalledOnce()
-            ->willReturn(true)
-        ;
-        $this->mysqlDatabase->commit()
+        $this->client->execute((new DeleteQuery($this->table))->addWhere(new Where('`parent_id`=?', [24])));
+        $this->client->execute(
+            (new DeleteQuery($this->table))
+            ->addWhere(new Where('`parent_id`=?', [42]))
+            ->addWhere(new Where('`id`!=?', [24])),
+        );
+        $this->client->commit()
             ->shouldBeCalledOnce()
         ;
 
-        $children = new MockModel($this->mysqlDatabase->reveal());
-        $model = (new MockModel($this->mysqlDatabase->reveal()))
+        $children = new MockModel($this->modelWrapper->reveal());
+        $model = (new MockModel($this->modelWrapper->reveal()))
             ->setChildren([$children])
         ;
         $this->modelManager->save($model);
@@ -267,65 +224,38 @@ class ModelManagerTest extends Unit
 
     public function testSaveWithAddChildren(): void
     {
-        $this->mysqlDatabase->isTransaction()
+        $this->client->isTransaction()
             ->shouldBeCalledTimes(2)
             ->willReturn(false, true)
         ;
-        $this->mysqlDatabase->startTransaction()
+        $this->client->startTransaction()
             ->shouldBeCalledOnce()
         ;
-        $this->mysqlDatabase->execute(
-            'INSERT INTO `galaxy`.`marvin` SET `parent_id`=NULL ON DUPLICATE KEY UPDATE `parent_id`=NULL',
-            [],
-        )
-            ->shouldBeCalledOnce()
-            ->willReturn(true)
+        $record = new Record(['id' => new Value(42), 'parent_id' => new Value(null)]);
+        $this->replaceService->replaceAndLoadRecord(new ReplaceQuery($this->table, []))
+            ->shouldBeCalledonce()
+            ->willReturn($record)
         ;
-        $this->mysqlDatabase->execute(
-            'SELECT `marvin`.`id`, `marvin`.`parent_id` FROM `galaxy`.`marvin` WHERE `parent_id` IS NULL',
-            [],
-        )
-            ->shouldBeCalledOnce()
-            ->willReturn(true)
+        $childRecord = new Record(['id' => new Value(24), 'parent_id' => new Value(42)]);
+        $this->replaceService->replaceAndLoadRecord(new ReplaceQuery($this->table, ['parent_id' => new Value(42)]))
+            ->shouldBeCalledonce()
+            ->willReturn($childRecord)
         ;
-        $this->mysqlDatabase->fetchAssocList()
-            ->shouldBeCalledTimes(2)
-            ->willReturn([['id' => 42]], [['id' => 24]])
+        $this->tableManager->getTable('marvin')
+            ->shouldBeCalledTimes(8)
         ;
-        $this->mysqlDatabase->execute(
-            'INSERT INTO `galaxy`.`marvin` SET `parent_id`=? ON DUPLICATE KEY UPDATE `parent_id`=?',
-            [42, 42],
-        )
-            ->shouldBeCalledOnce()
-            ->willReturn(true)
-        ;
-        $this->mysqlDatabase->execute(
-            'SELECT `marvin`.`id`, `marvin`.`parent_id` FROM `galaxy`.`marvin` WHERE `parent_id`=?',
-            [42],
-        )
-            ->shouldBeCalledOnce()
-            ->willReturn(true)
-        ;
-        $this->mysqlDatabase->execute(
-            'DELETE `marvin` FROM `galaxy`.`marvin` WHERE (`parent_id`=?) ',
-            [24],
-        )
-            ->shouldBeCalledOnce()
-            ->willReturn(true)
-        ;
-        $this->mysqlDatabase->execute(
-            'DELETE `marvin` FROM `galaxy`.`marvin` WHERE (`parent_id`=?) AND ((`id`!=?)) ',
-            [42, 24],
-        )
-            ->shouldBeCalledOnce()
-            ->willReturn(true)
-        ;
-        $this->mysqlDatabase->commit()
+        $this->client->execute((new DeleteQuery($this->table))->addWhere(new Where('`parent_id`=?', [24])));
+        $this->client->execute(
+            (new DeleteQuery($this->table))
+                ->addWhere(new Where('`parent_id`=?', [42]))
+                ->addWhere(new Where('`id`!=?', [24])),
+        );
+        $this->client->commit()
             ->shouldBeCalledOnce()
         ;
 
-        $children = new MockModel($this->mysqlDatabase->reveal());
-        $model = (new MockModel($this->mysqlDatabase->reveal()))
+        $children = new MockModel($this->modelWrapper->reveal());
+        $model = (new MockModel($this->modelWrapper->reveal()))
             ->addChildren([$children])
         ;
         $this->modelManager->save($model);

@@ -36,7 +36,7 @@ class UserAutoCompleteTest extends UnitAutoCompleteTest
 
     public function testGetById(): void
     {
-        $user = new User($this->mysqlDatabase->reveal());
+        $user = new User($this->modelWrapper->reveal());
         $this->userRepository->getById(42)
             ->shouldBeCalledOnce()
             ->willReturn($user)

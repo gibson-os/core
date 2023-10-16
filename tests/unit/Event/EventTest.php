@@ -40,8 +40,8 @@ class EventTest extends Unit
             new ReflectionManager(),
         );
 
-        $this->event = new Event();
-        $this->element = (new Element())
+        $this->event = new Event($this->modelWrapper->reveal());
+        $this->element = (new Element($this->modelWrapper->reveal()))
             ->setMethod('test')
             ->setParameters(['arthur' => 'dent'])
         ;

@@ -34,6 +34,7 @@ class ModelMapperTest extends Unit
         $this->modelMapper = new ModelMapper(
             new ServiceManager(),
             new ReflectionManager(),
+            $this->modelWrapper->reveal(),
         );
     }
 

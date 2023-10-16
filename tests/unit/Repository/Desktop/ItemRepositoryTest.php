@@ -4,109 +4,106 @@ declare(strict_types=1);
 namespace GibsonOS\Test\Unit\Core\Repository\Desktop;
 
 use Codeception\Test\Unit;
+use GibsonOS\Core\Model\Desktop\Item;
 use GibsonOS\Core\Model\User;
 use GibsonOS\Core\Repository\Desktop\ItemRepository;
-use GibsonOS\Test\Unit\Core\ModelManagerTrait;
+use GibsonOS\Test\Unit\Core\Repository\RepositoryTrait;
+use MDO\Dto\Field;
+use MDO\Dto\Query\Where;
+use MDO\Dto\Value;
+use MDO\Enum\OrderDirection;
+use MDO\Enum\Type;
+use MDO\Enum\ValueType;
+use MDO\Query\DeleteQuery;
+use MDO\Query\SelectQuery;
+use MDO\Query\UpdateQuery;
+use MDO\Service\SelectService;
 
 class ItemRepositoryTest extends Unit
 {
-    use ModelManagerTrait;
+    use RepositoryTrait;
 
     private ItemRepository $itemRepository;
 
     protected function _before()
     {
-        $this->loadModelManager();
+        $this->loadRepository(
+            'desktop_item',
+            [new Field('text', false, Type::VARCHAR, '', null, '', 42)],
+        );
 
-        $this->mysqlDatabase->getDatabaseName()
-            ->shouldBeCalledOnce()
-            ->willReturn('marvin')
-        ;
-        $this->mysqlDatabase->sendQuery('SHOW FIELDS FROM `marvin`.`desktop_item`')
-            ->shouldBeCalledOnce()
-            ->willReturn(true)
-        ;
-        $this->mysqlDatabase->fetchRow()
-            ->shouldBeCalledTimes(2)
-            ->willReturn(
-                ['text', 'varchar(42)', 'NO', '', null, ''],
-                null
-            )
-        ;
-
-        $this->itemRepository = new ItemRepository('desktop_item');
+        $this->itemRepository = new ItemRepository($this->repositoryWrapper->reveal(), $this->table);
     }
 
     public function testDeleteIdsNotIn(): void
     {
-        $this->mysqlDatabase->execute(
-            'DELETE `desktop_item` FROM `marvin`.`desktop_item` WHERE `id` NOT IN (?) AND `user_id`=? ',
-            [42, 0],
-        )
+        $deleteQuery = (new DeleteQuery($this->table))
+            ->addWhere(new Where('`id` NOT IN (?)', [42]))
+            ->addWhere(new Where('`user_id`=?', [0]))
+        ;
+        $this->repositoryWrapper->getClient()
             ->shouldBeCalledOnce()
-            ->willReturn(true)
+            ->willReturn($this->client->reveal())
+        ;
+        $this->client->execute($deleteQuery)
+            ->shouldBeCalledOnce()
+            ->willReturn(null)
+        ;
+        $selectService = $this->prophesize(SelectService::class);
+        $selectService->getParametersString([42])
+            ->shouldBeCalledOnce()
+            ->willReturn('?')
+        ;
+        $this->repositoryWrapper->getSelectService()
+            ->shouldBeCalledOnce()
+            ->willReturn($selectService)
         ;
 
-        $this->assertTrue($this->itemRepository->deleteByIdsNot(
-            new User(),
-            [42],
-        ));
+        $this->assertTrue($this->itemRepository->deleteByIdsNot(new User($this->modelWrapper->reveal()), [42]));
     }
 
     public function testGetLastPosition(): void
     {
-        $this->mysqlDatabase->execute(
-            'SELECT `desktop_item`.`text` FROM `marvin`.`desktop_item` WHERE `user_id`=? ORDER BY `position` DESC LIMIT 1',
-            [0],
-        )
-            ->shouldBeCalledOnce()
-            ->willReturn(true)
-        ;
-        $this->mysqlDatabase->fetchAssocList()
-            ->shouldBeCalledOnce()
-            ->willReturn([[
-                'text' => 'galaxy',
-            ]])
+        $selectQuery = (new SelectQuery($this->table))
+            ->addWhere(new Where('`user_id`=?', [0]))
+            ->setOrder('`position`', OrderDirection::DESC)
+            ->setLimit(1)
         ;
 
         $this->assertEquals(
-            'galaxy',
-            $this->itemRepository->getLastPosition(new User($this->mysqlDatabase->reveal()))->getText(),
+            $this->loadModel($selectQuery, Item::class),
+            $this->itemRepository->getLastPosition(new User($this->modelWrapper->reveal())),
         );
     }
 
     public function testUpdatePosition(): void
     {
-        $this->mysqlDatabase->execute(
-            'UPDATE `marvin`.`desktop_item` SET `position`=`position`+? WHERE `user_id`=? AND `position`>=? ',
-            [2, 0, 1],
-        )
+        $updateQuery = (new UpdateQuery($this->table, ['position' => new Value('`position`+2', ValueType::FUNCTION)]))
+            ->addWhere(new Where('`user_id`=?', [0]))
+            ->addWhere(new Where('`position`>=?', [1]))
+        ;
+        $this->repositoryWrapper->getClient()
             ->shouldBeCalledOnce()
-            ->willReturn(true)
+            ->willReturn($this->client->reveal())
+        ;
+        $this->client->execute($updateQuery)
+            ->shouldBeCalledOnce()
+            ->willReturn(null)
         ;
 
-        $this->itemRepository->updatePosition(new User(), 1, 2);
+        $this->itemRepository->updatePosition(new User($this->modelWrapper->reveal()), 1, 2);
     }
 
     public function testGetByUser(): void
     {
-        $this->mysqlDatabase->execute(
-            'SELECT `desktop_item`.`text` FROM `marvin`.`desktop_item` WHERE `user_id`=? ORDER BY `position` ASC',
-            [0],
-        )
-            ->shouldBeCalledOnce()
-            ->willReturn(true)
-        ;
-        $this->mysqlDatabase->fetchAssocList()
-            ->shouldBeCalledOnce()
-            ->willReturn([[
-                'text' => 'galaxy',
-            ]])
+        $selectQuery = (new SelectQuery($this->table))
+            ->addWhere(new Where('`user_id`=?', [0]))
+            ->setOrder('`position`')
         ;
 
         $this->assertEquals(
-            'galaxy',
-            $this->itemRepository->getByUser(new User($this->mysqlDatabase->reveal()))[0]->getText(),
+            $this->loadModel($selectQuery, Item::class, ''),
+            $this->itemRepository->getByUser(new User($this->modelWrapper->reveal()))[0],
         );
     }
 }

@@ -70,7 +70,7 @@ abstract class AbstractRepository
     ): array {
         $this->repositoryWrapper->getChildrenQuery()->extend($selectQuery, $modelClassName, $children);
         $response = $this->repositoryWrapper->getClient()->execute($selectQuery);
-        $modelService = $this->repositoryWrapper->getModelService();
+        $modelService = $this->repositoryWrapper->getModelWrapper();
         $models = [];
         $primaryKey = implode('-', array_map(
             static fn (Field $primaryField): string => $primaryField->getName(),
@@ -117,7 +117,7 @@ abstract class AbstractRepository
             throw $exception;
         }
 
-        $model = new $modelClassName($this->repositoryWrapper->getModelService());
+        $model = new $modelClassName($this->repositoryWrapper->getModelWrapper());
         $this->repositoryWrapper->getModelManager()->loadFromRecord($record, $model);
 
         $this->repositoryWrapper->getChildrenMapper()->getChildrenModels(
@@ -151,7 +151,7 @@ abstract class AbstractRepository
         array $orderBy = [],
         array $children = [],
     ): AbstractModel {
-        $model = new $modelClassName($this->repositoryWrapper->getModelService());
+        $model = new $modelClassName($this->repositoryWrapper->getModelWrapper());
         $selectQuery = $this->getSelectQuery($model->getTableName())
             ->addWhere(new Where($where, $parameters))
             ->setLimit(1)
@@ -186,7 +186,7 @@ abstract class AbstractRepository
         array $children = [],
     ): array {
         /** @var ModelInterface $model */
-        $model = new $modelClassName();
+        $model = new $modelClassName($this->repositoryWrapper->getModelWrapper());
         $selectQuery = $this->getSelectQuery($model->getTableName())
             ->addWhere(new Where($where, $parameters))
             ->setLimit($limit, $offset)

@@ -73,7 +73,7 @@ class ItemRepository extends AbstractRepository
             ['position' => new Value(sprintf('`position`+%d', $increase), ValueType::FUNCTION)],
         ))
             ->addWhere(new Where('`user_id`=?', [$user->getId() ?? 0]))
-            ->addWhere(new Where('`position`=?', [$fromPosition]))
+            ->addWhere(new Where('`position`>=?', [$fromPosition]))
         ;
 
         try {

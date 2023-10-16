@@ -6,35 +6,23 @@ namespace GibsonOS\Test\Unit\Core\Repository;
 use Codeception\Test\Unit;
 use DateTimeImmutable;
 use GibsonOS\Core\Repository\CronjobRepository;
-use GibsonOS\Test\Unit\Core\ModelManagerTrait;
+use MDO\Dto\Field;
+use MDO\Enum\Type;
 
 class CronjobRepositoryTest extends Unit
 {
-    use ModelManagerTrait;
+    use RepositoryTrait;
 
     private CronjobRepository $cronjobRepository;
 
     protected function _before()
     {
-        $this->loadModelManager();
+        $this->loadRepository(
+            'cronjob',
+            [new Field('command', false, Type::VARCHAR, '', null, '', 4200)],
+        );
 
-        $this->mysqlDatabase->getDatabaseName()
-            ->shouldBeCalledOnce()
-            ->willReturn('marvin')
-        ;
-        $this->mysqlDatabase->sendQuery('SHOW FIELDS FROM `marvin`.`cronjob`')
-            ->shouldBeCalledOnce()
-            ->willReturn(true)
-        ;
-        $this->mysqlDatabase->fetchRow()
-            ->shouldBeCalledTimes(2)
-            ->willReturn(
-                ['command', 'varchar(42)', 'NO', '', null, ''],
-                null,
-            )
-        ;
-
-        $this->cronjobRepository = new CronjobRepository('cronjob', 'cronjob_time');
+        $this->cronjobRepository = new CronjobRepository($this->repositoryWrapper->reveal());
     }
 
     public function testGetRunnableByUser(): void

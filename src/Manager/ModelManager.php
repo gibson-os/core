@@ -345,7 +345,7 @@ class ModelManager
         $deleteQuery = (new DeleteQuery($table))
             ->addWhere(new Where(
                 sprintf(
-                    '(%s`%s_id`=?)',
+                    '%s`%s_id`=?',
                     $where === null ? '' : '(' . $where . ') AND ',
                     $constraintAttribute->getParentColumn(),
                 ),
