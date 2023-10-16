@@ -14,11 +14,11 @@ use GibsonOS\Core\Service\Attribute\ModelsMapperAttribute;
 use GibsonOS\Core\Service\Attribute\ObjectMapperAttribute;
 use GibsonOS\Core\Service\RequestService;
 use GibsonOS\Core\Service\SessionService;
+use GibsonOS\Core\Wrapper\ModelWrapper;
 use GibsonOS\Mock\Dto\Mapper\MapModel;
 use GibsonOS\Mock\Dto\Mapper\MapModelChild;
 use GibsonOS\Mock\Dto\Mapper\StringEnum;
 use GibsonOS\Test\Unit\Core\ModelManagerTrait;
-use mysqlDatabase;
 use Prophecy\Prophecy\ObjectProphecy;
 use ReflectionFunction;
 
@@ -75,7 +75,7 @@ class ModelsMapperAttributeTest extends Unit
         array $parameters,
         array $modelsValues,
         callable $function,
-        array $return
+        array $return,
     ): void {
         $reflectionFunction = new ReflectionFunction($function);
 
@@ -114,7 +114,7 @@ class ModelsMapperAttributeTest extends Unit
                 'SELECT `gibson_o_s_mock_dto_mapper_map_model`.`id`, `gibson_o_s_mock_dto_mapper_map_model`.`nullable_int_value`, `gibson_o_s_mock_dto_mapper_map_model`.`string_enum_value`, `gibson_o_s_mock_dto_mapper_map_model`.`int_value`, `gibson_o_s_mock_dto_mapper_map_model`.`parent_id` ' .
                 'FROM `galaxy`.`gibson_o_s_mock_dto_mapper_map_model` ' .
                 'WHERE (`id`=?) OR (`id`=?)',
-                $ids
+                $ids,
             )
                 ->shouldBeCalledOnce()
                 ->willReturn(true)
@@ -127,13 +127,13 @@ class ModelsMapperAttributeTest extends Unit
 
         $this->assertEquals(
             json_encode($return),
-            json_encode($this->modelsMapperAttribute->replace($attribute, $parameters, $reflectionFunction->getParameters()[0]))
+            json_encode($this->modelsMapperAttribute->replace($attribute, $parameters, $reflectionFunction->getParameters()[0])),
         );
     }
 
     public function getData(): array
     {
-        $mysqlDatabase = $this->prophesize(mysqlDatabase::class);
+        $modelWrapper = $this->prophesize(ModelWrapper::class);
 
         return [
             'OK' => [
@@ -146,12 +146,12 @@ class ModelsMapperAttributeTest extends Unit
                 ],
                 function (array $models) { return $models; },
                 [
-                    (new MapModel($mysqlDatabase->reveal()))
+                    (new MapModel($modelWrapper->reveal()))
                         ->setId(24)
                         ->setStringEnumValue(StringEnum::YES)
                         ->setIntValue(142)
                         ->setChildObjects([]),
-                    (new MapModel($mysqlDatabase->reveal()))
+                    (new MapModel($modelWrapper->reveal()))
                         ->setId(42)
                         ->setStringEnumValue(StringEnum::NO)
                         ->setNullableIntValue(7)
@@ -171,12 +171,12 @@ class ModelsMapperAttributeTest extends Unit
                 [],
                 function (array $models = []) { return $models; },
                 [
-                    (new MapModel($mysqlDatabase->reveal()))
+                    (new MapModel($modelWrapper->reveal()))
                         ->setId(24)
                         ->setStringEnumValue(StringEnum::YES)
                         ->setIntValue(142)
                         ->setChildObjects([]),
-                    (new MapModel($mysqlDatabase->reveal()))
+                    (new MapModel($modelWrapper->reveal()))
                         ->setId(42)
                         ->setStringEnumValue(StringEnum::NO)
                         ->setNullableIntValue(7)
@@ -210,13 +210,13 @@ class ModelsMapperAttributeTest extends Unit
                 ],
                 function (array $models = []) { return $models; },
                 [
-                    (new MapModel($mysqlDatabase->reveal()))
+                    (new MapModel($modelWrapper->reveal()))
                         ->setId(24)
                         ->setStringEnumValue(StringEnum::YES)
                         ->setNullableIntValue(9)
                         ->setIntValue(142)
                         ->setChildObjects([]),
-                    (new MapModel($mysqlDatabase->reveal()))
+                    (new MapModel($modelWrapper->reveal()))
                         ->setId(42)
                         ->setStringEnumValue(StringEnum::NO)
                         ->setIntValue(421)
@@ -238,13 +238,13 @@ class ModelsMapperAttributeTest extends Unit
                 ],
                 function (array $models = []) { return $models; },
                 [
-                    (new MapModel($mysqlDatabase->reveal()))
+                    (new MapModel($modelWrapper->reveal()))
                         ->setId(24)
                         ->setStringEnumValue(StringEnum::YES)
                         ->setIntValue(142)
                         ->setParentId(42)
                         ->setChildObjects([]),
-                    (new MapModel($mysqlDatabase->reveal()))
+                    (new MapModel($modelWrapper->reveal()))
                         ->setId(42)
                         ->setStringEnumValue(StringEnum::NO)
                         ->setNullableIntValue(7)
@@ -267,15 +267,15 @@ class ModelsMapperAttributeTest extends Unit
                 ],
                 function (array $models = []) { return $models; },
                 [
-                    (new MapModel($mysqlDatabase->reveal()))
+                    (new MapModel($modelWrapper->reveal()))
                         ->setId(24)
                         ->setStringEnumValue(StringEnum::YES)
                         ->setIntValue(142)
                         ->setChildObjects([
-                            (new MapModelChild($mysqlDatabase->reveal()))->setId(42),
-                            (new MapModelChild($mysqlDatabase->reveal()))->setId(7),
+                            (new MapModelChild($modelWrapper->reveal()))->setId(42),
+                            (new MapModelChild($modelWrapper->reveal()))->setId(7),
                         ]),
-                    (new MapModel($mysqlDatabase->reveal()))
+                    (new MapModel($modelWrapper->reveal()))
                         ->setId(42)
                         ->setStringEnumValue(StringEnum::NO)
                         ->setNullableIntValue(7)

@@ -11,6 +11,7 @@ class ChildrenMapping
     public function __construct(
         private readonly string $propertyName,
         private readonly string $prefix,
+        private readonly string $alias,
         private readonly array $children = [],
     ) {
     }
@@ -28,5 +29,10 @@ class ChildrenMapping
     public function getChildren(): array
     {
         return $this->children;
+    }
+
+    public function getAlias(): string
+    {
+        return $this->alias;
     }
 }

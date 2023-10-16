@@ -9,10 +9,10 @@ use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Service\Attribute\ModelFetcherAttribute;
 use GibsonOS\Core\Service\RequestService;
 use GibsonOS\Core\Service\SessionService;
+use GibsonOS\Core\Wrapper\ModelWrapper;
 use GibsonOS\Mock\Dto\Mapper\MapModel;
 use GibsonOS\Mock\Dto\Mapper\StringEnum;
 use GibsonOS\Test\Unit\Core\ModelManagerTrait;
-use mysqlDatabase;
 use Prophecy\Prophecy\ObjectProphecy;
 use ReflectionFunction;
 
@@ -70,7 +70,7 @@ class ModelFetcherAttributeTest extends Unit
         array $parameters,
         array $modelValues,
         callable $function,
-        ?MapModel $return
+        ?MapModel $return,
     ): void {
         $reflectionFunction = new ReflectionFunction($function);
 
@@ -86,7 +86,7 @@ class ModelFetcherAttributeTest extends Unit
             'FROM `galaxy`.`gibson_o_s_mock_dto_mapper_map_model` ' .
             'WHERE `id`=? ' .
             'LIMIT 1',
-            [$id]
+            [$id],
         )
             ->shouldBeCalledOnce()
             ->willReturn(true)
@@ -105,14 +105,14 @@ class ModelFetcherAttributeTest extends Unit
             $this->modelFetcherAttribute->replace(
                 $attribute,
                 $parameters,
-                $reflectionFunction->getParameters()[0]
+                $reflectionFunction->getParameters()[0],
             ),
         );
     }
 
     public function getData(): array
     {
-        $mysqlDatabase = $this->prophesize(mysqlDatabase::class);
+        $modelWrapper = $this->prophesize(ModelWrapper::class);
 
         return [
             'OK' => [
@@ -121,7 +121,7 @@ class ModelFetcherAttributeTest extends Unit
                 ['id' => 42],
                 ['id' => 42, 'nullable_int_value' => null, 'string_enum_value' => 'YES', 'int_value' => 142],
                 function (MapModel $model) { return $model; },
-                (new MapModel($mysqlDatabase->reveal()))
+                (new MapModel($modelWrapper->reveal()))
                     ->setId(42)
                     ->setStringEnumValue(StringEnum::YES)
                     ->setIntValue(142),
@@ -140,7 +140,7 @@ class ModelFetcherAttributeTest extends Unit
                 ['modelId' => 42],
                 ['id' => 42, 'nullable_int_value' => null, 'string_enum_value' => 'YES', 'int_value' => 142],
                 function (MapModel $model) { return $model; },
-                (new MapModel($mysqlDatabase->reveal()))
+                (new MapModel($modelWrapper->reveal()))
                     ->setId(42)
                     ->setStringEnumValue(StringEnum::YES)
                     ->setIntValue(142),

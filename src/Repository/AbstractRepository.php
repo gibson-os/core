@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Repository;
 
-use GibsonOS\Core\Attribute\Install\Database\Constraint;
 use GibsonOS\Core\Dto\Model\ChildrenMapping;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\AbstractModel;
@@ -15,8 +14,8 @@ use MDO\Dto\Query\Where;
 use MDO\Dto\Record;
 use MDO\Enum\OrderDirection;
 use MDO\Exception\ClientException;
+use MDO\Exception\RecordException;
 use MDO\Query\SelectQuery;
-use ReflectionClass;
 use ReflectionException;
 
 abstract class AbstractRepository
@@ -56,9 +55,10 @@ abstract class AbstractRepository
      * @param class-string<T>   $modelClassName
      * @param ChildrenMapping[] $children
      *
-     * @throws ClientException
      * @throws JsonException
      * @throws ReflectionException
+     * @throws RecordException
+     * @throws ClientException
      *
      * @return T[]
      */
@@ -68,10 +68,9 @@ abstract class AbstractRepository
         string $prefix = '',
         array $children = [],
     ): array {
+        $this->repositoryWrapper->getChildrenQuery()->extend($selectQuery, $modelClassName, $children);
         $response = $this->repositoryWrapper->getClient()->execute($selectQuery);
         $modelService = $this->repositoryWrapper->getModelService();
-        $reflectionManager = $this->repositoryWrapper->getReflectionManager();
-        $modelReflection = $reflectionManager->getReflectionClass($modelClassName);
         $models = [];
         $primaryKey = implode('-', array_map(
             static fn (Field $primaryField): string => $primaryField->getName(),
@@ -85,97 +84,29 @@ abstract class AbstractRepository
                 $models[$primaryKey] = $model;
             }
 
-            $this->getChildModels($record, $models[$primaryKey], $modelReflection, $children);
+            $this->repositoryWrapper->getChildrenMapper()->getChildrenModels($record, $models[$primaryKey], $children);
         }
 
         return array_values($models);
     }
 
     /**
-     * @param ChildrenMapping[] $children
-     *
-     * @throws JsonException
-     * @throws ReflectionException
-     * @throws ClientException
-     */
-    private function getChildModels(
-        Record $record,
-        AbstractModel $model,
-        ReflectionClass $modelReflection,
-        array $children,
-    ): void {
-        $reflectionManager = $this->repositoryWrapper->getReflectionManager();
-        $modelService = $this->repositoryWrapper->getModelService();
-
-        foreach ($children as $child) {
-            $propertyName = $child->getPropertyName();
-            $propertyReflection = $modelReflection->getProperty($propertyName);
-            $isArray = false;
-            $uppercasePropertyName = ucfirst($propertyName);
-
-            try {
-                $childModelClassName = $reflectionManager->getNonBuiltinTypeName($propertyReflection);
-                $setter = sprintf('set%s', $uppercasePropertyName);
-            } catch (ReflectionException) {
-                $childModelClassName = $reflectionManager
-                    ->getAttribute($propertyReflection, Constraint::class)
-                    ?->getParentModelClassName()
-                ;
-                $isArray = true;
-                $setter = sprintf('add%s', $uppercasePropertyName);
-            }
-
-            if ($childModelClassName === null) {
-                throw new ReflectionException(sprintf(
-                    'No child class name found for property "%s::%s"',
-                    $model::class,
-                    $propertyName,
-                ));
-            }
-
-            // @todo gucken ob das child model schon existiert
-            /** @var AbstractModel $childModel */
-            $childModel = new $childModelClassName($modelService);
-            $primaryKeys = $this->repositoryWrapper->getTableManager()->getTable($childModel->getTableName());
-
-            if ($isArray) {
-                /** @var AbstractModel $existingChild */
-                foreach ($model->{'get' . $uppercasePropertyName}() as $existingChild) {
-
-                }
-            }
-
-            $this->repositoryWrapper->getModelManager()->loadFromRecord($record, $childModel, $child->getPrefix());
-
-            $this->getChildModels(
-                $record,
-                $childModel,
-                $reflectionManager->getReflectionClass($childModelClassName),
-                $child->getChildren(),
-            );
-
-            if ($isArray) {
-                $childModel = [$childModel];
-            }
-
-            $model->$setter($childModel);
-        }
-    }
-
-    /**
      * @template T of AbstractModel
      *
-     * @param class-string<T> $modelClassName
+     * @param class-string<T>   $modelClassName
+     * @param ChildrenMapping[] $children
      *
-     * @throws ClientException
-     * @throws JsonException
      * @throws ReflectionException
      * @throws SelectError
+     * @throws RecordException
+     * @throws ClientException
+     * @throws JsonException
      *
      * @return T
      */
     protected function getModel(SelectQuery $selectQuery, string $modelClassName, array $children = []): AbstractModel
     {
+        $this->repositoryWrapper->getChildrenQuery()->extend($selectQuery, $modelClassName, $children);
         $result = $this->repositoryWrapper->getClient()->execute($selectQuery);
         $record = $result?->iterateRecords()->current();
 
@@ -189,10 +120,9 @@ abstract class AbstractRepository
         $model = new $modelClassName($this->repositoryWrapper->getModelService());
         $this->repositoryWrapper->getModelManager()->loadFromRecord($record, $model);
 
-        $this->getChildModels(
+        $this->repositoryWrapper->getChildrenMapper()->getChildrenModels(
             $record,
             $model,
-            $this->repositoryWrapper->getReflectionManager()->getReflectionClass($modelClassName),
             $children,
         );
 
@@ -204,11 +134,13 @@ abstract class AbstractRepository
      *
      * @param class-string<T>               $modelClassName
      * @param array<string, OrderDirection> $orderBy
+     * @param ChildrenMapping[]             $children
      *
-     * @throws ClientException
      * @throws JsonException
      * @throws ReflectionException
      * @throws SelectError
+     * @throws RecordException
+     * @throws ClientException
      *
      * @return T
      */
@@ -234,10 +166,12 @@ abstract class AbstractRepository
      *
      * @param class-string<T>               $modelClassName
      * @param array<string, OrderDirection> $orderBy
+     * @param ChildrenMapping[]             $children
      *
-     * @throws ClientException
-     * @throws JsonException
      * @throws ReflectionException
+     * @throws ClientException
+     * @throws RecordException
+     * @throws JsonException
      *
      * @return T[]
      */
@@ -248,6 +182,8 @@ abstract class AbstractRepository
         int $limit = 0,
         int $offset = 0,
         array $orderBy = [],
+        string $prefix = '',
+        array $children = [],
     ): array {
         /** @var ModelInterface $model */
         $model = new $modelClassName();
@@ -257,7 +193,7 @@ abstract class AbstractRepository
             ->setOrders($orderBy)
         ;
 
-        return $this->getModels($selectQuery, $modelClassName);
+        return $this->getModels($selectQuery, $modelClassName, $prefix, $children);
     }
 
     /**

@@ -13,10 +13,10 @@ use GibsonOS\Core\Service\Attribute\ModelFetcherAttribute;
 use GibsonOS\Core\Service\Attribute\ModelMapperAttribute;
 use GibsonOS\Core\Service\RequestService;
 use GibsonOS\Core\Service\SessionService;
+use GibsonOS\Core\Wrapper\ModelWrapper;
 use GibsonOS\Mock\Dto\Mapper\MapModel;
 use GibsonOS\Mock\Dto\Mapper\StringEnum;
 use GibsonOS\Test\Unit\Core\ModelManagerTrait;
-use mysqlDatabase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 use ReflectionFunction;
@@ -64,7 +64,7 @@ class ModelMapperAttributeTest extends Unit
         array $parameters,
         array $modelValues,
         callable $function,
-        ?MapModel $return
+        ?MapModel $return,
     ): void {
         $this->requestService->getRequestValue(Argument::any())->willThrow(RequestError::class);
         $reflectionFunction = new ReflectionFunction($function);
@@ -101,7 +101,7 @@ class ModelMapperAttributeTest extends Unit
                 'FROM `galaxy`.`gibson_o_s_mock_dto_mapper_map_model` ' .
                 'WHERE `id`=? ' .
                 'LIMIT 1',
-                [$id]
+                [$id],
             )
                 ->shouldBeCalledOnce()
                 ->willReturn(true)
@@ -118,13 +118,13 @@ class ModelMapperAttributeTest extends Unit
 
         $this->assertEquals(
             json_encode($return),
-            json_encode($this->modelMapperAttribute->replace($attribute, $parameters, $reflectionFunction->getParameters()[0]))
+            json_encode($this->modelMapperAttribute->replace($attribute, $parameters, $reflectionFunction->getParameters()[0])),
         );
     }
 
     public function getData(): array
     {
-        $mysqlDatabase = $this->prophesize(mysqlDatabase::class);
+        $modelWrapper = $this->prophesize(ModelWrapper::class);
 
         return [
             'OK' => [
@@ -133,7 +133,7 @@ class ModelMapperAttributeTest extends Unit
                 ['id' => 42],
                 ['id' => 42, 'nullable_int_value' => null, 'string_enum_value' => 'YES', 'int_value' => 142],
                 function (MapModel $model) { return $model; },
-                (new MapModel($mysqlDatabase->reveal()))
+                (new MapModel($modelWrapper->reveal()))
                     ->setId(42)
                     ->setStringEnumValue(StringEnum::YES)
                     ->setIntValue(142)
@@ -153,7 +153,7 @@ class ModelMapperAttributeTest extends Unit
                 ['modelId' => 42],
                 ['id' => 42, 'nullable_int_value' => null, 'string_enum_value' => 'YES', 'int_value' => 142],
                 function (MapModel $model) { return $model; },
-                (new MapModel($mysqlDatabase->reveal()))
+                (new MapModel($modelWrapper->reveal()))
                     ->setId(42)
                     ->setStringEnumValue(StringEnum::YES)
                     ->setIntValue(142)
@@ -165,7 +165,7 @@ class ModelMapperAttributeTest extends Unit
                 ['id' => 42, 'nullableIntValue' => 420, 'stringEnumValue' => 'nein', 'intValue' => 24],
                 ['id' => 42, 'nullable_int_value' => null, 'string_enum_value' => 'YES', 'int_value' => 142],
                 function (MapModel $model) { return $model; },
-                (new MapModel($mysqlDatabase->reveal()))
+                (new MapModel($modelWrapper->reveal()))
                     ->setId(42)
                     ->setNullableIntValue(420)
                     ->setStringEnumValue(StringEnum::NO)
@@ -178,7 +178,7 @@ class ModelMapperAttributeTest extends Unit
                 ['nullableIntValue' => 240, 'stringEnumValue' => 'ja', 'intValue' => 42],
                 [],
                 function (MapModel $model) { return $model; },
-                (new MapModel($mysqlDatabase->reveal()))
+                (new MapModel($modelWrapper->reveal()))
                     ->setNullableIntValue(240)
                     ->setStringEnumValue(StringEnum::YES)
                     ->setIntValue(42)

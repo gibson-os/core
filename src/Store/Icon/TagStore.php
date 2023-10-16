@@ -3,8 +3,11 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Store\Icon;
 
+use Generator;
 use GibsonOS\Core\Model\Icon\Tag;
 use GibsonOS\Core\Store\AbstractDatabaseStore;
+use MDO\Dto\Record;
+use MDO\Dto\Value;
 
 /**
  * @extends AbstractDatabaseStore<Tag>
@@ -26,19 +29,26 @@ class TagStore extends AbstractDatabaseStore
         return '`tag`';
     }
 
-    protected function initTable(): void
+    protected function initQuery(): void
     {
-        parent::initTable();
-        $this->table->setGroupBy('`tag`');
+        parent::initQuery();
+
+        $this->selectQuery
+            ->setSelects(['tag' => '`tag`', 'count' => 'COUNT(`icon_id`)'])
+            ->setGroupBy(['`tag`'])
+        ;
     }
 
-    /**
-     * @return iterable<array>
-     */
-    public function getList(): iterable
+    public function getList(): array
     {
-        $this->table->selectPrepared(false, '`tag`, COUNT(`icon_id`) AS `count`');
+        $result = $this->getDatabaseStoreWrapper()->getClient()->execute($this->selectQuery);
 
-        return $this->table->connection->fetchAssocList();
+        return array_map(
+            static fn (Record $record): array => array_map(
+                static fn (Value $value): float|string|int|null => $value->getValue(),
+                $record->getValues(),
+            ),
+            iterator_to_array($result?->iterateRecords() ?? new Generator()),
+        );
     }
 }

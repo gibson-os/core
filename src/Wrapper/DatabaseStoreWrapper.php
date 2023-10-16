@@ -4,23 +4,26 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Wrapper;
 
 use GibsonOS\Core\Manager\ModelManager;
-use GibsonOS\Core\Mapper\Model\ChildrenMapper;
 use GibsonOS\Core\Query\ChildrenQuery;
 use MDO\Client;
 use MDO\Manager\TableManager;
 use MDO\Service\SelectService;
 
-class RepositoryWrapper
+class DatabaseStoreWrapper
 {
     public function __construct(
+        private readonly TableManager $tableManager,
         private readonly Client $client,
         private readonly ModelManager $modelManager,
-        private readonly TableManager $tableManager,
-        private readonly ModelWrapper $modelService,
-        private readonly SelectService $selectService,
-        private readonly ChildrenMapper $childrenMapper,
         private readonly ChildrenQuery $childrenQuery,
+        private readonly SelectService $selectService,
+        private readonly ModelWrapper $modelWrapper,
     ) {
+    }
+
+    public function getTableManager(): TableManager
+    {
+        return $this->tableManager;
     }
 
     public function getClient(): Client
@@ -33,14 +36,9 @@ class RepositoryWrapper
         return $this->modelManager;
     }
 
-    public function getTableManager(): TableManager
+    public function getChildrenQuery(): ChildrenQuery
     {
-        return $this->tableManager;
-    }
-
-    public function getModelService(): ModelWrapper
-    {
-        return $this->modelService;
+        return $this->childrenQuery;
     }
 
     public function getSelectService(): SelectService
@@ -48,13 +46,8 @@ class RepositoryWrapper
         return $this->selectService;
     }
 
-    public function getChildrenMapper(): ChildrenMapper
+    public function getModelWrapper(): ModelWrapper
     {
-        return $this->childrenMapper;
-    }
-
-    public function getChildrenQuery(): ChildrenQuery
-    {
-        return $this->childrenQuery;
+        return $this->modelWrapper;
     }
 }

@@ -12,10 +12,10 @@ use GibsonOS\Core\Service\Attribute\ModelsFetcherAttribute;
 use GibsonOS\Core\Service\Attribute\ObjectMapperAttribute;
 use GibsonOS\Core\Service\RequestService;
 use GibsonOS\Core\Service\SessionService;
+use GibsonOS\Core\Wrapper\ModelWrapper;
 use GibsonOS\Mock\Dto\Mapper\MapModel;
 use GibsonOS\Mock\Dto\Mapper\StringEnum;
 use GibsonOS\Test\Unit\Core\ModelManagerTrait;
-use mysqlDatabase;
 use Prophecy\Prophecy\ObjectProphecy;
 use ReflectionFunction;
 
@@ -48,7 +48,7 @@ class ModelsFetcherAttributeTest extends Unit
                 ),
                 $this->requestService->reveal(),
                 $reflectionManager,
-            )
+            ),
         );
     }
 
@@ -61,7 +61,7 @@ class ModelsFetcherAttributeTest extends Unit
         array $parameters,
         array $modelsValues,
         callable $function,
-        array $return
+        array $return,
     ): void {
         $reflectionFunction = new ReflectionFunction($function);
 
@@ -100,7 +100,7 @@ class ModelsFetcherAttributeTest extends Unit
                 'SELECT `gibson_o_s_mock_dto_mapper_map_model`.`id`, `gibson_o_s_mock_dto_mapper_map_model`.`nullable_int_value`, `gibson_o_s_mock_dto_mapper_map_model`.`string_enum_value`, `gibson_o_s_mock_dto_mapper_map_model`.`int_value`, `gibson_o_s_mock_dto_mapper_map_model`.`parent_id` ' .
                     'FROM `galaxy`.`gibson_o_s_mock_dto_mapper_map_model` ' .
                     'WHERE (`id`=?) OR (`id`=?)',
-                $ids
+                $ids,
             )
                 ->shouldBeCalledOnce()
                 ->willReturn(true)
@@ -113,13 +113,13 @@ class ModelsFetcherAttributeTest extends Unit
 
         $this->assertEquals(
             $return,
-            $this->modelsFetcherAttribute->replace($attribute, $parameters, $reflectionFunction->getParameters()[0])
+            $this->modelsFetcherAttribute->replace($attribute, $parameters, $reflectionFunction->getParameters()[0]),
         );
     }
 
     public function getData(): array
     {
-        $mysqlDatabase = $this->prophesize(mysqlDatabase::class);
+        $modelWrapper = $this->prophesize(ModelWrapper::class);
 
         return [
             'OK' => [
@@ -132,11 +132,11 @@ class ModelsFetcherAttributeTest extends Unit
                 ],
                 function (array $models) { return $models; },
                 [
-                    (new MapModel($mysqlDatabase->reveal()))
+                    (new MapModel($modelWrapper->reveal()))
                         ->setId(24)
                         ->setStringEnumValue(StringEnum::YES)
                         ->setIntValue(142),
-                    (new MapModel($mysqlDatabase->reveal()))
+                    (new MapModel($modelWrapper->reveal()))
                         ->setId(42)
                         ->setStringEnumValue(StringEnum::NO)
                         ->setNullableIntValue(7)

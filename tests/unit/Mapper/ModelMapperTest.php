@@ -10,13 +10,13 @@ use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Manager\ServiceManager;
 use GibsonOS\Core\Mapper\ModelMapper;
 use GibsonOS\Core\Utility\JsonUtility;
+use GibsonOS\Core\Wrapper\ModelWrapper;
 use GibsonOS\Mock\Dto\Mapper\IntEnum;
 use GibsonOS\Mock\Dto\Mapper\MapModel;
 use GibsonOS\Mock\Dto\Mapper\MapModelChild;
 use GibsonOS\Mock\Dto\Mapper\MapModelParent;
 use GibsonOS\Test\Unit\Core\ModelManagerTrait;
 use JsonException;
-use mysqlDatabase;
 use ReflectionException;
 use Throwable;
 use ValueError;
@@ -76,7 +76,7 @@ class ModelMapperTest extends Unit
             $this->assertEquals($parentObject instanceof MapModelParent ? $parentObject->getId() : ($parentObject['id'] ?? null), $parent->getId());
             $this->assertEquals($parentObject instanceof MapModelParent ? $parentObject->isDefault() : ($parentObject['default'] ?? false), $parent->isDefault());
             $this->assertEquals($parentObject instanceof MapModelParent ? $parentObject->getOptions() : ($parentObject['options'] ?? []), $parent->getOptions());
-//            $this->assertEquals($object, $parent->getObjects()[0]);
+            //            $this->assertEquals($object, $parent->getObjects()[0]);
         }
 
         $childObjects = $object->getChildObjects();
@@ -117,7 +117,7 @@ class ModelMapperTest extends Unit
 
     public function getTestData(): array
     {
-        $mysqlDatabase = $this->prophesize(mysqlDatabase::class);
+        $modelWrapper = $this->prophesize(ModelWrapper::class);
 
         return [
             'only defaults' => [['stringEnumValue' => 'ja', 'intValue' => 1]],
@@ -224,8 +224,8 @@ class ModelMapperTest extends Unit
                 [
                     'stringEnumValue' => 'nein',
                     'intValue' => 42,
-                    'parent' => (new MapModelParent($mysqlDatabase->reveal()))->setOptions(['foo' => 'bar']),
-                    'childObjects' => [(new MapModelChild($mysqlDatabase->reveal()))->setNullableIntEnumValue(IntEnum::DEFINED)],
+                    'parent' => (new MapModelParent($modelWrapper->reveal()))->setOptions(['foo' => 'bar']),
+                    'childObjects' => [(new MapModelChild($modelWrapper->reveal()))->setNullableIntEnumValue(IntEnum::DEFINED)],
                 ],
             ],
             'with parent object id' => [

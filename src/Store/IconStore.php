@@ -3,9 +3,11 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Store;
 
-use GibsonOS\Core\Attribute\GetTableName;
+use GibsonOS\Core\Attribute\GetTable;
 use GibsonOS\Core\Model\Icon;
-use mysqlDatabase;
+use GibsonOS\Core\Wrapper\DatabaseStoreWrapper;
+use MDO\Dto\Query\Join;
+use MDO\Dto\Table;
 
 /**
  * @extends AbstractDatabaseStore<Icon>
@@ -18,11 +20,11 @@ class IconStore extends AbstractDatabaseStore
     private array $tags = [];
 
     public function __construct(
-        #[GetTableName(Icon\Tag::class)]
-        private string $iconTagTableName,
-        mysqlDatabase $database = null,
+        #[GetTable(Icon\Tag::class)]
+        private readonly Table $iconTagTable,
+        DatabaseStoreWrapper $databaseStoreWrapper,
     ) {
-        parent::__construct($database);
+        parent::__construct($databaseStoreWrapper);
     }
 
     protected function getModelClassName(): string
@@ -30,26 +32,32 @@ class IconStore extends AbstractDatabaseStore
         return Icon::class;
     }
 
-    protected function initTable(): void
+    protected function getAlias(): ?string
     {
-        parent::initTable();
+        return 'i';
+    }
 
-        if (count($this->tags) > 0) {
-            $this->table->appendJoin(
-                $this->iconTagTableName,
-                '`' . $this->iconTagTableName . '`.`icon_id` = `' . $this->tableName . '`.`id`',
-            );
+    protected function initQuery(): void
+    {
+        parent::initQuery();
+
+        if (count($this->tags) === 0) {
+            return;
         }
+
+        $this->selectQuery->addJoin(new Join($this->iconTagTable, 'it', '`it`.`icon_id`=`i`.`id`'));
     }
 
     protected function setWheres(): void
     {
-        if (count($this->tags) > 0) {
-            $this->addWhere(
-                '`' . $this->iconTagTableName . '`.`tag` IN (' . $this->table->getParametersString($this->tags) . ')',
-                $this->tags,
-            );
+        if (count($this->tags) === 0) {
+            return;
         }
+
+        $this->addWhere(
+            sprintf('`it`.`tag` IN (%s)', $this->getDatabaseStoreWrapper()->getSelectService()->getParametersString($this->tags)),
+            $this->tags,
+        );
     }
 
     /**

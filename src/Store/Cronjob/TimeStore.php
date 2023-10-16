@@ -6,6 +6,7 @@ namespace GibsonOS\Core\Store\Cronjob;
 use GibsonOS\Core\Model\Cronjob;
 use GibsonOS\Core\Model\Cronjob\Time;
 use GibsonOS\Core\Store\AbstractDatabaseStore;
+use MDO\Dto\Record;
 
 /**
  * @extends AbstractDatabaseStore<Time>
@@ -38,17 +39,24 @@ class TimeStore extends AbstractDatabaseStore
 
     public function getList(): array
     {
-        $this->initTable();
+        $this->initQuery();
+        $this->selectQuery->setSelects([
+            'hour' => 'IF(`from_hour` = `to_hour`, `from_hour`, IF(`from_hour` = 0 AND `to_hour` = 23, "*", CONCAT(`from_hour`, "-", `to_hour`)))',
+            'minute' => 'IF(`from_minute` = `to_minute`, `from_minute`, IF(`from_minute` = 0 AND `to_minute` = 59, "*", CONCAT(`from_minute`, "-", `to_minute`)))',
+            'second' => 'IF(`from_second` = `to_second`, `from_second`, IF(`from_second` = 0 AND `to_second` = 59, "*", CONCAT(`from_second`, "-", `to_second`)))',
+            'day_of_month' => 'IF(`from_day_of_month` = `to_day_of_month`, `from_day_of_month`, IF(`from_day_of_month` = 1 AND `to_day_of_month` = 31, "*", CONCAT(`from_day_of_month`, "-", `to_day_of_month`)))',
+            'day_of_week' => 'IF(`from_day_of_week` = `to_day_of_week`, `from_day_of_week`, IF(`from_day_of_week` = 0 AND `to_day_of_week` = 6, "*", CONCAT(`from_day_of_week`, "-", `to_day_of_week`)))',
+            'month' => 'IF(`from_month` = `to_month`, `from_month`, IF(`from_month` = 1 AND `to_month` = 12, "*", CONCAT(`from_month`, "-", `to_month`)))',
+            'year' => 'IF(`from_year` = `to_year`, `from_year`, IF(`from_year` = 0 AND `to_year` = 9999, "*", CONCAT(`from_year`, "-", `to_year`)))',
+        ]);
 
-        $this->table->selectPrepared(false, 'IF(`from_hour` = `to_hour`, `from_hour`, IF(`from_hour` = 0 AND `to_hour` = 23, "*", CONCAT(`from_hour`, "-", `to_hour`))) AS `hour`, ' .
-            'IF(`from_minute` = `to_minute`, `from_minute`, IF(`from_minute` = 0 AND `to_minute` = 59, "*", CONCAT(`from_minute`, "-", `to_minute`))) AS `minute`, ' .
-            'IF(`from_second` = `to_second`, `from_second`, IF(`from_second` = 0 AND `to_second` = 59, "*", CONCAT(`from_second`, "-", `to_second`))) AS `second`, ' .
-            'IF(`from_day_of_month` = `to_day_of_month`, `from_day_of_month`, IF(`from_day_of_month` = 1 AND `to_day_of_month` = 31, "*", CONCAT(`from_day_of_month`, "-", `to_day_of_month`))) AS `day_of_month`, ' .
-            'IF(`from_day_of_week` = `to_day_of_week`, `from_day_of_week`, IF(`from_day_of_week` = 0 AND `to_day_of_week` = 6, "*", CONCAT(`from_day_of_week`, "-", `to_day_of_week`))) AS `day_of_week`, ' .
-            'IF(`from_month` = `to_month`, `from_month`, IF(`from_month` = 1 AND `to_month` = 12, "*", CONCAT(`from_month`, "-", `to_month`))) AS `month`, ' .
-            'IF(`from_year` = `to_year`, `from_year`, IF(`from_year` = 0 AND `to_year` = 9999, "*", CONCAT(`from_year`, "-", `to_year`))) AS `year`');
+        $result = $this->getDatabaseStoreWrapper()->getClient()->execute($this->selectQuery);
+        $records = array_map(
+            static fn (Record $record): array => $record->getValues(),
+            $result === null ? [] : iterator_to_array($result->iterateRecords()),
+        );
 
-        return $this->group($this->table->connection->fetchAssocList());
+        return $this->group($records);
     }
 
     public function setCronjob(?Cronjob $cronjob): TimeStore

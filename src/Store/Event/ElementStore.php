@@ -7,12 +7,14 @@ use GibsonOS\Core\Dto\Parameter\AbstractParameter;
 use GibsonOS\Core\Exception\FactoryError;
 use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\Repository\SelectError;
-use GibsonOS\Core\Manager\ModelManager;
 use GibsonOS\Core\Model\Event;
 use GibsonOS\Core\Model\Event\Element;
 use GibsonOS\Core\Store\AbstractDatabaseStore;
+use GibsonOS\Core\Wrapper\DatabaseStoreWrapper;
 use JsonException;
-use mysqlDatabase;
+use MDO\Enum\OrderDirection;
+use MDO\Exception\ClientException;
+use MDO\Exception\RecordException;
 use ReflectionException;
 
 /**
@@ -23,10 +25,9 @@ class ElementStore extends AbstractDatabaseStore
     public function __construct(
         private readonly ClassNameStore $classNameStore,
         private readonly MethodStore $methodStore,
-        private readonly ModelManager $modelManager,
-        mysqlDatabase $database = null,
+        DatabaseStoreWrapper $databaseStoreWrapper,
     ) {
-        parent::__construct($database);
+        parent::__construct($databaseStoreWrapper);
     }
 
     private Event $event;
@@ -46,37 +47,35 @@ class ElementStore extends AbstractDatabaseStore
         $this->addWhere('`event_id`=?', [$this->event->getId() ?? 0]);
     }
 
+    protected function initQuery(): void
+    {
+        parent::initQuery();
+
+        $this->selectQuery->setOrders([
+            '`parent_id`' => OrderDirection::ASC,
+            '`order`' => OrderDirection::ASC,
+        ]);
+    }
+
     /**
+     * @throws FactoryError
      * @throws GetError
      * @throws JsonException
-     * @throws SelectError
-     * @throws FactoryError
      * @throws ReflectionException
+     * @throws SelectError
+     * @throws ClientException
+     * @throws RecordException
      *
      * @return Element[]
      */
     public function getList(): array
     {
-        $this->initTable();
-        $this->table->setOrderBy('`parent_id`, `order`');
-
-        $select = $this->table->selectPrepared();
-
-        if ($select === false) {
-            throw (new SelectError())->setTable($this->table);
-        }
-
-        if ($select === 0) {
-            return [];
-        }
-
+        $this->initQuery();
         $data = [];
         $models = [];
         $classNames = $this->classNameStore->getList();
 
-        do {
-            $element = new Element();
-            $this->modelManager->loadFromMysqlTable($this->table, $element);
+        foreach (parent::getList() as $element) {
             $element->setChildren([]);
             $models[$element->getId() ?? 0] = $element;
             $parentId = $element->getParentId();
@@ -108,15 +107,13 @@ class ElementStore extends AbstractDatabaseStore
             } else {
                 $models[$parentId]->addChildren([$element]);
             }
-        } while ($this->table->next());
+        }
 
         return $data;
     }
 
     /**
      * @param AbstractParameter[] $methodParameters
-     *
-     * @throws JsonException
      *
      * @return AbstractParameter[]
      */
@@ -148,8 +145,6 @@ class ElementStore extends AbstractDatabaseStore
 
     /**
      * @param AbstractParameter[] $methodReturns
-     *
-     * @throws JsonException
      *
      * @return AbstractParameter[]
      */

@@ -17,6 +17,7 @@ use GibsonOS\Core\Service\Event\ElementService;
 use GibsonOS\Core\Service\EventService;
 use GibsonOS\Core\Service\LoggerService;
 use GibsonOS\Core\Service\ProcessService;
+use GibsonOS\Core\Wrapper\ModelWrapper;
 use GibsonOS\Mock\Service\TestEvent;
 use GibsonOS\Test\Unit\Core\ModelManagerTrait;
 use mysqlDatabase;
@@ -53,7 +54,7 @@ class EventServiceTest extends Unit
             $this->serviceManager->get(ReflectionManager::class),
             $this->serviceManager->get(ModelManager::class),
             $this->serviceManager->get(ProcessService::class),
-            $this->serviceManager->get(LoggerInterface::class)
+            $this->serviceManager->get(LoggerInterface::class),
         );
     }
 
@@ -62,7 +63,7 @@ class EventServiceTest extends Unit
         $this->eventRepository->getTimeControlled(
             TestEvent::class,
             TestEvent::TRIGGER_MARVIN,
-            Argument::type(DateTime::class)
+            Argument::type(DateTime::class),
         )
             ->shouldBeCalledOnce()
             ->willReturn([])
@@ -70,7 +71,7 @@ class EventServiceTest extends Unit
         $this->eventRepository->getTimeControlled(
             TestEvent::class,
             TestEvent::TRIGGER_FORD,
-            Argument::type(DateTime::class)
+            Argument::type(DateTime::class),
         )
             ->shouldBeCalledOnce()
             ->willReturn([])
@@ -124,20 +125,20 @@ class EventServiceTest extends Unit
 
     public function getTestData(): array
     {
-        $mysqlDatabase = $this->prophesize(mysqlDatabase::class);
+        $modelWrapper = $this->prophesize(ModelWrapper::class);
 
         return [
             'Simple Event' => [
-                (new Event($mysqlDatabase->reveal()))
+                (new Event($modelWrapper->reveal()))
                     ->setAsync(false)
                     ->setElements([
-                        (new Element($mysqlDatabase->reveal()))
+                        (new Element($modelWrapper->reveal()))
                             ->setClass(TestEvent::class)
                             ->setMethod('test')
                             ->setParameters(['arthur' => 'dent']),
                     ])
                     ->setTriggers([
-                        (new Event\Trigger($mysqlDatabase->reveal()))
+                        (new Event\Trigger($modelWrapper->reveal()))
                             ->setClass(TestEvent::class)
                             ->setTrigger(TestEvent::TRIGGER_FORD),
                     ]),

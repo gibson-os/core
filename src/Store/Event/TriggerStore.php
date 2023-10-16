@@ -7,12 +7,13 @@ use GibsonOS\Core\Dto\Parameter\AbstractParameter;
 use GibsonOS\Core\Exception\FactoryError;
 use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\Repository\SelectError;
-use GibsonOS\Core\Manager\ModelManager;
 use GibsonOS\Core\Model\Event;
 use GibsonOS\Core\Model\Event\Trigger;
 use GibsonOS\Core\Store\AbstractDatabaseStore;
+use GibsonOS\Core\Wrapper\DatabaseStoreWrapper;
 use JsonException;
-use mysqlDatabase;
+use MDO\Exception\ClientException;
+use MDO\Exception\RecordException;
 use ReflectionException;
 
 /**
@@ -25,10 +26,9 @@ class TriggerStore extends AbstractDatabaseStore
     public function __construct(
         private readonly ClassTriggerStore $classTriggerStore,
         private readonly ClassNameStore $classNameStore,
-        private readonly ModelManager $modelManager,
-        mysqlDatabase $database = null,
+        DatabaseStoreWrapper $databaseStoreWrapper,
     ) {
-        parent::__construct($database);
+        parent::__construct($databaseStoreWrapper);
     }
 
     protected function getModelClassName(): string
@@ -41,35 +41,28 @@ class TriggerStore extends AbstractDatabaseStore
         $this->addWhere('`event_id`=?', [$this->event->getId() ?? 0]);
     }
 
+    protected function initQuery(): void
+    {
+        parent::initQuery();
+
+        $this->selectQuery->setOrder('`priority`');
+    }
+
     /**
      * @throws FactoryError
      * @throws GetError
      * @throws JsonException
-     * @throws SelectError
      * @throws ReflectionException
+     * @throws SelectError
+     * @throws ClientException
+     * @throws RecordException
      */
     public function getList(): iterable
     {
-        $this->initTable();
-        $this->table->setOrderBy('priority');
-
-        $selectPrepared = $this->table->selectPrepared();
-
-        if ($selectPrepared === false) {
-            throw (new SelectError())->setTable($this->table);
-        }
-
-        if ($selectPrepared === 0) {
-            return [];
-        }
-
         $models = [];
         $classNames = $this->classNameStore->getList();
 
-        do {
-            $model = new Trigger();
-            $this->modelManager->loadFromMysqlTable($this->table, $model);
-
+        foreach (parent::getList() as $model) {
             foreach ($classNames as $className) {
                 if ($className['className'] === $model->getClass()) {
                     $model->setClassTitle($className['title']);
@@ -92,7 +85,7 @@ class TriggerStore extends AbstractDatabaseStore
             }
 
             $models[] = $model;
-        } while ($this->table->next());
+        }
 
         return $models;
     }

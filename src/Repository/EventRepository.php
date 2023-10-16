@@ -12,11 +12,9 @@ use GibsonOS\Core\Model\Event\Element;
 use GibsonOS\Core\Model\Event\Trigger;
 use GibsonOS\Core\Wrapper\RepositoryWrapper;
 use JsonException;
-use MDO\Dto\Query\Join;
 use MDO\Dto\Query\Where;
 use MDO\Dto\Select;
 use MDO\Dto\Table;
-use MDO\Enum\JoinType;
 use MDO\Enum\OrderDirection;
 use MDO\Exception\ClientException;
 use ReflectionException;
@@ -74,8 +72,6 @@ class EventRepository extends AbstractRepository
     public function getTimeControlled(string $className, string $trigger, DateTimeInterface $dateTime): array
     {
         $query = $this->getSelectQuery($this->eventElementTable->getTableName(), 'ee')
-            ->addJoin(new Join($this->eventTable, 'e', '`e`.`id`=`ee`.`event_id`', JoinType::LEFT))
-            ->addJoin(new Join($this->eventTriggerTable, 'et', '`e`.`id`=`et`.`event_id`', JoinType::LEFT))
             ->setOrder('`et`.`priority`', OrderDirection::DESC)
             ->setOrder('`ee`.`parentId`')
             ->setOrder('`ee`.`order`')
@@ -95,14 +91,25 @@ class EventRepository extends AbstractRepository
             ->addWhere(new Where('`et`.`minute` IS NULL OR `et`.`minute`=?', [(int) $dateTime->format('i')]))
             ->addWhere(new Where('`et`.`second` IS NULL OR `et`.`second`=?', [(int) $dateTime->format('s')]))
         ;
+        $childrenQuery = $this->getRepositoryWrapper()->getChildrenQuery();
+        $childrenQuery->extend(
+            $query,
+            Element::class,
+            [new ChildrenMapping('event', 'event_', 'e')],
+        );
+        $childrenQuery->extend(
+            $query,
+            Event::class,
+            [new ChildrenMapping('triggers', 'trigger_', 'et')],
+        );
 
         return $this->getModels(
             $query,
             Event::class,
             'event_',
             [
-                new ChildrenMapping('triggers', 'trigger_'),
-                new ChildrenMapping('elements', 'element_'),
+                new ChildrenMapping('triggers', 'trigger_', 'et'),
+                new ChildrenMapping('elements', 'element_', 'ee'),
             ],
         );
     }

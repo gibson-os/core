@@ -12,7 +12,7 @@ use GibsonOS\Core\Model\Task;
 use GibsonOS\Core\Model\User;
 use GibsonOS\Core\Model\User\Permission;
 use GibsonOS\Core\Store\AbstractStore;
-use mysqlDatabase;
+use GibsonOS\Core\Wrapper\DatabaseStoreWrapper;
 
 class PermissionStore extends AbstractStore
 {
@@ -23,6 +23,7 @@ class PermissionStore extends AbstractStore
     private ?int $actionId = null;
 
     public function __construct(
+        private readonly DatabaseStoreWrapper $databaseStoreWrapper,
         #[GetTableName(User::class)]
         private readonly string $userTableName,
         #[GetTableName(Permission::class)]
@@ -33,7 +34,6 @@ class PermissionStore extends AbstractStore
         private readonly string $taskTableName,
         #[GetTableName(Action::class)]
         private readonly string $actionTableName,
-        private readonly mysqlDatabase $mysqlDatabase,
     ) {
     }
 

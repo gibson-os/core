@@ -3,13 +3,14 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Store\Role;
 
-use DateTimeImmutable;
-use GibsonOS\Core\Attribute\GetTableName;
+use GibsonOS\Core\Attribute\GetTable;
+use GibsonOS\Core\Dto\Model\ChildrenMapping;
 use GibsonOS\Core\Model\Role;
 use GibsonOS\Core\Model\Role\User;
-use GibsonOS\Core\Model\User as BaseUser;
 use GibsonOS\Core\Store\AbstractDatabaseStore;
-use mysqlDatabase;
+use GibsonOS\Core\Wrapper\DatabaseStoreWrapper;
+use MDO\Dto\Query\Join;
+use MDO\Dto\Table;
 
 /**
  * @extends AbstractDatabaseStore<User>
@@ -19,13 +20,11 @@ class UserStore extends AbstractDatabaseStore
     private Role $role;
 
     public function __construct(
-        #[GetTableName(BaseUser::class)]
-        private readonly string $userTableName,
-        #[GetTableName(User::class)]
-        private readonly string $roleUserTableName,
-        mysqlDatabase $database = null,
+        #[GetTable(User::class)]
+        private readonly Table $roleUserTable,
+        DatabaseStoreWrapper $databaseStoreWrapper,
     ) {
-        parent::__construct($database);
+        parent::__construct($databaseStoreWrapper);
     }
 
     protected function getModelClassName(): string
@@ -40,70 +39,29 @@ class UserStore extends AbstractDatabaseStore
         return $this;
     }
 
-    protected function getDefaultOrder(): string
+    protected function getAlias(): string
     {
-        return sprintf('`%s`.`user`', $this->userTableName);
+        return 'u';
     }
 
-    protected function initTable(): void
+    protected function getDefaultOrder(): string
     {
-        parent::initTable();
+        return '`u`.`user`';
+    }
 
-        $this->table
-            ->appendJoin($this->userTableName, sprintf(
-                '`%s`.`id`=`%s`.`user_id`',
-                $this->userTableName,
-                $this->roleUserTableName,
-            ))
-            ->setSelectString(sprintf(
-                '`%s`.`id` `id`, ' .
-                '`%s`.`role_id` `roleId`, ' .
-                '`%s`.`id` `userId`, ' .
-                '`%s`.`user` `userName`, ' .
-                '`%s`.`password` `userPassword`, ' .
-                '`%s`.`host` `userHost`, ' .
-                '`%s`.`ip` `userIp`, ' .
-                '`%s`.`added` `userAdded`, ' .
-                '`%s`.`last_login` `userLastLogin`',
-                $this->roleUserTableName,
-                $this->roleUserTableName,
-                $this->userTableName,
-                $this->userTableName,
-                $this->userTableName,
-                $this->userTableName,
-                $this->userTableName,
-                $this->userTableName,
-                $this->userTableName,
-            ))
-        ;
+    protected function initQuery(): void
+    {
+        parent::initQuery();
+        $this->selectQuery->addJoin(new Join($this->roleUserTable, 'ru', '`u`.`id`=`ru`.`user_id`'));
     }
 
     protected function setWheres(): void
     {
-        $this->addWhere(sprintf('`%s`.`role_id`=?', $this->roleUserTableName), [$this->role->getId() ?? 0]);
+        $this->addWhere('`ru`.`role_id`=?', [$this->role->getId() ?? 0]);
     }
 
-    protected function getModel(): User
+    protected function getExtends(): array
     {
-        $record = $this->table->getSelectedRecord();
-
-        return (new User())
-            ->setId((int) $record['id'])
-            ->setRoleId((int) $record['roleId'])
-            ->setUser(
-                (new BaseUser())
-                    ->setId((int) $record['userId'])
-                    ->setUser($record['userName'])
-                    ->setPassword($record['userPassword'])
-                    ->setHost($record['userHost'])
-                    ->setIp($record['userIp'])
-                    ->setAdded(new DateTimeImmutable($record['userAdded']))
-                    ->setLastLogin(
-                        $record['userLastLogin'] === null
-                        ? null
-                        : new DateTimeImmutable($record['userLastLogin']),
-                    ),
-            )
-        ;
+        return [new ChildrenMapping('user', 'user', 'bu')];
     }
 }
