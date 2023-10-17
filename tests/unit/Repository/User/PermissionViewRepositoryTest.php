@@ -5,327 +5,305 @@ namespace GibsonOS\Test\Unit\Core\Repository\User;
 
 use Codeception\Test\Unit;
 use GibsonOS\Core\Enum\HttpMethod;
-use GibsonOS\Core\Exception\Repository\SelectError;
+use GibsonOS\Core\Enum\Permission;
+use GibsonOS\Core\Model\User\PermissionView;
 use GibsonOS\Core\Repository\User\PermissionViewRepository;
-use GibsonOS\Test\Unit\Core\ModelManagerTrait;
-use stdClass;
+use GibsonOS\Test\Unit\Core\Repository\RepositoryTrait;
+use MDO\Dto\Query\Where;
+use MDO\Dto\Record;
+use MDO\Dto\Result;
+use MDO\Enum\OrderDirection;
+use MDO\Query\SelectQuery;
 
 class PermissionViewRepositoryTest extends Unit
 {
-    use ModelManagerTrait;
+    use RepositoryTrait;
 
     private PermissionViewRepository $permissionViewRepository;
 
     protected function _before()
     {
-        $this->loadModelManager();
+        $this->loadRepository('view_user_permission');
 
-        $this->mysqlDatabase->getDatabaseName()
-            ->shouldBeCalledOnce()
-            ->willReturn('marvin')
-        ;
-        $this->mysqlDatabase->sendQuery('SHOW FIELDS FROM `marvin`.`view_user_permission`')
-            ->shouldBeCalledOnce()
-            ->willReturn(true)
-        ;
-        $this->mysqlDatabase->fetchRow()
-            ->shouldBeCalledTimes(2)
-            ->willReturn(
-                ['permission', 'bigint(42)', 'NO', '', null, ''],
-                null
-            )
-        ;
-
-        $this->permissionViewRepository = new PermissionViewRepository('view_user_permission');
+        $this->permissionViewRepository = new PermissionViewRepository(
+            $this->repositoryWrapper->reveal(),
+            $this->table->getTableName(),
+        );
     }
 
     public function testGetTaskList(): void
     {
-        $this->mysqlDatabase->execute(
-            'SELECT DISTINCT `module_name` AS `module`, `task_name` AS `task` FROM `marvin`.`view_user_permission` WHERE IFNULL(`user_id`, ?)=? AND `permission`>? AND `task_id` IS NOT NULL',
-            [0, 0, 1],
-        )
-            ->shouldBeCalledOnce()
-            ->willReturn(true)
+        $selectQuery = (new SelectQuery($this->table))
+            ->setDistinct(true)
+            ->setSelects(['module' => '`module_name`', 'task' => '`task_name`'])
+            ->addWhere(new Where('IFNULL(`user_id`, :userId)=:userId', ['userId' => 0]))
+            ->addWhere(new Where('`permission`>:permission', ['permission' => Permission::DENIED->value]))
+            ->addWhere(new Where('`task_id` IS NOT NULL', []))
         ;
-        $permissionObject = new stdClass();
-        $permissionObject->module = 'galaxy';
-        $permissionObject->permission = 1;
-
-        $this->mysqlDatabase->fetchObjectList()
+        $result = $this->prophesize(Result::class);
+        $record = new Record(['module' => 'galaxy', 'permission' => 1]);
+        $result->iterateRecords()
             ->shouldBeCalledOnce()
-            ->willReturn([$permissionObject])
+            ->willYield([$record])
+        ;
+        $this->client->execute($selectQuery)
+            ->shouldBeCalledOnce()
+            ->willReturn($result->reveal())
+        ;
+        $this->repositoryWrapper->getClient()
+            ->shouldBeCalledOnce()
+            ->willReturn($this->client->reveal())
+        ;
+        $this->repositoryWrapper->getTableManager()
+            ->shouldBeCalledOnce()
+            ->willReturn($this->tableManager->reveal())
+        ;
+        $this->tableManager->getTable($this->table->getTableName())
+            ->shouldBeCalledOnce()
+            ->willReturn($this->table)
         ;
 
-        $this->assertEquals([$permissionObject], $this->permissionViewRepository->getTaskList(null));
-    }
-
-    public function testGetTaskListEmpty(): void
-    {
-        $this->mysqlDatabase->execute(
-            'SELECT DISTINCT `module_name` AS `module`, `task_name` AS `task` FROM `marvin`.`view_user_permission` WHERE IFNULL(`user_id`, ?)=? AND `permission`>? AND `task_id` IS NOT NULL',
-            [0, 0, 1],
-        )
-            ->shouldBeCalledOnce()
-            ->willReturn(0)
-        ;
-        $permissionObject = new stdClass();
-        $permissionObject->module = 'galaxy';
-        $permissionObject->permission = 1;
-
-        $this->expectException(SelectError::class);
-        $this->permissionViewRepository->getTaskList(null);
+        $this->assertEquals($record, $this->permissionViewRepository->getTaskList(null)->current());
     }
 
     public function testGetTaskListWithUserId(): void
     {
-        $this->mysqlDatabase->execute(
-            'SELECT DISTINCT `module_name` AS `module`, `task_name` AS `task` FROM `marvin`.`view_user_permission` WHERE IFNULL(`user_id`, ?)=? AND `permission`>? AND `task_id` IS NOT NULL',
-            [42, 42, 1],
-        )
-            ->shouldBeCalledOnce()
-            ->willReturn(true)
+        $selectQuery = (new SelectQuery($this->table))
+            ->setDistinct(true)
+            ->setSelects(['module' => '`module_name`', 'task' => '`task_name`'])
+            ->addWhere(new Where('IFNULL(`user_id`, :userId)=:userId', ['userId' => 42]))
+            ->addWhere(new Where('`permission`>:permission', ['permission' => Permission::DENIED->value]))
+            ->addWhere(new Where('`task_id` IS NOT NULL', []))
         ;
-        $permissionObject = new stdClass();
-        $permissionObject->module = 'galaxy';
-        $permissionObject->permission = 1;
-
-        $this->mysqlDatabase->fetchObjectList()
+        $result = $this->prophesize(Result::class);
+        $record = new Record(['module' => 'galaxy', 'permission' => 1]);
+        $result->iterateRecords()
             ->shouldBeCalledOnce()
-            ->willReturn([$permissionObject])
+            ->willYield([$record])
+        ;
+        $this->client->execute($selectQuery)
+            ->shouldBeCalledOnce()
+            ->willReturn($result->reveal())
+        ;
+        $this->repositoryWrapper->getClient()
+            ->shouldBeCalledOnce()
+            ->willReturn($this->client->reveal())
+        ;
+        $this->repositoryWrapper->getTableManager()
+            ->shouldBeCalledOnce()
+            ->willReturn($this->tableManager->reveal())
+        ;
+        $this->tableManager->getTable($this->table->getTableName())
+            ->shouldBeCalledOnce()
+            ->willReturn($this->table)
         ;
 
-        $this->assertEquals([$permissionObject], $this->permissionViewRepository->getTaskList(42));
+        $this->assertEquals($record, $this->permissionViewRepository->getTaskList(42)->current());
     }
 
     public function testGetTaskListWithModule(): void
     {
-        $this->mysqlDatabase->execute(
-            'SELECT DISTINCT `module_name` AS `module`, `task_name` AS `task` FROM `marvin`.`view_user_permission` WHERE IFNULL(`user_id`, ?)=? AND `permission`>? AND `task_id` IS NOT NULL AND `module_name`=?',
-            [0, 0, 1, 'galaxy'],
-        )
-            ->shouldBeCalledOnce()
-            ->willReturn(true)
+        $selectQuery = (new SelectQuery($this->table))
+            ->setDistinct(true)
+            ->setSelects(['module' => '`module_name`', 'task' => '`task_name`'])
+            ->addWhere(new Where('IFNULL(`user_id`, :userId)=:userId', ['userId' => 0]))
+            ->addWhere(new Where('`permission`>:permission', ['permission' => Permission::DENIED->value]))
+            ->addWhere(new Where('`task_id` IS NOT NULL', []))
+            ->addWhere(new Where('`module_name`=:moduleName', ['moduleName' => 'galaxy']))
         ;
-        $permissionObject = new stdClass();
-        $permissionObject->module = 'galaxy';
-        $permissionObject->permission = 1;
-
-        $this->mysqlDatabase->fetchObjectList()
+        $result = $this->prophesize(Result::class);
+        $record = new Record(['module' => 'galaxy', 'permission' => 1]);
+        $result->iterateRecords()
             ->shouldBeCalledOnce()
-            ->willReturn([$permissionObject])
+            ->willYield([$record])
+        ;
+        $this->client->execute($selectQuery)
+            ->shouldBeCalledOnce()
+            ->willReturn($result->reveal())
+        ;
+        $this->repositoryWrapper->getClient()
+            ->shouldBeCalledOnce()
+            ->willReturn($this->client->reveal())
+        ;
+        $this->repositoryWrapper->getTableManager()
+            ->shouldBeCalledOnce()
+            ->willReturn($this->tableManager->reveal())
+        ;
+        $this->tableManager->getTable($this->table->getTableName())
+            ->shouldBeCalledOnce()
+            ->willReturn($this->table)
         ;
 
-        $this->assertEquals([$permissionObject], $this->permissionViewRepository->getTaskList(null, 'galaxy'));
+        $this->assertEquals($record, $this->permissionViewRepository->getTaskList(null, 'galaxy')->current());
     }
 
     public function testGetTaskListWithUserIdAndModule(): void
     {
-        $this->mysqlDatabase->execute(
-            'SELECT DISTINCT `module_name` AS `module`, `task_name` AS `task` FROM `marvin`.`view_user_permission` WHERE IFNULL(`user_id`, ?)=? AND `permission`>? AND `task_id` IS NOT NULL AND `module_name`=?',
-            [42, 42, 1, 'galaxy'],
-        )
-            ->shouldBeCalledOnce()
-            ->willReturn(true)
+        $selectQuery = (new SelectQuery($this->table))
+            ->setDistinct(true)
+            ->setSelects(['module' => '`module_name`', 'task' => '`task_name`'])
+            ->addWhere(new Where('IFNULL(`user_id`, :userId)=:userId', ['userId' => 42]))
+            ->addWhere(new Where('`permission`>:permission', ['permission' => Permission::DENIED->value]))
+            ->addWhere(new Where('`task_id` IS NOT NULL', []))
+            ->addWhere(new Where('`module_name`=:moduleName', ['moduleName' => 'galaxy']))
         ;
-        $permissionObject = new stdClass();
-        $permissionObject->module = 'galaxy';
-        $permissionObject->permission = 1;
-
-        $this->mysqlDatabase->fetchObjectList()
+        $result = $this->prophesize(Result::class);
+        $record = new Record(['module' => 'galaxy', 'permission' => 1]);
+        $result->iterateRecords()
             ->shouldBeCalledOnce()
-            ->willReturn([$permissionObject])
+            ->willYield([$record])
+        ;
+        $this->client->execute($selectQuery)
+            ->shouldBeCalledOnce()
+            ->willReturn($result->reveal())
+        ;
+        $this->repositoryWrapper->getClient()
+            ->shouldBeCalledOnce()
+            ->willReturn($this->client->reveal())
+        ;
+        $this->repositoryWrapper->getTableManager()
+            ->shouldBeCalledOnce()
+            ->willReturn($this->tableManager->reveal())
+        ;
+        $this->tableManager->getTable($this->table->getTableName())
+            ->shouldBeCalledOnce()
+            ->willReturn($this->table)
         ;
 
-        $this->assertEquals([$permissionObject], $this->permissionViewRepository->getTaskList(42, 'galaxy'));
+        $this->assertEquals($record, $this->permissionViewRepository->getTaskList(42, 'galaxy')->current());
     }
 
     public function testGetPermissionByModule(): void
     {
-        $this->mysqlDatabase->execute(
-            'SELECT `view_user_permission`.`permission` FROM `marvin`.`view_user_permission` WHERE IFNULL(`user_id`, ?)=? AND `module_name`=? AND `task_name` IS NULL AND `action_name` IS NULL ORDER BY `user_id` DESC, `permission_module_id` DESC LIMIT 1',
-            [0, 0, 'galaxy'],
-        )
-            ->shouldBeCalledOnce()
-            ->willReturn(true)
-        ;
-        $this->mysqlDatabase->fetchAssocList()
-            ->shouldBeCalledOnce()
-            ->willReturn([[
-                'permission' => '4',
-            ]])
+        $selectQuery = (new SelectQuery($this->table))
+            ->addWhere(new Where(
+                'IFNULL(`user_id`, :userIdNull)=:userId AND `module_name`=:moduleName AND `task_name` IS NULL AND `action_name` IS NULL',
+                ['userIdNull' => 0, 'userId' => 0, 'moduleName' => 'galaxy'],
+            ))
+            ->setOrders(['`user_id`' => OrderDirection::DESC, '`permission_module_id`' => OrderDirection::DESC])
+            ->setLimit(1)
         ;
 
-        $permission = $this->permissionViewRepository->getPermissionByModule('galaxy');
-
-        $this->assertEquals(4, $permission->getPermission());
+        $this->assertEquals(
+            $this->loadModel($selectQuery, PermissionView::class),
+            $this->permissionViewRepository->getPermissionByModule('galaxy'),
+        );
     }
 
     public function testGetPermissionByModuleWithUserId(): void
     {
-        $this->mysqlDatabase->execute(
-            'SELECT `view_user_permission`.`permission` FROM `marvin`.`view_user_permission` WHERE IFNULL(`user_id`, ?)=? AND `module_name`=? AND `task_name` IS NULL AND `action_name` IS NULL ORDER BY `user_id` DESC, `permission_module_id` DESC LIMIT 1',
-            [42, 42, 'galaxy'],
-        )
-            ->shouldBeCalledOnce()
-            ->willReturn(true)
-        ;
-        $this->mysqlDatabase->fetchAssocList()
-            ->shouldBeCalledOnce()
-            ->willReturn([[
-                'permission' => '1',
-            ]])
+        $selectQuery = (new SelectQuery($this->table))
+            ->addWhere(new Where(
+                'IFNULL(`user_id`, :userIdNull)=:userId AND `module_name`=:moduleName AND `task_name` IS NULL AND `action_name` IS NULL',
+                ['userIdNull' => 0, 'userId' => 42, 'moduleName' => 'galaxy'],
+            ))
+            ->setOrders(['`user_id`' => OrderDirection::DESC, '`permission_module_id`' => OrderDirection::DESC])
+            ->setLimit(1)
         ;
 
-        $permission = $this->permissionViewRepository->getPermissionByModule('galaxy', 42);
-
-        $this->assertEquals(1, $permission->getPermission());
-    }
-
-    public function testGetPermissionByModuleEmpty(): void
-    {
-        $this->mysqlDatabase->execute(
-            'SELECT `view_user_permission`.`permission` FROM `marvin`.`view_user_permission` WHERE IFNULL(`user_id`, ?)=? AND `module_name`=? AND `task_name` IS NULL AND `action_name` IS NULL ORDER BY `user_id` DESC, `permission_module_id` DESC LIMIT 1',
-            [42, 42, 'galaxy'],
-        )
-            ->shouldBeCalledOnce()
-            ->willReturn(0)
-        ;
-
-        $this->expectException(SelectError::class);
-        $this->permissionViewRepository->getPermissionByModule('galaxy', 42);
+        $this->assertEquals(
+            $this->loadModel($selectQuery, PermissionView::class),
+            $this->permissionViewRepository->getPermissionByModule('galaxy', 42),
+        );
     }
 
     public function testGetPermissionByTask(): void
     {
-        $this->mysqlDatabase->execute(
-            'SELECT `view_user_permission`.`permission` FROM `marvin`.`view_user_permission` WHERE IFNULL(`user_id`, ?)=? AND `module_name`=? AND `task_name`=? AND `action_name` IS NULL ORDER BY `user_id` DESC, `permission_task_id` DESC, `permission_module_id` DESC LIMIT 1',
-            [0, 0, 'galaxy', 'ford'],
-        )
-            ->shouldBeCalledOnce()
-            ->willReturn(true)
-        ;
-        $this->mysqlDatabase->fetchAssocList()
-            ->shouldBeCalledOnce()
-            ->willReturn([[
-                'module' => 'galaxy',
-                'permission' => '1',
-            ]])
+        $selectQuery = (new SelectQuery($this->table))
+            ->addWhere(new Where(
+                'IFNULL(`user_id`, :userIdNull)=:userId AND `module_name`=:moduleName AND `task_name`=:taskName AND `action_name` IS NULL',
+                ['userIdNull' => 0, 'userId' => 0, 'moduleName' => 'galaxy', 'taskName' => 'ford'],
+            ))
+            ->setOrders([
+                '`user_id`' => OrderDirection::DESC,
+                '`permission_task_id`' => OrderDirection::DESC,
+                '`permission_module_id`' => OrderDirection::DESC,
+            ])
+            ->setLimit(1)
         ;
 
-        $permission = $this->permissionViewRepository->getPermissionByTask('galaxy', 'ford');
-
-        $this->assertEquals(1, $permission->getPermission());
+        $this->assertEquals(
+            $this->loadModel($selectQuery, PermissionView::class),
+            $this->permissionViewRepository->getPermissionByTask('galaxy', 'ford'),
+        );
     }
 
     public function testGetPermissionByTaskWithUserId(): void
     {
-        $this->mysqlDatabase->execute(
-            'SELECT `view_user_permission`.`permission` FROM `marvin`.`view_user_permission` WHERE IFNULL(`user_id`, ?)=? AND `module_name`=? AND `task_name`=? AND `action_name` IS NULL ORDER BY `user_id` DESC, `permission_task_id` DESC, `permission_module_id` DESC LIMIT 1',
-            [42, 42, 'galaxy', 'ford'],
-        )
-            ->shouldBeCalledOnce()
-            ->willReturn(true)
-        ;
-        $this->mysqlDatabase->fetchAssocList()
-            ->shouldBeCalledOnce()
-            ->willReturn([[
-                'module' => 'galaxy',
-                'permission' => '1',
-            ]])
+        $selectQuery = (new SelectQuery($this->table))
+            ->addWhere(new Where(
+                'IFNULL(`user_id`, :userIdNull)=:userId AND `module_name`=:moduleName AND `task_name`=:taskName AND `action_name` IS NULL',
+                ['userIdNull' => 0, 'userId' => 42, 'moduleName' => 'galaxy', 'taskName' => 'ford'],
+            ))
+            ->setOrders([
+                '`user_id`' => OrderDirection::DESC,
+                '`permission_task_id`' => OrderDirection::DESC,
+                '`permission_module_id`' => OrderDirection::DESC,
+            ])
+            ->setLimit(1)
         ;
 
-        $permission = $this->permissionViewRepository->getPermissionByTask('galaxy', 'ford', 42);
-
-        $this->assertEquals(1, $permission->getPermission());
-    }
-
-    public function testGetPermissionByTaskEmpty(): void
-    {
-        $this->mysqlDatabase->execute(
-            'SELECT `view_user_permission`.`permission` FROM `marvin`.`view_user_permission` WHERE IFNULL(`user_id`, ?)=? AND `module_name`=? AND `task_name`=? AND `action_name` IS NULL ORDER BY `user_id` DESC, `permission_task_id` DESC, `permission_module_id` DESC LIMIT 1',
-            [42, 42, 'galaxy', 'ford'],
-        )
-            ->shouldBeCalledOnce()
-            ->willReturn(0)
-        ;
-
-        $this->expectException(SelectError::class);
-        $this->permissionViewRepository->getPermissionByTask('galaxy', 'ford', 42);
+        $this->assertEquals(
+            $this->loadModel($selectQuery, PermissionView::class),
+            $this->permissionViewRepository->getPermissionByTask('galaxy', 'ford', 42),
+        );
     }
 
     public function testGetPermissionByAction(): void
     {
-        $this->mysqlDatabase->execute(
-            'SELECT `view_user_permission`.`permission` FROM `marvin`.`view_user_permission` WHERE IFNULL(`user_id`, ?)=? AND `module_name`=? AND `task_name`=? AND `action_name`=? AND `action_method`=? ORDER BY `user_id` DESC, `permission_action_id` DESC, `permission_task_id` DESC, `permission_module_id` DESC LIMIT 1',
-            [0, 0, 'galaxy', 'ford', 'prefect', 'HEAD'],
-        )
-            ->shouldBeCalledOnce()
-            ->willReturn(true)
-        ;
-        $this->mysqlDatabase->fetchAssocList()
-            ->shouldBeCalledOnce()
-            ->willReturn([[
-                'module' => 'galaxy',
-                'permission' => '1',
-            ]])
+        $selectQuery = (new SelectQuery($this->table))
+            ->addWhere(new Where(
+                'IFNULL(`user_id`, :userIdNull)=:userId AND `module_name`=:moduleName AND `task_name`=:taskName AND `action_name`=:actionName AND `action_method`=:actionMethod',
+                [
+                    'userIdNull' => 0,
+                    'userId' => 0,
+                    'moduleName' => 'galaxy',
+                    'taskName' => 'ford',
+                    'actionName' => 'prefect',
+                    'actionMethod' => 'HEAD',
+                ],
+            ))
+            ->setOrders([
+                '`user_id`' => OrderDirection::DESC,
+                '`permission_action_id`' => OrderDirection::DESC,
+                '`permission_task_id`' => OrderDirection::DESC,
+                '`permission_module_id`' => OrderDirection::DESC,
+            ])
+            ->setLimit(1)
         ;
 
-        $permission = $this->permissionViewRepository->getPermissionByAction(
-            'galaxy',
-            'ford',
-            'prefect',
-            HttpMethod::HEAD,
+        $this->assertEquals(
+            $this->loadModel($selectQuery, PermissionView::class),
+            $this->permissionViewRepository->getPermissionByAction('galaxy', 'ford', 'prefect', HttpMethod::HEAD),
         );
-
-        $this->assertEquals(1, $permission->getPermission());
     }
 
     public function testGetPermissionByActionWithUserId(): void
     {
-        $this->mysqlDatabase->execute(
-            'SELECT `view_user_permission`.`permission` FROM `marvin`.`view_user_permission` WHERE IFNULL(`user_id`, ?)=? AND `module_name`=? AND `task_name`=? AND `action_name`=? AND `action_method`=? ORDER BY `user_id` DESC, `permission_action_id` DESC, `permission_task_id` DESC, `permission_module_id` DESC LIMIT 1',
-            [42, 42, 'galaxy', 'ford', 'prefect', 'HEAD'],
-        )
-            ->shouldBeCalledOnce()
-            ->willReturn(true)
-        ;
-        $this->mysqlDatabase->fetchAssocList()
-            ->shouldBeCalledOnce()
-            ->willReturn([[
-                'module' => 'galaxy',
-                'permission' => '1',
-            ]])
-        ;
-
-        $permission = $this->permissionViewRepository->getPermissionByAction(
-            'galaxy',
-            'ford',
-            'prefect',
-            HttpMethod::HEAD,
-            42
-        );
-
-        $this->assertEquals(1, $permission->getPermission());
-    }
-
-    public function testGetPermissionByActionEmpty(): void
-    {
-        $this->mysqlDatabase->execute(
-            'SELECT `view_user_permission`.`permission` FROM `marvin`.`view_user_permission` WHERE IFNULL(`user_id`, ?)=? AND `module_name`=? AND `task_name`=? AND `action_name`=? AND `action_method`=? ORDER BY `user_id` DESC, `permission_action_id` DESC, `permission_task_id` DESC, `permission_module_id` DESC LIMIT 1',
-            [42, 42, 'galaxy', 'ford', 'prefect', 'HEAD'],
-        )
-            ->shouldBeCalledOnce()
-            ->willReturn(0)
+        $selectQuery = (new SelectQuery($this->table))
+            ->addWhere(new Where(
+                'IFNULL(`user_id`, :userIdNull)=:userId AND `module_name`=:moduleName AND `task_name`=:taskName AND `action_name`=:actionName AND `action_method`=:actionMethod',
+                [
+                    'userIdNull' => 0,
+                    'userId' => 42,
+                    'moduleName' => 'galaxy',
+                    'taskName' => 'ford',
+                    'actionName' => 'prefect',
+                    'actionMethod' => 'HEAD',
+                ],
+            ))
+            ->setOrders([
+                '`user_id`' => OrderDirection::DESC,
+                '`permission_action_id`' => OrderDirection::DESC,
+                '`permission_task_id`' => OrderDirection::DESC,
+                '`permission_module_id`' => OrderDirection::DESC,
+            ])
+            ->setLimit(1)
         ;
 
-        $this->expectException(SelectError::class);
-        $this->permissionViewRepository->getPermissionByAction(
-            'galaxy',
-            'ford',
-            'prefect',
-            HttpMethod::HEAD,
-            42
+        $this->assertEquals(
+            $this->loadModel($selectQuery, PermissionView::class),
+            $this->permissionViewRepository->getPermissionByAction('galaxy', 'ford', 'prefect', HttpMethod::HEAD, 42),
         );
     }
 }

@@ -61,11 +61,12 @@ class PermissionViewRepository extends AbstractRepository
     public function getPermissionByModule(string $module, int $userId = null): PermissionView
     {
         return $this->fetchOne(
-            'IFNULL(`user_id`, :userId)=:userId AND ' .
+            'IFNULL(`user_id`, :userIdNull)=:userId AND ' .
             '`module_name`=:moduleName AND ' .
             '`task_name` IS NULL AND ' .
             '`action_name` IS NULL',
             [
+                'userIdNull' => 0,
                 'userId' => $userId,
                 'moduleName' => $module,
             ],
@@ -81,11 +82,12 @@ class PermissionViewRepository extends AbstractRepository
     public function getPermissionByTask(string $module, string $task, int $userId = null): PermissionView
     {
         return $this->fetchOne(
-            'IFNULL(`user_id`, :userId)=:userId AND ' .
+            'IFNULL(`user_id`, :userIdNull)=:userId AND ' .
             '`module_name`=:moduleName AND ' .
             '`task_name`=:taskName AND ' .
             '`action_name` IS NULL',
             [
+                'userIdNull' => 0,
                 'userId' => $userId,
                 'moduleName' => $module,
                 'taskName' => $task,
@@ -110,12 +112,13 @@ class PermissionViewRepository extends AbstractRepository
         int $userId = null,
     ): PermissionView {
         return $this->fetchOne(
-            'IFNULL(`user_id`, :userId)=:userId AND ' .
+            'IFNULL(`user_id`, :userIdNull)=:userId AND ' .
             '`module_name`=:moduleName AND ' .
             '`task_name`=:taskName AND ' .
             '`action_name`=:actionName AND ' .
             '`action_method`=:actionMethod',
             [
+                'userIdNull' => 0,
                 'userId' => $userId,
                 'moduleName' => $module,
                 'taskName' => $task,
