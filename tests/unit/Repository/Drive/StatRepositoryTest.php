@@ -7,12 +7,17 @@ use Codeception\Test\Unit;
 use DateTime;
 use GibsonOS\Core\Repository\Drive\StatRepository;
 use GibsonOS\Core\Service\DateTimeService;
-use GibsonOS\Test\Unit\Core\ModelManagerTrait;
+use GibsonOS\Test\Unit\Core\Repository\RepositoryTrait;
+use MDO\Dto\Query\Where;
+use MDO\Dto\Record;
+use MDO\Dto\Result;
+use MDO\Dto\Value;
+use MDO\Query\SelectQuery;
 use Prophecy\Prophecy\ObjectProphecy;
 
 class StatRepositoryTest extends Unit
 {
-    use ModelManagerTrait;
+    use RepositoryTrait;
 
     private StatRepository $statRepository;
 
@@ -20,47 +25,23 @@ class StatRepositoryTest extends Unit
 
     protected function _before()
     {
-        $this->loadModelManager();
+        $this->loadRepository('system_drive_stat');
+
         $this->dateTimeService = $this->prophesize(DateTimeService::class);
 
-        $this->mysqlDatabase->getDatabaseName()
-            ->shouldBeCalledOnce()
-            ->willReturn('marvin')
-        ;
-        $this->mysqlDatabase->sendQuery('SHOW FIELDS FROM `marvin`.`system_drive_stat`')
-            ->shouldBeCalledOnce()
-            ->willReturn(true)
-        ;
-        $this->mysqlDatabase->fetchRow()
-            ->shouldBeCalledTimes(3)
-            ->willReturn(
-                ['drive_id', 'bigint(42)', 'NO', '', null, ''],
-                ['disk', 'bigint(42)', 'NO', '', null, ''],
-                null
-            )
-        ;
-
-        $this->statRepository = new StatRepository($this->dateTimeService->reveal());
+        $this->statRepository = new StatRepository($this->repositoryWrapper->reveal(), $this->dateTimeService->reveal());
     }
 
     public function testGetTimeRange(): void
     {
-        $this->mysqlDatabase->execute(
-            'SELECT MIN(`added`) AS `min`, MAX(`added`) AS `max` FROM `marvin`.`system_drive_stat`',
-            [],
-        )
-            ->shouldBeCalledOnce()
-            ->willReturn(true)
+        $selectQuery = (new SelectQuery($this->table))
+            ->addWhere(new Where('1', []))
+            ->setSelects(['min' => 'MIN(`added`)', 'max' => 'MAX(`added`)'])
         ;
-        $this->mysqlDatabase->fetchRow()
-            ->shouldBeCalledTimes(4)
-            ->willReturn(
-                ['drive_id', 'bigint(42)', 'NO', '', null, ''],
-                ['disk', 'bigint(42)', 'NO', '', null, ''],
-                null,
-                ['min' => 'arthur', 'max' => 'dent'],
-            )
-        ;
+        $this->loadAggregation(
+            $selectQuery,
+            new Record(['min' => new Value('arthur'), 'max' => new Value('dent')]),
+        );
         $min = new DateTime('-1 hour');
         $max = new DateTime('+1 hour');
         $this->dateTimeService->get('arthur')
@@ -80,21 +61,34 @@ class StatRepositoryTest extends Unit
 
     public function testGetTimeRangeEmpty(): void
     {
-        $this->mysqlDatabase->execute(
-            'SELECT MIN(`added`) AS `min`, MAX(`added`) AS `max` FROM `marvin`.`system_drive_stat`',
-            [],
-        )
-            ->shouldBeCalledOnce()
-            ->willReturn(true)
+        $selectQuery = (new SelectQuery($this->table))
+            ->addWhere(new Where('1', []))
+            ->setSelects(['min' => 'MIN(`added`)', 'max' => 'MAX(`added`)'])
         ;
-        $this->mysqlDatabase->fetchRow()
-            ->shouldBeCalledTimes(4)
-            ->willReturn(
-                ['drive_id', 'bigint(42)', 'NO', '', null, ''],
-                ['disk', 'bigint(42)', 'NO', '', null, ''],
-                null,
-                null,
-            )
+        $result = $this->prophesize(Result::class);
+        $result->iterateRecords()
+            ->shouldBeCalledOnce()
+            ->willYield([new Record(['min' => new Value(null), 'max' => new Value(null)])])
+        ;
+        $this->client->execute($selectQuery)
+            ->shouldBeCalledOnce()
+            ->willReturn($result)
+        ;
+        $this->repositoryWrapper->getModelWrapper()
+            ->shouldBeCalledOnce()
+            ->willReturn($this->modelWrapper->reveal())
+        ;
+        $this->repositoryWrapper->getTableManager()
+            ->shouldBeCalledOnce()
+            ->willReturn($this->tableManager->reveal())
+        ;
+        $this->repositoryWrapper->getClient()
+            ->shouldBeCalledOnce()
+            ->willReturn($this->client->reveal())
+        ;
+        $this->tableManager->getTable($this->table->getTableName())
+            ->shouldBeCalledOnce()
+            ->willReturn($this->table)
         ;
 
         $this->assertEquals(

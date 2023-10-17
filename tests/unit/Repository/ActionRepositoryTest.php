@@ -7,9 +7,7 @@ use Codeception\Test\Unit;
 use GibsonOS\Core\Enum\HttpMethod;
 use GibsonOS\Core\Model\Action;
 use GibsonOS\Core\Repository\ActionRepository;
-use MDO\Dto\Field;
 use MDO\Dto\Query\Where;
-use MDO\Enum\Type;
 use MDO\Query\DeleteQuery;
 use MDO\Query\SelectQuery;
 use MDO\Service\SelectService;
@@ -22,10 +20,7 @@ class ActionRepositoryTest extends Unit
 
     protected function _before()
     {
-        $this->loadRepository(
-            'action',
-            [new Field('name', false, Type::VARCHAR, '', null, '')],
-        );
+        $this->loadRepository('action');
 
         $this->actionRepository = new ActionRepository($this->repositoryWrapper->reveal(), $this->table);
     }
@@ -85,14 +80,7 @@ class ActionRepositoryTest extends Unit
         $deleteQuery = (new DeleteQuery($this->table))
             ->addWhere(new Where('`id` NOT IN (?)', [42]))
         ;
-        $this->repositoryWrapper->getClient()
-            ->shouldBeCalledOnce()
-            ->willReturn($this->client->reveal())
-        ;
-        $this->client->execute($deleteQuery)
-            ->shouldBeCalledOnce()
-            ->willReturn(null)
-        ;
+        $this->loadDeleteQuery($deleteQuery);
         $selectService = $this->prophesize(SelectService::class);
         $selectService->getParametersString([42])
             ->shouldBeCalledOnce()

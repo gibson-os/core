@@ -4,139 +4,104 @@ declare(strict_types=1);
 namespace GibsonOS\Test\Unit\Core\Repository;
 
 use Codeception\Test\Unit;
+use DateTimeImmutable;
+use GibsonOS\Core\Model\User;
 use GibsonOS\Core\Repository\UserRepository;
-use GibsonOS\Test\Unit\Core\ModelManagerTrait;
+use MDO\Dto\Query\Where;
+use MDO\Dto\Record;
+use MDO\Dto\Value;
+use MDO\Query\SelectQuery;
 
 class UserRepositoryTest extends Unit
 {
-    use ModelManagerTrait;
+    use RepositoryTrait;
 
     private UserRepository $userRepository;
 
     protected function _before()
     {
-        $this->loadModelManager();
+        $this->loadRepository('user');
 
-        $this->mysqlDatabase->getDatabaseName()
-            ->shouldBeCalledOnce()
-            ->willReturn('marvin')
-        ;
-        $this->mysqlDatabase->sendQuery('SHOW FIELDS FROM `marvin`.`user`')
-            ->shouldBeCalledOnce()
-            ->willReturn(true)
-        ;
-        $this->mysqlDatabase->fetchRow()
-            ->shouldBeCalledTimes(2)
-            ->willReturn(
-                ['user', 'varchar(42)', 'NO', '', null, ''],
-                null
-            )
-        ;
-
-        $this->userRepository = new UserRepository('user');
+        $this->userRepository = new UserRepository($this->repositoryWrapper->reveal());
     }
 
     public function testGetById(): void
     {
-        $this->mysqlDatabase->execute(
-            'SELECT `user`.`user` FROM `marvin`.`user` WHERE `id`=? LIMIT 1',
-            [42],
-        )
-            ->shouldBeCalledOnce()
-            ->willReturn(true)
-        ;
-        $this->mysqlDatabase->fetchAssocList()
-            ->shouldBeCalledOnce()
-            ->willReturn([[
-                'user' => 'marvin',
-            ]])
+        $selectQuery = (new SelectQuery($this->table))
+            ->addWhere(new Where('`id`=?', [42]))
+            ->setLimit(1)
         ;
 
+        $model = $this->loadModel($selectQuery, User::class);
         $user = $this->userRepository->getById(42);
 
-        $this->assertEquals('marvin', $user->getUser());
+        $date = new DateTimeImmutable();
+        $model->setAdded($date);
+        $user->setAdded($date);
+
+        $this->assertEquals($model, $user);
     }
 
     public function testFindByName(): void
     {
-        $this->mysqlDatabase->execute(
-            'SELECT `user`.`user` FROM `marvin`.`user` WHERE `user` LIKE ?',
-            ['galaxy%'],
-        )
-            ->shouldBeCalledOnce()
-            ->willReturn(true)
-        ;
-        $this->mysqlDatabase->fetchAssocList()
-            ->shouldBeCalledOnce()
-            ->willReturn([[
-                'user' => 'marvin',
-            ]])
+        $selectQuery = (new SelectQuery($this->table))
+            ->addWhere(new Where('`user` LIKE ?', ['galaxy%']))
         ;
 
+        $model = $this->loadModel($selectQuery, User::class, '');
         $user = $this->userRepository->findByName('galaxy')[0];
 
-        $this->assertEquals('marvin', $user->getUser());
+        $date = new DateTimeImmutable();
+        $model->setAdded($date);
+        $user->setAdded($date);
+
+        $this->assertEquals($model, $user);
     }
 
     public function testGetByUsername(): void
     {
-        $this->mysqlDatabase->execute(
-            'SELECT `user`.`user` FROM `marvin`.`user` WHERE `user`=? LIMIT 1',
-            ['galaxy'],
-        )
-            ->shouldBeCalledOnce()
-            ->willReturn(true)
-        ;
-        $this->mysqlDatabase->fetchAssocList()
-            ->shouldBeCalledOnce()
-            ->willReturn([[
-                'user' => 'marvin',
-            ]])
+        $selectQuery = (new SelectQuery($this->table))
+            ->addWhere(new Where('`user`=?', ['galaxy']))
+            ->setLimit(1)
         ;
 
+        $model = $this->loadModel($selectQuery, User::class);
         $user = $this->userRepository->getByUsername('galaxy');
 
-        $this->assertEquals('marvin', $user->getUser());
+        $date = new DateTimeImmutable();
+        $model->setAdded($date);
+        $user->setAdded($date);
+
+        $this->assertEquals($model, $user);
     }
 
     public function testGetByUsernameAndPassword(): void
     {
-        $this->mysqlDatabase->execute(
-            'SELECT `user`.`user` FROM `marvin`.`user` WHERE `user`=? AND `password`=MD5(?) LIMIT 1',
-            ['galaxy', 'no hope'],
-        )
-            ->shouldBeCalledOnce()
-            ->willReturn(true)
-        ;
-        $this->mysqlDatabase->fetchAssocList()
-            ->shouldBeCalledOnce()
-            ->willReturn([[
-                'user' => 'marvin',
-            ]])
+        $selectQuery = (new SelectQuery($this->table))
+            ->addWhere(new Where('`user`=? AND `password`=MD5(?)', ['galaxy', 'no hope']))
+            ->setLimit(1)
         ;
 
+        $model = $this->loadModel($selectQuery, User::class);
         $user = $this->userRepository->getByUsernameAndPassword('galaxy', 'no hope');
 
-        $this->assertEquals('marvin', $user->getUser());
+        $date = new DateTimeImmutable();
+        $model->setAdded($date);
+        $user->setAdded($date);
+
+        $this->assertEquals($model, $user);
     }
 
     public function testGetCount(): void
     {
-        $this->mysqlDatabase->execute(
-            'SELECT COUNT(`id`) FROM `marvin`.`user`',
-            [],
-        )
-            ->shouldBeCalledOnce()
-            ->willReturn(true)
+        $selectQuery = (new SelectQuery($this->table))
+            ->setSelects(['count' => 'COUNT(`id`)'])
+            ->addWhere(new Where('1', []))
         ;
-        $this->mysqlDatabase->fetchRow()
-            ->shouldBeCalledTimes(3)
-            ->willReturn(
-                ['user', 'varchar(42)', 'NO', '', null, ''],
-                null,
-                [42],
-            )
-        ;
+        $this->loadAggregation(
+            $selectQuery,
+            new Record(['count' => new Value('42')]),
+        );
 
         $this->assertEquals(42, $this->userRepository->getCount());
     }

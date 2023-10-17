@@ -11,6 +11,7 @@ use GibsonOS\Test\Unit\Core\ModelManagerTrait;
 use MDO\Dto\Record;
 use MDO\Dto\Result;
 use MDO\Dto\Table;
+use MDO\Query\DeleteQuery;
 use MDO\Query\SelectQuery;
 use Prophecy\Prophecy\ObjectProphecy;
 
@@ -22,14 +23,24 @@ trait RepositoryTrait
 
     private ObjectProphecy|RepositoryWrapper $repositoryWrapper;
 
-    private function loadRepository(string $tableName, array $fields): void
+    private ObjectProphecy|ChildrenQuery $childrenQuery;
+
+    private function loadRepository(string $tableName, array $fields = []): void
     {
         $this->loadModelManager();
 
         $this->repositoryWrapper = $this->prophesize(RepositoryWrapper::class);
         $this->table = new Table($tableName, $fields);
+        $this->childrenQuery = $this->prophesize(ChildrenQuery::class);
     }
 
+    /**
+     * @template T of AbstractModel
+     *
+     * @param class-string<T> $modelClassName
+     *
+     * @return T
+     */
     private function loadModel(SelectQuery $selectQuery, string $modelClassName, string $prefix = null): AbstractModel
     {
         $this->repositoryWrapper->getModelWrapper()
@@ -44,11 +55,12 @@ trait RepositoryTrait
             ->shouldBeCalledOnce()
             ->willReturn($this->tableManager)
         ;
-        $childrenQuery = $this->prophesize(ChildrenQuery::class);
-        $childrenQuery->extend($selectQuery, $modelClassName, []);
+        $this->childrenQuery->extend($selectQuery, $modelClassName, [])
+            ->willReturn($selectQuery)
+        ;
         $this->repositoryWrapper->getChildrenQuery()
             ->shouldBeCalledOnce()
-            ->willReturn($childrenQuery->reveal())
+            ->willReturn($this->childrenQuery->reveal())
         ;
         $record = new Record([]);
         $result = $this->prophesize(Result::class);
@@ -86,5 +98,46 @@ trait RepositoryTrait
         }
 
         return $model;
+    }
+
+    private function loadDeleteQuery(DeleteQuery $deleteQuery): void
+    {
+        $this->repositoryWrapper->getClient()
+            ->shouldBeCalledOnce()
+            ->willReturn($this->client->reveal())
+        ;
+        $this->client->execute($deleteQuery)
+            ->shouldBeCalledOnce()
+            ->willReturn(null)
+        ;
+    }
+
+    private function loadAggregation(SelectQuery $selectQuery, Record $record): void
+    {
+        $result = $this->prophesize(Result::class);
+        $result->iterateRecords()
+            ->shouldBeCalledOnce()
+            ->willYield([$record])
+        ;
+        $this->client->execute($selectQuery)
+            ->shouldBeCalledOnce()
+            ->willReturn($result)
+        ;
+        $this->repositoryWrapper->getModelWrapper()
+            ->shouldBeCalledOnce()
+            ->willReturn($this->modelWrapper->reveal())
+        ;
+        $this->repositoryWrapper->getClient()
+            ->shouldBeCalledOnce()
+            ->willReturn($this->client->reveal())
+        ;
+        $this->repositoryWrapper->getTableManager()
+            ->shouldBeCalledOnce()
+            ->willReturn($this->tableManager->reveal())
+        ;
+        $this->tableManager->getTable($this->table->getTableName())
+            ->shouldBeCalledOnce()
+            ->willReturn($this->table)
+        ;
     }
 }

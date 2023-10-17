@@ -205,11 +205,11 @@ abstract class AbstractRepository
     protected function getAggregations(
         array $functions,
         string $modelClassName,
-        string $where = '',
+        string $where = '1',
         array $parameters = [],
     ): Record {
-        /** @var ModelInterface $model */
-        $model = new $modelClassName();
+        /** @var AbstractModel $model */
+        $model = new $modelClassName($this->repositoryWrapper->getModelWrapper());
         $selectQuery = $this->getSelectQuery($model->getTableName())
             ->addWhere(new Where($where, $parameters))
             ->setSelects($functions)

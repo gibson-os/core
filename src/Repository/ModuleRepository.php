@@ -11,6 +11,7 @@ use JsonException;
 use MDO\Dto\Query\Where;
 use MDO\Dto\Table;
 use MDO\Exception\ClientException;
+use MDO\Exception\RecordException;
 use MDO\Query\DeleteQuery;
 use ReflectionException;
 
@@ -25,8 +26,11 @@ class ModuleRepository extends AbstractRepository
     }
 
     /**
-     * @throws SelectError
      * @throws ClientException
+     * @throws JsonException
+     * @throws RecordException
+     * @throws ReflectionException
+     * @throws SelectError
      */
     public function getById(int $id): Module
     {
@@ -34,9 +38,10 @@ class ModuleRepository extends AbstractRepository
     }
 
     /**
-     * @throws ClientException
      * @throws JsonException
      * @throws ReflectionException
+     * @throws RecordException
+     * @throws ClientException
      *
      * @return Module[]
      */
@@ -49,8 +54,11 @@ class ModuleRepository extends AbstractRepository
     }
 
     /**
-     * @throws SelectError
      * @throws ClientException
+     * @throws JsonException
+     * @throws ReflectionException
+     * @throws SelectError
+     * @throws RecordException
      */
     public function getByName(string $name): Module
     {
@@ -60,13 +68,14 @@ class ModuleRepository extends AbstractRepository
     /**
      * @throws ClientException
      * @throws JsonException
+     * @throws RecordException
      * @throws ReflectionException
      *
      * @return Module[]
      */
     public function getAll(): array
     {
-        return $this->fetchAll('', [], Module::class);
+        return $this->fetchAll('1', [], Module::class);
     }
 
     public function deleteByIdsNot(array $ids): bool

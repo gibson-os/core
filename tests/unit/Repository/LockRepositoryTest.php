@@ -4,56 +4,34 @@ declare(strict_types=1);
 namespace GibsonOS\Test\Unit\Core\Repository;
 
 use Codeception\Test\Unit;
+use GibsonOS\Core\Model\Lock;
 use GibsonOS\Core\Repository\LockRepository;
-use GibsonOS\Test\Unit\Core\ModelManagerTrait;
+use MDO\Dto\Query\Where;
+use MDO\Query\SelectQuery;
 
 class LockRepositoryTest extends Unit
 {
-    use ModelManagerTrait;
+    use RepositoryTrait;
 
     private LockRepository $lockRepository;
 
     protected function _before()
     {
-        $this->loadModelManager();
+        $this->loadRepository('lock');
 
-        $this->mysqlDatabase->getDatabaseName()
-            ->shouldBeCalledOnce()
-            ->willReturn('marvin')
-        ;
-        $this->mysqlDatabase->sendQuery('SHOW FIELDS FROM `marvin`.`lock`')
-            ->shouldBeCalledOnce()
-            ->willReturn(true)
-        ;
-        $this->mysqlDatabase->fetchRow()
-            ->shouldBeCalledTimes(2)
-            ->willReturn(
-                ['pid', 'bigint(42)', 'NO', '', null, ''],
-                null
-            )
-        ;
-
-        $this->lockRepository = new LockRepository();
+        $this->lockRepository = new LockRepository($this->repositoryWrapper->reveal());
     }
 
     public function testGetByName(): void
     {
-        $this->mysqlDatabase->execute(
-            'SELECT `lock`.`pid` FROM `marvin`.`lock` WHERE `name`=? LIMIT 1',
-            ['galaxy'],
-        )
-            ->shouldBeCalledOnce()
-            ->willReturn(true)
-        ;
-        $this->mysqlDatabase->fetchAssocList()
-            ->shouldBeCalledOnce()
-            ->willReturn([[
-                'pid' => '42',
-            ]])
+        $selectQuery = (new SelectQuery($this->table))
+            ->addWhere(new Where('`name`=?', ['galaxy']))
+            ->setLimit(1)
         ;
 
-        $lock = $this->lockRepository->getByName('galaxy');
-
-        $this->assertEquals(42, $lock->getPid());
+        $this->assertEquals(
+            $this->loadModel($selectQuery, Lock::class),
+            $lock = $this->lockRepository->getByName('galaxy'),
+        );
     }
 }

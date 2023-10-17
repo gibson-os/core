@@ -13,6 +13,7 @@ use MDO\Dto\Query\Where;
 use MDO\Dto\Table;
 use MDO\Dto\Value;
 use MDO\Exception\ClientException;
+use MDO\Exception\RecordException;
 use MDO\Query\DeleteQuery;
 use MDO\Query\UpdateQuery;
 use ReflectionException;
@@ -28,8 +29,11 @@ class DeviceRepository extends AbstractRepository
     }
 
     /**
-     * @throws SelectError
      * @throws ClientException
+     * @throws JsonException
+     * @throws ReflectionException
+     * @throws SelectError
+     * @throws RecordException
      */
     public function getById(string $id): Device
     {
@@ -37,8 +41,11 @@ class DeviceRepository extends AbstractRepository
     }
 
     /**
-     * @throws SelectError
      * @throws ClientException
+     * @throws JsonException
+     * @throws RecordException
+     * @throws ReflectionException
+     * @throws SelectError
      */
     public function getByToken(string $token): Device
     {
@@ -48,6 +55,7 @@ class DeviceRepository extends AbstractRepository
     /**
      * @throws ClientException
      * @throws JsonException
+     * @throws RecordException
      * @throws ReflectionException
      *
      * @return Device[]
@@ -57,10 +65,7 @@ class DeviceRepository extends AbstractRepository
         return $this->fetchAll('`user_id`=?', [$userId], Device::class);
     }
 
-    /**
-     * @throws ClientException
-     */
-    public function deleteByIds(array $ids, int $userId = null): void
+    public function deleteByIds(array $ids, int $userId = null): bool
     {
         $repositoryWrapper = $this->getRepositoryWrapper();
         $deleteQuery = (new DeleteQuery($this->deviceTable))
@@ -77,18 +82,27 @@ class DeviceRepository extends AbstractRepository
             $deleteQuery->addWhere(new Where('`user_id`=?', [$userId]));
         }
 
-        $repositoryWrapper->getClient()->execute($deleteQuery);
+        try {
+            $repositoryWrapper->getClient()->execute($deleteQuery);
+        } catch (ClientException) {
+            return false;
+        }
+
+        return true;
     }
 
-    /**
-     * @throws ClientException
-     */
-    public function removeFcmToken(string $fcmToken): void
+    public function removeFcmToken(string $fcmToken): bool
     {
         $updateQuery = (new UpdateQuery($this->deviceTable, ['fcm_token' => new Value(null)]))
             ->addWhere(new Where('`fcm_token`=?', [$fcmToken]))
         ;
 
-        $this->getRepositoryWrapper()->getClient()->execute($updateQuery);
+        try {
+            $this->getRepositoryWrapper()->getClient()->execute($updateQuery);
+        } catch (ClientException) {
+            return false;
+        }
+
+        return true;
     }
 }

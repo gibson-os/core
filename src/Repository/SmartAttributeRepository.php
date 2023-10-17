@@ -19,6 +19,6 @@ class SmartAttributeRepository extends AbstractRepository
      */
     public function getAll(): array
     {
-        return $this->fetchAll('', [], SmartAttribute::class);
+        return $this->fetchAll('1', [], SmartAttribute::class);
     }
 }

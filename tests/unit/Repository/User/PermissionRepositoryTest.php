@@ -7,135 +7,102 @@ use Codeception\Test\Unit;
 use GibsonOS\Core\Model\Action;
 use GibsonOS\Core\Model\Module;
 use GibsonOS\Core\Model\Task;
+use GibsonOS\Core\Model\User\Permission;
 use GibsonOS\Core\Repository\User\PermissionRepository;
-use GibsonOS\Test\Unit\Core\ModelManagerTrait;
+use GibsonOS\Test\Unit\Core\Repository\RepositoryTrait;
+use MDO\Dto\Query\Where;
+use MDO\Query\SelectQuery;
 
 class PermissionRepositoryTest extends Unit
 {
-    use ModelManagerTrait;
+    use RepositoryTrait;
 
     private PermissionRepository $permissionRepository;
 
     protected function _before()
     {
-        $this->loadModelManager();
+        $this->loadRepository('user_permission');
 
-        $this->mysqlDatabase->getDatabaseName()
-            ->shouldBeCalledOnce()
-            ->willReturn('marvin')
-        ;
-        $this->mysqlDatabase->sendQuery('SHOW FIELDS FROM `marvin`.`user_permission`')
-            ->shouldBeCalledOnce()
-            ->willReturn(true)
-        ;
-        $this->mysqlDatabase->fetchRow()
-            ->shouldBeCalledTimes(2)
-            ->willReturn(
-                ['permission', 'bigint(42)', 'NO', '', null, ''],
-                null
-            )
-        ;
-
-        $this->permissionRepository = new PermissionRepository();
+        $this->permissionRepository = new PermissionRepository($this->repositoryWrapper->reveal());
     }
 
     public function testGetByModuleTaskAndAction(): void
     {
-        $this->mysqlDatabase->execute(
-            'SELECT `user_permission`.`permission` FROM `marvin`.`user_permission` WHERE `module_id`=? AND `task_id`=? AND `action_id`=? AND IFNULL(`user_id`, ?)=? LIMIT 1',
-            [42, 420, 4242, 0, 0],
-        )
-            ->shouldBeCalledOnce()
-            ->willReturn(true)
-        ;
-        $this->mysqlDatabase->fetchAssocList()
-            ->shouldBeCalledOnce()
-            ->willReturn([[
-                'permission' => '4',
-            ]])
+        $selectQuery = (new SelectQuery($this->table))
+            ->addWhere(new Where(
+                '`module_id`=? AND `task_id`=? AND `action_id`=? AND IFNULL(`user_id`, ?)=?',
+                [42, 420, 4242, 0, 0],
+            ))
+            ->setLimit(1)
         ;
 
+        $model = $this->loadModel($selectQuery, Permission::class);
         $permission = $this->permissionRepository->getByModuleTaskAndAction(
-            (new Module())->setId(42),
-            (new Task())->setId(420),
-            (new Action())->setId(4242)
+            (new Module($this->modelWrapper->reveal()))->setId(42),
+            (new Task($this->modelWrapper->reveal()))->setId(420),
+            (new Action($this->modelWrapper->reveal()))->setId(4242),
         );
 
-        $this->assertEquals(4, $permission->getPermission());
+        $this->assertEquals($model, $permission);
     }
 
     public function testGetByModuleTaskAndActionWithUserId(): void
     {
-        $this->mysqlDatabase->execute(
-            'SELECT `user_permission`.`permission` FROM `marvin`.`user_permission` WHERE `module_id`=? AND `task_id`=? AND `action_id`=? AND IFNULL(`user_id`, ?)=? LIMIT 1',
-            [42, 420, 4242, 0, 4200],
-        )
-            ->shouldBeCalledOnce()
-            ->willReturn(true)
-        ;
-        $this->mysqlDatabase->fetchAssocList()
-            ->shouldBeCalledOnce()
-            ->willReturn([[
-                'permission' => '4',
-            ]])
+        $selectQuery = (new SelectQuery($this->table))
+            ->addWhere(new Where(
+                '`module_id`=? AND `task_id`=? AND `action_id`=? AND IFNULL(`user_id`, ?)=?',
+                [42, 420, 4242, 0, 4200],
+            ))
+            ->setLimit(1)
         ;
 
+        $model = $this->loadModel($selectQuery, Permission::class);
         $permission = $this->permissionRepository->getByModuleTaskAndAction(
-            (new Module())->setId(42),
-            (new Task())->setId(420),
-            (new Action())->setId(4242),
-            4200
+            (new Module($this->modelWrapper->reveal()))->setId(42),
+            (new Task($this->modelWrapper->reveal()))->setId(420),
+            (new Action($this->modelWrapper->reveal()))->setId(4242),
+            4200,
         );
 
-        $this->assertEquals(4, $permission->getPermission());
+        $this->assertEquals($model, $permission);
     }
 
     public function testGetByModuleAndTask(): void
     {
-        $this->mysqlDatabase->execute(
-            'SELECT `user_permission`.`permission` FROM `marvin`.`user_permission` WHERE `module_id`=? AND `task_id`=? AND `action_id` IS NULL AND IFNULL(`user_id`, ?)=? LIMIT 1',
-            [42, 420, 0, 0],
-        )
-            ->shouldBeCalledOnce()
-            ->willReturn(true)
-        ;
-        $this->mysqlDatabase->fetchAssocList()
-            ->shouldBeCalledOnce()
-            ->willReturn([[
-                'permission' => '4',
-            ]])
+        $selectQuery = (new SelectQuery($this->table))
+            ->addWhere(new Where(
+                '`module_id`=? AND `task_id`=? AND `action_id` IS NULL AND IFNULL(`user_id`, ?)=?',
+                [42, 420, 0, 0],
+            ))
+            ->setLimit(1)
         ;
 
+        $model = $this->loadModel($selectQuery, Permission::class);
         $permission = $this->permissionRepository->getByModuleAndTask(
-            (new Module())->setId(42),
-            (new Task())->setId(420),
+            (new Module($this->modelWrapper->reveal()))->setId(42),
+            (new Task($this->modelWrapper->reveal()))->setId(420),
         );
 
-        $this->assertEquals(4, $permission->getPermission());
+        $this->assertEquals($model, $permission);
     }
 
     public function testGetByModuleAndTaskWithUserId(): void
     {
-        $this->mysqlDatabase->execute(
-            'SELECT `user_permission`.`permission` FROM `marvin`.`user_permission` WHERE `module_id`=? AND `task_id`=? AND `action_id` IS NULL AND IFNULL(`user_id`, ?)=? LIMIT 1',
-            [42, 420, 0, 4242],
-        )
-            ->shouldBeCalledOnce()
-            ->willReturn(true)
-        ;
-        $this->mysqlDatabase->fetchAssocList()
-            ->shouldBeCalledOnce()
-            ->willReturn([[
-                'permission' => '4',
-            ]])
+        $selectQuery = (new SelectQuery($this->table))
+            ->addWhere(new Where(
+                '`module_id`=? AND `task_id`=? AND `action_id` IS NULL AND IFNULL(`user_id`, ?)=?',
+                [42, 420, 0, 4200],
+            ))
+            ->setLimit(1)
         ;
 
+        $model = $this->loadModel($selectQuery, Permission::class);
         $permission = $this->permissionRepository->getByModuleAndTask(
-            (new Module())->setId(42),
-            (new Task())->setId(420),
-            4242
+            (new Module($this->modelWrapper->reveal()))->setId(42),
+            (new Task($this->modelWrapper->reveal()))->setId(420),
+            4200,
         );
 
-        $this->assertEquals(4, $permission->getPermission());
+        $this->assertEquals($model, $permission);
     }
 }

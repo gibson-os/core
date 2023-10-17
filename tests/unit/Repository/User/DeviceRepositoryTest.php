@@ -4,144 +4,133 @@ declare(strict_types=1);
 namespace GibsonOS\Test\Unit\Core\Repository\User;
 
 use Codeception\Test\Unit;
+use DateTimeImmutable;
+use GibsonOS\Core\Model\User\Device;
 use GibsonOS\Core\Repository\User\DeviceRepository;
-use GibsonOS\Test\Unit\Core\ModelManagerTrait;
+use GibsonOS\Test\Unit\Core\Repository\RepositoryTrait;
+use MDO\Dto\Query\Where;
+use MDO\Dto\Value;
+use MDO\Query\DeleteQuery;
+use MDO\Query\SelectQuery;
+use MDO\Query\UpdateQuery;
+use MDO\Service\SelectService;
 
 class DeviceRepositoryTest extends Unit
 {
-    use ModelManagerTrait;
+    use RepositoryTrait;
 
     private DeviceRepository $deviceRepository;
 
     protected function _before()
     {
-        $this->loadModelManager();
+        $this->loadRepository('user_device');
 
-        $this->mysqlDatabase->getDatabaseName()
-            ->shouldBeCalledOnce()
-            ->willReturn('marvin')
-        ;
-        $this->mysqlDatabase->sendQuery('SHOW FIELDS FROM `marvin`.`user_device`')
-            ->shouldBeCalledOnce()
-            ->willReturn(true)
-        ;
-        $this->mysqlDatabase->fetchRow()
-            ->shouldBeCalledTimes(3)
-            ->willReturn(
-                ['user_id', 'bigint(42)', 'NO', '', null, ''],
-                ['model', 'varchar(42)', 'NO', '', null, ''],
-                null
-            )
-        ;
-
-        $this->deviceRepository = new DeviceRepository('user_device');
+        $this->deviceRepository = new DeviceRepository($this->repositoryWrapper->reveal(), $this->table);
     }
 
     public function testGetById(): void
     {
-        $this->mysqlDatabase->execute(
-            'SELECT `user_device`.`user_id`, `user_device`.`model` FROM `marvin`.`user_device` WHERE `id`=? LIMIT 1',
-            ['42'],
-        )
-            ->shouldBeCalledOnce()
-            ->willReturn(true)
-        ;
-        $this->mysqlDatabase->fetchAssocList()
-            ->shouldBeCalledOnce()
-            ->willReturn([[
-                'user_id' => '21',
-                'model' => 'galaxy',
-            ]])
+        $selectQuery = (new SelectQuery($this->table))
+            ->addWhere(new Where('`id`=?', ['42']))
+            ->setLimit(1)
         ;
 
+        $model = $this->loadModel($selectQuery, Device::class);
         $device = $this->deviceRepository->getById('42');
 
-        $this->assertEquals(21, $device->getUserId());
-        $this->assertEquals('galaxy', $device->getModel());
+        $date = new DateTimeImmutable();
+        $model->setAdded($date);
+        $device->setAdded($date);
+
+        $this->assertEquals($model, $device);
     }
 
     public function testGetByToken(): void
     {
-        $this->mysqlDatabase->execute(
-            'SELECT `user_device`.`user_id`, `user_device`.`model` FROM `marvin`.`user_device` WHERE `token`=? LIMIT 1',
-            ['marvin'],
-        )
-            ->shouldBeCalledOnce()
-            ->willReturn(true)
-        ;
-        $this->mysqlDatabase->fetchAssocList()
-            ->shouldBeCalledOnce()
-            ->willReturn([[
-                'user_id' => '21',
-                'model' => 'galaxy',
-            ]])
+        $selectQuery = (new SelectQuery($this->table))
+            ->addWhere(new Where('`token`=?', ['marvin']))
+            ->setLimit(1)
         ;
 
+        $model = $this->loadModel($selectQuery, Device::class);
         $device = $this->deviceRepository->getByToken('marvin');
 
-        $this->assertEquals(21, $device->getUserId());
-        $this->assertEquals('galaxy', $device->getModel());
+        $date = new DateTimeImmutable();
+        $model->setAdded($date);
+        $device->setAdded($date);
+
+        $this->assertEquals($model, $device);
     }
 
     public function testFindByUserId(): void
     {
-        $this->mysqlDatabase->execute(
-            'SELECT `user_device`.`user_id`, `user_device`.`model` FROM `marvin`.`user_device` WHERE `user_id`=?',
-            [42],
-        )
-            ->shouldBeCalledOnce()
-            ->willReturn(true)
-        ;
-        $this->mysqlDatabase->fetchAssocList()
-            ->shouldBeCalledOnce()
-            ->willReturn([[
-                'user_id' => '21',
-                'model' => 'galaxy',
-            ]])
+        $selectQuery = (new SelectQuery($this->table))
+            ->addWhere(new Where('`user_id`=?', [42]))
         ;
 
+        $model = $this->loadModel($selectQuery, Device::class, '');
         $device = $this->deviceRepository->findByUserId(42)[0];
 
-        $this->assertEquals(21, $device->getUserId());
-        $this->assertEquals('galaxy', $device->getModel());
+        $date = new DateTimeImmutable();
+        $model->setAdded($date);
+        $device->setAdded($date);
+
+        $this->assertEquals($model, $device);
     }
 
     public function testDeleteByIds(): void
     {
-        $this->mysqlDatabase->execute(
-            'DELETE `user_device` FROM `marvin`.`user_device` WHERE `id` IN (?) ',
-            [42],
-        )
+        $deleteQuery = (new DeleteQuery($this->table))
+            ->addWhere(new Where('`id` IN (?)', [42]))
+        ;
+        $this->loadDeleteQuery($deleteQuery);
+        $selectService = $this->prophesize(SelectService::class);
+        $selectService->getParametersString([42])
             ->shouldBeCalledOnce()
-            ->willReturn(true)
+            ->willReturn('?')
+        ;
+        $this->repositoryWrapper->getSelectService()
+            ->shouldBeCalledOnce()
+            ->willReturn($selectService)
         ;
 
-        $this->deviceRepository->deleteByIds([42]);
+        $this->assertTrue($this->deviceRepository->deleteByIds([42]));
     }
 
     public function testDeleteByIdsWithUserId(): void
     {
-        $this->mysqlDatabase->execute(
-            'DELETE `user_device` FROM `marvin`.`user_device` WHERE `id` IN (?) AND `user_id`=? ',
-            [42, 21],
-        )
+        $deleteQuery = (new DeleteQuery($this->table))
+            ->addWhere(new Where('`id` IN (?)', [42]))
+            ->addWhere(new Where('`user_id`=?', [21]))
+        ;
+        $this->loadDeleteQuery($deleteQuery);
+        $selectService = $this->prophesize(SelectService::class);
+        $selectService->getParametersString([42])
             ->shouldBeCalledOnce()
-            ->willReturn(true)
+            ->willReturn('?')
+        ;
+        $this->repositoryWrapper->getSelectService()
+            ->shouldBeCalledOnce()
+            ->willReturn($selectService)
         ;
 
-        $this->deviceRepository->deleteByIds([42], 21);
+        $this->assertTrue($this->deviceRepository->deleteByIds([42], 21));
     }
 
     public function testRemoveFcmToken(): void
     {
-        $this->mysqlDatabase->execute(
-            'UPDATE `marvin`.`user_device` SET `fcm_token`=NULL WHERE `fcm_token`=? ',
-            ['galaxy'],
-        )
+        $updateQuery = (new UpdateQuery($this->table, ['fcm_token' => new Value(null)]))
+            ->addWhere(new Where('`fcm_token`=?', ['galaxy']))
+        ;
+        $this->client->execute($updateQuery)
             ->shouldBeCalledOnce()
-            ->willReturn(true)
+            ->willReturn(null)
+        ;
+        $this->repositoryWrapper->getClient()
+            ->shouldBeCalledOnce()
+            ->willReturn($this->client->reveal())
         ;
 
-        $this->deviceRepository->removeFcmToken('galaxy');
+        $this->assertTrue($this->deviceRepository->removeFcmToken('galaxy'));
     }
 }

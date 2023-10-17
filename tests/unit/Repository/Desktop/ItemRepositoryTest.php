@@ -8,11 +8,9 @@ use GibsonOS\Core\Model\Desktop\Item;
 use GibsonOS\Core\Model\User;
 use GibsonOS\Core\Repository\Desktop\ItemRepository;
 use GibsonOS\Test\Unit\Core\Repository\RepositoryTrait;
-use MDO\Dto\Field;
 use MDO\Dto\Query\Where;
 use MDO\Dto\Value;
 use MDO\Enum\OrderDirection;
-use MDO\Enum\Type;
 use MDO\Enum\ValueType;
 use MDO\Query\DeleteQuery;
 use MDO\Query\SelectQuery;
@@ -27,10 +25,7 @@ class ItemRepositoryTest extends Unit
 
     protected function _before()
     {
-        $this->loadRepository(
-            'desktop_item',
-            [new Field('text', false, Type::VARCHAR, '', null, '', 42)],
-        );
+        $this->loadRepository('desktop_item');
 
         $this->itemRepository = new ItemRepository($this->repositoryWrapper->reveal(), $this->table);
     }
@@ -41,14 +36,7 @@ class ItemRepositoryTest extends Unit
             ->addWhere(new Where('`id` NOT IN (?)', [42]))
             ->addWhere(new Where('`user_id`=?', [0]))
         ;
-        $this->repositoryWrapper->getClient()
-            ->shouldBeCalledOnce()
-            ->willReturn($this->client->reveal())
-        ;
-        $this->client->execute($deleteQuery)
-            ->shouldBeCalledOnce()
-            ->willReturn(null)
-        ;
+        $this->loadDeleteQuery($deleteQuery);
         $selectService = $this->prophesize(SelectService::class);
         $selectService->getParametersString([42])
             ->shouldBeCalledOnce()

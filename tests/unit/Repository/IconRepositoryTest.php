@@ -4,91 +4,83 @@ declare(strict_types=1);
 namespace GibsonOS\Test\Unit\Core\Repository;
 
 use Codeception\Test\Unit;
+use DateTimeImmutable;
+use GibsonOS\Core\Model\Icon;
 use GibsonOS\Core\Repository\IconRepository;
-use GibsonOS\Test\Unit\Core\ModelManagerTrait;
+use MDO\Dto\Query\Where;
+use MDO\Query\DeleteQuery;
+use MDO\Query\SelectQuery;
+use MDO\Service\SelectService;
 
 class IconRepositoryTest extends Unit
 {
-    use ModelManagerTrait;
+    use RepositoryTrait;
 
     private IconRepository $iconRepository;
 
     protected function _before()
     {
-        $this->loadModelManager();
+        $this->loadRepository('icon');
 
-        $this->mysqlDatabase->getDatabaseName()
-            ->shouldBeCalledOnce()
-            ->willReturn('marvin')
-        ;
-        $this->mysqlDatabase->sendQuery('SHOW FIELDS FROM `marvin`.`icon`')
-            ->shouldBeCalledOnce()
-            ->willReturn(true)
-        ;
-        $this->mysqlDatabase->fetchRow()
-            ->shouldBeCalledTimes(2)
-            ->willReturn(
-                ['name', 'varchar(42)', 'NO', '', null, ''],
-                null
-            )
-        ;
-
-        $this->iconRepository = new IconRepository('icon');
+        $this->iconRepository = new IconRepository($this->repositoryWrapper->reveal(), $this->table);
     }
 
     public function testGetById(): void
     {
-        $this->mysqlDatabase->execute(
-            'SELECT `icon`.`name` FROM `marvin`.`icon` WHERE `id`=? LIMIT 1',
-            [42],
-        )
-            ->shouldBeCalledOnce()
-            ->willReturn(true)
-        ;
-        $this->mysqlDatabase->fetchAssocList()
-            ->shouldBeCalledOnce()
-            ->willReturn([[
-                'name' => 'marvin',
-            ]])
+        $selectQuery = (new SelectQuery($this->table))
+            ->addWhere(new Where('`id`=?', [42]))
+            ->setLimit(1)
         ;
 
+        $model = $this->loadModel($selectQuery, Icon::class);
         $icon = $this->iconRepository->getById(42);
 
-        $this->assertEquals('marvin', $icon->getName());
+        $date = new DateTimeImmutable();
+        $model->setAdded($date);
+        $icon->setAdded($date);
+
+        $this->assertEquals($model, $icon);
     }
 
     public function testFindByIds(): void
     {
-        $this->mysqlDatabase->getDatabaseName()
-            ->shouldBeCalledTimes(2)
+        $selectQuery = (new SelectQuery($this->table))
+            ->addWhere(new Where('`id` IN (?)', [42]))
         ;
-        $this->mysqlDatabase->execute(
-            'SELECT `icon`.`name` FROM `marvin`.`icon` WHERE `id` IN (?)',
-            [42],
-        )
+        $selectService = $this->prophesize(SelectService::class);
+        $selectService->getParametersString([42])
             ->shouldBeCalledOnce()
-            ->willReturn(true)
+            ->willReturn('?')
         ;
-        $this->mysqlDatabase->fetchAssocList()
+        $this->repositoryWrapper->getSelectService()
             ->shouldBeCalledOnce()
-            ->willReturn([[
-                'name' => 'marvin',
-            ]])
+            ->willReturn($selectService->reveal())
         ;
 
+        $model = $this->loadModel($selectQuery, Icon::class, '');
         $icon = $this->iconRepository->findByIds([42])[0];
 
-        $this->assertEquals('marvin', $icon->getName());
+        $date = new DateTimeImmutable();
+        $model->setAdded($date);
+        $icon->setAdded($date);
+
+        $this->assertEquals($model, $icon);
     }
 
     public function testDeleteByIds(): void
     {
-        $this->mysqlDatabase->execute(
-            'DELETE `icon` FROM `marvin`.`icon` WHERE `id` IN (?) ',
-            [42],
-        )
+        $deleteQuery = (new DeleteQuery($this->table))
+            ->addWhere(new Where('`id` IN (?)', [42]))
+        ;
+        $this->loadDeleteQuery($deleteQuery);
+        $selectService = $this->prophesize(SelectService::class);
+        $selectService->getParametersString([42])
             ->shouldBeCalledOnce()
-            ->willReturn(true)
+            ->willReturn('?')
+        ;
+        $this->repositoryWrapper->getSelectService()
+            ->shouldBeCalledOnce()
+            ->willReturn($selectService->reveal())
         ;
 
         $this->assertTrue($this->iconRepository->deleteByIds([42]));

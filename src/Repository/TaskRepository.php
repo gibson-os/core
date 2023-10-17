@@ -71,7 +71,7 @@ class TaskRepository extends AbstractRepository
                     '`id` NOT IN (%s)',
                     $repositoryWrapper->getSelectService()->getParametersString($ids),
                 ),
-                [$ids],
+                $ids,
             ))
         ;
 

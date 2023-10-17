@@ -15,6 +15,7 @@ use MDO\Dto\Query\Where;
 use MDO\Dto\Table;
 use MDO\Enum\OrderDirection;
 use MDO\Exception\ClientException;
+use MDO\Exception\RecordException;
 use ReflectionException;
 
 class SettingRepository extends AbstractRepository
@@ -32,6 +33,7 @@ class SettingRepository extends AbstractRepository
     /**
      * @throws ClientException
      * @throws JsonException
+     * @throws RecordException
      * @throws ReflectionException
      *
      * @return Setting[]
@@ -54,6 +56,7 @@ class SettingRepository extends AbstractRepository
     /**
      * @throws ClientException
      * @throws JsonException
+     * @throws RecordException
      * @throws ReflectionException
      *
      * @return Setting[]
@@ -76,8 +79,11 @@ class SettingRepository extends AbstractRepository
     }
 
     /**
-     * @throws SelectError
      * @throws ClientException
+     * @throws JsonException
+     * @throws ReflectionException
+     * @throws SelectError
+     * @throws RecordException
      */
     public function getByKey(int $moduleId, ?int $userId, string $key): Setting
     {
@@ -99,8 +105,11 @@ class SettingRepository extends AbstractRepository
     }
 
     /**
-     * @throws SelectError
      * @throws ClientException
+     * @throws JsonException
+     * @throws RecordException
+     * @throws ReflectionException
+     * @throws SelectError
      */
     public function getByKeyAndValue(int $moduleId, string $key, string $value): Setting
     {
@@ -112,8 +121,11 @@ class SettingRepository extends AbstractRepository
     }
 
     /**
-     * @throws SelectError
      * @throws ClientException
+     * @throws JsonException
+     * @throws RecordException
+     * @throws ReflectionException
+     * @throws SelectError
      */
     public function getByKeyValueAndModuleName(string $moduleName, string $key, string $value): Setting
     {
@@ -163,15 +175,19 @@ class SettingRepository extends AbstractRepository
     }
 
     /**
-     * @throws SelectError
      * @throws ClientException
+     * @throws JsonException
+     * @throws RecordException
+     * @throws ReflectionException
+     * @throws SelectError
      */
     public function getByKeyAndModuleName(string $moduleName, ?int $userId, string $key): Setting
     {
         $selectQuery = $this->getSelectQuery($this->settingTableName, 's')
             ->addJoin(new Join($this->moduleTable, 'm', '`s`.`module_id`=`m`.`id`'))
             ->addWhere(new Where('`m`.`name`=?', [$moduleName]))
-            ->setOrder('`user_id`', OrderDirection::DESC)
+            ->addWhere(new Where('`s`.`key`=?', [$key]))
+            ->setOrder('`s`.`user_id`', OrderDirection::DESC)
             ->setLimit(1)
         ;
         $where = new Where('`s`.`user_id` IS NULL', []);

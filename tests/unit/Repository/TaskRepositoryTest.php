@@ -4,130 +4,90 @@ declare(strict_types=1);
 namespace GibsonOS\Test\Unit\Core\Repository;
 
 use Codeception\Test\Unit;
+use GibsonOS\Core\Model\Task;
 use GibsonOS\Core\Repository\TaskRepository;
-use GibsonOS\Test\Unit\Core\ModelManagerTrait;
+use MDO\Dto\Query\Where;
+use MDO\Query\DeleteQuery;
+use MDO\Query\SelectQuery;
+use MDO\Service\SelectService;
 
 class TaskRepositoryTest extends Unit
 {
-    use ModelManagerTrait;
+    use RepositoryTrait;
 
     private TaskRepository $taskRepository;
 
     protected function _before()
     {
-        $this->loadModelManager();
+        $this->loadRepository('task');
 
-        $this->mysqlDatabase->getDatabaseName()
-            ->shouldBeCalledOnce()
-            ->willReturn('marvin')
-        ;
-        $this->mysqlDatabase->sendQuery('SHOW FIELDS FROM `marvin`.`task`')
-            ->shouldBeCalledOnce()
-            ->willReturn(true)
-        ;
-        $this->mysqlDatabase->fetchRow()
-            ->shouldBeCalledTimes(2)
-            ->willReturn(
-                ['name', 'varchar(42)', 'NO', '', null, ''],
-                null
-            )
-        ;
-
-        $this->taskRepository = new TaskRepository('task');
+        $this->taskRepository = new TaskRepository($this->repositoryWrapper->reveal(), $this->table);
     }
 
     public function testGetById(): void
     {
-        $this->mysqlDatabase->execute(
-            'SELECT `task`.`name` FROM `marvin`.`task` WHERE `id`=? LIMIT 1',
-            [42],
-        )
-            ->shouldBeCalledOnce()
-            ->willReturn(true)
-        ;
-        $this->mysqlDatabase->fetchAssocList()
-            ->shouldBeCalledOnce()
-            ->willReturn([[
-                'name' => 'galaxy',
-            ]])
+        $selectQuery = (new SelectQuery($this->table))
+            ->addWhere(new Where('`id`=?', [42]))
+            ->setLimit(1)
         ;
 
-        $task = $this->taskRepository->getById(42);
-
-        $this->assertEquals('galaxy', $task->getName());
+        $this->assertEquals(
+            $this->loadModel($selectQuery, Task::class),
+            $this->taskRepository->getById(42),
+        );
     }
 
     public function testFindByName(): void
     {
-        $this->mysqlDatabase->execute(
-            'SELECT `task`.`name` FROM `marvin`.`task` WHERE `name` LIKE ?',
-            ['galaxy%'],
-        )
-            ->shouldBeCalledOnce()
-            ->willReturn(true)
-        ;
-        $this->mysqlDatabase->fetchAssocList()
-            ->shouldBeCalledOnce()
-            ->willReturn([[
-                'name' => 'galaxy',
-            ]])
+        $selectQuery = (new SelectQuery($this->table))
+            ->addWhere(new Where('`name` LIKE ?', ['galaxy%']))
         ;
 
-        $task = $this->taskRepository->findByName('galaxy')[0];
-
-        $this->assertEquals('galaxy', $task->getName());
+        $this->assertEquals(
+            $this->loadModel($selectQuery, Task::class, ''),
+            $this->taskRepository->findByName('galaxy')[0],
+        );
     }
 
     public function testFindByNameWithModuleId(): void
     {
-        $this->mysqlDatabase->execute(
-            'SELECT `task`.`name` FROM `marvin`.`task` WHERE `name` LIKE ? AND `module_id`=?',
-            ['galaxy%', 42],
-        )
-            ->shouldBeCalledOnce()
-            ->willReturn(true)
-        ;
-        $this->mysqlDatabase->fetchAssocList()
-            ->shouldBeCalledOnce()
-            ->willReturn([[
-                'name' => 'galaxy',
-            ]])
+        $selectQuery = (new SelectQuery($this->table))
+            ->addWhere(new Where('`name` LIKE ? AND `module_id`=?', ['galaxy%', 42]))
         ;
 
-        $task = $this->taskRepository->findByName('galaxy', 42)[0];
-
-        $this->assertEquals('galaxy', $task->getName());
+        $this->assertEquals(
+            $this->loadModel($selectQuery, Task::class, ''),
+            $this->taskRepository->findByName('galaxy', 42)[0],
+        );
     }
 
     public function testGetByNameAndModuleId(): void
     {
-        $this->mysqlDatabase->execute(
-            'SELECT `task`.`name` FROM `marvin`.`task` WHERE `name`=? AND `module_id`=? LIMIT 1',
-            ['galaxy', 42],
-        )
-            ->shouldBeCalledOnce()
-            ->willReturn(true)
-        ;
-        $this->mysqlDatabase->fetchAssocList()
-            ->shouldBeCalledOnce()
-            ->willReturn([[
-                'name' => 'galaxy',
-            ]])
+        $selectQuery = (new SelectQuery($this->table))
+            ->addWhere(new Where('`name`=? AND `module_id`=?', ['galaxy', 42]))
+            ->setLimit(1)
         ;
 
-        $task = $this->taskRepository->getByNameAndModuleId('galaxy', 42);
-
-        $this->assertEquals('galaxy', $task->getName());
+        $this->assertEquals(
+            $this->loadModel($selectQuery, Task::class),
+            $this->taskRepository->getByNameAndModuleId('galaxy', 42),
+        );
     }
 
     public function testDeleteByIdsNot(): void
     {
-        $this->mysqlDatabase->execute(
-            'DELETE `task` FROM `marvin`.`task` WHERE `id` NOT IN (?) ',
-            [42],
-        )
+        $deleteQuery = (new DeleteQuery($this->table))
+            ->addWhere(new Where('`id` NOT IN (?)', [42]))
+        ;
+        $this->loadDeleteQuery($deleteQuery);
+        $selectService = $this->prophesize(SelectService::class);
+        $selectService->getParametersString([42])
             ->shouldBeCalledOnce()
-            ->willReturn(true)
+            ->willReturn('?')
+        ;
+        $this->repositoryWrapper->getSelectService()
+            ->shouldBeCalledOnce()
+            ->willReturn($selectService)
         ;
 
         $this->assertTrue($this->taskRepository->deleteByIdsNot([42]));

@@ -6,8 +6,6 @@ namespace GibsonOS\Test\Unit\Core\Repository;
 use Codeception\Test\Unit;
 use DateTimeImmutable;
 use GibsonOS\Core\Repository\CronjobRepository;
-use MDO\Dto\Field;
-use MDO\Enum\Type;
 
 class CronjobRepositoryTest extends Unit
 {
@@ -17,10 +15,7 @@ class CronjobRepositoryTest extends Unit
 
     protected function _before()
     {
-        $this->loadRepository(
-            'cronjob',
-            [new Field('command', false, Type::VARCHAR, '', null, '', 4200)],
-        );
+        $this->loadRepository('cronjob');
 
         $this->cronjobRepository = new CronjobRepository($this->repositoryWrapper->reveal());
     }

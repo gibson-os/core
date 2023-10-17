@@ -7,13 +7,17 @@ use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\User;
 use JsonException;
 use MDO\Exception\ClientException;
+use MDO\Exception\RecordException;
 use ReflectionException;
 
 class UserRepository extends AbstractRepository
 {
     /**
-     * @throws SelectError
      * @throws ClientException
+     * @throws JsonException
+     * @throws RecordException
+     * @throws ReflectionException
+     * @throws SelectError
      */
     public function getById(int $id): User
     {
@@ -21,9 +25,10 @@ class UserRepository extends AbstractRepository
     }
 
     /**
-     * @throws ClientException
      * @throws JsonException
      * @throws ReflectionException
+     * @throws RecordException
+     * @throws ClientException
      *
      * @return User[]
      */
@@ -33,8 +38,11 @@ class UserRepository extends AbstractRepository
     }
 
     /**
-     * @throws SelectError
      * @throws ClientException
+     * @throws JsonException
+     * @throws RecordException
+     * @throws ReflectionException
+     * @throws SelectError
      */
     public function getByUsername(string $username): User
     {
@@ -46,6 +54,7 @@ class UserRepository extends AbstractRepository
      * @throws JsonException
      * @throws ReflectionException
      * @throws SelectError
+     * @throws RecordException
      */
     public function getByUsernameAndPassword(string $username, string $passwordHash): User
     {
@@ -55,6 +64,7 @@ class UserRepository extends AbstractRepository
     /**
      * @throws ClientException
      * @throws SelectError
+     * @throws RecordException
      */
     public function getCount(): int
     {

@@ -4,12 +4,11 @@ declare(strict_types=1);
 namespace GibsonOS\Test\Unit\Core\Repository;
 
 use Codeception\Test\Unit;
+use DateTimeImmutable;
 use GibsonOS\Core\Model\DevicePush;
 use GibsonOS\Core\Model\User\Device;
 use GibsonOS\Core\Repository\DevicePushRepository;
-use MDO\Dto\Field;
 use MDO\Dto\Query\Where;
-use MDO\Enum\Type;
 use MDO\Query\SelectQuery;
 
 class DevicePushRepositoryTest extends Unit
@@ -20,13 +19,7 @@ class DevicePushRepositoryTest extends Unit
 
     protected function _before()
     {
-        $this->loadRepository(
-            'device_push',
-            [
-                new Field('module', false, Type::VARCHAR, '', null, '', 42),
-                new Field('task', false, Type::VARCHAR, '', null, '', 42),
-            ],
-        );
+        $this->loadRepository('device_push');
 
         $this->devicePushRepository = new DevicePushRepository($this->repositoryWrapper->reveal());
     }
@@ -41,35 +34,32 @@ class DevicePushRepositoryTest extends Unit
             ->setLimit(1)
         ;
 
-        $this->assertEquals(
-            $this->loadModel($selectQuery, DevicePush::class),
-            $this->devicePushRepository->getByDevice(
-                (new Device($this->modelWrapper->reveal()))->setId('galaxy'),
-                'marvin',
-                'arthur',
-                'dent',
-                'no hope',
-            ),
+        $model = $this->loadModel($selectQuery, DevicePush::class);
+        $devicePush = $this->devicePushRepository->getByDevice(
+            (new Device($this->modelWrapper->reveal()))->setId('galaxy'),
+            'marvin',
+            'arthur',
+            'dent',
+            'no hope',
         );
+
+        $date = new DateTimeImmutable();
+        $model->setModified($date);
+        $devicePush->setModified($date);
+
+        $this->assertEquals($model, $devicePush);
     }
 
     public function testGetByAction(): void
     {
-        $this->mysqlDatabase->execute(
-            'SELECT `device_push`.`module`, `device_push`.`task` FROM `marvin`.`device_push` WHERE `module`=? AND `task`=? AND `action`=? AND `foreign_id`=?',
-            ['marvin', 'arthur', 'dent', 'no hope'],
-        )
-            ->shouldBeCalledOnce()
-            ->willReturn(true)
-        ;
-        $this->mysqlDatabase->fetchAssocList()
-            ->shouldBeCalledOnce()
-            ->willReturn([[
-                'module' => 'ford',
-                'task' => 'prefect',
-            ]])
+        $selectQuery = (new SelectQuery($this->table))
+            ->addWhere(new Where(
+                '`module`=? AND `task`=? AND `action`=? AND `foreign_id`=?',
+                ['marvin', 'arthur', 'dent', 'no hope'],
+            ))
         ;
 
+        $model = $this->loadModel($selectQuery, DevicePush::class, '');
         $devicePush = $this->devicePushRepository->getAllByAction(
             'marvin',
             'arthur',
@@ -77,7 +67,10 @@ class DevicePushRepositoryTest extends Unit
             'no hope',
         )[0];
 
-        $this->assertEquals('ford', $devicePush->getModule());
-        $this->assertEquals('prefect', $devicePush->getTask());
+        $date = new DateTimeImmutable();
+        $model->setModified($date);
+        $devicePush->setModified($date);
+
+        $this->assertEquals($model, $devicePush);
     }
 }
