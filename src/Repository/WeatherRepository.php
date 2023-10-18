@@ -35,7 +35,7 @@ class WeatherRepository extends AbstractRepository
     public function getByDate(Location $location, DateTimeInterface $date): Weather
     {
         return $this->fetchOne(
-            '`location_id`=? AND date=?',
+            '`location_id`=? AND `date`=?',
             [$location->getId(), $date->format('Y-m-d H:i:s')],
             Weather::class,
         );

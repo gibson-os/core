@@ -14,6 +14,7 @@ use MDO\Dto\Query\Join;
 use MDO\Dto\Query\Where;
 use MDO\Dto\Table;
 use MDO\Exception\ClientException;
+use MDO\Exception\RecordException;
 use ReflectionException;
 
 class CronjobRepository extends AbstractRepository
@@ -42,9 +43,10 @@ class CronjobRepository extends AbstractRepository
     }
 
     /**
-     * @throws ClientException
      * @throws JsonException
      * @throws ReflectionException
+     * @throws RecordException
+     * @throws ClientException
      *
      * @return Cronjob[]
      */

@@ -25,6 +25,7 @@
         <cache>
           <versions>
             <info id="Local" version="9.6.8" />
+            <info id="LocalC:\Users\Meins\Documents\Projekte\GibsonOs\Core\vendor\autoload.php" version="9.6.13" />
           </versions>
         </cache>
       </tool>

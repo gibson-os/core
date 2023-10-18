@@ -7,16 +7,19 @@ use Codeception\Test\Unit;
 use DateTime;
 use DateTimeImmutable;
 use DateTimeZone;
+use GibsonOS\Core\Model\Weather;
 use GibsonOS\Core\Model\Weather\Location;
 use GibsonOS\Core\Repository\WeatherRepository;
 use GibsonOS\Core\Service\DateTimeService;
-use GibsonOS\Test\Unit\Core\ModelManagerTrait;
-use Prophecy\Argument;
+use MDO\Dto\Query\Where;
+use MDO\Enum\OrderDirection;
+use MDO\Query\DeleteQuery;
+use MDO\Query\SelectQuery;
 use Prophecy\Prophecy\ObjectProphecy;
 
 class WeatherRepositoryTest extends Unit
 {
-    use ModelManagerTrait;
+    use RepositoryTrait;
 
     private WeatherRepository $weatherRepository;
 
@@ -24,123 +27,88 @@ class WeatherRepositoryTest extends Unit
 
     protected function _before()
     {
-        $this->loadModelManager();
-
-        $this->mysqlDatabase->getDatabaseName()
-            ->shouldBeCalledOnce()
-            ->willReturn('marvin')
-        ;
-        $this->mysqlDatabase->sendQuery('SHOW FIELDS FROM `marvin`.`weather`')
-            ->shouldBeCalledOnce()
-            ->willReturn(true)
-        ;
-        $this->mysqlDatabase->fetchRow()
-            ->shouldBeCalledTimes(2)
-            ->willReturn(
-                ['temperature', 'float(42)', 'NO', '', null, ''],
-                null
-            )
-        ;
-
+        $this->loadRepository('weather');
         $this->dateTimeService = $this->prophesize(DateTimeService::class);
 
-        $this->weatherRepository = new WeatherRepository($this->dateTimeService->reveal(), 'weather');
+        $this->weatherRepository = new WeatherRepository(
+            $this->repositoryWrapper->reveal(),
+            $this->dateTimeService->reveal(),
+            $this->table,
+        );
     }
 
     public function testGetByDate(): void
     {
         $date = new DateTimeImmutable();
-
-        $this->mysqlDatabase->execute(
-            'SELECT `weather`.`temperature` FROM `marvin`.`weather` WHERE `location_id`=? AND date=? LIMIT 1',
-            [42, $date->format('Y-m-d H:i:s')],
-        )
-            ->shouldBeCalledOnce()
-            ->willReturn(true)
-        ;
-        $this->mysqlDatabase->fetchAssocList()
-            ->shouldBeCalledOnce()
-            ->willReturn([[
-                'temperature' => '4.2',
-            ]])
+        $selectQuery = (new SelectQuery($this->table))
+            ->addWhere(new Where('`location_id`=? AND `date`=?', [42, $date->format('Y-m-d H:i:s')]))
+            ->setLimit(1)
         ;
 
-        $weather = $this->weatherRepository->getByDate(
-            (new Location())->setId(42),
-            $date,
-        );
+        $model = $this->loadModel($selectQuery, Weather::class);
+        $weather = $this->weatherRepository->getByDate((new Location($this->modelWrapper->reveal()))->setId(42), $date);
 
-        $this->assertEquals(4.2, $weather->getTemperature());
+        $model->setDate($date);
+        $weather->setDate($date);
+
+        $this->assertEquals($model, $weather);
     }
 
     public function testGetByNearestDate(): void
     {
         $date = new DateTimeImmutable();
-
-        $this->mysqlDatabase->execute(
-            'SELECT `weather`.`temperature` FROM `marvin`.`weather` WHERE `location_id`=? AND `date`<=? ORDER BY `date` DESC LIMIT 1',
-            [42, $date->format('Y-m-d H:i:s')],
-        )
-            ->shouldBeCalledOnce()
-            ->willReturn(true)
-        ;
-        $this->mysqlDatabase->fetchAssocList()
-            ->shouldBeCalledOnce()
-            ->willReturn([[
-                'temperature' => '4.2',
-            ]])
+        $selectQuery = (new SelectQuery($this->table))
+            ->addWhere(new Where('`location_id`=? AND `date`<=?', [42, $date->format('Y-m-d H:i:s')]))
+            ->setOrder('`date`', OrderDirection::DESC)
+            ->setLimit(1)
         ;
 
-        $weather = $this->weatherRepository->getByNearestDate(
-            (new Location())->setId(42),
-            $date,
-        );
+        $model = $this->loadModel($selectQuery, Weather::class);
+        $weather = $this->weatherRepository->getByNearestDate((new Location($this->modelWrapper->reveal()))->setId(42), $date);
 
-        $this->assertEquals(4.2, $weather->getTemperature());
+        $model->setDate($date);
+        $weather->setDate($date);
+
+        $this->assertEquals($model, $weather);
     }
 
     public function testGetByNearestDateNull(): void
     {
         $date = new DateTime();
+        $selectQuery = (new SelectQuery($this->table))
+            ->addWhere(new Where('`location_id`=? AND `date`<=?', [42, $date->format('Y-m-d H:i:s')]))
+            ->setOrder('`date`', OrderDirection::DESC)
+            ->setLimit(1)
+        ;
 
-        $this->mysqlDatabase->execute(
-            'SELECT `weather`.`temperature` FROM `marvin`.`weather` WHERE `location_id`=? AND `date`<=? ORDER BY `date` DESC LIMIT 1',
-            [42, $date->format('Y-m-d H:i:s')],
-        )
-            ->shouldBeCalledOnce()
-            ->willReturn(true)
-        ;
-        $this->mysqlDatabase->fetchAssocList()
-            ->shouldBeCalledOnce()
-            ->willReturn([[
-                'temperature' => '4.2',
-            ]])
-        ;
-        $this->dateTimeService->get('now', Argument::exact(new DateTimeZone('Europe/Berlin')))
+        $this->dateTimeService->get('now', new DateTimeZone('Europe/Berlin'))
             ->shouldBeCalledOnce()
             ->willReturn($date)
         ;
+        $model = $this->loadModel($selectQuery, Weather::class);
+        $weather = $this->weatherRepository->getByNearestDate(
+            (new Location($this->modelWrapper->reveal()))->setId(42)->setTimezone('Europe/Berlin'),
+        );
 
-        $weather = $this->weatherRepository->getByNearestDate((new Location())->setId(42)->setTimezone('Europe/Berlin'));
+        $model->setDate($date);
+        $weather->setDate($date);
 
-        $this->assertEquals(4.2, $weather->getTemperature());
+        $this->assertEquals($model, $weather);
     }
 
     public function testDeleteBetweenDate(): void
     {
         $from = new DateTimeImmutable('-1 hour');
         $to = new DateTimeImmutable('+1 hour');
-
-        $this->mysqlDatabase->execute(
-            'DELETE `weather` FROM `marvin`.`weather` WHERE `location_id`=? AND `date` > ? AND `date` < ? ',
-            [42, $from->format('Y-m-d H:i:s'), $to->format('Y-m-d H:i:s')],
-        )
-            ->shouldBeCalledOnce()
-            ->willReturn(true)
+        $deleteQuery = (new DeleteQuery($this->table))
+            ->addWhere(new Where('`location_id`=?', [42]))
+            ->addWhere(new Where('`date`>?', [$from->format('Y-m-d H:i:s')]))
+            ->addWhere(new Where('`date`<?', [$to->format('Y-m-d H:i:s')]))
         ;
+        $this->loadDeleteQuery($deleteQuery);
 
         $this->assertTrue($this->weatherRepository->deleteBetweenDates(
-            (new Location())->setId(42),
+            (new Location($this->modelWrapper->reveal()))->setId(42),
             $from,
             $to,
         ));

@@ -5,7 +5,12 @@ namespace GibsonOS\Test\Unit\Core\Repository;
 
 use Codeception\Test\Unit;
 use DateTimeImmutable;
+use GibsonOS\Core\Model\Cronjob;
 use GibsonOS\Core\Repository\CronjobRepository;
+use MDO\Dto\Query\Join;
+use MDO\Dto\Query\Where;
+use MDO\Dto\Table;
+use MDO\Query\SelectQuery;
 
 class CronjobRepositoryTest extends Unit
 {
@@ -13,100 +18,76 @@ class CronjobRepositoryTest extends Unit
 
     private CronjobRepository $cronjobRepository;
 
+    private Table $cronjobTimeTable;
+
     protected function _before()
     {
         $this->loadRepository('cronjob');
+        $this->cronjobTimeTable = new Table('cronjob_time', []);
 
-        $this->cronjobRepository = new CronjobRepository($this->repositoryWrapper->reveal());
+        $this->cronjobRepository = new CronjobRepository(
+            $this->repositoryWrapper->reveal(),
+            $this->table->getTableName(),
+            $this->cronjobTimeTable,
+        );
     }
 
     public function testGetRunnableByUser(): void
     {
         $date = new DateTimeImmutable();
-
-        $this->mysqlDatabase->execute(
-            "SELECT `cronjob`.`command` FROM `marvin`.`cronjob` JOIN cronjob_time ON `cronjob`.`id`=`cronjob_time`.`cronjob_id` WHERE `cronjob`.`user`=? AND `cronjob`.`active`=1 AND (`cronjob`.`last_run` IS NULL OR `cronjob`.`last_run` < ?) AND UNIX_TIMESTAMP(CONCAT(IF(? BETWEEN `cronjob_time`.`from_year` AND `cronjob_time`.`to_year`, ?,IF(`cronjob_time`.`from_year` > ?,`cronjob_time`.`from_year`,`cronjob_time`.`to_year`)), '-', IF(? BETWEEN `cronjob_time`.`from_month` AND `cronjob_time`.`to_month`, ?,IF(`cronjob_time`.`from_month` > ?,`cronjob_time`.`from_month`,`cronjob_time`.`to_month`)), '-', IF(? BETWEEN `cronjob_time`.`from_day_of_month` AND `cronjob_time`.`to_day_of_month`, ?,IF(`cronjob_time`.`from_day_of_month` > ?,`cronjob_time`.`from_day_of_month`,`cronjob_time`.`to_day_of_month`)), ' ', IF(? BETWEEN `cronjob_time`.`from_hour` AND `cronjob_time`.`to_hour`, ?,IF(`cronjob_time`.`from_hour` > ?,`cronjob_time`.`from_hour`,`cronjob_time`.`to_hour`)), ':', IF(? BETWEEN `cronjob_time`.`from_minute` AND `cronjob_time`.`to_minute`, ?,IF(`cronjob_time`.`from_minute` > ?,`cronjob_time`.`from_minute`,`cronjob_time`.`to_minute`)), ':', IF(? BETWEEN `cronjob_time`.`from_second` AND `cronjob_time`.`to_second`, ?,IF(`cronjob_time`.`from_second` > ?,`cronjob_time`.`from_second`,`cronjob_time`.`to_second`)))) BETWEEN UNIX_TIMESTAMP(COALESCE(`cronjob`.`last_run`, `cronjob`.`added`)) AND UNIX_TIMESTAMP(?) AND ? BETWEEN `cronjob_time`.`from_day_of_week` AND `cronjob_time`.`to_day_of_week`",
-            [
-                'marvin',
-                $date->format('Y-m-d H:i:s'),
-                (int) $date->format('Y'),
-                (int) $date->format('Y'),
-                (int) $date->format('Y'),
-                (int) $date->format('n'),
-                (int) $date->format('n'),
-                (int) $date->format('n'),
-                (int) $date->format('j'),
-                (int) $date->format('j'),
-                (int) $date->format('j'),
-                (int) $date->format('H'),
-                (int) $date->format('H'),
-                (int) $date->format('H'),
-                (int) $date->format('i'),
-                (int) $date->format('i'),
-                (int) $date->format('i'),
-                (int) $date->format('s'),
-                (int) $date->format('s'),
-                (int) $date->format('s'),
-                ((int) $date->format('Y')) . '-' . ((int) $date->format('n')) . '-' . ((int) $date->format('j')) . ' ' .
-                ((int) $date->format('H')) . ':' . ((int) $date->format('i')) . ':' . ((int) $date->format('s')),
-                (int) $date->format('w'),
-            ],
-        )
-            ->shouldBeCalledOnce()
-            ->willReturn(true)
+        $selectQuery = (new SelectQuery($this->table, 'c'))
+            ->addJoin(new Join($this->cronjobTimeTable, 'ct', '`c`.`id`=`ct`.`cronjob_id`'))
+            ->addWhere(new Where('`c`.`user`=:user', ['user' => 'marvin']))
+            ->addWhere(new Where('`c`.`active`=:active', ['active' => 1]))
+            ->addWhere(new Where(
+                '`c`.`last_run` IS NULL OR `c`.`last_run`<:now',
+                ['now' => $date->format('Y-m-d H:i:s')],
+            ))
+            ->addWhere(new Where(
+                'UNIX_TIMESTAMP(CONCAT(' .
+                    'IF(? BETWEEN `ct`.`from_year` AND `ct`.`to_year`, :year,IF(`ct`.`from_year` > :year,`ct`.`from_year`,`ct`.`to_year`)), \'-\', ' .
+                    'IF(? BETWEEN `ct`.`from_month` AND `ct`.`to_month`, :month,IF(`ct`.`from_month` > :month,`ct`.`from_month`,`ct`.`to_month`)), \'-\', ' .
+                    'IF(? BETWEEN `ct`.`from_day_of_month` AND `ct`.`to_day_of_month`, :dayOfMonth,IF(`ct`.`from_day_of_month` > :dayOfMonth,`ct`.`from_day_of_month`,`ct`.`to_day_of_month`)), \' \', ' .
+                    'IF(? BETWEEN `ct`.`from_hour` AND `ct`.`to_hour`, :hour,IF(`ct`.`from_hour` > :hour,`ct`.`from_hour`,`ct`.`to_hour`)), \':\', ' .
+                    'IF(? BETWEEN `ct`.`from_minute` AND `ct`.`to_minute`, :minute,IF(`ct`.`from_minute` > :minute,`ct`.`from_minute`,`ct`.`to_minute`)), \':\', ' .
+                    'IF(? BETWEEN `ct`.`from_second` AND `ct`.`to_second`, :second,IF(`ct`.`from_second` > :second,`ct`.`from_second`,`ct`.`to_second`))' .
+                ')) BETWEEN UNIX_TIMESTAMP(COALESCE(`c`.`last_run`, `c`.`added`))',
+                [
+                    'year' => (int) $date->format('Y'),
+                    'month' => (int) $date->format('n'),
+                    'dayOfMonth' => (int) $date->format('j'),
+                    'hour' => (int) $date->format('H'),
+                    'minute' => (int) $date->format('i'),
+                    'second' => (int) $date->format('s'),
+                ],
+            ))
+            ->addWhere(new Where(
+                ':dayOfWeek BETWEEN `c`.`from_day_of_week` AND `c`.`to_day_of_week`',
+                ['dayOfWeek' => (int) $date->format('w')],
+            ))
+            ->addWhere(new Where(
+                'UNIX_TIMESTAMP(:timestampDate)',
+                [
+                    'timestampDate' => ((int) $date->format('Y')) . '-' .
+                        ((int) $date->format('n')) . '-' .
+                        ((int) $date->format('j')) . ' ' .
+                        ((int) $date->format('H')) . ':' .
+                        ((int) $date->format('i')) . ':' .
+                        ((int) $date->format('s')),
+                ],
+            ))
         ;
-        $this->mysqlDatabase->fetchAssocList()
-            ->shouldBeCalledOnce()
-            ->willReturn([[
-                'command' => 'galaxy',
-            ]])
-        ;
 
+        $model = $this->loadModel($selectQuery, Cronjob::class, '');
+        $this->repositoryWrapper->getModelWrapper()
+            ->shouldBeCalledOnce()
+        ;
         $cronjob = $this->cronjobRepository->getRunnableByUser($date, 'marvin')[0];
 
-        $this->assertEquals('galaxy', $cronjob->getCommand());
-    }
-
-    public function testGetRunnableByUserError(): void
-    {
         $date = new DateTimeImmutable();
+        $model->setAdded($date);
+        $cronjob->setAdded($date);
 
-        $this->mysqlDatabase->execute(
-            "SELECT `cronjob`.`command` FROM `marvin`.`cronjob` JOIN cronjob_time ON `cronjob`.`id`=`cronjob_time`.`cronjob_id` WHERE `cronjob`.`user`=? AND `cronjob`.`active`=1 AND (`cronjob`.`last_run` IS NULL OR `cronjob`.`last_run` < ?) AND UNIX_TIMESTAMP(CONCAT(IF(? BETWEEN `cronjob_time`.`from_year` AND `cronjob_time`.`to_year`, ?,IF(`cronjob_time`.`from_year` > ?,`cronjob_time`.`from_year`,`cronjob_time`.`to_year`)), '-', IF(? BETWEEN `cronjob_time`.`from_month` AND `cronjob_time`.`to_month`, ?,IF(`cronjob_time`.`from_month` > ?,`cronjob_time`.`from_month`,`cronjob_time`.`to_month`)), '-', IF(? BETWEEN `cronjob_time`.`from_day_of_month` AND `cronjob_time`.`to_day_of_month`, ?,IF(`cronjob_time`.`from_day_of_month` > ?,`cronjob_time`.`from_day_of_month`,`cronjob_time`.`to_day_of_month`)), ' ', IF(? BETWEEN `cronjob_time`.`from_hour` AND `cronjob_time`.`to_hour`, ?,IF(`cronjob_time`.`from_hour` > ?,`cronjob_time`.`from_hour`,`cronjob_time`.`to_hour`)), ':', IF(? BETWEEN `cronjob_time`.`from_minute` AND `cronjob_time`.`to_minute`, ?,IF(`cronjob_time`.`from_minute` > ?,`cronjob_time`.`from_minute`,`cronjob_time`.`to_minute`)), ':', IF(? BETWEEN `cronjob_time`.`from_second` AND `cronjob_time`.`to_second`, ?,IF(`cronjob_time`.`from_second` > ?,`cronjob_time`.`from_second`,`cronjob_time`.`to_second`)))) BETWEEN UNIX_TIMESTAMP(COALESCE(`cronjob`.`last_run`, `cronjob`.`added`)) AND UNIX_TIMESTAMP(?) AND ? BETWEEN `cronjob_time`.`from_day_of_week` AND `cronjob_time`.`to_day_of_week`",
-            [
-                'marvin',
-                $date->format('Y-m-d H:i:s'),
-                (int) $date->format('Y'),
-                (int) $date->format('Y'),
-                (int) $date->format('Y'),
-                (int) $date->format('n'),
-                (int) $date->format('n'),
-                (int) $date->format('n'),
-                (int) $date->format('j'),
-                (int) $date->format('j'),
-                (int) $date->format('j'),
-                (int) $date->format('H'),
-                (int) $date->format('H'),
-                (int) $date->format('H'),
-                (int) $date->format('i'),
-                (int) $date->format('i'),
-                (int) $date->format('i'),
-                (int) $date->format('s'),
-                (int) $date->format('s'),
-                (int) $date->format('s'),
-                ((int) $date->format('Y')) . '-' . ((int) $date->format('n')) . '-' . ((int) $date->format('j')) . ' ' .
-                ((int) $date->format('H')) . ':' . ((int) $date->format('i')) . ':' . ((int) $date->format('s')),
-                (int) $date->format('w'),
-            ],
-        )
-            ->shouldBeCalledOnce()
-            ->willReturn(false)
-        ;
-        $this->mysqlDatabase->error()
-            ->shouldBeCalledOnce()
-            ->willReturn('no hope')
-        ;
-
-        $this->assertEquals([], $this->cronjobRepository->getRunnableByUser($date, 'marvin'));
+        $this->assertEquals($model, $cronjob);
     }
 }

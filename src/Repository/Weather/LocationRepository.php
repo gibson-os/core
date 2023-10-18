@@ -41,7 +41,7 @@ class LocationRepository extends AbstractRepository
     {
         $this->logger->debug(sprintf('Find weather location with name %d', $name));
 
-        $where = '`user` LIKE ?';
+        $where = '`name` LIKE ?';
         $parameters = [$name . '%'];
 
         if ($onlyActive) {
@@ -62,9 +62,9 @@ class LocationRepository extends AbstractRepository
     public function getToUpdate(): array
     {
         return $this->fetchAll(
-            '`active`=1 AND ' .
+            '`active`=? AND ' .
             '(`last_run` IS NULL OR FROM_UNIXTIME(UNIX_TIMESTAMP(`last_run`)+`interval`) <= ?)',
-            [$this->dateTimeService->get()->format('Y-m-d H:i:s')],
+            [1, $this->dateTimeService->get()->format('Y-m-d H:i:s')],
             Location::class,
         );
     }
