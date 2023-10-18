@@ -11,8 +11,7 @@ use GibsonOS\Core\Exception\RequestError;
 use GibsonOS\Core\Manager\ModelManager;
 use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Model\AbstractModel;
-use GibsonOS\Core\Service\RequestService;
-use GibsonOS\Core\Service\SessionService;
+use GibsonOS\Core\Transformer\ModelAttributeConditionTransformer;
 use GibsonOS\Core\Wrapper\ModelWrapper;
 use InvalidArgumentException;
 use JsonException;
@@ -30,11 +29,10 @@ class ModelFetcherAttribute implements AttributeServiceInterface, ParameterAttri
     public function __construct(
         private readonly TableManager $tableManager,
         private readonly ModelManager $modelManager,
-        private readonly RequestService $requestService,
         private readonly ReflectionManager $reflectionManager,
-        private readonly SessionService $sessionService,
         private readonly Client $client,
         private readonly ModelWrapper $modelWrapper,
+        private readonly ModelAttributeConditionTransformer $modelAttributeConditionTransformer,
     ) {
     }
 
@@ -72,7 +70,9 @@ class ModelFetcherAttribute implements AttributeServiceInterface, ParameterAttri
         $model = new $modelClassName($this->modelWrapper);
 
         try {
-            $whereParameters = $this->getWhereValues($attribute);
+            $whereParameters = array_values(
+                $this->modelAttributeConditionTransformer->transform($attribute->getConditions()),
+            );
         } catch (RequestError) {
             return null;
         }
@@ -112,64 +112,5 @@ class ModelFetcherAttribute implements AttributeServiceInterface, ParameterAttri
         $this->modelManager->loadFromRecord($record, $model);
 
         return $model;
-    }
-
-    /**
-     * @throws ReflectionException
-     * @throws RequestError
-     */
-    private function getWhereValues(GetModel $attribute): array
-    {
-        $values = [];
-
-        foreach ($attribute->getConditions() as $condition) {
-            $conditionParts = explode('.', $condition);
-            $count = count($conditionParts);
-
-            if ($count === 1) {
-                $values[] = $this->requestService->getRequestValue($condition);
-
-                continue;
-            }
-
-            if ($conditionParts[0] === 'session') {
-                $value = $this->sessionService->get($conditionParts[1]);
-
-                if ($count < 3) {
-                    $values[] = $value;
-
-                    continue;
-                }
-
-                for ($i = 2; $i < $count; ++$i) {
-                    if (is_array($value)) {
-                        $value = $value[$conditionParts[$i]];
-
-                        continue;
-                    }
-
-                    if (!is_object($value)) {
-                        throw new MapperException(sprintf(
-                            'Value for %s is no object or array',
-                            $conditionParts[$i],
-                        ));
-                    }
-
-                    $reflectionClass = $this->reflectionManager->getReflectionClass($value);
-                    $value = $this->reflectionManager->getProperty(
-                        $reflectionClass->getProperty($conditionParts[$i]),
-                        $value,
-                    );
-                }
-
-                $values[] = $value;
-            }
-
-            if ($conditionParts[0] === 'value') {
-                $values[] = $conditionParts[1];
-            }
-        }
-
-        return $values;
     }
 }

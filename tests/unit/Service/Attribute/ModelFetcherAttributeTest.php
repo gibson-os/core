@@ -13,10 +13,9 @@ use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Service\Attribute\ModelFetcherAttribute;
 use GibsonOS\Core\Service\RequestService;
 use GibsonOS\Core\Service\SessionService;
+use GibsonOS\Core\Transformer\ModelAttributeConditionTransformer;
 use GibsonOS\Mock\Dto\Mapper\MapModel;
 use GibsonOS\Mock\Dto\Mapper\MapObject;
-use GibsonOS\Mock\Dto\Mapper\MapObjectParent;
-use GibsonOS\Mock\Dto\Mapper\StringEnum;
 use GibsonOS\Test\Unit\Core\ModelManagerTrait;
 use InvalidArgumentException;
 use MDO\Dto\Query\Where;
@@ -38,21 +37,21 @@ class ModelFetcherAttributeTest extends Unit
 
     private SessionService|ObjectProphecy $sessionService;
 
+    private ModelAttributeConditionTransformer|ObjectProphecy $modelAttributeConditionTransformer;
+
     protected function _before(): void
     {
-        $this->requestService = $this->prophesize(RequestService::class);
-        $this->sessionService = $this->prophesize(SessionService::class);
-
         $this->loadModelManager();
+
+        $this->modelAttributeConditionTransformer = $this->prophesize(ModelAttributeConditionTransformer::class);
 
         $this->modelFetcherAttribute = new ModelFetcherAttribute(
             $this->tableManager->reveal(),
             $this->modelManager->reveal(),
-            $this->requestService->reveal(),
             new ReflectionManager(),
-            $this->sessionService->reveal(),
             $this->client->reveal(),
             $this->modelWrapper->reveal(),
+            $this->modelAttributeConditionTransformer->reveal(),
         );
     }
 
@@ -86,7 +85,7 @@ class ModelFetcherAttributeTest extends Unit
     {
         $reflectionFunction = new ReflectionFunction(function (MapModel $model) { return $model; });
 
-        $this->requestService->getRequestValue('id')
+        $this->modelAttributeConditionTransformer->transform(['id' => 'id'])
             ->shouldBeCalledOnce()
             ->willThrow(RequestError::class)
         ;
@@ -101,9 +100,9 @@ class ModelFetcherAttributeTest extends Unit
     public function testReplaceClientException(): void
     {
         $reflectionFunction = new ReflectionFunction(function (MapModel $model) { return $model; });
-        $this->requestService->getRequestValue('id')
+        $this->modelAttributeConditionTransformer->transform(['id' => 'id'])
             ->shouldBeCalledOnce()
-            ->willReturn(42)
+            ->willReturn(['id' => 42])
         ;
         $table = new Table('gibson_o_s_mock_dto_mapper_map_model', []);
         $this->tableManager->getTable('gibson_o_s_mock_dto_mapper_map_model')
@@ -131,9 +130,9 @@ class ModelFetcherAttributeTest extends Unit
     public function testReplaceClientExceptionAllowsNull(): void
     {
         $reflectionFunction = new ReflectionFunction(function (?MapModel $model) { return $model; });
-        $this->requestService->getRequestValue('id')
+        $this->modelAttributeConditionTransformer->transform(['id' => 'id'])
             ->shouldBeCalledOnce()
-            ->willReturn(42)
+            ->willReturn(['id' => 42])
         ;
         $table = new Table('gibson_o_s_mock_dto_mapper_map_model', []);
         $this->tableManager->getTable('gibson_o_s_mock_dto_mapper_map_model')
@@ -159,9 +158,9 @@ class ModelFetcherAttributeTest extends Unit
     public function testReplaceOk(): void
     {
         $reflectionFunction = new ReflectionFunction(function (MapModel $model) { return $model; });
-        $this->requestService->getRequestValue('id')
+        $this->modelAttributeConditionTransformer->transform(['id' => 'id'])
             ->shouldBeCalledOnce()
-            ->willReturn(42)
+            ->willReturn(['id' => 42])
         ;
 
         $table = new Table('gibson_o_s_mock_dto_mapper_map_model', []);
@@ -190,216 +189,6 @@ class ModelFetcherAttributeTest extends Unit
 
         $replacedModel = $this->modelFetcherAttribute->replace(
             new GetModel(),
-            [],
-            $reflectionFunction->getParameters()[0],
-        );
-
-        $this->assertNotEquals($model, $replacedModel);
-        $model->getTableName();
-        $this->assertEquals($model, $replacedModel);
-    }
-
-    public function testReplaceWithValue(): void
-    {
-        $reflectionFunction = new ReflectionFunction(function (MapModel $model) { return $model; });
-        $table = new Table('gibson_o_s_mock_dto_mapper_map_model', []);
-        $this->tableManager->getTable('gibson_o_s_mock_dto_mapper_map_model')
-            ->shouldBeCalledOnce()
-            ->willReturn($table)
-        ;
-        $selectQuery = (new SelectQuery($table))
-            ->addWhere(new Where('`id`=?', [42]))
-            ->setLimit(1)
-        ;
-        $record = new Record([]);
-        $result = $this->prophesize(Result::class);
-        $result->iterateRecords()
-            ->shouldBeCalledOnce()
-            ->willYield([$record])
-        ;
-        $this->client->execute($selectQuery)
-            ->shouldBeCalledOnce()
-            ->willReturn($result->reveal())
-        ;
-        $model = new MapModel($this->modelWrapper->reveal());
-        $this->modelManager->loadFromRecord($record, $model)
-            ->shouldBeCalledOnce()
-        ;
-
-        $replacedModel = $this->modelFetcherAttribute->replace(
-            new GetModel(['id' => 'value.42']),
-            [],
-            $reflectionFunction->getParameters()[0],
-        );
-
-        $this->assertNotEquals($model, $replacedModel);
-        $model->getTableName();
-        $this->assertEquals($model, $replacedModel);
-    }
-
-    public function testReplaceWithSessionValue(): void
-    {
-        $reflectionFunction = new ReflectionFunction(function (MapModel $model) { return $model; });
-        $this->sessionService->get('marvin')
-            ->shouldBeCalledOnce()
-            ->willReturn(42)
-        ;
-
-        $table = new Table('gibson_o_s_mock_dto_mapper_map_model', []);
-        $this->tableManager->getTable('gibson_o_s_mock_dto_mapper_map_model')
-            ->shouldBeCalledOnce()
-            ->willReturn($table)
-        ;
-        $selectQuery = (new SelectQuery($table))
-            ->addWhere(new Where('`id`=?', [42]))
-            ->setLimit(1)
-        ;
-        $record = new Record([]);
-        $result = $this->prophesize(Result::class);
-        $result->iterateRecords()
-            ->shouldBeCalledOnce()
-            ->willYield([$record])
-        ;
-        $this->client->execute($selectQuery)
-            ->shouldBeCalledOnce()
-            ->willReturn($result->reveal())
-        ;
-        $model = new MapModel($this->modelWrapper->reveal());
-        $this->modelManager->loadFromRecord($record, $model)
-            ->shouldBeCalledOnce()
-        ;
-
-        $replacedModel = $this->modelFetcherAttribute->replace(
-            new GetModel(['id' => 'session.marvin']),
-            [],
-            $reflectionFunction->getParameters()[0],
-        );
-
-        $this->assertNotEquals($model, $replacedModel);
-        $model->getTableName();
-        $this->assertEquals($model, $replacedModel);
-    }
-
-    public function testReplaceWithNestedSessionValue(): void
-    {
-        $reflectionFunction = new ReflectionFunction(function (MapModel $model) { return $model; });
-        $this->sessionService->get('arthur')
-            ->shouldBeCalledOnce()
-            ->willReturn(['dent' => 42])
-        ;
-
-        $table = new Table('gibson_o_s_mock_dto_mapper_map_model', []);
-        $this->tableManager->getTable('gibson_o_s_mock_dto_mapper_map_model')
-            ->shouldBeCalledOnce()
-            ->willReturn($table)
-        ;
-        $selectQuery = (new SelectQuery($table))
-            ->addWhere(new Where('`id`=?', [42]))
-            ->setLimit(1)
-        ;
-        $record = new Record([]);
-        $result = $this->prophesize(Result::class);
-        $result->iterateRecords()
-            ->shouldBeCalledOnce()
-            ->willYield([$record])
-        ;
-        $this->client->execute($selectQuery)
-            ->shouldBeCalledOnce()
-            ->willReturn($result->reveal())
-        ;
-        $model = new MapModel($this->modelWrapper->reveal());
-        $this->modelManager->loadFromRecord($record, $model)
-            ->shouldBeCalledOnce()
-        ;
-
-        $replacedModel = $this->modelFetcherAttribute->replace(
-            new GetModel(['id' => 'session.arthur.dent']),
-            [],
-            $reflectionFunction->getParameters()[0],
-        );
-
-        $this->assertNotEquals($model, $replacedModel);
-        $model->getTableName();
-        $this->assertEquals($model, $replacedModel);
-    }
-
-    public function testReplaceWithNestedSessionObjectValue(): void
-    {
-        $reflectionFunction = new ReflectionFunction(function (MapModel $model) { return $model; });
-        $this->sessionService->get('arthur')
-            ->shouldBeCalledOnce()
-            ->willReturn(['dent' => new MapObject(StringEnum::YES, 42)])
-        ;
-
-        $table = new Table('gibson_o_s_mock_dto_mapper_map_model', []);
-        $this->tableManager->getTable('gibson_o_s_mock_dto_mapper_map_model')
-            ->shouldBeCalledOnce()
-            ->willReturn($table)
-        ;
-        $selectQuery = (new SelectQuery($table))
-            ->addWhere(new Where('`id`=?', [42]))
-            ->setLimit(1)
-        ;
-        $record = new Record([]);
-        $result = $this->prophesize(Result::class);
-        $result->iterateRecords()
-            ->shouldBeCalledOnce()
-            ->willYield([$record])
-        ;
-        $this->client->execute($selectQuery)
-            ->shouldBeCalledOnce()
-            ->willReturn($result->reveal())
-        ;
-        $model = new MapModel($this->modelWrapper->reveal());
-        $this->modelManager->loadFromRecord($record, $model)
-            ->shouldBeCalledOnce()
-        ;
-
-        $replacedModel = $this->modelFetcherAttribute->replace(
-            new GetModel(['id' => 'session.arthur.dent.intValue']),
-            [],
-            $reflectionFunction->getParameters()[0],
-        );
-
-        $this->assertNotEquals($model, $replacedModel);
-        $model->getTableName();
-        $this->assertEquals($model, $replacedModel);
-    }
-
-    public function testReplaceWithNestedSessionObjectArrayValue(): void
-    {
-        $reflectionFunction = new ReflectionFunction(function (MapModel $model) { return $model; });
-        $this->sessionService->get('arthur')
-            ->shouldBeCalledOnce()
-            ->willReturn(new MapObjectParent(true, ['dent' => 42]))
-        ;
-
-        $table = new Table('gibson_o_s_mock_dto_mapper_map_model', []);
-        $this->tableManager->getTable('gibson_o_s_mock_dto_mapper_map_model')
-            ->shouldBeCalledOnce()
-            ->willReturn($table)
-        ;
-        $selectQuery = (new SelectQuery($table))
-            ->addWhere(new Where('`id`=?', [42]))
-            ->setLimit(1)
-        ;
-        $record = new Record([]);
-        $result = $this->prophesize(Result::class);
-        $result->iterateRecords()
-            ->shouldBeCalledOnce()
-            ->willYield([$record])
-        ;
-        $this->client->execute($selectQuery)
-            ->shouldBeCalledOnce()
-            ->willReturn($result->reveal())
-        ;
-        $model = new MapModel($this->modelWrapper->reveal());
-        $this->modelManager->loadFromRecord($record, $model)
-            ->shouldBeCalledOnce()
-        ;
-
-        $replacedModel = $this->modelFetcherAttribute->replace(
-            new GetModel(['id' => 'session.arthur.options.dent']),
             [],
             $reflectionFunction->getParameters()[0],
         );
