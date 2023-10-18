@@ -11,13 +11,15 @@ use GibsonOS\Core\Exception\RequestError;
 use GibsonOS\Core\Manager\ModelManager;
 use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Model\AbstractModel;
-use GibsonOS\Core\Model\ModelInterface;
 use GibsonOS\Core\Service\RequestService;
 use GibsonOS\Core\Service\SessionService;
+use GibsonOS\Core\Wrapper\ModelWrapper;
 use InvalidArgumentException;
 use JsonException;
 use MDO\Client;
 use MDO\Dto\Query\Where;
+use MDO\Exception\ClientException;
+use MDO\Exception\RecordException;
 use MDO\Manager\TableManager;
 use MDO\Query\SelectQuery;
 use ReflectionException;
@@ -32,14 +34,17 @@ class ModelFetcherAttribute implements AttributeServiceInterface, ParameterAttri
         private readonly ReflectionManager $reflectionManager,
         private readonly SessionService $sessionService,
         private readonly Client $client,
+        private readonly ModelWrapper $modelWrapper,
     ) {
     }
 
     /**
-     * @throws SelectError
-     * @throws ReflectionException
      * @throws JsonException
      * @throws MapperException
+     * @throws ReflectionException
+     * @throws SelectError
+     * @throws ClientException
+     * @throws RecordException
      */
     public function replace(
         AttributeInterface $attribute,
@@ -55,15 +60,16 @@ class ModelFetcherAttribute implements AttributeServiceInterface, ParameterAttri
         }
 
         $modelClassName = $this->reflectionManager->getNonBuiltinTypeName($reflectionParameter);
-        $model = new $modelClassName();
 
-        if (!$model instanceof AbstractModel) {
+        if (!is_subclass_of($modelClassName, AbstractModel::class)) {
             throw new InvalidArgumentException(sprintf(
                 'Model "%s" is no instance of "%s"!',
-                $model::class,
-                ModelInterface::class,
+                $modelClassName,
+                AbstractModel::class,
             ));
         }
+
+        $model = new $modelClassName($this->modelWrapper);
 
         try {
             $whereParameters = $this->getWhereValues($attribute);
@@ -83,7 +89,12 @@ class ModelFetcherAttribute implements AttributeServiceInterface, ParameterAttri
             ->setLimit(1)
         ;
 
-        $result = $this->client->execute($selectQuery);
+        try {
+            $result = $this->client->execute($selectQuery);
+        } catch (ClientException) {
+            $result = null;
+        }
+
         $record = $result?->iterateRecords()->current();
 
         if ($record === null) {
@@ -130,13 +141,28 @@ class ModelFetcherAttribute implements AttributeServiceInterface, ParameterAttri
                     continue;
                 }
 
-                if (is_object($value)) {
+                for ($i = 2; $i < $count; ++$i) {
+                    if (is_array($value)) {
+                        $value = $value[$conditionParts[$i]];
+
+                        continue;
+                    }
+
+                    if (!is_object($value)) {
+                        throw new MapperException(sprintf(
+                            'Value for %s is no object or array',
+                            $conditionParts[$i],
+                        ));
+                    }
+
                     $reflectionClass = $this->reflectionManager->getReflectionClass($value);
-                    $values[] = $this->reflectionManager->getProperty(
-                        $reflectionClass->getProperty($conditionParts[2]),
+                    $value = $this->reflectionManager->getProperty(
+                        $reflectionClass->getProperty($conditionParts[$i]),
                         $value,
                     );
                 }
+
+                $values[] = $value;
             }
 
             if ($conditionParts[0] === 'value') {
