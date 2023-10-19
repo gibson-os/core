@@ -5,6 +5,9 @@ namespace GibsonOS\Test\Unit\Core\Service\Attribute;
 
 use Codeception\Test\Unit;
 use GibsonOS\Core\Attribute\GetMappedModel;
+use GibsonOS\Core\Attribute\GetModel;
+use GibsonOS\Core\Exception\MapperException;
+use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Exception\RequestError;
 use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Manager\ServiceManager;
@@ -12,12 +15,11 @@ use GibsonOS\Core\Mapper\ModelMapper;
 use GibsonOS\Core\Service\Attribute\ModelFetcherAttribute;
 use GibsonOS\Core\Service\Attribute\ModelMapperAttribute;
 use GibsonOS\Core\Service\RequestService;
-use GibsonOS\Core\Service\SessionService;
-use GibsonOS\Core\Wrapper\ModelWrapper;
+use GibsonOS\Core\Transformer\AttributeParameterTransformer;
 use GibsonOS\Mock\Dto\Mapper\MapModel;
+use GibsonOS\Mock\Dto\Mapper\MapObject;
 use GibsonOS\Mock\Dto\Mapper\StringEnum;
 use GibsonOS\Test\Unit\Core\ModelManagerTrait;
-use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 use ReflectionFunction;
 
@@ -29,161 +31,211 @@ class ModelMapperAttributeTest extends Unit
 
     private RequestService|ObjectProphecy $requestService;
 
-    private SessionService|ObjectProphecy $sessionService;
+    private AttributeParameterTransformer|ObjectProphecy $attributeParameterTransformer;
+
+    private ModelFetcherAttribute|ObjectProphecy $modelFetcherAttribute;
 
     protected function _before(): void
     {
         $this->requestService = $this->prophesize(RequestService::class);
-        $this->sessionService = $this->prophesize(SessionService::class);
+        $this->modelFetcherAttribute = $this->prophesize(ModelFetcherAttribute::class);
+        $this->attributeParameterTransformer = $this->prophesize(AttributeParameterTransformer::class);
 
         $this->loadModelManager();
 
         $reflectionManager = new ReflectionManager();
 
         $this->modelMapperAttribute = new ModelMapperAttribute(
-            new ModelMapper(new ServiceManager(), $reflectionManager),
+            new ModelMapper(new ServiceManager(), $reflectionManager, $this->modelWrapper->reveal()),
             $this->requestService->reveal(),
             $reflectionManager,
-            new ModelFetcherAttribute(
-                $this->mysqlDatabase->reveal(),
-                $this->modelManager->reveal(),
-                $this->requestService->reveal(),
-                $reflectionManager,
-                $this->sessionService->reveal(),
-            ),
-            $this->sessionService->reveal(),
+            $this->modelFetcherAttribute->reveal(),
+            $this->modelWrapper->reveal(),
+            $this->attributeParameterTransformer->reveal(),
         );
     }
 
-    /**
-     * @dataProvider getData
-     */
-    public function testReplace(
-        GetMappedModel $attribute,
-        ?int $id,
-        array $parameters,
-        array $modelValues,
-        callable $function,
-        ?MapModel $return,
-    ): void {
-        $this->requestService->getRequestValue(Argument::any())->willThrow(RequestError::class);
-        $reflectionFunction = new ReflectionFunction($function);
-
-        foreach ($parameters as $key => $value) {
-            $this->requestService->getRequestValue($key)
-                ->willReturn($value)
-            ;
-        }
-
-        if ($id !== null) {
-            $this->mysqlDatabase->getDatabaseName()
-                ->shouldBeCalledOnce()
-                ->willReturn('galaxy')
-            ;
-            $this->mysqlDatabase->sendQuery('SHOW FIELDS FROM `galaxy`.`gibson_o_s_mock_dto_mapper_map_model`')
-                ->shouldBeCalledOnce()
-                ->willReturn(true)
-            ;
-            $this->mysqlDatabase->fetchRow()
-                ->shouldBeCalledTimes(6)
-                ->willReturn(
-                    ['id', 'bigint(20) unsigned', 'NO', 'PRI', null, 'auto_increment'],
-                    ['nullable_int_value', 'bigint(20)', 'YES', '', null, ''],
-                    ['string_enum_value', 'enum(\'NO\', \'YES\')', 'NO', '', null, ''],
-                    ['int_value', 'bigint(20)', 'NO', '', null, ''],
-                    ['parent_id', 'bigint(20) unsigned', 'YES', '', null, ''],
-                    null,
-                )
-            ;
-
-            $this->mysqlDatabase->execute(
-                'SELECT `gibson_o_s_mock_dto_mapper_map_model`.`id`, `gibson_o_s_mock_dto_mapper_map_model`.`nullable_int_value`, `gibson_o_s_mock_dto_mapper_map_model`.`string_enum_value`, `gibson_o_s_mock_dto_mapper_map_model`.`int_value`, `gibson_o_s_mock_dto_mapper_map_model`.`parent_id` ' .
-                'FROM `galaxy`.`gibson_o_s_mock_dto_mapper_map_model` ' .
-                'WHERE `id`=? ' .
-                'LIMIT 1',
-                [$id],
-            )
-                ->shouldBeCalledOnce()
-                ->willReturn(true)
-            ;
-            $this->mysqlDatabase->fetchAssocList()
-                ->shouldBeCalledOnce()
-                ->willReturn(count($modelValues) ? [$modelValues] : $modelValues)
-            ;
-        }
-
-        if ($return !== null) {
-            $return->getTableName();
-        }
-
-        $this->assertEquals(
-            json_encode($return),
-            json_encode($this->modelMapperAttribute->replace($attribute, $parameters, $reflectionFunction->getParameters()[0])),
-        );
-    }
-
-    public function getData(): array
+    public function testReplaceWrongAttribute(): void
     {
-        $modelWrapper = $this->prophesize(ModelWrapper::class);
+        $reflectionFunction = new ReflectionFunction(function (MapModel $model) { return $model; });
 
-        return [
-            'OK' => [
+        $this->expectException(MapperException::class);
+
+        $this->modelMapperAttribute->replace(
+            new GetModel(),
+            [],
+            $reflectionFunction->getParameters()[0],
+        );
+    }
+
+    public function testReplaceWrongModel(): void
+    {
+        $reflectionFunction = new ReflectionFunction(function (MapObject $model) { return $model; });
+
+        $this->expectException(MapperException::class);
+
+        $this->modelMapperAttribute->replace(
+            new GetMappedModel(),
+            [],
+            $reflectionFunction->getParameters()[0],
+        );
+    }
+
+    public function testReplaceNoRecord(): void
+    {
+        $reflectionFunction = new ReflectionFunction(function (MapModel $model) { return $model; });
+
+        $this->attributeParameterTransformer->transform(['parent'])
+            ->shouldBeCalledOnce()
+            ->willThrow(RequestError::class)
+        ;
+        $this->attributeParameterTransformer->transform(['childObjects'])
+            ->shouldBeCalledOnce()
+            ->willThrow(RequestError::class)
+        ;
+        $this->modelFetcherAttribute->replace(
+            new GetModel(),
+            ['stringEnumValue' => 'ja', 'intValue' => 42],
+            $reflectionFunction->getParameters()[0],
+        )
+            ->shouldBeCalledOnce()
+            ->willThrow(SelectError::class)
+        ;
+
+        $this->assertInstanceOf(
+            MapModel::class,
+            $this->modelMapperAttribute->replace(
                 new GetMappedModel(),
-                42,
-                ['id' => 42],
-                ['id' => 42, 'nullable_int_value' => null, 'string_enum_value' => 'YES', 'int_value' => 142],
-                function (MapModel $model) { return $model; },
-                (new MapModel($modelWrapper->reveal()))
-                    ->setId(42)
-                    ->setStringEnumValue(StringEnum::YES)
-                    ->setIntValue(142)
-                    ->setChildObjects([]),
-            ],
-            'Optional Parameter' => [
+                ['stringEnumValue' => 'ja', 'intValue' => 42],
+                $reflectionFunction->getParameters()[0],
+            ),
+        );
+    }
+
+    public function testReplaceNoRequestValue(): void
+    {
+        $reflectionFunction = new ReflectionFunction(function (MapModel $model) { return $model; });
+
+        $this->attributeParameterTransformer->transform(['parent'])
+            ->shouldBeCalledOnce()
+            ->willThrow(RequestError::class)
+        ;
+        $this->attributeParameterTransformer->transform(['childObjects'])
+            ->shouldBeCalledOnce()
+            ->willThrow(RequestError::class)
+        ;
+
+        $this->assertInstanceOf(
+            MapModel::class,
+            $this->modelMapperAttribute->replace(
                 new GetMappedModel(),
-                42,
-                ['id' => 42],
+                ['stringEnumValue' => 'ja', 'intValue' => 42],
+                $reflectionFunction->getParameters()[0],
+            ),
+        );
+    }
+
+    public function testReplaceNoRequestValueNullAllowed(): void
+    {
+        $reflectionFunction = new ReflectionFunction(function (?MapModel $model) { return $model; });
+
+        $this->assertNull($this->modelMapperAttribute->replace(
+            new GetMappedModel(),
+            [],
+            $reflectionFunction->getParameters()[0],
+        ));
+    }
+
+    public function testReplaceNewModel(): void
+    {
+        $reflectionFunction = new ReflectionFunction(function (MapModel $model) { return $model; });
+
+        $this->attributeParameterTransformer->transform(['parent'])
+            ->shouldBeCalledOnce()
+            ->willReturn([null])
+        ;
+        $this->attributeParameterTransformer->transform(['childObjects'])
+            ->shouldBeCalledOnce()
+            ->willReturn([null])
+        ;
+
+        $this->assertInstanceOf(
+            MapModel::class,
+            $this->modelMapperAttribute->replace(
+                new GetMappedModel(),
+                ['stringEnumValue' => 'ja', 'intValue' => 42],
+                $reflectionFunction->getParameters()[0],
+            ),
+        );
+    }
+
+    public function testReplaceExistingModel(): void
+    {
+        $reflectionFunction = new ReflectionFunction(function (MapModel $model) { return $model; });
+
+        $this->attributeParameterTransformer->transform(['parent'])
+            ->shouldBeCalledOnce()
+            ->willThrow(RequestError::class)
+        ;
+        $this->attributeParameterTransformer->transform(['childObjects'])
+            ->shouldBeCalledOnce()
+            ->willThrow(RequestError::class)
+        ;
+        $mapModel = (new MapModel($this->modelWrapper->reveal()))
+            ->setStringEnumValue(StringEnum::YES)
+            ->setIntValue(42)
+        ;
+        $this->modelFetcherAttribute->replace(
+            new GetModel(),
+            [],
+            $reflectionFunction->getParameters()[0],
+        )
+            ->shouldBeCalledOnce()
+            ->willReturn($mapModel)
+        ;
+
+        $this->assertInstanceOf(
+            MapModel::class,
+            $this->modelMapperAttribute->replace(
+                new GetMappedModel(),
                 [],
-                function (?MapModel $model) { return $model; },
-                null,
-            ],
-            'Changed parameter' => [
-                new GetMappedModel(['id' => 'modelId']),
-                42,
-                ['modelId' => 42],
-                ['id' => 42, 'nullable_int_value' => null, 'string_enum_value' => 'YES', 'int_value' => 142],
-                function (MapModel $model) { return $model; },
-                (new MapModel($modelWrapper->reveal()))
-                    ->setId(42)
-                    ->setStringEnumValue(StringEnum::YES)
-                    ->setIntValue(142)
-                    ->setChildObjects([]),
-            ],
-            'Change values' => [
-                new GetMappedModel(),
-                42,
-                ['id' => 42, 'nullableIntValue' => 420, 'stringEnumValue' => 'nein', 'intValue' => 24],
-                ['id' => 42, 'nullable_int_value' => null, 'string_enum_value' => 'YES', 'int_value' => 142],
-                function (MapModel $model) { return $model; },
-                (new MapModel($modelWrapper->reveal()))
-                    ->setId(42)
-                    ->setNullableIntValue(420)
-                    ->setStringEnumValue(StringEnum::NO)
-                    ->setIntValue(24)
-                    ->setChildObjects([]),
-            ],
-            'New model' => [
-                new GetMappedModel(),
-                null,
-                ['nullableIntValue' => 240, 'stringEnumValue' => 'ja', 'intValue' => 42],
-                [],
-                function (MapModel $model) { return $model; },
-                (new MapModel($modelWrapper->reveal()))
-                    ->setNullableIntValue(240)
-                    ->setStringEnumValue(StringEnum::YES)
-                    ->setIntValue(42)
-                    ->setChildObjects([]),
-            ],
-        ];
+                $reflectionFunction->getParameters()[0],
+            ),
+        );
+    }
+
+    public function testReplaceWithParent(): void
+    {
+        $reflectionFunction = new ReflectionFunction(function (MapModel $model) { return $model; });
+
+        $this->attributeParameterTransformer->transform(['parent'])
+            ->shouldBeCalledOnce()
+            ->willReturn([['id' => 42]])
+        ;
+        $this->attributeParameterTransformer->transform(['childObjects'])
+            ->shouldBeCalledOnce()
+            ->willThrow(RequestError::class)
+        ;
+        $mapModel = (new MapModel($this->modelWrapper->reveal()))
+            ->setStringEnumValue(StringEnum::YES)
+            ->setIntValue(42)
+        ;
+        $this->modelFetcherAttribute->replace(
+            new GetModel(),
+            ['stringEnumValue' => 'ja', 'intValue' => 42],
+            $reflectionFunction->getParameters()[0],
+        )
+            ->shouldBeCalledOnce()
+            ->willReturn($mapModel)
+        ;
+
+        $model = $this->modelMapperAttribute->replace(
+            new GetMappedModel(),
+            ['stringEnumValue' => 'ja', 'intValue' => 42],
+            $reflectionFunction->getParameters()[0],
+        );
+
+        $this->assertInstanceOf(MapModel::class, $model);
+        $this->assertEquals(42, $model->getParent()->getId());
     }
 }

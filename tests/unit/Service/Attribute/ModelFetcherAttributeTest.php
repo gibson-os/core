@@ -13,11 +13,10 @@ use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Service\Attribute\ModelFetcherAttribute;
 use GibsonOS\Core\Service\RequestService;
 use GibsonOS\Core\Service\SessionService;
-use GibsonOS\Core\Transformer\ModelAttributeConditionTransformer;
+use GibsonOS\Core\Transformer\AttributeParameterTransformer;
 use GibsonOS\Mock\Dto\Mapper\MapModel;
 use GibsonOS\Mock\Dto\Mapper\MapObject;
 use GibsonOS\Test\Unit\Core\ModelManagerTrait;
-use InvalidArgumentException;
 use MDO\Dto\Query\Where;
 use MDO\Dto\Record;
 use MDO\Dto\Result;
@@ -37,13 +36,13 @@ class ModelFetcherAttributeTest extends Unit
 
     private SessionService|ObjectProphecy $sessionService;
 
-    private ModelAttributeConditionTransformer|ObjectProphecy $modelAttributeConditionTransformer;
+    private AttributeParameterTransformer|ObjectProphecy $attributeParameterTransformer;
 
     protected function _before(): void
     {
         $this->loadModelManager();
 
-        $this->modelAttributeConditionTransformer = $this->prophesize(ModelAttributeConditionTransformer::class);
+        $this->attributeParameterTransformer = $this->prophesize(AttributeParameterTransformer::class);
 
         $this->modelFetcherAttribute = new ModelFetcherAttribute(
             $this->tableManager->reveal(),
@@ -51,7 +50,7 @@ class ModelFetcherAttributeTest extends Unit
             new ReflectionManager(),
             $this->client->reveal(),
             $this->modelWrapper->reveal(),
-            $this->modelAttributeConditionTransformer->reveal(),
+            $this->attributeParameterTransformer->reveal(),
         );
     }
 
@@ -72,7 +71,7 @@ class ModelFetcherAttributeTest extends Unit
     {
         $reflectionFunction = new ReflectionFunction(function (MapObject $model) { return $model; });
 
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(MapperException::class);
 
         $this->modelFetcherAttribute->replace(
             new GetModel(),
@@ -85,7 +84,7 @@ class ModelFetcherAttributeTest extends Unit
     {
         $reflectionFunction = new ReflectionFunction(function (MapModel $model) { return $model; });
 
-        $this->modelAttributeConditionTransformer->transform(['id' => 'id'])
+        $this->attributeParameterTransformer->transform(['id' => 'id'])
             ->shouldBeCalledOnce()
             ->willThrow(RequestError::class)
         ;
@@ -100,7 +99,7 @@ class ModelFetcherAttributeTest extends Unit
     public function testReplaceClientException(): void
     {
         $reflectionFunction = new ReflectionFunction(function (MapModel $model) { return $model; });
-        $this->modelAttributeConditionTransformer->transform(['id' => 'id'])
+        $this->attributeParameterTransformer->transform(['id' => 'id'])
             ->shouldBeCalledOnce()
             ->willReturn(['id' => 42])
         ;
@@ -130,7 +129,7 @@ class ModelFetcherAttributeTest extends Unit
     public function testReplaceClientExceptionAllowsNull(): void
     {
         $reflectionFunction = new ReflectionFunction(function (?MapModel $model) { return $model; });
-        $this->modelAttributeConditionTransformer->transform(['id' => 'id'])
+        $this->attributeParameterTransformer->transform(['id' => 'id'])
             ->shouldBeCalledOnce()
             ->willReturn(['id' => 42])
         ;
@@ -158,7 +157,7 @@ class ModelFetcherAttributeTest extends Unit
     public function testReplaceOk(): void
     {
         $reflectionFunction = new ReflectionFunction(function (MapModel $model) { return $model; });
-        $this->modelAttributeConditionTransformer->transform(['id' => 'id'])
+        $this->attributeParameterTransformer->transform(['id' => 'id'])
             ->shouldBeCalledOnce()
             ->willReturn(['id' => 42])
         ;

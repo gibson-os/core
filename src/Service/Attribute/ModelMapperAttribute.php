@@ -15,9 +15,11 @@ use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Mapper\ModelMapper;
 use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Service\RequestService;
-use GibsonOS\Core\Service\SessionService;
-use GibsonOS\Core\Utility\JsonUtility;
+use GibsonOS\Core\Transformer\AttributeParameterTransformer;
+use GibsonOS\Core\Wrapper\ModelWrapper;
 use JsonException;
+use MDO\Exception\ClientException;
+use MDO\Exception\RecordException;
 use ReflectionAttribute;
 use ReflectionException;
 use ReflectionParameter;
@@ -30,18 +32,19 @@ class ModelMapperAttribute extends ObjectMapperAttribute
         RequestService $requestService,
         ReflectionManager $reflectionManager,
         private readonly ModelFetcherAttribute $modelFetcherAttribute,
-        private readonly SessionService $sessionService,
+        private readonly ModelWrapper $modelWrapper,
+        private readonly AttributeParameterTransformer $attributeParameterTransformer,
     ) {
         parent::__construct($objectMapper, $requestService, $reflectionManager);
     }
 
     /**
-     * @throws RequestError
-     * @throws SelectError
      * @throws FactoryError
-     * @throws MapperException
      * @throws JsonException
+     * @throws MapperException
      * @throws ReflectionException
+     * @throws ClientException
+     * @throws RecordException
      */
     public function replace(AttributeInterface $attribute, array $parameters, ReflectionParameter $reflectionParameter): ?AbstractModel
     {
@@ -60,8 +63,7 @@ class ModelMapperAttribute extends ObjectMapperAttribute
                 $reflectionParameter,
             );
         } catch (SelectError) {
-            $modelClassName = $this->reflectionManager->getNonBuiltinTypeName($reflectionParameter);
-            $model = new $modelClassName();
+            $model = null;
         }
 
         if ($model === null) {
@@ -69,18 +71,10 @@ class ModelMapperAttribute extends ObjectMapperAttribute
                 return null;
             }
 
-            $modelClassName = $this->reflectionManager->getNonBuiltinTypeName($reflectionParameter);
-            $model = new $modelClassName();
+            $model = $this->getModel($reflectionParameter);
         }
 
-        if (!$model instanceof AbstractModel) {
-            throw new MapperException(sprintf(
-                'Model "%s" is not an instance of "%s"!',
-                $model::class,
-                AbstractModel::class,
-            ));
-        }
-
+        $parameters['modelWrapper'] = $this->modelWrapper;
         $this->objectMapper->setObjectValues(
             $model,
             $this->getObjectParameters($attribute, $model::class, $parameters),
@@ -91,44 +85,15 @@ class ModelMapperAttribute extends ObjectMapperAttribute
     }
 
     /**
-     * @throws JsonException
+     * @throws MapperException
      * @throws ReflectionException
+     * @throws RequestError
      */
     private function getValues(GetMappedModel $attribute, ReflectionProperty $reflectionProperty): mixed
     {
         $mappingKey = $this->getMappingKey($attribute, $reflectionProperty);
-        $conditionParts = explode('.', $mappingKey);
-        $count = count($conditionParts);
 
-        if ($count === 1) {
-            try {
-                return JsonUtility::decode($this->requestService->getRequestValue($mappingKey));
-            } catch (RequestError) {
-                return $reflectionProperty->getDefaultValue();
-            }
-        }
-
-        if ($conditionParts[0] === 'session') {
-            $value = $this->sessionService->get($conditionParts[1]);
-
-            if ($count < 3) {
-                return $value;
-            }
-
-            if (is_object($value)) {
-                return $this->reflectionManager->getProperty(
-                    $reflectionProperty,
-                    $value,
-                );
-            }
-        }
-
-        if ($conditionParts[0] === 'value') {
-            return $conditionParts[1];
-        }
-
-        // Muss noch aufgebohrt werden
-        return null;
+        return $this->attributeParameterTransformer->transform([$mappingKey])[0];
     }
 
     /**
@@ -163,9 +128,14 @@ class ModelMapperAttribute extends ObjectMapperAttribute
             }
 
             $propertyName = $reflectionProperty->getName();
-            $values = $this->getValues($attribute, $reflectionProperty)
-                ?? $parameters[$propertyName]
-                ?? null;
+
+            try {
+                $values = $this->getValues($attribute, $reflectionProperty);
+            } catch (RequestError) {
+                $values = null;
+            }
+
+            $values ??= $parameters[$propertyName] ?? null;
             $typeName = $this->reflectionManager->getTypeName($reflectionProperty);
             $idGetter = 'get' . ucfirst($constraintAttribute->getOwnColumn() ?? $propertyName . 'id');
             $setter = 'set' . ucfirst($propertyName);
@@ -198,5 +168,24 @@ class ModelMapperAttribute extends ObjectMapperAttribute
 
             $model->$setter(is_array($values) ? ($typeName === 'array' ? $values : reset($values)) : $values);
         }
+    }
+
+    /**
+     * @throws ReflectionException
+     * @throws MapperException
+     */
+    private function getModel(ReflectionParameter $reflectionParameter): AbstractModel
+    {
+        $modelClassName = $this->reflectionManager->getNonBuiltinTypeName($reflectionParameter);
+
+        if (!is_subclass_of($modelClassName, AbstractModel::class)) {
+            throw new MapperException(sprintf(
+                'Model "%s" is not an instance of "%s"!',
+                $modelClassName,
+                AbstractModel::class,
+            ));
+        }
+
+        return new $modelClassName($this->modelWrapper);
     }
 }

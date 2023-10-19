@@ -11,9 +11,8 @@ use GibsonOS\Core\Exception\RequestError;
 use GibsonOS\Core\Manager\ModelManager;
 use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Model\AbstractModel;
-use GibsonOS\Core\Transformer\ModelAttributeConditionTransformer;
+use GibsonOS\Core\Transformer\AttributeParameterTransformer;
 use GibsonOS\Core\Wrapper\ModelWrapper;
-use InvalidArgumentException;
 use JsonException;
 use MDO\Client;
 use MDO\Dto\Query\Where;
@@ -32,7 +31,7 @@ class ModelFetcherAttribute implements AttributeServiceInterface, ParameterAttri
         private readonly ReflectionManager $reflectionManager,
         private readonly Client $client,
         private readonly ModelWrapper $modelWrapper,
-        private readonly ModelAttributeConditionTransformer $modelAttributeConditionTransformer,
+        private readonly AttributeParameterTransformer $attributeParameterTransformer,
     ) {
     }
 
@@ -60,7 +59,7 @@ class ModelFetcherAttribute implements AttributeServiceInterface, ParameterAttri
         $modelClassName = $this->reflectionManager->getNonBuiltinTypeName($reflectionParameter);
 
         if (!is_subclass_of($modelClassName, AbstractModel::class)) {
-            throw new InvalidArgumentException(sprintf(
+            throw new MapperException(sprintf(
                 'Model "%s" is no instance of "%s"!',
                 $modelClassName,
                 AbstractModel::class,
@@ -71,7 +70,7 @@ class ModelFetcherAttribute implements AttributeServiceInterface, ParameterAttri
 
         try {
             $whereParameters = array_values(
-                $this->modelAttributeConditionTransformer->transform($attribute->getConditions()),
+                $this->attributeParameterTransformer->transform($attribute->getConditions()),
             );
         } catch (RequestError) {
             return null;
