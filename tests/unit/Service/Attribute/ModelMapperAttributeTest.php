@@ -169,6 +169,79 @@ class ModelMapperAttributeTest extends Unit
         );
     }
 
+    public function testReplaceNewModelMissingRequiredValues(): void
+    {
+        $reflectionFunction = new ReflectionFunction(function (MapModel $model) { return $model; });
+
+        $this->modelFetcherAttribute->replace(
+            new GetModel(),
+            ['stringEnumValue' => 'YES'],
+            $reflectionFunction->getParameters()[0],
+        )
+            ->shouldBeCalledOnce()
+            ->willThrow(SelectError::class)
+        ;
+
+        $this->expectException(MapperException::class);
+
+        $this->modelMapperAttribute->replace(
+            new GetMappedModel(),
+            ['stringEnumValue' => 'YES'],
+            $reflectionFunction->getParameters()[0],
+        );
+    }
+
+    public function testReplaceNewModelWithRequestValues(): void
+    {
+        $reflectionFunction = new ReflectionFunction(function (MapModel $model) { return $model; });
+
+        $this->modelFetcherAttribute->replace(
+            new GetModel(),
+            [],
+            $reflectionFunction->getParameters()[0],
+        )
+            ->shouldBeCalledOnce()
+            ->willThrow(SelectError::class)
+        ;
+        $this->requestService->getRequestValue('id')
+            ->shouldBeCalledOnce()
+            ->willThrow(RequestError::class)
+        ;
+        $this->requestService->getRequestValue('nullableIntValue')
+            ->shouldBeCalledOnce()
+            ->willThrow(RequestError::class)
+        ;
+        $this->requestService->getRequestValue('parentId')
+            ->shouldBeCalledOnce()
+            ->willThrow(RequestError::class)
+        ;
+        $this->requestService->getRequestValue('stringEnumValue')
+            ->shouldBeCalledTimes(2)
+            ->willReturn('YES')
+        ;
+        $this->requestService->getRequestValue('intValue')
+            ->shouldBeCalledTimes(2)
+            ->willReturn(42)
+        ;
+        $this->attributeParameterTransformer->transform(['parent'])
+            ->shouldBeCalledOnce()
+            ->willThrow(RequestError::class)
+        ;
+        $this->attributeParameterTransformer->transform(['childObjects'])
+            ->shouldBeCalledOnce()
+            ->willThrow(RequestError::class)
+        ;
+
+        $this->assertInstanceOf(
+            MapModel::class,
+            $this->modelMapperAttribute->replace(
+                new GetMappedModel(),
+                [],
+                $reflectionFunction->getParameters()[0],
+            ),
+        );
+    }
+
     public function testReplaceExistingModel(): void
     {
         $reflectionFunction = new ReflectionFunction(function (MapModel $model) { return $model; });

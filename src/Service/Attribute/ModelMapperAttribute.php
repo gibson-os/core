@@ -56,12 +56,15 @@ class ModelMapperAttribute extends ObjectMapperAttribute
             ));
         }
 
+        $isLoaded = false;
+
         try {
             $model = $this->modelFetcherAttribute->replace(
                 new GetModel($attribute->getConditions()),
                 $parameters,
                 $reflectionParameter,
             );
+            $isLoaded = true;
         } catch (SelectError) {
             $model = null;
         }
@@ -75,10 +78,18 @@ class ModelMapperAttribute extends ObjectMapperAttribute
         }
 
         $parameters['modelWrapper'] = $this->modelWrapper;
-        $this->objectMapper->setObjectValues(
-            $model,
-            $this->getObjectParameters($attribute, $model::class, $parameters),
-        );
+
+        try {
+            $this->objectMapper->setObjectValues(
+                $model,
+                $this->getObjectParameters($attribute, $model::class, $parameters),
+            );
+        } catch (MapperException $exception) {
+            if (!$isLoaded) {
+                throw $exception;
+            }
+        }
+
         $this->loadConstraints($model, $attribute, $parameters);
 
         return $model;
