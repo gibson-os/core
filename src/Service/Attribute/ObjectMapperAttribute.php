@@ -136,12 +136,12 @@ class ObjectMapperAttribute implements AttributeServiceInterface, ParameterAttri
                 return $this->reflectionManager->getDefaultValue($reflectionParameter);
             } catch (ReflectionException $exception) {
                 try {
-                    try {
-                        $reflectionProperty = $reflectionParameter->getDeclaringClass()?->getProperty($reflectionParameter->getName());
-                    } catch (ReflectionException) {
-                        $reflectionProperty = null;
-                    }
+                    $reflectionProperty = $reflectionParameter->getDeclaringClass()?->getProperty($reflectionParameter->getName());
+                } catch (ReflectionException) {
+                    $reflectionProperty = null;
+                }
 
+                try {
                     if ($reflectionProperty === null || !$reflectionProperty->hasDefaultValue()) {
                         throw new MapperException(sprintf(
                             'Parameter "%s" is not in request!',

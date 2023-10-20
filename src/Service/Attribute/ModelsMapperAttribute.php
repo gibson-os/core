@@ -11,12 +11,14 @@ use GibsonOS\Core\Attribute\Install\Database\Constraint;
 use GibsonOS\Core\Exception\FactoryError;
 use GibsonOS\Core\Exception\MapperException;
 use GibsonOS\Core\Exception\Repository\SelectError;
-use GibsonOS\Core\Exception\RequestError;
 use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Mapper\ModelMapper;
 use GibsonOS\Core\Model\AbstractModel;
-use GibsonOS\Core\Service\SessionService;
+use GibsonOS\Core\Transformer\AttributeParameterTransformer;
+use GibsonOS\Core\Wrapper\ModelWrapper;
 use JsonException;
+use MDO\Exception\ClientException;
+use MDO\Exception\RecordException;
 use ReflectionAttribute;
 use ReflectionException;
 use ReflectionParameter;
@@ -27,22 +29,23 @@ class ModelsMapperAttribute implements AttributeServiceInterface, ParameterAttri
         private readonly ModelMapper $objectMapper,
         private readonly ReflectionManager $reflectionManager,
         private readonly ModelsFetcherAttribute $modelsFetcherAttribute,
-        private readonly SessionService $sessionService,
         private readonly ObjectMapperAttribute $objectMapperAttribute,
+        private readonly AttributeParameterTransformer $attributeParameterTransformer,
+        private readonly ModelWrapper $modelWrapper,
     ) {
     }
 
     /**
-     * @throws RequestError
-     * @throws SelectError
      * @throws FactoryError
-     * @throws MapperException
      * @throws JsonException
+     * @throws MapperException
      * @throws ReflectionException
+     * @throws ClientException
+     * @throws RecordException
      *
-     * @return AbstractModel[]
+     * @return AbstractModel[]|null
      */
-    public function replace(AttributeInterface $attribute, array $parameters, ReflectionParameter $reflectionParameter): array
+    public function replace(AttributeInterface $attribute, array $parameters, ReflectionParameter $reflectionParameter): ?array
     {
         if (!$attribute instanceof GetMappedModels) {
             throw new MapperException(sprintf(
@@ -52,9 +55,19 @@ class ModelsMapperAttribute implements AttributeServiceInterface, ParameterAttri
             ));
         }
 
+        $modelClassName = $attribute->getClassName();
+
+        if (!is_subclass_of($modelClassName, AbstractModel::class)) {
+            throw new MapperException(sprintf(
+                'Model "%s" is no instance of "%s"!',
+                $modelClassName,
+                AbstractModel::class,
+            ));
+        }
+
         try {
             $fetchedModels = $this->modelsFetcherAttribute->replace(
-                new GetModels($attribute->getClassName(), $attribute->getConditions()),
+                new GetModels($modelClassName, $attribute->getConditions()),
                 $parameters,
                 $reflectionParameter,
             );
@@ -62,15 +75,20 @@ class ModelsMapperAttribute implements AttributeServiceInterface, ParameterAttri
             $fetchedModels = [];
         }
 
+        $conditions = $attribute->getConditions();
+        $transformedConditions = $this->attributeParameterTransformer->transform(
+            $conditions,
+            $reflectionParameter->getName(),
+        );
         $parameterFromRequest = $this->objectMapperAttribute->getParameterFromRequest($reflectionParameter);
         $models = [];
-        $modelClassName = $attribute->getClassName();
 
         foreach (is_array($parameterFromRequest) ? $parameterFromRequest : [] as $requestValues) {
-            $model = new $modelClassName();
+            /** @var AbstractModel $model */
+            $model = new $modelClassName($this->modelWrapper);
 
             foreach ($fetchedModels ?? [] as $fetchedModel) {
-                foreach ($attribute->getConditions() as $property => $condition) {
+                foreach ($conditions as $property => $condition) {
                     $propertyWithSpace = str_replace('_', ' ', $property);
 
                     if (!is_string($propertyWithSpace)) {
@@ -84,7 +102,7 @@ class ModelsMapperAttribute implements AttributeServiceInterface, ParameterAttri
                         $fetchedModel,
                     );
 
-                    if ($modelValue !== ($requestValues[$condition] ?? null)) {
+                    if ($modelValue !== ($transformedConditions[$property] ?? ($requestValues[$condition] ?? null))) {
                         continue 2;
                     }
                 }
@@ -138,6 +156,6 @@ class ModelsMapperAttribute implements AttributeServiceInterface, ParameterAttri
             $models[] = $model;
         }
 
-        return $models;
+        return $models ?: ($this->reflectionManager->allowsNull($reflectionParameter) ? null : []);
     }
 }

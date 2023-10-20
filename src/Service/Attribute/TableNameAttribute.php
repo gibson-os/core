@@ -7,7 +7,8 @@ use GibsonOS\Core\Attribute\AttributeInterface;
 use GibsonOS\Core\Attribute\GetTableName;
 use GibsonOS\Core\Attribute\Install\Database\Table;
 use GibsonOS\Core\Manager\ReflectionManager;
-use GibsonOS\Core\Model\ModelInterface;
+use GibsonOS\Core\Model\AbstractModel;
+use GibsonOS\Core\Wrapper\ModelWrapper;
 use ReflectionAttribute;
 use ReflectionException;
 use ReflectionParameter;
@@ -16,8 +17,10 @@ class TableNameAttribute implements ParameterAttributeInterface, AttributeServic
 {
     private array $tables = [];
 
-    public function __construct(private readonly ReflectionManager $reflectionManager)
-    {
+    public function __construct(
+        private readonly ReflectionManager $reflectionManager,
+        private readonly ModelWrapper $modelWrapper,
+    ) {
     }
 
     /**
@@ -41,8 +44,8 @@ class TableNameAttribute implements ParameterAttributeInterface, AttributeServic
             return null;
         }
 
-        /** @var ModelInterface $model */
-        $model = new $modelClassName();
+        /** @var AbstractModel $model */
+        $model = new $modelClassName($this->modelWrapper);
         $this->tables[$modelClassName] = $model->getTableName();
 
         return $this->tables[$modelClassName];

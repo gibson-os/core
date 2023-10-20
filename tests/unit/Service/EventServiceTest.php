@@ -20,7 +20,7 @@ use GibsonOS\Core\Service\ProcessService;
 use GibsonOS\Core\Wrapper\ModelWrapper;
 use GibsonOS\Mock\Service\TestEvent;
 use GibsonOS\Test\Unit\Core\ModelManagerTrait;
-use mysqlDatabase;
+use MDO\Client;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Log\LoggerInterface;
@@ -41,7 +41,7 @@ class EventServiceTest extends Unit
 
         $this->serviceManager = new ServiceManager();
         $this->serviceManager->setInterface(LoggerInterface::class, LoggerService::class);
-        $this->serviceManager->setService(mysqlDatabase::class, $this->mysqlDatabase->reveal());
+        $this->serviceManager->setService(Client::class, $this->client->reveal());
         $this->serviceManager->setService(ModelManager::class, $this->modelManager->reveal());
 
         $this->eventRepository = $this->prophesize(EventRepository::class);

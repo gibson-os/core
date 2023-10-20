@@ -8,18 +8,17 @@ use GibsonOS\Core\Attribute\GetModels;
 use GibsonOS\Core\Exception\MapperException;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Manager\ModelManager;
-use GibsonOS\Core\Manager\ReflectionManager;
-use GibsonOS\Core\Mapper\ModelMapper;
 use GibsonOS\Core\Model\AbstractModel;
-use GibsonOS\Core\Model\ModelInterface;
-use GibsonOS\Core\Service\SessionService;
-use InvalidArgumentException;
+use GibsonOS\Core\Transformer\AttributeParameterTransformer;
+use GibsonOS\Core\Wrapper\ModelWrapper;
 use JsonException;
 use MDO\Client;
 use MDO\Dto\Query\Where;
 use MDO\Exception\ClientException;
+use MDO\Exception\RecordException;
 use MDO\Manager\TableManager;
 use MDO\Query\SelectQuery;
+use MDO\Service\SelectService;
 use ReflectionException;
 use ReflectionParameter;
 
@@ -29,18 +28,19 @@ class ModelsFetcherAttribute implements AttributeServiceInterface, ParameterAttr
         private readonly Client $client,
         private readonly TableManager $tableManager,
         private readonly ModelManager $modelManager,
-        private readonly ReflectionManager $reflectionManager,
-        private readonly SessionService $sessionService,
-        private readonly ObjectMapperAttribute $objectMapperAttribute,
-        private readonly ModelMapper $modelMapper,
+        private readonly ModelWrapper $modelWrapper,
+        private readonly AttributeParameterTransformer $attributeParameterTransformer,
+        private readonly SelectService $selectService,
     ) {
     }
 
     /**
-     * @throws ReflectionException
+     * @throws ClientException
      * @throws JsonException
      * @throws MapperException
+     * @throws ReflectionException
      * @throws SelectError
+     * @throws RecordException
      *
      * @return AbstractModel[]|null
      */
@@ -58,44 +58,38 @@ class ModelsFetcherAttribute implements AttributeServiceInterface, ParameterAttr
         }
 
         $modelClassName = $attribute->getClassName();
-        $model = new $modelClassName();
 
-        if (!$model instanceof AbstractModel) {
-            throw new InvalidArgumentException(sprintf(
+        if (!is_subclass_of($modelClassName, AbstractModel::class)) {
+            throw new MapperException(sprintf(
                 'Model "%s" is no instance of "%s"!',
-                $model::class,
-                ModelInterface::class,
+                $modelClassName,
+                AbstractModel::class,
             ));
         }
 
-        $whereParameters = [];
-        $where = [];
+        $model = new $modelClassName($this->modelWrapper);
+        $conditions = $this->attributeParameterTransformer->transform(
+            $attribute->getConditions(),
+            $reflectionParameter->getName(),
+        );
 
-        try {
-            $parameterFromRequest = $this->objectMapperAttribute->getParameterFromRequest($reflectionParameter);
-        } catch (MapperException) {
-            $parameterFromRequest = [];
-        }
-
-        foreach (is_array($parameterFromRequest) ? $parameterFromRequest : [] as $requestValue) {
-            array_push(
-                $whereParameters,
-                ...$this->getWhereValuesForModel($attribute, $requestValue, $parameters),
-            );
-            $where[] = implode(' AND ', array_map(
-                fn (string $field): string => '`' . $field . '`=?',
-                array_keys($attribute->getConditions()),
-            ));
-        }
-
-        if (count($where) === 0) {
-            return [];
+        if (count($conditions) !== count(array_filter($conditions))) {
+            return $this->getDefaultReturn($reflectionParameter);
         }
 
         $table = $this->tableManager->getTable($model->getTableName());
-        $selectQuery = (new SelectQuery($table))
-            ->addWhere(new Where(sprintf('(%s)', implode(') OR (', $where)), $whereParameters))
-        ;
+        $selectQuery = new SelectQuery($table);
+
+        foreach ($conditions as $conditionField => $conditionValue) {
+            if (!is_array($conditionValue)) {
+                $conditionValue = [$conditionValue];
+            }
+
+            $selectQuery->addWhere(new Where(
+                sprintf('`%s` IN (%s)', $conditionField, $this->selectService->getParametersString($conditionValue)),
+                array_values($conditionValue),
+            ));
+        }
 
         try {
             $result = $this->client->execute($selectQuery);
@@ -114,76 +108,23 @@ class ModelsFetcherAttribute implements AttributeServiceInterface, ParameterAttr
         $models = [];
 
         foreach ($result?->iterateRecords() ?? [] as $record) {
-            $model = new $modelClassName();
+            $model = new $modelClassName($this->modelWrapper);
             $this->modelManager->loadFromRecord($record, $model);
             $models[] = $model;
         }
 
-        if (count($models) === 0) {
-            if ($reflectionParameter->allowsNull()) {
-                return null;
-            }
-
-            return [];
-        }
-
-        return $models;
+        return count($models) === 0
+            ? $this->getDefaultReturn($reflectionParameter)
+            : $models
+        ;
     }
 
-    private function getWhereValuesForModel(
-        GetModels $attribute,
-        array $requestValue,
-        array $parameters,
-    ): array {
-        $values = [];
-
-        foreach ($attribute->getConditions() as $condition) {
-            $conditionParts = explode('.', $condition);
-            $count = count($conditionParts);
-
-            if ($count === 1) {
-                $values[] = $parameters[$condition] ?? $requestValue[$condition];
-
-                continue;
-            }
-
-            if ($conditionParts[0] === 'session') {
-                $value = $this->sessionService->get($conditionParts[1]);
-
-                if ($count < 3) {
-                    $values[] = $value;
-
-                    continue;
-                }
-
-                if (is_object($value)) {
-                    $reflectionClass = $this->reflectionManager->getReflectionClass($value);
-                    $values[] = $this->reflectionManager->getProperty(
-                        $reflectionClass->getProperty($conditionParts[2]),
-                        $value,
-                    );
-                }
-
-                continue;
-            }
-
-            if ($conditionParts[0] === 'value') {
-                $values[] = $conditionParts[1];
-
-                continue;
-            }
-
-            $object = $parameters[$conditionParts[0]] ?? $requestValue[$conditionParts[0]];
-
-            if (is_object($object)) {
-                $reflectionClass = $this->reflectionManager->getReflectionClass($object);
-                $values[] = $this->reflectionManager->getProperty(
-                    $reflectionClass->getProperty($conditionParts[1]),
-                    $object,
-                );
-            }
+    private function getDefaultReturn(ReflectionParameter $reflectionParameter): ?array
+    {
+        if ($reflectionParameter->allowsNull()) {
+            return null;
         }
 
-        return $values;
+        return [];
     }
 }

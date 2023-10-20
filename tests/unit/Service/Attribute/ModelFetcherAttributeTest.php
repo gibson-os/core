@@ -8,7 +8,6 @@ use GibsonOS\Core\Attribute\GetMappedModel;
 use GibsonOS\Core\Attribute\GetModel;
 use GibsonOS\Core\Exception\MapperException;
 use GibsonOS\Core\Exception\Repository\SelectError;
-use GibsonOS\Core\Exception\RequestError;
 use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Service\Attribute\ModelFetcherAttribute;
 use GibsonOS\Core\Service\RequestService;
@@ -86,7 +85,7 @@ class ModelFetcherAttributeTest extends Unit
 
         $this->attributeParameterTransformer->transform(['id' => 'id'])
             ->shouldBeCalledOnce()
-            ->willThrow(RequestError::class)
+            ->willReturn(['id' => null])
         ;
 
         $this->assertNull($this->modelFetcherAttribute->replace(

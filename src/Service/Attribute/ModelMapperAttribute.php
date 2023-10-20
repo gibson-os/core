@@ -10,7 +10,6 @@ use GibsonOS\Core\Attribute\Install\Database\Constraint;
 use GibsonOS\Core\Exception\FactoryError;
 use GibsonOS\Core\Exception\MapperException;
 use GibsonOS\Core\Exception\Repository\SelectError;
-use GibsonOS\Core\Exception\RequestError;
 use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Mapper\ModelMapper;
 use GibsonOS\Core\Model\AbstractModel;
@@ -98,7 +97,6 @@ class ModelMapperAttribute extends ObjectMapperAttribute
     /**
      * @throws MapperException
      * @throws ReflectionException
-     * @throws RequestError
      */
     private function getValues(GetMappedModel $attribute, ReflectionProperty $reflectionProperty): mixed
     {
@@ -139,14 +137,7 @@ class ModelMapperAttribute extends ObjectMapperAttribute
             }
 
             $propertyName = $reflectionProperty->getName();
-
-            try {
-                $values = $this->getValues($attribute, $reflectionProperty);
-            } catch (RequestError) {
-                $values = null;
-            }
-
-            $values ??= $parameters[$propertyName] ?? null;
+            $values = $this->getValues($attribute, $reflectionProperty) ?? ($parameters[$propertyName] ?? null);
             $typeName = $this->reflectionManager->getTypeName($reflectionProperty);
             $idGetter = 'get' . ucfirst($constraintAttribute->getOwnColumn() ?? $propertyName . 'id');
             $setter = 'set' . ucfirst($propertyName);

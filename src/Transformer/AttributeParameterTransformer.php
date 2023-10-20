@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Transformer;
 
-use GibsonOS\Core\Exception\MapperException;
 use GibsonOS\Core\Exception\RequestError;
 use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Service\RequestService;
@@ -21,16 +20,14 @@ class AttributeParameterTransformer
     }
 
     /**
-     * @throws MapperException
-     * @throws RequestError
      * @throws ReflectionException
      */
-    public function transform(array $parameters): array
+    public function transform(array $parameters, string $prefix = ''): array
     {
         $values = [];
 
         foreach ($parameters as $parameterKey => $parameter) {
-            $parameterParts = explode('.', $parameter);
+            $parameterParts = explode('.', $prefix . $parameter);
 
             if ($parameterParts[0] === 'value') {
                 $values[$parameterKey] = $parameterParts[1];
@@ -38,25 +35,37 @@ class AttributeParameterTransformer
                 continue;
             }
 
-            $value = match ($parameterParts[0]) {
-                'session' => $this->sessionService->get($parameterParts[1]),
-                default => JsonUtility::decode((string) $this->requestService->getRequestValue($parameterParts[0])),
-            };
+            try {
+                $value = match ($parameterParts[0]) {
+                    'session' => $this->sessionService->get($parameterParts[1]),
+                    default => $this->getRequestValue($parameterParts[0]),
+                };
+            } catch (RequestError) {
+                $values[$parameterKey] = null;
+
+                continue;
+            }
 
             $count = count($parameterParts);
 
             for ($i = $parameterParts[0] === 'session' ? 2 : 1; $i < $count; ++$i) {
                 if (is_array($value)) {
-                    $value = $value[$parameterParts[$i]] ?? null;
+                    if (!isset($value[0])) {
+                        $value = $value[$parameterParts[$i]] ?? null;
+
+                        continue;
+                    }
+
+                    $value = array_map(
+                        static fn (mixed $valueItem): mixed => $valueItem[$parameterParts[$i]] ?? null,
+                        $value,
+                    );
 
                     continue;
                 }
 
                 if (!is_object($value)) {
-                    throw new MapperException(sprintf(
-                        'Value for %s is no object or array',
-                        $parameterParts[$i],
-                    ));
+                    break;
                 }
 
                 $reflectionClass = $this->reflectionManager->getReflectionClass($value);
@@ -75,5 +84,15 @@ class AttributeParameterTransformer
         }
 
         return $values;
+    }
+
+    /**
+     * @throws RequestError
+     */
+    private function getRequestValue(string $key): mixed
+    {
+        $value = $this->requestService->getRequestValue($key);
+
+        return is_string($value) ? JsonUtility::decode($value) : $value;
     }
 }

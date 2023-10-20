@@ -78,7 +78,7 @@ class ModelManagerTest extends Unit
             $this->dateTimeService->reveal(),
             $this->jsonUtility->reveal(),
             $reflectionManager,
-            new TableNameAttribute($reflectionManager),
+            new TableNameAttribute($reflectionManager, $this->modelWrapper->reveal()),
             $this->tableManager->reveal(),
             $this->replaceService->reveal(),
             $this->deleteService->reveal(),

@@ -10,13 +10,13 @@ use GibsonOS\Core\Exception\MapperException;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Exception\RequestError;
 use GibsonOS\Core\Manager\ReflectionManager;
-use GibsonOS\Core\Manager\ServiceManager;
 use GibsonOS\Core\Mapper\ModelMapper;
 use GibsonOS\Core\Service\Attribute\ModelFetcherAttribute;
 use GibsonOS\Core\Service\Attribute\ModelMapperAttribute;
 use GibsonOS\Core\Service\RequestService;
 use GibsonOS\Core\Transformer\AttributeParameterTransformer;
 use GibsonOS\Mock\Dto\Mapper\MapModel;
+use GibsonOS\Mock\Dto\Mapper\MapModelParent;
 use GibsonOS\Mock\Dto\Mapper\MapObject;
 use GibsonOS\Mock\Dto\Mapper\StringEnum;
 use GibsonOS\Test\Unit\Core\ModelManagerTrait;
@@ -35,20 +35,21 @@ class ModelMapperAttributeTest extends Unit
 
     private ModelFetcherAttribute|ObjectProphecy $modelFetcherAttribute;
 
+    private ModelMapper|ObjectProphecy $modelMapper;
+
     protected function _before(): void
     {
+        $this->loadModelManager();
+
         $this->requestService = $this->prophesize(RequestService::class);
         $this->modelFetcherAttribute = $this->prophesize(ModelFetcherAttribute::class);
         $this->attributeParameterTransformer = $this->prophesize(AttributeParameterTransformer::class);
-
-        $this->loadModelManager();
-
-        $reflectionManager = new ReflectionManager();
+        $this->modelMapper = $this->prophesize(ModelMapper::class);
 
         $this->modelMapperAttribute = new ModelMapperAttribute(
-            new ModelMapper(new ServiceManager(), $reflectionManager, $this->modelWrapper->reveal()),
+            $this->modelMapper->reveal(),
             $this->requestService->reveal(),
-            $reflectionManager,
+            new ReflectionManager(),
             $this->modelFetcherAttribute->reveal(),
             $this->modelWrapper->reveal(),
             $this->attributeParameterTransformer->reveal(),
@@ -87,11 +88,11 @@ class ModelMapperAttributeTest extends Unit
 
         $this->attributeParameterTransformer->transform(['parent'])
             ->shouldBeCalledOnce()
-            ->willThrow(RequestError::class)
+            ->willReturn([null])
         ;
         $this->attributeParameterTransformer->transform(['childObjects'])
             ->shouldBeCalledOnce()
-            ->willThrow(RequestError::class)
+            ->willReturn([null])
         ;
         $this->modelFetcherAttribute->replace(
             new GetModel(),
@@ -101,28 +102,17 @@ class ModelMapperAttributeTest extends Unit
             ->shouldBeCalledOnce()
             ->willThrow(SelectError::class)
         ;
-
-        $this->assertInstanceOf(
-            MapModel::class,
-            $this->modelMapperAttribute->replace(
-                new GetMappedModel(),
-                ['stringEnumValue' => 'ja', 'intValue' => 42],
-                $reflectionFunction->getParameters()[0],
-            ),
-        );
-    }
-
-    public function testReplaceNoRequestValue(): void
-    {
-        $reflectionFunction = new ReflectionFunction(function (MapModel $model) { return $model; });
-
-        $this->attributeParameterTransformer->transform(['parent'])
+        $model = new MapModel($this->modelWrapper->reveal());
+        $this->modelMapper->setObjectValues($model, [
+            'modelWrapper' => $this->modelWrapper->reveal(),
+            'id' => null,
+            'nullableIntValue' => null,
+            'stringEnumValue' => 'ja',
+            'intValue' => '42',
+            'parentId' => null,
+        ])
             ->shouldBeCalledOnce()
-            ->willThrow(RequestError::class)
-        ;
-        $this->attributeParameterTransformer->transform(['childObjects'])
-            ->shouldBeCalledOnce()
-            ->willThrow(RequestError::class)
+            ->willReturn($model)
         ;
 
         $this->assertInstanceOf(
@@ -157,6 +147,18 @@ class ModelMapperAttributeTest extends Unit
         $this->attributeParameterTransformer->transform(['childObjects'])
             ->shouldBeCalledOnce()
             ->willReturn([null])
+        ;
+        $model = new MapModel($this->modelWrapper->reveal());
+        $this->modelMapper->setObjectValues($model, [
+            'modelWrapper' => $this->modelWrapper->reveal(),
+            'id' => null,
+            'nullableIntValue' => null,
+            'stringEnumValue' => 'ja',
+            'intValue' => '42',
+            'parentId' => null,
+        ])
+            ->shouldBeCalledOnce()
+            ->willReturn($model)
         ;
 
         $this->assertInstanceOf(
@@ -225,11 +227,20 @@ class ModelMapperAttributeTest extends Unit
         ;
         $this->attributeParameterTransformer->transform(['parent'])
             ->shouldBeCalledOnce()
-            ->willThrow(RequestError::class)
+            ->willReturn([null])
         ;
         $this->attributeParameterTransformer->transform(['childObjects'])
             ->shouldBeCalledOnce()
-            ->willThrow(RequestError::class)
+            ->willReturn([null])
+        ;
+        $model = new MapModel($this->modelWrapper->reveal());
+        $this->modelMapper->setObjectValues($model, [
+            'modelWrapper' => $this->modelWrapper->reveal(),
+            'stringEnumValue' => 'YES',
+            'intValue' => 42,
+        ])
+            ->shouldBeCalledOnce()
+            ->willReturn($model)
         ;
 
         $this->assertInstanceOf(
@@ -248,11 +259,11 @@ class ModelMapperAttributeTest extends Unit
 
         $this->attributeParameterTransformer->transform(['parent'])
             ->shouldBeCalledOnce()
-            ->willThrow(RequestError::class)
+            ->willReturn([null])
         ;
         $this->attributeParameterTransformer->transform(['childObjects'])
             ->shouldBeCalledOnce()
-            ->willThrow(RequestError::class)
+            ->willReturn([null])
         ;
         $mapModel = (new MapModel($this->modelWrapper->reveal()))
             ->setStringEnumValue(StringEnum::YES)
@@ -287,7 +298,7 @@ class ModelMapperAttributeTest extends Unit
         ;
         $this->attributeParameterTransformer->transform(['childObjects'])
             ->shouldBeCalledOnce()
-            ->willThrow(RequestError::class)
+            ->willReturn([null])
         ;
         $mapModel = (new MapModel($this->modelWrapper->reveal()))
             ->setStringEnumValue(StringEnum::YES)
@@ -301,6 +312,22 @@ class ModelMapperAttributeTest extends Unit
             ->shouldBeCalledOnce()
             ->willReturn($mapModel)
         ;
+        $this->modelMapper->setObjectValues($mapModel, [
+            'modelWrapper' => $this->modelWrapper->reveal(),
+            'id' => null,
+            'nullableIntValue' => null,
+            'stringEnumValue' => 'ja',
+            'intValue' => 42,
+            'parentId' => null,
+        ])
+            ->shouldBeCalledOnce()
+            ->willReturn($mapModel)
+        ;
+        $mapModelParent = new MapModelParent($this->modelWrapper->reveal());
+        $this->modelMapper->mapToObject(MapModelParent::class, ['id' => 42])
+            ->shouldBeCalledOnce()
+            ->willReturn($mapModelParent)
+        ;
 
         $model = $this->modelMapperAttribute->replace(
             new GetMappedModel(),
@@ -309,6 +336,6 @@ class ModelMapperAttributeTest extends Unit
         );
 
         $this->assertInstanceOf(MapModel::class, $model);
-        $this->assertEquals(42, $model->getParent()->getId());
+        $this->assertEquals($mapModelParent, $model->getParent());
     }
 }

@@ -7,7 +7,6 @@ use GibsonOS\Core\Attribute\AttributeInterface;
 use GibsonOS\Core\Attribute\GetModel;
 use GibsonOS\Core\Exception\MapperException;
 use GibsonOS\Core\Exception\Repository\SelectError;
-use GibsonOS\Core\Exception\RequestError;
 use GibsonOS\Core\Manager\ModelManager;
 use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Model\AbstractModel;
@@ -67,12 +66,11 @@ class ModelFetcherAttribute implements AttributeServiceInterface, ParameterAttri
         }
 
         $model = new $modelClassName($this->modelWrapper);
+        $whereParameters = array_values(
+            $this->attributeParameterTransformer->transform($attribute->getConditions()),
+        );
 
-        try {
-            $whereParameters = array_values(
-                $this->attributeParameterTransformer->transform($attribute->getConditions()),
-            );
-        } catch (RequestError) {
+        if (count($whereParameters) !== count(array_filter($whereParameters))) {
             return null;
         }
 

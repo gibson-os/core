@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace GibsonOS\Test\Unit\Core\Transformer;
 
 use Codeception\Test\Unit;
-use GibsonOS\Core\Exception\MapperException;
 use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Service\RequestService;
 use GibsonOS\Core\Service\SessionService;
@@ -42,18 +41,6 @@ class AttributeParameterTransformerTest extends Unit
         $this->assertEquals(['id' => 42], $this->attributeParameterTransformer->transform(['id' => 'value.42']));
     }
 
-    public function testTransformNestedException(): void
-    {
-        $this->sessionService->get('arthur')
-            ->shouldBeCalledOnce()
-            ->willReturn(42)
-        ;
-
-        $this->expectException(MapperException::class);
-
-        $this->attributeParameterTransformer->transform(['id' => 'session.arthur.dent']);
-    }
-
     /**
      * @dataProvider getSessionData
      */
@@ -85,6 +72,7 @@ class AttributeParameterTransformerTest extends Unit
             [['id' => 'session.arthur.dent'], 'arthur', ['dent' => $mapObject], ['id' => $mapObject]],
             [['id' => 'session.arthur.options.dent'], 'arthur', $mapObjectParent, ['id' => 42]],
             [['id' => 'session.arthur.options'], 'arthur', $mapObjectParent, ['id' => ['dent' => 42]]],
+            [['id' => 'session.arthur.options.id'], 'arthur', new MapObjectParent(true, [['id' => 42], ['id' => 24]]), ['id' => [42, 24]]],
         ];
     }
 
@@ -96,13 +84,14 @@ class AttributeParameterTransformerTest extends Unit
         string $requestKey,
         mixed $requestValue,
         array $expected,
+        string $prefix = '',
     ): void {
         $this->requestService->getRequestValue($requestKey)
             ->shouldBeCalledOnce()
             ->willReturn($requestValue)
         ;
 
-        $this->assertEquals($expected, $this->attributeParameterTransformer->transform($conditions));
+        $this->assertEquals($expected, $this->attributeParameterTransformer->transform($conditions, $prefix));
     }
 
     public function getRequestData(): array
@@ -111,9 +100,12 @@ class AttributeParameterTransformerTest extends Unit
             [['id' => 'marvin'], 'marvin', 42, ['id' => 42]],
             [['id' => 'arthur.dent'], 'arthur', '[]', ['id' => null]],
             [['id' => 'arthur.dent'], 'arthur', '{"dent": 42}', ['id' => 42]],
+            [['id' => 'dent'], 'arthur', '{"dent": 42}', ['id' => 42], 'arthur.'],
             [['id' => 'arthur.dent'], 'arthur', '{"dent": [42]}', ['id' => [42]]],
             [['id' => 'arthur.dent'], 'arthur', '{"dent": {"ford": 42}}', ['id' => ['ford' => 42]]],
             [['id' => 'arthur.dent.ford'], 'arthur', '{"dent": {"ford": 42}}', ['id' => 42]],
+            [['id' => 'arthur.dent'], 'arthur', '[{"dent": 42}, {"dent": 24}]', ['id' => [42, 24]]],
+            [['id' => 'dent'], 'arthur', '[{"dent": 42}, {"dent": 24}]', ['id' => [42, 24]], 'arthur.'],
         ];
     }
 }
