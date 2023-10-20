@@ -22,10 +22,11 @@ use GibsonOS\Core\Service\InstallService;
 use GibsonOS\Core\Service\PriorityInterface;
 use GibsonOS\Core\Utility\JsonUtility;
 use JsonException;
-use mysqlDatabase;
+use MDO\Client;
+use MDO\Dto\Record;
+use MDO\Exception\ClientException;
 use ReflectionAttribute;
 use ReflectionException;
-use stdClass;
 use UnitEnum;
 
 class TableInstall extends AbstractInstall implements PriorityInterface
@@ -78,9 +79,9 @@ class TableInstall extends AbstractInstall implements PriorityInterface
 
     public function __construct(
         ServiceManager $serviceManagerService,
-        private mysqlDatabase $mysqlDatabase,
-        private TableNameAttribute $tableAttribute,
-        private ReflectionManager $reflectionManager,
+        private readonly Client $client,
+        private readonly TableNameAttribute $tableAttribute,
+        private readonly ReflectionManager $reflectionManager,
     ) {
         parent::__construct($serviceManagerService);
     }
@@ -189,15 +190,17 @@ class TableInstall extends AbstractInstall implements PriorityInterface
             ;
             $parameters = [$tableName, $this->envService->getString('MYSQL_DATABASE')];
 
-            if ($this->mysqlDatabase->execute($tableExistsQuery, $parameters) === false) {
+            try {
+                $result = $this->client->execute($tableExistsQuery, $parameters);
+            } catch (ClientException) {
                 throw new InstallException(sprintf(
                     'Show table "%s" failed! Error: %s',
                     $tableName,
-                    $this->mysqlDatabase->error(),
+                    $this->client->getError(),
                 ));
             }
 
-            if ($this->mysqlDatabase->result?->fetch_row() === null) {
+            if (count(iterator_to_array($result?->iterateRecords() ?? new Generator())) === 0) {
                 $this->createTable($tableAttribute, $columnsAttributes);
 
                 yield new Success(sprintf('Table "%s" installed!', $tableName));
@@ -205,48 +208,54 @@ class TableInstall extends AbstractInstall implements PriorityInterface
                 continue;
             }
 
-            if ($this->mysqlDatabase->sendQuery('SHOW FIELDS FROM `' . $tableName . '`') === false) {
+            try {
+                $result = $this->client->execute(sprintf('SHOW FIELDS FROM `%s`', $tableName));
+            } catch (ClientException) {
                 throw new InstallException(sprintf(
                     'Show field from table "%s" failed! Error: %s',
                     $tableName,
-                    $this->mysqlDatabase->error(),
+                    $this->client->getError(),
                 ));
             }
 
             $updates = [];
 
-            foreach ($this->mysqlDatabase->fetchObjectList() as $column) {
-                if (isset($columnsAttributes[$column->Field])) {
-                    $columnAttribute = $columnsAttributes[$column->Field];
+            foreach ($result?->iterateRecords() ?? [] as $column) {
+                $field = (string) $column->get('Field')->getValue();
+
+                if (isset($columnsAttributes[$field])) {
+                    $columnAttribute = $columnsAttributes[$field];
 
                     if ($this->isColumnModified($columnAttribute, $column)) {
                         $updates[] = 'MODIFY ' . $this->getColumnString($columnAttribute);
                     }
 
-                    unset($columnsAttributes[$column->Field]);
+                    unset($columnsAttributes[$field]);
 
                     continue;
                 }
 
-                $updates[] = 'DROP COLUMN `' . $column->Field . '`';
+                $updates[] = sprintf('DROP COLUMN `%s`', $field);
             }
 
             foreach ($columnsAttributes as $columnAttribute) {
-                $updates[] = 'ADD ' . $this->getColumnString($columnAttribute);
+                $updates[] = sprintf('ADD %s', $this->getColumnString($columnAttribute));
             }
 
             if (count($updates) === 0) {
                 continue;
             }
 
-            $alterTableQuery = 'ALTER TABLE `' . $tableName . '` ' . implode(', ', $updates);
+            $alterTableQuery = sprintf('ALTER TABLE `%s` %s', $tableName, implode(', ', $updates));
             $this->logger->debug($alterTableQuery);
 
-            if ($this->mysqlDatabase->sendQuery($alterTableQuery) === false) {
+            try {
+                $this->client->execute($alterTableQuery);
+            } catch (ClientException) {
                 throw new InstallException(sprintf(
                     'Modify table table "%s" failed! Error: %s',
                     $tableName,
-                    $this->mysqlDatabase->error(),
+                    $this->client->getError(),
                 ));
             }
 
@@ -309,11 +318,13 @@ class TableInstall extends AbstractInstall implements PriorityInterface
         ;
         $this->logger->debug($query);
 
-        if ($this->mysqlDatabase->sendQuery($query) === false) {
+        try {
+            $this->client->execute($query);
+        } catch (ClientException) {
             throw new InstallException(sprintf(
                 'Create table "%s" failed! Error: %s',
                 $table->getName() ?? '',
-                $this->mysqlDatabase->error(),
+                $this->client->getError(),
             ));
         }
     }
@@ -359,9 +370,9 @@ class TableInstall extends AbstractInstall implements PriorityInterface
         ;
     }
 
-    private function isColumnModified(Column $columnAttribute, stdClass $column): bool
+    private function isColumnModified(Column $columnAttribute, Record $column): bool
     {
-        if (($column->Null === 'YES') !== $columnAttribute->isNullable()) {
+        if (($column->get('Null')->getValue() === 'YES') !== $columnAttribute->isNullable()) {
             return true;
         }
 
@@ -372,14 +383,14 @@ class TableInstall extends AbstractInstall implements PriorityInterface
         }
 
         if (
-            $column->Default !== ($default === Column::DEFAULT_CURRENT_TIMESTAMP ? 'current_timestamp()' : $default)
+            $column->get('Default')->getValue() !== ($default === Column::DEFAULT_CURRENT_TIMESTAMP ? 'current_timestamp()' : $default)
             && !($columnAttribute->getType() === Column::TYPE_TIMESTAMP && $default === null)
         ) {
             return true;
         }
 
         $columnType = $this->getColumnType($columnAttribute);
-        $existingColumnType = $column->Type;
+        $existingColumnType = (string) $column->get('Type')->getValue();
 
         if ($columnAttribute->getLength() === null) {
             $existingColumnType = preg_replace('/\(\d*\)/', '', $existingColumnType);
@@ -389,7 +400,7 @@ class TableInstall extends AbstractInstall implements PriorityInterface
             }
         }
 
-        $extra = str_replace('()', '', $column->Extra);
+        $extra = str_replace('()', '', (string) $column->get('Extra')->getValue());
 
         if ($columnAttribute->getType() !== Column::TYPE_TIMESTAMP) {
             $columnType = trim($columnType . ' ' . implode(' ', $columnAttribute->getAttributes()));

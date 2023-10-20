@@ -14,9 +14,9 @@ use GibsonOS\Core\Service\EnvService;
 use GibsonOS\Core\Service\LoggerService;
 use GibsonOS\Core\Service\Response\AjaxResponse;
 use GibsonOS\Core\Service\SessionService;
+use GibsonOS\Core\Wrapper\ModelWrapper;
 use GibsonOS\Mock\Service\TestSessionService;
-use mysqlDatabase;
-use mysqlRegistry;
+use MDO\Client;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Log\LoggerInterface;
@@ -28,6 +28,8 @@ abstract class FunctionalTest extends Unit
     protected string $databaseName = 'galaxy';
 
     protected ServiceManager $serviceManager;
+
+    protected ModelWrapper $modelWrapper;
 
     protected ObjectProphecy|CommandService $commandService;
 
@@ -47,26 +49,26 @@ abstract class FunctionalTest extends Unit
         $envService->loadFile($this->getDir() . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '.env.test');
         $this->serviceManager->setService(EnvService::class, $envService);
 
-        $mysqlDatabase = new mysqlDatabase(
+        $client = new Client(
             $envService->getString('MYSQL_HOST'),
             $envService->getString('MYSQL_USER'),
             $envService->getString('MYSQL_PASS'),
         );
-        $mysqlDatabase->openDB();
         $databaseName = $envService->getString('MYSQL_DATABASE');
-        $mysqlDatabase->sendQuery(sprintf(
+        $client->execute(sprintf(
             'DROP DATABASE IF EXISTS `%s`',
-            $databaseName
+            $databaseName,
         ));
-        $mysqlDatabase->sendQuery(sprintf(
+        $client->execute(sprintf(
             'CREATE DATABASE `%s`',
-            $databaseName
+            $databaseName,
         ));
-        $mysqlDatabase->useDatabase($databaseName);
-        $this->serviceManager->setService(mysqlDatabase::class, $mysqlDatabase);
-        mysqlRegistry::getInstance()->set('database', $mysqlDatabase);
+        $client->useDatabase($databaseName);
+        $this->serviceManager->setService(Client::class, $client);
 
         $this->initDatabase();
+
+        $this->modelWrapper = $this->serviceManager->get(ModelWrapper::class);
     }
 
     protected function initDatabase(): void
@@ -87,16 +89,16 @@ abstract class FunctionalTest extends Unit
     protected function addUser(string $username = 'marvin'): User
     {
         $modelManager = $this->serviceManager->get(ModelManager::class);
-        $user = (new User())
+        $user = (new User($this->modelWrapper))
             ->setUser($username)
             ->setPassword('galaxy')
         ;
         $modelManager->saveWithoutChildren($user);
         $modelManager->saveWithoutChildren(
-            (new Permission())
+            (new Permission($this->modelWrapper))
                 ->setModule('core')
                 ->setPermission(Permission::READ + Permission::WRITE + Permission::DELETE + Permission::MANAGE)
-                ->setUser($user)
+                ->setUser($user),
         );
 
         return $user;

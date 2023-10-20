@@ -17,16 +17,18 @@ use GibsonOS\Core\Model\ModelInterface;
 use GibsonOS\Core\Service\Attribute\TableNameAttribute;
 use GibsonOS\Core\Service\InstallService;
 use GibsonOS\Core\Service\PriorityInterface;
-use mysqlDatabase;
+use MDO\Client;
+use MDO\Exception\ClientException;
+use MDO\Exception\RecordException;
 use ReflectionException;
 
 class KeyInstall extends AbstractInstall implements PriorityInterface
 {
     public function __construct(
         ServiceManager $serviceManagerService,
-        private mysqlDatabase $mysqlDatabase,
-        private TableNameAttribute $tableAttribute,
-        private ReflectionManager $reflectionManager,
+        private readonly Client $client,
+        private readonly TableNameAttribute $tableAttribute,
+        private readonly ReflectionManager $reflectionManager,
     ) {
         parent::__construct($serviceManagerService);
     }
@@ -36,6 +38,7 @@ class KeyInstall extends AbstractInstall implements PriorityInterface
      * @throws FactoryError
      * @throws GetError
      * @throws ReflectionException
+     * @throws RecordException
      */
     public function install(string $module): Generator
     {
@@ -98,24 +101,29 @@ class KeyInstall extends AbstractInstall implements PriorityInterface
                 $installedKeys,
             );
 
-            if (!$this->mysqlDatabase->execute($query, $parameters)) {
+            try {
+                $result = $this->client->execute($query, $parameters);
+            } catch (ClientException) {
                 throw new InstallException(sprintf(
                     'Show indexes from table "%s" failed! Error: %s',
                     $tableName,
-                    $this->mysqlDatabase->error(),
+                    $this->client->getError(),
                 ));
             }
 
-            foreach ($this->mysqlDatabase->fetchObjectList() as $index) {
-                $query = 'DROP INDEX `' . $index->Key_name . '` ON `' . $tableName . '`';
+            foreach ($result?->iterateRecords() ?? [] as $index) {
+                $keyName = (string) $index->get('Key_name')->getValue();
+                $query = sprintf('DROP INDEX `%s` ON `%s`', $keyName, $tableName);
                 $this->logger->debug($query);
 
-                if (!$this->mysqlDatabase->sendQuery($query)) {
+                try {
+                    $this->client->execute($query);
+                } catch (ClientException) {
                     throw new InstallException(sprintf(
                         'Drop index "%s" from table "%s" failed! Error: %s',
-                        $index->Key_name,
+                        $keyName,
                         $tableName,
-                        $this->mysqlDatabase->error(),
+                        $this->client->getError(),
                     ));
                 }
             }
@@ -131,33 +139,40 @@ class KeyInstall extends AbstractInstall implements PriorityInterface
             $key->getColumns(),
         )), 0, 64);
 
-        if (!$this->mysqlDatabase->execute('SHOW INDEXES FROM `' . $tableName . '` WHERE `Key_name`=?', [$name])) {
+        try {
+            $result = $this->client->execute(sprintf('SHOW INDEXES FROM `%s` WHERE `Key_name`=?', $tableName), [$name]);
+        } catch (ClientException) {
             throw new InstallException(sprintf(
                 'Get indexes for table "%s" failed! Error: %s',
                 $tableName,
-                $this->mysqlDatabase->error(),
+                $this->client->getError(),
             ));
         }
 
-        $keyFields = $this->mysqlDatabase->fetchAssocList();
+        $keyFields = iterator_to_array($result?->iterateRecords() ?? new Generator());
         // @todo hier muss geprüft werden ob die richtigen columns im key sind. Er noch/nicht mehr unique ist usw.
 
         if (count($keyFields) === count($key->getColumns())) {
             return $name;
         }
 
-        $query =
-            'CREATE ' . ($key->isUnique() ? 'UNIQUE ' : '') . 'INDEX `' . $name . '` ON `' . $tableName . '` ' .
-            '(`' . implode('`, `', $key->getColumns()) . '`)'
-        ;
+        $query = sprintf(
+            'CREATE %sINDEX `%s` ON `%s` (`%s`)',
+            $key->isUnique() ? 'UNIQUE ' : '',
+            $name,
+            $tableName,
+            implode('`, `', $key->getColumns()),
+        );
         $this->logger->debug($query);
 
-        if (!$this->mysqlDatabase->sendQuery($query)) {
+        try {
+            $this->client->execute($query);
+        } catch (ClientException) {
             throw new InstallException(sprintf(
                 'Add key "%s" for table "%s" failed! Error: %s',
                 $name,
                 $tableName,
-                $this->mysqlDatabase->error(),
+                $this->client->getError(),
             ));
         }
 

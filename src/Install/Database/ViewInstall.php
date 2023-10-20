@@ -15,15 +15,16 @@ use GibsonOS\Core\Manager\ServiceManager;
 use GibsonOS\Core\Model\ModelInterface;
 use GibsonOS\Core\Service\InstallService;
 use GibsonOS\Core\Service\PriorityInterface;
-use mysqlDatabase;
+use MDO\Client;
+use MDO\Exception\ClientException;
 use ReflectionException;
 
 class ViewInstall extends AbstractInstall implements PriorityInterface
 {
     public function __construct(
         ServiceManager $serviceManagerService,
-        private mysqlDatabase $mysqlDatabase,
-        private ReflectionManager $reflectionManager,
+        private readonly Client $client,
+        private readonly ReflectionManager $reflectionManager,
     ) {
         parent::__construct($serviceManagerService);
     }
@@ -51,25 +52,29 @@ class ViewInstall extends AbstractInstall implements PriorityInterface
             $model = new $className();
             $viewName = $model->getTableName();
             $viewAttribute->setName($viewName);
-            $query = 'DROP VIEW IF EXISTS `' . $viewName . '`';
+            $query = sprintf('DROP VIEW IF EXISTS `%s`', $viewName);
             $this->logger->debug($query);
 
-            if ($this->mysqlDatabase->sendQuery($query) === false) {
+            try {
+                $this->client->execute($query);
+            } catch (ClientException) {
                 throw new InstallException(sprintf(
                     'Drop view "%s" failed! Error: %s',
                     $viewName,
-                    $this->mysqlDatabase->error(),
+                    $this->client->getError(),
                 ));
             }
 
-            $query = 'CREATE VIEW `' . $viewName . '` AS ' . $viewAttribute->getQuery();
+            $query = sprintf('CREATE VIEW `%s` AS %s', $viewName, $viewAttribute->getQuery());
             $this->logger->debug($query);
 
-            if ($this->mysqlDatabase->sendQuery($query) === false) {
+            try {
+                $this->client->execute($query);
+            } catch (ClientException) {
                 throw new InstallException(sprintf(
                     'Create view "%s" failed! Error: %s',
                     $viewName,
-                    $this->mysqlDatabase->error(),
+                    $this->client->getError(),
                 ));
             }
 

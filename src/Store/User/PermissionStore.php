@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Store\User;
 
 use Generator;
+use GibsonOS\Core\Attribute\GetTable;
 use GibsonOS\Core\Attribute\GetTableName;
 use GibsonOS\Core\Enum\Permission as PermissionEnum;
 use GibsonOS\Core\Model\Action;
@@ -13,6 +14,10 @@ use GibsonOS\Core\Model\User;
 use GibsonOS\Core\Model\User\Permission;
 use GibsonOS\Core\Store\AbstractStore;
 use GibsonOS\Core\Wrapper\DatabaseStoreWrapper;
+use MDO\Dto\Table;
+use MDO\Dto\Value;
+use MDO\Exception\ClientException;
+use MDO\Query\SelectQuery;
 
 class PermissionStore extends AbstractStore
 {
@@ -24,8 +29,8 @@ class PermissionStore extends AbstractStore
 
     public function __construct(
         private readonly DatabaseStoreWrapper $databaseStoreWrapper,
-        #[GetTableName(User::class)]
-        private readonly string $userTableName,
+        #[GetTable(User::class)]
+        private readonly Table $userTable,
         #[GetTableName(Permission::class)]
         private readonly string $permissionTableName,
         #[GetTableName(Module::class)]
@@ -39,11 +44,13 @@ class PermissionStore extends AbstractStore
 
     public function getCount(): int
     {
-        if (!$this->mysqlDatabase->sendQuery(sprintf('SELECT COUNT(`id`) FROM `%s`', $this->userTableName))) {
-            return 0;
-        }
+        $selectQuery = (new SelectQuery($this->userTable))
+            ->setSelects(['count' => 'COUNT(`id`)'])
+        ;
 
-        return (int) $this->mysqlDatabase->fetchResult(0);
+        $result = $this->databaseStoreWrapper->getClient()->execute($selectQuery);
+
+        return (int) ($result?->iterateRecords()->current()->get('count')->getValue() ?? 0);
     }
 
     public function getList(): Generator
@@ -168,16 +175,19 @@ class PermissionStore extends AbstractStore
             'FROM ((SELECT `id`, `user` FROM `%s`) UNION ALL (SELECT 0 `id`, "Allgemein" `user`)) `u` %s ' .
             'ORDER BY `u`.`user`',
             implode(', ', $selects),
-            $this->userTableName,
+            $this->userTable->getTableName(),
             implode(' ', $joins),
         );
 
-        if (!$this->mysqlDatabase->execute($query, $parameters)) {
-            return;
-        }
-
-        while ($permission = $this->mysqlDatabase->fetchAssoc()) {
-            yield $permission;
+        try {
+            foreach ($this->databaseStoreWrapper->getClient()->execute($query, $parameters)?->iterateRecords() ?? [] as $record) {
+                yield array_map(
+                    static fn (Value $value): float|int|string|null => $value->getValue(),
+                    $record->getValues(),
+                );
+            }
+        } catch (ClientException) {
+            // Do nothing
         }
     }
 

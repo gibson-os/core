@@ -11,7 +11,8 @@ use GibsonOS\Core\Install\AbstractInstall;
 use GibsonOS\Core\Install\SingleInstallInterface;
 use GibsonOS\Core\Service\InstallService;
 use GibsonOS\Core\Service\PriorityInterface;
-use mysqlDatabase;
+use MDO\Client;
+use MDO\Exception\ClientException;
 
 class ConnectInstall extends AbstractInstall implements PriorityInterface, SingleInstallInterface
 {
@@ -32,66 +33,78 @@ class ConnectInstall extends AbstractInstall implements PriorityInterface, Singl
         yield $databaseInput = $this->getEnvInput('MYSQL_DATABASE', 'What is the MySQL database name?');
 
         $host = $hostInput->getValue() ?? '';
-        $mysqlDatabase = $this->serviceManagerService->get(mysqlDatabase::class);
-        $mysqlDatabase->host = $host;
-        $mysqlDatabase->user = $installUserInput->getValue() ?? '';
-        $mysqlDatabase->pass = $installPasswordInput->getValue() ?? '';
+        /** @var Client $client */
+        $client = $this->serviceManagerService->get(Client::class);
+        $client->close();
 
-        if (!$mysqlDatabase->openDB()) {
+        try {
+            $client = new Client(
+                $host,
+                $installUserInput->getValue() ?? '',
+                $installPasswordInput->getValue() ?? '',
+            );
+        } catch (ClientException $exception) {
             throw new InstallException(sprintf(
                 'Database connection can not be established! Error: %s',
-                $mysqlDatabase->error(),
+                $exception->getMessage(),
             ));
         }
 
-        $this->serviceManagerService->setService($mysqlDatabase::class, $mysqlDatabase);
+        $this->serviceManagerService->setService($client::class, $client);
         $database = $databaseInput->getValue() ?? '';
 
-        if (!$mysqlDatabase->useDatabase($database)) {
-            if (!$mysqlDatabase->sendQuery('CREATE DATABASE `' . $database . '` COLLATE utf8_general_ci')) {
+        if (!$client->useDatabase($database)) {
+            if (!$client->execute('CREATE DATABASE `' . $database . '` COLLATE utf8_general_ci')) {
                 throw new InstallException(sprintf(
                     'Database "%s" could not be created! Error: %s',
                     $database,
-                    $mysqlDatabase->error(),
+                    $client->getError(),
                 ));
             }
 
-            if (!$mysqlDatabase->useDatabase($database)) {
+            if (!$client->useDatabase($database)) {
                 throw new InstallException(sprintf(
                     'Database "%s" could not be open! Error: %s',
                     $database,
-                    $mysqlDatabase->error(),
+                    $client->getError(),
                 ));
             }
         }
 
-        $mysqlUserDatabase = new mysqlDatabase($host, $user, $password);
-
-        if (
-            !$mysqlUserDatabase->openDB()
-            && !$mysqlDatabase->sendQuery("CREATE USER '" . $user . "'@'%' IDENTIFIED BY '" . $password . "'")
-            && !$mysqlDatabase->sendQuery("GRANT USAGE ON *.* TO  '" . $user . "'@'%' IDENTIFIED BY '" . $password . "' WITH MAX_QUERIES_PER_HOUR 0 MAX_CONNECTIONS_PER_HOUR 0 MAX_UPDATES_PER_HOUR 0 MAX_USER_CONNECTIONS 0")
-        ) {
+        try {
+            $mysqlUserClient = new Client($host, $user, $password);
+        } catch (ClientException $exception) {
             throw new InstallException(sprintf(
                 'MySQL User "%s" could not be created! Error: %s',
                 $user,
-                $mysqlDatabase->error(),
+                $exception->getMessage(),
             ));
         }
 
-        if (
-            !$mysqlUserDatabase->useDatabase($database)
-            && !$mysqlDatabase->sendQuery('GRANT SELECT, INSERT, UPDATE, DELETE ON `' . $database . "`.* TO '" . $user . "'@'%'")
-        ) {
+        try {
+            $client->execute("CREATE USER '" . $user . "'@'%' IDENTIFIED BY '" . $password . "'");
+            $client->execute("GRANT USAGE ON *.* TO  '" . $user . "'@'%' IDENTIFIED BY '" . $password . "' WITH MAX_QUERIES_PER_HOUR 0 MAX_CONNECTIONS_PER_HOUR 0 MAX_UPDATES_PER_HOUR 0 MAX_USER_CONNECTIONS 0");
+        } catch (ClientException) {
+            throw new InstallException(sprintf(
+                'MySQL User "%s" could not be created! Error: %s',
+                $user,
+                $client->getError(),
+            ));
+        }
+
+        try {
+            $mysqlUserClient->useDatabase($database);
+            $client->execute('GRANT SELECT, INSERT, UPDATE, DELETE ON `' . $database . "`.* TO '" . $user . "'@'%'");
+        } catch (ClientException) {
             throw new InstallException(sprintf(
                 'MySQL User "%s" could not be connected with "%s"! Error: %s',
                 $user,
                 $database,
-                $mysqlDatabase->error(),
+                $client->getError(),
             ));
         }
 
-        $mysqlUserDatabase->closeDB();
+        $mysqlUserClient->close();
 
         yield (new Configuration('Database connection established!'))
             ->setValue('MYSQL_HOST', $host)

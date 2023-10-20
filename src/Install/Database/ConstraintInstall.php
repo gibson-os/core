@@ -17,7 +17,8 @@ use GibsonOS\Core\Model\ModelInterface;
 use GibsonOS\Core\Service\Attribute\TableNameAttribute;
 use GibsonOS\Core\Service\InstallService;
 use GibsonOS\Core\Service\PriorityInterface;
-use mysqlDatabase;
+use MDO\Client;
+use MDO\Exception\ClientException;
 use ReflectionAttribute;
 use ReflectionException;
 
@@ -25,9 +26,9 @@ class ConstraintInstall extends AbstractInstall implements PriorityInterface
 {
     public function __construct(
         ServiceManager $serviceManagerService,
-        private mysqlDatabase $mysqlDatabase,
-        private TableNameAttribute $tableAttribute,
-        private ReflectionManager $reflectionManager,
+        private readonly Client $client,
+        private readonly TableNameAttribute $tableAttribute,
+        private readonly ReflectionManager $reflectionManager,
     ) {
         parent::__construct($serviceManagerService);
     }
@@ -96,15 +97,17 @@ class ConstraintInstall extends AbstractInstall implements PriorityInterface
                     $parentColumn,
                 ];
 
-                if (!$this->mysqlDatabase->execute($query, $parameters)) {
+                try {
+                    $result = $this->client->execute($query, $parameters);
+                } catch (ClientException) {
                     throw new InstallException(sprintf(
                         'Get constraints for table "%s" failed! Error: %s',
                         $tableName,
-                        $this->mysqlDatabase->error(),
+                        $this->client->getError(),
                     ));
                 }
 
-                if ($this->mysqlDatabase->fetchResult() > 0) {
+                if (iterator_to_array($result?->iterateRecords() ?? new Generator()) > 0) {
                     continue;
                 }
 
@@ -127,11 +130,13 @@ class ConstraintInstall extends AbstractInstall implements PriorityInterface
             $query = 'ALTER TABLE `' . $tableName . '` ' . implode(', ', $constraints);
             $this->logger->debug($query);
 
-            if (!$this->mysqlDatabase->sendQuery($query)) {
+            try {
+                $this->client->execute($query);
+            } catch (ClientException) {
                 throw new InstallException(sprintf(
                     'Add constraints for table "%s" failed! Error: %s',
                     $tableName,
-                    $this->mysqlDatabase->error(),
+                    $this->client->getError(),
                 ));
             }
 
