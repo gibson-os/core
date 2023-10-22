@@ -98,6 +98,7 @@ class ModelManager
      * @throws SaveError
      * @throws ReflectionException
      * @throws JsonException
+     * @throws RecordException
      */
     public function saveWithoutChildren(ModelInterface $model): void
     {
@@ -124,9 +125,11 @@ class ModelManager
     }
 
     /**
+     * @throws ClientException
+     * @throws JsonException
+     * @throws RecordException
      * @throws ReflectionException
      * @throws SaveError
-     * @throws JsonException
      */
     public function save(ModelInterface $model): void
     {
@@ -324,6 +327,7 @@ class ModelManager
      * @throws ReflectionException
      * @throws SaveError
      * @throws ClientException
+     * @throws RecordException
      */
     private function saveChildren(Children $children): void
     {
