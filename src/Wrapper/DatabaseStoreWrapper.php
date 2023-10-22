@@ -4,8 +4,10 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Wrapper;
 
 use GibsonOS\Core\Manager\ModelManager;
+use GibsonOS\Core\Mapper\Model\ChildrenMapper;
 use GibsonOS\Core\Query\ChildrenQuery;
 use MDO\Client;
+use MDO\Extractor\PrimaryKeyExtractor;
 use MDO\Manager\TableManager;
 use MDO\Service\SelectService;
 
@@ -18,6 +20,8 @@ class DatabaseStoreWrapper
         private readonly ChildrenQuery $childrenQuery,
         private readonly SelectService $selectService,
         private readonly ModelWrapper $modelWrapper,
+        private readonly PrimaryKeyExtractor $primaryKeyExtractor,
+        private readonly ChildrenMapper $childrenMapper,
     ) {
     }
 
@@ -49,5 +53,15 @@ class DatabaseStoreWrapper
     public function getModelWrapper(): ModelWrapper
     {
         return $this->modelWrapper;
+    }
+
+    public function getPrimaryKeyExtractor(): PrimaryKeyExtractor
+    {
+        return $this->primaryKeyExtractor;
+    }
+
+    public function getChildrenMapper(): ChildrenMapper
+    {
+        return $this->childrenMapper;
     }
 }

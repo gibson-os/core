@@ -43,7 +43,6 @@ class ActionRepositoryTest extends Unit
         $selectQuery = (new SelectQuery($this->table))
             ->addWhere(new Where('`name` LIKE ?', ['galaxy%']))
         ;
-
         $this->assertEquals(
             $this->loadModel($selectQuery, Action::class, ''),
             $this->actionRepository->findByName('galaxy')[0],

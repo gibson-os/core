@@ -7,6 +7,7 @@ use GibsonOS\Core\Manager\ModelManager;
 use GibsonOS\Core\Mapper\Model\ChildrenMapper;
 use GibsonOS\Core\Query\ChildrenQuery;
 use MDO\Client;
+use MDO\Extractor\PrimaryKeyExtractor;
 use MDO\Manager\TableManager;
 use MDO\Service\SelectService;
 
@@ -20,6 +21,7 @@ class RepositoryWrapper
         private readonly SelectService $selectService,
         private readonly ChildrenMapper $childrenMapper,
         private readonly ChildrenQuery $childrenQuery,
+        private readonly PrimaryKeyExtractor $primaryKeyExtractor,
     ) {
     }
 
@@ -56,5 +58,10 @@ class RepositoryWrapper
     public function getChildrenQuery(): ChildrenQuery
     {
         return $this->childrenQuery;
+    }
+
+    public function getPrimaryKeyExtractor(): PrimaryKeyExtractor
+    {
+        return $this->primaryKeyExtractor;
     }
 }

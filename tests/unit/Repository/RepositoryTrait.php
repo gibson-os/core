@@ -11,6 +11,7 @@ use GibsonOS\Test\Unit\Core\ModelManagerTrait;
 use MDO\Dto\Record;
 use MDO\Dto\Result;
 use MDO\Dto\Table;
+use MDO\Extractor\PrimaryKeyExtractor;
 use MDO\Query\DeleteQuery;
 use MDO\Query\SelectQuery;
 use Prophecy\Prophecy\ObjectProphecy;
@@ -25,6 +26,8 @@ trait RepositoryTrait
 
     private ObjectProphecy|ChildrenQuery $childrenQuery;
 
+    private ObjectProphecy|PrimaryKeyExtractor $primaryKeyExtractor;
+
     private function loadRepository(string $tableName, array $fields = []): void
     {
         $this->loadModelManager();
@@ -32,6 +35,7 @@ trait RepositoryTrait
         $this->repositoryWrapper = $this->prophesize(RepositoryWrapper::class);
         $this->table = new Table($tableName, $fields);
         $this->childrenQuery = $this->prophesize(ChildrenQuery::class);
+        $this->primaryKeyExtractor = $this->prophesize(PrimaryKeyExtractor::class);
     }
 
     /**
@@ -67,6 +71,12 @@ trait RepositoryTrait
         $result->iterateRecords()
             ->shouldBeCalledOnce()
             ->willYield([$record])
+        ;
+        $this->primaryKeyExtractor->extractFromRecord($this->table, $record, $prefix)
+            ->willReturn([])
+        ;
+        $this->repositoryWrapper->getPrimaryKeyExtractor()
+            ->willReturn($this->primaryKeyExtractor->reveal())
         ;
         $this->client->execute($selectQuery)
             ->shouldBeCalledOnce()

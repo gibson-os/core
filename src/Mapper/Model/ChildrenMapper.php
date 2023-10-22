@@ -10,10 +10,10 @@ use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Wrapper\ModelWrapper;
 use JsonException;
-use MDO\Dto\Field;
 use MDO\Dto\Record;
 use MDO\Exception\ClientException;
 use MDO\Exception\RecordException;
+use MDO\Extractor\PrimaryKeyExtractor;
 use MDO\Manager\TableManager;
 use ReflectionException;
 
@@ -24,6 +24,7 @@ class ChildrenMapper
         private readonly ReflectionManager $reflectionManager,
         private readonly TableManager $tableManager,
         private readonly ModelWrapper $modelWrapper,
+        private readonly PrimaryKeyExtractor $primaryKeyExtractor,
     ) {
     }
 
@@ -72,12 +73,14 @@ class ChildrenMapper
             /** @var AbstractModel $childModel */
             $childModel = new $childModelClassName($this->modelWrapper);
             $tableName = $childModel->getTableName();
-            $primaryFields = $this->tableManager->getTable($tableName)->getPrimaryFields();
-            $primaryKeyValues = array_map(
-                fn (Field $field): string|int|float|null => $record->get($child->getPrefix() . $field->getName())->getValue(),
-                $primaryFields,
+            $key = $tableName . implode(
+                '_',
+                $this->primaryKeyExtractor->extractFromRecord(
+                    $this->tableManager->getTable($tableName),
+                    $record,
+                    $child->getPrefix(),
+                ),
             );
-            $key = $tableName . implode('_', $primaryKeyValues);
 
             if (!isset($loadedRecords[$key])) {
                 $this->modelManager->loadFromRecord($record, $childModel, $child->getPrefix());

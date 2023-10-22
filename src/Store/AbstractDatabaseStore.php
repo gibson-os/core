@@ -211,10 +211,30 @@ abstract class AbstractDatabaseStore extends AbstractStore
     protected function getModels(): iterable
     {
         $result = $this->databaseStoreWrapper->getClient()->execute($this->selectQuery);
+        $models = [];
 
         foreach ($result?->iterateRecords() ?? [] as $record) {
-            yield $this->getModel($record);
+            $primaryKey = implode(
+                '-',
+                $this->databaseStoreWrapper->getPrimaryKeyExtractor()->extractFromRecord(
+                    $this->selectQuery->getTable(),
+                    $record,
+                ),
+            );
+
+            if (!isset($models[$primaryKey])) {
+                $model = $this->getModel($record);
+                $models[$primaryKey] = $model;
+            }
+
+            $this->databaseStoreWrapper->getChildrenMapper()->getChildrenModels(
+                $record,
+                $models[$primaryKey],
+                $this->getExtends(),
+            );
         }
+
+        return array_values($models);
     }
 
     /**

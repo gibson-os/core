@@ -9,7 +9,6 @@ use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Model\ModelInterface;
 use GibsonOS\Core\Wrapper\RepositoryWrapper;
 use JsonException;
-use MDO\Dto\Field;
 use MDO\Dto\Query\Where;
 use MDO\Dto\Record;
 use MDO\Enum\OrderDirection;
@@ -72,12 +71,17 @@ abstract class AbstractRepository
         $response = $this->repositoryWrapper->getClient()->execute($selectQuery);
         $modelService = $this->repositoryWrapper->getModelWrapper();
         $models = [];
-        $primaryKey = implode('-', array_map(
-            static fn (Field $primaryField): string => $primaryField->getName(),
-            $selectQuery->getTable()->getPrimaryFields(),
-        ));
 
         foreach ($response?->iterateRecords() ?? [] as $record) {
+            $primaryKey = implode(
+                '-',
+                $this->repositoryWrapper->getPrimaryKeyExtractor()->extractFromRecord(
+                    $selectQuery->getTable(),
+                    $record,
+                    $prefix,
+                ),
+            );
+
             if (!isset($models[$primaryKey])) {
                 $model = new $modelClassName($modelService);
                 $this->repositoryWrapper->getModelManager()->loadFromRecord($record, $model, $prefix);

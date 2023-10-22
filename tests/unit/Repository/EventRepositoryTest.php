@@ -11,6 +11,7 @@ use GibsonOS\Core\Model\Event;
 use GibsonOS\Core\Repository\EventRepository;
 use GibsonOS\Core\Service\DateTimeService;
 use MDO\Dto\Query\Where;
+use MDO\Dto\Record;
 use MDO\Dto\Table;
 use MDO\Enum\OrderDirection;
 use MDO\Query\SelectQuery;
@@ -135,6 +136,9 @@ class EventRepositoryTest extends Unit
         ;
         $this->repositoryWrapper->getModelWrapper()
             ->shouldBeCalledOnce()
+        ;
+        $this->primaryKeyExtractor->extractFromRecord($this->eventElementTable, new Record([]), 'event_')
+            ->willReturn([])
         ;
 
         $event = $this->eventRepository->getTimeControlled('arthur', 'dent', $date)[0];

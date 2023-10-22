@@ -13,7 +13,6 @@ use GibsonOS\Core\Model\Event\Trigger;
 use GibsonOS\Core\Wrapper\RepositoryWrapper;
 use JsonException;
 use MDO\Dto\Query\Where;
-use MDO\Dto\Select;
 use MDO\Dto\Table;
 use MDO\Enum\OrderDirection;
 use MDO\Exception\ClientException;
@@ -81,11 +80,6 @@ class EventRepository extends AbstractRepository
             ->setOrder('`et`.`priority`', OrderDirection::DESC)
             ->setOrder('`ee`.`parentId`')
             ->setOrder('`ee`.`order`')
-//            ->setSelects($this->getRepositoryWrapper()->getSelectService()->getSelects([
-//                new Select($this->eventTable, 'e', 'event_'),
-//                new Select($this->eventElementTable, 'ee', 'element_'),
-//                new Select($this->eventTriggerTable, 'et', 'trigger_'),
-//            ]))
             ->addWhere(new Where('`e`.`active`=?', [1]))
             ->addWhere(new Where('`et`.`class`=?', [$className]))
             ->addWhere(new Where('`et`.`trigger`=?', [$trigger]))
@@ -97,18 +91,6 @@ class EventRepository extends AbstractRepository
             ->addWhere(new Where('`et`.`minute` IS NULL OR `et`.`minute`=?', [(int) $dateTime->format('i')]))
             ->addWhere(new Where('`et`.`second` IS NULL OR `et`.`second`=?', [(int) $dateTime->format('s')]))
         ;
-        //        $childrenQuery = $this->getRepositoryWrapper()->getChildrenQuery();
-
-        //        $childrenQuery->extend(
-        //            $query,
-        //            Element::class,
-        //            [new ChildrenMapping('event', 'event_', 'e')],
-        //        );
-        //        $childrenQuery->extend(
-        //            $query,
-        //            Event::class,
-        //            [new ChildrenMapping('triggers', 'trigger_', 'et')],
-        //        );
 
         return $this->getModels(
             $query,
