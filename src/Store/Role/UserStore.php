@@ -3,13 +3,11 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Store\Role;
 
-use GibsonOS\Core\Attribute\GetTableName;
 use GibsonOS\Core\Dto\Model\ChildrenMapping;
 use GibsonOS\Core\Model\Role;
 use GibsonOS\Core\Model\Role\User;
 use GibsonOS\Core\Store\AbstractDatabaseStore;
 use GibsonOS\Core\Wrapper\DatabaseStoreWrapper;
-use MDO\Dto\Query\Join;
 
 /**
  * @extends AbstractDatabaseStore<User>
@@ -18,11 +16,8 @@ class UserStore extends AbstractDatabaseStore
 {
     private Role $role;
 
-    public function __construct(
-        #[GetTableName(User::class)]
-        private readonly string $roleUserTableName,
-        DatabaseStoreWrapper $databaseStoreWrapper,
-    ) {
+    public function __construct(DatabaseStoreWrapper $databaseStoreWrapper)
+    {
         parent::__construct($databaseStoreWrapper);
     }
 
@@ -40,18 +35,12 @@ class UserStore extends AbstractDatabaseStore
 
     protected function getAlias(): string
     {
-        return 'u';
+        return 'ru';
     }
 
     protected function getDefaultOrder(): string
     {
         return '`u`.`user`';
-    }
-
-    protected function initQuery(): void
-    {
-        parent::initQuery();
-        $this->selectQuery->addJoin(new Join($this->getTable($this->roleUserTableName), 'ru', '`u`.`id`=`ru`.`user_id`'));
     }
 
     protected function setWheres(): void
@@ -61,6 +50,6 @@ class UserStore extends AbstractDatabaseStore
 
     protected function getExtends(): array
     {
-        return [new ChildrenMapping('user', 'user', 'bu')];
+        return [new ChildrenMapping('user', 'user', 'u')];
     }
 }
