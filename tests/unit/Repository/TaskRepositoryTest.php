@@ -21,7 +21,7 @@ class TaskRepositoryTest extends Unit
     {
         $this->loadRepository('task');
 
-        $this->taskRepository = new TaskRepository($this->repositoryWrapper->reveal(), $this->table);
+        $this->taskRepository = new TaskRepository($this->repositoryWrapper->reveal(), 'task');
     }
 
     public function testGetById(): void

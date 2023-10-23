@@ -21,7 +21,7 @@ class ModuleRepositoryTest extends Unit
     {
         $this->loadRepository('module');
 
-        $this->moduleRepository = new ModuleRepository($this->repositoryWrapper->reveal(), $this->table);
+        $this->moduleRepository = new ModuleRepository($this->repositoryWrapper->reveal(), 'module');
     }
 
     public function testGetById(): void

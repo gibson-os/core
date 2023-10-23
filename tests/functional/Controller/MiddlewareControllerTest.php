@@ -22,22 +22,23 @@ class MiddlewareControllerTest extends FunctionalTest
         $this->middlewareController = $this->serviceManager->get(MiddlewareController::class);
     }
 
-    public function testConfirm(): void
+    public function testPostConfirm(): void
     {
         $modelManager = $this->serviceManager->get(ModelManager::class);
-        $module = (new Module())->setName('core');
+        $module = (new Module($this->modelWrapper))->setName('core');
         $modelManager->saveWithoutChildren($module);
 
         $this->checkSuccessResponse(
-            $this->middlewareController->confirm(
+            $this->middlewareController->postConfirm(
                 'galaxy',
                 $this->serviceManager->get(ModuleRepository::class),
                 $modelManager,
-                (new Setting())
+                $this->modelWrapper,
+                (new Setting($this->modelWrapper))
                     ->setValue('marvin')
                     ->setModule($module)
                     ->setKey('middlewareToken'),
-            )
+            ),
         );
 
         $settingRepository = $this->serviceManager->get(SettingRepository::class);
@@ -46,18 +47,19 @@ class MiddlewareControllerTest extends FunctionalTest
         $this->assertEquals('galaxy', $setting->getValue());
     }
 
-    public function testConfirmWithoutMiddlewareToken(): void
+    public function testPostConfirmWithoutMiddlewareToken(): void
     {
         $modelManager = $this->serviceManager->get(ModelManager::class);
-        $module = (new Module())->setName('core');
+        $module = (new Module($this->modelWrapper))->setName('core');
         $modelManager->saveWithoutChildren($module);
 
         $this->checkSuccessResponse(
-            $this->middlewareController->confirm(
+            $this->middlewareController->postConfirm(
                 'marvin',
                 $this->serviceManager->get(ModuleRepository::class),
                 $modelManager,
-            )
+                $this->modelWrapper,
+            ),
         );
 
         $settingRepository = $this->serviceManager->get(SettingRepository::class);

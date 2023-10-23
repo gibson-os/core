@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Repository;
 
 use DateTimeInterface;
-use GibsonOS\Core\Attribute\GetTable;
 use GibsonOS\Core\Attribute\GetTableName;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\Cronjob;
@@ -12,7 +11,6 @@ use GibsonOS\Core\Wrapper\RepositoryWrapper;
 use JsonException;
 use MDO\Dto\Query\Join;
 use MDO\Dto\Query\Where;
-use MDO\Dto\Table;
 use MDO\Exception\ClientException;
 use MDO\Exception\RecordException;
 use ReflectionException;
@@ -23,8 +21,8 @@ class CronjobRepository extends AbstractRepository
         RepositoryWrapper $repositoryWrapper,
         #[GetTableName(Cronjob::class)]
         private readonly string $cronjobTableName,
-        #[GetTable(Cronjob\Time::class)]
-        private readonly Table $cronjobTimeTable,
+        #[GetTableName(Cronjob\Time::class)]
+        private readonly string $cronjobTimeTableName,
     ) {
         parent::__construct($repositoryWrapper);
     }
@@ -53,7 +51,7 @@ class CronjobRepository extends AbstractRepository
     public function getRunnableByUser(DateTimeInterface $dateTime, string $user): array
     {
         $selectQuery = $this->getSelectQuery($this->cronjobTableName, 'c')
-            ->addJoin(new Join($this->cronjobTimeTable, 'ct', '`c`.`id`=`ct`.`cronjob_id`'))
+            ->addJoin(new Join($this->getTable($this->cronjobTimeTableName), 'ct', '`c`.`id`=`ct`.`cronjob_id`'))
             ->addWhere(new Where('`c`.`user`=:user', ['user' => $user]))
             ->addWhere(new Where('`c`.`active`=:active', ['active' => 1]))
             ->addWhere(new Where(

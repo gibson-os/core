@@ -3,13 +3,12 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Repository;
 
-use GibsonOS\Core\Attribute\GetTable;
+use GibsonOS\Core\Attribute\GetTableName;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\Icon;
 use GibsonOS\Core\Wrapper\RepositoryWrapper;
 use JsonException;
 use MDO\Dto\Query\Where;
-use MDO\Dto\Table;
 use MDO\Exception\ClientException;
 use MDO\Exception\RecordException;
 use MDO\Query\DeleteQuery;
@@ -19,8 +18,8 @@ class IconRepository extends AbstractRepository
 {
     public function __construct(
         RepositoryWrapper $repositoryWrapper,
-        #[GetTable(Icon::class)]
-        private readonly Table $iconTable,
+        #[GetTableName(Icon::class)]
+        private readonly string $iconTableName,
     ) {
         parent::__construct($repositoryWrapper);
     }
@@ -57,7 +56,7 @@ class IconRepository extends AbstractRepository
     public function deleteByIds(array $ids): bool
     {
         $repositoryWrapper = $this->getRepositoryWrapper();
-        $deleteQuery = (new DeleteQuery($this->iconTable))
+        $deleteQuery = (new DeleteQuery($this->getTable($this->iconTableName)))
             ->addWhere(new Where(
                 sprintf('`id` IN (%s)', $repositoryWrapper->getSelectService()->getParametersString($ids)),
                 $ids,

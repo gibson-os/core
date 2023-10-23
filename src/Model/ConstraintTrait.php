@@ -375,12 +375,13 @@ trait ConstraintTrait
         ;
 
         $result = $modelWrapper->getClient()->execute($selectQuery);
+        $current = $result->iterateRecords()->current();
 
-        if ($result === null) {
+        if ($current === null) {
             throw (new SelectError('No result!'))->setTable($table);
         }
 
-        $modelWrapper->getModelManager()->loadFromRecord($result->iterateRecords()->current(), $model);
+        $modelWrapper->getModelManager()->loadFromRecord($current, $model);
 
         return $model;
     }
@@ -422,7 +423,7 @@ trait ConstraintTrait
 
         $result = $modelWrapper->getClient()->execute($selectQuery);
 
-        foreach ($result?->iterateRecords() ?? [] as $record) {
+        foreach ($result->iterateRecords() as $record) {
             $model = new $modelClassName($modelWrapper);
             $modelWrapper->getModelManager()->loadFromRecord($record, $model);
             $models[] = $model;

@@ -23,7 +23,7 @@ class CronjobControllerTest extends FunctionalTest
         $this->cronjobController = $this->serviceManager->get(CronjobController::class);
     }
 
-    public function testIndex(): void
+    public function testGet(): void
     {
         $modelManager = $this->serviceManager->get(ModelManager::class);
         $list = [];
@@ -32,10 +32,10 @@ class CronjobControllerTest extends FunctionalTest
             $command = sprintf('AAA %04d', $i);
             $date = new DateTimeImmutable();
             $modelManager->saveWithoutChildren(
-                (new Cronjob())
+                (new Cronjob($this->modelWrapper))
                 ->setUser('marvin')
                 ->setCommand($command)
-                ->setAdded($date)
+                ->setAdded($date),
             );
             $list[] = [
                 'id' => $i,
@@ -52,14 +52,14 @@ class CronjobControllerTest extends FunctionalTest
         $date = new DateTimeImmutable();
         $lastRun = new DateTimeImmutable('-1 month');
         $modelManager->saveWithoutChildren(
-            (new Cronjob())
+            (new Cronjob($this->modelWrapper))
                 ->setUser('ford')
                 ->setCommand('BBB')
                 ->setAdded($date)
                 ->setLastRun($lastRun)
                 ->setActive(false)
                 ->setArguments('["arthur": "dent"]')
-                ->setOptions('["dent": "arthur"]')
+                ->setOptions('["dent": "arthur"]'),
         );
         $last = [
             'id' => 101,
@@ -73,12 +73,12 @@ class CronjobControllerTest extends FunctionalTest
         ];
 
         $this->checkSuccessResponse(
-            $this->cronjobController->index($this->serviceManager->get(CronjobStore::class)),
+            $this->cronjobController->get($this->serviceManager->get(CronjobStore::class)),
             $list,
             101,
         );
         $this->checkSuccessResponse(
-            $this->cronjobController->index(
+            $this->cronjobController->get(
                 $this->serviceManager->get(CronjobStore::class),
                 start: 100,
             ),
@@ -87,7 +87,7 @@ class CronjobControllerTest extends FunctionalTest
         );
     }
 
-    public function testIndexLimit(): void
+    public function testGetLimit(): void
     {
         $modelManager = $this->serviceManager->get(ModelManager::class);
         $list = [];
@@ -96,10 +96,10 @@ class CronjobControllerTest extends FunctionalTest
             $command = sprintf('AAA %04d', $i);
             $date = new DateTimeImmutable();
             $modelManager->saveWithoutChildren(
-                (new Cronjob())
-                ->setUser('marvin')
-                ->setCommand($command)
-                ->setAdded($date)
+                (new Cronjob($this->modelWrapper))
+                    ->setUser('marvin')
+                    ->setCommand($command)
+                    ->setAdded($date),
             );
             $list[] = [
                 'id' => $i,
@@ -116,14 +116,14 @@ class CronjobControllerTest extends FunctionalTest
         $date = new DateTimeImmutable();
         $lastRun = new DateTimeImmutable('-1 month');
         $modelManager->saveWithoutChildren(
-            (new Cronjob())
+            (new Cronjob($this->modelWrapper))
                 ->setUser('ford')
                 ->setCommand('BBB')
                 ->setAdded($date)
                 ->setLastRun($lastRun)
                 ->setActive(false)
                 ->setArguments('["arthur": "dent"]')
-                ->setOptions('["dent": "arthur"]')
+                ->setOptions('["dent": "arthur"]'),
         );
         $last = [
             'id' => 6,
@@ -137,12 +137,12 @@ class CronjobControllerTest extends FunctionalTest
         ];
 
         $this->checkSuccessResponse(
-            $this->cronjobController->index($this->serviceManager->get(CronjobStore::class), 5),
+            $this->cronjobController->get($this->serviceManager->get(CronjobStore::class), 5),
             $list,
             6,
         );
         $this->checkSuccessResponse(
-            $this->cronjobController->index(
+            $this->cronjobController->get(
                 $this->serviceManager->get(CronjobStore::class),
                 5,
                 5,
@@ -152,7 +152,7 @@ class CronjobControllerTest extends FunctionalTest
         );
     }
 
-    public function testIndexSort(): void
+    public function testGetSort(): void
     {
         $modelManager = $this->serviceManager->get(ModelManager::class);
         $listByCommand = [];
@@ -167,12 +167,12 @@ class CronjobControllerTest extends FunctionalTest
             $date = new DateTimeImmutable();
             $lastRun = new DateTimeImmutable('-' . $i . ' hours');
             $modelManager->saveWithoutChildren(
-                (new Cronjob())
+                (new Cronjob($this->modelWrapper))
                 ->setUser($user)
                 ->setCommand($command)
                 ->setAdded($date)
                 ->setLastRun($lastRun)
-                ->setActive($i > 3)
+                ->setActive($i > 3),
             );
             $item = [
                 'id' => $i,
@@ -192,7 +192,7 @@ class CronjobControllerTest extends FunctionalTest
         }
 
         $this->checkSuccessResponse(
-            $this->cronjobController->index(
+            $this->cronjobController->get(
                 $this->serviceManager->get(CronjobStore::class),
                 sort: [['property' => 'command', 'direction' => 'DESC']],
             ),
@@ -201,7 +201,7 @@ class CronjobControllerTest extends FunctionalTest
         );
         ksort($listByCommand);
         $this->checkSuccessResponse(
-            $this->cronjobController->index(
+            $this->cronjobController->get(
                 $this->serviceManager->get(CronjobStore::class),
             ),
             array_values($listByCommand),
@@ -209,7 +209,7 @@ class CronjobControllerTest extends FunctionalTest
         );
 
         $this->checkSuccessResponse(
-            $this->cronjobController->index(
+            $this->cronjobController->get(
                 $this->serviceManager->get(CronjobStore::class),
                 sort: [['property' => 'user']],
             ),
@@ -218,7 +218,7 @@ class CronjobControllerTest extends FunctionalTest
         );
         krsort($listByUser);
         $this->checkSuccessResponse(
-            $this->cronjobController->index(
+            $this->cronjobController->get(
                 $this->serviceManager->get(CronjobStore::class),
                 sort: [['property' => 'user', 'direction' => 'desc']],
             ),
@@ -227,7 +227,7 @@ class CronjobControllerTest extends FunctionalTest
         );
 
         $this->checkSuccessResponse(
-            $this->cronjobController->index(
+            $this->cronjobController->get(
                 $this->serviceManager->get(CronjobStore::class),
                 sort: [['property' => 'last_run', 'direction' => 'desc']],
             ),
@@ -236,7 +236,7 @@ class CronjobControllerTest extends FunctionalTest
         );
         ksort($listByLastRun);
         $this->checkSuccessResponse(
-            $this->cronjobController->index(
+            $this->cronjobController->get(
                 $this->serviceManager->get(CronjobStore::class),
                 sort: [['property' => 'last_run']],
             ),
@@ -245,7 +245,7 @@ class CronjobControllerTest extends FunctionalTest
         );
 
         $this->checkSuccessResponse(
-            $this->cronjobController->index(
+            $this->cronjobController->get(
                 $this->serviceManager->get(CronjobStore::class),
                 sort: [['property' => 'active']],
             ),
@@ -253,7 +253,7 @@ class CronjobControllerTest extends FunctionalTest
             5,
         );
 
-        $response = $this->cronjobController->index(
+        $response = $this->cronjobController->get(
             $this->serviceManager->get(CronjobStore::class),
             sort: [['property' => 'active', 'direction' => 'desc']],
         );
@@ -277,31 +277,31 @@ class CronjobControllerTest extends FunctionalTest
         $this->assertEquals(0, count($list));
     }
 
-//    public function testTimes(): void
-//    {
-//        $modelManager = $this->serviceManager->get(ModelManager::class);
-//        $cronjob = (new Cronjob())
-//            ->setUser('marvin')
-//            ->setCommand('galaxy')
-//        ;
-//        $modelManager->saveWithoutChildren(
-//            (new Time())
-//                ->setCronjob($cronjob)
-//        );
-//        $modelManager->saveWithoutChildren(
-//            (new Time())
-//                ->setCronjob($cronjob)
-//                ->setFromMinute(7)
-//                ->setToMinute(7)
-//                ->setFromSecond(42)
-//                ->setToSecond(42)
-//        );
-//
-//        $this->checkAjaxResponse(
-//            $this->cronjobController->times(
-//                $this->serviceManager->get(TimeStore::class),
-//                $cronjob,
-//            ),
-//        );
-//    }
+    //    public function testTimes(): void
+    //    {
+    //        $modelManager = $this->serviceManager->get(ModelManager::class);
+    //        $cronjob = (new Cronjob())
+    //            ->setUser('marvin')
+    //            ->setCommand('galaxy')
+    //        ;
+    //        $modelManager->saveWithoutChildren(
+    //            (new Time())
+    //                ->setCronjob($cronjob)
+    //        );
+    //        $modelManager->saveWithoutChildren(
+    //            (new Time())
+    //                ->setCronjob($cronjob)
+    //                ->setFromMinute(7)
+    //                ->setToMinute(7)
+    //                ->setFromSecond(42)
+    //                ->setToSecond(42)
+    //        );
+    //
+    //        $this->checkAjaxResponse(
+    //            $this->cronjobController->times(
+    //                $this->serviceManager->get(TimeStore::class),
+    //                $cronjob,
+    //            ),
+    //        );
+    //    }
 }

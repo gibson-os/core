@@ -21,7 +21,7 @@ class PermissionRepositoryTest extends Unit
     {
         $this->loadRepository('action_permission');
 
-        $this->permissionRepository = new PermissionRepository($this->repositoryWrapper->reveal(), $this->table);
+        $this->permissionRepository = new PermissionRepository($this->repositoryWrapper->reveal(), 'action_permission');
     }
 
     public function testFindByActionId(): void

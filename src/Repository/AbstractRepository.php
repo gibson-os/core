@@ -11,6 +11,7 @@ use GibsonOS\Core\Wrapper\RepositoryWrapper;
 use JsonException;
 use MDO\Dto\Query\Where;
 use MDO\Dto\Record;
+use MDO\Dto\Table;
 use MDO\Enum\OrderDirection;
 use MDO\Exception\ClientException;
 use MDO\Exception\RecordException;
@@ -72,7 +73,7 @@ abstract class AbstractRepository
         $modelService = $this->repositoryWrapper->getModelWrapper();
         $models = [];
 
-        foreach ($response?->iterateRecords() ?? [] as $record) {
+        foreach ($response->iterateRecords() as $record) {
             $primaryKey = implode(
                 '-',
                 $this->repositoryWrapper->getPrimaryKeyExtractor()->extractFromRecord(
@@ -112,7 +113,7 @@ abstract class AbstractRepository
     {
         $this->repositoryWrapper->getChildrenQuery()->extend($selectQuery, $modelClassName, $children);
         $result = $this->repositoryWrapper->getClient()->execute($selectQuery);
-        $record = $result?->iterateRecords()->current();
+        $record = $result->iterateRecords()->current();
 
         if (!$record instanceof Record) {
             $exception = new SelectError('No results!');
@@ -219,12 +220,13 @@ abstract class AbstractRepository
             ->setSelects($functions)
         ;
         $result = $this->repositoryWrapper->getClient()->execute($selectQuery);
+        $current = $result->iterateRecords()->current();
 
-        if ($result === null) {
+        if ($current === null) {
             throw new SelectError();
         }
 
-        return $result->iterateRecords()->current();
+        return $current;
     }
 
     /**
@@ -238,5 +240,10 @@ abstract class AbstractRepository
     protected function getRegexString(string $search): string
     {
         return $this->repositoryWrapper->getSelectService()->getUnescapedRegexString($search);
+    }
+
+    protected function getTable(string $tableName): Table
+    {
+        return $this->repositoryWrapper->getTableManager()->getTable($tableName);
     }
 }

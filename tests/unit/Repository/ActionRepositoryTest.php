@@ -22,7 +22,7 @@ class ActionRepositoryTest extends Unit
     {
         $this->loadRepository('action');
 
-        $this->actionRepository = new ActionRepository($this->repositoryWrapper->reveal(), $this->table);
+        $this->actionRepository = new ActionRepository($this->repositoryWrapper->reveal(), 'action');
     }
 
     public function testGetById(): void

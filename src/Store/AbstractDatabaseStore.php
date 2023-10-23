@@ -6,7 +6,6 @@ namespace GibsonOS\Core\Store;
 use GibsonOS\Core\Dto\Model\ChildrenMapping;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\AbstractModel;
-use GibsonOS\Core\Model\ModelInterface;
 use GibsonOS\Core\Wrapper\DatabaseStoreWrapper;
 use JsonException;
 use JsonSerializable;
@@ -48,8 +47,8 @@ abstract class AbstractDatabaseStore extends AbstractStore
     public function __construct(private readonly DatabaseStoreWrapper $databaseStoreWrapper)
     {
         $modelClassName = $this->getModelClassName();
-        /** @var ModelInterface $model */
-        $model = new $modelClassName();
+        /** @var AbstractModel $model */
+        $model = new $modelClassName($this->databaseStoreWrapper->getModelWrapper());
         $this->tableName = $model->getTableName();
         $this->table = $this->databaseStoreWrapper->getTableManager()->getTable($this->tableName);
     }
@@ -57,8 +56,6 @@ abstract class AbstractDatabaseStore extends AbstractStore
     public function setLimit(int $rows, int $from): self
     {
         parent::setLimit($rows, $from);
-
-        $this->selectQuery->setLimit($rows, $from);
 
         return $this;
     }
@@ -73,6 +70,7 @@ abstract class AbstractDatabaseStore extends AbstractStore
             ->setWheres($this->wheres)
             ->setLimit($this->getRows(), $this->getFrom())
             ->setOrders($this->getOrderBy())
+            ->setLimit($this->getRows(), $this->getFrom())
         ;
 
         $this->databaseStoreWrapper->getChildrenQuery()->extend(
@@ -108,12 +106,16 @@ abstract class AbstractDatabaseStore extends AbstractStore
         $this->initQuery();
         $selects = $this->selectQuery->getSelects();
         $this->selectQuery->setSelects(['count' => sprintf('COUNT(%s)', $this->getCountField())]);
+        $this->selectQuery->setLimit();
 
         $result = $this->databaseStoreWrapper->getClient()->execute($this->selectQuery);
 
-        $this->selectQuery->setSelects($selects);
+        $this->selectQuery
+            ->setSelects($selects)
+            ->setLimit($this->getRows(), $this->getFrom())
+        ;
 
-        return (int) ($result?->iterateRecords()->current()->get('count')->getValue() ?? 0);
+        return (int) ($result->iterateRecords()->current()->get('count')->getValue() ?? 0);
     }
 
     protected function getCountField(): string
@@ -213,7 +215,7 @@ abstract class AbstractDatabaseStore extends AbstractStore
         $result = $this->databaseStoreWrapper->getClient()->execute($this->selectQuery);
         $models = [];
 
-        foreach ($result?->iterateRecords() ?? [] as $record) {
+        foreach ($result->iterateRecords() as $record) {
             $primaryKey = implode(
                 '-',
                 $this->databaseStoreWrapper->getPrimaryKeyExtractor()->extractFromRecord(
@@ -249,7 +251,7 @@ abstract class AbstractDatabaseStore extends AbstractStore
     protected function getModel(Record $record, string $prefix = ''): AbstractModel
     {
         $modelClassName = $this->getModelClassName();
-        $model = new $modelClassName();
+        $model = new $modelClassName($this->databaseStoreWrapper->getModelWrapper());
 
         if (!$model instanceof AbstractModel) {
             $exception = new SelectError(sprintf(
@@ -274,8 +276,16 @@ abstract class AbstractDatabaseStore extends AbstractStore
         return $model;
     }
 
-    public function getDatabaseStoreWrapper(): DatabaseStoreWrapper
+    protected function getDatabaseStoreWrapper(): DatabaseStoreWrapper
     {
         return $this->databaseStoreWrapper;
+    }
+
+    /**
+     * @throws ClientException
+     */
+    protected function getTable(string $tableName): Table
+    {
+        return $this->databaseStoreWrapper->getTableManager()->getTable($tableName);
     }
 }

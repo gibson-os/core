@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Store\Role;
 
-use GibsonOS\Core\Attribute\GetTable;
+use GibsonOS\Core\Attribute\GetTableName;
 use GibsonOS\Core\Enum\Permission as PermissionEnum;
 use GibsonOS\Core\Model\Action;
 use GibsonOS\Core\Model\Module;
@@ -14,7 +14,6 @@ use GibsonOS\Core\Store\AbstractDatabaseStore;
 use GibsonOS\Core\Wrapper\DatabaseStoreWrapper;
 use MDO\Dto\Query\Join;
 use MDO\Dto\Query\Where;
-use MDO\Dto\Table;
 use MDO\Dto\Value;
 use MDO\Enum\JoinType;
 use MDO\Exception\ClientException;
@@ -31,14 +30,14 @@ class PermissionStore extends AbstractDatabaseStore
     private ?int $actionId = null;
 
     public function __construct(
-        #[GetTable(Permission::class)]
-        private readonly Table $permissionTable,
-        #[GetTable(Module::class)]
-        private readonly Table $moduleTable,
-        #[GetTable(Task::class)]
-        private readonly Table $taskTable,
-        #[GetTable(Action::class)]
-        private readonly Table $actionTable,
+        #[GetTableName(Permission::class)]
+        private readonly string $permissionTableName,
+        #[GetTableName(Module::class)]
+        private readonly string $moduleTableName,
+        #[GetTableName(Task::class)]
+        private readonly string $taskTableName,
+        #[GetTableName(Action::class)]
+        private readonly string $actionTableName,
         DatabaseStoreWrapper $databaseStoreWrapper,
     ) {
         parent::__construct($databaseStoreWrapper);
@@ -76,13 +75,13 @@ class PermissionStore extends AbstractDatabaseStore
         if ($this->moduleId !== null) {
             $this->selectQuery
                 ->addJoin(new Join(
-                    $this->permissionTable,
+                    $this->getTable($this->permissionTableName),
                     'upm',
                     '`r`.`id`=`upm`.`role_id` AND `m`.id`=:moduleId AND `upm`.`task_id` IS NULL',
                     JoinType::LEFT,
                 ))
                 ->addJoin(new Join(
-                    $this->moduleTable,
+                    $this->getTable($this->moduleTableName),
                     'm',
                     '`upm`.`module_id`=`m`.`id`',
                     JoinType::LEFT,
@@ -107,25 +106,25 @@ class PermissionStore extends AbstractDatabaseStore
         if ($this->taskId !== null) {
             $this->selectQuery
                 ->addJoin(new Join(
-                    $this->permissionTable,
+                    $this->getTable($this->permissionTableName),
                     'upt',
                     '`r`.`id`=`upt`.`role_id` AND `upt`.`task_id`=`t`.`id` AND `upt`.`action_id` IS NULL',
                     JoinType::LEFT,
                 ))
                 ->addJoin(new Join(
-                    $this->taskTable,
+                    $this->getTable($this->taskTableName),
                     't',
                     '`upt`.`task_id`=:taskId',
                     JoinType::LEFT,
                 ))
                 ->addJoin(new Join(
-                    $this->moduleTable,
+                    $this->getTable($this->moduleTableName),
                     'm',
                     '`m`.`id`=`t`.`module_id`',
                     JoinType::LEFT,
                 ))
                 ->addJoin(new Join(
-                    $this->permissionTable,
+                    $this->getTable($this->permissionTableName),
                     'upm',
                     '`r`.`id`=`upm`.`role_id` AND `upm`.`module_id`=`m`.`id` AND `upm`.`task_id` IS NULL',
                     JoinType::LEFT,
@@ -150,33 +149,33 @@ class PermissionStore extends AbstractDatabaseStore
         if ($this->actionId !== null) {
             $this->selectQuery
                 ->addJoin(new Join(
-                    $this->actionTable,
+                    $this->getTable($this->actionTableName),
                     'a',
                     '`a`.`id`=:actionId',
                     JoinType::LEFT,
                 ))
                 ->addJoin(new Join(
-                    $this->permissionTable,
+                    $this->getTable($this->permissionTableName),
                     'upa',
                     '`r`.`id`=`upa`.`role_id` AND `upa`.`action_id`=`a`.`id`',
                 ))
                 ->addJoin(new Join(
-                    $this->taskTable,
+                    $this->getTable($this->taskTableName),
                     't',
                     '`t`.`id`=`a`.`task_id`',
                 ))
                 ->addJoin(new Join(
-                    $this->permissionTable,
+                    $this->getTable($this->permissionTableName),
                     'upt',
                     '`r`.`id`=`upt`.`role_id` AND `upt`.`task_id`=`t`.`id` AND `upt`.`action_id` IS NULL',
                 ))
                 ->addJoin(new Join(
-                    $this->moduleTable,
+                    $this->getTable($this->moduleTableName),
                     'm',
                     '`m`.`id`=`t`.`module_id`',
                 ))
                 ->addJoin(new Join(
-                    $this->permissionTable,
+                    $this->getTable($this->permissionTableName),
                     'upm',
                     '`r`.`id`=`upm`.`role_id` AND `upm`.`module_id`=`m`.`id` AND `upm`.`task_id` IS NULL',
                 ))
@@ -215,7 +214,7 @@ class PermissionStore extends AbstractDatabaseStore
     {
         $result = $this->getDatabaseStoreWrapper()->getClient()->execute($this->selectQuery);
 
-        foreach ($result?->iterateRecords() ?? [] as $record) {
+        foreach ($result->iterateRecords() as $record) {
             yield array_map(
                 static fn (Value $value): float|int|null|string => $value->getValue(),
                 $record->getValues(),

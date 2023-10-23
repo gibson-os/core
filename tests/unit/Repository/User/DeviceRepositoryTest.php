@@ -9,6 +9,7 @@ use GibsonOS\Core\Model\User\Device;
 use GibsonOS\Core\Repository\User\DeviceRepository;
 use GibsonOS\Test\Unit\Core\Repository\RepositoryTrait;
 use MDO\Dto\Query\Where;
+use MDO\Dto\Result;
 use MDO\Dto\Value;
 use MDO\Query\DeleteQuery;
 use MDO\Query\SelectQuery;
@@ -25,7 +26,7 @@ class DeviceRepositoryTest extends Unit
     {
         $this->loadRepository('user_device');
 
-        $this->deviceRepository = new DeviceRepository($this->repositoryWrapper->reveal(), $this->table);
+        $this->deviceRepository = new DeviceRepository($this->repositoryWrapper->reveal(), 'user_device');
     }
 
     public function testGetById(): void
@@ -124,11 +125,19 @@ class DeviceRepositoryTest extends Unit
         ;
         $this->client->execute($updateQuery)
             ->shouldBeCalledOnce()
-            ->willReturn(null)
+            ->willReturn(new Result(null))
         ;
         $this->repositoryWrapper->getClient()
             ->shouldBeCalledOnce()
             ->willReturn($this->client->reveal())
+        ;
+        $this->repositoryWrapper->getTableManager()
+            ->shouldBeCalledOnce()
+            ->willReturn($this->tableManager->reveal())
+        ;
+        $this->tableManager->getTable($this->table->getTableName())
+            ->shouldBeCalledOnce()
+            ->willReturn($this->table)
         ;
 
         $this->assertTrue($this->deviceRepository->removeFcmToken('galaxy'));

@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Repository;
 
-use GibsonOS\Core\Attribute\GetTable;
 use GibsonOS\Core\Attribute\GetTableName;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\Module;
@@ -12,7 +11,6 @@ use GibsonOS\Core\Wrapper\RepositoryWrapper;
 use JsonException;
 use MDO\Dto\Query\Join;
 use MDO\Dto\Query\Where;
-use MDO\Dto\Table;
 use MDO\Enum\OrderDirection;
 use MDO\Exception\ClientException;
 use MDO\Exception\RecordException;
@@ -24,8 +22,8 @@ class SettingRepository extends AbstractRepository
         RepositoryWrapper $repositoryWrapper,
         #[GetTableName(Setting::class)]
         private readonly string $settingTableName,
-        #[GetTable(Module::class)]
-        private readonly Table $moduleTable,
+        #[GetTableName(Module::class)]
+        private readonly string $moduleTableName,
     ) {
         parent::__construct($repositoryWrapper);
     }
@@ -64,7 +62,7 @@ class SettingRepository extends AbstractRepository
     public function getAllByModuleName(string $moduleName, ?int $userId): array
     {
         $selectQuery = $this->getSelectQuery($this->settingTableName, 's')
-            ->addJoin(new Join($this->moduleTable, 'm', '`s`.`module_id`=`m`.`id`'))
+            ->addJoin(new Join($this->getTable($this->moduleTableName), 'm', '`s`.`module_id`=`m`.`id`'))
             ->addWhere(new Where('`m`.`name`=?', [$moduleName]))
         ;
         $where = new Where('`s`.`user_id` IS NULL', []);
@@ -130,7 +128,7 @@ class SettingRepository extends AbstractRepository
     public function getByKeyValueAndModuleName(string $moduleName, string $key, string $value): Setting
     {
         $selectQuery = $this->getSelectQuery($this->settingTableName, 's')
-            ->addJoin(new Join($this->moduleTable, 'm', '`s`.`module_id`=`m`.`id`'))
+            ->addJoin(new Join($this->getTable($this->moduleTableName), 'm', '`s`.`module_id`=`m`.`id`'))
             ->addWhere(new Where('`m`.`name`=?', [$moduleName]))
             ->addWhere(new Where('`m`.`key`=?', [$key]))
             ->addWhere(new Where('`m`.`value`=?', [$value]))
@@ -141,9 +139,10 @@ class SettingRepository extends AbstractRepository
     }
 
     /**
-     * @throws ClientException
      * @throws JsonException
      * @throws ReflectionException
+     * @throws RecordException
+     * @throws ClientException
      *
      * @return Setting[]
      */
@@ -157,16 +156,17 @@ class SettingRepository extends AbstractRepository
     }
 
     /**
-     * @throws ClientException
      * @throws JsonException
      * @throws ReflectionException
+     * @throws RecordException
+     * @throws ClientException
      *
      * @return Setting[]
      */
     public function getAllByKeyAndModuleName(string $moduleName, string $key): array
     {
         $selectQuery = $this->getSelectQuery($this->settingTableName, 's')
-            ->addJoin(new Join($this->moduleTable, 'm', '`s`.`module_id`= `m`.`id`'))
+            ->addJoin(new Join($this->getTable($this->moduleTableName), 'm', '`s`.`module_id`= `m`.`id`'))
             ->addWhere(new Where('`m`.`name`=?', [$moduleName]))
             ->addWhere(new Where('`s`.`key`=?', [$key]))
         ;
@@ -184,7 +184,7 @@ class SettingRepository extends AbstractRepository
     public function getByKeyAndModuleName(string $moduleName, ?int $userId, string $key): Setting
     {
         $selectQuery = $this->getSelectQuery($this->settingTableName, 's')
-            ->addJoin(new Join($this->moduleTable, 'm', '`s`.`module_id`=`m`.`id`'))
+            ->addJoin(new Join($this->getTable($this->moduleTableName), 'm', '`s`.`module_id`=`m`.`id`'))
             ->addWhere(new Where('`m`.`name`=?', [$moduleName]))
             ->addWhere(new Where('`s`.`key`=?', [$key]))
             ->setOrder('`s`.`user_id`', OrderDirection::DESC)

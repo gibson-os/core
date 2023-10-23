@@ -3,11 +3,10 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Store;
 
-use GibsonOS\Core\Attribute\GetTable;
+use GibsonOS\Core\Attribute\GetTableName;
 use GibsonOS\Core\Model\Icon;
 use GibsonOS\Core\Wrapper\DatabaseStoreWrapper;
 use MDO\Dto\Query\Join;
-use MDO\Dto\Table;
 
 /**
  * @extends AbstractDatabaseStore<Icon>
@@ -20,8 +19,8 @@ class IconStore extends AbstractDatabaseStore
     private array $tags = [];
 
     public function __construct(
-        #[GetTable(Icon\Tag::class)]
-        private readonly Table $iconTagTable,
+        #[GetTableName(Icon\Tag::class)]
+        private readonly string $iconTagTableName,
         DatabaseStoreWrapper $databaseStoreWrapper,
     ) {
         parent::__construct($databaseStoreWrapper);
@@ -45,7 +44,7 @@ class IconStore extends AbstractDatabaseStore
             return;
         }
 
-        $this->selectQuery->addJoin(new Join($this->iconTagTable, 'it', '`it`.`icon_id`=`i`.`id`'));
+        $this->selectQuery->addJoin(new Join($this->getTable($this->iconTagTableName), 'it', '`it`.`icon_id`=`i`.`id`'));
     }
 
     protected function setWheres(): void

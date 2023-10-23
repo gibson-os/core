@@ -111,7 +111,7 @@ class KeyInstall extends AbstractInstall implements PriorityInterface
                 ));
             }
 
-            foreach ($result?->iterateRecords() ?? [] as $index) {
+            foreach ($result->iterateRecords() as $index) {
                 $keyName = (string) $index->get('Key_name')->getValue();
                 $query = sprintf('DROP INDEX `%s` ON `%s`', $keyName, $tableName);
                 $this->logger->debug($query);
@@ -149,7 +149,7 @@ class KeyInstall extends AbstractInstall implements PriorityInterface
             ));
         }
 
-        $keyFields = iterator_to_array($result?->iterateRecords() ?? new Generator());
+        $keyFields = iterator_to_array($result->iterateRecords());
         // @todo hier muss geprüft werden ob die richtigen columns im key sind. Er noch/nicht mehr unique ist usw.
 
         if (count($keyFields) === count($key->getColumns())) {

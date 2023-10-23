@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace GibsonOS\Test\Functional\Core\Controller;
 
 use GibsonOS\Core\Controller\DeviceController;
+use GibsonOS\Core\Enum\HttpMethod;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Manager\ModelManager;
 use GibsonOS\Core\Model\Action;
@@ -36,27 +37,28 @@ class DeviceControllerTest extends FunctionalTest
         $this->deviceController = $this->serviceManager->get(DeviceController::class);
     }
 
-    public function testAddPush(): void
+    public function testPostAddPush(): void
     {
         $modelManager = $this->serviceManager->get(ModelManager::class);
-        $device = (new Device())
+        $module = (new Module($this->modelWrapper))->setName('arthur');
+        $modelManager->saveWithoutChildren($module);
+        $device = (new Device($this->modelWrapper))
             ->setId('42')
             ->setToken('galaxy')
             ->setModel('marvin')
             ->setUser($this->addUser())
         ;
         $modelManager->saveWithoutChildren($device);
-        $module = (new Module())->setName('arthur');
-        $modelManager->saveWithoutChildren($module);
-        $task = (new Task())
+        $task = (new Task($this->modelWrapper))
             ->setName('dent')
             ->setModule($module)
         ;
         $modelManager->saveWithoutChildren($task);
-        $action = (new Action())
+        $action = (new Action($this->modelWrapper))
             ->setName('ford')
             ->setTask($task)
             ->setModule($module)
+            ->setMethod(HttpMethod::GET)
         ;
         $modelManager->saveWithoutChildren($action);
         $this->requestService->getHeader('X-Device-Token')
@@ -66,14 +68,15 @@ class DeviceControllerTest extends FunctionalTest
         $deviceRepository = $this->serviceManager->get(DeviceRepository::class);
 
         $this->checkSuccessResponse(
-            $this->deviceController->addPush(
+            $this->deviceController->postAddPush(
                 $modelManager,
+                $this->modelWrapper,
                 $deviceRepository,
                 $module,
                 $task,
                 $action,
                 'prefect',
-            )
+            ),
         );
 
         $devicePushRepository = $this->serviceManager->get(DevicePushRepository::class);
@@ -92,7 +95,7 @@ class DeviceControllerTest extends FunctionalTest
         $this->assertEquals('prefect', $devicePush->getForeignId());
     }
 
-    public function testRemovePush(): void
+    public function testDeletePush(): void
     {
         $modelManager = $this->serviceManager->get(ModelManager::class);
         $deviceRepository = $this->serviceManager->get(DeviceRepository::class);
@@ -102,14 +105,14 @@ class DeviceControllerTest extends FunctionalTest
             ->willReturn('galaxy')
         ;
 
-        $device = (new Device())
+        $device = (new Device($this->modelWrapper))
             ->setId('42')
             ->setToken('galaxy')
             ->setModel('marvin')
             ->setUser($this->addUser())
         ;
         $modelManager->saveWithoutChildren($device);
-        $devicePush = (new DevicePush())
+        $devicePush = (new DevicePush($this->modelWrapper))
             ->setDevice($device)
             ->setModule('arthur')
             ->setTask('dent')
@@ -121,7 +124,7 @@ class DeviceControllerTest extends FunctionalTest
         $devicePushRepository->getByDevice($device, 'arthur', 'dent', 'ford', 'prefect');
 
         $this->checkSuccessResponse(
-            $this->deviceController->removePush(
+            $this->deviceController->deletePush(
                 $modelManager,
                 $deviceRepository,
                 $devicePushRepository,
@@ -129,14 +132,14 @@ class DeviceControllerTest extends FunctionalTest
                 'dent',
                 'ford',
                 'prefect',
-            )
+            ),
         );
 
         $this->expectException(SelectError::class);
         $devicePushRepository->getByDevice($device, 'arthur', 'dent', 'ford', 'prefect');
     }
 
-    public function testRemoveNotExistingPush(): void
+    public function testDeleteNotExistingPush(): void
     {
         $modelManager = $this->serviceManager->get(ModelManager::class);
         $deviceRepository = $this->serviceManager->get(DeviceRepository::class);
@@ -146,7 +149,7 @@ class DeviceControllerTest extends FunctionalTest
             ->willReturn('galaxy')
         ;
 
-        $device = (new Device())
+        $device = (new Device($this->modelWrapper))
             ->setId('42')
             ->setToken('galaxy')
             ->setModel('marvin')
@@ -155,7 +158,7 @@ class DeviceControllerTest extends FunctionalTest
         $modelManager->saveWithoutChildren($device);
 
         $this->checkSuccessResponse(
-            $this->deviceController->removePush(
+            $this->deviceController->deletePush(
                 $modelManager,
                 $deviceRepository,
                 $devicePushRepository,
@@ -163,11 +166,11 @@ class DeviceControllerTest extends FunctionalTest
                 'dent',
                 'ford',
                 'prefect',
-            )
+            ),
         );
     }
 
-    public function testUpdateToken(): void
+    public function testPostUpdateToken(): void
     {
         $modelManager = $this->serviceManager->get(ModelManager::class);
         $deviceRepository = $this->serviceManager->get(DeviceRepository::class);
@@ -176,7 +179,7 @@ class DeviceControllerTest extends FunctionalTest
             ->willReturn('galaxy')
         ;
 
-        $device = (new Device())
+        $device = (new Device($this->modelWrapper))
             ->setId('42')
             ->setToken('galaxy')
             ->setModel('marvin')
@@ -187,11 +190,11 @@ class DeviceControllerTest extends FunctionalTest
         $this->assertNull($deviceRepository->getById('42')->getFcmToken());
 
         $this->checkSuccessResponse(
-            $this->deviceController->updateToken(
+            $this->deviceController->postUpdateToken(
                 $modelManager,
                 $deviceRepository,
                 'zaphod',
-            )
+            ),
         );
 
         $this->assertEquals('zaphod', $deviceRepository->getById('42')->getFcmToken());

@@ -4,9 +4,11 @@ declare(strict_types=1);
 namespace GibsonOS\Test\Functional\Core;
 
 use Codeception\Test\Unit;
+use GibsonOS\Core\Enum\Permission as PermissionEnum;
 use GibsonOS\Core\Install\Database\TableInstall;
 use GibsonOS\Core\Manager\ModelManager;
 use GibsonOS\Core\Manager\ServiceManager;
+use GibsonOS\Core\Model\Module;
 use GibsonOS\Core\Model\User;
 use GibsonOS\Core\Model\User\Permission;
 use GibsonOS\Core\Service\CommandService;
@@ -94,10 +96,14 @@ abstract class FunctionalTest extends Unit
             ->setPassword('galaxy')
         ;
         $modelManager->saveWithoutChildren($user);
+        $module = (new Module($this->modelWrapper))
+            ->setName('core')
+        ;
+        $modelManager->saveWithoutChildren($module);
         $modelManager->saveWithoutChildren(
             (new Permission($this->modelWrapper))
-                ->setModule('core')
-                ->setPermission(Permission::READ + Permission::WRITE + Permission::DELETE + Permission::MANAGE)
+                ->setModule($module)
+                ->setPermission(PermissionEnum::READ->value + PermissionEnum::WRITE->value + PermissionEnum::DELETE->value + PermissionEnum::MANAGE->value)
                 ->setUser($user),
         );
 

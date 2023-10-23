@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Store\Icon;
 
-use Generator;
 use GibsonOS\Core\Model\Icon\Tag;
 use GibsonOS\Core\Store\AbstractDatabaseStore;
 use MDO\Dto\Record;
@@ -48,7 +47,7 @@ class TagStore extends AbstractDatabaseStore
                 static fn (Value $value): float|string|int|null => $value->getValue(),
                 $record->getValues(),
             ),
-            iterator_to_array($result?->iterateRecords() ?? new Generator()),
+            iterator_to_array($result->iterateRecords()),
         );
     }
 }

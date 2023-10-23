@@ -39,9 +39,7 @@ class EventRepositoryTest extends Unit
 
         $this->eventRepository = new EventRepository(
             $this->repositoryWrapper->reveal(),
-            $this->table,
-            $this->eventElementTable,
-            $this->eventTriggerTable,
+            'event_element',
         );
     }
 

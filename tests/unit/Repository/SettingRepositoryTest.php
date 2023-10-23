@@ -28,7 +28,7 @@ class SettingRepositoryTest extends Unit
         $this->settingRepository = new SettingRepository(
             $this->repositoryWrapper->reveal(),
             $this->table->getTableName(),
-            $this->moduleTable,
+            'module',
         );
     }
 
@@ -68,6 +68,13 @@ class SettingRepositoryTest extends Unit
         $this->repositoryWrapper->getModelWrapper()
             ->shouldBeCalledOnce()
         ;
+        $this->repositoryWrapper->getTableManager()
+            ->shouldBeCalledTimes(2)
+        ;
+        $this->tableManager->getTable($this->moduleTable->getTableName())
+            ->shouldBeCalledOnce()
+            ->willReturn($this->moduleTable)
+        ;
 
         $this->assertEquals($model, $this->settingRepository->getAllByModuleName('marvin', 42)[0]);
     }
@@ -83,6 +90,13 @@ class SettingRepositoryTest extends Unit
         $model = $this->loadModel($selectQuery, Setting::class, '');
         $this->repositoryWrapper->getModelWrapper()
             ->shouldBeCalledOnce()
+        ;
+        $this->repositoryWrapper->getTableManager()
+            ->shouldBeCalledTimes(2)
+        ;
+        $this->tableManager->getTable($this->moduleTable->getTableName())
+            ->shouldBeCalledOnce()
+            ->willReturn($this->moduleTable)
         ;
 
         $this->assertEquals($model, $this->settingRepository->getAllByModuleName('marvin', null)[0]);
@@ -135,6 +149,13 @@ class SettingRepositoryTest extends Unit
         $this->repositoryWrapper->getModelWrapper()
             ->shouldBeCalledOnce()
         ;
+        $this->repositoryWrapper->getTableManager()
+            ->shouldBeCalledTimes(2)
+        ;
+        $this->tableManager->getTable($this->moduleTable->getTableName())
+            ->shouldBeCalledOnce()
+            ->willReturn($this->moduleTable)
+        ;
 
         $this->assertEquals(
             $model,
@@ -156,6 +177,13 @@ class SettingRepositoryTest extends Unit
         $model = $this->loadModel($selectQuery, Setting::class);
         $this->repositoryWrapper->getModelWrapper()
             ->shouldBeCalledOnce()
+        ;
+        $this->repositoryWrapper->getTableManager()
+            ->shouldBeCalledTimes(2)
+        ;
+        $this->tableManager->getTable($this->moduleTable->getTableName())
+            ->shouldBeCalledOnce()
+            ->willReturn($this->moduleTable)
         ;
 
         $this->assertEquals(

@@ -38,16 +38,16 @@ class DriveRepositoryTest extends Unit
         $this->driveRepository = new DriveRepository(
             $this->repositoryWrapper->reveal(),
             $this->table->getTableName(),
-            $driveStatTable,
+            'drive_stat',
         );
     }
 
     public function testGetDrivesWithAttributes(): void
     {
-        $selectQuery = (new SelectQuery($this->table))
+        $selectQuery = (new SelectQuery($this->table, 'd'))
             ->addJoin(new Join($this->driveStatTable, 'ds', '`d`.`id`=`ds`.`drive_id`'))
             ->addWhere(new Where(
-                'UNIX_TIMESTAMP(`system_drive_stat`.`added`)>=UNIX_TIMESTAMP(NOW())-?',
+                'UNIX_TIMESTAMP(`ds`.`added`)>=UNIX_TIMESTAMP(NOW())-?',
                 [900],
             ))
         ;
@@ -55,6 +55,13 @@ class DriveRepositoryTest extends Unit
         $model = $this->loadModel($selectQuery, Drive::class, '');
         $this->repositoryWrapper->getModelWrapper()
             ->shouldBeCalledOnce()
+        ;
+        $this->repositoryWrapper->getTableManager()
+            ->shouldBeCalledTimes(2)
+        ;
+        $this->tableManager->getTable($this->driveStatTable->getTableName())
+            ->shouldBeCalledOnce()
+            ->willReturn($this->driveStatTable)
         ;
         $drive = $this->driveRepository->getDrivesWithAttributes()[0];
 
@@ -67,10 +74,10 @@ class DriveRepositoryTest extends Unit
 
     public function testGetDrivesWithAttributesChangedSeconds(): void
     {
-        $selectQuery = (new SelectQuery($this->table))
+        $selectQuery = (new SelectQuery($this->table, 'd'))
             ->addJoin(new Join($this->driveStatTable, 'ds', '`d`.`id`=`ds`.`drive_id`'))
             ->addWhere(new Where(
-                'UNIX_TIMESTAMP(`system_drive_stat`.`added`)>=UNIX_TIMESTAMP(NOW())-?',
+                'UNIX_TIMESTAMP(`ds`.`added`)>=UNIX_TIMESTAMP(NOW())-?',
                 [42],
             ))
         ;
@@ -78,6 +85,13 @@ class DriveRepositoryTest extends Unit
         $model = $this->loadModel($selectQuery, Drive::class, '');
         $this->repositoryWrapper->getModelWrapper()
             ->shouldBeCalledOnce()
+        ;
+        $this->repositoryWrapper->getTableManager()
+            ->shouldBeCalledTimes(2)
+        ;
+        $this->tableManager->getTable($this->driveStatTable->getTableName())
+            ->shouldBeCalledOnce()
+            ->willReturn($this->driveStatTable)
         ;
         $drive = $this->driveRepository->getDrivesWithAttributes(42)[0];
 

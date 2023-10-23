@@ -33,7 +33,7 @@ class WeatherRepositoryTest extends Unit
         $this->weatherRepository = new WeatherRepository(
             $this->repositoryWrapper->reveal(),
             $this->dateTimeService->reveal(),
-            $this->table,
+            'weather',
         );
     }
 

@@ -4,16 +4,14 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Repository;
 
 use DateTimeInterface;
-use GibsonOS\Core\Attribute\GetTable;
+use GibsonOS\Core\Attribute\GetTableName;
 use GibsonOS\Core\Dto\Model\ChildrenMapping;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\Event;
 use GibsonOS\Core\Model\Event\Element;
-use GibsonOS\Core\Model\Event\Trigger;
 use GibsonOS\Core\Wrapper\RepositoryWrapper;
 use JsonException;
 use MDO\Dto\Query\Where;
-use MDO\Dto\Table;
 use MDO\Enum\OrderDirection;
 use MDO\Exception\ClientException;
 use MDO\Exception\RecordException;
@@ -23,12 +21,8 @@ class EventRepository extends AbstractRepository
 {
     public function __construct(
         RepositoryWrapper $repositoryWrapper,
-        #[GetTable(Event::class)]
-        private readonly Table $eventTable,
-        #[GetTable(Element::class)]
-        private readonly Table $eventElementTable,
-        #[GetTable(Trigger::class)]
-        private readonly Table $eventTriggerTable,
+        #[GetTableName(Element::class)]
+        private readonly string $eventElementTableName,
     ) {
         parent::__construct($repositoryWrapper);
     }
@@ -76,7 +70,7 @@ class EventRepository extends AbstractRepository
      */
     public function getTimeControlled(string $className, string $trigger, DateTimeInterface $dateTime): array
     {
-        $query = $this->getSelectQuery($this->eventElementTable->getTableName(), 'ee')
+        $query = $this->getSelectQuery($this->eventElementTableName, 'ee')
             ->setOrder('`et`.`priority`', OrderDirection::DESC)
             ->setOrder('`ee`.`parentId`')
             ->setOrder('`ee`.`order`')

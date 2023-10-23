@@ -107,7 +107,7 @@ class ConstraintInstall extends AbstractInstall implements PriorityInterface
                     ));
                 }
 
-                if (iterator_to_array($result?->iterateRecords() ?? new Generator()) > 0) {
+                if (iterator_to_array($result->iterateRecords()) > 0) {
                     continue;
                 }
 

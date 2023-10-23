@@ -16,7 +16,7 @@ use GibsonOS\Core\Exception\InstallException;
 use GibsonOS\Core\Install\AbstractInstall;
 use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Manager\ServiceManager;
-use GibsonOS\Core\Model\ModelInterface;
+use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Service\Attribute\TableNameAttribute;
 use GibsonOS\Core\Service\InstallService;
 use GibsonOS\Core\Service\PriorityInterface;
@@ -25,24 +25,13 @@ use JsonException;
 use MDO\Client;
 use MDO\Dto\Record;
 use MDO\Exception\ClientException;
+use MDO\Exception\RecordException;
 use ReflectionAttribute;
 use ReflectionException;
 use UnitEnum;
 
 class TableInstall extends AbstractInstall implements PriorityInterface
 {
-    private const NUMBER_TYPES = [
-        Column::TYPE_TINYINT,
-        Column::TYPE_SMALLINT,
-        Column::TYPE_MEDIUMINT,
-        Column::TYPE_INT,
-        Column::TYPE_BIGINT,
-        Column::TYPE_DECIMAL,
-        Column::TYPE_FLOAT,
-        Column::TYPE_DOUBLE,
-        Column::TYPE_BIT,
-    ];
-
     private const STRING_TYPES = [
         Column::TYPE_CHAR,
         Column::TYPE_VARCHAR,
@@ -56,14 +45,6 @@ class TableInstall extends AbstractInstall implements PriorityInterface
         Column::TYPE_LONGBLOB,
         Column::TYPE_ENUM,
         Column::TYPE_SET,
-    ];
-
-    private const DATE_TYPES = [
-        Column::TYPE_DATE,
-        Column::TYPE_DATETIME,
-        Column::TYPE_TIMESTAMP,
-        Column::TYPE_TIME,
-        Column::TYPE_YEAR,
     ];
 
     private const NO_DEFAULT_TYPES = [
@@ -92,6 +73,7 @@ class TableInstall extends AbstractInstall implements PriorityInterface
      * @throws ReflectionException
      * @throws InstallException
      * @throws JsonException
+     * @throws RecordException
      */
     public function install(string $module): Generator
     {
@@ -107,8 +89,8 @@ class TableInstall extends AbstractInstall implements PriorityInterface
             }
 
             $columnsAttributes = [];
-            /** @var ModelInterface $model */
-            $model = new $className();
+            /** @var AbstractModel $model */
+            $model = new $className($this->modelWrapper);
             $tableName = $model->getTableName();
             $tableAttribute->setName($tableName);
 
@@ -200,7 +182,7 @@ class TableInstall extends AbstractInstall implements PriorityInterface
                 ));
             }
 
-            if (count(iterator_to_array($result?->iterateRecords() ?? new Generator())) === 0) {
+            if (count(iterator_to_array($result->iterateRecords())) === 0) {
                 $this->createTable($tableAttribute, $columnsAttributes);
 
                 yield new Success(sprintf('Table "%s" installed!', $tableName));
@@ -220,7 +202,7 @@ class TableInstall extends AbstractInstall implements PriorityInterface
 
             $updates = [];
 
-            foreach ($result?->iterateRecords() ?? [] as $column) {
+            foreach ($result->iterateRecords() as $column) {
                 $field = (string) $column->get('Field')->getValue();
 
                 if (isset($columnsAttributes[$field])) {

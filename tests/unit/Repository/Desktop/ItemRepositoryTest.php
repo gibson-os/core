@@ -9,6 +9,8 @@ use GibsonOS\Core\Model\User;
 use GibsonOS\Core\Repository\Desktop\ItemRepository;
 use GibsonOS\Test\Unit\Core\Repository\RepositoryTrait;
 use MDO\Dto\Query\Where;
+use MDO\Dto\Result;
+use MDO\Dto\Table;
 use MDO\Dto\Value;
 use MDO\Enum\OrderDirection;
 use MDO\Enum\ValueType;
@@ -27,7 +29,7 @@ class ItemRepositoryTest extends Unit
     {
         $this->loadRepository('desktop_item');
 
-        $this->itemRepository = new ItemRepository($this->repositoryWrapper->reveal(), $this->table);
+        $this->itemRepository = new ItemRepository($this->repositoryWrapper->reveal(), 'desktop_item');
     }
 
     public function testDeleteIdsNotIn(): void
@@ -74,9 +76,17 @@ class ItemRepositoryTest extends Unit
             ->shouldBeCalledOnce()
             ->willReturn($this->client->reveal())
         ;
+        $this->repositoryWrapper->getTableManager()
+            ->shouldBeCalledOnce()
+            ->willReturn($this->tableManager->reveal())
+        ;
+        $this->tableManager->getTable('desktop_item')
+            ->shouldBeCalledOnce()
+            ->willReturn(new Table('desktop_item', []))
+        ;
         $this->client->execute($updateQuery)
             ->shouldBeCalledOnce()
-            ->willReturn(null)
+            ->willReturn(new Result(null))
         ;
 
         $this->itemRepository->updatePosition(new User($this->modelWrapper->reveal()), 1, 2);

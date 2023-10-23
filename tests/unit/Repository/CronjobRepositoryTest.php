@@ -28,7 +28,7 @@ class CronjobRepositoryTest extends Unit
         $this->cronjobRepository = new CronjobRepository(
             $this->repositoryWrapper->reveal(),
             $this->table->getTableName(),
-            $this->cronjobTimeTable,
+            'cronjob_time',
         );
     }
 
@@ -81,6 +81,13 @@ class CronjobRepositoryTest extends Unit
         $model = $this->loadModel($selectQuery, Cronjob::class, '');
         $this->repositoryWrapper->getModelWrapper()
             ->shouldBeCalledOnce()
+        ;
+        $this->repositoryWrapper->getTableManager()
+            ->shouldBeCalledTimes(2)
+        ;
+        $this->tableManager->getTable('cronjob_time')
+            ->shouldBeCalledOnce()
+            ->willReturn(new Table('cronjob_time', []))
         ;
         $cronjob = $this->cronjobRepository->getRunnableByUser($date, 'marvin')[0];
 

@@ -19,7 +19,7 @@ class TagRepositoryTest extends Unit
     {
         $this->loadRepository('icon_tag');
 
-        $this->tagRepository = new TagRepository($this->repositoryWrapper->reveal(), $this->table);
+        $this->tagRepository = new TagRepository($this->repositoryWrapper->reveal(), 'icon_tag');
     }
 
     public function testDeleteByIconId(): void

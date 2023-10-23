@@ -118,7 +118,15 @@ trait RepositoryTrait
         ;
         $this->client->execute($deleteQuery)
             ->shouldBeCalledOnce()
-            ->willReturn(null)
+            ->willReturn(new Result(null))
+        ;
+        $this->repositoryWrapper->getTableManager()
+            ->shouldBeCalledOnce()
+            ->willReturn($this->tableManager->reveal())
+        ;
+        $this->tableManager->getTable($this->table->getTableName())
+            ->shouldBeCalledOnce()
+            ->willReturn($this->table)
         ;
     }
 

@@ -3,13 +3,12 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Repository;
 
-use GibsonOS\Core\Attribute\GetTable;
+use GibsonOS\Core\Attribute\GetTableName;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\Module;
 use GibsonOS\Core\Wrapper\RepositoryWrapper;
 use JsonException;
 use MDO\Dto\Query\Where;
-use MDO\Dto\Table;
 use MDO\Exception\ClientException;
 use MDO\Exception\RecordException;
 use MDO\Query\DeleteQuery;
@@ -19,8 +18,8 @@ class ModuleRepository extends AbstractRepository
 {
     public function __construct(
         RepositoryWrapper $repositoryWrapper,
-        #[GetTable(Module::class)]
-        private readonly Table $moduleTable,
+        #[GetTableName(Module::class)]
+        private readonly string $moduleTableName,
     ) {
         parent::__construct($repositoryWrapper);
     }
@@ -81,7 +80,7 @@ class ModuleRepository extends AbstractRepository
     public function deleteByIdsNot(array $ids): bool
     {
         $repositoryWrapper = $this->getRepositoryWrapper();
-        $deleteQuery = (new DeleteQuery($this->moduleTable))
+        $deleteQuery = (new DeleteQuery($this->getTable($this->moduleTableName)))
             ->addWhere(new Where(
                 sprintf('`id` NOT IN (%s)', $repositoryWrapper->getSelectService()->getParametersString($ids)),
                 $ids,

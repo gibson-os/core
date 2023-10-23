@@ -21,12 +21,12 @@ class DesktopControllerTest extends FunctionalTest
         $this->desktopController = $this->serviceManager->get(DesktopController::class);
     }
 
-    public function testIndex(): void
+    public function testGet(): void
     {
         $user = $this->addUser();
 
         $this->checkSuccessResponse(
-            $this->desktopController->index(
+            $this->desktopController->get(
                 $this->serviceManager->get(ItemRepository::class),
                 null,
                 null,
@@ -41,21 +41,21 @@ class DesktopControllerTest extends FunctionalTest
 
         $modelManager = $this->serviceManager->get(ModelManager::class);
         $modelManager->saveWithoutChildren(
-            (new Item())
+            (new Item($this->modelWrapper))
                 ->setText('Arthur')
                 ->setModule('galaxy')
                 ->setTask('marvin')
                 ->setAction('42')
                 ->setIcon('dent')
-                ->setUser($user)
+                ->setUser($user),
         );
 
         $this->checkSuccessResponse(
-            $this->desktopController->index(
+            $this->desktopController->get(
                 $this->serviceManager->get(ItemRepository::class),
-                (new Setting())->setValue('{"arthur":"dent"}'),
-                (new Setting())->setValue('{"ford":"prefect"}'),
-                $user
+                (new Setting($this->modelWrapper))->setValue('{"arthur":"dent"}'),
+                (new Setting($this->modelWrapper))->setValue('{"ford":"prefect"}'),
+                $user,
             ),
             [
                 DesktopController::APPS_KEY => ['arthur' => 'dent'],
@@ -74,7 +74,7 @@ class DesktopControllerTest extends FunctionalTest
         );
     }
 
-    public function testSave(): void
+    public function testPost(): void
     {
         $modelManager = $this->serviceManager->get(ModelManager::class);
         $user = $this->addUser();
@@ -90,11 +90,11 @@ class DesktopControllerTest extends FunctionalTest
             'parameters' => null,
         ];
         $this->checkSuccessResponse(
-            $this->desktopController->save(
+            $this->desktopController->post(
                 $modelManager,
                 $this->serviceManager->get(ItemRepository::class),
                 [
-                    (new Item())
+                    (new Item($this->modelWrapper))
                         ->setText('Arthur')
                         ->setModule('galaxy')
                         ->setTask('marvin')
@@ -107,7 +107,7 @@ class DesktopControllerTest extends FunctionalTest
             [$item],
         );
         $this->checkSuccessResponse(
-            $this->desktopController->index(
+            $this->desktopController->get(
                 $this->serviceManager->get(ItemRepository::class),
                 null,
                 null,
@@ -131,11 +131,11 @@ class DesktopControllerTest extends FunctionalTest
             'parameters' => ['zaphod' => 'bebblebrox'],
         ];
         $this->checkSuccessResponse(
-            $this->desktopController->save(
+            $this->desktopController->post(
                 $modelManager,
                 $this->serviceManager->get(ItemRepository::class),
                 [
-                    (new Item())
+                    (new Item($this->modelWrapper))
                         ->setText('Ford')
                         ->setModule('marvin')
                         ->setTask('galaxy')
@@ -149,7 +149,7 @@ class DesktopControllerTest extends FunctionalTest
             [$item],
         );
         $this->checkSuccessResponse(
-            $this->desktopController->index(
+            $this->desktopController->get(
                 $this->serviceManager->get(ItemRepository::class),
                 null,
                 null,
@@ -163,7 +163,7 @@ class DesktopControllerTest extends FunctionalTest
         );
     }
 
-    public function testAdd(): void
+    public function testPostAdd(): void
     {
         $modelManager = $this->serviceManager->get(ModelManager::class);
         $user = $this->addUser();
@@ -180,11 +180,11 @@ class DesktopControllerTest extends FunctionalTest
             'parameters' => null,
         ];
         $this->checkSuccessResponse(
-            $this->desktopController->add(
+            $this->desktopController->postAdd(
                 $modelManager,
                 $this->serviceManager->get(ItemRepository::class),
                 [
-                    (new Item())
+                    (new Item($this->modelWrapper))
                         ->setText('Arthur')
                         ->setModule('galaxy')
                         ->setTask('marvin')
@@ -198,7 +198,7 @@ class DesktopControllerTest extends FunctionalTest
             [$items[0]],
         );
         $this->checkSuccessResponse(
-            $this->desktopController->index(
+            $this->desktopController->get(
                 $this->serviceManager->get(ItemRepository::class),
                 null,
                 null,
@@ -232,11 +232,11 @@ class DesktopControllerTest extends FunctionalTest
             'parameters' => ['zaphod2' => 'bebblebrox2'],
         ];
         $this->checkSuccessResponse(
-            $this->desktopController->add(
+            $this->desktopController->postAdd(
                 $modelManager,
                 $this->serviceManager->get(ItemRepository::class),
                 [
-                    (new Item())
+                    (new Item($this->modelWrapper))
                         ->setText('Ford')
                         ->setModule('marvin')
                         ->setTask('galaxy')
@@ -245,7 +245,7 @@ class DesktopControllerTest extends FunctionalTest
                         ->setUser($user)
                         ->setPosition(-1)
                         ->setParameters(['zaphod' => 'bebblebrox']),
-                    (new Item())
+                    (new Item($this->modelWrapper))
                         ->setText('Ford2')
                         ->setModule('marvin2')
                         ->setTask('galaxy2')
@@ -260,7 +260,7 @@ class DesktopControllerTest extends FunctionalTest
             [$items[1], $items[2]],
         );
         $this->checkSuccessResponse(
-            $this->desktopController->index(
+            $this->desktopController->get(
                 $this->serviceManager->get(ItemRepository::class),
                 null,
                 null,

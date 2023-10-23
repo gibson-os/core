@@ -54,12 +54,17 @@ class ConnectInstall extends AbstractInstall implements PriorityInterface, Singl
         $database = $databaseInput->getValue() ?? '';
 
         if (!$client->useDatabase($database)) {
-            if (!$client->execute('CREATE DATABASE `' . $database . '` COLLATE utf8_general_ci')) {
-                throw new InstallException(sprintf(
-                    'Database "%s" could not be created! Error: %s',
-                    $database,
-                    $client->getError(),
-                ));
+            try {
+                $client->execute('CREATE DATABASE `' . $database . '` COLLATE utf8_general_ci');
+            } catch (ClientException $exception) {
+                throw new InstallException(
+                    sprintf(
+                        'Database "%s" could not be created! Error: %s',
+                        $database,
+                        $client->getError(),
+                    ),
+                    previous: $exception,
+                );
             }
 
             if (!$client->useDatabase($database)) {

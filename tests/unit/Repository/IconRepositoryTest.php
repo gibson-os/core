@@ -22,7 +22,7 @@ class IconRepositoryTest extends Unit
     {
         $this->loadRepository('icon');
 
-        $this->iconRepository = new IconRepository($this->repositoryWrapper->reveal(), $this->table);
+        $this->iconRepository = new IconRepository($this->repositoryWrapper->reveal(), 'icon');
     }
 
     public function testGetById(): void

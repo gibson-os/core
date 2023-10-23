@@ -21,19 +21,18 @@ class DriveControllerTest extends FunctionalTest
         $this->driveController = $this->serviceManager->get(DriveController::class);
     }
 
-    public function testIndex(): void
+    public function testGet(): void
     {
         $driveRepository = $this->serviceManager->get(DriveRepository::class);
         $smartAttributeRepository = $this->serviceManager->get(SmartAttributeRepository::class);
         $statRepository = $this->serviceManager->get(StatRepository::class);
 
-        $response = $this->driveController->index($driveRepository, $smartAttributeRepository, $statRepository);
+        $response = $this->driveController->get($driveRepository, $smartAttributeRepository, $statRepository);
 
         $this->checkSuccessResponse($response, []);
 
         $body = json_decode($response->getBody(), true);
 
-        $this->assertEquals([], $body['attributes']);
         $this->assertEquals([], $body['attributes']);
 
         $this->serviceManager->get(SmartAttributeData::class)->install('core');

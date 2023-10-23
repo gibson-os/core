@@ -3,14 +3,13 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Repository\User;
 
-use GibsonOS\Core\Attribute\GetTable;
+use GibsonOS\Core\Attribute\GetTableName;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\User\Device;
 use GibsonOS\Core\Repository\AbstractRepository;
 use GibsonOS\Core\Wrapper\RepositoryWrapper;
 use JsonException;
 use MDO\Dto\Query\Where;
-use MDO\Dto\Table;
 use MDO\Dto\Value;
 use MDO\Exception\ClientException;
 use MDO\Exception\RecordException;
@@ -22,8 +21,8 @@ class DeviceRepository extends AbstractRepository
 {
     public function __construct(
         RepositoryWrapper $repositoryWrapper,
-        #[GetTable(Device::class)]
-        private readonly Table $deviceTable,
+        #[GetTableName(Device::class)]
+        private readonly string $deviceTableName,
     ) {
         parent::__construct($repositoryWrapper);
     }
@@ -68,7 +67,7 @@ class DeviceRepository extends AbstractRepository
     public function deleteByIds(array $ids, int $userId = null): bool
     {
         $repositoryWrapper = $this->getRepositoryWrapper();
-        $deleteQuery = (new DeleteQuery($this->deviceTable))
+        $deleteQuery = (new DeleteQuery($this->getTable($this->deviceTableName)))
             ->addWhere(new Where(
                 sprintf(
                     '`id` IN (%s)',
@@ -93,7 +92,7 @@ class DeviceRepository extends AbstractRepository
 
     public function removeFcmToken(string $fcmToken): bool
     {
-        $updateQuery = (new UpdateQuery($this->deviceTable, ['fcm_token' => new Value(null)]))
+        $updateQuery = (new UpdateQuery($this->getTable($this->deviceTableName), ['fcm_token' => new Value(null)]))
             ->addWhere(new Where('`fcm_token`=?', [$fcmToken]))
         ;
 

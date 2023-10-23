@@ -4,11 +4,10 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Store;
 
 use DateTimeInterface;
-use GibsonOS\Core\Attribute\GetTable;
+use GibsonOS\Core\Attribute\GetTableName;
 use GibsonOS\Core\Model\Drive;
 use GibsonOS\Core\Wrapper\DatabaseStoreWrapper;
 use MDO\Dto\Query\Join;
-use MDO\Dto\Table;
 use MDO\Exception\ClientException;
 use MDO\Exception\RecordException;
 
@@ -28,10 +27,10 @@ class DriveStore extends AbstractDatabaseStore
     private DateTimeInterface $toTime;
 
     public function __construct(
-        #[GetTable(Drive\Stat::class)]
-        private readonly Table $driveStatTable,
-        #[GetTable(Drive\StatAttribute::class)]
-        private readonly Table $driveStatAttributeTable,
+        #[GetTableName(Drive\Stat::class)]
+        private readonly string $driveStatTableName,
+        #[GetTableName(Drive\StatAttribute::class)]
+        private readonly string $driveStatAttributeTableName,
         DatabaseStoreWrapper $databaseStoreWrapper,
     ) {
         parent::__construct($databaseStoreWrapper);
@@ -52,8 +51,8 @@ class DriveStore extends AbstractDatabaseStore
         parent::initQuery();
 
         $this->selectQuery
-            ->addJoin(new Join($this->driveStatTable, 'ds', '`d`.`id`=`ds`.`drive_id`'))
-            ->addJoin(new Join($this->driveStatAttributeTable, 'dsa', '`ds`.`id`=`dsa`.`stat_id`'))
+            ->addJoin(new Join($this->getTable($this->driveStatTableName), 'ds', '`d`.`id`=`ds`.`drive_id`'))
+            ->addJoin(new Join($this->getTable($this->driveStatAttributeTableName), 'dsa', '`ds`.`id`=`dsa`.`stat_id`'))
         ;
     }
 
@@ -146,7 +145,7 @@ class DriveStore extends AbstractDatabaseStore
         $result = $this->getDatabaseStoreWrapper()->getClient()->execute($this->selectQuery);
         $data = [];
 
-        foreach ($result?->iterateRecords() ?? [] as $record) {
+        foreach ($result->iterateRecords() as $record) {
             $timestamp = (string) $record->get('timestamp')->getValue();
             $data[$timestamp] ??= [
                 'date' => $record->get('date')->getValue(),
