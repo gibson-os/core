@@ -15,7 +15,7 @@ class SessionService
 
     private array $data;
 
-    public function __construct(private readonly ModelWrapper $modelWrapper)
+    public function __construct(protected readonly ModelWrapper $modelWrapper)
     {
         session_start();
         /**
