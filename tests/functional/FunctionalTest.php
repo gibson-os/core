@@ -44,10 +44,6 @@ abstract class FunctionalTest extends Unit
     {
         $this->serviceManager = new ServiceManager();
         $this->serviceManager->setInterface(LoggerInterface::class, LoggerService::class);
-        $this->serviceManager->setService(
-            SessionService::class,
-            $this->serviceManager->get(TestSessionService::class),
-        );
 
         $envService = $this->serviceManager->get(EnvService::class);
 
@@ -70,6 +66,10 @@ abstract class FunctionalTest extends Unit
         ));
         $client->useDatabase($databaseName);
         $this->serviceManager->setService(Client::class, $client);
+        $this->serviceManager->setService(
+            SessionService::class,
+            $this->serviceManager->get(TestSessionService::class),
+        );
 
         $this->initDatabase();
 
