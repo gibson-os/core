@@ -4,13 +4,10 @@ declare(strict_types=1);
 namespace GibsonOS\Mock\Service;
 
 use GibsonOS\Core\Service\SessionService;
+use OutOfBoundsException;
 
 class TestSessionService extends SessionService
 {
-    public function __construct()
-    {
-    }
-
     public function set(string $key, $value): SessionService
     {
         $this->data[$key] = $value;
@@ -22,7 +19,7 @@ class TestSessionService extends SessionService
     public function unset(string $key): SessionService
     {
         if (!isset($this->data[$key])) {
-            throw new \OutOfBoundsException(sprintf('Session key $%s not exists!', $key));
+            throw new OutOfBoundsException(sprintf('Session key $%s not exists!', $key));
         }
 
         unset($this->data[$key], $_SESSION[$key]);

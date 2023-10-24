@@ -44,7 +44,10 @@ abstract class FunctionalTest extends Unit
     {
         $this->serviceManager = new ServiceManager();
         $this->serviceManager->setInterface(LoggerInterface::class, LoggerService::class);
-        $this->serviceManager->setService(SessionService::class, new TestSessionService());
+        $this->serviceManager->setService(
+            SessionService::class,
+            $this->serviceManager->get(TestSessionService::class),
+        );
 
         $envService = $this->serviceManager->get(EnvService::class);
 
