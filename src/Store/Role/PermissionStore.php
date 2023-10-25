@@ -16,6 +16,7 @@ use MDO\Dto\Query\Join;
 use MDO\Dto\Query\Where;
 use MDO\Dto\Value;
 use MDO\Enum\JoinType;
+use MDO\Enum\OrderDirection;
 use MDO\Exception\ClientException;
 
 /**
@@ -53,9 +54,9 @@ class PermissionStore extends AbstractDatabaseStore
         return 'r';
     }
 
-    protected function getDefaultOrder(): string
+    protected function getDefaultOrder(): array
     {
-        return '`r`.`name`';
+        return ['`r`.`name`' => OrderDirection::ASC];
     }
 
     protected function initQuery(): void

@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Store;
 
 use GibsonOS\Core\Model\Setting;
+use MDO\Enum\OrderDirection;
 
 /**
  * @extends AbstractDatabaseStore<Setting>
@@ -24,9 +25,9 @@ class SettingStore extends AbstractDatabaseStore
         return '*';
     }
 
-    protected function getDefaultOrder(): string
+    protected function getDefaultOrder(): array
     {
-        return '`key`';
+        return ['`key`' => OrderDirection::ASC];
     }
 
     protected function setWheres(): void

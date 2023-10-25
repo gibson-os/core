@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Store;
 
 use GibsonOS\Core\Model\Action;
+use MDO\Enum\OrderDirection;
 
 /**
  * @extends AbstractDatabaseStore<Action>
@@ -17,9 +18,9 @@ class ActionStore extends AbstractDatabaseStore
         return Action::class;
     }
 
-    protected function getDefaultOrder(): string
+    protected function getDefaultOrder(): array
     {
-        return '`name`';
+        return ['`name`' => OrderDirection::ASC];
     }
 
     protected function setWheres(): void

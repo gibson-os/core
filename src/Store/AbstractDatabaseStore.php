@@ -120,17 +120,15 @@ abstract class AbstractDatabaseStore extends AbstractStore
 
     protected function getCountField(): string
     {
-        return '`' . $this->tableName . '`.`id`';
+        return '`' . ($this->getAlias() ?? $this->tableName) . '`.`id`';
     }
 
-    protected function getDefaultOrder(): string
+    /**
+     * @return array<string, OrderDirection>
+     */
+    protected function getDefaultOrder(): array
     {
-        return '`' . $this->tableName . '`.`id`';
-    }
-
-    protected function getDefaultOrderDirection(): OrderDirection
-    {
-        return OrderDirection::ASC;
+        return ['`' . ($this->getAlias() ?? $this->tableName) . '`.`id`' => OrderDirection::ASC];
     }
 
     protected function getAlias(): ?string
@@ -190,7 +188,7 @@ abstract class AbstractDatabaseStore extends AbstractStore
 
     protected function getOrderBy(): array
     {
-        return $this->orderBy ?: [$this->getDefaultOrder() => $this->getDefaultOrderDirection()];
+        return $this->orderBy ?: $this->getDefaultOrder();
     }
 
     /**

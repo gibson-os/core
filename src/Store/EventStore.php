@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Store;
 
 use GibsonOS\Core\Model\Event;
+use MDO\Enum\OrderDirection;
 
 /**
  * @extends AbstractDatabaseStore<Event>
@@ -15,9 +16,9 @@ class EventStore extends AbstractDatabaseStore
         return Event::class;
     }
 
-    protected function getDefaultOrder(): string
+    protected function getDefaultOrder(): array
     {
-        return '`name`';
+        return ['`name`' => OrderDirection::ASC];
     }
 
     protected function getOrderMapping(): array

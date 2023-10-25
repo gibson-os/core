@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Store;
 
 use GibsonOS\Core\Model\Role;
+use MDO\Enum\OrderDirection;
 
 /**
  * @extends AbstractDatabaseStore<Role>
@@ -15,8 +16,8 @@ class RoleStore extends AbstractDatabaseStore
         return Role::class;
     }
 
-    protected function getDefaultOrder(): string
+    protected function getDefaultOrder(): array
     {
-        return '`name`';
+        return ['`name`' => OrderDirection::ASC];
     }
 }

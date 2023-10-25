@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Store;
 
 use GibsonOS\Core\Model\Cronjob;
+use MDO\Enum\OrderDirection;
 
 /**
  * @extends AbstractDatabaseStore<Cronjob>
@@ -25,8 +26,8 @@ class CronjobStore extends AbstractDatabaseStore
         ];
     }
 
-    protected function getDefaultOrder(): string
+    protected function getDefaultOrder(): array
     {
-        return '`command`';
+        return ['`command`' => OrderDirection::ASC];
     }
 }

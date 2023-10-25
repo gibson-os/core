@@ -6,6 +6,7 @@ namespace GibsonOS\Core\Store;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\Task;
 use JsonException;
+use MDO\Enum\OrderDirection;
 use ReflectionException;
 
 /**
@@ -27,9 +28,9 @@ class TaskStore extends AbstractDatabaseStore
         }
     }
 
-    protected function getDefaultOrder(): string
+    protected function getDefaultOrder(): array
     {
-        return '`name`';
+        return ['`name`' => OrderDirection::ASC];
     }
 
     /**

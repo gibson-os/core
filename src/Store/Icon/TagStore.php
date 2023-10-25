@@ -7,6 +7,7 @@ use GibsonOS\Core\Model\Icon\Tag;
 use GibsonOS\Core\Store\AbstractDatabaseStore;
 use MDO\Dto\Record;
 use MDO\Dto\Value;
+use MDO\Enum\OrderDirection;
 
 /**
  * @extends AbstractDatabaseStore<Tag>
@@ -23,9 +24,9 @@ class TagStore extends AbstractDatabaseStore
         return '*';
     }
 
-    protected function getDefaultOrder(): string
+    protected function getDefaultOrder(): array
     {
-        return '`tag`';
+        return ['`tag`' => OrderDirection::ASC];
     }
 
     protected function initQuery(): void

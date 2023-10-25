@@ -8,6 +8,7 @@ use GibsonOS\Core\Attribute\GetTableName;
 use GibsonOS\Core\Model\Drive;
 use GibsonOS\Core\Wrapper\DatabaseStoreWrapper;
 use MDO\Dto\Query\Join;
+use MDO\Enum\OrderDirection;
 use MDO\Exception\ClientException;
 use MDO\Exception\RecordException;
 
@@ -56,9 +57,9 @@ class DriveStore extends AbstractDatabaseStore
         ;
     }
 
-    protected function getDefaultOrder(): string
+    protected function getDefaultOrder(): array
     {
-        return '`ds`.`added`';
+        return ['`ds`.`added`' => OrderDirection::ASC];
     }
 
     protected function setWheres(): void

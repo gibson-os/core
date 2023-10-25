@@ -8,6 +8,7 @@ use GibsonOS\Core\Model\Role;
 use GibsonOS\Core\Model\Role\User;
 use GibsonOS\Core\Store\AbstractDatabaseStore;
 use GibsonOS\Core\Wrapper\DatabaseStoreWrapper;
+use MDO\Enum\OrderDirection;
 
 /**
  * @extends AbstractDatabaseStore<User>
@@ -38,9 +39,9 @@ class UserStore extends AbstractDatabaseStore
         return 'ru';
     }
 
-    protected function getDefaultOrder(): string
+    protected function getDefaultOrder(): array
     {
-        return '`u`.`user`';
+        return ['`u`.`user`' => OrderDirection::ASC];
     }
 
     protected function setWheres(): void
