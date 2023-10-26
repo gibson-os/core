@@ -53,6 +53,7 @@ class ChildrenQuery
         $childModel = new $modelClassName($this->modelWrapper);
         $ownReflectionProperty = $reflectionClass->getProperty($this->getOwnProperty($reflectionProperty, $constraintAttribute));
         $selectQuery = (new SelectQuery($this->tableManager->getTable($childModel->getTableName()), $alias))
+            ->setWheres($child->getWheres())
             ->addWhere(new Where(
                 sprintf('`%s`.`%s`=?', $alias, $this->getChildColumn($reflectionProperty, $constraintAttribute)),
                 [$this->reflectionManager->getProperty($ownReflectionProperty, $model)],
@@ -114,6 +115,10 @@ class ChildrenQuery
 
             if ($where !== null) {
                 $selectQuery->addWhere(new Where($where, $constraintAttribute->getWhereParameters()));
+            }
+
+            foreach ($child->getWheres() as $where) {
+                $selectQuery->addWhere($where);
             }
 
             $this->extend($selectQuery, $parentModelClassName, $child->getChildren());
