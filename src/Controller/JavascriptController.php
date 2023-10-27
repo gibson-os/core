@@ -7,12 +7,14 @@ use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Service\JavascriptService;
 use GibsonOS\Core\Service\Response\Response;
+use MDO\Exception\ClientException;
 
 class JavascriptController extends AbstractController
 {
     /**
      * @throws SelectError
      * @throws GetError
+     * @throws ClientException
      */
     public function getIndex(
         JavascriptService $javaScriptService,

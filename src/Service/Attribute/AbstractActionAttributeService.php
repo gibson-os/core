@@ -29,7 +29,7 @@ abstract class AbstractActionAttributeService implements AttributeServiceInterfa
     /**
      * @param ReflectionParameter[] $reflectionParameters
      */
-    protected function getReflectionParameter(mixed $name, array $reflectionParameters): ?ReflectionParameter
+    protected function getReflectionParameter(string $name, array $reflectionParameters): ?ReflectionParameter
     {
         foreach ($reflectionParameters as $reflectionParameter) {
             if ($name === $reflectionParameter->getName()) {

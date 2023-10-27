@@ -21,6 +21,7 @@ use GibsonOS\Core\Utility\JsonUtility;
 use GibsonOS\Core\Wrapper\ModelWrapper;
 use JsonException;
 use MDO\Exception\ClientException;
+use MDO\Exception\RecordException;
 use Psr\Log\LoggerInterface;
 use ReflectionException;
 
@@ -165,6 +166,7 @@ abstract class AbstractInstall implements InstallInterface
      * @throws ReflectionException
      * @throws SaveError
      * @throws SelectError
+     * @throws RecordException
      */
     protected function addApp(string $text, string $module, string $task, string $action, string $icon): self
     {
