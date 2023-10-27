@@ -12,7 +12,7 @@ use GibsonOS\Core\Exception\InstallException;
 use GibsonOS\Core\Install\AbstractInstall;
 use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Manager\ServiceManager;
-use GibsonOS\Core\Model\ModelInterface;
+use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Service\InstallService;
 use GibsonOS\Core\Service\PriorityInterface;
 use MDO\Client;
@@ -48,8 +48,8 @@ class ViewInstall extends AbstractInstall implements PriorityInterface
                 continue;
             }
 
-            /** @var ModelInterface $model */
-            $model = new $className();
+            /** @var AbstractModel $model */
+            $model = new $className($this->modelWrapper);
             $viewName = $model->getTableName();
             $viewAttribute->setName($viewName);
             $query = sprintf('DROP VIEW IF EXISTS `%s`', $viewName);

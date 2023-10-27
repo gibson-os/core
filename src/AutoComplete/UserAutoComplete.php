@@ -4,9 +4,12 @@ declare(strict_types=1);
 namespace GibsonOS\Core\AutoComplete;
 
 use GibsonOS\Core\Exception\Repository\SelectError;
-use GibsonOS\Core\Model\AutoCompleteModelInterface;
 use GibsonOS\Core\Model\User;
 use GibsonOS\Core\Repository\UserRepository;
+use JsonException;
+use MDO\Exception\ClientException;
+use MDO\Exception\RecordException;
+use ReflectionException;
 
 class UserAutoComplete implements AutoCompleteInterface
 {
@@ -15,7 +18,10 @@ class UserAutoComplete implements AutoCompleteInterface
     }
 
     /**
-     * @throws SelectError
+     * @throws ClientException
+     * @throws JsonException
+     * @throws RecordException
+     * @throws ReflectionException
      *
      * @return User[]
      */
@@ -26,8 +32,12 @@ class UserAutoComplete implements AutoCompleteInterface
 
     /**
      * @throws SelectError
+     * @throws JsonException
+     * @throws ClientException
+     * @throws RecordException
+     * @throws ReflectionException
      */
-    public function getById(string $id, array $parameters): AutoCompleteModelInterface
+    public function getById(string $id, array $parameters): User
     {
         return $this->userRepository->getById((int) $id);
     }

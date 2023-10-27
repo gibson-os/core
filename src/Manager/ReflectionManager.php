@@ -305,4 +305,9 @@ class ReflectionManager
             default => throw new ReflectionException(sprintf('Type "%s" of %s "%s" for "%s%s" is not allowed!', $this->getTypeName($reflectionObject) ?? 'null', $reflectionObject instanceof ReflectionParameter ? 'parameter' : 'property', $reflectionObject->getName(), $reflectionObject->getDeclaringClass()?->getName() ?? 'null', $reflectionObject instanceof ReflectionParameter ? '::' . $reflectionObject->getDeclaringFunction()->getName() : '')),
         };
     }
+
+    public function __serialize(): array
+    {
+        return [];
+    }
 }

@@ -13,7 +13,7 @@ use GibsonOS\Core\Exception\InstallException;
 use GibsonOS\Core\Install\AbstractInstall;
 use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Manager\ServiceManager;
-use GibsonOS\Core\Model\ModelInterface;
+use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Service\Attribute\TableNameAttribute;
 use GibsonOS\Core\Service\InstallService;
 use GibsonOS\Core\Service\PriorityInterface;
@@ -51,8 +51,8 @@ class ConstraintInstall extends AbstractInstall implements PriorityInterface
                 continue;
             }
 
-            /** @var ModelInterface $model */
-            $model = new $className();
+            /** @var AbstractModel $model */
+            $model = new $className($this->modelWrapper);
             $tableName = $model->getTableName();
             $constraints = [];
 
@@ -72,8 +72,8 @@ class ConstraintInstall extends AbstractInstall implements PriorityInterface
                 }
 
                 $parentClassName = $this->reflectionManager->getNonBuiltinTypeName($reflectionProperty);
-                /** @var ModelInterface $parentModel */
-                $parentModel = new $parentClassName();
+                /** @var AbstractModel $parentModel */
+                $parentModel = new $parentClassName($this->modelWrapper);
                 $parentTableName = $parentModel->getTableName();
                 $constraintName = $constraintAttribute->getName() ?? 'fk' . ucfirst($tableName) . ucfirst($parentTableName);
                 $foreignKey = $constraintAttribute->getOwnColumn()

@@ -26,7 +26,7 @@ class SessionService
         session_write_close();
     }
 
-    public function set(string $key, $value): SessionService
+    public function set(string $key, mixed $value): SessionService
     {
         $this->data[$key] = $value;
         session_start();
@@ -36,7 +36,7 @@ class SessionService
         return $this;
     }
 
-    public function get(string $key)
+    public function get(string $key): mixed
     {
         if (!isset($this->data[$key])) {
             throw new OutOfBoundsException(sprintf('Session key $%s not exists!', $key));
@@ -59,10 +59,7 @@ class SessionService
         return $this;
     }
 
-    /**
-     * @param mixed|null $default
-     */
-    public function getWithDefault(string $key, $default = null)
+    public function getWithDefault(string $key, mixed $default = null)
     {
         try {
             return $this->get($key);
@@ -100,7 +97,7 @@ class SessionService
 
     public function getUser(): ?User
     {
-        return $this->getWithDefault(self::USER, null);
+        return $this->getWithDefault(self::USER);
     }
 
     public function getUserId(): ?int

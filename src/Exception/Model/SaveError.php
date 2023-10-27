@@ -9,30 +9,22 @@ use Throwable;
 
 class SaveError extends AbstractException
 {
-    /**
-     * @var ModelInterface
-     */
-    private $model;
+    private ModelInterface $model;
 
     public function __construct($message = 'Datensatz konnte nicht gespeichert werden!', $code = 0, Throwable $previous = null)
     {
         parent::__construct($message, $code, $previous);
     }
 
-    /**
-     * @return ModelInterface
-     */
-    public function getModel()
+    public function getModel(): ModelInterface
     {
         return $this->model;
     }
 
     /**
-     * @param ModelInterface $model
-     *
      * @return SaveError
      */
-    public function setModel($model)
+    public function setModel(ModelInterface $model)
     {
         $this->model = $model;
 

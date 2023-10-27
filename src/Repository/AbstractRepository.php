@@ -6,7 +6,6 @@ namespace GibsonOS\Core\Repository;
 use GibsonOS\Core\Dto\Model\ChildrenMapping;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\AbstractModel;
-use GibsonOS\Core\Model\ModelInterface;
 use GibsonOS\Core\Wrapper\RepositoryWrapper;
 use JsonException;
 use MDO\Dto\Query\Where;
@@ -190,7 +189,7 @@ abstract class AbstractRepository
         string $prefix = '',
         array $children = [],
     ): array {
-        /** @var ModelInterface $model */
+        /** @var AbstractModel $model */
         $model = new $modelClassName($this->repositoryWrapper->getModelWrapper());
         $selectQuery = $this->getSelectQuery($model->getTableName())
             ->addWhere(new Where($where, $parameters))
@@ -202,7 +201,7 @@ abstract class AbstractRepository
     }
 
     /**
-     * @param class-string<ModelInterface> $modelClassName
+     * @param class-string<AbstractModel> $modelClassName
      *
      * @throws ClientException
      * @throws SelectError
@@ -213,7 +212,6 @@ abstract class AbstractRepository
         string $where = '1',
         array $parameters = [],
     ): Record {
-        /** @var AbstractModel $model */
         $model = new $modelClassName($this->repositoryWrapper->getModelWrapper());
         $selectQuery = $this->getSelectQuery($model->getTableName())
             ->addWhere(new Where($where, $parameters))

@@ -13,7 +13,7 @@ use GibsonOS\Core\Exception\InstallException;
 use GibsonOS\Core\Install\AbstractInstall;
 use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Manager\ServiceManager;
-use GibsonOS\Core\Model\ModelInterface;
+use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Service\Attribute\TableNameAttribute;
 use GibsonOS\Core\Service\InstallService;
 use GibsonOS\Core\Service\PriorityInterface;
@@ -53,8 +53,8 @@ class KeyInstall extends AbstractInstall implements PriorityInterface
             }
 
             $installedKeys = ['PRIMARY'];
-            /** @var ModelInterface $model */
-            $model = new $className();
+            /** @var AbstractModel $model */
+            $model = new $className($this->modelWrapper);
             $tableName = $model->getTableName();
             $keyAttributes = $this->reflectionManager->getAttributes($reflectionClass, Key::class);
 

@@ -38,7 +38,7 @@ class ConnectInstall extends AbstractInstall implements PriorityInterface, Singl
         $client->close();
 
         try {
-            $client = new Client(
+            $client->connect(
                 $host,
                 $installUserInput->getValue() ?? '',
                 $installPasswordInput->getValue() ?? '',
@@ -78,23 +78,19 @@ class ConnectInstall extends AbstractInstall implements PriorityInterface, Singl
 
         try {
             $mysqlUserClient = new Client($host, $user, $password);
-        } catch (ClientException $exception) {
-            throw new InstallException(sprintf(
-                'MySQL User "%s" could not be created! Error: %s',
-                $user,
-                $exception->getMessage(),
-            ));
-        }
-
-        try {
-            $client->execute("CREATE USER '" . $user . "'@'%' IDENTIFIED BY '" . $password . "'");
-            $client->execute("GRANT USAGE ON *.* TO  '" . $user . "'@'%' IDENTIFIED BY '" . $password . "' WITH MAX_QUERIES_PER_HOUR 0 MAX_CONNECTIONS_PER_HOUR 0 MAX_UPDATES_PER_HOUR 0 MAX_USER_CONNECTIONS 0");
         } catch (ClientException) {
-            throw new InstallException(sprintf(
-                'MySQL User "%s" could not be created! Error: %s',
-                $user,
-                $client->getError(),
-            ));
+            try {
+                $client->execute("CREATE USER '" . $user . "'@'%' IDENTIFIED BY '" . $password . "'");
+                $client->execute("GRANT USAGE ON *.* TO  '" . $user . "'@'%' IDENTIFIED BY '" . $password . "' WITH MAX_QUERIES_PER_HOUR 0 MAX_CONNECTIONS_PER_HOUR 0 MAX_UPDATES_PER_HOUR 0 MAX_USER_CONNECTIONS 0");
+            } catch (ClientException) {
+                throw new InstallException(sprintf(
+                    'MySQL User "%s" could not be created! Error: %s',
+                    $user,
+                    $client->getError(),
+                ));
+            }
+
+            $mysqlUserClient = new Client($host, $user, $password);
         }
 
         try {
