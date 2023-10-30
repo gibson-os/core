@@ -17,6 +17,9 @@ use GibsonOS\Core\Repository\Desktop\ItemRepository;
 use GibsonOS\Core\Service\Response\AjaxResponse;
 use GibsonOS\Core\Utility\JsonUtility;
 use JsonException;
+use MDO\Exception\ClientException;
+use MDO\Exception\RecordException;
+use ReflectionException;
 
 class DesktopController extends AbstractController
 {
@@ -27,8 +30,13 @@ class DesktopController extends AbstractController
     public const TOOLS_KEY = 'tools';
 
     /**
+     * @param Setting|null $apps
+     * @param Setting|null $tools
+     *
      * @throws JsonException
-     * @throws SelectError
+     * @throws ClientException
+     * @throws RecordException
+     * @throws ReflectionException
      */
     #[CheckPermission([Permission::READ])]
     public function get(
@@ -49,6 +57,9 @@ class DesktopController extends AbstractController
     /**
      * @param Item[] $items
      *
+     * @throws JsonException
+     * @throws RecordException
+     * @throws ReflectionException
      * @throws SaveError
      */
     #[CheckPermission([Permission::WRITE])]
@@ -79,6 +90,10 @@ class DesktopController extends AbstractController
     /**
      * @param non-empty-array<Item> $items
      *
+     * @throws ClientException
+     * @throws JsonException
+     * @throws RecordException
+     * @throws ReflectionException
      * @throws SaveError
      */
     #[CheckPermission([Permission::WRITE])]

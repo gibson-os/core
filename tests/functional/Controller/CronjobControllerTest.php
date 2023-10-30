@@ -277,31 +277,86 @@ class CronjobControllerTest extends FunctionalTest
         $this->assertEquals(0, count($list));
     }
 
-    //    public function testTimes(): void
-    //    {
-    //        $modelManager = $this->serviceManager->get(ModelManager::class);
-    //        $cronjob = (new Cronjob())
-    //            ->setUser('marvin')
-    //            ->setCommand('galaxy')
-    //        ;
-    //        $modelManager->saveWithoutChildren(
-    //            (new Time())
-    //                ->setCronjob($cronjob)
-    //        );
-    //        $modelManager->saveWithoutChildren(
-    //            (new Time())
-    //                ->setCronjob($cronjob)
-    //                ->setFromMinute(7)
-    //                ->setToMinute(7)
-    //                ->setFromSecond(42)
-    //                ->setToSecond(42)
-    //        );
-    //
-    //        $this->checkAjaxResponse(
-    //            $this->cronjobController->times(
-    //                $this->serviceManager->get(TimeStore::class),
-    //                $cronjob,
-    //            ),
-    //        );
-    //    }
+    public function testTimes(): void
+    {
+        $modelManager = $this->serviceManager->get(ModelManager::class);
+        $cronjob = (new Cronjob($this->modelWrapper))
+            ->setUser('marvin')
+            ->setCommand('galaxy')
+        ;
+        $modelManager->saveWithoutChildren($cronjob);
+        $modelManager->saveWithoutChildren(
+            (new Time($this->modelWrapper))
+                ->setCronjob($cronjob),
+        );
+        $modelManager->saveWithoutChildren(
+            (new Time($this->modelWrapper))
+                ->setCronjob($cronjob)
+                ->setFromMinute(7)
+                ->setToMinute(7)
+                ->setFromSecond(42)
+                ->setToSecond(42),
+        );
+
+        $response = $this->cronjobController->getTimes(
+            $this->serviceManager->get(TimeStore::class),
+            $cronjob,
+        );
+        $body = json_decode($response->getBody(), true);
+
+        $expected = [
+            '*' => [
+                'part' => 'year',
+                'items' => [
+                    '*' => [
+                        'part' => 'month',
+                        'items' => [
+                            '*' => [
+                                'part' => 'day_of_month',
+                                'items' => [
+                                    '*' => [
+                                        'part' => 'day_of_week',
+                                        'items' => [
+                                            '*' => [
+                                                'part' => 'hour',
+                                                'items' => [
+                                                    'part' => 'minute',
+                                                    'items' => [
+                                                        '*' => [
+                                                            0 => [
+                                                                'hour' => '*',
+                                                                'minute' => '*',
+                                                                'second' => '*',
+                                                                'day_of_month' => '*',
+                                                                'day_of_week' => '*',
+                                                                'month' => '*',
+                                                                'year' => '*',
+                                                            ],
+                                                        ],
+                                                        7 => [
+                                                            0 => [
+                                                                'hour' => '*',
+                                                                'minute' => '7',
+                                                                'second' => '42',
+                                                                'day_of_month' => '*',
+                                                                'day_of_week' => '*',
+                                                                'month' => '*',
+                                                                'year' => '*',
+                                                            ],
+                                                        ],
+                                                    ],
+                                                ],
+                                            ],
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $this->assertEquals($expected, $body['data']);
+    }
 }

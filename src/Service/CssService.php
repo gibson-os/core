@@ -5,8 +5,9 @@ namespace GibsonOS\Core\Service;
 
 use GibsonOS\Core\Dto\Css;
 use GibsonOS\Core\Exception\GetError;
-use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Repository\User\PermissionViewRepository;
+use MDO\Exception\ClientException;
+use MDO\Exception\RecordException;
 
 class CssService
 {
@@ -29,7 +30,8 @@ class CssService
 
     /**
      * @throws GetError
-     * @throws SelectError
+     * @throws ClientException
+     * @throws RecordException
      */
     public function getByUserId(?int $userId, string $module = null): string
     {

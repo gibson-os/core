@@ -6,6 +6,7 @@ namespace GibsonOS\Test\Functional\Core;
 use Codeception\Test\Unit;
 use GibsonOS\Core\Enum\Permission as PermissionEnum;
 use GibsonOS\Core\Install\Database\TableInstall;
+use GibsonOS\Core\Install\Database\ViewInstall;
 use GibsonOS\Core\Manager\ModelManager;
 use GibsonOS\Core\Manager\ServiceManager;
 use GibsonOS\Core\Model\Module;
@@ -83,11 +84,19 @@ abstract class FunctionalTest extends Unit
         foreach ($tableInstall->install(__DIR__ . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..') as $success) {
         }
 
+        $viewInstall = $this->serviceManager->get(ViewInstall::class);
+
+        foreach ($viewInstall->install(__DIR__ . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..') as $success) {
+        }
+
         if (__DIR__ === $this->getDir()) {
             return;
         }
 
         foreach ($tableInstall->install($this->getDir() . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..') as $success) {
+        }
+
+        foreach ($viewInstall->install($this->getDir() . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..') as $success) {
         }
     }
 

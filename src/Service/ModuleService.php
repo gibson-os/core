@@ -20,6 +20,8 @@ use GibsonOS\Core\Repository\ModuleRepository;
 use GibsonOS\Core\Repository\TaskRepository;
 use GibsonOS\Core\Wrapper\ModelWrapper;
 use JsonException;
+use MDO\Exception\ClientException;
+use MDO\Exception\RecordException;
 use Psr\Log\LoggerInterface;
 use ReflectionAttribute;
 use ReflectionClass;
@@ -28,7 +30,7 @@ use ReflectionMethod;
 
 class ModuleService
 {
-    private string $vendorPath;
+    private string $modulesPath;
 
     public function __construct(
         private readonly ModuleRepository $moduleRepository,
@@ -40,8 +42,9 @@ class ModuleService
         private readonly ModelManager $modelManager,
         private readonly LoggerInterface $logger,
         private readonly ModelWrapper $modelWrapper,
+        string $modulesPath = null,
     ) {
-        $this->vendorPath = realpath(
+        $this->modulesPath = $modulesPath ?? realpath(
             dirname(__FILE__) . DIRECTORY_SEPARATOR .
             '..' . DIRECTORY_SEPARATOR .
             '..' . DIRECTORY_SEPARATOR .
@@ -50,9 +53,11 @@ class ModuleService
     }
 
     /**
+     * @throws ClientException
      * @throws GetError
-     * @throws SaveError
      * @throws JsonException
+     * @throws RecordException
+     * @throws SaveError
      */
     public function scan(): void
     {
@@ -68,10 +73,12 @@ class ModuleService
     }
 
     /**
+     * @throws GetError
+     * @throws JsonException
      * @throws ReflectionException
      * @throws SaveError
-     * @throws JsonException
-     * @throws GetError
+     * @throws ClientException
+     * @throws RecordException
      *
      * @return array{moduleIds: array<int>, taskIds: array<int>, actionIds: array<int>}
      */
@@ -83,12 +90,12 @@ class ModuleService
         $taskIds = [];
         $actionIds = [];
 
-        foreach ($this->dirService->getFiles($this->vendorPath) as $dir) {
+        foreach ($this->dirService->getFiles($this->modulesPath) as $dir) {
             if (!is_dir($dir)) {
                 continue;
             }
 
-            $pos = mb_strrpos($dir, '/') ?: -1;
+            $pos = mb_strrpos($dir, DIRECTORY_SEPARATOR) ?: -1;
             $moduleName = strtolower(mb_substr($dir, $pos + 1));
 
             try {
@@ -138,7 +145,7 @@ class ModuleService
             $pos = mb_strpos($taskName, '.');
             $taskName = strtolower(mb_substr($taskName, 0, $pos ?: null));
             $taskName = str_replace('controller', '', $taskName);
-            $classname = str_replace($this->vendorPath, '', $controller);
+            $classname = str_replace($this->modulesPath, '', $controller);
             $classname = ucfirst(str_replace('.php', '', str_replace(
                 DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'Controller' . DIRECTORY_SEPARATOR,
                 '\\Controller\\',

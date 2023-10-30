@@ -13,14 +13,20 @@ use GibsonOS\Core\Model\Setting;
 use GibsonOS\Core\Repository\ModuleRepository;
 use GibsonOS\Core\Service\Response\AjaxResponse;
 use GibsonOS\Core\Wrapper\ModelWrapper;
+use JsonException;
+use MDO\Exception\ClientException;
+use MDO\Exception\RecordException;
+use ReflectionException;
 
 class MiddlewareController extends AbstractController
 {
     /**
-     * @param Setting|null $middlewareToken
-     *
      * @throws SaveError
      * @throws SelectError
+     * @throws JsonException
+     * @throws ClientException
+     * @throws RecordException
+     * @throws ReflectionException
      */
     #[CheckMiddlewarePermission([Permission::WRITE])]
     public function postConfirm(

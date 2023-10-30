@@ -32,12 +32,18 @@ use GibsonOS\Core\Store\Event\TriggerStore;
 use GibsonOS\Core\Store\EventStore;
 use JsonException;
 use MDO\Client;
+use MDO\Exception\ClientException;
+use MDO\Exception\RecordException;
 use ReflectionException;
 
 class EventController extends AbstractController
 {
     /**
+     * @throws JsonException
+     * @throws ReflectionException
      * @throws SelectError
+     * @throws ClientException
+     * @throws RecordException
      */
     #[CheckPermission([Permission::READ])]
     public function get(
@@ -53,11 +59,11 @@ class EventController extends AbstractController
     }
 
     /**
-     * @param Event|null $event
-     *
+     * @throws ClientException
      * @throws FactoryError
      * @throws GetError
      * @throws JsonException
+     * @throws RecordException
      * @throws ReflectionException
      * @throws SelectError
      */
@@ -118,11 +124,13 @@ class EventController extends AbstractController
     }
 
     /**
+     * @throws ClientException
      * @throws FactoryError
      * @throws GetError
-     * @throws SelectError
      * @throws JsonException
+     * @throws RecordException
      * @throws ReflectionException
+     * @throws SelectError
      */
     #[CheckPermission([Permission::READ])]
     public function getTriggers(TriggerStore $triggerStore, #[GetModel(['id' => 'eventId'])] Event $event): AjaxResponse

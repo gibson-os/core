@@ -79,6 +79,10 @@ class ModuleRepository extends AbstractRepository
 
     public function deleteByIdsNot(array $ids): bool
     {
+        if (count($ids) === 0) {
+            return true;
+        }
+
         $repositoryWrapper = $this->getRepositoryWrapper();
         $deleteQuery = (new DeleteQuery($this->getTable($this->moduleTableName)))
             ->addWhere(new Where(

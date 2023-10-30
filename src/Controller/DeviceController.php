@@ -18,14 +18,20 @@ use GibsonOS\Core\Repository\User\DeviceRepository;
 use GibsonOS\Core\Service\Response\AjaxResponse;
 use GibsonOS\Core\Wrapper\ModelWrapper;
 use JsonException;
+use MDO\Exception\ClientException;
+use MDO\Exception\RecordException;
 use ReflectionException;
 
 class DeviceController extends AbstractController
 {
     /**
+     * @throws JsonException
+     * @throws ReflectionException
+     * @throws RequestError
      * @throws SaveError
      * @throws SelectError
-     * @throws RequestError
+     * @throws ClientException
+     * @throws RecordException
      */
     public function postAddPush(
         ModelManager $modelManager,
@@ -54,8 +60,11 @@ class DeviceController extends AbstractController
     }
 
     /**
+     * @throws ClientException
      * @throws DeleteError
      * @throws JsonException
+     * @throws RecordException
+     * @throws ReflectionException
      * @throws RequestError
      * @throws SelectError
      */
@@ -81,7 +90,9 @@ class DeviceController extends AbstractController
     }
 
     /**
+     * @throws ClientException
      * @throws JsonException
+     * @throws RecordException
      * @throws ReflectionException
      * @throws RequestError
      * @throws SaveError

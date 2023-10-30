@@ -52,7 +52,7 @@ class TimeStore extends AbstractDatabaseStore
 
         $result = $this->getDatabaseStoreWrapper()->getClient()->execute($this->selectQuery);
         $records = array_map(
-            static fn (Record $record): array => $record->getValues(),
+            static fn (Record $record): array => $record->getValuesAsArray(),
             iterator_to_array($result->iterateRecords()),
         );
 

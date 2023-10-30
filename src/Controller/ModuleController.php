@@ -15,14 +15,18 @@ use GibsonOS\Core\Store\ModuleStore;
 use GibsonOS\Core\Store\SettingStore;
 use GibsonOS\Core\Store\TaskStore;
 use JsonException;
+use MDO\Exception\ClientException;
+use MDO\Exception\RecordException;
 use ReflectionException;
 
 class ModuleController extends AbstractController
 {
     /**
-     * @throws SelectError
      * @throws JsonException
      * @throws ReflectionException
+     * @throws SelectError
+     * @throws ClientException
+     * @throws RecordException
      */
     #[CheckPermission([Permission::MANAGE, Permission::READ])]
     public function get(
