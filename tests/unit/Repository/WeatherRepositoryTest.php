@@ -40,7 +40,7 @@ class WeatherRepositoryTest extends Unit
     public function testGetByDate(): void
     {
         $date = new DateTimeImmutable();
-        $selectQuery = (new SelectQuery($this->table))
+        $selectQuery = (new SelectQuery($this->table, 't'))
             ->addWhere(new Where('`location_id`=? AND `date`=?', [42, $date->format('Y-m-d H:i:s')]))
             ->setLimit(1)
         ;
@@ -57,7 +57,7 @@ class WeatherRepositoryTest extends Unit
     public function testGetByNearestDate(): void
     {
         $date = new DateTimeImmutable();
-        $selectQuery = (new SelectQuery($this->table))
+        $selectQuery = (new SelectQuery($this->table, 't'))
             ->addWhere(new Where('`location_id`=? AND `date`<=?', [42, $date->format('Y-m-d H:i:s')]))
             ->setOrder('`date`', OrderDirection::DESC)
             ->setLimit(1)
@@ -75,7 +75,7 @@ class WeatherRepositoryTest extends Unit
     public function testGetByNearestDateNull(): void
     {
         $date = new DateTime();
-        $selectQuery = (new SelectQuery($this->table))
+        $selectQuery = (new SelectQuery($this->table, 't'))
             ->addWhere(new Where('`location_id`=? AND `date`<=?', [42, $date->format('Y-m-d H:i:s')]))
             ->setOrder('`date`', OrderDirection::DESC)
             ->setLimit(1)

@@ -27,7 +27,7 @@ class UserRepositoryTest extends Unit
 
     public function testGetById(): void
     {
-        $selectQuery = (new SelectQuery($this->table))
+        $selectQuery = (new SelectQuery($this->table, 't'))
             ->addWhere(new Where('`id`=?', [42]))
             ->setLimit(1)
         ;
@@ -60,7 +60,7 @@ class UserRepositoryTest extends Unit
 
     public function testGetByUsername(): void
     {
-        $selectQuery = (new SelectQuery($this->table))
+        $selectQuery = (new SelectQuery($this->table, 't'))
             ->addWhere(new Where('`user`=?', ['galaxy']))
             ->setLimit(1)
         ;
@@ -77,7 +77,7 @@ class UserRepositoryTest extends Unit
 
     public function testGetByUsernameAndPassword(): void
     {
-        $selectQuery = (new SelectQuery($this->table))
+        $selectQuery = (new SelectQuery($this->table, 't'))
             ->addWhere(new Where('`user`=? AND `password`=MD5(?)', ['galaxy', 'no hope']))
             ->setLimit(1)
         ;

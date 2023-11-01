@@ -175,7 +175,7 @@ class PermissionViewRepositoryTest extends Unit
 
     public function testGetPermissionByModule(): void
     {
-        $selectQuery = (new SelectQuery($this->table))
+        $selectQuery = (new SelectQuery($this->table, 't'))
             ->addWhere(new Where(
                 'IFNULL(`user_id`, :userIdNull)=:userId AND `module_name`=:moduleName AND `task_name` IS NULL AND `action_name` IS NULL',
                 ['userIdNull' => 0, 'userId' => 0, 'moduleName' => 'galaxy'],
@@ -192,7 +192,7 @@ class PermissionViewRepositoryTest extends Unit
 
     public function testGetPermissionByModuleWithUserId(): void
     {
-        $selectQuery = (new SelectQuery($this->table))
+        $selectQuery = (new SelectQuery($this->table, 't'))
             ->addWhere(new Where(
                 'IFNULL(`user_id`, :userIdNull)=:userId AND `module_name`=:moduleName AND `task_name` IS NULL AND `action_name` IS NULL',
                 ['userIdNull' => 0, 'userId' => 42, 'moduleName' => 'galaxy'],
@@ -209,7 +209,7 @@ class PermissionViewRepositoryTest extends Unit
 
     public function testGetPermissionByTask(): void
     {
-        $selectQuery = (new SelectQuery($this->table))
+        $selectQuery = (new SelectQuery($this->table, 't'))
             ->addWhere(new Where(
                 'IFNULL(`user_id`, :userIdNull)=:userId AND `module_name`=:moduleName AND `task_name`=:taskName AND `action_name` IS NULL',
                 ['userIdNull' => 0, 'userId' => 0, 'moduleName' => 'galaxy', 'taskName' => 'ford'],
@@ -230,7 +230,7 @@ class PermissionViewRepositoryTest extends Unit
 
     public function testGetPermissionByTaskWithUserId(): void
     {
-        $selectQuery = (new SelectQuery($this->table))
+        $selectQuery = (new SelectQuery($this->table, 't'))
             ->addWhere(new Where(
                 'IFNULL(`user_id`, :userIdNull)=:userId AND `module_name`=:moduleName AND `task_name`=:taskName AND `action_name` IS NULL',
                 ['userIdNull' => 0, 'userId' => 42, 'moduleName' => 'galaxy', 'taskName' => 'ford'],
@@ -251,7 +251,7 @@ class PermissionViewRepositoryTest extends Unit
 
     public function testGetPermissionByAction(): void
     {
-        $selectQuery = (new SelectQuery($this->table))
+        $selectQuery = (new SelectQuery($this->table, 't'))
             ->addWhere(new Where(
                 'IFNULL(`user_id`, :userIdNull)=:userId AND `module_name`=:moduleName AND `task_name`=:taskName AND `action_name`=:actionName AND `action_method`=:actionMethod',
                 [
@@ -280,7 +280,7 @@ class PermissionViewRepositoryTest extends Unit
 
     public function testGetPermissionByActionWithUserId(): void
     {
-        $selectQuery = (new SelectQuery($this->table))
+        $selectQuery = (new SelectQuery($this->table, 't'))
             ->addWhere(new Where(
                 'IFNULL(`user_id`, :userIdNull)=:userId AND `module_name`=:moduleName AND `task_name`=:taskName AND `action_name`=:actionName AND `action_method`=:actionMethod',
                 [

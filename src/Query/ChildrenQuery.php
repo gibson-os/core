@@ -75,7 +75,7 @@ class ChildrenQuery
      * @throws ReflectionException
      * @throws ClientException
      */
-    public function extend(SelectQuery $selectQuery, string $modelClassName, array $children): SelectQuery
+    public function extend(SelectQuery $selectQuery, string $modelClassName, array $children, string $alias = null): SelectQuery
     {
         $reflectionClass = $this->reflectionManager->getReflectionClass($modelClassName);
         $selects = [];
@@ -93,7 +93,10 @@ class ChildrenQuery
             }
 
             $parentModelClassName = $this->getModelClassName($reflectionProperty, $constraintAttribute);
-
+            $joinLeft =
+                $this->reflectionManager->allowsNull($reflectionProperty)
+                || $this->reflectionManager->getTypeName($reflectionProperty) === 'array'
+            ;
             /** @var AbstractModel $parentModel */
             $parentModel = new $parentModelClassName($this->modelWrapper);
             $table = $this->tableManager->getTable($parentModel->getTableName());
@@ -103,12 +106,12 @@ class ChildrenQuery
                     $child->getAlias(),
                     sprintf(
                         '`%s`.`%s`=`%s`.`%s`',
-                        $selectQuery->getAlias() ?? $selectQuery->getTable()->getTableName(),
+                        $alias ?? $selectQuery->getAlias() ?? $selectQuery->getTable()->getTableName(),
                         $this->getOwnColumn($reflectionProperty, $constraintAttribute),
                         $child->getAlias(),
-                        $this->getModelClassName($reflectionProperty, $constraintAttribute),
+                        $this->getChildColumn($reflectionProperty, $constraintAttribute),
                     ),
-                    JoinType::LEFT,
+                    $joinLeft ? JoinType::LEFT : JoinType::INNER,
                 ))
             ;
             $where = $constraintAttribute->getWhere();
@@ -121,7 +124,7 @@ class ChildrenQuery
                 $selectQuery->addWhere($where);
             }
 
-            $this->extend($selectQuery, $parentModelClassName, $child->getChildren());
+            $this->extend($selectQuery, $parentModelClassName, $child->getChildren(), $child->getAlias());
             $selects[] = new Select($table, $child->getAlias(), $child->getPrefix());
         }
 
@@ -150,7 +153,7 @@ class ChildrenQuery
 
     private function transformFieldName(string $fieldName): string
     {
-        return str_replace(' ', '', ucwords(str_replace('_', ' ', $fieldName)));
+        return lcfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $fieldName))));
     }
 
     private function getOwnProperty(

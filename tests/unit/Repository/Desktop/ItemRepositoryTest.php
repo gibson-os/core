@@ -54,7 +54,7 @@ class ItemRepositoryTest extends Unit
 
     public function testGetLastPosition(): void
     {
-        $selectQuery = (new SelectQuery($this->table))
+        $selectQuery = (new SelectQuery($this->table, 't'))
             ->addWhere(new Where('`user_id`=?', [0]))
             ->setOrder('`position`', OrderDirection::DESC)
             ->setLimit(1)

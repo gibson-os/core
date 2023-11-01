@@ -24,7 +24,7 @@ class RoleRepositoryTest extends Unit
 
     public function testGetByName(): void
     {
-        $selectQuery = (new SelectQuery($this->table))
+        $selectQuery = (new SelectQuery($this->table, 't'))
             ->addWhere(new Where('`name`=?', ['galaxy']))
             ->setLimit(1)
         ;

@@ -31,7 +31,7 @@ class DeviceRepositoryTest extends Unit
 
     public function testGetById(): void
     {
-        $selectQuery = (new SelectQuery($this->table))
+        $selectQuery = (new SelectQuery($this->table, 't'))
             ->addWhere(new Where('`id`=?', ['42']))
             ->setLimit(1)
         ;
@@ -48,7 +48,7 @@ class DeviceRepositoryTest extends Unit
 
     public function testGetByToken(): void
     {
-        $selectQuery = (new SelectQuery($this->table))
+        $selectQuery = (new SelectQuery($this->table, 't'))
             ->addWhere(new Where('`token`=?', ['marvin']))
             ->setLimit(1)
         ;

@@ -27,7 +27,7 @@ class ActionRepositoryTest extends Unit
 
     public function testGetById(): void
     {
-        $selectQuery = (new SelectQuery($this->table))
+        $selectQuery = (new SelectQuery($this->table, 't'))
             ->addWhere(new Where('`id`=?', [42]))
             ->setLimit(1)
         ;
@@ -63,7 +63,7 @@ class ActionRepositoryTest extends Unit
 
     public function testGetByNameAndTaskId(): void
     {
-        $selectQuery = (new SelectQuery($this->table))
+        $selectQuery = (new SelectQuery($this->table, 't'))
             ->addWhere(new Where('`name`=? AND `method`=? AND `task_id`=?', ['galaxy', 'GET', 42]))
             ->setLimit(1)
         ;

@@ -104,7 +104,7 @@ class SettingRepositoryTest extends Unit
 
     public function testGetByKey(): void
     {
-        $selectQuery = (new SelectQuery($this->table))
+        $selectQuery = (new SelectQuery($this->table, 't'))
             ->addWhere(new Where(
                 '`module_id`=? AND (`user_id` IS NULL OR `user_id`=?) AND `key`=?',
                 [42, 24, 'marvin'],
@@ -120,7 +120,7 @@ class SettingRepositoryTest extends Unit
 
     public function testGetByKeyEmptyUserId(): void
     {
-        $selectQuery = (new SelectQuery($this->table))
+        $selectQuery = (new SelectQuery($this->table, 't'))
             ->addWhere(new Where(
                 '`module_id`=? AND (`user_id` IS NULL) AND `key`=?',
                 [42, 'marvin'],

@@ -26,7 +26,7 @@ class DevicePushRepositoryTest extends Unit
 
     public function testGetByDevice(): void
     {
-        $selectQuery = (new SelectQuery($this->table))
+        $selectQuery = (new SelectQuery($this->table, 't'))
             ->addWhere(new Where(
                 '`module`=? AND `task`=? AND `action`=? AND `foreign_id`=? AND `device_id`=?',
                 ['marvin', 'arthur', 'dent', 'no hope', 'galaxy'],

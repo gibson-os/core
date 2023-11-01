@@ -28,7 +28,7 @@ class PermissionRepositoryTest extends Unit
 
     public function testGetByModuleTaskAndAction(): void
     {
-        $selectQuery = (new SelectQuery($this->table))
+        $selectQuery = (new SelectQuery($this->table, 't'))
             ->addWhere(new Where(
                 '`module_id`=? AND `task_id`=? AND `action_id`=? AND IFNULL(`user_id`, ?)=?',
                 [42, 420, 4242, 0, 0],
@@ -48,7 +48,7 @@ class PermissionRepositoryTest extends Unit
 
     public function testGetByModuleTaskAndActionWithUserId(): void
     {
-        $selectQuery = (new SelectQuery($this->table))
+        $selectQuery = (new SelectQuery($this->table, 't'))
             ->addWhere(new Where(
                 '`module_id`=? AND `task_id`=? AND `action_id`=? AND IFNULL(`user_id`, ?)=?',
                 [42, 420, 4242, 0, 4200],
@@ -69,7 +69,7 @@ class PermissionRepositoryTest extends Unit
 
     public function testGetByModuleAndTask(): void
     {
-        $selectQuery = (new SelectQuery($this->table))
+        $selectQuery = (new SelectQuery($this->table, 't'))
             ->addWhere(new Where(
                 '`module_id`=? AND `task_id`=? AND `action_id` IS NULL AND IFNULL(`user_id`, ?)=?',
                 [42, 420, 0, 0],
@@ -88,7 +88,7 @@ class PermissionRepositoryTest extends Unit
 
     public function testGetByModuleAndTaskWithUserId(): void
     {
-        $selectQuery = (new SelectQuery($this->table))
+        $selectQuery = (new SelectQuery($this->table, 't'))
             ->addWhere(new Where(
                 '`module_id`=? AND `task_id`=? AND `action_id` IS NULL AND IFNULL(`user_id`, ?)=?',
                 [42, 420, 0, 4200],

@@ -156,7 +156,7 @@ abstract class AbstractRepository
         array $children = [],
     ): AbstractModel {
         $model = new $modelClassName($this->repositoryWrapper->getModelWrapper());
-        $selectQuery = $this->getSelectQuery($model->getTableName())
+        $selectQuery = $this->getSelectQuery($model->getTableName(), 't')
             ->addWhere(new Where($where, $parameters))
             ->setLimit(1)
             ->setOrders($orderBy)

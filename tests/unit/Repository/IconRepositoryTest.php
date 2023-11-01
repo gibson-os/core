@@ -27,7 +27,7 @@ class IconRepositoryTest extends Unit
 
     public function testGetById(): void
     {
-        $selectQuery = (new SelectQuery($this->table))
+        $selectQuery = (new SelectQuery($this->table, 't'))
             ->addWhere(new Where('`id`=?', [42]))
             ->setLimit(1)
         ;
