@@ -59,7 +59,11 @@ class ChildrenMapper
                     ?->getParentModelClassName()
                 ;
                 $isArray = true;
-                $setter = sprintf('add%s', $uppercasePropertyName);
+                $setter = sprintf(
+                    '%s%s',
+                    $model->isConstraintLoaded($propertyName) ? 'add' : 'set',
+                    $uppercasePropertyName,
+                );
             }
 
             if ($childModelClassName === null) {
@@ -73,14 +77,17 @@ class ChildrenMapper
             /** @var AbstractModel $childModel */
             $childModel = new $childModelClassName($this->modelWrapper);
             $tableName = $childModel->getTableName();
-            $key = $tableName . implode(
-                '_',
-                $this->primaryKeyExtractor->extractFromRecord(
-                    $this->tableManager->getTable($tableName),
-                    $record,
-                    $child->getPrefix(),
-                ),
+            $primaryKeys = $this->primaryKeyExtractor->extractFromRecord(
+                $this->tableManager->getTable($tableName),
+                $record,
+                $child->getPrefix(),
             );
+
+            if (count(array_filter($primaryKeys)) === 0) {
+                continue;
+            }
+
+            $key = $tableName . implode('_', $primaryKeys);
 
             if (!isset($loadedRecords[$key])) {
                 $this->modelManager->loadFromRecord($record, $childModel, $child->getPrefix());
