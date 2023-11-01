@@ -93,10 +93,6 @@ class ChildrenQuery
             }
 
             $parentModelClassName = $this->getModelClassName($reflectionProperty, $constraintAttribute);
-            $joinLeft =
-                $this->reflectionManager->allowsNull($reflectionProperty)
-                || $this->reflectionManager->getTypeName($reflectionProperty) === 'array'
-            ;
             /** @var AbstractModel $parentModel */
             $parentModel = new $parentModelClassName($this->modelWrapper);
             $table = $this->tableManager->getTable($parentModel->getTableName());
@@ -111,7 +107,7 @@ class ChildrenQuery
                         $child->getAlias(),
                         $this->getChildColumn($reflectionProperty, $constraintAttribute),
                     ),
-                    $joinLeft ? JoinType::LEFT : JoinType::INNER,
+                    JoinType::LEFT,
                 ))
             ;
             $where = $constraintAttribute->getWhere();
