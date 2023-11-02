@@ -96,16 +96,24 @@ class ChildrenQuery
             /** @var AbstractModel $parentModel */
             $parentModel = new $parentModelClassName($this->modelWrapper);
             $table = $this->tableManager->getTable($parentModel->getTableName());
+            $wheres = [];
+
+            foreach ($child->getWheres() as $where) {
+                $selectQuery->addParameters($where->getParameters());
+                $wheres[] = $where->getCondition();
+            }
+
             $selectQuery
                 ->addJoin(new Join(
                     $table,
                     $child->getAlias(),
                     sprintf(
-                        '`%s`.`%s`=`%s`.`%s`',
+                        '`%s`.`%s`=`%s`.`%s`%s',
                         $alias ?? $selectQuery->getAlias() ?? $selectQuery->getTable()->getTableName(),
                         $this->getOwnColumn($reflectionProperty, $constraintAttribute),
                         $child->getAlias(),
                         $this->getChildColumn($reflectionProperty, $constraintAttribute),
+                        count($wheres) === 0 ? '' : ' AND (' . implode(') AND (', $wheres) . ')',
                     ),
                     JoinType::LEFT,
                 ))
@@ -114,10 +122,6 @@ class ChildrenQuery
 
             if ($where !== null) {
                 $selectQuery->addWhere(new Where($where, $constraintAttribute->getWhereParameters()));
-            }
-
-            foreach ($child->getWheres() as $where) {
-                $selectQuery->addWhere($where);
             }
 
             $this->extend($selectQuery, $parentModelClassName, $child->getChildren(), $child->getAlias());
