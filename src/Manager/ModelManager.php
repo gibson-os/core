@@ -294,6 +294,10 @@ class ModelManager
             $value = $model->{$getterPrefix . $transformedFieldName}();
 
             if ($value === null) {
+                if (!$field->hasAutoIncrement()) {
+                    $values[$fieldName] = new Value(null);
+                }
+
                 continue;
             }
 

@@ -89,7 +89,7 @@ class ModelManagerTest extends Unit
 
     public function testSaveWithoutChildren(): void
     {
-        $replaceQuery = new ReplaceQuery($this->table, []);
+        $replaceQuery = new ReplaceQuery($this->table, ['parent_id' => new Value(null)]);
         $record = new Record(['id' => new Value(42), 'parent_id' => new Value(null)]);
         $this->replaceService->replaceAndLoadRecord($replaceQuery)
             ->shouldBeCalledonce()
@@ -107,7 +107,7 @@ class ModelManagerTest extends Unit
 
     public function testSaveWithoutChildrenWithSetChildren(): void
     {
-        $replaceQuery = new ReplaceQuery($this->table, []);
+        $replaceQuery = new ReplaceQuery($this->table, ['parent_id' => new Value(null)]);
         $record = new Record(['id' => new Value(42), 'parent_id' => new Value(null)]);
         $this->replaceService->replaceAndLoadRecord($replaceQuery)
             ->shouldBeCalledonce()
@@ -130,7 +130,7 @@ class ModelManagerTest extends Unit
 
     public function testSaveWithoutChildrenWithAddChildren(): void
     {
-        $replaceQuery = new ReplaceQuery($this->table, []);
+        $replaceQuery = new ReplaceQuery($this->table, ['parent_id' => new Value(null)]);
         $record = new Record(['id' => new Value(42), 'parent_id' => new Value(null)]);
         $this->replaceService->replaceAndLoadRecord($replaceQuery)
             ->shouldBeCalledonce()
@@ -160,7 +160,7 @@ class ModelManagerTest extends Unit
         $this->client->startTransaction()
             ->shouldBeCalledOnce()
         ;
-        $replaceQuery = new ReplaceQuery($this->table, []);
+        $replaceQuery = new ReplaceQuery($this->table, ['parent_id' => new Value(null)]);
         $record = new Record(['id' => new Value(42), 'parent_id' => new Value(null)]);
         $this->replaceService->replaceAndLoadRecord($replaceQuery)
             ->shouldBeCalledonce()
@@ -191,7 +191,7 @@ class ModelManagerTest extends Unit
             ->shouldBeCalledOnce()
         ;
         $record = new Record(['id' => new Value(42), 'parent_id' => new Value(null)]);
-        $this->replaceService->replaceAndLoadRecord(new ReplaceQuery($this->table, []))
+        $this->replaceService->replaceAndLoadRecord(new ReplaceQuery($this->table, ['parent_id' => new Value(null)]))
             ->shouldBeCalledonce()
             ->willReturn($record)
         ;
@@ -232,7 +232,7 @@ class ModelManagerTest extends Unit
             ->shouldBeCalledOnce()
         ;
         $record = new Record(['id' => new Value(42), 'parent_id' => new Value(null)]);
-        $this->replaceService->replaceAndLoadRecord(new ReplaceQuery($this->table, []))
+        $this->replaceService->replaceAndLoadRecord(new ReplaceQuery($this->table, ['parent_id' => new Value(null)]))
             ->shouldBeCalledonce()
             ->willReturn($record)
         ;
