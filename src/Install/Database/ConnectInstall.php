@@ -77,11 +77,12 @@ class ConnectInstall extends AbstractInstall implements PriorityInterface, Singl
         }
 
         try {
-            $mysqlUserClient = new Client($host, $user, $password);
+            $mysqlUserClient = new Client($host, $user, $password, $database);
         } catch (ClientException) {
             try {
                 $client->execute("CREATE USER '" . $user . "'@'%' IDENTIFIED BY '" . $password . "'");
                 $client->execute("GRANT USAGE ON *.* TO  '" . $user . "'@'%' IDENTIFIED BY '" . $password . "' WITH MAX_QUERIES_PER_HOUR 0 MAX_CONNECTIONS_PER_HOUR 0 MAX_UPDATES_PER_HOUR 0 MAX_USER_CONNECTIONS 0");
+                $client->execute('GRANT SELECT, INSERT, UPDATE, DELETE ON `' . $database . "`.* TO '" . $user . "'@'%'");
             } catch (ClientException) {
                 throw new InstallException(sprintf(
                     'MySQL User "%s" could not be created! Error: %s',
@@ -90,21 +91,10 @@ class ConnectInstall extends AbstractInstall implements PriorityInterface, Singl
                 ));
             }
 
-            $mysqlUserClient = new Client($host, $user, $password);
+            $mysqlUserClient = new Client($host, $user, $password, $database);
         }
 
-        try {
-            $mysqlUserClient->useDatabase($database);
-            $client->execute('GRANT SELECT, INSERT, UPDATE, DELETE ON `' . $database . "`.* TO '" . $user . "'@'%'");
-        } catch (ClientException) {
-            throw new InstallException(sprintf(
-                'MySQL User "%s" could not be connected with "%s"! Error: %s',
-                $user,
-                $database,
-                $client->getError(),
-            ));
-        }
-
+        $mysqlUserClient->useDatabase($database);
         $mysqlUserClient->close();
 
         yield (new Configuration('Database connection established!'))
