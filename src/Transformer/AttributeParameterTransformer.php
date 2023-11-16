@@ -8,6 +8,7 @@ use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Service\RequestService;
 use GibsonOS\Core\Service\SessionService;
 use GibsonOS\Core\Utility\JsonUtility;
+use JsonException;
 use ReflectionException;
 
 class AttributeParameterTransformer
@@ -37,7 +38,9 @@ class AttributeParameterTransformer
 
             try {
                 $value = match ($parameterParts[0]) {
-                    'session' => $this->sessionService->get($parameterParts[1]),
+                    'session' => isset($parameterParts[1])
+                        ? $this->sessionService->get($parameterParts[1])
+                        : $this->getRequestValue($parameterParts[0]),
                     default => $this->getRequestValue($parameterParts[0]),
                 };
             } catch (RequestError) {
@@ -93,6 +96,10 @@ class AttributeParameterTransformer
     {
         $value = $this->requestService->getRequestValue($key);
 
-        return is_string($value) ? JsonUtility::decode($value) : $value;
+        try {
+            return is_string($value) ? JsonUtility::decode($value) : $value;
+        } catch (JsonException) {
+            return $value;
+        }
     }
 }

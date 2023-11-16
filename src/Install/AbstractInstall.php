@@ -105,6 +105,7 @@ abstract class AbstractInstall implements InstallInterface
      * @throws ReflectionException
      * @throws SaveError
      * @throws SelectError
+     * @throws RecordException
      */
     protected function setSetting(string $moduleName, string $key, string $value): void
     {
@@ -116,7 +117,7 @@ abstract class AbstractInstall implements InstallInterface
             $setting = new Setting($this->modelWrapper);
         }
 
-        $this->modelManager->save(
+        $this->modelManager->saveWithoutChildren(
             $setting
                 ->setModuleId($module->getId() ?? 0)
                 ->setKey($key)

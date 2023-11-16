@@ -98,6 +98,7 @@ class AttributeParameterTransformerTest extends Unit
     {
         return [
             [['id' => 'marvin'], 'marvin', 42, ['id' => 42]],
+            [['id' => 'session'], 'session', 'marvin', ['id' => 'marvin']],
             [['id' => 'arthur.dent'], 'arthur', '[]', ['id' => null]],
             [['id' => 'arthur.dent'], 'arthur', '{"dent": 42}', ['id' => 42]],
             [['id' => 'dent'], 'arthur', '{"dent": 42}', ['id' => 42], 'arthur.'],

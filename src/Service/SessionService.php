@@ -3,20 +3,32 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Service;
 
+use GibsonOS\Core\Exception\Repository\SelectError;
+use GibsonOS\Core\Manager\ModelManager;
 use GibsonOS\Core\Model\User;
+use GibsonOS\Core\Repository\UserRepository;
 use GibsonOS\Core\Wrapper\ModelWrapper;
+use JsonException;
+use MDO\Exception\ClientException;
+use MDO\Exception\RecordException;
 use OutOfBoundsException;
+use ReflectionException;
 
 class SessionService
 {
     private const LOGIN = 'login';
 
-    private const USER = 'user';
+    private const USER_ID = 'userId';
 
     private array $data;
 
-    public function __construct(protected readonly ModelWrapper $modelWrapper)
-    {
+    private ?User $user = null;
+
+    public function __construct(
+        protected readonly ModelWrapper $modelWrapper,
+        protected readonly ModelManager $modelManager,
+        protected readonly UserRepository $userRepository,
+    ) {
         session_start();
         /**
          * @psalm-suppress InvalidScalarArgument
@@ -70,23 +82,21 @@ class SessionService
 
     public function login(User $user): SessionService
     {
+        $this->user = $user;
+
         return $this
             ->set(self::LOGIN, true)
-            ->set(self::USER, $user)
-            // @todo old stuff. Entfernen wenn alles umgebaut ist
-            ->set('user_id', $user->getId())
-            ->set('user_name', $user->getUser())
+            ->set(self::USER_ID, $user->getId())
         ;
     }
 
     public function logout(): SessionService
     {
+        $this->user = null;
+
         return $this
             ->unset(self::LOGIN)
-            ->unset(self::USER)
-            // @todo old stuff. Entfernen wenn alles umgebaut ist
-            ->unset('user_id')
-            ->unset('user_name')
+            ->unset(self::USER_ID)
         ;
     }
 
@@ -95,16 +105,34 @@ class SessionService
         return (bool) $this->getWithDefault(self::LOGIN, false);
     }
 
+    /**
+     * @throws JsonException
+     * @throws RecordException
+     * @throws ReflectionException
+     */
     public function getUser(): ?User
     {
-        return $this->getWithDefault(self::USER);
+        $userId = $this->getUserId();
+
+        if ($userId === 0) {
+            return null;
+        }
+
+        if ($userId === $this->user?->getId()) {
+            return $this->user;
+        }
+
+        try {
+            $this->user = $this->userRepository->getById($userId);
+        } catch (SelectError|ClientException) {
+            return null;
+        }
+
+        return $this->user;
     }
 
-    public function getUserId(): ?int
+    public function getUserId(): int
     {
-        /** @var User $user */
-        $user = $this->getWithDefault(self::USER, (new User($this->modelWrapper))->setId(0));
-
-        return $user->getId();
+        return $this->getWithDefault(self::USER_ID, 0);
     }
 }
