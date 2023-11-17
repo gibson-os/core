@@ -71,16 +71,16 @@
         },
         {
             "name": "gibson-os/mdo",
-            "version": "v2.12.0",
+            "version": "v2.12.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/gibson-os/mdo.git",
-                "reference": "751e753ae11972101e8a9b717915548873e45b3b"
+                "reference": "b39f67b42b09c249db8eee002fc9deabbe9dd57b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/gibson-os/mdo/zipball/751e753ae11972101e8a9b717915548873e45b3b",
-                "reference": "751e753ae11972101e8a9b717915548873e45b3b",
+                "url": "https://api.github.com/repos/gibson-os/mdo/zipball/b39f67b42b09c249db8eee002fc9deabbe9dd57b",
+                "reference": "b39f67b42b09c249db8eee002fc9deabbe9dd57b",
                 "shasum": ""
             },
             "require": {
@@ -112,9 +112,9 @@
             "notification-url": "https://packagist.org/downloads/",
             "support": {
                 "issues": "https://github.com/gibson-os/mdo/issues",
-                "source": "https://github.com/gibson-os/mdo/tree/v2.12.0"
+                "source": "https://github.com/gibson-os/mdo/tree/v2.12.1"
             },
-            "time": "2023-10-27T07:52:29+00:00"
+            "time": "2023-11-15T21:39:18+00:00"
         },
         {
             "name": "google/auth",
@@ -176,16 +176,16 @@
         },
         {
             "name": "google/protobuf",
-            "version": "v3.25.0",
+            "version": "v3.25.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/protocolbuffers/protobuf-php.git",
-                "reference": "e5a021e653ee3a7a78760caefa605b4ec31bba80"
+                "reference": "1fb247e72df401c863ed239c1660f981644af5db"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/protocolbuffers/protobuf-php/zipball/e5a021e653ee3a7a78760caefa605b4ec31bba80",
-                "reference": "e5a021e653ee3a7a78760caefa605b4ec31bba80",
+                "url": "https://api.github.com/repos/protocolbuffers/protobuf-php/zipball/1fb247e72df401c863ed239c1660f981644af5db",
+                "reference": "1fb247e72df401c863ed239c1660f981644af5db",
                 "shasum": ""
             },
             "require": {
@@ -214,9 +214,9 @@
                 "proto"
             ],
             "support": {
-                "source": "https://github.com/protocolbuffers/protobuf-php/tree/v3.25.0"
+                "source": "https://github.com/protocolbuffers/protobuf-php/tree/v3.25.1"
             },
-            "time": "2023-11-01T22:12:38+00:00"
+            "time": "2023-11-15T21:36:03+00:00"
         },
         {
             "name": "guzzlehttp/guzzle",

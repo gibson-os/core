@@ -130,8 +130,8 @@ class SettingRepository extends AbstractRepository
         $selectQuery = $this->getSelectQuery($this->settingTableName, 's')
             ->addJoin(new Join($this->getTable($this->moduleTableName), 'm', '`s`.`module_id`=`m`.`id`'))
             ->addWhere(new Where('`m`.`name`=?', [$moduleName]))
-            ->addWhere(new Where('`m`.`key`=?', [$key]))
-            ->addWhere(new Where('`m`.`value`=?', [$value]))
+            ->addWhere(new Where('`s`.`key`=?', [$key]))
+            ->addWhere(new Where('`s`.`value`=?', [$value]))
             ->setLimit(1)
         ;
 
