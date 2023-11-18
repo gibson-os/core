@@ -45,7 +45,7 @@ trait RepositoryTrait
      *
      * @return T
      */
-    private function loadModel(SelectQuery $selectQuery, string $modelClassName, string $prefix = null): AbstractModel
+    private function loadModel(SelectQuery $selectQuery, string $modelClassName, string $prefix = ''): AbstractModel
     {
         $this->repositoryWrapper->getModelWrapper()
             ->shouldBeCalledTimes(2)
@@ -96,16 +96,9 @@ trait RepositoryTrait
             ->willReturn($childrenMapper->reveal())
         ;
         $model = new $modelClassName($this->modelWrapper->reveal());
-
-        if ($prefix === null) {
-            $this->modelManager->loadFromRecord($record, $model)
-                ->shouldBeCalledOnce()
-            ;
-        } else {
-            $this->modelManager->loadFromRecord($record, $model, $prefix)
-                ->shouldBeCalledOnce()
-            ;
-        }
+        $this->modelManager->loadFromRecord($record, $model, $prefix)
+            ->shouldBeCalledOnce()
+        ;
 
         return $model;
     }

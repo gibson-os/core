@@ -34,24 +34,24 @@ class SettingRepositoryTest extends Unit
 
     public function testGetAll(): void
     {
-        $selectQuery = (new SelectQuery($this->table))
+        $selectQuery = (new SelectQuery($this->table, 't'))
             ->addWhere(new Where('`module_id`=? AND (`user_id` IS NULL OR `user_id`=?)', [42, 24]))
         ;
 
         $this->assertEquals(
-            $this->loadModel($selectQuery, Setting::class, ''),
+            $this->loadModel($selectQuery, Setting::class),
             $this->settingRepository->getAll(42, 24)[0],
         );
     }
 
     public function testGetAllUserIdEmpty(): void
     {
-        $selectQuery = (new SelectQuery($this->table))
+        $selectQuery = (new SelectQuery($this->table, 't'))
             ->addWhere(new Where('`module_id`=? AND (`user_id` IS NULL)', [42]))
         ;
 
         $this->assertEquals(
-            $this->loadModel($selectQuery, Setting::class, ''),
+            $this->loadModel($selectQuery, Setting::class),
             $this->settingRepository->getAll(42, null)[0],
         );
     }
@@ -64,7 +64,7 @@ class SettingRepositoryTest extends Unit
             ->addWhere(new Where('`s`.`user_id` IS NULL OR `s`.`user_id`=?', [42]))
         ;
 
-        $model = $this->loadModel($selectQuery, Setting::class, '');
+        $model = $this->loadModel($selectQuery, Setting::class);
         $this->repositoryWrapper->getModelWrapper()
             ->shouldBeCalledOnce()
         ;
@@ -87,7 +87,7 @@ class SettingRepositoryTest extends Unit
             ->addWhere(new Where('`s`.`user_id` IS NULL', []))
         ;
 
-        $model = $this->loadModel($selectQuery, Setting::class, '');
+        $model = $this->loadModel($selectQuery, Setting::class);
         $this->repositoryWrapper->getModelWrapper()
             ->shouldBeCalledOnce()
         ;

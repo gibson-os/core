@@ -40,23 +40,23 @@ class ActionRepositoryTest extends Unit
 
     public function testFindByName(): void
     {
-        $selectQuery = (new SelectQuery($this->table))
+        $selectQuery = (new SelectQuery($this->table, 't'))
             ->addWhere(new Where('`name` LIKE ?', ['galaxy%']))
         ;
         $this->assertEquals(
-            $this->loadModel($selectQuery, Action::class, ''),
+            $this->loadModel($selectQuery, Action::class),
             $this->actionRepository->findByName('galaxy')[0],
         );
     }
 
     public function testFindByNameWithTaskId(): void
     {
-        $selectQuery = (new SelectQuery($this->table))
+        $selectQuery = (new SelectQuery($this->table, 't'))
             ->addWhere(new Where('`name` LIKE ? AND `task_id`=?', ['galaxy%', 42]))
         ;
 
         $this->assertEquals(
-            $this->loadModel($selectQuery, Action::class, ''),
+            $this->loadModel($selectQuery, Action::class),
             $this->actionRepository->findByName('galaxy', 42)[0],
         );
     }

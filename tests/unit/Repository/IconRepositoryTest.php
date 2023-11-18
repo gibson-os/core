@@ -44,7 +44,7 @@ class IconRepositoryTest extends Unit
 
     public function testFindByIds(): void
     {
-        $selectQuery = (new SelectQuery($this->table))
+        $selectQuery = (new SelectQuery($this->table, 't'))
             ->addWhere(new Where('`id` IN (?)', [42]))
         ;
         $selectService = $this->prophesize(SelectService::class);
@@ -57,7 +57,7 @@ class IconRepositoryTest extends Unit
             ->willReturn($selectService->reveal())
         ;
 
-        $model = $this->loadModel($selectQuery, Icon::class, '');
+        $model = $this->loadModel($selectQuery, Icon::class);
         $icon = $this->iconRepository->findByIds([42])[0];
 
         $date = new DateTimeImmutable();

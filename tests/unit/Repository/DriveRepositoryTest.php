@@ -52,7 +52,7 @@ class DriveRepositoryTest extends Unit
             ))
         ;
 
-        $model = $this->loadModel($selectQuery, Drive::class, '');
+        $model = $this->loadModel($selectQuery, Drive::class);
         $this->repositoryWrapper->getModelWrapper()
             ->shouldBeCalledOnce()
         ;
@@ -82,7 +82,7 @@ class DriveRepositoryTest extends Unit
             ))
         ;
 
-        $model = $this->loadModel($selectQuery, Drive::class, '');
+        $model = $this->loadModel($selectQuery, Drive::class);
         $this->repositoryWrapper->getModelWrapper()
             ->shouldBeCalledOnce()
         ;

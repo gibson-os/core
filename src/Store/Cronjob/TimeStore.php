@@ -33,7 +33,7 @@ class TimeStore extends AbstractDatabaseStore
     protected function setWheres(): void
     {
         if ($this->cronjob !== null) {
-            $this->addWhere('`cronjob_d`=?', [$this->cronjob->getId() ?? 0]);
+            $this->addWhere('`cronjob_id`=?', [$this->cronjob->getId() ?? 0]);
         }
     }
 

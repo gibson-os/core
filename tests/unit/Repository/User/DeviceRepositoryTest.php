@@ -65,11 +65,11 @@ class DeviceRepositoryTest extends Unit
 
     public function testFindByUserId(): void
     {
-        $selectQuery = (new SelectQuery($this->table))
+        $selectQuery = (new SelectQuery($this->table, 't'))
             ->addWhere(new Where('`user_id`=?', [42]))
         ;
 
-        $model = $this->loadModel($selectQuery, Device::class, '');
+        $model = $this->loadModel($selectQuery, Device::class);
         $device = $this->deviceRepository->findByUserId(42)[0];
 
         $date = new DateTimeImmutable();

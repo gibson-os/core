@@ -39,24 +39,24 @@ class TaskRepositoryTest extends Unit
 
     public function testFindByName(): void
     {
-        $selectQuery = (new SelectQuery($this->table))
+        $selectQuery = (new SelectQuery($this->table, 't'))
             ->addWhere(new Where('`name` LIKE ?', ['galaxy%']))
         ;
 
         $this->assertEquals(
-            $this->loadModel($selectQuery, Task::class, ''),
+            $this->loadModel($selectQuery, Task::class),
             $this->taskRepository->findByName('galaxy')[0],
         );
     }
 
     public function testFindByNameWithModuleId(): void
     {
-        $selectQuery = (new SelectQuery($this->table))
+        $selectQuery = (new SelectQuery($this->table, 't'))
             ->addWhere(new Where('`name` LIKE ? AND `module_id`=?', ['galaxy%', 42]))
         ;
 
         $this->assertEquals(
-            $this->loadModel($selectQuery, Task::class, ''),
+            $this->loadModel($selectQuery, Task::class),
             $this->taskRepository->findByName('galaxy', 42)[0],
         );
     }

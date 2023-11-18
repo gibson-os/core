@@ -100,37 +100,26 @@ abstract class AbstractRepository
      * @param class-string<T>   $modelClassName
      * @param ChildrenMapping[] $children
      *
+     * @throws JsonException
+     * @throws RecordException
      * @throws ReflectionException
      * @throws SelectError
-     * @throws RecordException
      * @throws ClientException
-     * @throws JsonException
      *
      * @return T
      */
     protected function getModel(SelectQuery $selectQuery, string $modelClassName, array $children = []): AbstractModel
     {
-        $this->repositoryWrapper->getChildrenQuery()->extend($selectQuery, $modelClassName, $children);
-        $result = $this->repositoryWrapper->getClient()->execute($selectQuery);
-        $record = $result->iterateRecords()->current();
+        $models = $this->getModels($selectQuery, $modelClassName, children: $children);
 
-        if (!$record instanceof Record) {
+        if (count($models) === 0) {
             $exception = new SelectError('No results!');
             $exception->setTable($this->repositoryWrapper->getTableManager()->getTable($selectQuery->getTable()->getTableName()));
 
             throw $exception;
         }
 
-        $model = new $modelClassName($this->repositoryWrapper->getModelWrapper());
-        $this->repositoryWrapper->getModelManager()->loadFromRecord($record, $model);
-
-        $this->repositoryWrapper->getChildrenMapper()->getChildrenModels(
-            $record,
-            $model,
-            $children,
-        );
-
-        return $model;
+        return $models[0];
     }
 
     /**
@@ -158,9 +147,12 @@ abstract class AbstractRepository
         $model = new $modelClassName($this->repositoryWrapper->getModelWrapper());
         $selectQuery = $this->getSelectQuery($model->getTableName(), 't')
             ->addWhere(new Where($where, $parameters))
-            ->setLimit(1)
             ->setOrders($orderBy)
         ;
+
+        if (count($children) === 0) {
+            $selectQuery->setLimit(1);
+        }
 
         return $this->getModel($selectQuery, $modelClassName, $children);
     }
@@ -191,7 +183,7 @@ abstract class AbstractRepository
     ): array {
         /** @var AbstractModel $model */
         $model = new $modelClassName($this->repositoryWrapper->getModelWrapper());
-        $selectQuery = $this->getSelectQuery($model->getTableName())
+        $selectQuery = $this->getSelectQuery($model->getTableName(), 't')
             ->addWhere(new Where($where, $parameters))
             ->setLimit($limit, $offset)
             ->setOrders($orderBy)

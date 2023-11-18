@@ -26,12 +26,12 @@ class PermissionRepositoryTest extends Unit
 
     public function testFindByActionId(): void
     {
-        $selectQuery = (new SelectQuery($this->table))
+        $selectQuery = (new SelectQuery($this->table, 't'))
             ->addWhere(new Where('`action_id`=?', [42]))
         ;
 
         $this->assertEquals(
-            $this->loadModel($selectQuery, Action\Permission::class, ''),
+            $this->loadModel($selectQuery, Action\Permission::class),
             $this->permissionRepository->findByActionId(42)[0],
         );
     }

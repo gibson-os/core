@@ -39,12 +39,12 @@ class ModuleRepositoryTest extends Unit
 
     public function testFindByName(): void
     {
-        $selectQuery = (new SelectQuery($this->table))
+        $selectQuery = (new SelectQuery($this->table, 't'))
             ->addWhere(new Where('`name` LIKE ?', ['galaxy%']))
         ;
 
         $this->assertEquals(
-            $this->loadModel($selectQuery, Module::class, ''),
+            $this->loadModel($selectQuery, Module::class),
             $this->moduleRepository->findByName('galaxy')[0],
         );
     }
@@ -64,12 +64,12 @@ class ModuleRepositoryTest extends Unit
 
     public function testGetAll(): void
     {
-        $selectQuery = (new SelectQuery($this->table))
+        $selectQuery = (new SelectQuery($this->table, 't'))
             ->addWhere(new Where('1', []))
         ;
 
         $this->assertEquals(
-            $this->loadModel($selectQuery, Module::class, ''),
+            $this->loadModel($selectQuery, Module::class),
             $this->moduleRepository->getAll()[0],
         );
     }

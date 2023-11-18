@@ -78,7 +78,7 @@ class CronjobRepositoryTest extends Unit
             ))
         ;
 
-        $model = $this->loadModel($selectQuery, Cronjob::class, '');
+        $model = $this->loadModel($selectQuery, Cronjob::class);
         $this->repositoryWrapper->getModelWrapper()
             ->shouldBeCalledOnce()
         ;

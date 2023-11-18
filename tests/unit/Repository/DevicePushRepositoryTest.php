@@ -52,14 +52,14 @@ class DevicePushRepositoryTest extends Unit
 
     public function testGetByAction(): void
     {
-        $selectQuery = (new SelectQuery($this->table))
+        $selectQuery = (new SelectQuery($this->table, 't'))
             ->addWhere(new Where(
                 '`module`=? AND `task`=? AND `action`=? AND `foreign_id`=?',
                 ['marvin', 'arthur', 'dent', 'no hope'],
             ))
         ;
 
-        $model = $this->loadModel($selectQuery, DevicePush::class, '');
+        $model = $this->loadModel($selectQuery, DevicePush::class);
         $devicePush = $this->devicePushRepository->getAllByAction(
             'marvin',
             'arthur',

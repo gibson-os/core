@@ -53,24 +53,24 @@ class LocationRepositoryTest extends Unit
 
     public function testFindByName(): void
     {
-        $selectQuery = (new SelectQuery($this->table))
+        $selectQuery = (new SelectQuery($this->table, 't'))
             ->addWhere(new Where('`name` LIKE ?', ['arthur%']))
         ;
 
         $this->assertEquals(
-            $this->loadModel($selectQuery, Location::class, ''),
+            $this->loadModel($selectQuery, Location::class),
             $this->locationRepository->findByName('arthur', false)[0],
         );
     }
 
     public function testFindByNameOnlyActive(): void
     {
-        $selectQuery = (new SelectQuery($this->table))
+        $selectQuery = (new SelectQuery($this->table, 't'))
             ->addWhere(new Where('`name` LIKE ? AND `active`=?', ['arthur%', 1]))
         ;
 
         $this->assertEquals(
-            $this->loadModel($selectQuery, Location::class, ''),
+            $this->loadModel($selectQuery, Location::class),
             $this->locationRepository->findByName('arthur', true)[0],
         );
     }
@@ -78,7 +78,7 @@ class LocationRepositoryTest extends Unit
     public function testGetToUpdate(): void
     {
         $date = new DateTime();
-        $selectQuery = (new SelectQuery($this->table))
+        $selectQuery = (new SelectQuery($this->table, 't'))
             ->addWhere(new Where(
                 '`active`=? AND (`last_run` IS NULL OR FROM_UNIXTIME(UNIX_TIMESTAMP(`last_run`)+`interval`) <= ?)',
                 [1, $date->format('Y-m-d H:i:s')],
@@ -91,7 +91,7 @@ class LocationRepositoryTest extends Unit
         ;
 
         $this->assertEquals(
-            $this->loadModel($selectQuery, Location::class, ''),
+            $this->loadModel($selectQuery, Location::class),
             $this->locationRepository->getToUpdate()[0],
         );
     }

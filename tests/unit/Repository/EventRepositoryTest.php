@@ -62,11 +62,11 @@ class EventRepositoryTest extends Unit
 
     public function testFindByName(): void
     {
-        $selectQuery = (new SelectQuery($this->table))
+        $selectQuery = (new SelectQuery($this->table, 't'))
             ->addWhere(new Where('`name` LIKE ?', ['galaxy%']))
         ;
 
-        $model = $this->loadModel($selectQuery, Event::class, '');
+        $model = $this->loadModel($selectQuery, Event::class);
         $event = $this->eventRepository->findByName('galaxy', false)[0];
 
         $date = new DateTimeImmutable();
@@ -78,11 +78,11 @@ class EventRepositoryTest extends Unit
 
     public function testFindByNameOnlyActive(): void
     {
-        $selectQuery = (new SelectQuery($this->table))
+        $selectQuery = (new SelectQuery($this->table, 't'))
             ->addWhere(new Where('`name` LIKE ? AND `active`=?', ['galaxy%', 1]))
         ;
 
-        $model = $this->loadModel($selectQuery, Event::class, '');
+        $model = $this->loadModel($selectQuery, Event::class);
         $event = $this->eventRepository->findByName('galaxy', true)[0];
 
         $date = new DateTimeImmutable();

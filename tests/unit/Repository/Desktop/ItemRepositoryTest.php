@@ -94,13 +94,13 @@ class ItemRepositoryTest extends Unit
 
     public function testGetByUser(): void
     {
-        $selectQuery = (new SelectQuery($this->table))
+        $selectQuery = (new SelectQuery($this->table, 't'))
             ->addWhere(new Where('`user_id`=?', [0]))
             ->setOrder('`position`')
         ;
 
         $this->assertEquals(
-            $this->loadModel($selectQuery, Item::class, ''),
+            $this->loadModel($selectQuery, Item::class),
             $this->itemRepository->getByUser(new User($this->modelWrapper->reveal()))[0],
         );
     }

@@ -24,12 +24,12 @@ class SmartAttributeRepositoryTest extends Unit
 
     public function testGetAll(): void
     {
-        $selectQuery = (new SelectQuery($this->table))
+        $selectQuery = (new SelectQuery($this->table, 't'))
             ->addWhere(new Where('1', []))
         ;
 
         $this->assertEquals(
-            $this->loadModel($selectQuery, SmartAttribute::class, ''),
+            $this->loadModel($selectQuery, SmartAttribute::class),
             $this->smartAttributeRepository->getAll()[0],
         );
     }

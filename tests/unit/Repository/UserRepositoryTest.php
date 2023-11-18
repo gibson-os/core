@@ -44,11 +44,11 @@ class UserRepositoryTest extends Unit
 
     public function testFindByName(): void
     {
-        $selectQuery = (new SelectQuery($this->table))
+        $selectQuery = (new SelectQuery($this->table, 't'))
             ->addWhere(new Where('`user` LIKE ?', ['galaxy%']))
         ;
 
-        $model = $this->loadModel($selectQuery, User::class, '');
+        $model = $this->loadModel($selectQuery, User::class);
         $user = $this->userRepository->findByName('galaxy')[0];
 
         $date = new DateTimeImmutable();
