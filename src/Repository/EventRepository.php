@@ -8,7 +8,6 @@ use GibsonOS\Core\Attribute\GetTableName;
 use GibsonOS\Core\Dto\Model\ChildrenMapping;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\Event;
-use GibsonOS\Core\Model\Event\Element;
 use GibsonOS\Core\Wrapper\RepositoryWrapper;
 use JsonException;
 use MDO\Dto\Query\Where;
@@ -21,8 +20,8 @@ class EventRepository extends AbstractRepository
 {
     public function __construct(
         RepositoryWrapper $repositoryWrapper,
-        #[GetTableName(Element::class)]
-        private readonly string $eventElementTableName,
+        #[GetTableName(Event::class)]
+        private readonly string $eventTableName,
     ) {
         parent::__construct($repositoryWrapper);
     }
@@ -70,9 +69,9 @@ class EventRepository extends AbstractRepository
      */
     public function getTimeControlled(string $className, string $trigger, DateTimeInterface $dateTime): array
     {
-        $query = $this->getSelectQuery($this->eventElementTableName, 'ee')
+        $query = $this->getSelectQuery($this->eventTableName, 'e')
             ->setOrder('`et`.`priority`', OrderDirection::DESC)
-            ->setOrder('`ee`.`parentId`')
+            ->setOrder('`ee`.`parent_id`')
             ->setOrder('`ee`.`order`')
             ->addWhere(new Where('`e`.`active`=?', [1]))
             ->addWhere(new Where('`et`.`class`=?', [$className]))

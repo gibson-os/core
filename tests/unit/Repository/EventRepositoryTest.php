@@ -95,9 +95,9 @@ class EventRepositoryTest extends Unit
     public function testGetTimeControlled(): void
     {
         $date = new DateTime();
-        $selectQuery = (new SelectQuery($this->eventElementTable, 'ee'))
+        $selectQuery = (new SelectQuery($this->eventElementTable, 'e'))
             ->setOrder('`et`.`priority`', OrderDirection::DESC)
-            ->setOrder('`ee`.`parentId`')
+            ->setOrder('`ee`.`parent_id`')
             ->setOrder('`ee`.`order`')
             ->addWhere(new Where('`e`.`active`=?', [1]))
             ->addWhere(new Where('`et`.`class`=?', ['arthur']))
