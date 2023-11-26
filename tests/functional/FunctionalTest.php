@@ -77,6 +77,11 @@ abstract class FunctionalTest extends Unit
         $this->modelWrapper = $this->serviceManager->get(ModelWrapper::class);
     }
 
+    protected function _after()
+    {
+        $this->serviceManager->get(Client::class)->close();
+    }
+
     protected function initDatabase(): void
     {
         $tableInstall = $this->serviceManager->get(TableInstall::class);
