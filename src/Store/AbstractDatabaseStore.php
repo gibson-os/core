@@ -132,6 +132,14 @@ abstract class AbstractDatabaseStore extends AbstractStore
         return ['`' . ($this->getAlias() ?? $this->tableName) . '`.`id`' => OrderDirection::ASC];
     }
 
+    /**
+     * @return array<string, OrderDirection>
+     */
+    protected function getOrderExtension(): array
+    {
+        return [];
+    }
+
     protected function getAlias(): ?string
     {
         return null;
@@ -189,7 +197,13 @@ abstract class AbstractDatabaseStore extends AbstractStore
 
     protected function getOrderBy(): array
     {
-        return $this->orderBy ?: $this->getDefaultOrder();
+        $orders = $this->orderBy ?: $this->getDefaultOrder();
+
+        foreach ($this->getOrderExtension() as $orderExtensionField => $orderExtensionDirection) {
+            $orders[$orderExtensionField] ??= $orderExtensionDirection;
+        }
+
+        return $orders;
     }
 
     /**
