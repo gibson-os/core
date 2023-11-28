@@ -51,7 +51,7 @@ class OpenTelemetryTracer extends AbstractTracer
 
         /** @var TransportInterface<'application/x-protobuf'> $transport */
         $transport = (new OtlpHttpTransportFactory())->create(
-            sprintf('%s/v1/traces', $this->endpoint ?? ''),
+            $this->endpoint ?? '',
             'application/x-protobuf',
         );
         $spanProcessor = new BatchSpanProcessor(
