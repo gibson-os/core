@@ -21,7 +21,10 @@ class DateTimeService
         #[GetEnv('date_longitude')]
         private readonly ?float $longitude,
     ) {
-        $this->timezone = $timezone === null ? null : new DateTimeZone($timezone);
+        $this->timezone = ($timezone === null || $timezone === '')
+            ? null
+            : new DateTimeZone($timezone)
+        ;
     }
 
     /**

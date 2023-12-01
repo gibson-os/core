@@ -45,13 +45,13 @@ class CronjobRepositoryTest extends Unit
             ))
             ->addWhere(new Where(
                 'UNIX_TIMESTAMP(CONCAT(' .
-                    'IF(? BETWEEN `ct`.`from_year` AND `ct`.`to_year`, :year,IF(`ct`.`from_year` > :year,`ct`.`from_year`,`ct`.`to_year`)), \'-\', ' .
-                    'IF(? BETWEEN `ct`.`from_month` AND `ct`.`to_month`, :month,IF(`ct`.`from_month` > :month,`ct`.`from_month`,`ct`.`to_month`)), \'-\', ' .
-                    'IF(? BETWEEN `ct`.`from_day_of_month` AND `ct`.`to_day_of_month`, :dayOfMonth,IF(`ct`.`from_day_of_month` > :dayOfMonth,`ct`.`from_day_of_month`,`ct`.`to_day_of_month`)), \' \', ' .
-                    'IF(? BETWEEN `ct`.`from_hour` AND `ct`.`to_hour`, :hour,IF(`ct`.`from_hour` > :hour,`ct`.`from_hour`,`ct`.`to_hour`)), \':\', ' .
-                    'IF(? BETWEEN `ct`.`from_minute` AND `ct`.`to_minute`, :minute,IF(`ct`.`from_minute` > :minute,`ct`.`from_minute`,`ct`.`to_minute`)), \':\', ' .
-                    'IF(? BETWEEN `ct`.`from_second` AND `ct`.`to_second`, :second,IF(`ct`.`from_second` > :second,`ct`.`from_second`,`ct`.`to_second`))' .
-                ')) BETWEEN UNIX_TIMESTAMP(COALESCE(`c`.`last_run`, `c`.`added`))',
+                    'IF(:year BETWEEN `ct`.`from_year` AND `ct`.`to_year`, :year,IF(`ct`.`from_year` > :year,`ct`.`from_year`,`ct`.`to_year`)), \'-\', ' .
+                    'IF(:month BETWEEN `ct`.`from_month` AND `ct`.`to_month`, :month,IF(`ct`.`from_month` > :month,`ct`.`from_month`,`ct`.`to_month`)), \'-\', ' .
+                    'IF(:dayOfMonth BETWEEN `ct`.`from_day_of_month` AND `ct`.`to_day_of_month`, :dayOfMonth,IF(`ct`.`from_day_of_month` > :dayOfMonth,`ct`.`from_day_of_month`,`ct`.`to_day_of_month`)), \' \', ' .
+                    'IF(:hour BETWEEN `ct`.`from_hour` AND `ct`.`to_hour`, :hour,IF(`ct`.`from_hour` > :hour,`ct`.`from_hour`,`ct`.`to_hour`)), \':\', ' .
+                    'IF(:minute BETWEEN `ct`.`from_minute` AND `ct`.`to_minute`, :minute,IF(`ct`.`from_minute` > :minute,`ct`.`from_minute`,`ct`.`to_minute`)), \':\', ' .
+                    'IF(:second BETWEEN `ct`.`from_second` AND `ct`.`to_second`, :second,IF(`ct`.`from_second` > :second,`ct`.`from_second`,`ct`.`to_second`))' .
+                ')) BETWEEN UNIX_TIMESTAMP(COALESCE(`c`.`last_run`, `c`.`added`)) AND UNIX_TIMESTAMP(:timestampDate)',
                 [
                     'year' => (int) $date->format('Y'),
                     'month' => (int) $date->format('n'),
@@ -59,15 +59,6 @@ class CronjobRepositoryTest extends Unit
                     'hour' => (int) $date->format('H'),
                     'minute' => (int) $date->format('i'),
                     'second' => (int) $date->format('s'),
-                ],
-            ))
-            ->addWhere(new Where(
-                ':dayOfWeek BETWEEN `c`.`from_day_of_week` AND `c`.`to_day_of_week`',
-                ['dayOfWeek' => (int) $date->format('w')],
-            ))
-            ->addWhere(new Where(
-                'UNIX_TIMESTAMP(:timestampDate)',
-                [
                     'timestampDate' => ((int) $date->format('Y')) . '-' .
                         ((int) $date->format('n')) . '-' .
                         ((int) $date->format('j')) . ' ' .
@@ -75,6 +66,10 @@ class CronjobRepositoryTest extends Unit
                         ((int) $date->format('i')) . ':' .
                         ((int) $date->format('s')),
                 ],
+            ))
+            ->addWhere(new Where(
+                ':dayOfWeek BETWEEN `ct`.`from_day_of_week` AND `ct`.`to_day_of_week`',
+                ['dayOfWeek' => (int) $date->format('w')],
             ))
         ;
 

@@ -21,13 +21,17 @@ use OpenTelemetry\API\Trace\SpanInterface;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Contrib\Otlp\OtlpHttpTransportFactory;
 use OpenTelemetry\Contrib\Otlp\SpanExporter;
+use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Export\TransportInterface;
 use OpenTelemetry\SDK\Common\Time\SystemClock;
 use OpenTelemetry\SDK\Common\Util\ShutdownHandler;
+use OpenTelemetry\SDK\Resource\ResourceInfo;
+use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
 use OpenTelemetry\SDK\Trace\Sampler\ParentBased;
 use OpenTelemetry\SDK\Trace\SpanProcessor\BatchSpanProcessor;
 use OpenTelemetry\SDK\Trace\TracerProviderBuilder;
+use OpenTelemetry\SemConv\ResourceAttributes;
 use Throwable;
 
 class OpenTelemetryTracer extends AbstractTracer
@@ -42,6 +46,8 @@ class OpenTelemetryTracer extends AbstractTracer
         private readonly ArgumentService $argumentService,
         #[GetEnv('OTEL_EXPORTER_OTLP_ENDPOINT')]
         private readonly ?string $endpoint,
+        #[GetEnv('APP_NAME')]
+        private readonly string $appName,
         #[GetServices(['core/src/OpenTelemetry/Instrumentation'], InstrumentationInterface::class)]
         private readonly array $instrumentations,
     ) {
@@ -58,9 +64,17 @@ class OpenTelemetryTracer extends AbstractTracer
             new SpanExporter($transport),
             new SystemClock(),
         );
+
+        $resource = ResourceInfoFactory::merge(ResourceInfo::create(Attributes::create([
+            ResourceAttributes::SERVICE_NAMESPACE => 'GibsonOS',
+            ResourceAttributes::SERVICE_NAME => $this->appName,
+            ResourceAttributes::SERVICE_INSTANCE_ID => gethostname() ?: '',
+            'service-instance' => gethostname() ?: '',
+        ])));
         $tracerProvider = (new TracerProviderBuilder())
             ->addSpanProcessor($spanProcessor)
             ->setSampler(new ParentBased(new AlwaysOnSampler()))
+            ->setResource($resource)
             ->build()
         ;
 
@@ -96,6 +110,7 @@ class OpenTelemetryTracer extends AbstractTracer
             'root',
             link: $link,
         );
+        $this->rootSpan->setAttribute('service.instance.id', 'foo');
         Context::storage()->attach($this->rootSpan->storeInContext(Context::getCurrent()));
 
         ShutdownHandler::register(function (): void {

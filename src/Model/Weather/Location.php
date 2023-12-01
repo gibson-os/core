@@ -29,6 +29,9 @@ class Location extends AbstractModel implements JsonSerializable, AutoCompleteMo
     #[Column]
     private float $longitude;
 
+    /**
+     * @var non-empty-string
+     */
     #[Column(length: 128)]
     private string $timezone;
 
@@ -92,11 +95,17 @@ class Location extends AbstractModel implements JsonSerializable, AutoCompleteMo
         return $this;
     }
 
+    /**
+     * @return non-empty-string
+     */
     public function getTimezone(): string
     {
         return $this->timezone;
     }
 
+    /**
+     * @param non-empty-string $timezone
+     */
     public function setTimezone(string $timezone): Location
     {
         $this->timezone = $timezone;

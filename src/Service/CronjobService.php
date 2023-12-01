@@ -15,6 +15,8 @@ use GibsonOS\Core\Repository\CronjobRepository;
 use GibsonOS\Core\Utility\JsonUtility;
 use GibsonOS\Core\Wrapper\ModelWrapper;
 use JsonException;
+use MDO\Exception\ClientException;
+use MDO\Exception\RecordException;
 use Psr\Log\LoggerInterface;
 use ReflectionException;
 
@@ -100,9 +102,11 @@ class CronjobService
     }
 
     /**
-     * @throws SaveError
      * @throws JsonException
      * @throws ReflectionException
+     * @throws SaveError
+     * @throws ClientException
+     * @throws RecordException
      */
     public function run(string $user): void
     {

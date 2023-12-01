@@ -36,11 +36,14 @@ class ProcessService
         pclose($process);
     }
 
+    /**
+     * @throws ProcessError
+     */
     public function execute(string $command): string
     {
         $this->logger->debug(sprintf('Execute process "%s"', $command));
 
-        return exec($command);
+        return exec($command) ?: throw new ProcessError('Exec error!');
     }
 
     public function executeAsync(string $command): void

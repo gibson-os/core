@@ -66,7 +66,7 @@ class CronjobRepository extends AbstractRepository
                     $this->getTimePart('hour', 'hour') . ', \':\', ' .
                     $this->getTimePart('minute', 'minute') . ', \':\', ' .
                     $this->getTimePart('second', 'second') .
-                ')) BETWEEN UNIX_TIMESTAMP(COALESCE(`c`.`last_run`, `c`.`added`))',
+                ')) BETWEEN UNIX_TIMESTAMP(COALESCE(`c`.`last_run`, `c`.`added`)) AND UNIX_TIMESTAMP(:timestampDate)',
                 [
                     'year' => (int) $dateTime->format('Y'),
                     'month' => (int) $dateTime->format('n'),
@@ -74,22 +74,20 @@ class CronjobRepository extends AbstractRepository
                     'hour' => (int) $dateTime->format('H'),
                     'minute' => (int) $dateTime->format('i'),
                     'second' => (int) $dateTime->format('s'),
+                    'timestampDate' => sprintf(
+                        '%d-%d-%d %d:%d:%d',
+                        (int) $dateTime->format('Y'),
+                        (int) $dateTime->format('n'),
+                        (int) $dateTime->format('j'),
+                        (int) $dateTime->format('H'),
+                        (int) $dateTime->format('i'),
+                        (int) $dateTime->format('s'),
+                    ),
                 ],
             ))
             ->addWhere(new Where(
-                ':dayOfWeek BETWEEN `c`.`from_day_of_week` AND `c`.`to_day_of_week`',
+                ':dayOfWeek BETWEEN `ct`.`from_day_of_week` AND `ct`.`to_day_of_week`',
                 ['dayOfWeek' => (int) $dateTime->format('w')],
-            ))
-            ->addWhere(new Where(
-                'UNIX_TIMESTAMP(:timestampDate)',
-                [
-                    'timestampDate' => ((int) $dateTime->format('Y')) . '-' .
-                        ((int) $dateTime->format('n')) . '-' .
-                        ((int) $dateTime->format('j')) . ' ' .
-                        ((int) $dateTime->format('H')) . ':' .
-                        ((int) $dateTime->format('i')) . ':' .
-                        ((int) $dateTime->format('s')),
-                ],
             ))
         ;
 
@@ -100,13 +98,14 @@ class CronjobRepository extends AbstractRepository
     {
         return sprintf(
             'IF(' .
-                '? BETWEEN `ct`.`from_%s` AND `ct`.`to_%s`, :%s,' .
+                ':%s BETWEEN `ct`.`from_%s` AND `ct`.`to_%s`, :%s,' .
                 'IF(' .
                     '`ct`.`from_%s` > :%s,' .
                     '`ct`.`from_%s`,' .
                     '`ct`.`to_%s`' .
                 ')' .
             ')',
+            $parameterName,
             $field,
             $field,
             $parameterName,

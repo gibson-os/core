@@ -327,16 +327,26 @@ readonly class ControllerService
                     continue;
                 }
 
-                try {
-                    $parameters[$name] = $this->serviceManagerService->get($typeName);
-                } catch (FactoryError $e) {
+                if (!class_exists($typeName)) {
                     throw new ControllerError(sprintf(
                         'Class %s of parameter $%s for %s::%s not found!',
                         $typeName,
                         $name,
                         $reflectionMethod->getDeclaringClass()->getName(),
                         $reflectionMethod->getName(),
-                    ), 0, $e);
+                    ));
+                }
+
+                try {
+                    $parameters[$name] = $this->serviceManagerService->get($typeName);
+                } catch (FactoryError $exception) {
+                    throw new ControllerError(sprintf(
+                        'Class %s of parameter $%s for %s::%s not found!',
+                        $typeName,
+                        $name,
+                        $reflectionMethod->getDeclaringClass()->getName(),
+                        $reflectionMethod->getName(),
+                    ), 0, $exception);
                 }
 
                 continue;
