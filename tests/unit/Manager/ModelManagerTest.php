@@ -4,8 +4,10 @@ declare(strict_types=1);
 namespace GibsonOS\Test\Unit\Core\Manager;
 
 use Codeception\Test\Unit;
+use GibsonOS\Core\Dto\Model\ChildrenMapping;
 use GibsonOS\Core\Manager\ModelManager;
 use GibsonOS\Core\Manager\ReflectionManager;
+use GibsonOS\Core\Query\ChildrenQuery;
 use GibsonOS\Core\Service\Attribute\TableNameAttribute;
 use GibsonOS\Core\Service\DateTimeService;
 use GibsonOS\Core\Utility\JsonUtility;
@@ -46,6 +48,8 @@ class ModelManagerTest extends Unit
 
     private ModelWrapper|ObjectProphecy $modelWrapper;
 
+    private ChildrenQuery|ObjectProphecy $childrenQuery;
+
     private Table $table;
 
     protected function _before()
@@ -57,6 +61,7 @@ class ModelManagerTest extends Unit
         $this->deleteService = $this->prophesize(DeleteService::class);
         $this->client = $this->prophesize(Client::class);
         $this->modelWrapper = $this->prophesize(ModelWrapper::class);
+        $this->childrenQuery = $this->prophesize(ChildrenQuery::class);
         $reflectionManager = new ReflectionManager();
 
         $this->client->getDatabaseName()
@@ -84,6 +89,7 @@ class ModelManagerTest extends Unit
             $this->deleteService->reveal(),
             $this->client->reveal(),
             $this->modelWrapper->reveal(),
+            $this->childrenQuery->reveal(),
         );
     }
 
@@ -169,13 +175,23 @@ class ModelManagerTest extends Unit
         $this->tableManager->getTable('marvin')
             ->shouldBeCalledTimes(4)
         ;
+
+        $model = new MockModel($this->modelWrapper->reveal());
+
         $deleteQuery = (new DeleteQuery($this->table))->addWhere(new Where('`parent_id`=?', [42]));
+        $this->childrenQuery->getDeleteQuery(
+            $model,
+            't',
+            new ChildrenMapping('children', 'child_', 'c'),
+        )
+            ->shouldBeCalledOnce()
+            ->willReturn($deleteQuery)
+        ;
         $this->client->execute($deleteQuery);
         $this->client->commit()
             ->shouldBeCalledOnce()
         ;
 
-        $model = new MockModel($this->modelWrapper->reveal());
         $this->modelManager->save($model);
 
         $this->assertEquals(42, $model->getId());
@@ -203,20 +219,43 @@ class ModelManagerTest extends Unit
         $this->tableManager->getTable('marvin')
             ->shouldBeCalledTimes(8)
         ;
-        $this->client->execute((new DeleteQuery($this->table))->addWhere(new Where('`parent_id`=?', [24])));
-        $this->client->execute(
-            (new DeleteQuery($this->table))
-            ->addWhere(new Where('`parent_id`=?', [42]))
-            ->addWhere(new Where('`id`!=?', [24])),
-        );
-        $this->client->commit()
-            ->shouldBeCalledOnce()
-        ;
 
         $children = new MockModel($this->modelWrapper->reveal());
         $model = (new MockModel($this->modelWrapper->reveal()))
             ->setChildren([$children])
         ;
+
+        $deleteQuery = (new DeleteQuery($this->table))->addWhere(new Where('`parent_id`=?', [24]));
+        $this->childrenQuery->getDeleteQuery(
+            $model,
+            't',
+            new ChildrenMapping('children', 'child_', 'c'),
+        )
+            ->shouldBeCalledOnce()
+            ->willReturn($deleteQuery)
+        ;
+        $this->client->execute($deleteQuery)
+            ->shouldBeCalledOnce()
+        ;
+        $deleteQuery2 = (new DeleteQuery($this->table))
+            ->addWhere(new Where('`parent_id`=?', [42]))
+            ->addWhere(new Where('`id`!=?', [24]))
+        ;
+        $this->childrenQuery->getDeleteQuery(
+            $children,
+            't',
+            new ChildrenMapping('children', 'child_', 'c'),
+        )
+            ->shouldBeCalledOnce()
+            ->willReturn($deleteQuery2)
+        ;
+        $this->client->execute($deleteQuery2)
+            ->shouldBeCalledOnce()
+        ;
+        $this->client->commit()
+            ->shouldBeCalledOnce()
+        ;
+
         $this->modelManager->save($model);
 
         $this->assertEquals(42, $model->getId());
@@ -244,20 +283,41 @@ class ModelManagerTest extends Unit
         $this->tableManager->getTable('marvin')
             ->shouldBeCalledTimes(8)
         ;
-        $this->client->execute((new DeleteQuery($this->table))->addWhere(new Where('`parent_id`=?', [24])));
-        $this->client->execute(
-            (new DeleteQuery($this->table))
-                ->addWhere(new Where('`parent_id`=?', [42]))
-                ->addWhere(new Where('`id`!=?', [24])),
-        );
-        $this->client->commit()
-            ->shouldBeCalledOnce()
-        ;
 
         $children = new MockModel($this->modelWrapper->reveal());
         $model = (new MockModel($this->modelWrapper->reveal()))
             ->addChildren([$children])
         ;
+
+        $deleteQuery = (new DeleteQuery($this->table))->addWhere(new Where('`parent_id`=?', [24]));
+        $this->childrenQuery->getDeleteQuery(
+            $model,
+            't',
+            new ChildrenMapping('children', 'child_', 'c'),
+        )
+            ->shouldBeCalledOnce()
+            ->willReturn($deleteQuery)
+        ;
+        $this->client->execute($deleteQuery);
+        $deleteQuery2 = (new DeleteQuery($this->table))
+            ->addWhere(new Where('`parent_id`=?', [42]))
+            ->addWhere(new Where('`id`!=?', [24]))
+        ;
+        $this->childrenQuery->getDeleteQuery(
+            $children,
+            't',
+            new ChildrenMapping('children', 'child_', 'c'),
+        )
+            ->shouldBeCalledOnce()
+            ->willReturn($deleteQuery2)
+        ;
+        $this->client->execute($deleteQuery2)
+            ->shouldBeCalledOnce()
+        ;
+        $this->client->commit()
+            ->shouldBeCalledOnce()
+        ;
+
         $this->modelManager->save($model);
 
         $this->assertEquals(42, $model->getId());

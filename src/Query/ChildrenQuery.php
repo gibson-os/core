@@ -14,6 +14,7 @@ use MDO\Dto\Select;
 use MDO\Enum\JoinType;
 use MDO\Exception\ClientException;
 use MDO\Manager\TableManager;
+use MDO\Query\DeleteQuery;
 use MDO\Query\SelectQuery;
 use MDO\Service\SelectService;
 use ReflectionException;
@@ -33,7 +34,7 @@ class ChildrenQuery
      * @throws ClientException
      * @throws ReflectionException
      */
-    public function getQuery(AbstractModel $model, string $alias, ChildrenMapping $child): SelectQuery
+    public function getSelectQuery(AbstractModel $model, string $alias, ChildrenMapping $child): SelectQuery
     {
         $reflectionClass = $this->reflectionManager->getReflectionClass($model);
         $reflectionProperty = $reflectionClass->getProperty($child->getPropertyName());
@@ -66,6 +67,41 @@ class ChildrenQuery
         }
 
         return $this->extend($selectQuery, $model::class, $child->getChildren());
+    }
+
+    public function getDeleteQuery(AbstractModel $model, string $alias, ChildrenMapping $child): DeleteQuery
+    {
+        $reflectionClass = $this->reflectionManager->getReflectionClass($model);
+        $reflectionProperty = $reflectionClass->getProperty($child->getPropertyName());
+        $constraintAttribute = $this->reflectionManager->getAttribute($reflectionProperty, Constraint::class);
+
+        if ($constraintAttribute === null) {
+            throw new ReflectionException(sprintf(
+                'Property "%s::%s" has not constraint attribute',
+                $model::class,
+                $child->getPropertyName(),
+            ));
+        }
+
+        $modelClassName = $this->getModelClassName($reflectionProperty, $constraintAttribute);
+
+        /** @var AbstractModel $childModel */
+        $childModel = new $modelClassName($this->modelWrapper);
+        $ownReflectionProperty = $reflectionClass->getProperty($this->getOwnProperty($reflectionProperty, $constraintAttribute));
+        $deleteQuery = (new DeleteQuery($this->tableManager->getTable($childModel->getTableName()), $alias))
+            ->setWheres($child->getWheres())
+            ->addWhere(new Where(
+                sprintf('`%s`.`%s`=?', $alias, $this->getChildColumn($reflectionProperty, $constraintAttribute)),
+                [$this->reflectionManager->getProperty($ownReflectionProperty, $model)],
+            ))
+        ;
+        $where = $constraintAttribute->getWhere();
+
+        if ($where !== null) {
+            $deleteQuery->addWhere(new Where($where, $constraintAttribute->getWhereParameters()));
+        }
+
+        return $deleteQuery;
     }
 
     /**
@@ -174,12 +210,13 @@ class ChildrenQuery
         Constraint $constraintAttribute,
     ): string {
         $typeName = $this->reflectionManager->getTypeName($reflectionProperty);
+        $parentColumn = mb_strtolower(preg_replace('/([A-Z])/', '_$1', $constraintAttribute->getParentColumn()));
 
         if ($typeName === 'array') {
-            return $constraintAttribute->getParentColumn() . '_id';
+            return $parentColumn . '_id';
         }
 
-        return $constraintAttribute->getParentColumn();
+        return $parentColumn;
     }
 
     /**

@@ -66,7 +66,7 @@ class ChildrenQueryTest extends Unit
                     'parent_id' => '`m`.`parent_id`',
                 ])
                 ->addWhere(new Where('`m`.`parent_id`=?', [42])),
-            $this->childrenQuery->getQuery(
+            $this->childrenQuery->getSelectQuery(
                 (new MockModel($this->modelWrapper->reveal()))->setId(42),
                 'm',
                 new ChildrenMapping('children', 'child_', 'c'),
@@ -96,7 +96,7 @@ class ChildrenQueryTest extends Unit
                     'parent_id' => '`m`.`parent_id`',
                 ])
                 ->addWhere(new Where('`m`.`id`=?', [42])),
-            $this->childrenQuery->getQuery(
+            $this->childrenQuery->getSelectQuery(
                 (new MockModel($this->modelWrapper->reveal()))->setParentId(42),
                 'm',
                 new ChildrenMapping('parent', 'parent_', 'p'),
@@ -136,7 +136,7 @@ class ChildrenQueryTest extends Unit
                 ])
                 ->addJoin(new Join($table, 'pp', '`m`.`parent_id`=`pp`.`id`', JoinType::LEFT))
                 ->addWhere(new Where('`m`.`id`=?', [42])),
-            $this->childrenQuery->getQuery(
+            $this->childrenQuery->getSelectQuery(
                 (new MockModel($this->modelWrapper->reveal()))->setParentId(42),
                 'm',
                 new ChildrenMapping('parent', 'parent_', 'p', [

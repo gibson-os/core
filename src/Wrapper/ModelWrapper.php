@@ -5,14 +5,13 @@ namespace GibsonOS\Core\Wrapper;
 
 use GibsonOS\Core\Manager\ModelManager;
 use GibsonOS\Core\Manager\ServiceManager;
+use GibsonOS\Core\Query\ChildrenQuery;
 use MDO\Client;
-use MDO\Manager\TableManager;
 
 class ModelWrapper
 {
     public function __construct(
         private readonly Client $client,
-        private readonly TableManager $tableManager,
         private readonly ServiceManager $serviceManager,
     ) {
     }
@@ -22,13 +21,13 @@ class ModelWrapper
         return $this->client;
     }
 
-    public function getTableManager(): TableManager
-    {
-        return $this->tableManager;
-    }
-
     public function getModelManager(): ModelManager
     {
         return $this->serviceManager->get(ModelManager::class);
+    }
+
+    public function getChildrenQuery(): ChildrenQuery
+    {
+        return $this->serviceManager->get(ChildrenQuery::class);
     }
 }

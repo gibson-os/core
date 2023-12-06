@@ -6,11 +6,13 @@ namespace GibsonOS\Core\Manager;
 use GibsonOS\Core\Attribute\Install\Database\Column;
 use GibsonOS\Core\Attribute\Install\Database\Constraint;
 use GibsonOS\Core\Dto\Model\Children;
+use GibsonOS\Core\Dto\Model\ChildrenMapping;
 use GibsonOS\Core\Dto\Model\PrimaryColumn;
 use GibsonOS\Core\Exception\Model\DeleteError;
 use GibsonOS\Core\Exception\Model\SaveError;
 use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Model\ModelInterface;
+use GibsonOS\Core\Query\ChildrenQuery;
 use GibsonOS\Core\Service\Attribute\TableNameAttribute;
 use GibsonOS\Core\Service\DateTimeService;
 use GibsonOS\Core\Utility\JsonUtility;
@@ -91,6 +93,7 @@ class ModelManager
         private readonly DeleteService $deleteService,
         private readonly Client $client,
         private readonly ModelWrapper $modelWrapper,
+        private readonly ChildrenQuery $childrenQuery,
     ) {
     }
 
@@ -131,7 +134,7 @@ class ModelManager
      * @throws ReflectionException
      * @throws SaveError
      */
-    public function save(ModelInterface $model): void
+    public function save(AbstractModel $model): void
     {
         $newTransaction = false;
 
@@ -154,7 +157,7 @@ class ModelManager
 
         foreach ($childrenList as $children) {
             try {
-                $this->saveChildren($children);
+                $this->saveChildren($children, $model);
             } catch (SaveError|JsonException|ReflectionException $exception) {
                 $exception = new SaveError($exception->getMessage(), 0, $exception);
                 $exception->setModel($model);
@@ -333,7 +336,7 @@ class ModelManager
      * @throws ClientException
      * @throws RecordException
      */
-    private function saveChildren(Children $children): void
+    private function saveChildren(Children $children, AbstractModel $model): void
     {
         $constraintAttribute = $children->getConstraint();
         $parentModelClassName = $constraintAttribute->getParentModelClassName();
@@ -360,6 +363,11 @@ class ModelManager
                 $parameters,
             ))
         ;
+        $deleteQuery = $this->childrenQuery->getDeleteQuery(
+            $model,
+            't',
+            new ChildrenMapping($children->getReflectionProperty()->getName(), 'child_', 'c'),
+        );
 
         $primaryColumns = $this->getPrimaryColumns($parentModelClassName);
 

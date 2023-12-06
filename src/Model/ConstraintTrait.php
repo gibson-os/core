@@ -4,13 +4,14 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Model;
 
 use GibsonOS\Core\Attribute\Install\Database\Constraint;
+use GibsonOS\Core\Dto\Model\ChildrenMapping;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use InvalidArgumentException;
 use JsonException;
 use MDO\Dto\Query\Where;
 use MDO\Enum\OrderDirection;
 use MDO\Exception\ClientException;
-use MDO\Query\SelectQuery;
+use MDO\Exception\RecordException;
 use ReflectionAttribute;
 use ReflectionClass;
 use ReflectionException;
@@ -119,7 +120,9 @@ trait ConstraintTrait
     /**
      * @throws ClientException
      * @throws JsonException
+     * @throws RecordException
      * @throws ReflectionException
+     * @throws SelectError
      */
     private function getConstraint(
         Constraint $constraintAttribute,
@@ -158,9 +161,8 @@ trait ConstraintTrait
             || $parentModel->{'get' . $fieldName}() !== $value
         ) {
             $this->$propertyName = $this->loadForeignRecord(
+                $propertyName,
                 $parentModel,
-                $value,
-                $parentColumn,
                 $constraintAttribute->getWhere(),
                 $constraintAttribute->getWhereParameters(),
             ) ?? ($reflectionProperty->getType()?->allowsNull() ? null : $parentModel);
@@ -172,9 +174,10 @@ trait ConstraintTrait
     }
 
     /**
-     * @throws ClientException
      * @throws JsonException
      * @throws ReflectionException
+     * @throws RecordException
+     * @throws ClientException
      *
      * @return AbstractModel[]
      */
@@ -198,17 +201,14 @@ trait ConstraintTrait
             ));
         }
 
-        /** @var AbstractModel $parentModel */
-        $parentModel = new $parentModelClassName($this->modelWrapper);
         $this->$propertyName = [];
         $this->loadedConstraints[$propertyName] = $value;
 
         if ($value !== null) {
             $this->addConstraints($constraintAttribute, $reflectionProperty, $this->loadForeignRecords(
+                $propertyName,
                 $parentModelClassName,
                 $value,
-                $parentModel->getTableName(),
-                $constraintAttribute->getParentColumn() . '_id',
                 $constraintAttribute->getWhere(),
                 $constraintAttribute->getWhereParameters(),
                 $constraintAttribute->getOrderBy(),
@@ -279,6 +279,7 @@ trait ConstraintTrait
      * @throws ClientException
      * @throws JsonException
      * @throws ReflectionException
+     * @throws RecordException
      */
     private function addConstraints(
         Constraint $constraintAttribute,
@@ -353,32 +354,35 @@ trait ConstraintTrait
     }
 
     /**
-     * @throws ReflectionException
-     * @throws JsonException
      * @throws ClientException
+     * @throws JsonException
+     * @throws RecordException
+     * @throws ReflectionException
      */
     private function loadForeignRecord(
+        string $propertyName,
         AbstractModel $model,
-        string|int|float $value,
-        string $foreignField = 'id',
         string $where = null,
         array $whereParameters = [],
     ): ?AbstractModel {
         $modelWrapper = $this->getModelWrapper();
-        $table = $modelWrapper->getTableManager()->getTable($model->getTableName());
-        $selectQuery = (new SelectQuery($table))
-            ->addWhere(new Where(
-                sprintf('`%s`=?%s', $foreignField, $where === null ? '' : ' AND (' . $where . ')'),
-                array_merge([$value], $whereParameters),
-            ))
+        $selectQuery = $modelWrapper->getChildrenQuery()->getSelectQuery(
+            $this,
+            't',
+            new ChildrenMapping($propertyName, 'child_', 'c'),
+        )
             ->setLimit(1)
         ;
+
+        if ($where !== null) {
+            $selectQuery->addWhere(new Where($where, $whereParameters));
+        }
 
         $result = $modelWrapper->getClient()->execute($selectQuery);
         $current = $result->iterateRecords()->current();
 
         if ($current === null) {
-            throw (new SelectError('No result!'))->setTable($table);
+            return null;
         }
 
         $modelWrapper->getModelManager()->loadFromRecord($current, $model);
@@ -390,17 +394,17 @@ trait ConstraintTrait
      * @param class-string<AbstractModel>   $modelClassName
      * @param array<string, OrderDirection> $orderBy
      *
-     * @throws ClientException
      * @throws JsonException
      * @throws ReflectionException
+     * @throws RecordException
+     * @throws ClientException
      *
      * @return AbstractModel[]
      */
     private function loadForeignRecords(
+        string $propertyName,
         string $modelClassName,
         string|int|float|null $value,
-        string $foreignTable,
-        string $foreignField,
         string $where = null,
         array $whereParameters = [],
         array $orderBy = [],
@@ -412,14 +416,17 @@ trait ConstraintTrait
         }
 
         $modelWrapper = $this->getModelWrapper();
-        $table = $modelWrapper->getTableManager()->getTable($foreignTable);
-        $selectQuery = (new SelectQuery($table))
-            ->addWhere(new Where(
-                sprintf('`%s`=?%s', $foreignField, $where === null ? '' : ' AND (' . $where . ')'),
-                array_merge([$value], $whereParameters),
-            ))
+        $selectQuery = $modelWrapper->getChildrenQuery()->getSelectQuery(
+            $this,
+            't',
+            new ChildrenMapping($propertyName, 'child_', 'c'),
+        )
             ->setOrders($orderBy)
         ;
+
+        if ($where !== null) {
+            $selectQuery->addWhere(new Where($where, $whereParameters));
+        }
 
         $result = $modelWrapper->getClient()->execute($selectQuery);
 
