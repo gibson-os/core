@@ -5,6 +5,8 @@ namespace GibsonOS\Test\Functional\Core;
 
 use Codeception\Test\Unit;
 use GibsonOS\Core\Enum\Permission as PermissionEnum;
+use GibsonOS\Core\Install\Database\ConstraintInstall;
+use GibsonOS\Core\Install\Database\KeyInstall;
 use GibsonOS\Core\Install\Database\TableInstall;
 use GibsonOS\Core\Install\Database\ViewInstall;
 use GibsonOS\Core\Manager\ModelManager;
@@ -94,6 +96,16 @@ abstract class FunctionalTest extends Unit
         foreach ($viewInstall->install(__DIR__ . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..') as $success) {
         }
 
+        $constraintInstall = $this->serviceManager->get(ConstraintInstall::class);
+
+        foreach ($constraintInstall->install(__DIR__ . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..') as $success) {
+        }
+
+        $keyInstall = $this->serviceManager->get(KeyInstall::class);
+
+        foreach ($keyInstall->install(__DIR__ . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..') as $success) {
+        }
+
         if (__DIR__ === $this->getDir()) {
             return;
         }
@@ -102,6 +114,9 @@ abstract class FunctionalTest extends Unit
         }
 
         foreach ($viewInstall->install($this->getDir() . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..') as $success) {
+        }
+
+        foreach ($keyInstall->install($this->getDir() . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..') as $success) {
         }
     }
 
