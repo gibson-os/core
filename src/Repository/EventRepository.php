@@ -88,8 +88,7 @@ class EventRepository extends AbstractRepository
         return $this->getModels(
             $query,
             Event::class,
-            'event_',
-            [
+            children: [
                 new ChildrenMapping('triggers', 'trigger_', 'et'),
                 new ChildrenMapping('elements', 'element_', 'ee'),
             ],
