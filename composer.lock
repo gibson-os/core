@@ -71,16 +71,16 @@
         },
         {
             "name": "gibson-os/mdo",
-            "version": "v2.12.1",
+            "version": "v2.12.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/gibson-os/mdo.git",
-                "reference": "b39f67b42b09c249db8eee002fc9deabbe9dd57b"
+                "reference": "c5cec58a87f769c7d092338b6d416e4ca7a7aa14"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/gibson-os/mdo/zipball/b39f67b42b09c249db8eee002fc9deabbe9dd57b",
-                "reference": "b39f67b42b09c249db8eee002fc9deabbe9dd57b",
+                "url": "https://api.github.com/repos/gibson-os/mdo/zipball/c5cec58a87f769c7d092338b6d416e4ca7a7aa14",
+                "reference": "c5cec58a87f769c7d092338b6d416e4ca7a7aa14",
                 "shasum": ""
             },
             "require": {
@@ -112,9 +112,9 @@
             "notification-url": "https://packagist.org/downloads/",
             "support": {
                 "issues": "https://github.com/gibson-os/mdo/issues",
-                "source": "https://github.com/gibson-os/mdo/tree/v2.12.1"
+                "source": "https://github.com/gibson-os/mdo/tree/v2.12.2"
             },
-            "time": "2023-11-15T21:39:18+00:00"
+            "time": "2023-12-18T18:21:02+00:00"
         },
         {
             "name": "google/auth",
@@ -2352,16 +2352,16 @@
         },
         {
             "name": "captainhook/captainhook",
-            "version": "5.19.1",
+            "version": "5.19.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/captainhookphp/captainhook.git",
-                "reference": "93ef43a6934fdcaea7d20c983ec2ac05c103ab02"
+                "reference": "604bfc55fa40d6fe8c0275ca707ee80920b3b3f1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/captainhookphp/captainhook/zipball/93ef43a6934fdcaea7d20c983ec2ac05c103ab02",
-                "reference": "93ef43a6934fdcaea7d20c983ec2ac05c103ab02",
+                "url": "https://api.github.com/repos/captainhookphp/captainhook/zipball/604bfc55fa40d6fe8c0275ca707ee80920b3b3f1",
+                "reference": "604bfc55fa40d6fe8c0275ca707ee80920b3b3f1",
                 "shasum": ""
             },
             "require": {
@@ -2373,9 +2373,9 @@
                 "sebastianfeldmann/camino": "^0.9.2",
                 "sebastianfeldmann/cli": "^3.3",
                 "sebastianfeldmann/git": "^3.9",
-                "symfony/console": "^2.7 || ^3.0 || ^4.0 || ^5.0 || ^6.0",
-                "symfony/filesystem": "^2.7 || ^3.0 || ^4.0 || ^5.0 || ^6.0",
-                "symfony/process": "^2.7 || ^3.0 || ^4.0 || ^5.0 || ^6.0"
+                "symfony/console": "^2.7 || ^3.0 || ^4.0 || ^5.0 || ^6.0 || ^7.0",
+                "symfony/filesystem": "^2.7 || ^3.0 || ^4.0 || ^5.0 || ^6.0 || ^7.0",
+                "symfony/process": "^2.7 || ^3.0 || ^4.0 || ^5.0 || ^6.0 || ^7.0"
             },
             "replace": {
                 "sebastianfeldmann/captainhook": "*"
@@ -2424,7 +2424,7 @@
             ],
             "support": {
                 "issues": "https://github.com/captainhookphp/captainhook/issues",
-                "source": "https://github.com/captainhookphp/captainhook/tree/5.19.1"
+                "source": "https://github.com/captainhookphp/captainhook/tree/5.19.2"
             },
             "funding": [
                 {
@@ -2432,7 +2432,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2023-12-15T09:20:36+00:00"
+            "time": "2023-12-18T14:06:12+00:00"
         },
         {
             "name": "captainhook/plugin-composer",
@@ -6759,20 +6759,20 @@
         },
         {
             "name": "symfony/filesystem",
-            "version": "v6.4.0",
+            "version": "v7.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/filesystem.git",
-                "reference": "952a8cb588c3bc6ce76f6023000fb932f16a6e59"
+                "reference": "7da8ea2362a283771478c5f7729cfcb43a76b8b7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/filesystem/zipball/952a8cb588c3bc6ce76f6023000fb932f16a6e59",
-                "reference": "952a8cb588c3bc6ce76f6023000fb932f16a6e59",
+                "url": "https://api.github.com/repos/symfony/filesystem/zipball/7da8ea2362a283771478c5f7729cfcb43a76b8b7",
+                "reference": "7da8ea2362a283771478c5f7729cfcb43a76b8b7",
                 "shasum": ""
             },
             "require": {
-                "php": ">=8.1",
+                "php": ">=8.2",
                 "symfony/polyfill-ctype": "~1.8",
                 "symfony/polyfill-mbstring": "~1.8"
             },
@@ -6802,7 +6802,7 @@
             "description": "Provides basic utilities for the filesystem",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/filesystem/tree/v6.4.0"
+                "source": "https://github.com/symfony/filesystem/tree/v7.0.0"
             },
             "funding": [
                 {
@@ -6818,7 +6818,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2023-07-26T17:27:13+00:00"
+            "time": "2023-07-27T06:33:22+00:00"
         },
         {
             "name": "symfony/finder",
@@ -7118,20 +7118,20 @@
         },
         {
             "name": "symfony/process",
-            "version": "v6.4.0",
+            "version": "v7.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/process.git",
-                "reference": "191703b1566d97a5425dc969e4350d32b8ef17aa"
+                "reference": "13bdb1670c7f510494e04fcb2bfa29af63db9c0d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/process/zipball/191703b1566d97a5425dc969e4350d32b8ef17aa",
-                "reference": "191703b1566d97a5425dc969e4350d32b8ef17aa",
+                "url": "https://api.github.com/repos/symfony/process/zipball/13bdb1670c7f510494e04fcb2bfa29af63db9c0d",
+                "reference": "13bdb1670c7f510494e04fcb2bfa29af63db9c0d",
                 "shasum": ""
             },
             "require": {
-                "php": ">=8.1"
+                "php": ">=8.2"
             },
             "type": "library",
             "autoload": {
@@ -7159,7 +7159,7 @@
             "description": "Executes commands in sub-processes",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/process/tree/v6.4.0"
+                "source": "https://github.com/symfony/process/tree/v7.0.0"
             },
             "funding": [
                 {
@@ -7175,7 +7175,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2023-11-17T21:06:49+00:00"
+            "time": "2023-11-20T16:43:42+00:00"
         },
         {
             "name": "symfony/service-contracts",

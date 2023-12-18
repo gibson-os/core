@@ -127,7 +127,7 @@ class EventRepositoryTest extends Unit
             ->willReturn($selectQuery)
         ;
 
-        $model = $this->loadModel($selectQuery, Event::class, 'event_');
+        $model = $this->loadModel($selectQuery, Event::class, '');
 
         $this->tableManager->getTable($this->table->getTableName())
             ->shouldNotBeCalled()
@@ -135,7 +135,7 @@ class EventRepositoryTest extends Unit
         $this->repositoryWrapper->getModelWrapper()
             ->shouldBeCalledOnce()
         ;
-        $this->primaryKeyExtractor->extractFromRecord($this->eventElementTable, new Record([]), 'event_')
+        $this->primaryKeyExtractor->extractFromRecord($this->eventElementTable, new Record([]), '')
             ->willReturn([])
         ;
 
