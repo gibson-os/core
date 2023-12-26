@@ -20,15 +20,19 @@ use GibsonOS\Core\Store\Role\PermissionStore;
 use GibsonOS\Core\Store\Role\UserStore;
 use GibsonOS\Core\Store\RoleStore;
 use JsonException;
+use MDO\Exception\ClientException;
+use MDO\Exception\RecordException;
 use ReflectionException;
 use Traversable;
 
 class RoleController extends AbstractController
 {
     /**
-     * @throws SelectError
      * @throws JsonException
      * @throws ReflectionException
+     * @throws SelectError
+     * @throws ClientException
+     * @throws RecordException
      */
     #[CheckPermission([Permission::MANAGE, Permission::READ])]
     public function get(
@@ -44,6 +48,9 @@ class RoleController extends AbstractController
     }
 
     /**
+     * @throws JsonException
+     * @throws RecordException
+     * @throws ReflectionException
      * @throws SaveError
      */
     #[CheckPermission([Permission::MANAGE, Permission::WRITE])]
@@ -73,6 +80,9 @@ class RoleController extends AbstractController
     }
 
     /**
+     * @throws JsonException
+     * @throws RecordException
+     * @throws ReflectionException
      * @throws SaveError
      */
     #[CheckPermission([Permission::MANAGE, Permission::WRITE])]
@@ -87,9 +97,11 @@ class RoleController extends AbstractController
     }
 
     /**
-     * @throws SelectError
+     * @throws ClientException
      * @throws JsonException
+     * @throws RecordException
      * @throws ReflectionException
+     * @throws SelectError
      */
     #[CheckPermission([Permission::MANAGE, Permission::READ])]
     public function getUsers(
@@ -110,6 +122,9 @@ class RoleController extends AbstractController
     }
 
     /**
+     * @throws JsonException
+     * @throws RecordException
+     * @throws ReflectionException
      * @throws SaveError
      */
     #[CheckPermission([Permission::MANAGE, Permission::WRITE])]

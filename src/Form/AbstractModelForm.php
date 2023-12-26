@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Form;
 
+use GibsonOS\Core\Dto\Form\Button;
 use GibsonOS\Core\Dto\Parameter\AbstractParameter;
 use GibsonOS\Core\Exception\FormException;
 use GibsonOS\Core\Model\ModelInterface;
@@ -12,6 +13,11 @@ abstract class AbstractModelForm extends AbstractForm
     private const POSSIBLE_PREFIXES = ['get', 'is', 'has', 'should'];
 
     private ?ModelInterface $model = null;
+
+    /**
+     * @return array<string, Button>
+     */
+    abstract public function getButtons(): array;
 
     public function getModel(): ?ModelInterface
     {

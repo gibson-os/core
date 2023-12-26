@@ -78,7 +78,7 @@ class PermissionStore extends AbstractDatabaseStore
                 ->addJoin(new Join(
                     $this->getTable($this->permissionTableName),
                     'upm',
-                    '`r`.`id`=`upm`.`role_id` AND `m`.id`=:moduleId AND `upm`.`task_id` IS NULL',
+                    '`r`.`id`=`upm`.`role_id` AND `m`.`id`=:moduleId AND `upm`.`task_id` IS NULL',
                     JoinType::LEFT,
                 ))
                 ->addJoin(new Join(
