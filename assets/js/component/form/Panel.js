@@ -96,6 +96,10 @@ Ext.define('GibsonOS.module.core.component.form.Panel', {
 
         me.down('#buttons').add({
             text: button.text,
+            module: button.module,
+            task: button.task,
+            action: button.action,
+            parameters: button.parameters,
             handler() {
                 if (button.module === null) {
                     return;
@@ -104,18 +108,19 @@ Ext.define('GibsonOS.module.core.component.form.Panel', {
                 me.setLoading(true);
 
                 const form = me.getForm();
+                const renderedButton = this;
 
                 form.submit({
                     xtype: 'gosFormActionAction',
                     itemId: name,
                     requiredPermission: {
-                        module: button.module,
-                        task: button.task,
-                        action: button.action,
+                        module: renderedButton.module,
+                        task: renderedButton.task,
+                        action: renderedButton.action,
                         method: 'POST'
                     },
-                    url: baseDir + button.module + '/' + button.task + '/' + button.action,
-                    params: button.parameters,
+                    url: baseDir + renderedButton.module + '/' + renderedButton.task + '/' + renderedButton.action,
+                    params: renderedButton.parameters,
                     failure() {
                         me.setLoading(false);
                     },
