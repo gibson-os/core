@@ -7,6 +7,7 @@ Ext.define('GibsonOS.module.core.component.form.field.AutoComplete', {
     queryParamId: 'id',
     minChars: 0,
     isSetting: false,
+    displayAsValue: false,
     store: {
         autoLoad: false,
         proxy: {
@@ -80,5 +81,14 @@ Ext.define('GibsonOS.module.core.component.form.field.AutoComplete', {
         });
         delete params[me.queryParamId];
         me.getStore().getProxy().extraParams = params;
+    },
+    getValue() {
+        const value = this.callParent();
+
+        if (this.displayAsValue === false) {
+            return value;
+        }
+
+        return this.findRecordByValue(value).get(this.displayField);
     }
 });
