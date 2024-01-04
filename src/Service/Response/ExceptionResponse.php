@@ -70,7 +70,7 @@ readonly class ExceptionResponse implements ResponseInterface
                     'type' => $this->exception->getType(),
                 ];
 
-                $data['extraParameters'] = $this->exception->getExtraParameters();
+                $data['extraParameters'] = (object) $this->exception->getExtraParameters();
                 $data['buttons'] = $this->exception->getButtons();
 
                 if ($this->exception->getType() == AbstractException::PROMPT) {
