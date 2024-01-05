@@ -89,6 +89,12 @@ Ext.define('GibsonOS.module.core.component.form.field.AutoComplete', {
             return value;
         }
 
-        return this.findRecordByValue(value).get(this.displayField);
+        const record = this.findRecordByValue(value);
+
+        if (!record) {
+            return value;
+        }
+
+        return record.get(this.displayField);
     }
 });
