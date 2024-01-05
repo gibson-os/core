@@ -305,8 +305,13 @@ class ModelManager
             }
 
             if ($this->getColumnType($field->getType()) === self::TYPE_DATE_TIME) {
-                $values[$fieldName] = new Value($value->format('Y-m-d H:i:s'));
-                $model->{'set' . $transformedFieldName}($this->dateTimeService->get((string) $values[$fieldName]->getValue()));
+                $format = match ($field->getType()) {
+                    Type::YEAR => 'Y',
+                    Type::TIME => 'H:i:s',
+                    Type::DATE => 'Y-m-d',
+                    default => 'Y-m-d H:i:s',
+                };
+                $values[$fieldName] = new Value($value->format($format));
             } elseif (is_object($value) && enum_exists($value::class)) {
                 $values[$fieldName] = new Value($value->name);
             } elseif (is_array($value)) {
