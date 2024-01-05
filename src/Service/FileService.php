@@ -284,6 +284,12 @@ class FileService
 
     public function getFileEnding(string $path): string
     {
+        $filename = $this->getFilename($path);
+
+        if (mb_strrpos($filename, '.') === false) {
+            return $filename;
+        }
+
         return mb_substr($path, (mb_strrpos($path, '.') ?: -1) + 1);
     }
 
