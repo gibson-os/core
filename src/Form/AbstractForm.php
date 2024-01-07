@@ -3,14 +3,9 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Form;
 
-use GibsonOS\Core\Dto\Parameter\AbstractParameter;
+use GibsonOS\Core\Dto\Form;
 
 abstract class AbstractForm
 {
-    /**
-     * @return AbstractParameter[]
-     */
-    abstract protected function getFields(): array;
-
-    abstract public function getForm(): array;
+    abstract public function getForm(): Form;
 }

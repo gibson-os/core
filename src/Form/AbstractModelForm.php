@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Form;
 
+use GibsonOS\Core\Dto\Form;
 use GibsonOS\Core\Dto\Form\Button;
 use GibsonOS\Core\Dto\Parameter\AbstractParameter;
 use GibsonOS\Core\Exception\FormException;
@@ -13,6 +14,11 @@ abstract class AbstractModelForm extends AbstractForm
     private const POSSIBLE_PREFIXES = ['get', 'is', 'has', 'should'];
 
     private ?ModelInterface $model = null;
+
+    /**
+     * @return array<string, AbstractParameter>
+     */
+    abstract protected function getFields(): array;
 
     /**
      * @return array<string, Button>
@@ -34,7 +40,7 @@ abstract class AbstractModelForm extends AbstractForm
     /**
      * @throws FormException
      */
-    public function getForm(): array
+    public function getForm(): Form
     {
         $fields = $this->getFields();
 
@@ -44,10 +50,7 @@ abstract class AbstractModelForm extends AbstractForm
             }
         }
 
-        return [
-            'fields' => $fields,
-            'buttons' => $this->getButtons(),
-        ];
+        return new Form($fields, $this->getButtons());
     }
 
     /**
