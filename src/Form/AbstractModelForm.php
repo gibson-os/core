@@ -8,34 +8,31 @@ use GibsonOS\Core\Dto\Form\AbstractModelConfig;
 use GibsonOS\Core\Dto\Form\Button;
 use GibsonOS\Core\Dto\Parameter\AbstractParameter;
 use GibsonOS\Core\Exception\FormException;
-use GibsonOS\Core\Model\ModelInterface;
 
 abstract class AbstractModelForm
 {
     private const POSSIBLE_PREFIXES = ['get', 'is', 'has', 'should'];
 
-    private ?ModelInterface $model = null;
-
     /**
      * @return array<string, AbstractParameter>
      */
-    abstract protected function getFields(AbstractModelConfig $config = null): array;
+    abstract protected function getFields(AbstractModelConfig $config): array;
 
     /**
      * @return array<string, Button>
      */
-    abstract public function getButtons(AbstractModelConfig $config = null): array;
+    abstract public function getButtons(AbstractModelConfig $config): array;
 
     /**
      * @throws FormException
      */
-    public function getForm(AbstractModelConfig $config = null): Form
+    public function getForm(AbstractModelConfig $config): Form
     {
         $fields = $this->getFields($config);
 
-        if ($this->model !== null) {
+        if ($config->getModel() !== null) {
             foreach ($fields as $name => $field) {
-                $this->setFieldValue($field, $name);
+                $this->setFieldValue($config, $field, $name);
             }
         }
 
@@ -45,9 +42,11 @@ abstract class AbstractModelForm
     /**
      * @throws FormException
      */
-    private function setFieldValue(AbstractParameter $field, string $name): void
+    private function setFieldValue(AbstractModelConfig $config, AbstractParameter $field, string $name): void
     {
-        if ($this->model === null) {
+        $model = $config->getModel();
+
+        if ($model === null) {
             return;
         }
 
@@ -55,7 +54,7 @@ abstract class AbstractModelForm
         $getterPrefix = null;
 
         foreach (self::POSSIBLE_PREFIXES as $possiblePrefix) {
-            if (method_exists($this->model, $possiblePrefix . $propertyName)) {
+            if (method_exists($model, $possiblePrefix . $propertyName)) {
                 $getterPrefix = $possiblePrefix;
 
                 break;
@@ -63,9 +62,9 @@ abstract class AbstractModelForm
         }
 
         if ($getterPrefix === null) {
-            throw new FormException(sprintf('No getter found for %s n %s!', $name, $this->model::class));
+            throw new FormException(sprintf('No getter found for %s n %s!', $name, $model::class));
         }
 
-        $field->setValue($this->model->{$getterPrefix . $propertyName}());
+        $field->setValue($model->{$getterPrefix . $propertyName}());
     }
 }

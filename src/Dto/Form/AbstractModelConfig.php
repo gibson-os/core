@@ -7,11 +7,11 @@ use GibsonOS\Core\Model\ModelInterface;
 
 abstract class AbstractModelConfig implements ConfigInterface
 {
-    public function __construct(private readonly ModelInterface $model)
+    public function __construct(private readonly ?ModelInterface $model = null)
     {
     }
 
-    public function getModel(): ModelInterface
+    public function getModel(): ?ModelInterface
     {
         return $this->model;
     }
