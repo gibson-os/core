@@ -4,8 +4,8 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Form;
 
 use GibsonOS\Core\Dto\Form;
-use GibsonOS\Core\Dto\Form\AbstractModelConfig;
 use GibsonOS\Core\Dto\Form\Button;
+use GibsonOS\Core\Dto\Form\ModelFormConfig;
 use GibsonOS\Core\Dto\Parameter\AbstractParameter;
 use GibsonOS\Core\Exception\FormException;
 
@@ -16,17 +16,17 @@ abstract class AbstractModelForm
     /**
      * @return array<string, AbstractParameter>
      */
-    abstract protected function getFields(AbstractModelConfig $config): array;
+    abstract protected function getFields(ModelFormConfig $config): array;
 
     /**
      * @return array<string, Button>
      */
-    abstract public function getButtons(AbstractModelConfig $config): array;
+    abstract public function getButtons(ModelFormConfig $config): array;
 
     /**
      * @throws FormException
      */
-    public function getForm(AbstractModelConfig $config): Form
+    public function getForm(ModelFormConfig $config): Form
     {
         $fields = $this->getFields($config);
 
@@ -42,7 +42,7 @@ abstract class AbstractModelForm
     /**
      * @throws FormException
      */
-    private function setFieldValue(AbstractModelConfig $config, AbstractParameter $field, string $name): void
+    private function setFieldValue(ModelFormConfig $config, AbstractParameter $field, string $name): void
     {
         $model = $config->getModel();
 

@@ -5,7 +5,7 @@ namespace GibsonOS\Core\Dto\Form;
 
 use GibsonOS\Core\Model\ModelInterface;
 
-abstract class AbstractModelConfig implements ConfigInterface
+class ModelFormConfig
 {
     public function __construct(private readonly ?ModelInterface $model = null)
     {
