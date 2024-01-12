@@ -6,7 +6,7 @@ namespace GibsonOS\Core\Dto\Form;
 use GibsonOS\Core\Model\ModelInterface;
 
 /**
- * @template T of ModelInterface or null
+ * @template T of ModelInterface|null
  */
 class ModelFormConfig
 {
