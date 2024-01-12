@@ -3,24 +3,24 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Dto\Form;
 
-use GibsonOS\Core\Model\AbstractModel;
+use GibsonOS\Core\Model\ModelInterface;
 
 /**
- * @template T of AbstractModel|null
+ * @template T of ModelInterface|null
  */
 class ModelFormConfig
 {
     /**
      * @param T|null $model
      */
-    public function __construct(private readonly ?AbstractModel $model = null)
+    public function __construct(private readonly ?ModelInterface $model = null)
     {
     }
 
     /**
      * @return T|null
      */
-    public function getModel(): ?AbstractModel
+    public function getModel(): ?ModelInterface
     {
         return $this->model;
     }

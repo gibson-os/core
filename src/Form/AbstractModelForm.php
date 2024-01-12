@@ -8,10 +8,10 @@ use GibsonOS\Core\Dto\Form\Button;
 use GibsonOS\Core\Dto\Form\ModelFormConfig;
 use GibsonOS\Core\Dto\Parameter\AbstractParameter;
 use GibsonOS\Core\Exception\FormException;
-use GibsonOS\Core\Model\AbstractModel;
+use GibsonOS\Core\Model\ModelInterface;
 
 /**
- * @template T of AbstractModel
+ * @template T of ModelInterface
  */
 abstract class AbstractModelForm
 {
