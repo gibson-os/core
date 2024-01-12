@@ -8,24 +8,24 @@ use GibsonOS\Core\Dto\Form\Button;
 use GibsonOS\Core\Dto\Form\ModelFormConfig;
 use GibsonOS\Core\Dto\Parameter\AbstractParameter;
 use GibsonOS\Core\Exception\FormException;
-use GibsonOS\Core\Model\ModelInterface;
+use GibsonOS\Core\Model\AbstractModel;
 
 /**
- * @template T of ModelInterface
+ * @template T of AbstractModel
  */
 abstract class AbstractModelForm
 {
     private const POSSIBLE_PREFIXES = ['get', 'is', 'has', 'should'];
 
     /**
-     * @param ModelFormConfig<T> $config
+     * @param ModelFormConfig<T|null> $config
      *
      * @return array<string, AbstractParameter>
      */
     abstract protected function getFields(ModelFormConfig $config): array;
 
     /**
-     * @param ModelFormConfig<T> $config
+     * @param ModelFormConfig<T|null> $config
      *
      * @return array<string, Button>
      */
@@ -37,7 +37,7 @@ abstract class AbstractModelForm
     abstract protected function supportedModel(): string;
 
     /**
-     * @param ModelFormConfig<T> $config
+     * @param ModelFormConfig<T|null> $config
      *
      * @throws FormException
      */
@@ -65,7 +65,7 @@ abstract class AbstractModelForm
     }
 
     /**
-     * @param ModelFormConfig<T> $config
+     * @param ModelFormConfig<T|null> $config
      *
      * @throws FormException
      */
