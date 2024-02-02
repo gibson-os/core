@@ -28,7 +28,7 @@ abstract class AbstractTracer
         return $this;
     }
 
-    public function stopSpan(Throwable $exception = null): self
+    public function stopSpan(?Throwable $exception = null): self
     {
         return $this;
     }

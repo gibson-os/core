@@ -69,7 +69,7 @@ class TracerService
         return $this;
     }
 
-    public function stopSpan(Throwable $exception = null): TracerService
+    public function stopSpan(?Throwable $exception = null): TracerService
     {
         foreach ($this->tracers as $tracer) {
             if ($tracer->isLoaded()) {

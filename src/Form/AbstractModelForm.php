@@ -47,7 +47,7 @@ abstract class AbstractModelForm
         $model = $config->getModel();
 
         if ($model !== null) {
-            if (!is_subclass_of($model, $this->supportedModel())) {
+            if ($model::class !== $this->supportedModel() && !is_subclass_of($model, $this->supportedModel())) {
                 throw new FormException(sprintf(
                     'Model "%s" is not supported by "%s". Supported is "%s"',
                     $model::class,

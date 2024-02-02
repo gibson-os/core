@@ -43,10 +43,10 @@ class DriveController extends AbstractController
     public function getChart(
         DriveStore $driveStore,
         DateTimeService $dateTimeService,
-        string $from = null,
-        string $fromTime = null,
-        string $to = null,
-        string $toTime = null,
+        ?string $from = null,
+        ?string $fromTime = null,
+        ?string $to = null,
+        ?string $toTime = null,
         int $attributeId = 194,
     ): AjaxResponse {
         $driveStore

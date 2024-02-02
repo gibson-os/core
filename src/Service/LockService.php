@@ -31,7 +31,7 @@ class LockService
      * @throws LockException
      * @throws JsonException
      */
-    public function lock(string $name = null): void
+    public function lock(?string $name = null): void
     {
         $name = $this->getName($name);
 
@@ -55,7 +55,7 @@ class LockService
      * @throws JsonException
      * @throws ReflectionException
      */
-    public function forceLock(string $name = null): void
+    public function forceLock(?string $name = null): void
     {
         $name = $this->getName($name);
 
@@ -84,7 +84,7 @@ class LockService
      * @throws UnlockException
      * @throws JsonException
      */
-    public function unlock(string $name = null): void
+    public function unlock(?string $name = null): void
     {
         $name = $this->getName($name);
 
@@ -99,7 +99,7 @@ class LockService
     /**
      * @throws JsonException
      */
-    public function isLocked(string $name = null): bool
+    public function isLocked(?string $name = null): bool
     {
         $name = $this->getName($name);
 
@@ -125,7 +125,7 @@ class LockService
      * @throws DateTimeError
      * @throws JsonException
      */
-    public function waitUnlockToLock(string $name = null): void
+    public function waitUnlockToLock(?string $name = null): void
     {
         try {
             $this->lock($name);
@@ -139,7 +139,7 @@ class LockService
      * @throws DeleteError
      * @throws JsonException
      */
-    public function kill(string $name = null): void
+    public function kill(?string $name = null): void
     {
         $name = $this->getName($name);
 
@@ -156,7 +156,7 @@ class LockService
      * @throws ReflectionException
      * @throws SaveError
      */
-    public function stop(string $name = null): void
+    public function stop(?string $name = null): void
     {
         $name = $this->getName($name);
 
@@ -169,7 +169,7 @@ class LockService
     /**
      * @throws LockException
      */
-    public function shouldStop(string $name = null): bool
+    public function shouldStop(?string $name = null): bool
     {
         $name = $this->getName($name);
 
@@ -180,7 +180,7 @@ class LockService
         }
     }
 
-    private function getName(string $name = null): string
+    private function getName(?string $name = null): string
     {
         if (null !== $name) {
             return $name;

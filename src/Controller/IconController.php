@@ -67,9 +67,9 @@ class IconController extends AbstractController
         string $name,
         string $tags,
         array $icon,
-        array $iconIco = null,
+        ?array $iconIco = null,
         #[GetModel]
-        Icon $iconModel = null,
+        ?Icon $iconModel = null,
     ): AjaxResponse {
         $iconModel ??= (new Icon($modelWrapper))
             ->setName($name)

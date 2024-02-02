@@ -95,7 +95,6 @@ class ModelMapperAttribute extends ObjectMapperAttribute
     }
 
     /**
-     * @throws MapperException
      * @throws ReflectionException
      */
     private function getValues(GetMappedModel $attribute, ReflectionProperty $reflectionProperty): mixed

@@ -59,7 +59,7 @@ readonly class ControllerService
         private TracerService $tracerService,
         ModuleRepository $moduleRepository,
         #[GetSetting('chromecastReceiverAppId', 'core')]
-        Setting $chromecastReceiverAppId = null,
+        ?Setting $chromecastReceiverAppId = null,
     ) {
         $this->chromecastReceiverAppId = $chromecastReceiverAppId
             ?? (new Setting($this->modelWrapper))

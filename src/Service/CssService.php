@@ -33,7 +33,7 @@ class CssService
      * @throws ClientException
      * @throws RecordException
      */
-    public function getByUserId(?int $userId, string $module = null): string
+    public function getByUserId(?int $userId, ?string $module = null): string
     {
         $files = [];
 

@@ -30,7 +30,7 @@ class DateTimeService
     /**
      * @psalm-suppress InvalidReturnType
      */
-    public function get(string $time = 'now', DateTimeZone $timezone = null): DateTime
+    public function get(string $time = 'now', ?DateTimeZone $timezone = null): DateTime
     {
         try {
             return new DateTime($time, $timezone ?? $this->timezone);

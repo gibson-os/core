@@ -63,7 +63,7 @@ class WebService
     /**
      * @throws WebException
      */
-    public function request(Request $request, HttpMethod $method = null): Response
+    public function request(Request $request, ?HttpMethod $method = null): Response
     {
         $curl = $this->initRequest($request, $method);
 
@@ -80,7 +80,7 @@ class WebService
         return $this->getResponse($request, $curl, $responseHandle, $cookieFile);
     }
 
-    private function initRequest(Request $request, HttpMethod $method = null): CurlHandle
+    private function initRequest(Request $request, ?HttpMethod $method = null): CurlHandle
     {
         $method ??= $request->getMethod();
         $port = $request->getPort();

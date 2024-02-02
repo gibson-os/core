@@ -33,7 +33,7 @@ class PermissionViewRepository extends AbstractRepository
      *
      * @return Generator<Record>
      */
-    public function getTaskList(?int $userId, string $module = null): Generator
+    public function getTaskList(?int $userId, ?string $module = null): Generator
     {
         $selectQuery = $this->getSelectQuery($this->permissionViewName)
             ->setDistinct(true)
@@ -58,7 +58,7 @@ class PermissionViewRepository extends AbstractRepository
      * @throws JsonException
      * @throws ReflectionException
      */
-    public function getPermissionByModule(string $module, int $userId = null): PermissionView
+    public function getPermissionByModule(string $module, ?int $userId = null): PermissionView
     {
         return $this->fetchOne(
             'IFNULL(`user_id`, :userIdNull)=:userId AND ' .
@@ -79,7 +79,7 @@ class PermissionViewRepository extends AbstractRepository
      * @throws SelectError
      * @throws ClientException
      */
-    public function getPermissionByTask(string $module, string $task, int $userId = null): PermissionView
+    public function getPermissionByTask(string $module, string $task, ?int $userId = null): PermissionView
     {
         return $this->fetchOne(
             'IFNULL(`user_id`, :userIdNull)=:userId AND ' .
@@ -109,7 +109,7 @@ class PermissionViewRepository extends AbstractRepository
         string $task,
         string $action,
         HttpMethod $method,
-        int $userId = null,
+        ?int $userId = null,
     ): PermissionView {
         return $this->fetchOne(
             'IFNULL(`user_id`, :userIdNull)=:userId AND ' .

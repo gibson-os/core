@@ -35,7 +35,7 @@ class MiddlewareController extends AbstractController
         ModelManager $modelManager,
         ModelWrapper $modelWrapper,
         #[GetSetting('middlewareToken', 'core')]
-        Setting $middlewareToken = null,
+        ?Setting $middlewareToken = null,
     ): AjaxResponse {
         $middlewareToken ??= (new Setting($modelWrapper))
             ->setModule($moduleRepository->getByName('core'))

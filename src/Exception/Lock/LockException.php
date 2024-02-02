@@ -8,7 +8,7 @@ use Throwable;
 
 class LockException extends AbstractException
 {
-    public function __construct($message = 'Lock error!', $code = 0, Throwable $previous = null)
+    public function __construct($message = 'Lock error!', $code = 0, ?Throwable $previous = null)
     {
         parent::__construct($message, $code, $previous);
     }

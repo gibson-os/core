@@ -220,7 +220,7 @@ class FileService
      *
      * @todo Refactor to files only array or null
      */
-    public function delete(string $dir, string|array $files = null): void
+    public function delete(string $dir, string|array|null $files = null): void
     {
         $dir = $this->dirService->addEndSlash($dir);
 

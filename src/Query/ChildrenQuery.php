@@ -111,7 +111,7 @@ class ChildrenQuery
      * @throws ReflectionException
      * @throws ClientException
      */
-    public function extend(SelectQuery $selectQuery, string $modelClassName, array $children, string $alias = null): SelectQuery
+    public function extend(SelectQuery $selectQuery, string $modelClassName, array $children, ?string $alias = null): SelectQuery
     {
         $reflectionClass = $this->reflectionManager->getReflectionClass($modelClassName);
         $selects = [];

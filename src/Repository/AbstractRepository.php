@@ -222,7 +222,7 @@ abstract class AbstractRepository
     /**
      * @throws ClientException
      */
-    protected function getSelectQuery(string $tableName, string $alias = null): SelectQuery
+    protected function getSelectQuery(string $tableName, ?string $alias = null): SelectQuery
     {
         return new SelectQuery($this->repositoryWrapper->getTableManager()->getTable($tableName), $alias);
     }

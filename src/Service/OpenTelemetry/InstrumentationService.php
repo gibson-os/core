@@ -22,8 +22,8 @@ class InstrumentationService
         CachedInstrumentation $instrumentation,
         ?string $className,
         string $functionName,
-        callable $pre = null,
-        callable $post = null,
+        ?callable $pre = null,
+        ?callable $post = null,
     ): InstrumentationService {
         $pre ??= function (
             ?object $object,

@@ -72,7 +72,7 @@ class EventService
      * @throws ReflectionException
      * @throws SaveError
      */
-    public function fireInCommand(string $className, string $trigger, array $parameters = null): void
+    public function fireInCommand(string $className, string $trigger, ?array $parameters = null): void
     {
         $triggerName = $this->getTriggerName($className, $trigger);
         $this->logger->info('Fire event ' . $triggerName);
@@ -95,7 +95,7 @@ class EventService
     /**
      * @param class-string $className
      */
-    public function fire(string $className, string $trigger, array $parameters = null): void
+    public function fire(string $className, string $trigger, ?array $parameters = null): void
     {
         try {
             $this->fireInCommand($className, $trigger, $parameters);
@@ -173,7 +173,7 @@ class EventService
     public function getParameter(
         string $className,
         array $options = [],
-        string $title = null,
+        ?string $title = null,
         array $listeners = [],
     ): AbstractParameter {
         $reflectionClass = $this->reflectionManager->getReflectionClass($className);

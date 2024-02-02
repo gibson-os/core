@@ -19,10 +19,10 @@ class PermissionService
      */
     public function getPermission(
         string $module,
-        string $task = null,
-        string $action = null,
-        HttpMethod $method = null,
-        int $userId = null,
+        ?string $task = null,
+        ?string $action = null,
+        ?HttpMethod $method = null,
+        ?int $userId = null,
     ): int {
         if ($task === null) {
             return $this->permissionViewRepository->getPermissionByModule($module, $userId)->getPermission();
@@ -44,10 +44,10 @@ class PermissionService
     public function hasPermission(
         int $permission,
         string $module,
-        string $task = null,
-        string $action = null,
-        HttpMethod $method = null,
-        int $userId = null,
+        ?string $task = null,
+        ?string $action = null,
+        ?HttpMethod $method = null,
+        ?int $userId = null,
     ): bool {
         try {
             $permissionValue = $this->getPermission($module, $task, $action, $method, $userId);
@@ -72,50 +72,50 @@ class PermissionService
 
     public function isDenied(
         string $module,
-        string $task = null,
-        string $action = null,
-        HttpMethod $method = null,
-        int $userId = null,
+        ?string $task = null,
+        ?string $action = null,
+        ?HttpMethod $method = null,
+        ?int $userId = null,
     ): bool {
         return $this->hasPermission(PermissionEnum::DENIED->value, $module, $task, $action, $method, $userId);
     }
 
     public function hasReadPermission(
         string $module,
-        string $task = null,
-        string $action = null,
-        HttpMethod $method = null,
-        int $userId = null,
+        ?string $task = null,
+        ?string $action = null,
+        ?HttpMethod $method = null,
+        ?int $userId = null,
     ): bool {
         return $this->hasPermission(PermissionEnum::READ->value, $module, $task, $action, $method, $userId);
     }
 
     public function hasWritePermission(
         string $module,
-        string $task = null,
-        string $action = null,
-        HttpMethod $method = null,
-        int $userId = null,
+        ?string $task = null,
+        ?string $action = null,
+        ?HttpMethod $method = null,
+        ?int $userId = null,
     ): bool {
         return $this->hasPermission(PermissionEnum::WRITE->value, $module, $task, $action, $method, $userId);
     }
 
     public function hasDeletePermission(
         string $module,
-        string $task = null,
-        string $action = null,
-        HttpMethod $method = null,
-        int $userId = null,
+        ?string $task = null,
+        ?string $action = null,
+        ?HttpMethod $method = null,
+        ?int $userId = null,
     ): bool {
         return $this->hasPermission(PermissionEnum::DELETE->value, $module, $task, $action, $method, $userId);
     }
 
     public function hasManagePermission(
         string $module,
-        string $task = null,
-        string $action = null,
-        HttpMethod $method = null,
-        int $userId = null,
+        ?string $task = null,
+        ?string $action = null,
+        ?HttpMethod $method = null,
+        ?int $userId = null,
     ): bool {
         return $this->hasPermission(PermissionEnum::MANAGE->value, $module, $task, $action, $method, $userId);
     }
@@ -141,8 +141,8 @@ class PermissionService
         array $permissionItem,
         ?int $userId,
         string $module,
-        string $task = null,
-        string $action = null,
+        ?string $task = null,
+        ?string $action = null,
     ): array {
         $permissions = [];
 

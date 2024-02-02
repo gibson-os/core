@@ -50,7 +50,7 @@ class InstallService
      *
      * @return Generator<InstallDtoInterface>|InstallDtoInterface[]
      */
-    public function install(string $module = null, string $part = null): iterable
+    public function install(?string $module = null, ?string $part = null): iterable
     {
         $modules = $this->getModules();
         $moduleNames = array_map(

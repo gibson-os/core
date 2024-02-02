@@ -74,8 +74,8 @@ class FfmpegService
     public function convert(
         Media $media,
         string $outputFilename,
-        string $videoCodec = null,
-        string $audioCodec = null,
+        ?string $videoCodec = null,
+        ?string $audioCodec = null,
         array $options = [],
     ): void {
         $optionString = $this->getOption($options, 'activation_bytes', '');

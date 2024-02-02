@@ -123,7 +123,7 @@ class ReflectionManager
         return count($reflectionObject->getAttributes($attributeClassName, $flags)) > 0;
     }
 
-    public function setProperty(ReflectionProperty $reflectionProperty, object $object, string|int|float|bool|null|array|object $value): bool
+    public function setProperty(ReflectionProperty $reflectionProperty, object $object, string|int|float|bool|array|object|null $value): bool
     {
         $propertyName = $reflectionProperty->getName();
         $setter = 'set' . ucfirst($propertyName);
@@ -143,7 +143,7 @@ class ReflectionManager
         return false;
     }
 
-    public function getProperty(ReflectionProperty $reflectionProperty, object $object): string|int|float|bool|null|array|object
+    public function getProperty(ReflectionProperty $reflectionProperty, object $object): string|int|float|bool|array|object|null
     {
         $propertyName = $reflectionProperty->getName();
 
@@ -165,7 +165,7 @@ class ReflectionManager
     /**
      * @throws ReflectionException
      */
-    public function getDefaultValue(ReflectionParameter $reflectionParameter): string|int|float|bool|null|array|object
+    public function getDefaultValue(ReflectionParameter $reflectionParameter): string|int|float|bool|array|object|null
     {
         if ($reflectionParameter->isDefaultValueAvailable()) {
             return $reflectionParameter->getDefaultValue();
@@ -264,7 +264,7 @@ class ReflectionManager
      * @throws ReflectionException
      * @throws JsonException
      */
-    public function castValue(ReflectionProperty|ReflectionParameter $reflectionObject, int|float|bool|string|null|array $value): int|float|bool|string|null|array|object
+    public function castValue(ReflectionProperty|ReflectionParameter $reflectionObject, int|float|bool|string|array|null $value): int|float|bool|string|array|object|null
     {
         if (!$this->isBuiltin($reflectionObject)) {
             return $value;

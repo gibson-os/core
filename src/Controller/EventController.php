@@ -71,8 +71,8 @@ class EventController extends AbstractController
     public function getElements(
         ElementStore $elementStore,
         #[GetModel(['id' => 'eventId'])]
-        Event $event = null,
-        string $node = null,
+        ?Event $event = null,
+        ?string $node = null,
     ): AjaxResponse {
         if (
             $event === null

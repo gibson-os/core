@@ -16,7 +16,7 @@ class FloatParameter extends AbstractParameter
         parent::__construct($title, 'gosCoreComponentFormFieldNumberField');
     }
 
-    public function setRange(?int $min, int $max = null): FloatParameter
+    public function setRange(?int $min, ?int $max = null): FloatParameter
     {
         $this->min = $min;
         $this->max = $max;

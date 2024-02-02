@@ -42,9 +42,9 @@ class MiddlewareService
         private readonly ModelWrapper $modelWrapper,
         ModuleRepository $moduleRepository,
         #[GetSetting('middlewareToken', 'core')]
-        Setting $middlewareToken = null,
+        ?Setting $middlewareToken = null,
         #[GetSetting('middlewareSecret', 'core')]
-        Setting $middlewareSecret = null,
+        ?Setting $middlewareSecret = null,
     ) {
         $module = $moduleRepository->getByName('core');
         $this->middlewareToken = $middlewareToken
@@ -65,7 +65,7 @@ class MiddlewareService
      * @throws WebException
      * @throws JsonException
      */
-    public function send(string $task, string $action, array $parameters = [], string $body = null, HttpMethod $method = null): Response
+    public function send(string $task, string $action, array $parameters = [], ?string $body = null, ?HttpMethod $method = null): Response
     {
         if ($this->middlewareUrl === null) {
             throw new InvalidArgumentException('Middleware URL not set');

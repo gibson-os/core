@@ -217,7 +217,7 @@ class PermissionStore extends AbstractDatabaseStore
 
         foreach ($result->iterateRecords() as $record) {
             yield array_map(
-                static fn (Value $value): float|int|null|string => $value->getValue(),
+                static fn (Value $value): float|int|string|null => $value->getValue(),
                 $record->getValues(),
             );
         }

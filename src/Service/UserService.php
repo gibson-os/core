@@ -72,7 +72,7 @@ class UserService
      * @throws SaveError
      * @throws Exception
      */
-    public function addDevice(User $user, string $model, string $fcmToken = null): Device
+    public function addDevice(User $user, string $model, ?string $fcmToken = null): Device
     {
         // @todo remove after app release
         while (true) {

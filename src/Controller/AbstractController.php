@@ -26,7 +26,7 @@ abstract class AbstractController
         ;
     }
 
-    protected function returnSuccess($data = null, int $total = null): AjaxResponse
+    protected function returnSuccess($data = null, ?int $total = null): AjaxResponse
     {
         $return = [
             'success' => true,

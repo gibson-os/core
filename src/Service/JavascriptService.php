@@ -31,7 +31,7 @@ class JavascriptService
      * @throws GetError
      * @throws SelectError
      */
-    public function getByUserId(?int $userId, string $module = null, bool $withDefault = true): string
+    public function getByUserId(?int $userId, ?string $module = null, bool $withDefault = true): string
     {
         $files = $withDefault ? $this->getDefaultFiles() : [];
         $oldData = '';

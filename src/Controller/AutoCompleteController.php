@@ -23,8 +23,8 @@ class AutoCompleteController extends AbstractController
         ServiceManager $serviceManagerService,
         RequestService $requestService,
         string $autoCompleteClassname,
-        string $id = null,
-        string $name = null,
+        ?string $id = null,
+        ?string $name = null,
     ): AjaxResponse {
         /** @var AutoCompleteInterface $autoComplete */
         $autoComplete = $serviceManagerService->get($autoCompleteClassname);

@@ -107,7 +107,7 @@ abstract class AbstractException extends Exception
     /**
      * @param mixed|null $value
      */
-    public function addButton(string $text, string $parameter = null, $value = null): AbstractException
+    public function addButton(string $text, ?string $parameter = null, $value = null): AbstractException
     {
         $this->buttons[] = [
             'text' => $text,

@@ -16,7 +16,7 @@ class DateParameter extends AbstractParameter
         parent::__construct($title, 'gosCoreComponentFormFieldDate');
     }
 
-    public function setRange(?DateTimeInterface $min, DateTimeInterface $max = null): DateParameter
+    public function setRange(?DateTimeInterface $min, ?DateTimeInterface $max = null): DateParameter
     {
         $this->min = $min;
         $this->max = $max;

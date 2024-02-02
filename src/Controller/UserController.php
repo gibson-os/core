@@ -67,7 +67,7 @@ class UserController extends AbstractController
     public function getSettings(
         DeviceRepository $deviceRepository,
         #[GetModel]
-        User $user = null,
+        ?User $user = null,
     ): AjaxResponse {
         if ($user === null) {
             $user = $this->sessionService->getUser();
@@ -188,7 +188,7 @@ class UserController extends AbstractController
         #[GetMappedModel]
         User\Permission $permission,
         #[GetModel]
-        User\Permission $originalPermission = null,
+        ?User\Permission $originalPermission = null,
     ): AjaxResponse {
         if ($permission->getPermission() === 0) {
             if ($originalPermission === null) {

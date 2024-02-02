@@ -45,7 +45,7 @@ class ActionRepository extends AbstractRepository
      *
      * @return Action[]
      */
-    public function findByName(string $name, int $taskId = null): array
+    public function findByName(string $name, ?int $taskId = null): array
     {
         $where = '`name` LIKE ?';
         $parameters = [$name . '%'];

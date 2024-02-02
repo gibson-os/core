@@ -362,7 +362,7 @@ trait ConstraintTrait
     private function loadForeignRecord(
         string $propertyName,
         AbstractModel $model,
-        string $where = null,
+        ?string $where = null,
         array $whereParameters = [],
     ): ?AbstractModel {
         $modelWrapper = $this->getModelWrapper();
@@ -405,7 +405,7 @@ trait ConstraintTrait
         string $propertyName,
         string $modelClassName,
         string|int|float|null $value,
-        string $where = null,
+        ?string $where = null,
         array $whereParameters = [],
         array $orderBy = [],
     ): array {

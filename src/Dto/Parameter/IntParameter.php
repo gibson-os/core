@@ -14,7 +14,7 @@ class IntParameter extends AbstractParameter
         parent::__construct($title, 'gosCoreComponentFormFieldNumberField');
     }
 
-    public function setRange(?int $min, int $max = null): IntParameter
+    public function setRange(?int $min, ?int $max = null): IntParameter
     {
         $this->min = $min;
         $this->max = $max;

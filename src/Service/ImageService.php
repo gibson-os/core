@@ -77,7 +77,7 @@ class ImageService
      * @throws FileNotFound
      * @throws LoadError
      */
-    public function load(string $filename, string $type = null): Image
+    public function load(string $filename, ?string $type = null): Image
     {
         if ($type === null) {
             $type = $this->getImageTypeByFilename($filename);
@@ -180,7 +180,7 @@ class ImageService
      * @throws DeleteError
      * @throws GetError
      */
-    public function save(Image $image, string $type = null): bool
+    public function save(Image $image, ?string $type = null): bool
     {
         if ($type === null) {
             $type = $this->getImageTypeByFilename($image->getFilename());

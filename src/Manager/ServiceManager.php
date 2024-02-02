@@ -57,7 +57,7 @@ class ServiceManager
      *
      * @return T
      */
-    public function get(string $classname, string $instanceOf = null): object
+    public function get(string $classname, ?string $instanceOf = null): object
     {
         $tracerService = $this->getTracerService();
         $tracerService?->startSpan(sprintf('get %s', $classname), ['instanceof' => $instanceOf]);
@@ -112,7 +112,7 @@ class ServiceManager
      *
      * @return array<T|object>
      */
-    public function getAll(string $dir, string $instanceOf = null): array
+    public function getAll(string $dir, ?string $instanceOf = null): array
     {
         $classNames = $this->getClassNames($dir);
         $classes = [];
@@ -204,7 +204,7 @@ class ServiceManager
      *
      * @return T|object
      */
-    public function create(string $classname, array $parameters = [], string $instanceOf = null): object
+    public function create(string $classname, array $parameters = [], ?string $instanceOf = null): object
     {
         $class = $this->getByCreate($classname, $parameters);
 
@@ -224,7 +224,7 @@ class ServiceManager
      *
      * @throws FactoryError
      */
-    private function checkInstanceOf(object $class, string $className = null): void
+    private function checkInstanceOf(object $class, ?string $className = null): void
     {
         if (
             $className !== null

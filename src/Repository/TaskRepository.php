@@ -44,7 +44,7 @@ class TaskRepository extends AbstractRepository
      *
      * @return Task[]
      */
-    public function findByName(string $name, int $moduleId = null): array
+    public function findByName(string $name, ?int $moduleId = null): array
     {
         $where = '`name` LIKE ?';
         $parameters = [$name . '%'];

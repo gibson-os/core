@@ -112,7 +112,7 @@ class ManipulateService extends DrawService
     /**
      * @throws CreateError
      */
-    public function crop(Image $image, int $width, int $height, int $startX = null, int $startY = null, int $color = null): bool
+    public function crop(Image $image, int $width, int $height, ?int $startX = null, ?int $startY = null, ?int $color = null): bool
     {
         if ($startX === null) {
             $startX = (int) (($this->getWidth($image) - $width) / 2);
@@ -139,7 +139,7 @@ class ManipulateService extends DrawService
     /**
      * @throws CreateError
      */
-    public function cropResized(Image $image, int $width, int $height, int $startX = null, int $startY = null): bool
+    public function cropResized(Image $image, int $width, int $height, ?int $startX = null, ?int $startY = null): bool
     {
         if ($this->getWidth($image) > $this->getHeight($image)) {
             $newWidth = ($this->getWidth($image) / $this->getHeight($image)) * $height;

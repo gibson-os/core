@@ -161,7 +161,7 @@ class OpenTelemetryTracer extends AbstractTracer
         return $this;
     }
 
-    public function stopSpan(Throwable $exception = null): AbstractTracer
+    public function stopSpan(?Throwable $exception = null): AbstractTracer
     {
         $this->spanService->detachCurrentSpan($exception);
 

@@ -8,7 +8,7 @@ use Throwable;
 
 class PermissionDenied extends AbstractException
 {
-    public function __construct($message = 'Permission Denied', Throwable $previous = null)
+    public function __construct($message = 'Permission Denied', ?Throwable $previous = null)
     {
         parent::__construct($message, HttpStatusCode::FORBIDDEN->value, $previous);
     }

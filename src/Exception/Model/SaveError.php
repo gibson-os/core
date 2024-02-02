@@ -11,7 +11,7 @@ class SaveError extends AbstractException
 {
     private ModelInterface $model;
 
-    public function __construct($message = 'Datensatz konnte nicht gespeichert werden!', $code = 0, Throwable $previous = null)
+    public function __construct($message = 'Datensatz konnte nicht gespeichert werden!', $code = 0, ?Throwable $previous = null)
     {
         parent::__construct($message, $code, $previous);
     }

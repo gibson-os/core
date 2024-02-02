@@ -43,7 +43,7 @@ class IconService
      * @throws SetError
      * @throws Throwable
      */
-    public function save(Icon $icon, string $imageFilename, string $iconFilename = null, array $tags = []): void
+    public function save(Icon $icon, string $imageFilename, ?string $iconFilename = null, array $tags = []): void
     {
         $this->client->startTransaction();
 

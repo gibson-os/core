@@ -104,8 +104,8 @@ class MediaService
     public function convert(
         MediaDto $media,
         string $outputFilename,
-        string $videoCodec = null,
-        string $audioCodec = null,
+        ?string $videoCodec = null,
+        ?string $audioCodec = null,
         array $options = [],
     ): void {
         $this->ffmpeg->convert($media, $outputFilename, $videoCodec, $audioCodec, $options);
@@ -133,7 +133,7 @@ class MediaService
      * @throws NoAudioError
      * @throws NoVideoError
      */
-    public function getImageBySecond(MediaDto $media, int $second, int $frame = null): Image
+    public function getImageBySecond(MediaDto $media, int $second, ?int $frame = null): Image
     {
         if ($second > $media->getDuration()) {
             throw new OutOfRangeException(

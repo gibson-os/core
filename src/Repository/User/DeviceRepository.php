@@ -64,7 +64,7 @@ class DeviceRepository extends AbstractRepository
         return $this->fetchAll('`user_id`=?', [$userId], Device::class);
     }
 
-    public function deleteByIds(array $ids, int $userId = null): bool
+    public function deleteByIds(array $ids, ?int $userId = null): bool
     {
         $repositoryWrapper = $this->getRepositoryWrapper();
         $deleteQuery = (new DeleteQuery($this->getTable($this->deviceTableName)))

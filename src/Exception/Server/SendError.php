@@ -8,7 +8,7 @@ use Throwable;
 
 class SendError extends AbstractException
 {
-    public function __construct($message = 'Konnte nicht gesendet werden!', $code = 0, Throwable $previous = null)
+    public function __construct($message = 'Konnte nicht gesendet werden!', $code = 0, ?Throwable $previous = null)
     {
         parent::__construct($message, $code, $previous);
     }

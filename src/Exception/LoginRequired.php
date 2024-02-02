@@ -8,7 +8,7 @@ use Throwable;
 
 class LoginRequired extends AbstractException
 {
-    public function __construct($message = 'Login is required!', Throwable $previous = null)
+    public function __construct($message = 'Login is required!', ?Throwable $previous = null)
     {
         parent::__construct($message, HttpStatusCode::UNAUTHORIZED->value, $previous);
     }

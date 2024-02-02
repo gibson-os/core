@@ -42,7 +42,7 @@ class ModuleService
         private readonly ModelManager $modelManager,
         private readonly LoggerInterface $logger,
         private readonly ModelWrapper $modelWrapper,
-        string $modulesPath = null,
+        ?string $modulesPath = null,
     ) {
         $this->modulesPath = $modulesPath ?? realpath(
             dirname(__FILE__) . DIRECTORY_SEPARATOR .
