@@ -73,7 +73,7 @@ class ModelsFetcherAttributeTest extends Unit
     public function testReplaceRequestError(): void
     {
         $reflectionFunction = new ReflectionFunction(function (array $models) { return $models; });
-        $this->attributeParameterTransformer->transform(['id' => 'id'], 'models')
+        $this->attributeParameterTransformer->transform(['id' => 'id'], 'models.')
             ->shouldBeCalledOnce()
             ->willReturn(['id' => null])
         ;
@@ -91,7 +91,7 @@ class ModelsFetcherAttributeTest extends Unit
     public function testReplaceRequestErrorNullAllowed(): void
     {
         $reflectionFunction = new ReflectionFunction(function (?array $models) { return $models; });
-        $this->attributeParameterTransformer->transform(['id' => 'id'], 'models')
+        $this->attributeParameterTransformer->transform(['id' => 'id'], 'models.')
             ->shouldBeCalledOnce()
             ->willReturn(['id' => null])
         ;
@@ -120,7 +120,7 @@ class ModelsFetcherAttributeTest extends Unit
     {
         $reflectionFunction = new ReflectionFunction(function (array $models) { return $models; });
 
-        $this->attributeParameterTransformer->transform(['id' => 'id'], 'models')
+        $this->attributeParameterTransformer->transform(['id' => 'id'], 'models.')
             ->shouldBeCalledOnce()
             ->willReturn(['id' => null])
         ;
@@ -136,7 +136,7 @@ class ModelsFetcherAttributeTest extends Unit
     {
         $reflectionFunction = new ReflectionFunction(function (?array $models) { return $models; });
 
-        $this->attributeParameterTransformer->transform(['id' => 'id'], 'models')
+        $this->attributeParameterTransformer->transform(['id' => 'id'], 'models.')
             ->shouldBeCalledOnce()
             ->willReturn(['id' => null])
         ;
@@ -152,7 +152,7 @@ class ModelsFetcherAttributeTest extends Unit
     {
         $reflectionFunction = new ReflectionFunction(function (array $models) { return $models; });
 
-        $this->attributeParameterTransformer->transform(['id' => 'id'], 'models')
+        $this->attributeParameterTransformer->transform(['id' => 'id'], 'models.')
             ->shouldBeCalledOnce()
             ->willReturn(['id' => 42])
         ;
@@ -192,7 +192,7 @@ class ModelsFetcherAttributeTest extends Unit
     {
         $reflectionFunction = new ReflectionFunction(function (array $models) { return $models; });
 
-        $this->attributeParameterTransformer->transform(['id' => 'id'], 'models')
+        $this->attributeParameterTransformer->transform(['id' => 'id'], 'models.')
             ->shouldBeCalledOnce()
             ->willReturn(['id' => 42])
         ;
@@ -232,7 +232,7 @@ class ModelsFetcherAttributeTest extends Unit
     {
         $reflectionFunction = new ReflectionFunction(function (?array $models) { return $models; });
 
-        $this->attributeParameterTransformer->transform(['id' => 'id'], 'models')
+        $this->attributeParameterTransformer->transform(['id' => 'id'], 'models.')
             ->shouldBeCalledOnce()
             ->willReturn(['id' => 42])
         ;
@@ -269,7 +269,7 @@ class ModelsFetcherAttributeTest extends Unit
     {
         $reflectionFunction = new ReflectionFunction(function (array $models) { return $models; });
 
-        $this->attributeParameterTransformer->transform(['id' => 'id'], 'models')
+        $this->attributeParameterTransformer->transform(['id' => 'id'], 'models.')
             ->shouldBeCalledOnce()
             ->willReturn(['id' => 42])
         ;

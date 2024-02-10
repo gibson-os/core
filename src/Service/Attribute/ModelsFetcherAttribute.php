@@ -70,7 +70,7 @@ class ModelsFetcherAttribute implements AttributeServiceInterface, ParameterAttr
         $model = new $modelClassName($this->modelWrapper);
         $conditions = $this->attributeParameterTransformer->transform(
             $attribute->getConditions(),
-            $reflectionParameter->getName(),
+            $reflectionParameter->getName() . '.',
         );
 
         if (count($conditions) !== count(array_filter($conditions))) {

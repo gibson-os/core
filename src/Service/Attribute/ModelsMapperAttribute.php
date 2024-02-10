@@ -78,7 +78,7 @@ class ModelsMapperAttribute implements AttributeServiceInterface, ParameterAttri
         $conditions = $attribute->getConditions();
         $transformedConditions = $this->attributeParameterTransformer->transform(
             $conditions,
-            $reflectionParameter->getName(),
+            $reflectionParameter->getName() . '.',
         );
         $parameterFromRequest = $this->objectMapperAttribute->getParameterFromRequest($reflectionParameter);
         $models = [];
