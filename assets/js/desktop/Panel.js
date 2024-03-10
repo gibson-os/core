@@ -57,12 +57,19 @@ Ext.define('GibsonOS.module.core.desktop.Panel', {
                 parameters = '{gos: {data: ' + Ext.encode(record.get('parameters')) + '}}';
             }
 
-            functionName = 'GibsonOS.module.' + record.get('module') + '.' + record.get('task') + '.App';
+            const actionName = 'GibsonOS.module.' + record.get('module') + '.' + record.get('task') + '.' + record.get('action');
+            functionName = 'GibsonOS.module.' + record.get('module') + '.' + record.get('task') + '.' + record.get('action') + '.App';
 
-            if (eval('typeof(' + functionName + ') == "function"')) {
+            if (eval('typeof(' + actionName + ') != "undefined" && typeof(' + functionName + ') == "function"')) {
                 eval('new ' + functionName + '(' + parameters + ')');
             } else {
-                GibsonOS.MessageBox.show({msg: 'Modul wurde nicht gefunden!'});
+                functionName = 'GibsonOS.module.' + record.get('module') + '.' + record.get('task') + '.App';
+
+                if (eval('typeof(' + functionName + ') == "function"')) {
+                    eval('new ' + functionName + '(' + parameters + ')');
+                } else {
+                    GibsonOS.MessageBox.show({msg: 'Modul wurde nicht gefunden!'});
+                }
             }
         }
     },
