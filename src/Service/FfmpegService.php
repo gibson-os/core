@@ -7,6 +7,7 @@ use GibsonOS\Core\Attribute\GetEnv;
 use GibsonOS\Core\Dto\Ffmpeg\ConvertStatus;
 use GibsonOS\Core\Dto\Ffmpeg\Media;
 use GibsonOS\Core\Dto\Image as ImageDto;
+use GibsonOS\Core\Enum\Ffmpeg\ConvertStatus as ConvertStatusEnum;
 use GibsonOS\Core\Exception\DeleteError;
 use GibsonOS\Core\Exception\Ffmpeg\ConvertStatusError;
 use GibsonOS\Core\Exception\FfmpegException;
@@ -162,7 +163,7 @@ class FfmpegService
             throw new ConvertStatusError();
         }
 
-        return (new ConvertStatus(ConvertStatus::STATUS_GENERATE))
+        return (new ConvertStatus(ConvertStatusEnum::GENERATE))
             ->setFrame((int) $hits[1])
             ->setFps((int) round((float) $hits[2]))
             ->setQuality((float) $hits[3])

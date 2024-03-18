@@ -6,27 +6,13 @@ namespace GibsonOS\Core\Dto\Ffmpeg;
 use DateTime;
 use DateTimeInterface;
 use Exception;
+use GibsonOS\Core\Enum\Ffmpeg\ConvertStatus as ConvertStatusEnum;
 use GibsonOS\Core\Exception\SetError;
 use JsonSerializable;
 
 class ConvertStatus implements JsonSerializable
 {
-    public const STATUS_ERROR = 'error';
-
-    public const STATUS_WAIT = 'wait';
-
-    public const STATUS_GENERATE = 'generate';
-
-    public const STATUS_GENERATED = 'generated';
-
-    private const STATUS = [
-        self::STATUS_ERROR,
-        self::STATUS_WAIT,
-        self::STATUS_GENERATE,
-        self::STATUS_GENERATED,
-    ];
-
-    private string $status;
+    private ConvertStatusEnum $status;
 
     private int $frame = 0;
 
@@ -47,7 +33,7 @@ class ConvertStatus implements JsonSerializable
      *
      * @throws SetError
      */
-    public function __construct(string $status)
+    public function __construct(ConvertStatusEnum $status)
     {
         $this->setStatus($status);
     }
@@ -159,7 +145,7 @@ class ConvertStatus implements JsonSerializable
         return new DateTime('@' . round(($this->getFrames() - $this->getFrame()) / $this->getFps()));
     }
 
-    public function getStatus(): string
+    public function getStatus(): ConvertStatusEnum
     {
         return $this->status;
     }
@@ -167,16 +153,8 @@ class ConvertStatus implements JsonSerializable
     /**
      * @throws SetError
      */
-    public function setStatus(string $status): ConvertStatus
+    public function setStatus(ConvertStatusEnum $status): ConvertStatus
     {
-        if (!in_array($status, self::STATUS)) {
-            throw new SetError(sprintf(
-                'Status "%s" nicht erlaubt! Erlaubt: %s',
-                $status,
-                implode(', ', self::STATUS),
-            ));
-        }
-
         $this->status = $status;
 
         return $this;
@@ -187,11 +165,11 @@ class ConvertStatus implements JsonSerializable
      */
     public function jsonSerialize(): array
     {
-        if ($this->status === self::STATUS_GENERATE) {
+        if ($this->status === ConvertStatusEnum::GENERATE) {
             $timeRemaining = $this->getTimeRemaining();
 
             return [
-                'status' => $this->getStatus(),
+                'status' => $this->getStatus()->value,
                 'bitrate' => $this->getBitrate(),
                 'fps' => $this->getFps(),
                 'frame' => $this->getFrame(),
