@@ -14,6 +14,8 @@ use GibsonOS\Core\Dto\Parameter\AutoCompleteParameter;
 use GibsonOS\Core\Exception\DateTimeError;
 use GibsonOS\Core\Exception\EventException;
 use GibsonOS\Core\Exception\FactoryError;
+use GibsonOS\Core\Exception\Lock\LockException;
+use GibsonOS\Core\Exception\Lock\UnlockException;
 use GibsonOS\Core\Exception\Model\SaveError;
 use GibsonOS\Core\Manager\ModelManager;
 use GibsonOS\Core\Manager\ReflectionManager;
@@ -23,6 +25,7 @@ use GibsonOS\Core\Model\Event;
 use GibsonOS\Core\Repository\EventRepository;
 use GibsonOS\Core\Service\Event\ElementService;
 use JsonException;
+use MDO\Exception\RecordException;
 use Psr\Log\LoggerInterface;
 use ReflectionAttribute;
 use ReflectionClass;
@@ -44,6 +47,7 @@ class EventService
         private readonly ModelManager $modelManager,
         private readonly ProcessService $processService,
         private readonly LoggerInterface $logger,
+        private readonly LockService $lockService,
     ) {
     }
 
@@ -111,10 +115,13 @@ class EventService
 
     /**
      * @throws DateTimeError
+     * @throws EventException
      * @throws FactoryError
      * @throws JsonException
+     * @throws ReflectionException
      * @throws SaveError
-     * @throws EventException
+     * @throws UnlockException
+     * @throws RecordException
      */
     public function runEvent(Event $event, bool $async): void
     {
@@ -123,6 +130,18 @@ class EventService
             $this->commandService->executeAsync(RunCommand::class, ['eventId' => $event->getId()], []);
 
             return;
+        }
+
+        $lockName = sprintf('event%d', $event->getId() ?? 0);
+
+        if ($event->isLockCommand()) {
+            try {
+                $this->lockService->lock($lockName);
+            } catch (LockException) {
+                $this->logger->warning(sprintf('Event %s already runs', $event->getId() ?? 0));
+
+                return;
+            }
         }
 
         $this->logger->info('Run event ' . $event->getId());
@@ -139,6 +158,10 @@ class EventService
                 ->setLastRun($this->dateTimeService->get())
                 ->setRuntime(((int) (microtime(true) * 1000000)) - $startTime),
         );
+
+        if ($event->isLockCommand()) {
+            $this->lockService->unlock($lockName);
+        }
     }
 
     /**

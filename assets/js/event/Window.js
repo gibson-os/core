@@ -3,7 +3,7 @@ Ext.define('GibsonOS.module.core.event.Window', {
     alias: ['widget.gosModuleCoreEventWindow'],
     title: 'Event',
     width: 800,
-    height: 500,
+    height: 400,
     maximizable: true,
     requiredPermission: {
         module: 'core',
