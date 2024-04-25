@@ -51,6 +51,9 @@ class Event extends AbstractModel implements JsonSerializable, AutoCompleteModel
     #[Column]
     private bool $exitOnError = true;
 
+    #[Column]
+    private bool $lockCommand = false;
+
     #[Column(type: Column::TYPE_TIMESTAMP, default: Column::DEFAULT_CURRENT_TIMESTAMP)]
     private DateTimeInterface $modified;
 
@@ -166,6 +169,18 @@ class Event extends AbstractModel implements JsonSerializable, AutoCompleteModel
         return $this;
     }
 
+    public function isLockCommand(): bool
+    {
+        return $this->lockCommand;
+    }
+
+    public function setLockCommand(bool $lockCommand): Event
+    {
+        $this->lockCommand = $lockCommand;
+
+        return $this;
+    }
+
     public function getModified(): DateTimeInterface
     {
         return $this->modified;
@@ -198,6 +213,7 @@ class Event extends AbstractModel implements JsonSerializable, AutoCompleteModel
             'active' => $this->isActive(),
             'async' => $this->isAsync(),
             'exitOnError' => $this->isExitOnError(),
+            'lockCommand' => $this->isLockCommand(),
             'lastRun' => $this->getLastRun()?->format('Y-m-d H:i:s'),
             'runtime' => $this->getRuntime(),
             'tags' => $this->getTags(),

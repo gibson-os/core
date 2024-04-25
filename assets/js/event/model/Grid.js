@@ -19,6 +19,9 @@ Ext.define('GibsonOS.module.core.event.model.Grid', {
         name: 'exitOnError',
         type: 'bool'
     },{
+        name: 'lockCommand',
+        type: 'bool'
+    },{
         name: 'lastRun',
         type: 'string'
     }]

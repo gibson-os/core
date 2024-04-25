@@ -133,6 +133,13 @@ Ext.define('GibsonOS.module.core.event.Grid', {
             trueText: 'Ja',
             falseText: 'Nein',
             width: 120
+        },{
+            xtype: 'booleancolumn',
+            header: 'Einmalig ausführen',
+            dataIndex: 'lockCommand',
+            trueText: 'Ja',
+            falseText: 'Nein',
+            width: 120
         }];
     }
 });

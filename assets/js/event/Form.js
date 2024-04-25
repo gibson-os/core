@@ -2,14 +2,7 @@ Ext.define('GibsonOS.module.core.event.Form', {
     extend: 'GibsonOS.form.Panel',
     alias: ['widget.gosModuleCoreEventForm'],
     itemId: 'coreEventForm',
-    defaults: {
-        border: false,
-        xtype: 'panel',
-        flex: 1,
-        layout: 'anchor'
-    },
     border: false,
-    layout: 'hbox',
     initComponent: function () {
         let me = this;
 
@@ -17,26 +10,40 @@ Ext.define('GibsonOS.module.core.event.Form', {
             xtype: 'gosFormHidden',
             name: 'id'
         },{
-            xtype: 'gosFormTextfield',
+            xtype: 'gosCoreComponentFormFieldContainer',
             fieldLabel: 'Name',
-            name: 'name'
+            items: [{
+                xtype: 'gosFormTextfield',
+                flex: 2,
+                name: 'name'
+            },{
+                xtype: 'gosFormCheckbox',
+                name: 'active',
+                boxLabel: 'Aktiv',
+                margins: '0 5px',
+                uncheckedValue: false
+            }]
         },{
-            xtype: 'gosFormCheckbox',
-            name: 'async',
-            margins: '0 5px',
-            boxLabel: 'Asynchron',
-            uncheckedValue: false
-        },{
-            xtype: 'gosFormCheckbox',
-            name: 'exitOnError',
-            margins: '0 5px',
-            boxLabel: 'Bei Fehler beenden',
-            uncheckedValue: false
-        },{
-            xtype: 'gosFormCheckbox',
-            name: 'active',
-            boxLabel: 'Aktiv',
-            uncheckedValue: false
+            xtype: 'gosCoreComponentFormFieldContainer',
+            fieldLabel: '&nbsp;',
+            labelSeparator: '',
+            items: [{
+                xtype: 'gosFormCheckbox',
+                name: 'async',
+                boxLabel: 'Asynchron',
+                uncheckedValue: false
+            },{
+                xtype: 'gosFormCheckbox',
+                name: 'exitOnError',
+                boxLabel: 'Bei Fehler beenden',
+                uncheckedValue: false
+            },{
+                xtype: 'gosFormCheckbox',
+                name: 'lockCommand',
+                margins: '0 5px',
+                boxLabel: 'Nicht mehrfach gleichzeitig ausführen',
+                uncheckedValue: false
+            }],
         }];
 
         me.callParent();
