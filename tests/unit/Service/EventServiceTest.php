@@ -3,8 +3,10 @@ declare(strict_types=1);
 
 namespace GibsonOS\Test\Unit\Core\Service;
 
+use Codeception\Attribute\DataProvider;
 use Codeception\Test\Unit;
 use DateTime;
+use GibsonOS\Core\Exception\Lock\LockException;
 use GibsonOS\Core\Manager\ModelManager;
 use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Manager\ServiceManager;
@@ -15,6 +17,7 @@ use GibsonOS\Core\Service\CommandService;
 use GibsonOS\Core\Service\DateTimeService;
 use GibsonOS\Core\Service\Event\ElementService;
 use GibsonOS\Core\Service\EventService;
+use GibsonOS\Core\Service\LockService;
 use GibsonOS\Core\Service\LoggerService;
 use GibsonOS\Core\Service\ProcessService;
 use GibsonOS\Core\Wrapper\ModelWrapper;
@@ -33,6 +36,8 @@ class EventServiceTest extends Unit
 
     private EventRepository|ObjectProphecy $eventRepository;
 
+    private LockService|ObjectProphecy $lockService;
+
     private ServiceManager $serviceManager;
 
     protected function _before(): void
@@ -45,6 +50,8 @@ class EventServiceTest extends Unit
         $this->serviceManager->setService(ModelManager::class, $this->modelManager->reveal());
 
         $this->eventRepository = $this->prophesize(EventRepository::class);
+        $this->lockService = $this->prophesize(LockService::class);
+
         $this->eventService = new EventService(
             $this->serviceManager,
             $this->eventRepository->reveal(),
@@ -55,6 +62,7 @@ class EventServiceTest extends Unit
             $this->serviceManager->get(ModelManager::class),
             $this->serviceManager->get(ProcessService::class),
             $this->serviceManager->get(LoggerInterface::class),
+            $this->lockService->reveal(),
         );
     }
 
@@ -111,14 +119,56 @@ class EventServiceTest extends Unit
         $this->assertEquals($returnValue, $this->serviceManager->get(TestEvent::class)->arthur);
     }
 
-    /**
-     * @dataProvider getTestData
-     */
+    #[DataProvider('getTestData')]
     public function testRunEvent(Event $event, string $returnValue): void
     {
         $testEvent = $this->serviceManager->get(TestEvent::class);
+        $this->modelManager->saveWithoutChildren(Argument::any())
+            ->shouldBeCalledTimes(2)
+        ;
+        $this->lockService->lock('event0')
+            ->shouldNotBeCalled()
+        ;
+        $this->lockService->unlock('event0')
+            ->shouldNotBeCalled()
+        ;
+
         $this->eventService->runEvent($event, false);
-        $this->modelManager->saveWithoutChildren(Argument::any())->shouldBeCalledTimes(2);
+
+        $this->assertEquals($returnValue, $testEvent->arthur);
+    }
+
+    #[DataProvider('getTestData')]
+    public function testRunEventLocked(Event $event): void
+    {
+        $event->setLockCommand(true);
+        $testEvent = $this->serviceManager->get(TestEvent::class);
+        $this->lockService->lock('event0')
+            ->shouldBeCalledOnce()
+            ->willThrow(LockException::class)
+        ;
+        $this->lockService->unlock('event0')
+            ->shouldNotBeCalled()
+        ;
+
+        $this->eventService->runEvent($event, false);
+
+        $this->assertEquals('', $testEvent->arthur);
+    }
+
+    #[DataProvider('getTestData')]
+    public function testRunEventNotLocked(Event $event, string $returnValue): void
+    {
+        $event->setLockCommand(true);
+        $testEvent = $this->serviceManager->get(TestEvent::class);
+        $this->lockService->lock('event0')
+            ->shouldBeCalledOnce()
+        ;
+        $this->lockService->unlock('event0')
+            ->shouldBeCalledOnce()
+        ;
+
+        $this->eventService->runEvent($event, false);
 
         $this->assertEquals($returnValue, $testEvent->arthur);
     }
