@@ -9,6 +9,7 @@ use GibsonOS\Core\Dto\Ffmpeg\Media;
 use GibsonOS\Core\Dto\Image as ImageDto;
 use GibsonOS\Core\Enum\Ffmpeg\ConvertStatus as ConvertStatusEnum;
 use GibsonOS\Core\Exception\DeleteError;
+use GibsonOS\Core\Exception\Ffmpeg\ConvertException;
 use GibsonOS\Core\Exception\Ffmpeg\ConvertStatusError;
 use GibsonOS\Core\Exception\FfmpegException;
 use GibsonOS\Core\Exception\File\OpenError;
@@ -27,10 +28,10 @@ class FfmpegService
         private readonly string $ffmpegPath,
         #[GetEnv('FFPROBE_PATH')]
         private readonly string $ffprobePath,
-        private readonly DateTimeService $dateTime,
-        private readonly FileService $file,
-        private readonly ProcessService $process,
-        private readonly ImageService $image,
+        private readonly DateTimeService $dateTimeService,
+        private readonly FileService $fileService,
+        private readonly ProcessService $processService,
+        private readonly ImageService $imageService,
     ) {
     }
 
@@ -41,13 +42,13 @@ class FfmpegService
     public function getFileMetaDataString(string $filename): string
     {
         if (
-            !$this->file->exists($filename)
-            || !$this->file->isReadable($filename)
+            !$this->fileService->exists($filename)
+            || !$this->fileService->isReadable($filename)
         ) {
             throw new FileNotFound(sprintf('Datei %s existiert nicht!', $filename));
         }
 
-        $ffMpeg = $this->process->open(sprintf('%s -i %s', $this->ffmpegPath, escapeshellarg($filename)), 'r');
+        $ffMpeg = $this->processService->open(sprintf('%s -i %s', $this->ffmpegPath, escapeshellarg($filename)), 'r');
         $output = '';
 
         while ($out = fgets($ffMpeg)) {
@@ -62,7 +63,7 @@ class FfmpegService
             }
         }
 
-        $this->process->close($ffMpeg);
+        $this->processService->close($ffMpeg);
 
         return $output;
     }
@@ -71,6 +72,7 @@ class FfmpegService
      * @throws DeleteError
      * @throws FileNotFound
      * @throws GetError
+     * @throws ConvertException
      */
     public function convert(
         Media $media,
@@ -116,7 +118,8 @@ class FfmpegService
             $optionString .= '-' . $key . ' ' . escapeshellarg((string) $option) . ' ';
         }
 
-        $filename = 'ffmpeg' . $this->file->getFilename($outputFilename);
+        $outputFileNameWithoutPath = $this->fileService->getFilename($outputFilename);
+        $filename = 'ffmpeg' . $outputFileNameWithoutPath;
         $logPath = sys_get_temp_dir() . DIRECTORY_SEPARATOR . $filename;
         $this->execute(sprintf(
             '%s%s > %s 2> %s',
@@ -126,11 +129,21 @@ class FfmpegService
             escapeshellarg($logPath),
         ));
 
-        $this->file->delete(sys_get_temp_dir(), $filename);
+        $this->fileService->delete(sys_get_temp_dir(), $filename);
 
-        if (!$this->file->exists($outputFilename)) {
-            throw new FileNotFound(
+        if (!$this->fileService->exists($outputFilename)) {
+            throw new ConvertException(
                 sprintf('Konvertieren war nicht erfolgreich! Datei %s existiert nicht!', $outputFilename),
+            );
+        }
+
+        $filesize = $this->fileService->size($outputFilename);
+
+        if ($filesize === 0) {
+            $this->fileService->delete($this->fileService->getDir($outputFilename), $outputFileNameWithoutPath);
+
+            throw new ConvertException(
+                sprintf('Konvertieren war nicht erfolgreich! Datei %s hat keine Größe!', $outputFilename),
             );
         }
     }
@@ -144,11 +157,11 @@ class FfmpegService
     {
         $path = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'ffmpeg' . $filename;
 
-        if (!$this->file->exists($path)) {
+        if (!$this->fileService->exists($path)) {
             throw new FileNotFound(sprintf('Konvertstatus "%s" existiert nicht! Maybe PrivateTmp? /usr/lib/systemd/system/apache2.service', $path));
         }
 
-        $content = $this->file->readLastLine($path);
+        $content = $this->fileService->readLastLine($path);
 
         if (!preg_match(
             '/frame=\s*(\d*)\s*' .
@@ -168,7 +181,7 @@ class FfmpegService
             ->setFps((int) round((float) $hits[2]))
             ->setQuality((float) $hits[3])
             ->setSize((int) $hits[4])
-            ->setTime($this->dateTime->get($hits[5]))
+            ->setTime($this->dateTimeService->get($hits[5]))
             ->setBitrate((float) $hits[6])
         ;
     }
@@ -190,8 +203,8 @@ class FfmpegService
             $path,
         ));
 
-        $image = $this->image->load($path);
-        $this->file->delete(sys_get_temp_dir(), $tmpFilename);
+        $image = $this->imageService->load($path);
+        $this->fileService->delete(sys_get_temp_dir(), $tmpFilename);
 
         return $image;
     }
@@ -202,14 +215,14 @@ class FfmpegService
     public function getChecksum(string $filename): string
     {
         if (
-            !$this->file->exists($filename)
-            || !$this->file->isReadable($filename)
+            !$this->fileService->exists($filename)
+            || !$this->fileService->isReadable($filename)
         ) {
             throw new FfmpegException(sprintf('File %s not found!', $filename));
         }
 
         try {
-            $ffMpeg = $this->process->open(sprintf('%s %s', $this->ffprobePath, escapeshellarg($filename)), 'r');
+            $ffMpeg = $this->processService->open(sprintf('%s %s', $this->ffprobePath, escapeshellarg($filename)), 'r');
         } catch (ProcessError) {
             throw new FfmpegException('Ffprobe not found!');
         }
@@ -221,19 +234,19 @@ class FfmpegService
                 continue;
             }
 
-            $this->process->close($ffMpeg);
+            $this->processService->close($ffMpeg);
 
             return $matches[1];
         }
 
-        $this->process->close($ffMpeg);
+        $this->processService->close($ffMpeg);
 
         throw new FfmpegException('Checksum not found!');
     }
 
     private function execute(string $parameters): void
     {
-        $this->process->execute($this->ffmpegPath . ' ' . $parameters);
+        $this->processService->execute($this->ffmpegPath . ' ' . $parameters);
     }
 
     private function getOption(array &$options, string $key, string $optionString): string

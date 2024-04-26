@@ -7,6 +7,7 @@ use Codeception\Test\Unit;
 use DateTime;
 use GibsonOS\Core\Dto\Ffmpeg\Media;
 use GibsonOS\Core\Dto\Image as ImageDto;
+use GibsonOS\Core\Exception\Ffmpeg\ConvertException;
 use GibsonOS\Core\Exception\Ffmpeg\ConvertStatusError;
 use GibsonOS\Core\Exception\FileNotFound;
 use GibsonOS\Core\Exception\ProcessError;
@@ -66,7 +67,7 @@ class FfmpegTest extends Unit
             escapeshellarg($this->inputVideoFilename),
             escapeshellarg($this->outputVideoFilename),
             escapeshellarg($this->logPath),
-            escapeshellarg($this->logPath)
+            escapeshellarg($this->logPath),
         );
 
         $this->ffmpeg = new FfmpegService(
@@ -75,7 +76,7 @@ class FfmpegTest extends Unit
             $this->dateTime->reveal(),
             $this->fileService->reveal(),
             $this->processService->reveal(),
-            $this->imageService->reveal()
+            $this->imageService->reveal(),
         );
     }
 
@@ -159,12 +160,32 @@ class FfmpegTest extends Unit
 
     public function testConvertFileDoesntExists(): void
     {
-        $this->expectException(FileNotFound::class);
+        $this->expectException(ConvertException::class);
 
         $media = $this->initTestConvert();
         $this->fileService->exists($this->outputVideoFilename)
             ->willReturn(false)
         ;
+        $this->fileService->size($this->outputVideoFilename)
+            ->shouldNotBeCalled()
+        ;
+
+        $this->ffmpeg->convert($media, $this->outputVideoFilename);
+    }
+
+    public function testConvertFileNoSize(): void
+    {
+        $this->expectException(ConvertException::class);
+
+        $media = $this->initTestConvert();
+        $this->fileService->size($this->outputVideoFilename)
+            ->willReturn(0)
+        ;
+        $this->fileService->getDir($this->outputVideoFilename)
+            ->shouldBeCalledOnce()
+            ->willReturn('marvin')
+        ;
+        $this->fileService->delete('marvin', 'file.vid');
 
         $this->ffmpeg->convert($media, $this->outputVideoFilename);
     }
@@ -183,7 +204,7 @@ class FfmpegTest extends Unit
             escapeshellarg($this->inputVideoFilename),
             escapeshellarg($this->outputVideoFilename),
             escapeshellarg($this->logPath),
-            escapeshellarg($this->logPath)
+            escapeshellarg($this->logPath),
         ))
             ->shouldBeCalledOnce()
         ;
@@ -212,7 +233,7 @@ class FfmpegTest extends Unit
             escapeshellarg($this->inputVideoFilename),
             escapeshellarg($this->outputVideoFilename),
             escapeshellarg($this->logPath),
-            escapeshellarg($this->logPath)
+            escapeshellarg($this->logPath),
         ))
             ->shouldBeCalledOnce()
         ;
@@ -251,7 +272,7 @@ class FfmpegTest extends Unit
             $this->inputVideoFilename,
             escapeshellarg($this->outputVideoFilename),
             escapeshellarg($this->logPath),
-            escapeshellarg($this->logPath)
+            escapeshellarg($this->logPath),
         ))
             ->shouldBeCalledOnce()
         ;
@@ -272,7 +293,7 @@ class FfmpegTest extends Unit
             escapeshellarg($this->inputVideoFilename),
             escapeshellarg($this->outputVideoFilename),
             escapeshellarg($this->logPath),
-            escapeshellarg($this->logPath)
+            escapeshellarg($this->logPath),
         ))
             ->shouldBeCalledOnce()
         ;
@@ -297,7 +318,7 @@ class FfmpegTest extends Unit
         int $hours,
         int $minutes,
         int $seconds,
-        int $microseconds
+        int $microseconds,
     ): void {
         $this->fileService->exists(sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'ffmpeg' . $this->logFilename)
             ->willReturn(true)
@@ -363,7 +384,7 @@ class FfmpegTest extends Unit
             $this->ffmpegPath,
             $frameNumber,
             escapeshellarg($this->inputVideoFilename),
-            sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'tmpFrame'
+            sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'tmpFrame',
         )))
             ->shouldBeCalledOnce()
         ;
@@ -1379,6 +1400,10 @@ At least one output file must be specified
         ;
         $this->fileService->exists($this->outputVideoFilename)
             ->willReturn(true)
+            ->shouldBeCalledOnce()
+        ;
+        $this->fileService->size($this->outputVideoFilename)
+            ->willReturn(42)
             ->shouldBeCalledOnce()
         ;
         $this->fileService->delete(sys_get_temp_dir(), $this->logFilename)

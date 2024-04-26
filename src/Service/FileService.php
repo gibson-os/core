@@ -331,6 +331,11 @@ class FileService
         return fclose($fileHandle);
     }
 
+    public function size(string $filename): int
+    {
+        return filesize($filename) ?: 0;
+    }
+
     /**
      * @throws OpenError
      */
