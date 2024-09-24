@@ -96,7 +96,7 @@ class ModuleService
             }
 
             $pos = mb_strrpos($dir, DIRECTORY_SEPARATOR) ?: -1;
-            $moduleName = strtolower(mb_substr($dir, $pos + 1));
+            $moduleName = $this->transformModuleName(strtolower(mb_substr($dir, $pos + 1)));
 
             try {
                 $module = $this->moduleRepository->getByName($moduleName);
@@ -151,6 +151,7 @@ class ModuleService
                 '\\Controller\\',
                 $classname,
             )));
+            $classname = $this->transformModuleName($classname);
             /** @var class-string $fqClassname */
             $fqClassname = 'GibsonOS\\Module\\' . $classname;
 
@@ -262,5 +263,14 @@ class ModuleService
             static fn (Permission $permission): int => $permission->value,
             $permissions,
         ));
+    }
+
+    private function transformModuleName(string $moduleName): string
+    {
+        return preg_replace_callback(
+            '/-(\w)/',
+            static fn ($matches) => mb_strtoupper($matches[1]),
+            $moduleName,
+        );
     }
 }
