@@ -73,7 +73,7 @@ class Element extends AbstractModel implements Serializable, JsonSerializable
     protected ?Element $parent = null;
 
     /**
-     * @var Element[]|null
+     * @var Element[]
      */
     #[Constraint('parent', Element::class)]
     protected array $children = [];
