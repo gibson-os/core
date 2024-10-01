@@ -5,6 +5,7 @@ namespace GibsonOS\Core\Dto\Parameter;
 
 use GibsonOS\Core\Exception\ParameterException;
 use GibsonOS\Core\Manager\ReflectionManager;
+use ReflectionEnumBackedCase;
 use ReflectionException;
 
 class EnumParameter extends OptionParameter
@@ -23,7 +24,11 @@ class EnumParameter extends OptionParameter
         $cases = [];
 
         foreach ($reflectionEnum->getCases() as $case) {
-            $cases[$case->getName()] = $case->getValue();
+            if (!$case instanceof ReflectionEnumBackedCase) {
+                throw new ReflectionException(sprintf('Case %s is not backed by enum', $case->getName()));
+            }
+
+            $cases[$case->getBackingValue()] = $case->getName();
         }
 
         parent::__construct($title, $cases);
