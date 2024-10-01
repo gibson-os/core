@@ -50,7 +50,7 @@ class JavascriptService
             $files = array_merge($files, $this->getFiles(
                 $this->vendorPath .
                 'gibson-os' . DIRECTORY_SEPARATOR .
-                $task->get('module')->getValue() . DIRECTORY_SEPARATOR .
+                $this->transformModuleName((string) $task->get('module')->getValue()) . DIRECTORY_SEPARATOR .
                 'assets' . DIRECTORY_SEPARATOR .
                 'js' . DIRECTORY_SEPARATOR,
             ));
@@ -94,7 +94,7 @@ class JavascriptService
             $files = array_merge($files, $this->getFiles(
                 $this->vendorPath .
                 'gibson-os' . DIRECTORY_SEPARATOR .
-                $permission->get('module')->getValue() . DIRECTORY_SEPARATOR .
+                $this->transformModuleName((string) $permission->get('module')->getValue()) . DIRECTORY_SEPARATOR .
                 'assets' . DIRECTORY_SEPARATOR .
                 'js' . DIRECTORY_SEPARATOR,
             ));
@@ -243,6 +243,15 @@ class JavascriptService
                 'js' . DIRECTORY_SEPARATOR .
                 'component' . DIRECTORY_SEPARATOR,
             ),
+        );
+    }
+
+    private function transformModuleName(string $moduleName): string
+    {
+        return preg_replace_callback(
+            '/([a-z])([A-Z])/',
+            static fn ($matches) => $matches[1] . '-' . mb_strtolower($matches[2]),
+            $moduleName,
         );
     }
 }
