@@ -2,6 +2,7 @@ GibsonOS.define('GibsonOS.decorator.PagingBar', {
     init(component) {
         component = Ext.merge(component, Ext.merge({
             enablePagingBar: false,
+            viewItem: component,
         }, component));
 
         if (component.enablePagingBar) {
@@ -11,18 +12,18 @@ GibsonOS.define('GibsonOS.decorator.PagingBar', {
 
             component.dockedItems.push(new GibsonOS.module.core.component.toolbar.Paging({
                 dock: 'bottom',
-                store: component.store,
+                store: component.viewItem.store,
                 displayInfo: true
             }));
 
-            component.store.on('add', (store, records) => {
+            component.viewItem.store.on('add', (store, records) => {
                 store.totalCount += records.length;
                 component.down('gosCoreComponentToolbarPaging').onLoad();
             }, component, {
                 priority: 999
             });
 
-            component.store.on('remove', (store) => {
+            component.viewItem.store.on('remove', (store) => {
                 store.totalCount--;
                 component.down('gosCoreComponentToolbarPaging').onLoad();
             }, component, {

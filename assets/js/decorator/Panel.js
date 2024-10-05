@@ -6,6 +6,7 @@ GibsonOS.define('GibsonOS.decorator.Panel', {
 
         component = GibsonOS.decorator.ActionManager.init(component);
         component = GibsonOS.decorator.AutoReload.init(component);
+        component = GibsonOS.decorator.PagingBar.init(component);
         component = GibsonOS.decorator.Drag.init(component);
         component = GibsonOS.decorator.Drop.init(component);
         component = GibsonOS.decorator.action.Add.init(component);

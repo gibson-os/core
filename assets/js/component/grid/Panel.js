@@ -12,7 +12,6 @@ Ext.define('GibsonOS.module.core.component.grid.Panel', {
         let me = this;
 
         me = GibsonOS.decorator.Panel.init(me);
-        me = GibsonOS.decorator.PagingBar.init(me);
 
         if (typeof(me.getColumns) === 'function') {
             me.columns = me.getColumns();
