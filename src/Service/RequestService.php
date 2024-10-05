@@ -45,6 +45,12 @@ class RequestService
             $keyFiles = [];
 
             foreach ($file as $property => $values) {
+                if (!is_array($values)) {
+                    $keyFiles = $file;
+
+                    break;
+                }
+
                 foreach ($values as $index => $value) {
                     $keyFiles[$index][$property] = $value;
                 }
