@@ -115,7 +115,7 @@ class ImageService
 
     public static function getImageTypeByFilename(string $filename): string
     {
-        return strtolower((string) substr((string) strrchr($filename, '.'), 1));
+        return preg_replace('/.*\//', '', mime_content_type($filename));
     }
 
     public static function getImageTypeByMimeType(string $mimeType): string
