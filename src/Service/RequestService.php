@@ -25,7 +25,10 @@ class RequestService
     public function __construct()
     {
         $queryString = (string) preg_replace('/\?.*/', '', $_SERVER['REQUEST_URI'] ?? '');
-        $queryParams = explode('/', mb_substr($queryString, 1));
+        $queryParams = array_map(
+            fn ($value) => rawurldecode($value),
+            explode('/', mb_substr($queryString, 1)),
+        );
 
         $this->moduleName = array_shift($queryParams) ?: 'core';
         $this->taskName = array_shift($queryParams) ?: 'index';
