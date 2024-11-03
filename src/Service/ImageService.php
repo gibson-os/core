@@ -247,7 +247,7 @@ class ImageService
 
     public function getExif(Image $image): array
     {
-        return exif_read_data($image->getFilename());
+        return exif_read_data($image->getFilename()) ?: [];
     }
 
     public function getExifKey(Image $image, string $key): mixed
