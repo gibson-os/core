@@ -244,4 +244,14 @@ class ImageService
 
         return $newImage;
     }
+
+    public function getExif(Image $image): array
+    {
+        return exif_read_data($image->getFilename());
+    }
+
+    public function getExifKey(Image $image, string $key): mixed
+    {
+        return $this->getExif($image)[$key] ?? null;
+    }
 }

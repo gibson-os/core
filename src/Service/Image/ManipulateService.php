@@ -4,7 +4,9 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Service\Image;
 
 use GibsonOS\Core\Dto\Image;
+use GibsonOS\Core\Enum\Image\Axis;
 use GibsonOS\Core\Exception\Image\CreateError;
+use GibsonOS\Core\Exception\ImageException;
 
 class ManipulateService extends DrawService
 {
@@ -187,5 +189,54 @@ class ManipulateService extends DrawService
         }
 
         return imagecopyresampled($destinationImage->getImage(), $sourceImage->getImage(), $destX, $destY, $srcX, $srcY, $dstWidth, $dstHeight, $srcWidth, $srcHeight);
+    }
+
+    /**
+     * @throws CreateError
+     */
+    public function mirror(Image $image, Axis $axis): Image
+    {
+        $width = $this->getWidth($image);
+        $height = $this->getHeight($image);
+        $newImage = $this->create($width, $height);
+
+        match ($axis) {
+            Axis::HORIZONTAL => imagecopyresampled($newImage->getImage(), $image->getImage(), 0, 0, $width - 1, 0, $width, $height, -$width, $height),
+            Axis::VERTICAL => imagecopyresampled($newImage->getImage(), $image->getImage(), 0, 0, 0, $height - 1, $width, $height, $width, -$height),
+        };
+
+        return $newImage;
+    }
+
+    /**
+     * @throws CreateError
+     * @throws ImageException
+     */
+    public function rotate(Image $image, float $angle, int $backgroundColor = 0): Image
+    {
+        return new Image(imagerotate($image->getImage(), $angle, $backgroundColor));
+    }
+
+    /**
+     * @throws CreateError
+     * @throws ImageException
+     */
+    public function setOrientationByExif(Image $image): Image
+    {
+        return match ($this->getExifKey($image, 'Orientation')) {
+            2 => $this->mirror($image, Axis::HORIZONTAL),
+            3 => $this->rotate($image, 180),
+            4 => $this->rotate($this->mirror($image, Axis::HORIZONTAL), 180),
+            5 => $this->rotate($this->mirror($image, Axis::VERTICAL), 270),
+            6 => $this->rotate($image, 270),
+            7 => $this->rotate($this->mirror($image, Axis::VERTICAL), 90),
+            8 => $this->rotate($image, 90),
+            default => $image,
+        };
+    }
+
+    public function load(string $filename, ?string $type = null): Image
+    {
+        return $this->setOrientationByExif(parent::load($filename, $type));
     }
 }

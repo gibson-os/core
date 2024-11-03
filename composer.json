@@ -20,7 +20,8 @@
     "open-telemetry/sdk": "^0.0.17",
     "open-telemetry/exporter-otlp": "^0.0.17",
     "php-http/guzzle7-adapter": "^1.0",
-    "ext-mysqli": "*"
+    "ext-mysqli": "*",
+    "ext-exif": "*"
   },
   "require-dev": {
     "codeception/codeception": "^5.0",
