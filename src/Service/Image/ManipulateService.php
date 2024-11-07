@@ -5,14 +5,12 @@ namespace GibsonOS\Core\Service\Image;
 
 use GibsonOS\Core\Dto\Image;
 use GibsonOS\Core\Enum\Image\Axis;
+use GibsonOS\Core\Exception\FileNotFound;
 use GibsonOS\Core\Exception\Image\CreateError;
-use GibsonOS\Core\Exception\ImageException;
+use GibsonOS\Core\Exception\Image\LoadError;
 
 class ManipulateService extends DrawService
 {
-    /**
-     * @throws CreateError
-     */
     public function resize(Image $image, int $width, int $height): bool
     {
         // Wenn das bild breiter als hoch ist
@@ -45,16 +43,14 @@ class ManipulateService extends DrawService
         $width = (int) $newWidth;
         $height = (int) $newHeight;
 
-        $newImage = $this->create($width, $height);
+        $newImage = imagescale($image->getImage(), $width, $height);
 
-        if (
-            !imagecopyresampled($newImage->getImage(), $image->getImage(), 0, 0, 0, 0, $width, $height, $this->getWidth($image), $this->getHeight($image))
-        ) {
+        if ($newImage === false) {
             return false;
         }
 
         $this->destroy($image);
-        $image->setImage($newImage->getImage());
+        $image->setImage($newImage);
 
         return true;
     }
@@ -208,10 +204,6 @@ class ManipulateService extends DrawService
         return $newImage;
     }
 
-    /**
-     * @throws CreateError
-     * @throws ImageException
-     */
     public function rotate(Image $image, float $angle, int $backgroundColor = 0): Image
     {
         return new Image(imagerotate($image->getImage(), $angle, $backgroundColor));
@@ -219,7 +211,6 @@ class ManipulateService extends DrawService
 
     /**
      * @throws CreateError
-     * @throws ImageException
      */
     public function setOrientationByExif(Image $image): Image
     {
@@ -235,6 +226,11 @@ class ManipulateService extends DrawService
         };
     }
 
+    /**
+     * @throws CreateError
+     * @throws FileNotFound
+     * @throws LoadError
+     */
     public function load(string $filename, ?string $type = null): Image
     {
         return $this->setOrientationByExif(parent::load($filename, $type));
