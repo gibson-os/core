@@ -2,14 +2,17 @@ Ext.define('GibsonOS.module.core.component.form.field.DateTime', {
     extend: 'GibsonOS.module.core.component.form.FieldContainer',
     alias: ['widget.gosCoreComponentFormFieldDateTime'],
     fieldLabel: 'Datum und Zeit',
+    combinedField: true,
     initComponent() {
         const me = this;
 
         me.items = [{
             xtype: 'gosCoreComponentFormFieldDate',
+            name: me.name + 'Date',
             margins: '0 5px 0 0'
         },{
-            xtype: 'gosCoreComponentFormFieldTime'
+            xtype: 'gosCoreComponentFormFieldTime',
+            name: me.name + 'Time',
         }];
 
         me.callParent();

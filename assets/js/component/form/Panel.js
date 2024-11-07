@@ -109,6 +109,15 @@ Ext.define('GibsonOS.module.core.component.form.Panel', {
 
                 const form = me.getForm();
                 const renderedButton = this;
+                let parameters = renderedButton.parameters;
+
+                me.items.each((item) => {
+                    if (item.combinedField !== true) {
+                        return true;
+                    }
+
+                    parameters[item.getName()] = item.getValue();
+                });
 
                 form.submit({
                     xtype: 'gosFormActionAction',
@@ -120,7 +129,7 @@ Ext.define('GibsonOS.module.core.component.form.Panel', {
                         method: 'POST'
                     },
                     url: baseDir + renderedButton.module + '/' + renderedButton.task + '/' + renderedButton.action,
-                    params: renderedButton.parameters,
+                    params: parameters,
                     failure() {
                         me.setLoading(false);
                     },
