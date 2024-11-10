@@ -30,6 +30,11 @@ class ReflectionManager
     private array $enums = [];
 
     /**
+     * @var array<class-string, string[]>
+     */
+    private array $docMethods = [];
+
+    /**
      * @param class-string|object $objectOrClass
      *
      * @throws ReflectionException
@@ -148,9 +153,13 @@ class ReflectionManager
         $propertyName = $reflectionProperty->getName();
 
         foreach (self::GETTER_PREFIXES as $getterPrefix) {
-            $getter = $getterPrefix . lcfirst($propertyName);
+            $getter = $getterPrefix . ucfirst($propertyName);
 
             if ($reflectionProperty->getDeclaringClass()->hasMethod($getter)) {
+                return $object->$getter();
+            }
+
+            if ($this->hasDocMethod($reflectionProperty->getDeclaringClass(), $getter)) {
                 return $object->$getter();
             }
         }
@@ -304,6 +313,35 @@ class ReflectionManager
                 || (is_bool($value) && $value)),
             default => throw new ReflectionException(sprintf('Type "%s" of %s "%s" for "%s%s" is not allowed!', $this->getTypeName($reflectionObject) ?? 'null', $reflectionObject instanceof ReflectionParameter ? 'parameter' : 'property', $reflectionObject->getName(), $reflectionObject->getDeclaringClass()?->getName() ?? 'null', $reflectionObject instanceof ReflectionParameter ? '::' . $reflectionObject->getDeclaringFunction()->getName() : '')),
         };
+    }
+
+    public function hasDocMethod(ReflectionClass $reflectionClass, string $methodName): bool
+    {
+        return in_array($methodName, $this->getDocMethods($reflectionClass));
+    }
+
+    public function getDocMethods(ReflectionClass $reflectionClass): array
+    {
+        $className = $reflectionClass->getName();
+
+        if (isset($this->docMethods[$className])) {
+            return $this->docMethods[$className];
+        }
+
+        $this->docMethods[$className] = [];
+
+        foreach (explode(PHP_EOL, $reflectionClass->getDocComment()) as $line) {
+            if (!str_contains($line, '@method')) {
+                continue;
+            }
+
+            preg_match('/@method.*\s(.*)\(.*\)/', $line, $matches);
+
+            $this->docMethods[$className][] = $matches[1];
+        }
+
+        return $this->docMethods[$className];
+
     }
 
     public function __serialize(): array

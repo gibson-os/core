@@ -14,6 +14,7 @@ use ReflectionClass;
 use ReflectionClassConstant;
 use ReflectionMethod;
 use ReflectionParameter;
+use ReflectionProperty;
 
 class AttributeService
 {
@@ -29,7 +30,7 @@ class AttributeService
      * @return Attribute[]
      */
     public function getAttributes(
-        ReflectionMethod|ReflectionClass|ReflectionParameter|ReflectionClassConstant $reflectionObject,
+        ReflectionMethod|ReflectionClass|ReflectionParameter|ReflectionClassConstant|ReflectionProperty $reflectionObject,
     ): array {
         return $this->getAttributesByClassName($reflectionObject, AttributeInterface::class);
     }
@@ -42,7 +43,7 @@ class AttributeService
      * @return Attribute[]
      */
     public function getAttributesByClassName(
-        ReflectionMethod|ReflectionClass|ReflectionParameter|ReflectionClassConstant $reflectionObject,
+        ReflectionMethod|ReflectionClass|ReflectionParameter|ReflectionClassConstant|ReflectionProperty $reflectionObject,
         string $attributeClassName,
     ): array {
         $attributesClasses = [];

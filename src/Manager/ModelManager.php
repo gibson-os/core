@@ -10,11 +10,13 @@ use GibsonOS\Core\Dto\Model\ChildrenMapping;
 use GibsonOS\Core\Dto\Model\PrimaryColumn;
 use GibsonOS\Core\Exception\Model\DeleteError;
 use GibsonOS\Core\Exception\Model\SaveError;
+use GibsonOS\Core\Exception\ViolationException;
 use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Model\ModelInterface;
 use GibsonOS\Core\Query\ChildrenQuery;
 use GibsonOS\Core\Service\Attribute\TableNameAttribute;
 use GibsonOS\Core\Service\DateTimeService;
+use GibsonOS\Core\Service\ValidatorService;
 use GibsonOS\Core\Utility\JsonUtility;
 use GibsonOS\Core\Wrapper\ModelWrapper;
 use JsonException;
@@ -94,6 +96,7 @@ class ModelManager
         private readonly Client $client,
         private readonly ModelWrapper $modelWrapper,
         private readonly ChildrenQuery $childrenQuery,
+        private readonly ValidatorService $validatorService,
     ) {
     }
 
@@ -102,9 +105,16 @@ class ModelManager
      * @throws ReflectionException
      * @throws JsonException
      * @throws RecordException
+     * @throws ViolationException
      */
     public function saveWithoutChildren(ModelInterface $model): void
     {
+        $violations = $this->validatorService->validate($model);
+
+        if (count($violations)) {
+            throw new ViolationException($violations);
+        }
+
         $childrenList = $this->getChildrenList($model);
 
         try {

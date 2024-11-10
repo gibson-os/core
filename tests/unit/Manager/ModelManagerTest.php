@@ -5,12 +5,16 @@ namespace GibsonOS\Test\Unit\Core\Manager;
 
 use Codeception\Test\Unit;
 use GibsonOS\Core\Dto\Model\ChildrenMapping;
+use GibsonOS\Core\Dto\Violation;
+use GibsonOS\Core\Exception\ViolationException;
 use GibsonOS\Core\Manager\ModelManager;
 use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Query\ChildrenQuery;
 use GibsonOS\Core\Service\Attribute\TableNameAttribute;
 use GibsonOS\Core\Service\DateTimeService;
+use GibsonOS\Core\Service\ValidatorService;
 use GibsonOS\Core\Utility\JsonUtility;
+use GibsonOS\Core\Validator\ValidatorInterface;
 use GibsonOS\Core\Wrapper\ModelWrapper;
 use GibsonOS\Mock\Model\MockModel;
 use MDO\Client;
@@ -50,6 +54,8 @@ class ModelManagerTest extends Unit
 
     private ChildrenQuery|ObjectProphecy $childrenQuery;
 
+    private ValidatorService|ObjectProphecy $validatorService;
+
     private Table $table;
 
     protected function _before()
@@ -62,6 +68,7 @@ class ModelManagerTest extends Unit
         $this->client = $this->prophesize(Client::class);
         $this->modelWrapper = $this->prophesize(ModelWrapper::class);
         $this->childrenQuery = $this->prophesize(ChildrenQuery::class);
+        $this->validatorService = $this->prophesize(ValidatorService::class);
         $reflectionManager = new ReflectionManager();
 
         $this->client->getDatabaseName()
@@ -90,6 +97,7 @@ class ModelManagerTest extends Unit
             $this->client->reveal(),
             $this->modelWrapper->reveal(),
             $this->childrenQuery->reveal(),
+            $this->validatorService->reveal(),
         );
     }
 
@@ -106,6 +114,11 @@ class ModelManagerTest extends Unit
         ;
 
         $model = new MockModel($this->modelWrapper->reveal());
+        $this->validatorService->validate($model)
+            ->shouldBeCalledOnce()
+            ->willReturn([])
+        ;
+
         $this->modelManager->saveWithoutChildren($model);
 
         $this->assertEquals(42, $model->getId());
@@ -126,6 +139,10 @@ class ModelManagerTest extends Unit
         $children = new MockModel($this->modelWrapper->reveal());
         $model = (new MockModel($this->modelWrapper->reveal()))
             ->setChildren([$children])
+        ;
+        $this->validatorService->validate($model)
+            ->shouldBeCalledOnce()
+            ->willReturn([])
         ;
         $this->modelManager->saveWithoutChildren($model);
 
@@ -149,6 +166,10 @@ class ModelManagerTest extends Unit
         $children = new MockModel($this->modelWrapper->reveal());
         $model = (new MockModel($this->modelWrapper->reveal()))
             ->addChildren([$children])
+        ;
+        $this->validatorService->validate($model)
+            ->shouldBeCalledOnce()
+            ->willReturn([])
         ;
         $this->modelManager->saveWithoutChildren($model);
 
@@ -177,6 +198,10 @@ class ModelManagerTest extends Unit
         ;
 
         $model = new MockModel($this->modelWrapper->reveal());
+        $this->validatorService->validate($model)
+            ->shouldBeCalledOnce()
+            ->willReturn([])
+        ;
 
         $deleteQuery = (new DeleteQuery($this->table))->addWhere(new Where('`parent_id`=?', [42]));
         $this->childrenQuery->getDeleteQuery(
@@ -195,6 +220,35 @@ class ModelManagerTest extends Unit
         $this->modelManager->save($model);
 
         $this->assertEquals(42, $model->getId());
+    }
+
+    public function testSaveValidationError(): void
+    {
+        $this->client->isTransaction()
+            ->shouldBeCalledOnce()
+            ->willReturn(false)
+        ;
+        $this->client->startTransaction()
+            ->shouldBeCalledOnce()
+        ;
+        $this->tableManager->getTable('marvin')
+            ->shouldNotBeCalled()
+        ;
+
+        $model = new MockModel($this->modelWrapper->reveal());
+        $this->validatorService->validate($model)
+            ->shouldBeCalledOnce()
+            ->willReturn([new Violation(
+                'no hope',
+                $this->prophesize(ValidatorInterface::class)->reveal(),
+                $model::class,
+            )])
+        ;
+
+        $this->expectException(ViolationException::class);
+        $this->expectExceptionMessage($model::class . ': no hope');
+
+        $this->modelManager->save($model);
     }
 
     public function testSaveWithSetChildren(): void
@@ -221,8 +275,16 @@ class ModelManagerTest extends Unit
         ;
 
         $children = new MockModel($this->modelWrapper->reveal());
+        $this->validatorService->validate($children)
+            ->shouldBeCalledOnce()
+            ->willReturn([])
+        ;
         $model = (new MockModel($this->modelWrapper->reveal()))
             ->setChildren([$children])
+        ;
+        $this->validatorService->validate($model)
+            ->shouldBeCalledOnce()
+            ->willReturn([])
         ;
 
         $deleteQuery = (new DeleteQuery($this->table))->addWhere(new Where('`parent_id`=?', [24]));
@@ -285,8 +347,16 @@ class ModelManagerTest extends Unit
         ;
 
         $children = new MockModel($this->modelWrapper->reveal());
+        $this->validatorService->validate($children)
+            ->shouldBeCalledOnce()
+            ->willReturn([])
+        ;
         $model = (new MockModel($this->modelWrapper->reveal()))
             ->addChildren([$children])
+        ;
+        $this->validatorService->validate($model)
+            ->shouldBeCalledOnce()
+            ->willReturn([])
         ;
 
         $deleteQuery = (new DeleteQuery($this->table))->addWhere(new Where('`parent_id`=?', [24]));
