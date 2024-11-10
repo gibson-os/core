@@ -3,9 +3,11 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Attribute\Validation;
 
+use Attribute;
 use DateTimeInterface;
-use GibsonOS\Core\Validator\GreaterValidator;
+use GibsonOS\Core\Validator\GreaterAbstractValidator;
 
+#[Attribute(Attribute::TARGET_PROPERTY)]
 class GreaterEqual extends AbstractValidation
 {
     public function __construct(private readonly int|float|DateTimeInterface $greaterThan)
@@ -14,7 +16,7 @@ class GreaterEqual extends AbstractValidation
 
     public function getAttributeServiceName(): string
     {
-        return GreaterValidator::class;
+        return GreaterAbstractValidator::class;
     }
 
     public function getMessage(mixed $value): string

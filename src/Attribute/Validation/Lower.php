@@ -3,9 +3,11 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Attribute\Validation;
 
+use Attribute;
 use DateTimeInterface;
-use GibsonOS\Core\Validator\LowerValidator;
+use GibsonOS\Core\Validator\LowerAbstractValidator;
 
+#[Attribute(Attribute::TARGET_PROPERTY)]
 class Lower extends AbstractValidation
 {
     public function __construct(private readonly int|float|DateTimeInterface $lowerThan)
@@ -14,7 +16,7 @@ class Lower extends AbstractValidation
 
     public function getAttributeServiceName(): string
     {
-        return LowerValidator::class;
+        return LowerAbstractValidator::class;
     }
 
     public function getMessage(mixed $value): string

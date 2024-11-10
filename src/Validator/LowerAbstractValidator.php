@@ -9,7 +9,7 @@ use GibsonOS\Core\Attribute\Validation\Lower;
 use GibsonOS\Core\Attribute\Validation\LowerEqual;
 use GibsonOS\Core\Exception\ValidationException;
 
-class LowerValidator implements ValidatorInterface
+class LowerAbstractValidator extends AbstractValidator
 {
     /**
      * @throws ValidationException

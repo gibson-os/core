@@ -3,13 +3,13 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Dto;
 
-use GibsonOS\Core\Validator\ValidatorInterface;
+use GibsonOS\Core\Validator\AbstractValidator;
 
 class Violation
 {
     public function __construct(
         private readonly string $message,
-        private readonly ValidatorInterface $validator,
+        private readonly AbstractValidator $validator,
         private readonly ?string $objectName = null,
         private readonly ?string $propertyName = null,
     ) {
@@ -20,7 +20,7 @@ class Violation
         return $this->message;
     }
 
-    public function getValidator(): ValidatorInterface
+    public function getValidator(): AbstractValidator
     {
         return $this->validator;
     }

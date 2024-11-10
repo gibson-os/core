@@ -14,7 +14,7 @@ use GibsonOS\Core\Service\Attribute\TableNameAttribute;
 use GibsonOS\Core\Service\DateTimeService;
 use GibsonOS\Core\Service\ValidatorService;
 use GibsonOS\Core\Utility\JsonUtility;
-use GibsonOS\Core\Validator\ValidatorInterface;
+use GibsonOS\Core\Validator\AbstractValidator;
 use GibsonOS\Core\Wrapper\ModelWrapper;
 use GibsonOS\Mock\Model\MockModel;
 use MDO\Client;
@@ -240,7 +240,7 @@ class ModelManagerTest extends Unit
             ->shouldBeCalledOnce()
             ->willReturn([new Violation(
                 'no hope',
-                $this->prophesize(ValidatorInterface::class)->reveal(),
+                $this->prophesize(AbstractValidator::class)->reveal(),
                 $model::class,
             )])
         ;

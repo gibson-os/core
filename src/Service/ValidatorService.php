@@ -6,7 +6,7 @@ namespace GibsonOS\Core\Service;
 use GibsonOS\Core\Attribute\Validation\AbstractValidation;
 use GibsonOS\Core\Dto\Violation;
 use GibsonOS\Core\Manager\ReflectionManager;
-use GibsonOS\Core\Validator\ValidatorInterface;
+use GibsonOS\Core\Validator\AbstractValidator;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionProperty;
@@ -58,7 +58,7 @@ class ValidatorService
         $violations = [];
 
         foreach ($validationAttributes as $validationAttribute) {
-            /** @var ValidatorInterface $validator */
+            /** @var AbstractValidator $validator */
             $validator = $validationAttribute->getService();
             /** @var AbstractValidation $validation */
             $validation = $validationAttribute->getAttribute();
