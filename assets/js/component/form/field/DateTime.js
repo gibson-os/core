@@ -6,16 +6,17 @@ Ext.define('GibsonOS.module.core.component.form.field.DateTime', {
     value: null,
     initComponent() {
         const me = this;
+        const date = new Date(me.value);
 
         me.items = [{
             xtype: 'gosCoreComponentFormFieldDate',
             name: me.name + 'Date',
             margins: '0 5px 0 0',
-            value: me.value
+            value: me.value === null ? null : date
         },{
             xtype: 'gosCoreComponentFormFieldTime',
             name: me.name + 'Time',
-            value: me.value
+            value: me.value === null ? null : date
         }];
 
         me.callParent();
@@ -43,5 +44,11 @@ Ext.define('GibsonOS.module.core.component.form.field.DateTime', {
 
         me.down('gosCoreComponentFormFieldDate').setValue(date);
         me.down('gosCoreComponentFormFieldTime').setValue(date);
+    },
+    getDateValue(date) {
+        return Ext.Date.format(date, 'Y-m-d');
+    },
+    getTimeValue(date) {
+        return Ext.Date.format(date, 'H:i');
     }
 });
