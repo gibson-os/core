@@ -10,6 +10,7 @@ use GibsonOS\Core\Exception\FileNotFound;
 use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\Image\CreateError;
 use GibsonOS\Core\Exception\Image\LoadError;
+use Throwable;
 
 class ImageService
 {
@@ -247,7 +248,11 @@ class ImageService
 
     public function getExif(Image $image): array
     {
-        return exif_read_data($image->getFilename()) ?: [];
+        try {
+            return exif_read_data($image->getFilename()) ?: [];
+        } catch (Throwable) {
+            return [];
+        }
     }
 
     public function getExifKey(Image $image, string $key): mixed
