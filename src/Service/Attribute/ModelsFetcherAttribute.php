@@ -8,7 +8,9 @@ use GibsonOS\Core\Attribute\GetModels;
 use GibsonOS\Core\Exception\MapperException;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Manager\ModelManager;
+use GibsonOS\Core\Mapper\Model\ChildrenMapper;
 use GibsonOS\Core\Model\AbstractModel;
+use GibsonOS\Core\Query\ChildrenQuery;
 use GibsonOS\Core\Transformer\AttributeParameterTransformer;
 use GibsonOS\Core\Wrapper\ModelWrapper;
 use JsonException;
@@ -16,6 +18,7 @@ use MDO\Client;
 use MDO\Dto\Query\Where;
 use MDO\Exception\ClientException;
 use MDO\Exception\RecordException;
+use MDO\Extractor\PrimaryKeyExtractor;
 use MDO\Manager\TableManager;
 use MDO\Query\SelectQuery;
 use MDO\Service\SelectService;
@@ -31,6 +34,9 @@ class ModelsFetcherAttribute implements AttributeServiceInterface, ParameterAttr
         private readonly ModelWrapper $modelWrapper,
         private readonly AttributeParameterTransformer $attributeParameterTransformer,
         private readonly SelectService $selectService,
+        private readonly PrimaryKeyExtractor $primaryKeyExtractor,
+        private readonly ChildrenQuery $childrenQuery,
+        private readonly ChildrenMapper $childrenMapper,
     ) {
     }
 
@@ -78,7 +84,8 @@ class ModelsFetcherAttribute implements AttributeServiceInterface, ParameterAttr
         }
 
         $table = $this->tableManager->getTable($model->getTableName());
-        $selectQuery = new SelectQuery($table);
+        $alias = $attribute->getAlias();
+        $selectQuery = new SelectQuery($table, $alias);
 
         foreach ($conditions as $conditionField => $conditionValue) {
             if (!is_array($conditionValue)) {
@@ -86,10 +93,16 @@ class ModelsFetcherAttribute implements AttributeServiceInterface, ParameterAttr
             }
 
             $selectQuery->addWhere(new Where(
-                sprintf('`%s` IN (%s)', $conditionField, $this->selectService->getParametersString($conditionValue)),
+                sprintf('`%s`.`%s` IN (%s)', $alias, $conditionField, $this->selectService->getParametersString($conditionValue)),
                 array_values($conditionValue),
             ));
         }
+
+        $this->childrenQuery->extend(
+            $selectQuery,
+            $modelClassName,
+            $attribute->getExtends(),
+        );
 
         try {
             $result = $this->client->execute($selectQuery);
@@ -108,14 +121,30 @@ class ModelsFetcherAttribute implements AttributeServiceInterface, ParameterAttr
         $models = [];
 
         foreach ($result->iterateRecords() as $record) {
-            $model = new $modelClassName($this->modelWrapper);
-            $this->modelManager->loadFromRecord($record, $model);
-            $models[] = $model;
+            $primaryKey = implode(
+                '-',
+                $this->primaryKeyExtractor->extractFromRecord(
+                    $selectQuery->getTable(),
+                    $record,
+                ),
+            );
+
+            if (!isset($models[$primaryKey])) {
+                $model = new $modelClassName($this->modelWrapper);
+                $this->modelManager->loadFromRecord($record, $model);
+                $models[$primaryKey] = $model;
+            }
+
+            $this->childrenMapper->getChildrenModels(
+                $record,
+                $models[$primaryKey],
+                $attribute->getExtends(),
+            );
         }
 
         return count($models) === 0
             ? $this->getDefaultReturn($reflectionParameter)
-            : $models
+            : array_values($models)
         ;
     }
 

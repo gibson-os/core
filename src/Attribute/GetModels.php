@@ -14,8 +14,12 @@ class GetModels implements AttributeInterface
      * @param class-string<AbstractModel> $className
      * @param array<string, string>       $conditions
      */
-    public function __construct(private readonly string $className, private readonly array $conditions = ['id' => 'id'])
-    {
+    public function __construct(
+        private readonly string $className,
+        private readonly array $conditions = ['id' => 'id'],
+        private readonly array $extends = [],
+        private readonly string $alias = 't',
+    ) {
     }
 
     public function getAttributeServiceName(): string
@@ -37,5 +41,15 @@ class GetModels implements AttributeInterface
     public function getConditions(): array
     {
         return $this->conditions;
+    }
+
+    public function getExtends(): array
+    {
+        return $this->extends;
+    }
+
+    public function getAlias(): string
+    {
+        return $this->alias;
     }
 }
