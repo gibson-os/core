@@ -188,7 +188,26 @@ Ext.define('GibsonOS.module.core.component.form.Panel', {
             });
         }
 
-        me.add(item);
+        if (me.withOperator) {
+            if (me.withSet) {
+                parameter.allowedOperators.push('=');
+            }
+
+            me.add({
+                xtype: 'gosCoreComponentFormFieldContainer',
+                fieldLabel: parameter.title,
+                items: [{
+                    xtype: 'gosModuleCoreEventElementOperatorComboBox',
+                    name: name + 'Operator',
+                    margins: '0 5px 0 0',
+                    value: parameter.operator ?? null,
+                    allowed: parameter.allowedOperators
+                }, item]
+            });
+        } else {
+            me.add(item);
+        }
+
         me.fireEvent('afterAddField', name, parameter);
     },
     addFields(parameters) {

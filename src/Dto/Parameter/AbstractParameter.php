@@ -54,9 +54,11 @@ abstract class AbstractParameter implements JsonSerializable
         ], $this->getTypeConfig());
     }
 
-    public function setListener(string $field, array $options): void
+    public function setListener(string $field, array $options): self
     {
         $this->listeners[$field] = $options;
+
+        return $this;
     }
 
     public function getOperator(): ?string
@@ -64,7 +66,7 @@ abstract class AbstractParameter implements JsonSerializable
         return $this->operator;
     }
 
-    public function setOperator(?string $operator): AbstractParameter
+    public function setOperator(?string $operator): self
     {
         $this->operator = $operator;
 
@@ -76,7 +78,7 @@ abstract class AbstractParameter implements JsonSerializable
         return $this->value;
     }
 
-    public function setValue(mixed $value): AbstractParameter
+    public function setValue(mixed $value): self
     {
         $this->value = $value;
 
@@ -88,7 +90,7 @@ abstract class AbstractParameter implements JsonSerializable
         return $this->image;
     }
 
-    public function setImage(?string $image): AbstractParameter
+    public function setImage(?string $image): self
     {
         $this->image = $image;
 
@@ -100,7 +102,7 @@ abstract class AbstractParameter implements JsonSerializable
         return $this->subText;
     }
 
-    public function setSubText(?string $subText): AbstractParameter
+    public function setSubText(?string $subText): self
     {
         $this->subText = $subText;
 
