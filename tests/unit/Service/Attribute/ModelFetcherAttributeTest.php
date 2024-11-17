@@ -9,6 +9,8 @@ use GibsonOS\Core\Attribute\GetModel;
 use GibsonOS\Core\Exception\MapperException;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Manager\ReflectionManager;
+use GibsonOS\Core\Mapper\Model\ChildrenMapper;
+use GibsonOS\Core\Query\ChildrenQuery;
 use GibsonOS\Core\Service\Attribute\ModelFetcherAttribute;
 use GibsonOS\Core\Service\RequestService;
 use GibsonOS\Core\Service\SessionService;
@@ -37,11 +39,17 @@ class ModelFetcherAttributeTest extends Unit
 
     private AttributeParameterTransformer|ObjectProphecy $attributeParameterTransformer;
 
+    private ObjectProphecy|ChildrenQuery $childrenQuery;
+
+    private ObjectProphecy|ChildrenMapper $childrenMapper;
+
     protected function _before(): void
     {
         $this->loadModelManager();
 
         $this->attributeParameterTransformer = $this->prophesize(AttributeParameterTransformer::class);
+        $this->childrenQuery = $this->prophesize(ChildrenQuery::class);
+        $this->childrenMapper = $this->prophesize(ChildrenMapper::class);
 
         $this->modelFetcherAttribute = new ModelFetcherAttribute(
             $this->tableManager->reveal(),
@@ -50,6 +58,8 @@ class ModelFetcherAttributeTest extends Unit
             $this->client->reveal(),
             $this->modelWrapper->reveal(),
             $this->attributeParameterTransformer->reveal(),
+            $this->childrenQuery->reveal(),
+            $this->childrenMapper->reveal(),
         );
     }
 
@@ -107,9 +117,12 @@ class ModelFetcherAttributeTest extends Unit
             ->shouldBeCalledOnce()
             ->willReturn($table)
         ;
-        $selectQuery = (new SelectQuery($table))
-            ->addWhere(new Where('`id`=?', [42]))
-            ->setLimit(1)
+        $selectQuery = (new SelectQuery($table, 't'))
+            ->addWhere(new Where('`t`.`id`=?', [42]))
+        ;
+        $this->childrenQuery->extend($selectQuery, MapModel::class, [])
+            ->shouldBeCalledOnce()
+            ->willReturn($selectQuery)
         ;
         $this->client->execute($selectQuery)
             ->shouldBeCalledOnce()
@@ -137,13 +150,20 @@ class ModelFetcherAttributeTest extends Unit
             ->shouldBeCalledOnce()
             ->willReturn($table)
         ;
-        $selectQuery = (new SelectQuery($table))
-            ->addWhere(new Where('`id`=?', [42]))
-            ->setLimit(1)
+        $selectQuery = (new SelectQuery($table, 't'))
+            ->addWhere(new Where('`t`.`id`=?', [42]))
         ;
         $this->client->execute($selectQuery)
             ->shouldBeCalledOnce()
             ->willThrow(ClientException::class)
+        ;
+        $this->childrenQuery->extend($selectQuery, MapModel::class, [])
+            ->shouldBeCalledOnce()
+            ->willReturn($selectQuery)
+        ;
+        $this->childrenQuery->extend($selectQuery, MapModel::class, [])
+            ->shouldBeCalledOnce()
+            ->willReturn($selectQuery)
         ;
 
         $this->assertNull($this->modelFetcherAttribute->replace(
@@ -166,15 +186,18 @@ class ModelFetcherAttributeTest extends Unit
             ->shouldBeCalledOnce()
             ->willReturn($table)
         ;
-        $selectQuery = (new SelectQuery($table))
-            ->addWhere(new Where('`id`=?', [42]))
-            ->setLimit(1)
+        $selectQuery = (new SelectQuery($table, 't'))
+            ->addWhere(new Where('`t`.`id`=?', [42]))
         ;
         $record = new Record([]);
         $result = $this->prophesize(Result::class);
         $result->iterateRecords()
             ->shouldBeCalledOnce()
             ->willYield([$record])
+        ;
+        $this->childrenQuery->extend($selectQuery, MapModel::class, [])
+            ->shouldBeCalledOnce()
+            ->willReturn($selectQuery)
         ;
         $this->client->execute($selectQuery)
             ->shouldBeCalledOnce()

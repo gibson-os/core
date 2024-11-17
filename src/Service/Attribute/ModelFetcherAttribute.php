@@ -9,7 +9,9 @@ use GibsonOS\Core\Exception\MapperException;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Manager\ModelManager;
 use GibsonOS\Core\Manager\ReflectionManager;
+use GibsonOS\Core\Mapper\Model\ChildrenMapper;
 use GibsonOS\Core\Model\AbstractModel;
+use GibsonOS\Core\Query\ChildrenQuery;
 use GibsonOS\Core\Transformer\AttributeParameterTransformer;
 use GibsonOS\Core\Wrapper\ModelWrapper;
 use JsonException;
@@ -31,6 +33,8 @@ class ModelFetcherAttribute implements AttributeServiceInterface, ParameterAttri
         private readonly Client $client,
         private readonly ModelWrapper $modelWrapper,
         private readonly AttributeParameterTransformer $attributeParameterTransformer,
+        private readonly ChildrenQuery $childrenQuery,
+        private readonly ChildrenMapper $childrenMapper,
     ) {
     }
 
@@ -75,16 +79,21 @@ class ModelFetcherAttribute implements AttributeServiceInterface, ParameterAttri
         }
 
         $table = $this->tableManager->getTable($model->getTableName());
-        $selectQuery = (new SelectQuery($table))
+        $alias = $attribute->getAlias();
+        $selectQuery = (new SelectQuery($table, $alias))
             ->addWhere(new Where(
                 implode(' AND ', array_map(
-                    fn (string $field): string => '`' . $field . '`=?',
+                    fn (string $field): string => sprintf('`%s`.`%s`=?', $alias, $field),
                     array_keys($attribute->getConditions()),
                 )),
                 $whereParameters,
             ))
-            ->setLimit(1)
         ;
+        $this->childrenQuery->extend(
+            $selectQuery,
+            $modelClassName,
+            $attribute->getExtends(),
+        );
 
         try {
             $result = $this->client->execute($selectQuery);
@@ -92,9 +101,18 @@ class ModelFetcherAttribute implements AttributeServiceInterface, ParameterAttri
             $result = null;
         }
 
-        $record = $result?->iterateRecords()->current();
+        $modelLoaded = false;
 
-        if ($record === null) {
+        foreach ($result?->iterateRecords() ?? [] as $record) {
+            if (!$modelLoaded) {
+                $this->modelManager->loadFromRecord($record, $model);
+                $modelLoaded = true;
+            }
+
+            $this->childrenMapper->getChildrenModels($record, $model, $attribute->getExtends());
+        }
+
+        if (!$modelLoaded) {
             if ($reflectionParameter->allowsNull()) {
                 return null;
             }
@@ -105,8 +123,6 @@ class ModelFetcherAttribute implements AttributeServiceInterface, ParameterAttri
                 $reflectionParameter->getName(),
             )))->setTable($table);
         }
-
-        $this->modelManager->loadFromRecord($record, $model);
 
         return $model;
     }
