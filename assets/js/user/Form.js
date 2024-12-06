@@ -81,12 +81,21 @@ Ext.define('GibsonOS.module.core.user.Form', {
             },
             text: 'Speichern',
             handler: function() {
+                let params = {};
+
+                if (form.gos.data.userId) {
+                    params.id = form.gos.data.userId;
+                }
+
+                if (form.gos.data.add) {
+                    params.add = form.gos.data.add;
+                }
+
+                if (form.gos.data.add) {}
+
                 this.up('form').getForm().submit({
                     xtype: 'gosFormActionAction',
-                    params: {
-                        id: form.gos.data.userId ? form.gos.data.userId : 0,
-                        add: form.gos.data.add ? form.gos.data.add : false
-                    },
+                    params: params,
                     url: baseDir + 'core/user',
                     method: 'POST',
                     success: function(formAction, action) {

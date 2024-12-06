@@ -30,9 +30,6 @@ class DesktopController extends AbstractController
     public const TOOLS_KEY = 'tools';
 
     /**
-     * @param Setting|null $apps
-     * @param Setting|null $tools
-     *
      * @throws JsonException
      * @throws ClientException
      * @throws RecordException

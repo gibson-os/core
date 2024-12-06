@@ -14,6 +14,9 @@ use GibsonOS\Core\Exception\RequestError;
 use GibsonOS\Core\Service\PermissionService;
 use GibsonOS\Core\Service\RequestService;
 use GibsonOS\Core\Service\SessionService;
+use JsonException;
+use MDO\Exception\RecordException;
+use ReflectionException;
 
 class PermissionAttribute extends AbstractActionAttributeService
 {
@@ -28,6 +31,9 @@ class PermissionAttribute extends AbstractActionAttributeService
      * @throws LoginRequired
      * @throws PermissionDenied
      * @throws SelectError
+     * @throws JsonException
+     * @throws RecordException
+     * @throws ReflectionException
      */
     public function preExecute(AttributeInterface $attribute, array $parameters, array $reflectionParameters): array
     {
@@ -82,7 +88,6 @@ class PermissionAttribute extends AbstractActionAttributeService
      */
     private function getPermissionSum(array $permissions): int
     {
-
         return array_sum(array_map(
             static fn (Permission $permission): int => $permission->value,
             $permissions,

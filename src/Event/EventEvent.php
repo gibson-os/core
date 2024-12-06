@@ -51,9 +51,6 @@ class EventEvent extends AbstractEvent
     }
 
     /**
-     * @param EventModel $event
-     * @param bool       $async
-     *
      * @throws DateTimeError
      * @throws JsonException
      * @throws SaveError
