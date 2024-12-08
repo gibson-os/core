@@ -139,15 +139,16 @@ class ChildrenQuery
                 $wheres[] = $where->getCondition();
             }
 
+            $childAlias = $child->getAlias();
             $selectQuery
                 ->addJoin(new Join(
                     $table,
-                    $child->getAlias(),
+                    $childAlias,
                     sprintf(
                         '`%s`.`%s`=`%s`.`%s`%s',
                         $alias ?? $selectQuery->getAlias() ?? $selectQuery->getTable()->getTableName(),
                         $this->getOwnColumn($reflectionProperty, $constraintAttribute),
-                        $child->getAlias(),
+                        $childAlias,
                         $this->getChildColumn($reflectionProperty, $constraintAttribute),
                         count($wheres) === 0 ? '' : ' AND (' . implode(') AND (', $wheres) . ')',
                     ),
@@ -160,8 +161,12 @@ class ChildrenQuery
                 $selectQuery->addWhere(new Where($where, $constraintAttribute->getWhereParameters()));
             }
 
-            $this->extend($selectQuery, $parentModelClassName, $child->getChildren(), $child->getAlias());
-            $selects[] = new Select($table, $child->getAlias(), $child->getPrefix());
+            foreach ($constraintAttribute->getOrderBy() as $field => $orderDirection) {
+                $selectQuery->setOrder(sprintf('`%s`.`%s`', $childAlias, $field), $orderDirection);
+            }
+
+            $this->extend($selectQuery, $parentModelClassName, $child->getChildren(), $childAlias);
+            $selects[] = new Select($table, $childAlias, $child->getPrefix());
         }
 
         $selectQuery->setSelects(array_merge(
