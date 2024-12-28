@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Dto\Form;
 
 use JsonSerializable;
+use stdClass;
 
 class Button implements JsonSerializable
 {
@@ -48,7 +49,7 @@ class Button implements JsonSerializable
             'module' => $this->getModule(),
             'task' => $this->getTask(),
             'action' => $this->getAction(),
-            'parameters' => $this->getParameters(),
+            'parameters' => $this->getParameters() ?: new stdClass(),
         ];
     }
 }

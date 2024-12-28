@@ -28,7 +28,6 @@ use MDO\Enum\Type;
 use MDO\Exception\ClientException;
 use MDO\Exception\RecordException;
 use MDO\Manager\TableManager;
-use MDO\Query\DeleteQuery;
 use MDO\Query\ReplaceQuery;
 use MDO\Service\DeleteService;
 use MDO\Service\ReplaceService;
@@ -362,27 +361,17 @@ class ModelManager
             );
         }
 
-        $childrenModel = new $parentModelClassName($this->modelWrapper);
-        $tableName = $childrenModel->getTableName();
         $where = $constraintAttribute->getWhere();
         $parameters = $constraintAttribute->getWhereParameters();
-        $parameters[] = $children->getParentId();
-        $table = $this->tableManager->getTable($tableName);
-        $deleteQuery = (new DeleteQuery($table))
-            ->addWhere(new Where(
-                sprintf(
-                    '%s`%s_id`=?',
-                    $where === null ? '' : '(' . $where . ') AND ',
-                    $constraintAttribute->getParentColumn(),
-                ),
-                $parameters,
-            ))
-        ;
         $deleteQuery = $this->childrenQuery->getDeleteQuery(
             $model,
             't',
             new ChildrenMapping($children->getReflectionProperty()->getName(), 'child_', 'c'),
         );
+
+        if ($where !== null) {
+            $deleteQuery->addWhere(new Where($where, $parameters));
+        }
 
         $primaryColumns = $this->getPrimaryColumns($parentModelClassName);
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Dto\Parameter;
 
 use GibsonOS\Core\AutoComplete\AutoCompleteInterface;
+use stdClass;
 
 class AutoCompleteParameter extends AbstractParameter
 {
@@ -45,7 +46,7 @@ class AutoCompleteParameter extends AbstractParameter
             'model' => $this->autoComplete->getModel(),
             'valueField' => $this->autoComplete->getValueField(),
             'displayField' => $this->autoComplete->getDisplayField(),
-            'parameters' => $this->getParameters(),
+            'parameters' => $this->getParameters() ?: new stdClass(),
         ];
     }
 

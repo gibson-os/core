@@ -194,7 +194,7 @@ class ModelManagerTest extends Unit
             ->willReturn($record)
         ;
         $this->tableManager->getTable('marvin')
-            ->shouldBeCalledTimes(4)
+            ->shouldBeCalledTimes(3)
         ;
 
         $model = new MockModel($this->modelWrapper->reveal());
@@ -271,7 +271,7 @@ class ModelManagerTest extends Unit
             ->willReturn($childRecord)
         ;
         $this->tableManager->getTable('marvin')
-            ->shouldBeCalledTimes(8)
+            ->shouldBeCalledTimes(6)
         ;
 
         $children = new MockModel($this->modelWrapper->reveal());
@@ -343,7 +343,7 @@ class ModelManagerTest extends Unit
             ->willReturn($childRecord)
         ;
         $this->tableManager->getTable('marvin')
-            ->shouldBeCalledTimes(8)
+            ->shouldBeCalledTimes(6)
         ;
 
         $children = new MockModel($this->modelWrapper->reveal());
