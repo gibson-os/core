@@ -18,7 +18,9 @@ use GibsonOS\Core\Service\Attribute\TableNameAttribute;
 use GibsonOS\Core\Service\InstallService;
 use GibsonOS\Core\Service\PriorityInterface;
 use MDO\Client;
+use MDO\Dto\Record;
 use MDO\Exception\ClientException;
+use MDO\Exception\RecordException;
 use ReflectionAttribute;
 use ReflectionException;
 
@@ -38,6 +40,7 @@ class ConstraintInstall extends AbstractInstall implements PriorityInterface
      * @throws FactoryError
      * @throws GetError
      * @throws ReflectionException
+     * @throws RecordException
      */
     public function install(string $module): Generator
     {
@@ -47,7 +50,7 @@ class ConstraintInstall extends AbstractInstall implements PriorityInterface
             $className = $this->serviceManagerService->getNamespaceByPath($file);
             $reflectionClass = $this->reflectionManager->getReflectionClass($className);
 
-            if (!$this->reflectionManager->getAttribute($reflectionClass, Table::class)) {
+            if (!$this->reflectionManager->hasAttribute($reflectionClass, Table::class)) {
                 continue;
             }
 
@@ -107,7 +110,10 @@ class ConstraintInstall extends AbstractInstall implements PriorityInterface
                     ));
                 }
 
-                if (iterator_to_array($result->iterateRecords()) > 0) {
+                /** @var Record $record */
+                $record = $result->iterateRecords()->current();
+
+                if ($record->get('COUNT(`CONSTRAINT_NAME`)')->getValue() > 0) {
                     continue;
                 }
 
@@ -132,11 +138,11 @@ class ConstraintInstall extends AbstractInstall implements PriorityInterface
 
             try {
                 $this->client->execute($query);
-            } catch (ClientException) {
+            } catch (ClientException $exception) {
                 throw new InstallException(sprintf(
                     'Add constraints for table "%s" failed! Error: %s',
                     $tableName,
-                    $this->client->getError(),
+                    $exception->getMessage(),
                 ));
             }
 
