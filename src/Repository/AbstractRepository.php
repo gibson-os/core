@@ -67,7 +67,7 @@ abstract class AbstractRepository
         string $prefix = '',
         array $children = [],
     ): array {
-        $this->repositoryWrapper->getChildrenQuery()->extend($selectQuery, $modelClassName, $children);
+        $selectQuery = $this->repositoryWrapper->getChildrenQuery()->extend($selectQuery, $modelClassName, $children);
         $response = $this->repositoryWrapper->getClient()->execute($selectQuery);
         $modelService = $this->repositoryWrapper->getModelWrapper();
         $models = [];

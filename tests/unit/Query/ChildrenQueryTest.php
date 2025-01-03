@@ -12,6 +12,7 @@ use GibsonOS\Test\Unit\Core\ModelManagerTrait;
 use MDO\Dto\Field;
 use MDO\Dto\Query\Join;
 use MDO\Dto\Query\Where;
+use MDO\Dto\Query\With;
 use MDO\Dto\Select;
 use MDO\Dto\Table;
 use MDO\Enum\JoinType;
@@ -54,10 +55,6 @@ class ChildrenQueryTest extends Unit
             ->shouldBeCalledOnce()
             ->willReturn($table)
         ;
-        $this->selectService->getSelects([])
-            ->shouldBeCalledOnce()
-            ->willReturn([])
-        ;
 
         $this->assertEquals(
             (new SelectQuery($table, 'm'))
@@ -83,10 +80,6 @@ class ChildrenQueryTest extends Unit
         $this->tableManager->getTable('marvin')
             ->shouldBeCalledOnce()
             ->willReturn($table)
-        ;
-        $this->selectService->getSelects([])
-            ->shouldBeCalledOnce()
-            ->willReturn([])
         ;
 
         $this->assertEquals(
@@ -114,10 +107,6 @@ class ChildrenQueryTest extends Unit
             ->shouldBeCalledTimes(2)
             ->willReturn($table)
         ;
-        $this->selectService->getSelects([])
-            ->shouldBeCalledOnce()
-            ->willReturn([])
-        ;
         $this->selectService->getSelects([new Select($table, 'pp', 'parent_parent_')])
             ->shouldBeCalledOnce()
             ->willReturn([
@@ -126,14 +115,19 @@ class ChildrenQueryTest extends Unit
             ])
         ;
 
+        $withTable = new Table('with_marvin', [
+            'id' => new Field('id', false, Type::BIGINT, '', null, '', 20),
+            'parent_id' => new Field('parent_id', true, Type::BIGINT, '', null, '', 20),
+        ]);
         $this->assertEquals(
-            (new SelectQuery($table, 'm'))
+            (new SelectQuery($withTable, 'm'))
                 ->setSelects([
                     'id' => '`m`.`id`',
                     'parent_id' => '`m`.`parent_id`',
                     'parent_parent_id' => '`pp`.`id`',
                     'parent_parent_parent_id' => '`pp`.`parent_id`',
                 ])
+                ->setWith(new With('with_marvin', new SelectQuery($table, 'm')))
                 ->addJoin(new Join($table, 'pp', '`m`.`parent_id`=`pp`.`id`', JoinType::LEFT))
                 ->addWhere(new Where('`m`.`id`=?', [42])),
             $this->childrenQuery->getSelectQuery(
@@ -156,10 +150,6 @@ class ChildrenQueryTest extends Unit
             ->shouldBeCalledTimes(2)
             ->willReturn($table)
         ;
-        $this->selectService->getSelects([])
-            ->shouldBeCalledTimes(2)
-            ->willReturn([])
-        ;
         $this->selectService->getSelects([
             new Select($table, 'p', 'parent_'),
             new Select($table, 'c', 'child_'),
@@ -173,8 +163,12 @@ class ChildrenQueryTest extends Unit
             ])
         ;
 
+        $withTable = new Table('with_marvin', [
+            'id' => new Field('id', false, Type::BIGINT, '', null, '', 20),
+            'parent_id' => new Field('parent_id', true, Type::BIGINT, '', null, '', 20),
+        ]);
         $this->assertEquals(
-            (new SelectQuery($table, 'm'))
+            (new SelectQuery($withTable, 'm'))
                 ->setSelects([
                     'id' => '`m`.`id`',
                     'parent_id' => '`p`.`id`',
@@ -182,6 +176,7 @@ class ChildrenQueryTest extends Unit
                     'child_id' => '`c`.`id`',
                     'child_parent_id' => '`c`.`parent_id`',
                 ])
+                ->setWith(new With('with_marvin', new SelectQuery($table, 'm')))
                 ->addJoin(new Join($table, 'p', '`m`.`parent_id`=`p`.`id`', JoinType::LEFT))
                 ->addJoin(new Join($table, 'c', '`m`.`id`=`c`.`parent_id`', JoinType::LEFT)),
             $this->childrenQuery->extend(
@@ -205,10 +200,6 @@ class ChildrenQueryTest extends Unit
         $this->tableManager->getTable('marvin')
             ->shouldBeCalledTimes(4)
             ->willReturn($table)
-        ;
-        $this->selectService->getSelects([])
-            ->shouldBeCalledTimes(2)
-            ->willReturn([])
         ;
         $this->selectService->getSelects([
             new Select($table, 'p', 'parent_'),
@@ -237,8 +228,12 @@ class ChildrenQueryTest extends Unit
             ])
         ;
 
+        $withTable = new Table('with_marvin', [
+            'id' => new Field('id', false, Type::BIGINT, '', null, '', 20),
+            'parent_id' => new Field('parent_id', true, Type::BIGINT, '', null, '', 20),
+        ]);
         $this->assertEquals(
-            (new SelectQuery($table, 'm'))
+            (new SelectQuery($withTable, 'm'))
                 ->setSelects([
                     'id' => '`m`.`id`',
                     'parent_id' => '`p`.`id`',
@@ -250,6 +245,7 @@ class ChildrenQueryTest extends Unit
                     'child_child_id' => '`cc`.`id`',
                     'child_child_parent_id' => '`cc`.`parent_id`',
                 ])
+                ->setWith(new With('with_marvin', new SelectQuery($table, 'm')))
                 ->addJoin(new Join($table, 'p', '`m`.`parent_id`=`p`.`id`', JoinType::LEFT))
                 ->addJoin(new Join($table, 'pc', '`p`.`id`=`pc`.`parent_id`', JoinType::LEFT))
                 ->addJoin(new Join($table, 'c', '`m`.`id`=`c`.`parent_id`', JoinType::LEFT))

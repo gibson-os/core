@@ -98,7 +98,7 @@ class ModelsFetcherAttribute implements AttributeServiceInterface, ParameterAttr
             ));
         }
 
-        $this->childrenQuery->extend(
+        $selectQuery = $this->childrenQuery->extend(
             $selectQuery,
             $modelClassName,
             $attribute->getExtends(),

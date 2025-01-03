@@ -74,7 +74,7 @@ abstract class AbstractDatabaseStore extends AbstractStore
             ->setLimit($this->getRows(), $this->getFrom())
         ;
 
-        $this->databaseStoreWrapper->getChildrenQuery()->extend(
+        $this->selectQuery = $this->databaseStoreWrapper->getChildrenQuery()->extend(
             $this->selectQuery,
             $this->getModelClassName(),
             $this->getExtends(),
@@ -104,17 +104,12 @@ abstract class AbstractDatabaseStore extends AbstractStore
      */
     public function getCount(): int
     {
-        $this->initQuery();
-        $selects = $this->selectQuery->getSelects();
-        $this->selectQuery->setSelects(['count' => sprintf('COUNT(%s)', $this->getCountField())]);
-        $this->selectQuery->setLimit();
-
-        $result = $this->databaseStoreWrapper->getClient()->execute($this->selectQuery);
-
-        $this->selectQuery
-            ->setSelects($selects)
-            ->setLimit($this->getRows(), $this->getFrom())
+        $selectQuery = (new SelectQuery($this->table, $this->getAlias()))
+            ->setSelects(['count' => sprintf('COUNT(%s)', $this->getCountField())])
+            ->setWheres($this->wheres)
         ;
+
+        $result = $this->databaseStoreWrapper->getClient()->execute($selectQuery);
 
         return (int) ($result->iterateRecords()->current()->get('count')->getValue() ?? 0);
     }

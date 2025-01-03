@@ -89,7 +89,7 @@ class ModelFetcherAttribute implements AttributeServiceInterface, ParameterAttri
                 $whereParameters,
             ))
         ;
-        $this->childrenQuery->extend(
+        $selectQuery = $this->childrenQuery->extend(
             $selectQuery,
             $modelClassName,
             $attribute->getExtends(),
