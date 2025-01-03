@@ -125,18 +125,33 @@ class ChildrenQuery
         $newSelectQuery = $selectQuery;
 
         if ($addWith) {
-            $withTableName = sprintf('with_%s', $selectQuery->getTable()->getTableName());
-            $withQuery = new SelectQuery($selectQuery->getTable(), $selectQuery->getAlias());
-            $withQuery->setLimit($selectQuery->getRowCount(), $selectQuery->getOffset());
+            $filteredOrders = [];
 
-            $newSelectQuery = new SelectQuery(new Table($withTableName, $selectQuery->getTable()->getFields()), $selectQuery->getAlias());
-            $newSelectQuery->setSelects($selectQuery->getSelects());
-            $newSelectQuery->setWiths($selectQuery->getWiths());
-            $newSelectQuery->setWith(new With($withTableName, $withQuery));
-            $newSelectQuery->setJoins($selectQuery->getJoins());
-            $newSelectQuery->setWheres($selectQuery->getWheres());
-            $newSelectQuery->setOrders($selectQuery->getOrders());
-            $newSelectQuery->setGroupBy($selectQuery->getGroupBy(), $selectQuery->getHaving());
+            foreach ($selectQuery->getOrders() as $field => $order) {
+                foreach ($selectQuery->getSelects() as $select) {
+                    if (mb_strpos($field, $select) !== false) {
+                        $filteredOrders[$field] = $order;
+
+                        continue 2;
+                    }
+                }
+            }
+
+            $withTableName = sprintf('with_%s', $selectQuery->getTable()->getTableName());
+            $withQuery = (new SelectQuery($selectQuery->getTable(), $selectQuery->getAlias()))
+                ->setLimit($selectQuery->getRowCount(), $selectQuery->getOffset())
+                ->setOrders($filteredOrders)
+            ;
+
+            $newSelectQuery = (new SelectQuery(new Table($withTableName, $selectQuery->getTable()->getFields()), $selectQuery->getAlias()))
+                ->setSelects($selectQuery->getSelects())
+                ->setWiths($selectQuery->getWiths())
+                ->setWith(new With($withTableName, $withQuery))
+                ->setJoins($selectQuery->getJoins())
+                ->setWheres($selectQuery->getWheres())
+                ->setOrders($selectQuery->getOrders())
+                ->setGroupBy($selectQuery->getGroupBy(), $selectQuery->getHaving())
+            ;
         }
 
         foreach ($children as $child) {

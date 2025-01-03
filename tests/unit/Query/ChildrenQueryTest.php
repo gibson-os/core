@@ -191,6 +191,67 @@ class ChildrenQueryTest extends Unit
         );
     }
 
+    public function testExtendWithLimitAndOrder(): void
+    {
+        $table = new Table('marvin', [
+            'id' => new Field('id', false, Type::BIGINT, '', null, '', 20),
+            'parent_id' => new Field('parent_id', true, Type::BIGINT, '', null, '', 20),
+        ]);
+        $this->tableManager->getTable('marvin')
+            ->shouldBeCalledTimes(2)
+            ->willReturn($table)
+        ;
+        $this->selectService->getSelects([
+            new Select($table, 'p', 'parent_'),
+            new Select($table, 'c', 'child_'),
+        ])
+            ->shouldBeCalledOnce()
+            ->willReturn([
+                'parent_id' => '`p`.`id`',
+                'parent_parent_id' => '`p`.`parent_id`',
+                'child_id' => '`c`.`id`',
+                'child_parent_id' => '`c`.`parent_id`',
+            ])
+        ;
+
+        $withTable = new Table('with_marvin', [
+            'id' => new Field('id', false, Type::BIGINT, '', null, '', 20),
+            'parent_id' => new Field('parent_id', true, Type::BIGINT, '', null, '', 20),
+        ]);
+        $this->assertEquals(
+            (new SelectQuery($withTable, 'm'))
+                ->setSelects([
+                    'id' => '`m`.`id`',
+                    'parent_id' => '`p`.`id`',
+                    'parent_parent_id' => '`p`.`parent_id`',
+                    'child_id' => '`c`.`id`',
+                    'child_parent_id' => '`c`.`parent_id`',
+                ])
+                ->setWith(new With(
+                    'with_marvin',
+                    (new SelectQuery($table, 'm'))
+                        ->setLimit(10)
+                        ->setOrder('`m`.`id`'),
+                ))
+                ->addJoin(new Join($table, 'p', '`m`.`parent_id`=`p`.`id`', JoinType::LEFT))
+                ->addJoin(new Join($table, 'c', '`m`.`id`=`c`.`parent_id`', JoinType::LEFT))
+                ->setOrder('`m`.`id`')
+                ->setOrder('`p`.`id`'),
+            $this->childrenQuery->extend(
+                (new SelectQuery($table, 'm'))
+                    ->setLimit(10)
+                    ->setOrder('`m`.`id`')
+                    ->setOrder('`p`.`id`'),
+                MockModel::class,
+                [
+                    new ChildrenMapping('parent', 'parent_', 'p'),
+                    new ChildrenMapping('children', 'child_', 'c'),
+                ],
+                'm',
+            ),
+        );
+    }
+
     public function testExtendNested(): void
     {
         $table = new Table('marvin', [
