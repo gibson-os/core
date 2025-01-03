@@ -97,7 +97,7 @@ class PermissionStore extends AbstractDatabaseStore
             $selects['id'] = '`upm`.`id`';
             $selects['permission'] = '`upm`.`permission`';
             $selects['parentId'] = 'NULL';
-            $selects['parentPermission'] = PermissionEnum::DENIED->value;
+            $selects['parentPermission'] = (string) PermissionEnum::DENIED->value;
             $selects['taskPermissionId'] = 'NULL';
             $selects['taskPermission'] = 'NULL';
             $selects['actionPermissionId'] = 'NULL';
