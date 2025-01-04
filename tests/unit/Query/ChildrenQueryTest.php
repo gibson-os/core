@@ -100,7 +100,7 @@ class ChildrenQueryTest extends Unit
     public function testGetQueryNested(): void
     {
         $table = new Table('marvin', [
-            'id' => new Field('id', false, Type::BIGINT, '', null, '', 20),
+            'id' => new Field('id', false, Type::BIGINT, 'pri', null, '', 20),
             'parent_id' => new Field('parent_id', true, Type::BIGINT, '', null, '', 20),
         ]);
         $this->tableManager->getTable('marvin')
@@ -116,20 +116,28 @@ class ChildrenQueryTest extends Unit
         ;
 
         $withTable = new Table('with_marvin', [
-            'id' => new Field('id', false, Type::BIGINT, '', null, '', 20),
+            'id' => new Field('id', false, Type::BIGINT, 'pri', null, '', 20),
             'parent_id' => new Field('parent_id', true, Type::BIGINT, '', null, '', 20),
         ]);
         $this->assertEquals(
-            (new SelectQuery($withTable, 'm'))
+            (new SelectQuery($table, 'm'))
                 ->setSelects([
                     'id' => '`m`.`id`',
                     'parent_id' => '`m`.`parent_id`',
                     'parent_parent_id' => '`pp`.`id`',
                     'parent_parent_parent_id' => '`pp`.`parent_id`',
                 ])
-                ->setWith(new With('with_marvin', new SelectQuery($table, 'm')))
+                ->addParameters([42])
+                ->setWith(new With(
+                    'with_marvin',
+                    (new SelectQuery($table, 'm'))
+                        ->setSelects(['id' => '`m`.`id`'])
+                        ->setGroupBy(['`m`.`id`'])
+                        ->addJoin(new Join($table, 'pp', '`m`.`parent_id`=`pp`.`id`', JoinType::LEFT))
+                        ->addWhere(new Where('`m`.`id`=?', [42])),
+                ))
                 ->addJoin(new Join($table, 'pp', '`m`.`parent_id`=`pp`.`id`', JoinType::LEFT))
-                ->addWhere(new Where('`m`.`id`=?', [42])),
+                ->addJoin(new Join($withTable, 'with_marvin', '`with_marvin`.`id`=`m`.`id`')),
             $this->childrenQuery->getSelectQuery(
                 (new MockModel($this->modelWrapper->reveal()))->setParentId(42),
                 'm',
@@ -143,7 +151,7 @@ class ChildrenQueryTest extends Unit
     public function testExtend(): void
     {
         $table = new Table('marvin', [
-            'id' => new Field('id', false, Type::BIGINT, '', null, '', 20),
+            'id' => new Field('id', false, Type::BIGINT, 'pri', null, '', 20),
             'parent_id' => new Field('parent_id', true, Type::BIGINT, '', null, '', 20),
         ]);
         $this->tableManager->getTable('marvin')
@@ -164,11 +172,11 @@ class ChildrenQueryTest extends Unit
         ;
 
         $withTable = new Table('with_marvin', [
-            'id' => new Field('id', false, Type::BIGINT, '', null, '', 20),
+            'id' => new Field('id', false, Type::BIGINT, 'pri', null, '', 20),
             'parent_id' => new Field('parent_id', true, Type::BIGINT, '', null, '', 20),
         ]);
         $this->assertEquals(
-            (new SelectQuery($withTable, 'm'))
+            (new SelectQuery($table, 'm'))
                 ->setSelects([
                     'id' => '`m`.`id`',
                     'parent_id' => '`p`.`id`',
@@ -176,9 +184,17 @@ class ChildrenQueryTest extends Unit
                     'child_id' => '`c`.`id`',
                     'child_parent_id' => '`c`.`parent_id`',
                 ])
-                ->setWith(new With('with_marvin', new SelectQuery($table, 'm')))
+                ->setWith(new With(
+                    'with_marvin',
+                    (new SelectQuery($table, 'm'))
+                        ->setSelects(['id' => '`m`.`id`'])
+                        ->setGroupBy(['`m`.`id`'])
+                        ->addJoin(new Join($table, 'p', '`m`.`parent_id`=`p`.`id`', JoinType::LEFT))
+                        ->addJoin(new Join($table, 'c', '`m`.`id`=`c`.`parent_id`', JoinType::LEFT)),
+                ))
                 ->addJoin(new Join($table, 'p', '`m`.`parent_id`=`p`.`id`', JoinType::LEFT))
-                ->addJoin(new Join($table, 'c', '`m`.`id`=`c`.`parent_id`', JoinType::LEFT)),
+                ->addJoin(new Join($table, 'c', '`m`.`id`=`c`.`parent_id`', JoinType::LEFT))
+                ->addJoin(new Join($withTable, 'with_marvin', '`with_marvin`.`id`=`m`.`id`')),
             $this->childrenQuery->extend(
                 new SelectQuery($table, 'm'),
                 MockModel::class,
@@ -194,7 +210,7 @@ class ChildrenQueryTest extends Unit
     public function testExtendWithLimitAndOrder(): void
     {
         $table = new Table('marvin', [
-            'id' => new Field('id', false, Type::BIGINT, '', null, '', 20),
+            'id' => new Field('id', false, Type::BIGINT, 'pri', null, '', 20),
             'parent_id' => new Field('parent_id', true, Type::BIGINT, '', null, '', 20),
         ]);
         $this->tableManager->getTable('marvin')
@@ -215,11 +231,11 @@ class ChildrenQueryTest extends Unit
         ;
 
         $withTable = new Table('with_marvin', [
-            'id' => new Field('id', false, Type::BIGINT, '', null, '', 20),
+            'id' => new Field('id', false, Type::BIGINT, 'pri', null, '', 20),
             'parent_id' => new Field('parent_id', true, Type::BIGINT, '', null, '', 20),
         ]);
         $this->assertEquals(
-            (new SelectQuery($withTable, 'm'))
+            (new SelectQuery($table, 'm'))
                 ->setSelects([
                     'id' => '`m`.`id`',
                     'parent_id' => '`p`.`id`',
@@ -230,11 +246,17 @@ class ChildrenQueryTest extends Unit
                 ->setWith(new With(
                     'with_marvin',
                     (new SelectQuery($table, 'm'))
-                        ->setLimit(10)
-                        ->setOrder('`m`.`id`'),
+                        ->setSelects(['id' => '`m`.`id`'])
+                        ->setGroupBy(['`m`.`id`'])
+                        ->addJoin(new Join($table, 'p', '`m`.`parent_id`=`p`.`id`', JoinType::LEFT))
+                        ->addJoin(new Join($table, 'c', '`m`.`id`=`c`.`parent_id`', JoinType::LEFT))
+                        ->setOrder('`m`.`id`')
+                        ->setOrder('`p`.`id`')
+                        ->setLimit(10),
                 ))
                 ->addJoin(new Join($table, 'p', '`m`.`parent_id`=`p`.`id`', JoinType::LEFT))
                 ->addJoin(new Join($table, 'c', '`m`.`id`=`c`.`parent_id`', JoinType::LEFT))
+                ->addJoin(new Join($withTable, 'with_marvin', '`with_marvin`.`id`=`m`.`id`'))
                 ->setOrder('`m`.`id`')
                 ->setOrder('`p`.`id`'),
             $this->childrenQuery->extend(
@@ -255,7 +277,7 @@ class ChildrenQueryTest extends Unit
     public function testExtendNested(): void
     {
         $table = new Table('marvin', [
-            'id' => new Field('id', false, Type::BIGINT, '', null, '', 20),
+            'id' => new Field('id', false, Type::BIGINT, 'pri', null, '', 20),
             'parent_id' => new Field('parent_id', true, Type::BIGINT, '', null, '', 20),
         ]);
         $this->tableManager->getTable('marvin')
@@ -290,11 +312,11 @@ class ChildrenQueryTest extends Unit
         ;
 
         $withTable = new Table('with_marvin', [
-            'id' => new Field('id', false, Type::BIGINT, '', null, '', 20),
+            'id' => new Field('id', false, Type::BIGINT, 'pri', null, '', 20),
             'parent_id' => new Field('parent_id', true, Type::BIGINT, '', null, '', 20),
         ]);
         $this->assertEquals(
-            (new SelectQuery($withTable, 'm'))
+            (new SelectQuery($table, 'm'))
                 ->setSelects([
                     'id' => '`m`.`id`',
                     'parent_id' => '`p`.`id`',
@@ -306,11 +328,21 @@ class ChildrenQueryTest extends Unit
                     'child_child_id' => '`cc`.`id`',
                     'child_child_parent_id' => '`cc`.`parent_id`',
                 ])
-                ->setWith(new With('with_marvin', new SelectQuery($table, 'm')))
+                ->setWith(new With(
+                    'with_marvin',
+                    (new SelectQuery($table, 'm'))
+                        ->setSelects(['id' => '`m`.`id`'])
+                        ->setGroupBy(['`m`.`id`'])
+                        ->addJoin(new Join($table, 'p', '`m`.`parent_id`=`p`.`id`', JoinType::LEFT))
+                        ->addJoin(new Join($table, 'pc', '`p`.`id`=`pc`.`parent_id`', JoinType::LEFT))
+                        ->addJoin(new Join($table, 'c', '`m`.`id`=`c`.`parent_id`', JoinType::LEFT))
+                        ->addJoin(new Join($table, 'cc', '`c`.`id`=`cc`.`parent_id`', JoinType::LEFT)),
+                ))
                 ->addJoin(new Join($table, 'p', '`m`.`parent_id`=`p`.`id`', JoinType::LEFT))
                 ->addJoin(new Join($table, 'pc', '`p`.`id`=`pc`.`parent_id`', JoinType::LEFT))
                 ->addJoin(new Join($table, 'c', '`m`.`id`=`c`.`parent_id`', JoinType::LEFT))
-                ->addJoin(new Join($table, 'cc', '`c`.`id`=`cc`.`parent_id`', JoinType::LEFT)),
+                ->addJoin(new Join($table, 'cc', '`c`.`id`=`cc`.`parent_id`', JoinType::LEFT))
+                ->addJoin(new Join($withTable, 'with_marvin', '`with_marvin`.`id`=`m`.`id`')),
             $this->childrenQuery->extend(
                 new SelectQuery($table, 'm'),
                 MockModel::class,

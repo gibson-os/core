@@ -113,46 +113,68 @@ class ChildrenQuery
      * @throws ReflectionException
      * @throws ClientException
      */
-    public function extend(SelectQuery $selectQuery, string $modelClassName, array $children, ?string $alias = null, $addWith = true): SelectQuery
+    public function extend(SelectQuery $selectQuery, string $modelClassName, array $children): SelectQuery
     {
-        $reflectionClass = $this->reflectionManager->getReflectionClass($modelClassName);
-        $selects = [];
-
         if (count($children) === 0) {
             return $selectQuery;
         }
 
-        $newSelectQuery = $selectQuery;
+        $selectQuery = $this->extendQuery($selectQuery, $modelClassName, $children);
 
-        if ($addWith) {
-            $filteredOrders = [];
+        return $this->extendWith($selectQuery);
+    }
 
-            foreach ($selectQuery->getOrders() as $field => $order) {
-                foreach ($selectQuery->getSelects() as $select) {
-                    if (mb_strpos($field, $select) !== false) {
-                        $filteredOrders[$field] = $order;
+    private function extendWith(SelectQuery $selectQuery): SelectQuery
+    {
+        $table = $selectQuery->getTable();
+        $tableName = $table->getTableName();
+        $alias = $selectQuery->getAlias();
+        $withTableName = sprintf('with_%s', $tableName);
 
-                        continue 2;
-                    }
-                }
-            }
+        $groupBy = [];
+        $ons = [];
+        $selects = $selectQuery->getSelects();
+        $selectQuery->setSelects([]);
 
-            $withTableName = sprintf('with_%s', $selectQuery->getTable()->getTableName());
-            $withQuery = (new SelectQuery($selectQuery->getTable(), $selectQuery->getAlias()))
-                ->setLimit($selectQuery->getRowCount(), $selectQuery->getOffset())
-                ->setOrders($filteredOrders)
-            ;
-
-            $newSelectQuery = (new SelectQuery(new Table($withTableName, $selectQuery->getTable()->getFields()), $selectQuery->getAlias()))
-                ->setSelects($selectQuery->getSelects())
-                ->setWiths($selectQuery->getWiths())
-                ->setWith(new With($withTableName, $withQuery))
-                ->setJoins($selectQuery->getJoins())
-                ->setWheres($selectQuery->getWheres())
-                ->setOrders($selectQuery->getOrders())
-                ->setGroupBy($selectQuery->getGroupBy(), $selectQuery->getHaving())
-            ;
+        foreach ($table->getPrimaryFields() as $field) {
+            $fieldName = $field->getName();
+            $fieldString = ($alias === null ? '' : '`' . $alias . '`.') . '`' . $fieldName . '`';
+            $selectQuery->setSelect($fieldString, $fieldName);
+            $groupBy[] = $fieldString;
+            $ons[] = sprintf('`%s`.`%s`=%s', $withTableName, $fieldName, $fieldString);
         }
+
+        $selectQuery->setGroupBy($groupBy);
+        $newSelectQuery = (new SelectQuery($table, $alias))
+            ->setSelects($selects)
+            ->setJoins($selectQuery->getJoins())
+            ->addJoin(new Join(new Table($withTableName, $table->getFields()), $withTableName, implode(' AND ', $ons)))
+            ->setWiths($selectQuery->getWiths())
+            ->setWith(new With($withTableName, $selectQuery))
+            ->setOrders($selectQuery->getOrders())
+            ->addParameters($selectQuery->getParameters())
+        ;
+
+        $selectQuery->setWiths([]);
+
+        return $newSelectQuery;
+    }
+
+    /**
+     * @param class-string      $modelClassName
+     * @param ChildrenMapping[] $children
+     *
+     * @throws ReflectionException
+     * @throws ClientException
+     */
+    private function extendQuery(SelectQuery $selectQuery, string $modelClassName, array $children, ?string $alias = null): SelectQuery
+    {
+        if (count($children) === 0) {
+            return $selectQuery;
+        }
+
+        $reflectionClass = $this->reflectionManager->getReflectionClass($modelClassName);
+        $selects = [];
 
         foreach ($children as $child) {
             $reflectionProperty = $reflectionClass->getProperty($child->getPropertyName());
@@ -173,18 +195,18 @@ class ChildrenQuery
             $wheres = [];
 
             foreach ($child->getWheres() as $where) {
-                $newSelectQuery->addParameters($where->getParameters());
+                $selectQuery->addParameters($where->getParameters());
                 $wheres[] = $where->getCondition();
             }
 
             $childAlias = $child->getAlias();
-            $newSelectQuery
+            $selectQuery
                 ->addJoin(new Join(
                     $table,
                     $childAlias,
                     sprintf(
                         '`%s`.`%s`=`%s`.`%s`%s',
-                        $alias ?? $newSelectQuery->getAlias() ?? $newSelectQuery->getTable()->getTableName(),
+                        $alias ?? $selectQuery->getAlias() ?? $selectQuery->getTable()->getTableName(),
                         $this->getOwnColumn($reflectionProperty, $constraintAttribute),
                         $childAlias,
                         $this->getChildColumn($reflectionProperty, $constraintAttribute),
@@ -196,23 +218,23 @@ class ChildrenQuery
             $where = $constraintAttribute->getWhere();
 
             if ($where !== null) {
-                $newSelectQuery->addWhere(new Where($where, $constraintAttribute->getWhereParameters()));
+                $selectQuery->addWhere(new Where($where, $constraintAttribute->getWhereParameters()));
             }
 
             foreach ($constraintAttribute->getOrderBy() as $field => $orderDirection) {
-                $newSelectQuery->setOrder(sprintf('`%s`.`%s`', $childAlias, $field), $orderDirection);
+                $selectQuery->setOrder(sprintf('`%s`.`%s`', $childAlias, $field), $orderDirection);
             }
 
-            $newSelectQuery = $this->extend($newSelectQuery, $parentModelClassName, $child->getChildren(), $childAlias, false);
+            $selectQuery = $this->extendQuery($selectQuery, $parentModelClassName, $child->getChildren(), $childAlias);
             $selects[] = new Select($table, $childAlias, $child->getPrefix());
         }
 
-        $newSelectQuery->setSelects(array_merge(
-            $newSelectQuery->getSelects(),
+        $selectQuery->setSelects(array_merge(
+            $selectQuery->getSelects(),
             $this->selectService->getSelects($selects),
         ));
 
-        return $newSelectQuery;
+        return $selectQuery;
     }
 
     private function getOwnColumn(

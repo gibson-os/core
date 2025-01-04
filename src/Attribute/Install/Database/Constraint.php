@@ -17,19 +17,19 @@ class Constraint
     public const RULE_SET_DEFAULT = 'SET DEFAULT';
 
     /**
-     * @param class-string<AbstractModel>   $parentModelClassName
-     * @param array<string, OrderDirection> $orderBy
+     * @param class-string<AbstractModel>|null $parentModelClassName
+     * @param array<string, OrderDirection>    $orderBy
      */
     public function __construct(
-        private string $parentColumn = 'id',
-        private ?string $parentModelClassName = null,
-        private ?string $onDelete = self::RULE_CASCADE,
-        private ?string $onUpdate = null,
-        private ?string $name = null,
-        private ?string $ownColumn = null,
-        private ?string $where = null,
-        private array $whereParameters = [],
-        private array $orderBy = [],
+        private readonly string $parentColumn = 'id',
+        private readonly ?string $parentModelClassName = null,
+        private readonly ?string $onDelete = self::RULE_CASCADE,
+        private readonly ?string $onUpdate = null,
+        private readonly ?string $name = null,
+        private readonly ?string $ownColumn = null,
+        private readonly ?string $where = null,
+        private readonly array $whereParameters = [],
+        private readonly array $orderBy = [],
     ) {
     }
 
