@@ -222,7 +222,7 @@ class ChildrenQuery
             }
 
             foreach ($constraintAttribute->getOrderBy() as $field => $orderDirection) {
-                $selectQuery->setOrder(sprintf('`%s`.`%s`', $childAlias, $field), $orderDirection);
+                $selectQuery->setOrder(sprintf('`%s`.%s', $childAlias, $field), $orderDirection);
             }
 
             $selectQuery = $this->extendQuery($selectQuery, $parentModelClassName, $child->getChildren(), $childAlias);
