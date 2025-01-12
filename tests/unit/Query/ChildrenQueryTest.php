@@ -127,7 +127,8 @@ class ChildrenQueryTest extends Unit
                     'parent_parent_id' => '`pp`.`id`',
                     'parent_parent_parent_id' => '`pp`.`parent_id`',
                 ])
-                ->addParameters([42])
+                ->addWhere(new Where('`m`.`id`=?', [42]))
+                ->addParameters([42, 42])
                 ->setWith(new With(
                     'with_marvin',
                     (new SelectQuery($table, 'm'))
