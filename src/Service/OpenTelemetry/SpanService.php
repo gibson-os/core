@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Service\OpenTelemetry;
 
 use InvalidArgumentException;
-use OpenTelemetry\API\Common\Instrumentation\CachedInstrumentation;
+use OpenTelemetry\API\Instrumentation\CachedInstrumentation;
 use OpenTelemetry\API\Trace\Span;
 use OpenTelemetry\API\Trace\SpanContextInterface;
 use OpenTelemetry\API\Trace\SpanInterface;

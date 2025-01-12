@@ -5,7 +5,7 @@ namespace GibsonOS\Core\OpenTelemetry\Instrumentation;
 
 use GibsonOS\Core\Service\ControllerService;
 use GibsonOS\Core\Service\OpenTelemetry\InstrumentationService;
-use OpenTelemetry\API\Common\Instrumentation\CachedInstrumentation;
+use OpenTelemetry\API\Instrumentation\CachedInstrumentation;
 
 class ControllerInstrumentation implements InstrumentationInterface
 {

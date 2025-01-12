@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Service\OpenTelemetry;
 
-use OpenTelemetry\API\Common\Instrumentation\CachedInstrumentation;
+use OpenTelemetry\API\Instrumentation\CachedInstrumentation;
 
 use function OpenTelemetry\Instrumentation\hook;
 

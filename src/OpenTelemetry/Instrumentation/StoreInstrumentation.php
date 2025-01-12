@@ -5,7 +5,7 @@ namespace GibsonOS\Core\OpenTelemetry\Instrumentation;
 
 use GibsonOS\Core\Service\OpenTelemetry\InstrumentationService;
 use GibsonOS\Core\Store\AbstractStore;
-use OpenTelemetry\API\Common\Instrumentation\CachedInstrumentation;
+use OpenTelemetry\API\Instrumentation\CachedInstrumentation;
 
 class StoreInstrumentation implements InstrumentationInterface
 {

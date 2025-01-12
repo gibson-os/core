@@ -7,7 +7,7 @@ use GibsonOS\Core\Service\OpenTelemetry\InstrumentationService;
 use GibsonOS\Core\Service\OpenTelemetry\SpanService;
 use mysqli;
 use mysqli_stmt;
-use OpenTelemetry\API\Common\Instrumentation\CachedInstrumentation;
+use OpenTelemetry\API\Instrumentation\CachedInstrumentation;
 use OpenTelemetry\API\Trace\SpanKind;
 
 class MysqliInstrumentation implements InstrumentationInterface

@@ -12,9 +12,10 @@ use GibsonOS\Core\OpenTelemetry\Instrumentation\InstrumentationInterface;
 use GibsonOS\Core\Service\Command\ArgumentService;
 use GibsonOS\Core\Service\OpenTelemetry\SpanService;
 use GibsonOS\Core\Service\RequestService;
-use OpenTelemetry\API\Common\Instrumentation\CachedInstrumentation;
-use OpenTelemetry\API\Common\Instrumentation\Configurator;
-use OpenTelemetry\API\Common\Instrumentation\Globals;
+use OpenTelemetry\API\Common\Time\SystemClock;
+use OpenTelemetry\API\Globals;
+use OpenTelemetry\API\Instrumentation\CachedInstrumentation;
+use OpenTelemetry\API\Instrumentation\Configurator;
 use OpenTelemetry\API\Trace\Propagation\TraceContextPropagator;
 use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\API\Trace\SpanInterface;
@@ -23,7 +24,6 @@ use OpenTelemetry\Contrib\Otlp\OtlpHttpTransportFactory;
 use OpenTelemetry\Contrib\Otlp\SpanExporter;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Export\TransportInterface;
-use OpenTelemetry\SDK\Common\Time\SystemClock;
 use OpenTelemetry\SDK\Common\Util\ShutdownHandler;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
@@ -50,6 +50,7 @@ class OpenTelemetryTracer extends AbstractTracer
         private readonly string $appName,
         #[GetServices(['core/src/OpenTelemetry/Instrumentation'], InstrumentationInterface::class)]
         private readonly array $instrumentations,
+        private readonly SystemClock $systemClock,
     ) {
         if (!$this->isLoaded()) {
             return;
@@ -60,12 +61,13 @@ class OpenTelemetryTracer extends AbstractTracer
             $this->endpoint ?? '',
             'application/x-protobuf',
         );
+
         $spanProcessor = new BatchSpanProcessor(
             new SpanExporter($transport),
-            new SystemClock(),
+            $this->systemClock,
         );
 
-        $resource = ResourceInfoFactory::merge(ResourceInfo::create(Attributes::create([
+        $resource = ResourceInfoFactory::defaultResource()->merge(ResourceInfo::create(Attributes::create([
             ResourceAttributes::SERVICE_NAMESPACE => 'GibsonOS',
             ResourceAttributes::SERVICE_NAME => $this->appName,
             ResourceAttributes::SERVICE_INSTANCE_ID => gethostname() ?: '',

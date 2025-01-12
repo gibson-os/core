@@ -7,7 +7,7 @@ use GibsonOS\Core\Dto\Web\Request;
 use GibsonOS\Core\Service\OpenTelemetry\InstrumentationService;
 use GibsonOS\Core\Service\OpenTelemetry\SpanService;
 use GibsonOS\Core\Service\WebService;
-use OpenTelemetry\API\Common\Instrumentation\CachedInstrumentation;
+use OpenTelemetry\API\Instrumentation\CachedInstrumentation;
 use OpenTelemetry\API\Trace\SpanKind;
 
 class WebInstrumentation implements InstrumentationInterface
