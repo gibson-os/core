@@ -5,18 +5,17 @@ namespace GibsonOS\Core\Validator;
 
 use DateTimeInterface;
 use GibsonOS\Core\Attribute\Validation\AbstractValidation;
-use GibsonOS\Core\Attribute\Validation\Lower;
-use GibsonOS\Core\Attribute\Validation\LowerEqual;
+use GibsonOS\Core\Attribute\Validation\Range;
 use GibsonOS\Core\Exception\ValidationException;
 
-class LowerAbstractValidator extends AbstractValidator
+class RangeValidator extends AbstractValidator
 {
     /**
      * @throws ValidationException
      */
     public function isValid(AbstractValidation $validation, mixed $value): bool
     {
-        if (!$validation instanceof Lower && !$validation instanceof LowerEqual) {
+        if (!$validation instanceof Range) {
             throw new ValidationException(sprintf('Wrong validator %s for %s', $validation::class, $this::class));
         }
 
@@ -24,11 +23,10 @@ class LowerAbstractValidator extends AbstractValidator
             return false;
         }
 
-        $lowerThan = $validation->getLowerThan();
+        if ($validation->getMin() !== min($value, $validation->getMin())) {
+            return false;
+        }
 
-        return match ($validation::class) {
-            Lower::class => $value > $lowerThan,
-            LowerEqual::class => $value >= $lowerThan,
-        };
+        return $validation->getMax() === max($value, $validation->getMax());
     }
 }

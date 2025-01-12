@@ -5,7 +5,7 @@ namespace GibsonOS\Core\Attribute\Validation;
 
 use Attribute;
 use DateTimeInterface;
-use GibsonOS\Core\Validator\LowerAbstractValidator;
+use GibsonOS\Core\Validator\LowerValidator;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class LowerEqual extends AbstractValidation
@@ -16,7 +16,7 @@ class LowerEqual extends AbstractValidation
 
     public function getAttributeServiceName(): string
     {
-        return LowerAbstractValidator::class;
+        return LowerValidator::class;
     }
 
     public function getMessage(mixed $value): string

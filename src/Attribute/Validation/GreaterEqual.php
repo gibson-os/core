@@ -5,7 +5,7 @@ namespace GibsonOS\Core\Attribute\Validation;
 
 use Attribute;
 use DateTimeInterface;
-use GibsonOS\Core\Validator\GreaterAbstractValidator;
+use GibsonOS\Core\Validator\GreaterValidator;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class GreaterEqual extends AbstractValidation
@@ -16,7 +16,7 @@ class GreaterEqual extends AbstractValidation
 
     public function getAttributeServiceName(): string
     {
-        return GreaterAbstractValidator::class;
+        return GreaterValidator::class;
     }
 
     public function getMessage(mixed $value): string

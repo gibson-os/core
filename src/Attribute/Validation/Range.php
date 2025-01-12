@@ -5,7 +5,7 @@ namespace GibsonOS\Core\Attribute\Validation;
 
 use Attribute;
 use DateTimeInterface;
-use GibsonOS\Core\Validator\RangeAbstractValidator;
+use GibsonOS\Core\Validator\RangeValidator;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class Range extends AbstractValidation
@@ -18,7 +18,7 @@ class Range extends AbstractValidation
 
     public function getAttributeServiceName(): string
     {
-        return RangeAbstractValidator::class;
+        return RangeValidator::class;
     }
 
     public function getMessage(mixed $value): string
