@@ -151,8 +151,9 @@ class ChildrenQuery
             ->addJoin(new Join(new Table($withTableName, $table->getFields()), $withTableName, implode(' AND ', $ons)))
             ->setWiths($selectQuery->getWiths())
             ->setWith(new With($withTableName, $selectQuery))
+            ->setWheres($selectQuery->getWheres())
             ->setOrders($selectQuery->getOrders())
-            ->addParameters($selectQuery->getParameters())
+            ->addParameters(array_merge($selectQuery->getParameters(), $selectQuery->getParameters()))
         ;
 
         $selectQuery->setWiths([]);
