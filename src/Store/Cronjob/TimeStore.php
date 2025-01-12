@@ -32,7 +32,7 @@ class TimeStore extends AbstractDatabaseStore
 
     protected function setWheres(): void
     {
-        if ($this->cronjob !== null) {
+        if ($this->cronjob instanceof Cronjob) {
             $this->addWhere('`cronjob_id`=?', [$this->cronjob->getId() ?? 0]);
         }
     }
@@ -79,7 +79,7 @@ class TimeStore extends AbstractDatabaseStore
             $newGroupedCronjobs = $this->groupByPart($cronjobs, $part);
 
             if (
-                empty($groupedCronjobs)
+                $groupedCronjobs === []
                 || count($groupedCronjobs) > count($newGroupedCronjobs)
             ) {
                 $groupedCronjobs = $newGroupedCronjobs;
@@ -87,7 +87,7 @@ class TimeStore extends AbstractDatabaseStore
             }
         }
 
-        if (count($groupedCronjobs) === 0) {
+        if ($groupedCronjobs === []) {
             return $cronjobs;
         }
 

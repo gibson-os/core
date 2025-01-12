@@ -231,7 +231,7 @@ class CommandService
             unset($arguments[$name]);
         }
 
-        if (count($arguments) > 0) {
+        if ($arguments !== []) {
             throw new ArgumentError(sprintf(
                 '%s "%s" not allowed! Possible arguments: "%s"',
                 count($arguments) > 1 ? 'Arguments' : 'Argument',
@@ -280,7 +280,7 @@ class CommandService
             unset($options[$name]);
         }
 
-        if (count($options) > 0) {
+        if ($options !== []) {
             throw new ArgumentError(sprintf(
                 '%s "%s" not allowed! Possible options: "%s"',
                 count($options) > 1 ? 'Options' : 'Option',

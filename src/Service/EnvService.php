@@ -75,15 +75,13 @@ class EnvService
      */
     public function setBool(string $name, bool $value): EnvService
     {
-        $this->set($name, $value === true ? 'true' : 'false');
+        $this->set($name, $value ? 'true' : 'false');
 
         return $this;
     }
 
     /**
      * @throws SetError
-     *
-     * @return $this
      */
     public function loadFile(string $filename): EnvService
     {
@@ -91,7 +89,7 @@ class EnvService
         $rows = preg_split('/\r\n|\r|\n/', $file);
 
         foreach ($rows as $row) {
-            if (mb_strpos($row, '#') === 0 || empty($row)) {
+            if (mb_strpos($row, '#') === 0 || $row === '' || $row === '0') {
                 continue;
             }
 

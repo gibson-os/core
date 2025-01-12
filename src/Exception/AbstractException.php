@@ -90,7 +90,7 @@ abstract class AbstractException extends Exception
 
     public function getButtons(): array
     {
-        if (!count($this->buttons)) {
+        if ($this->buttons === []) {
             $this->addButton('OK');
         }
 
@@ -113,7 +113,7 @@ abstract class AbstractException extends Exception
             'text' => $text,
             'parameter' => $parameter,
             'value' => $value,
-            'sendRequest' => $parameter ? true : false,
+            'sendRequest' => (bool) $parameter,
         ];
 
         return $this;

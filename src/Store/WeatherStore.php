@@ -24,7 +24,7 @@ class WeatherStore extends AbstractDatabaseStore
     {
         $this->addWhere('`location_id`=?', [$this->locationId]);
 
-        if ($this->date !== null) {
+        if ($this->date instanceof DateTimeInterface) {
             $this->addWhere('`date`>', [$this->date->format('Y-m-d H:i:s')]);
         }
     }

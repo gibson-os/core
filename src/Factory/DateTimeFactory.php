@@ -13,7 +13,7 @@ class DateTimeFactory
 
     public static function get(): DateTimeService
     {
-        if (self::$instance !== null) {
+        if (self::$instance instanceof DateTimeService) {
             return self::$instance;
         }
 

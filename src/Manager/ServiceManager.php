@@ -281,7 +281,7 @@ class ServiceManager
 
                 $attributes = $this->attributeService->getAttributes($reflectionParameter);
 
-                if (count($attributes)) {
+                if ($attributes !== []) {
                     foreach ($attributes as $attribute) {
                         /** @var ParameterAttributeInterface $attributeService */
                         $attributeService = $attribute->getService();

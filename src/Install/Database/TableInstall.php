@@ -182,7 +182,7 @@ class TableInstall extends AbstractInstall implements PriorityInterface
                 ));
             }
 
-            if (count(iterator_to_array($result->iterateRecords())) === 0) {
+            if (iterator_to_array($result->iterateRecords()) === []) {
                 $this->createTable($tableAttribute, $columnsAttributes);
 
                 yield new Success(sprintf('Table "%s" installed!', $tableName));
@@ -224,7 +224,7 @@ class TableInstall extends AbstractInstall implements PriorityInterface
                 $updates[] = sprintf('ADD %s', $this->getColumnString($columnAttribute));
             }
 
-            if (count($updates) === 0) {
+            if ($updates === []) {
                 continue;
             }
 
@@ -293,7 +293,7 @@ class TableInstall extends AbstractInstall implements PriorityInterface
                         $columns,
                     ),
                 ) .
-                (count($primaryColumns) > 0 ? ', PRIMARY KEY (`' . implode('`, `', $primaryColumns) . '`)' : '') .
+                ($primaryColumns !== [] ? ', PRIMARY KEY (`' . implode('`, `', $primaryColumns) . '`)' : '') .
             ') ' .
             'ENGINE=' . $table->getEngine() . ' ' .
             'DEFAULT CHARSET ' . $table->getCharset()
@@ -394,11 +394,7 @@ class TableInstall extends AbstractInstall implements PriorityInterface
         $existingColumnType = mb_strtolower($existingColumnType);
 
         if ($columnType !== $existingColumnType) {
-            if ($columnType === 'json' && $existingColumnType === 'longtext') {
-                return false;
-            }
-
-            return true;
+            return !($columnType === 'json' && $existingColumnType === 'longtext');
         }
 
         return false;

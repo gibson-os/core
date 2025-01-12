@@ -10,10 +10,7 @@ class CollectionParameter extends AbstractParameter
      */
     private array $parameters = [];
 
-    /**
-     * @param class-string<AbstractParameter> $className
-     */
-    public function __construct(private string $className)
+    public function __construct()
     {
         parent::__construct('', 'gosCoreComponentPanel');
     }

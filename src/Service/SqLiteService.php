@@ -104,11 +104,7 @@ class SqLiteService
 
     public function hasTable(string $name): bool
     {
-        if ($this->database->querySingle("SELECT * FROM sqlite_master WHERE type='table' AND tbl_name='" . SQLite3::escapeString($name) . "'")) {
-            return true;
-        }
-
-        return false;
+        return (bool) $this->database->querySingle("SELECT * FROM sqlite_master WHERE type='table' AND tbl_name='" . SQLite3::escapeString($name) . "'");
     }
 
     public function getDatabase(): SQLite3
@@ -122,25 +118,11 @@ class SqLiteService
             return false;
         }
 
-        if (
-            file_exists($this->filename)
-            && !is_writable($this->filename)
-        ) {
-            return false;
-        }
-
-        return true;
+        return !(file_exists($this->filename) && !is_writable($this->filename));
     }
 
     public function isReadable(): bool
     {
-        if (
-            !file_exists($this->filename)
-            || !is_readable($this->filename)
-        ) {
-            return false;
-        }
-
-        return true;
+        return file_exists($this->filename) && is_readable($this->filename);
     }
 }

@@ -6,6 +6,7 @@ namespace GibsonOS\Core\Controller;
 use GibsonOS\Core\Attribute\CheckPermission;
 use GibsonOS\Core\Enum\Permission;
 use GibsonOS\Core\Exception\Repository\SelectError;
+use GibsonOS\Core\Model\Setting;
 use GibsonOS\Core\Repository\SettingRepository;
 use GibsonOS\Core\Service\PermissionService;
 use GibsonOS\Core\Service\Response\AjaxResponse;
@@ -37,7 +38,7 @@ class SettingController extends AbstractController
         }
 
         return $this->returnSuccess([
-            'settings' => JsonUtility::decode($windowSettings === null ? '[]' : $windowSettings->getValue()),
+            'settings' => JsonUtility::decode($windowSettings instanceof Setting ? $windowSettings->getValue() : '[]'),
             'permissions' => $permissionService->getRequiredPermissions(
                 $requiredPermissions,
                 $this->sessionService->getUserId(),

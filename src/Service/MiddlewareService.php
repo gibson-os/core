@@ -82,7 +82,7 @@ class MiddlewareService
             ])
         ;
 
-        if (count($parameters)) {
+        if ($parameters !== []) {
             $request->setParameters($parameters);
         }
 

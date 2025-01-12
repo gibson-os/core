@@ -50,7 +50,7 @@ class ClassNameStore extends AbstractStore
      */
     private function generateList(): void
     {
-        if (count($this->list) !== 0) {
+        if ($this->list !== []) {
             return;
         }
 

@@ -40,7 +40,7 @@ class IconStore extends AbstractDatabaseStore
     {
         parent::initQuery();
 
-        if (count($this->tags) === 0) {
+        if ($this->tags === []) {
             return;
         }
 
@@ -49,7 +49,7 @@ class IconStore extends AbstractDatabaseStore
 
     protected function setWheres(): void
     {
-        if (count($this->tags) === 0) {
+        if ($this->tags === []) {
             return;
         }
 

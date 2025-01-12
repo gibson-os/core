@@ -28,7 +28,7 @@ class PermissionService
             return $this->permissionViewRepository->getPermissionByModule($module, $userId)->getPermission();
         }
 
-        if ($action === null || $method === null) {
+        if ($action === null || !$method instanceof HttpMethod) {
             return $this->permissionViewRepository->getPermissionByTask($module, $task, $userId)->getPermission();
         }
 

@@ -95,7 +95,6 @@ class ModelManagerTest extends Unit
             $this->replaceService->reveal(),
             $this->deleteService->reveal(),
             $this->client->reveal(),
-            $this->modelWrapper->reveal(),
             $this->childrenQuery->reveal(),
             $this->validatorService->reveal(),
         );

@@ -103,7 +103,7 @@ trait ConstraintTrait
             ReflectionAttribute::IS_INSTANCEOF,
         );
 
-        if (count($constraintAttributes) === 0) {
+        if ($constraintAttributes === []) {
             throw new ReflectionException(sprintf(
                 'Property "%s" has no "%s" attribute!',
                 $reflectionProperty->getName(),

@@ -9,17 +9,21 @@ use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\Model\SaveError;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Exception\UserError;
+use GibsonOS\Core\Exception\ViolationException;
 use GibsonOS\Core\Manager\ModelManager;
 use GibsonOS\Core\Model\User;
 use GibsonOS\Core\Model\User\Device;
 use GibsonOS\Core\Repository\User\DeviceRepository;
 use GibsonOS\Core\Repository\UserRepository;
 use GibsonOS\Core\Wrapper\ModelWrapper;
+use JsonException;
+use MDO\Exception\ClientException;
+use MDO\Exception\RecordException;
 use ReflectionException;
 
 class UserService
 {
-    private const PASSWORD_MIN_LENGTH = 6;
+    private const int PASSWORD_MIN_LENGTH = 6;
 
     public function __construct(
         private readonly EnvService $envService,
@@ -35,6 +39,10 @@ class UserService
      * @throws ReflectionException
      * @throws SaveError
      * @throws UserError
+     * @throws ViolationException
+     * @throws JsonException
+     * @throws ClientException
+     * @throws RecordException
      */
     public function login(string $username, string $password): User
     {
@@ -50,9 +58,13 @@ class UserService
     }
 
     /**
+     * @throws ClientException
+     * @throws JsonException
+     * @throws RecordException
      * @throws ReflectionException
      * @throws SaveError
      * @throws UserError
+     * @throws ViolationException
      */
     public function deviceLogin(string $token): Device
     {
@@ -103,20 +115,20 @@ class UserService
     }
 
     /**
+     * @throws ClientException
+     * @throws JsonException
+     * @throws RecordException
+     * @throws ReflectionException
      * @throws SaveError
      * @throws UserError
-     * @throws ReflectionException
      */
     public function save(
         User $user,
         string $password,
         string $passwordRepeat,
     ): User {
-        if (
-            !empty($password)
-            || !empty($passwordRepeat)
-        ) {
-            if ($password != $passwordRepeat) {
+        if ($password !== '' || $passwordRepeat !== '') {
+            if ($password !== $passwordRepeat) {
                 throw new UserError('Password not equal');
             }
 

@@ -72,8 +72,6 @@ class Cronjob extends AbstractModel implements JsonSerializable
 
     /**
      * @param class-string $command
-     *
-     * @return $this
      */
     public function setCommand(string $command): Cronjob
     {

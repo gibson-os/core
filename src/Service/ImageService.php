@@ -85,7 +85,7 @@ class ImageService
         }
 
         if (
-            $type != 'string'
+            $type !== 'string'
             && !$this->fileService->exists($filename)
         ) {
             throw new FileNotFound(sprintf('Bild %s existiert nicht!', $filename));
@@ -121,7 +121,7 @@ class ImageService
 
     public static function getImageTypeByMimeType(string $mimeType): string
     {
-        return strtolower((string) substr((string) strrchr($mimeType, '/'), 1));
+        return strtolower(substr((string) strrchr($mimeType, '/'), 1));
     }
 
     public static function getMimeTypeByFilename(string $filename): string

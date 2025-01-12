@@ -120,7 +120,7 @@ class InstallService
             }
         }
 
-        if (!empty($configuration)) {
+        if ($configuration !== []) {
             $envFilename = realpath(
                 dirname(__FILE__) . DIRECTORY_SEPARATOR .
                     '..' . DIRECTORY_SEPARATOR .
@@ -138,7 +138,7 @@ class InstallService
             $oldEnvEntries = [];
 
             foreach (explode(PHP_EOL, $envFile) as $envEntry) {
-                if (empty(trim($envEntry))) {
+                if (in_array(trim($envEntry), ['', '0'], true)) {
                     continue;
                 }
 

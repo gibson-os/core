@@ -41,7 +41,7 @@ class FileResponse implements ResponseInterface
             $ranges = explode('-', substr($range, 6));
             $this->hasRange = true;
 
-            if (!$ranges[1]) {
+            if ($ranges[1] === '' || $ranges[1] === '0') {
                 $ranges[1] = $this->size - 1;
             }
 
@@ -71,7 +71,7 @@ class FileResponse implements ResponseInterface
             'Content-Transfer-Encoding' => 'binary',
         ];
 
-        if (!empty($this->disposition)) {
+        if ($this->disposition !== null && $this->disposition !== '') {
             $filename = mb_substr($this->filename, (mb_strrpos($this->filename, DIRECTORY_SEPARATOR) ?: -1) + 1);
             $headers['Content-Disposition'] =
                 $this->disposition . '; ' .

@@ -55,7 +55,7 @@ class WeatherRepository extends AbstractRepository
      */
     public function getByNearestDate(Location $location, ?DateTimeInterface $dateTime = null): Weather
     {
-        if ($dateTime === null) {
+        if (!$dateTime instanceof DateTimeInterface) {
             $dateTime = $this->dateTimeService->get('now', new DateTimeZone($location->getTimezone()));
         }
 

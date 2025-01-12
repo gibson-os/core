@@ -43,7 +43,7 @@ class DirService
             $lastSlashPosition !== 0
             && $lastSlashPosition === mb_strlen($dir) - $slashLength
         ) {
-            return mb_substr($dir, 0, 0 - $slashLength);
+            return mb_substr($dir, 0, -$slashLength);
         }
 
         return $dir;

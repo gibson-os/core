@@ -18,7 +18,6 @@ use GibsonOS\Core\Service\Attribute\TableNameAttribute;
 use GibsonOS\Core\Service\DateTimeService;
 use GibsonOS\Core\Service\ValidatorService;
 use GibsonOS\Core\Utility\JsonUtility;
-use GibsonOS\Core\Wrapper\ModelWrapper;
 use JsonException;
 use MDO\Client;
 use MDO\Dto\Query\Where;
@@ -93,7 +92,6 @@ class ModelManager
         private readonly ReplaceService $replaceService,
         private readonly DeleteService $deleteService,
         private readonly Client $client,
-        private readonly ModelWrapper $modelWrapper,
         private readonly ChildrenQuery $childrenQuery,
         private readonly ValidatorService $validatorService,
     ) {
@@ -110,7 +108,7 @@ class ModelManager
     {
         $violations = $this->validatorService->validate($model);
 
-        if (count($violations)) {
+        if ($violations !== []) {
             throw new ViolationException($violations);
         }
 

@@ -121,7 +121,7 @@ class ManipulateService extends DrawService
 
         $draw = $this->create($width, $height);
 
-        if (!empty($color)) {
+        if ($color !== null && $color !== 0) {
             $this->filledRectangle($draw, $color);
         }
 
@@ -157,13 +157,7 @@ class ManipulateService extends DrawService
             }
         }
 
-        if ($this->resize($image, (int) $newWidth, (int) $newHeight)) {
-            if ($this->crop($image, $width, $height, $startX, $startY)) {
-                return true;
-            }
-        }
-
-        return false;
+        return $this->resize($image, (int) $newWidth, (int) $newHeight) && $this->crop($image, $width, $height, $startX, $startY);
     }
 
     public function copy(Image $sourceImage, Image $destinationImage, int $destX = 0, int $destY = 0, int $srcX = 0, int $srcY = 0, int $srcWidth = -1, int $srcHeight = -1, int $dstWidth = -1, int $dstHeight = -1): bool

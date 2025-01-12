@@ -112,7 +112,7 @@ abstract class AbstractRepository
     {
         $models = $this->getModels($selectQuery, $modelClassName, children: $children);
 
-        if (count($models) === 0) {
+        if ($models === []) {
             $exception = new SelectError('No results!');
             $exception->setTable($this->repositoryWrapper->getTableManager()->getTable($selectQuery->getTable()->getTableName()));
 
@@ -150,7 +150,7 @@ abstract class AbstractRepository
             ->setOrders($orderBy)
         ;
 
-        if (count($children) === 0) {
+        if ($children === []) {
             $selectQuery->setLimit(1);
         }
 

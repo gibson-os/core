@@ -54,7 +54,7 @@ class IconService
                 $this->iconPath . DIRECTORY_SEPARATOR . 'icon' . $icon->getId() . '.' . $icon->getOriginalType(),
             );
 
-            if (!empty($iconFilename)) {
+            if ($iconFilename !== null && $iconFilename !== '') {
                 $this->fileService->copy(
                     $iconFilename,
                     $this->iconPath . DIRECTORY_SEPARATOR . 'icon' . $icon->getId() . '.ico',

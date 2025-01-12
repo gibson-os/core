@@ -76,7 +76,7 @@ class DriveStore extends AbstractDatabaseStore
 
         $this->addWhere('UNIX_TIMESTAMP(`ds`.`added`)%? BETWEEN 0 AND 60', [$timePoint]);
 
-        if ($this->from !== null) {
+        if ($this->from instanceof DateTimeInterface) {
             $this->addWhere(
                 'UNIX_TIMESTAMP(`ds`.`added`)>=UNIX_TIMESTAMP(?)',
                 [$this->from->format('Y-m-d H:i:s')],
@@ -85,7 +85,7 @@ class DriveStore extends AbstractDatabaseStore
             $this->addWhere('UNIX_TIMESTAMP(`ds`.`added`)>=UNIX_TIMESTAMP(NOW())-(3600*4)-840');
         }
 
-        if ($this->to !== null) {
+        if ($this->to instanceof DateTimeInterface) {
             $this->addWhere(
                 'UNIX_TIMESTAMP(`ds`.`added`)<=UNIX_TIMESTAMP(?)+60',
                 [$this->to->format('Y-m-d H:i:s')],

@@ -29,8 +29,6 @@ class Form implements JsonSerializable
 
     /**
      * @param array<string, AbstractParameter> $fields
-     *
-     * @return $this
      */
     public function setFields(array $fields): Form
     {

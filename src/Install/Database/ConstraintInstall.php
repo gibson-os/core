@@ -129,7 +129,7 @@ class ConstraintInstall extends AbstractInstall implements PriorityInterface
                 ;
             }
 
-            if (count($constraints) === 0) {
+            if ($constraints === []) {
                 continue;
             }
 

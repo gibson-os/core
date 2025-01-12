@@ -27,10 +27,6 @@ class RangeAbstractValidator extends AbstractValidator
             return false;
         }
 
-        if ($validation->getMax() !== max($value, $validation->getMax())) {
-            return false;
-        }
-
-        return true;
+        return $validation->getMax() === max($value, $validation->getMax());
     }
 }

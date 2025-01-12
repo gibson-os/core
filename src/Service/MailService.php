@@ -5,6 +5,8 @@ namespace GibsonOS\Core\Service;
 
 use Exception;
 use GibsonOS\Core\Dto\Mail;
+use GibsonOS\Core\Dto\Mail\Address;
+use GibsonOS\Core\Enum\SmtpEncryption;
 use GibsonOS\Core\Exception\MailException;
 use PHPMailer\PHPMailer\PHPMailer;
 
@@ -25,7 +27,7 @@ class MailService
 
             $smtpEncryption = $mail->getEncryption();
 
-            if ($smtpEncryption !== null) {
+            if ($smtpEncryption instanceof SmtpEncryption) {
                 $mailer->SMTPSecure = $smtpEncryption->value;
             }
 
@@ -34,7 +36,7 @@ class MailService
 
             $replyTo = $mail->getReplyTo();
 
-            if ($replyTo !== null) {
+            if ($replyTo instanceof Address) {
                 $mailer->addReplyTo($replyTo->getAddress(), $replyTo->getName());
             }
 

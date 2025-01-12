@@ -59,7 +59,7 @@ class ModelMapper extends ObjectMapper
                 $typeName = $this->reflectionManager->getTypeName($reflectionProperty);
 
                 if (is_string($value)) {
-                    $value = mb_strlen($value) ? JsonUtility::decode($value) : null;
+                    $value = mb_strlen($value) !== 0 ? JsonUtility::decode($value) : null;
                 }
 
                 $values = array_map(

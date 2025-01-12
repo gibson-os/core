@@ -68,7 +68,7 @@ class ModelMapperAttribute extends ObjectMapperAttribute
             $model = null;
         }
 
-        if ($model === null) {
+        if (!$model instanceof AbstractModel) {
             if ($reflectionParameter->allowsNull()) {
                 return null;
             }
@@ -141,7 +141,7 @@ class ModelMapperAttribute extends ObjectMapperAttribute
             $idGetter = 'get' . ucfirst($constraintAttribute->getOwnColumn() ?? $propertyName . 'id');
             $setter = 'set' . ucfirst($propertyName);
 
-            if (is_array($values) && count($values) !== 0) {
+            if (is_array($values) && $values !== []) {
                 $values = array_map(
                     fn ($value): object => is_object($value)
                         ? $value

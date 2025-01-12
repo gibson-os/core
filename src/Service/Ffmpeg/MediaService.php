@@ -54,7 +54,9 @@ class MediaService
             return $media;
         }
 
-        for ($i = 0; $i < count($hits[0]); ++$i) {
+        $counter = count($hits[0]);
+
+        for ($i = 0; $i < $counter; ++$i) {
             $options = (string) preg_replace('/(\([^\)]*),/', '$1', $hits[4][$i]);
             $options = (string) preg_replace('/(\[[^\]]*),/', '$1', $options);
             $properties = $this->getPropertiesFromString($hits[4][$i]);

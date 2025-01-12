@@ -203,11 +203,7 @@ class FileService
                 return false;
             }
 
-            if ($overwrite) {
-                return true;
-            }
-
-            return false;
+            return $overwrite;
         }
 
         return is_writable($this->getDir($path));

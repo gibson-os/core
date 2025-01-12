@@ -83,7 +83,7 @@ class ChildrenMapper
                 $child->getPrefix(),
             );
 
-            if (count(array_filter($primaryKeys)) === 0) {
+            if (array_filter($primaryKeys) === []) {
                 continue;
             }
 

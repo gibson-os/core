@@ -131,7 +131,7 @@ readonly class ControllerService
                 AlwaysAjaxResponse::class,
             );
 
-            if (count($alwaysAjaxAttributes) === 0) {
+            if ($alwaysAjaxAttributes === []) {
                 try {
                     $this->checkRequiredHeaders($response);
                 } catch (ControllerError $e) {
@@ -284,7 +284,7 @@ readonly class ControllerService
 
             $attributes = $this->attributeService->getAttributes($reflectionParameter);
 
-            if (count($attributes)) {
+            if ($attributes !== []) {
                 foreach ($attributes as $attribute) {
                     /** @var ParameterAttributeInterface $attributeService */
                     $attributeService = $attribute->getService();

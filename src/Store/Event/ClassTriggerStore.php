@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Store\Event;
 
-use GibsonOS\Core\Attribute\Event\Parameter;
 use GibsonOS\Core\Attribute\Event\Trigger;
 use GibsonOS\Core\Dto\Parameter\AbstractParameter;
 use GibsonOS\Core\Exception\FactoryError;
@@ -117,7 +116,6 @@ class ClassTriggerStore extends AbstractStore
         $parameters = [];
 
         foreach ($triggerAttribute->getParameters() as $parameter) {
-            /** @var Parameter $parameterAttribute */
             $parameters[$parameter['key']] = $this->eventService->getParameter(
                 $parameter['className'],
                 array_merge(

@@ -115,7 +115,7 @@ class ChildrenQuery
      */
     public function extend(SelectQuery $selectQuery, string $modelClassName, array $children): SelectQuery
     {
-        if (count($children) === 0) {
+        if ($children === []) {
             return $selectQuery;
         }
 
@@ -169,7 +169,7 @@ class ChildrenQuery
      */
     private function extendQuery(SelectQuery $selectQuery, string $modelClassName, array $children, ?string $alias = null): SelectQuery
     {
-        if (count($children) === 0) {
+        if ($children === []) {
             return $selectQuery;
         }
 
@@ -210,7 +210,7 @@ class ChildrenQuery
                         $this->getOwnColumn($reflectionProperty, $constraintAttribute),
                         $childAlias,
                         $this->getChildColumn($reflectionProperty, $constraintAttribute),
-                        count($wheres) === 0 ? '' : ' AND (' . implode(') AND (', $wheres) . ')',
+                        $wheres === [] ? '' : ' AND (' . implode(') AND (', $wheres) . ')',
                     ),
                     JoinType::LEFT,
                 ))

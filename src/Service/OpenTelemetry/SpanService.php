@@ -25,20 +25,20 @@ class SpanService
     {
         $scope = $this->getScope();
 
-        return $scope === null ? null : Span::fromContext($scope->context());
+        return $scope instanceof ContextStorageScopeInterface ? Span::fromContext($scope->context()) : null;
     }
 
     public function detachCurrentSpan(?Throwable $exception = null): SpanService
     {
         $span = $this->getCurrentSpan();
 
-        if ($span === null) {
+        if (!$span instanceof SpanInterface) {
             return $this;
         }
 
         $this->getScope()?->detach();
 
-        if ($exception !== null) {
+        if ($exception instanceof Throwable) {
             $span->recordException($exception);
             $span->setStatus(StatusCode::STATUS_ERROR);
         }
@@ -63,7 +63,7 @@ class SpanService
             ->setSpanKind($spanKind)
         ;
 
-        if ($link !== null) {
+        if ($link instanceof SpanContextInterface) {
             $spanBuilder->addLink($link);
         }
 

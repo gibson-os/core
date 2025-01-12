@@ -112,7 +112,7 @@ class ReflectionManager
         if ($reflectionObject instanceof ReflectionParameter) {
             $reflectionProperty = $this->getPropertyByParameter($reflectionObject);
 
-            if ($reflectionProperty !== null) {
+            if ($reflectionProperty instanceof ReflectionProperty) {
                 return $this->getAttribute($reflectionProperty, $attributeClassName, $flags);
             }
         }
@@ -125,7 +125,7 @@ class ReflectionManager
      */
     public function hasAttribute(ReflectionClass|ReflectionParameter|ReflectionProperty|ReflectionMethod|ReflectionClassConstant $reflectionObject, string $attributeClassName, int $flags = 0): bool
     {
-        return count($reflectionObject->getAttributes($attributeClassName, $flags)) > 0;
+        return $reflectionObject->getAttributes($attributeClassName, $flags) !== [];
     }
 
     public function setProperty(ReflectionProperty $reflectionProperty, object $object, string|int|float|bool|array|object|null $value): bool
@@ -187,7 +187,7 @@ class ReflectionManager
         $reflectionProperty = $this->getPropertyByParameter($reflectionParameter);
 
         if (
-            $reflectionProperty !== null
+            $reflectionProperty instanceof ReflectionProperty
             && $reflectionProperty->hasDefaultValue()
         ) {
             return $reflectionProperty->getDefaultValue();
@@ -306,8 +306,8 @@ class ReflectionManager
         return match ($typeName) {
             'int' => is_numeric($value) ? (int) $value : null,
             'float' => is_numeric($value) ? (float) $value : null,
-            'string' => !is_array($value) ? (string) $value : JsonUtility::encode($value),
-            'array' => !is_array($value) ? (array) JsonUtility::decode((string) $value) : $value,
+            'string' => is_array($value) ? JsonUtility::encode($value) : (string) $value,
+            'array' => is_array($value) ? $value : (array) JsonUtility::decode((string) $value),
             'bool' => !is_array($value) && (mb_strtolower((string) $value) === 'true'
                 || (is_numeric((string) $value) && ((int) $value))
                 || (is_bool($value) && $value)),

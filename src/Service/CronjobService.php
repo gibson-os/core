@@ -186,7 +186,9 @@ class CronjobService
             );
         }
 
-        for ($i = 1; $i < count($minutes); ++$i) {
+        $counter = count($minutes);
+
+        for ($i = 1; $i < $counter; ++$i) {
             $combinedTimes[] = new Time(
                 reset($hours),
                 $minutes[$i],
@@ -198,7 +200,9 @@ class CronjobService
             );
         }
 
-        for ($i = 1; $i < count($seconds); ++$i) {
+        $counter = count($seconds);
+
+        for ($i = 1; $i < $counter; ++$i) {
             $combinedTimes[] = new Time(
                 reset($hours),
                 reset($minutes),
@@ -210,7 +214,9 @@ class CronjobService
             );
         }
 
-        for ($i = 1; $i < count($daysOfMonth); ++$i) {
+        $counter = count($daysOfMonth);
+
+        for ($i = 1; $i < $counter; ++$i) {
             $combinedTimes[] = new Time(
                 reset($hours),
                 reset($minutes),
@@ -222,7 +228,9 @@ class CronjobService
             );
         }
 
-        for ($i = 1; $i < count($daysOfWeek); ++$i) {
+        $counter = count($daysOfWeek);
+
+        for ($i = 1; $i < $counter; ++$i) {
             $combinedTimes[] = new Time(
                 reset($hours),
                 reset($minutes),
@@ -234,7 +242,9 @@ class CronjobService
             );
         }
 
-        for ($i = 1; $i < count($months); ++$i) {
+        $counter = count($months);
+
+        for ($i = 1; $i < $counter; ++$i) {
             $combinedTimes[] = new Time(
                 reset($hours),
                 reset($minutes),
@@ -246,7 +256,9 @@ class CronjobService
             );
         }
 
-        for ($i = 1; $i < count($years); ++$i) {
+        $counter = count($years);
+
+        for ($i = 1; $i < $counter; ++$i) {
             $combinedTimes[] = new Time(
                 reset($hours),
                 reset($minutes),

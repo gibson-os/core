@@ -73,7 +73,7 @@ class WebService
 
         $body = $request->getBody();
 
-        if ($body !== null) {
+        if ($body instanceof Body) {
             curl_setopt($curl, CURLOPT_POSTFIELDS, $body->getContent());
         }
 
@@ -86,6 +86,9 @@ class WebService
         return $this->getResponse($request, $curl, $responseHandle, $cookieFile);
     }
 
+    /**
+     * @throws WebException
+     */
     private function initRequest(Request $request, ?HttpMethod $method = null): CurlHandle
     {
         $method ??= $request->getMethod();
@@ -99,8 +102,8 @@ class WebService
             $requestBody = null;
         }
 
-        if (count($parameters) > 0) {
-            if (!empty($requestBody)) {
+        if ($parameters !== []) {
+            if ($requestBody !== null && $requestBody !== '') {
                 throw new WebException('Request body and parameters are set!');
             }
 
@@ -124,7 +127,7 @@ class WebService
             $headers['X-OpenTelemetry-spanId'] = $spanId;
         }
 
-        if (!empty($requestBody) && $method === HttpMethod::POST) {
+        if ($requestBody !== null && $requestBody !== '' && $method === HttpMethod::POST) {
             $this->logger->debug('With body: ' . $requestBody);
             $headers['Content-Length'] = (string) strlen($requestBody);
             curl_setopt($curl, CURLOPT_POSTFIELDS, $requestBody);
@@ -174,7 +177,7 @@ class WebService
         $responseHandle,
         string $cookieFile,
     ): Response {
-        $httpCode = HttpStatusCode::from((int) curl_getinfo($curl, CURLINFO_HTTP_CODE));
+        $httpCode = HttpStatusCode::from(curl_getinfo($curl, CURLINFO_HTTP_CODE));
         $headerSize = curl_getinfo($curl, CURLINFO_HEADER_SIZE);
         curl_close($curl);
         rewind($responseHandle);

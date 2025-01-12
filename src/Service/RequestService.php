@@ -38,7 +38,7 @@ class RequestService
         $params = [];
 
         while (count($queryParams) > 1) {
-            $params[(string) array_shift($queryParams)] = array_shift($queryParams);
+            $params[array_shift($queryParams)] = array_shift($queryParams);
         }
 
         $files = [];
@@ -167,7 +167,7 @@ class RequestService
 
             $body = file_get_contents('php://input');
 
-            if (empty($body)) {
+            if ($body === '' || $body === false) {
                 return [];
             }
 

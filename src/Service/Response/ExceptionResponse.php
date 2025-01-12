@@ -109,7 +109,7 @@ readonly class ExceptionResponse implements ResponseInterface
             'file' => $exception->getFile(),
             'line' => $exception->getLine(),
             'code' => $exception->getCode(),
-            'previous' => $exception->getPrevious() === null ? null : $this->getExceptionJson($exception->getPrevious()),
+            'previous' => $exception->getPrevious() instanceof Throwable ? $this->getExceptionJson($exception->getPrevious()) : null,
             'trace' => $exception->getTrace(),
         ];
     }

@@ -170,7 +170,7 @@ abstract class AbstractDatabaseStore extends AbstractStore
     {
         $mapping = $this->getOrderMapping();
 
-        if (count($mapping) === 0) {
+        if ($mapping === []) {
             $this->orderBy = [];
 
             return $this;

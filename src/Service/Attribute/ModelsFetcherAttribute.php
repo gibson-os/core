@@ -142,7 +142,7 @@ class ModelsFetcherAttribute implements AttributeServiceInterface, ParameterAttr
             );
         }
 
-        return count($models) === 0
+        return $models === []
             ? $this->getDefaultReturn($reflectionParameter)
             : array_values($models)
         ;

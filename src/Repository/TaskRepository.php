@@ -71,7 +71,7 @@ class TaskRepository extends AbstractRepository
 
     public function deleteByIdsNot(array $ids): bool
     {
-        if (count($ids) === 0) {
+        if ($ids === []) {
             return true;
         }
 

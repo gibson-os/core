@@ -25,7 +25,7 @@ class WebResponse implements ResponseInterface
 
     public function getCode(): HttpStatusCode
     {
-        if ($this->statusCode !== null) {
+        if ($this->statusCode instanceof HttpStatusCode) {
             return $this->statusCode;
         }
 
@@ -62,7 +62,7 @@ class WebResponse implements ResponseInterface
 
     private function getHeadResponse(): ResponseDto
     {
-        if ($this->headResponse !== null) {
+        if ($this->headResponse instanceof ResponseDto) {
             return $this->headResponse;
         }
 

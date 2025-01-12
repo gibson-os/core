@@ -167,7 +167,7 @@ class Item extends AbstractModel implements JsonSerializable
             'task' => $this->getTask(),
             'action' => $this->getAction(),
             'position' => $this->getPosition(),
-            'parameters' => count($parameters) === 0 ? null : $parameters,
+            'parameters' => $parameters === [] ? null : $parameters,
         ];
     }
 }

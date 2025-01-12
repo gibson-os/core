@@ -12,6 +12,7 @@ use GibsonOS\Core\Exception\Model\DeleteError;
 use GibsonOS\Core\Exception\Model\SaveError;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Exception\UserError;
+use GibsonOS\Core\Exception\ViolationException;
 use GibsonOS\Core\Manager\ModelManager;
 use GibsonOS\Core\Model\User;
 use GibsonOS\Core\Model\User\Device;
@@ -25,15 +26,19 @@ use GibsonOS\Core\Service\UserService;
 use GibsonOS\Core\Store\User\PermissionStore;
 use GibsonOS\Core\Store\UserStore;
 use JsonException;
+use MDO\Exception\ClientException;
+use MDO\Exception\RecordException;
 use ReflectionException;
 use Traversable;
 
 class UserController extends AbstractController
 {
     /**
-     * @throws SelectError
      * @throws JsonException
      * @throws ReflectionException
+     * @throws SelectError
+     * @throws ClientException
+     * @throws RecordException
      */
     #[CheckPermission([Permission::MANAGE, Permission::READ])]
     public function get(UserStore $userStore): AjaxResponse
@@ -51,7 +56,7 @@ class UserController extends AbstractController
         ?string $username,
         ?string $password,
     ): RedirectResponse {
-        if (empty($password) || empty($username)) {
+        if ($password === null || $password === '' || $username === null || $username === '') {
             return new RedirectResponse($this->requestService->getBaseDir());
         }
 
@@ -61,7 +66,10 @@ class UserController extends AbstractController
     }
 
     /**
-     * @throws SelectError
+     * @throws ClientException
+     * @throws JsonException
+     * @throws RecordException
+     * @throws ReflectionException
      */
     #[CheckPermission([Permission::READ], ['id' => [Permission::READ, Permission::MANAGE]])]
     public function getSettings(
@@ -69,11 +77,11 @@ class UserController extends AbstractController
         #[GetModel]
         ?User $user = null,
     ): AjaxResponse {
-        if ($user === null) {
+        if (!$user instanceof User) {
             $user = $this->sessionService->getUser();
         }
 
-        if ($user === null) {
+        if (!$user instanceof User) {
             return $this->returnFailure('User not found!');
         }
 
@@ -95,7 +103,7 @@ class UserController extends AbstractController
         string $password,
         string $fcmToken,
     ): AjaxResponse {
-        if (empty($password) || empty($username)) {
+        if ($password === '' || $username === '') {
             return $this->returnFailure('Login Error', HttpStatusCode::UNAUTHORIZED);
         }
 
@@ -125,11 +133,12 @@ class UserController extends AbstractController
     }
 
     /**
+     * @throws ClientException
+     * @throws JsonException
+     * @throws RecordException
      * @throws ReflectionException
      * @throws SaveError
      * @throws UserError
-     *
-     * @todo Model mapping?
      */
     #[CheckPermission([Permission::WRITE], ['add' => [Permission::WRITE, Permission::MANAGE]])]
     public function post(
@@ -177,10 +186,12 @@ class UserController extends AbstractController
     }
 
     /**
-     * @throws JsonException
-     * @throws SaveError
      * @throws DeleteError
+     * @throws JsonException
+     * @throws RecordException
      * @throws ReflectionException
+     * @throws SaveError
+     * @throws ViolationException
      */
     #[CheckPermission([Permission::MANAGE, Permission::WRITE])]
     public function postPermission(
@@ -191,7 +202,7 @@ class UserController extends AbstractController
         ?User\Permission $originalPermission = null,
     ): AjaxResponse {
         if ($permission->getPermission() === 0) {
-            if ($originalPermission === null) {
+            if (!$originalPermission instanceof User\Permission) {
                 return $this->returnFailure('Permission not found!');
             }
 
@@ -211,8 +222,11 @@ class UserController extends AbstractController
     }
 
     /**
-     * @throws SaveError
+     * @throws JsonException
+     * @throws RecordException
      * @throws ReflectionException
+     * @throws SaveError
+     * @throws ViolationException
      */
     #[CheckPermission([Permission::WRITE])]
     public function postUpdateFcmToken(
@@ -239,7 +253,10 @@ class UserController extends AbstractController
     }
 
     /**
-     * @throws SelectError
+     * @throws ClientException
+     * @throws JsonException
+     * @throws RecordException
+     * @throws ReflectionException
      */
     #[CheckPermission([Permission::MANAGE, Permission::READ])]
     public function getPermissions(
