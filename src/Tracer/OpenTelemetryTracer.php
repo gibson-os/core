@@ -12,10 +12,7 @@ use GibsonOS\Core\OpenTelemetry\Instrumentation\InstrumentationInterface;
 use GibsonOS\Core\Service\Command\ArgumentService;
 use GibsonOS\Core\Service\OpenTelemetry\SpanService;
 use GibsonOS\Core\Service\RequestService;
-use OpenTelemetry\API\Common\Time\SystemClock;
-use OpenTelemetry\API\Globals;
 use OpenTelemetry\API\Instrumentation\CachedInstrumentation;
-use OpenTelemetry\API\Instrumentation\Configurator;
 use OpenTelemetry\API\Trace\Propagation\TraceContextPropagator;
 use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\API\Trace\SpanInterface;
@@ -27,9 +24,10 @@ use OpenTelemetry\SDK\Common\Export\TransportInterface;
 use OpenTelemetry\SDK\Common\Util\ShutdownHandler;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
+use OpenTelemetry\SDK\Sdk;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
 use OpenTelemetry\SDK\Trace\Sampler\ParentBased;
-use OpenTelemetry\SDK\Trace\SpanProcessor\BatchSpanProcessor;
+use OpenTelemetry\SDK\Trace\SpanProcessor\BatchSpanProcessorBuilder;
 use OpenTelemetry\SDK\Trace\TracerProviderBuilder;
 use OpenTelemetry\SemConv\ResourceAttributes;
 use Throwable;
@@ -49,8 +47,7 @@ class OpenTelemetryTracer extends AbstractTracer
         #[GetEnv('APP_NAME')]
         private readonly string $appName,
         #[GetServices(['core/src/OpenTelemetry/Instrumentation'], InstrumentationInterface::class)]
-        private readonly array $instrumentations,
-        private readonly SystemClock $systemClock,
+        private readonly array $instrumentals,
     ) {
         if (!$this->isLoaded()) {
             return;
@@ -61,12 +58,9 @@ class OpenTelemetryTracer extends AbstractTracer
             $this->endpoint ?? '',
             'application/x-protobuf',
         );
-
-        $spanProcessor = new BatchSpanProcessor(
-            new SpanExporter($transport),
-            $this->systemClock,
-        );
-
+        $spanProcessor = (new BatchSpanProcessorBuilder(new SpanExporter($transport)))
+            ->build()
+        ;
         $resource = ResourceInfoFactory::defaultResource()->merge(ResourceInfo::create(Attributes::create([
             ResourceAttributes::SERVICE_NAMESPACE => 'GibsonOS',
             ResourceAttributes::SERVICE_NAME => $this->appName,
@@ -80,14 +74,12 @@ class OpenTelemetryTracer extends AbstractTracer
             ->build()
         ;
 
-        /** @psalm-suppress InternalMethod */
-        Globals::registerInitializer(static function (Configurator $configurator) use ($tracerProvider) {
-            $propagator = TraceContextPropagator::getInstance();
-
-            return $configurator
-                ->withTracerProvider($tracerProvider)
-                ->withPropagator($propagator);
-        });
+        Sdk::builder()
+            ->setTracerProvider($tracerProvider)
+            ->setPropagator(TraceContextPropagator::getInstance())
+            ->setAutoShutdown(false)
+            ->buildAndRegisterGlobal()
+        ;
 
         try {
             $link = SpanContext::create(
@@ -112,15 +104,12 @@ class OpenTelemetryTracer extends AbstractTracer
             'root',
             link: $link,
         );
-        $this->rootSpan->setAttribute('service.instance.id', 'foo');
         Context::storage()->attach($this->rootSpan->storeInContext(Context::getCurrent()));
 
-        ShutdownHandler::register(function (): void {
-            $this->spanService->detachCurrentSpan();
-        });
+        ShutdownHandler::register(fn () => $this->spanService->detachCurrentSpan());
         ShutdownHandler::register([$tracerProvider, 'shutdown']);
 
-        foreach ($this->instrumentations as $instrumentation) {
+        foreach ($this->instrumentals as $instrumentation) {
             $instrumentation();
         }
     }
