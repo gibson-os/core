@@ -3,6 +3,6 @@ Ext.define('GibsonOS.module.core.component.form.field.Time', {
     alias: ['widget.gosCoreComponentFormFieldTime'],
     anchor: '100%',
     fieldLabel: 'Zeit',
-    format: 'H:i',
+    format: 'H:i:s',
     increment: 15
 });

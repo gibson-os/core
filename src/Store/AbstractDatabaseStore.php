@@ -69,7 +69,6 @@ abstract class AbstractDatabaseStore extends AbstractStore
         $this->setWheres();
         $this->selectQuery = (new SelectQuery($this->table, $this->getAlias()))
             ->setWheres($this->wheres)
-            ->setLimit($this->getRows(), $this->getFrom())
             ->setOrders($this->getOrderBy())
             ->setLimit($this->getRows(), $this->getFrom())
         ;
