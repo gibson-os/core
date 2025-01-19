@@ -112,11 +112,27 @@ class DeviceControllerTest extends FunctionalTest
             ->setUser($this->addUser())
         ;
         $modelManager->saveWithoutChildren($device);
+        $module = (new Module($this->modelWrapper))
+            ->setName('arthur')
+        ;
+        $modelManager->saveWithoutChildren($module);
+        $task = (new Task($this->modelWrapper))
+            ->setName('dent')
+            ->setModule($module)
+        ;
+        $modelManager->saveWithoutChildren($task);
+        $action = (new Action($this->modelWrapper))
+            ->setName('ford')
+            ->setMethod(HttpMethod::DELETE)
+            ->setModule($module)
+            ->setTask($task)
+        ;
+        $modelManager->saveWithoutChildren($action);
         $devicePush = (new DevicePush($this->modelWrapper))
             ->setDevice($device)
-            ->setModule('arthur')
-            ->setTask('dent')
-            ->setAction('ford')
+            ->setModuleModel($module)
+            ->setTaskModel($task)
+            ->setActionModel($action)
             ->setForeignId('prefect')
         ;
         $modelManager->saveWithoutChildren($devicePush);

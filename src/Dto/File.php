@@ -11,9 +11,9 @@ class File
         private readonly string $name,
         private readonly string $type,
         private readonly int $size,
-        private readonly string $tmp_name,
+        private readonly string $tmpName,
         private readonly Error $error,
-        private readonly string $full_path,
+        private readonly string $fullPath,
     ) {
     }
 
@@ -34,7 +34,7 @@ class File
 
     public function getTmpName(): string
     {
-        return $this->tmp_name;
+        return $this->tmpName;
     }
 
     public function getError(): Error
@@ -44,6 +44,6 @@ class File
 
     public function getFullPath(): string
     {
-        return $this->full_path;
+        return $this->fullPath;
     }
 }

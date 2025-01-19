@@ -84,6 +84,7 @@ class DeviceController extends AbstractController
             $devicePush = $devicePushRepository->getByDevice($device, $module, $task, $action, $foreignId);
             $modelManager->delete($devicePush);
         } catch (SelectError) {
+            // do nothing
         }
 
         return $this->returnSuccess();

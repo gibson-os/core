@@ -330,7 +330,7 @@ class ReflectionManager
 
         $this->docMethods[$className] = [];
 
-        foreach (explode(PHP_EOL, $reflectionClass->getDocComment() ?: '') as $line) {
+        foreach (explode("\n", $reflectionClass->getDocComment() ?: '') as $line) {
             if (!str_contains($line, '@method')) {
                 continue;
             }
@@ -341,7 +341,6 @@ class ReflectionManager
         }
 
         return $this->docMethods[$className];
-
     }
 
     public function __serialize(): array

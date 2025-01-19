@@ -41,6 +41,7 @@ class EventControllerTest extends FunctionalTest
                 'lastRun' => null,
                 'runtime' => null,
                 'tags' => [],
+                'lockCommand' => false,
             ],
             [
                 'id' => $eventDent->getId(),
@@ -51,6 +52,7 @@ class EventControllerTest extends FunctionalTest
                 'lastRun' => null,
                 'runtime' => null,
                 'tags' => [],
+                'lockCommand' => false,
             ],
         ];
 

@@ -17,6 +17,7 @@ class RegistryService
         return array_key_exists($key, $this->registry);
     }
 
+    /** @SuppressWarnings(PHPMD.Superglobals) */
     public function loadFromSession(string $name = 'REGISTRY'): bool
     {
         /** @psalm-suppress InvalidScalarArgument */
@@ -29,9 +30,7 @@ class RegistryService
         return false;
     }
 
-    /**
-     * @param string $name Name
-     */
+    /** @SuppressWarnings(PHPMD.Superglobals) */
     public function saveToSession(string $name = 'REGISTRY'): void
     {
         $_SESSION[$name] = $this->registry;

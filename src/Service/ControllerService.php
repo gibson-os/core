@@ -152,6 +152,8 @@ readonly class ControllerService
     }
 
     /**
+     * @SuppressWarnings(PHPMD.Superglobals)
+     *
      * @throws FactoryError
      * @throws GetError
      * @throws JsonException
@@ -318,9 +320,9 @@ readonly class ControllerService
                         $enumReflection = $this->reflectionManager->getReflectionEnum($typeName);
 
                         $parameters[$name] = $typeName::from(match ((string) $enumReflection->getBackingType()) {
-                            'string' => (string) $values,
-                            'int' => (int) $values,
-                            'float' => (float) $values,
+                            'string' => (string) $value,
+                            'int' => (int) $value,
+                            'float' => (float) $value,
                         });
                     }
 

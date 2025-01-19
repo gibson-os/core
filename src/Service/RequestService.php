@@ -22,6 +22,7 @@ class RequestService
 
     private string $queryString;
 
+    /** @SuppressWarnings(PHPMD.Superglobals) */
     public function __construct()
     {
         $queryString = (string) preg_replace('/\?.*/', '', $_SERVER['REQUEST_URI'] ?? '');
@@ -87,6 +88,7 @@ class RequestService
         return $this->actionName;
     }
 
+    /** @SuppressWarnings(PHPMD.Superglobals) */
     public function getBaseDir(): string
     {
         return preg_replace('|^(.*/).+?$|', '$1', $_SERVER['SCRIPT_NAME'] ?? '');
@@ -151,6 +153,7 @@ class RequestService
         }
     }
 
+    /** @SuppressWarnings(PHPMD.Superglobals) */
     public function getMethod(): string
     {
         return $_SERVER['REQUEST_METHOD'] ?? '';
@@ -161,6 +164,7 @@ class RequestService
         return $this->queryString;
     }
 
+    /** @SuppressWarnings(PHPMD.Superglobals) */
     private function getJsonBody(): array
     {
         if (mb_strtolower($_SERVER['CONTENT_TYPE'] ?? '') === 'application/json') {

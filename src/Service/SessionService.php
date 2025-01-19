@@ -24,6 +24,7 @@ class SessionService
 
     private ?User $user = null;
 
+    /** @SuppressWarnings(PHPMD.Superglobals) */
     public function __construct(
         protected readonly ModelWrapper $modelWrapper,
         protected readonly ModelManager $modelManager,
@@ -38,6 +39,7 @@ class SessionService
         session_write_close();
     }
 
+    /** @SuppressWarnings(PHPMD.Superglobals) */
     public function set(string $key, mixed $value): SessionService
     {
         $this->data[$key] = $value;
@@ -57,6 +59,7 @@ class SessionService
         return $this->data[$key];
     }
 
+    /** @SuppressWarnings(PHPMD.Superglobals) */
     public function unset(string $key): SessionService
     {
         if (!isset($this->data[$key])) {

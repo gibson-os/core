@@ -96,14 +96,14 @@ abstract class FunctionalTest extends Unit
         foreach ($viewInstall->install(__DIR__ . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..') as $success) {
         }
 
-        $constraintInstall = $this->serviceManager->get(ConstraintInstall::class);
-
-        foreach ($constraintInstall->install(__DIR__ . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..') as $success) {
-        }
-
         $keyInstall = $this->serviceManager->get(KeyInstall::class);
 
         foreach ($keyInstall->install(__DIR__ . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..') as $success) {
+        }
+
+        $constraintInstall = $this->serviceManager->get(ConstraintInstall::class);
+
+        foreach ($constraintInstall->install(__DIR__ . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..') as $success) {
         }
 
         if (__DIR__ === $this->getDir()) {
