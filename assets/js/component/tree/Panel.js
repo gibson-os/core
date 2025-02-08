@@ -6,7 +6,7 @@ Ext.define('GibsonOS.module.core.component.tree.Panel', {
     plain: true,
     flex: 1,
     rootVisible: false,
-    enablePagingBar: true,
+    enablePagingBar: false,
     enableToolbar: true,
     enableKeyEvents: true,
     enableClickEvents: true,
