@@ -6,6 +6,7 @@ namespace GibsonOS\Core\Controller;
 use GibsonOS\Core\Attribute\CheckPermission;
 use GibsonOS\Core\Attribute\GetMappedModel;
 use GibsonOS\Core\Attribute\GetModel;
+use GibsonOS\Core\Attribute\GetStore;
 use GibsonOS\Core\Enum\HttpStatusCode;
 use GibsonOS\Core\Enum\Permission;
 use GibsonOS\Core\Exception\Model\DeleteError;
@@ -33,23 +34,22 @@ use Traversable;
 
 class UserController extends AbstractController
 {
-    /**
-     * @throws JsonException
-     * @throws ReflectionException
-     * @throws SelectError
-     * @throws ClientException
-     * @throws RecordException
-     */
     #[CheckPermission([Permission::MANAGE, Permission::READ])]
-    public function get(UserStore $userStore): AjaxResponse
-    {
-        return $this->returnSuccess($userStore->getList());
+    public function get(
+        #[GetStore]
+        UserStore $userStore,
+    ): AjaxResponse {
+        return $userStore->getAjaxResponse();
     }
 
     /**
+     * @throws ClientException
+     * @throws JsonException
+     * @throws RecordException
      * @throws ReflectionException
      * @throws SaveError
      * @throws UserError
+     * @throws ViolationException
      */
     public function postLogin(
         UserService $userService,

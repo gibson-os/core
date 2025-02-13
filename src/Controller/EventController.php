@@ -8,6 +8,7 @@ use GibsonOS\Core\Attribute\CheckPermission;
 use GibsonOS\Core\Attribute\GetMappedModel;
 use GibsonOS\Core\Attribute\GetModel;
 use GibsonOS\Core\Attribute\GetModels;
+use GibsonOS\Core\Attribute\GetStore;
 use GibsonOS\Core\Enum\Permission;
 use GibsonOS\Core\Exception\DateTimeError;
 use GibsonOS\Core\Exception\EventException;
@@ -38,24 +39,12 @@ use ReflectionException;
 
 class EventController extends AbstractController
 {
-    /**
-     * @throws JsonException
-     * @throws ReflectionException
-     * @throws SelectError
-     * @throws ClientException
-     * @throws RecordException
-     */
     #[CheckPermission([Permission::READ])]
     public function get(
+        #[GetStore]
         EventStore $eventStore,
-        int $start = 0,
-        int $limit = 0,
-        array $sort = [],
     ): AjaxResponse {
-        $eventStore->setLimit($limit, $start);
-        $eventStore->setSortByExt($sort);
-
-        return $this->returnSuccess($eventStore->getList(), $eventStore->getCount());
+        return $eventStore->getAjaxResponse();
     }
 
     /**
@@ -69,6 +58,7 @@ class EventController extends AbstractController
      */
     #[CheckPermission([Permission::READ])]
     public function getElements(
+        #[GetStore]
         ElementStore $elementStore,
         #[GetModel(['id' => 'eventId'])]
         ?Event $event = null,
@@ -83,16 +73,15 @@ class EventController extends AbstractController
 
         $elementStore->setEvent($event);
 
-        return $this->returnSuccess($elementStore->getList());
+        return $elementStore->getAjaxResponse();
     }
 
-    /**
-     * @throws GetError
-     */
     #[CheckPermission([Permission::READ])]
-    public function getClassNames(ClassNameStore $classNameStore): AjaxResponse
-    {
-        return $this->returnSuccess($classNameStore->getList());
+    public function getClassNames(
+        #[GetStore]
+        ClassNameStore $classNameStore,
+    ): AjaxResponse {
+        return $classNameStore->getAjaxResponse();
     }
 
     /**
@@ -102,42 +91,40 @@ class EventController extends AbstractController
      * @throws ReflectionException
      */
     #[CheckPermission([Permission::READ])]
-    public function getMethods(MethodStore $methodStore, string $className): AjaxResponse
-    {
+    public function getMethods(
+        #[GetStore]
+        MethodStore $methodStore,
+        string $className,
+    ): AjaxResponse {
         $methodStore->setClassName($className);
 
-        return $this->returnSuccess($methodStore->getList());
+        return $methodStore->getAjaxResponse();
     }
 
     /**
      * @param class-string $className
-     *
-     * @throws FactoryError
-     * @throws ReflectionException
      */
     #[CheckPermission([Permission::READ])]
-    public function getClassTriggers(ClassTriggerStore $classTriggerStore, string $className): AjaxResponse
-    {
+    public function getClassTriggers(
+        #[GetStore]
+        ClassTriggerStore $classTriggerStore,
+        string $className,
+    ): AjaxResponse {
         $classTriggerStore->setClassName($className);
 
-        return $this->returnSuccess($classTriggerStore->getList());
+        return $classTriggerStore->getAjaxResponse();
     }
 
-    /**
-     * @throws ClientException
-     * @throws FactoryError
-     * @throws GetError
-     * @throws JsonException
-     * @throws RecordException
-     * @throws ReflectionException
-     * @throws SelectError
-     */
     #[CheckPermission([Permission::READ])]
-    public function getTriggers(TriggerStore $triggerStore, #[GetModel(['id' => 'eventId'])] Event $event): AjaxResponse
-    {
+    public function getTriggers(
+        #[GetStore]
+        TriggerStore $triggerStore,
+        #[GetModel(['id' => 'eventId'])]
+        Event $event,
+    ): AjaxResponse {
         $triggerStore->setEvent($event);
 
-        return $this->returnSuccess($triggerStore->getList());
+        return $triggerStore->getAjaxResponse();
     }
 
     #[CheckPermission([Permission::WRITE])]

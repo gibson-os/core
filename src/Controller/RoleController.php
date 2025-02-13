@@ -7,10 +7,11 @@ use GibsonOS\Core\Attribute\CheckPermission;
 use GibsonOS\Core\Attribute\GetMappedModel;
 use GibsonOS\Core\Attribute\GetModel;
 use GibsonOS\Core\Attribute\GetModels;
+use GibsonOS\Core\Attribute\GetStore;
 use GibsonOS\Core\Enum\Permission;
 use GibsonOS\Core\Exception\Model\DeleteError;
 use GibsonOS\Core\Exception\Model\SaveError;
-use GibsonOS\Core\Exception\Repository\SelectError;
+use GibsonOS\Core\Exception\ViolationException;
 use GibsonOS\Core\Manager\ModelManager;
 use GibsonOS\Core\Model\Role;
 use GibsonOS\Core\Model\Role\Permission as RolePermission;
@@ -20,31 +21,18 @@ use GibsonOS\Core\Store\Role\PermissionStore;
 use GibsonOS\Core\Store\Role\UserStore;
 use GibsonOS\Core\Store\RoleStore;
 use JsonException;
-use MDO\Exception\ClientException;
 use MDO\Exception\RecordException;
 use ReflectionException;
 use Traversable;
 
 class RoleController extends AbstractController
 {
-    /**
-     * @throws JsonException
-     * @throws ReflectionException
-     * @throws SelectError
-     * @throws ClientException
-     * @throws RecordException
-     */
     #[CheckPermission([Permission::MANAGE, Permission::READ])]
     public function get(
+        #[GetStore]
         RoleStore $roleStore,
-        int $start = 0,
-        int $limit = 0,
-        array $sort = [],
     ): AjaxResponse {
-        $roleStore->setLimit($limit, $start);
-        $roleStore->setSortByExt($sort);
-
-        return $this->returnSuccess($roleStore->getList(), $roleStore->getCount());
+        return $roleStore->getAjaxResponse();
     }
 
     /**
@@ -52,6 +40,7 @@ class RoleController extends AbstractController
      * @throws RecordException
      * @throws ReflectionException
      * @throws SaveError
+     * @throws ViolationException
      */
     #[CheckPermission([Permission::MANAGE, Permission::WRITE])]
     public function post(
@@ -84,6 +73,7 @@ class RoleController extends AbstractController
      * @throws RecordException
      * @throws ReflectionException
      * @throws SaveError
+     * @throws ViolationException
      */
     #[CheckPermission([Permission::MANAGE, Permission::WRITE])]
     public function postPermission(
@@ -96,29 +86,16 @@ class RoleController extends AbstractController
         return $this->returnSuccess();
     }
 
-    /**
-     * @throws ClientException
-     * @throws JsonException
-     * @throws RecordException
-     * @throws ReflectionException
-     * @throws SelectError
-     */
     #[CheckPermission([Permission::MANAGE, Permission::READ])]
     public function getUsers(
+        #[GetStore]
         UserStore $userStore,
         #[GetModel]
         Role $role,
-        int $start = 0,
-        int $limit = 0,
-        array $sort = [],
     ): AjaxResponse {
-        $userStore
-            ->setRole($role)
-            ->setLimit($limit, $start)
-            ->setSortByExt($sort)
-        ;
+        $userStore->setRole($role);
 
-        return $this->returnSuccess($userStore->getList(), $userStore->getCount());
+        return $userStore->getAjaxResponse();
     }
 
     /**
@@ -126,6 +103,7 @@ class RoleController extends AbstractController
      * @throws RecordException
      * @throws ReflectionException
      * @throws SaveError
+     * @throws ViolationException
      */
     #[CheckPermission([Permission::MANAGE, Permission::WRITE])]
     public function postUser(

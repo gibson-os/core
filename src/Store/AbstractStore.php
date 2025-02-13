@@ -3,6 +3,9 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Store;
 
+use GibsonOS\Core\Dto\Store\Filter;
+use GibsonOS\Core\Service\Response\AjaxResponse;
+
 abstract class AbstractStore
 {
     private int $rows = 0;
@@ -29,5 +32,37 @@ abstract class AbstractStore
     public function getFrom(): int
     {
         return $this->from;
+    }
+
+    public function setFilters(array $filters): self
+    {
+        return $this;
+    }
+
+    /**
+     * @return array<string, Filter>
+     */
+    protected function getFilters(): array
+    {
+        return [];
+    }
+
+    public function setSortByExt(array $sort): self
+    {
+        return $this;
+    }
+
+    public function getAjaxResponse(): AjaxResponse
+    {
+        $data = $this->getList();
+        $return = [
+            'success' => true,
+            'failure' => false,
+            'data' => !is_array($data) ? iterator_to_array($data) : $data,
+            'total' => $this->getCount(),
+            'filters' => $this->getFilters(),
+        ];
+
+        return new AjaxResponse($return);
     }
 }

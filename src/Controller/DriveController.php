@@ -36,9 +36,6 @@ class DriveController extends AbstractController
         ]);
     }
 
-    /**
-     * @throws SelectError
-     */
     #[CheckPermission([Permission::READ])]
     public function getChart(
         DriveStore $driveStore,
@@ -57,6 +54,6 @@ class DriveController extends AbstractController
             ->setToTime($dateTimeService->get($toTime ?? 'now'))
         ;
 
-        return $this->returnSuccess($driveStore->getList());
+        return $driveStore->getAjaxResponse();
     }
 }

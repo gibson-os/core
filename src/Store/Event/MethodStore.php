@@ -28,8 +28,10 @@ class MethodStore extends AbstractStore
      */
     private array $list = [];
 
-    public function __construct(private EventService $eventService, private ReflectionManager $reflectionManager)
-    {
+    public function __construct(
+        private readonly EventService $eventService,
+        private readonly ReflectionManager $reflectionManager,
+    ) {
     }
 
     /**

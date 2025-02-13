@@ -5,7 +5,6 @@ namespace GibsonOS\Core\Store\Event;
 
 use GibsonOS\Core\Attribute\Event;
 use GibsonOS\Core\Attribute\GetClassNames;
-use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Store\AbstractStore;
 use ReflectionAttribute;
@@ -19,14 +18,14 @@ class ClassNameStore extends AbstractStore
     private array $list = [];
 
     public function __construct(
-        private ReflectionManager $reflectionManager,
+        private readonly ReflectionManager $reflectionManager,
         #[GetClassNames(['*/src/Event'])]
-        private array $classNames,
+        private readonly array $classNames,
     ) {
     }
 
     /**
-     * @throws GetError
+     * @throws ReflectionException
      *
      * @return array[]
      */
@@ -38,7 +37,7 @@ class ClassNameStore extends AbstractStore
     }
 
     /**
-     * @throws GetError
+     * @throws ReflectionException
      */
     public function getCount(): int
     {

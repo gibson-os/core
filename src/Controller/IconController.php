@@ -22,6 +22,8 @@ use GibsonOS\Core\Store\Icon\TagStore;
 use GibsonOS\Core\Store\IconStore;
 use GibsonOS\Core\Wrapper\ModelWrapper;
 use JsonException;
+use MDO\Exception\ClientException;
+use MDO\Exception\RecordException;
 use ReflectionException;
 use Throwable;
 use Traversable;
@@ -29,9 +31,11 @@ use Traversable;
 class IconController extends AbstractController
 {
     /**
-     * @throws SelectError
      * @throws JsonException
      * @throws ReflectionException
+     * @throws SelectError
+     * @throws ClientException
+     * @throws RecordException
      */
     #[CheckPermission([Permission::READ])]
     public function get(IconStore $iconStore, TagStore $tagStore, array $tags = []): AjaxResponse
