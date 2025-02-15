@@ -34,6 +34,9 @@ abstract class AbstractStore
         return $this->from;
     }
 
+    /**
+     * @param array<string, string> $filters
+     */
     public function setFilters(array $filters): self
     {
         return $this;

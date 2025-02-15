@@ -4,7 +4,9 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Store;
 
 use GibsonOS\Core\Dto\Model\ChildrenMapping;
+use GibsonOS\Core\Dto\Store\Filter\Option;
 use GibsonOS\Core\Exception\Repository\SelectError;
+use GibsonOS\Core\Exception\StoreException;
 use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Wrapper\DatabaseStoreWrapper;
 use JsonException;
@@ -31,6 +33,11 @@ abstract class AbstractDatabaseStore extends AbstractStore
     private array $wheres = [];
 
     private array $orderBy = [];
+
+    /**
+     * @var array<string, string>
+     */
+    private array $filters = [];
 
     protected string $tableName;
 
@@ -61,6 +68,14 @@ abstract class AbstractDatabaseStore extends AbstractStore
     }
 
     /**
+     * @param array<string, string> $filters
+     */
+    public function setFilters(array $filters): self
+    {
+        return $this;
+    }
+
+    /**
      * @throws ClientException
      * @throws ReflectionException
      */
@@ -72,6 +87,22 @@ abstract class AbstractDatabaseStore extends AbstractStore
             ->setOrders($this->getOrderBy())
             ->setLimit($this->getRows(), $this->getFrom())
         ;
+
+        foreach ($this->filters as $field => $value) {
+            $filter = $this->getFilters()[$field] ?? null;
+
+            if ($filter === null) {
+                throw new StoreException(sprintf(
+                    'Filter "%s" not allowed. Possible filters: %s',
+                    $field,
+                    implode(', ', array_keys($this->getFilters())),
+                ));
+            }
+
+            $this->selectQuery->addWhere(
+                new Where($filter->getWhere(), [$filter->getWhereParameterName() ?? $field => $value]),
+            );
+        }
 
         $this->selectQuery = $this->databaseStoreWrapper->getChildrenQuery()->extend(
             $this->selectQuery,
@@ -123,6 +154,51 @@ abstract class AbstractDatabaseStore extends AbstractStore
     protected function getCountField(): string
     {
         return 'DISTINCT `' . ($this->getAlias() ?? $this->tableName) . '`.`id`';
+    }
+
+    /**
+     * @throws ReflectionException
+     * @throws ClientException
+     * @throws RecordException
+     *
+     * @return Option[]
+     */
+    protected function getFilterOptions(string $nameSelect, string $valueSelect, bool $distinct): array
+    {
+        $rows = $this->getRows();
+        $from = $this->getFrom();
+
+        $filters = $this->filters;
+        $this
+            ->setFilters([])
+            ->setLimit(0, 0)
+        ;
+        $this->initQuery();
+
+        $selects = $this->selectQuery->getSelects();
+        $this->selectQuery
+            ->setSelects(['name' => $nameSelect, 'value' => $valueSelect])
+            ->setDistinct($distinct)
+        ;
+
+        $result = $this->getDatabaseStoreWrapper()->getClient()->execute($this->selectQuery);
+
+        $this->selectQuery
+            ->setSelects($selects)
+            ->setDistinct(false)
+        ;
+        $this
+            ->setFilters($filters)
+            ->setLimit($rows, $from)
+        ;
+
+        return array_map(
+            fn (Record $record) => new Option(
+                (string) $record->get('name')->getValue(),
+                (string) $record->get('value')->getValue(),
+            ),
+            iterator_to_array($result->iterateRecords()),
+        );
     }
 
     /**
