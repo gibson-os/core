@@ -12,6 +12,7 @@ GibsonOS.define('GibsonOS.decorator.Panel', {
         component = GibsonOS.decorator.action.Add.init(component);
         component = GibsonOS.decorator.action.Enter.init(component);
         component = GibsonOS.decorator.action.Delete.init(component);
+        component = GibsonOS.decorator.action.Filter.init(component);
 
         return component;
     },

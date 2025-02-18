@@ -17,8 +17,25 @@ Ext.define('GibsonOS.module.core.component.grid.Panel', {
             me.columns = me.getColumns();
         }
 
+        if (me.store !== undefined) {
+            me.store.on('load', (store) => {
+                const jsonData = store.getProxy().getReader().jsonData;
+
+                if (typeof(jsonData.filters) === 'object' && !Ext.Object.isEmpty(jsonData.filters)) {
+                    me.setFilters(jsonData.filters);
+                }
+            });
+        }
+
         me.callParent();
 
         GibsonOS.decorator.Panel.addListeners(me);
+    },
+    filterFunction(filters) {
+        const me = this;
+
+        console.log(filters);
+        me.store.getProxy().setExtraParam('filters', Ext.encode(filters));
+        me.store.load();
     }
 });

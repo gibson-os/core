@@ -14,8 +14,8 @@ class Filter implements JsonSerializable
     public function __construct(
         private readonly string $name,
         private readonly array $options,
-        private readonly string $where,
-        private readonly ?string $whereParameterName = null,
+        private readonly string $field,
+        private readonly bool $multiple = true,
     ) {
     }
 
@@ -32,14 +32,14 @@ class Filter implements JsonSerializable
         return $this->options;
     }
 
-    public function getWhere(): string
+    public function isMultiple(): bool
     {
-        return $this->where;
+        return $this->multiple;
     }
 
-    public function getWhereParameterName(): ?string
+    public function getField(): string
     {
-        return $this->whereParameterName;
+        return $this->field;
     }
 
     public function jsonSerialize(): array
@@ -47,6 +47,7 @@ class Filter implements JsonSerializable
         return [
             'name' => $this->getName(),
             'options' => $this->getOptions(),
+            'multiple' => $this->isMultiple(),
         ];
     }
 }

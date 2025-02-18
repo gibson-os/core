@@ -35,7 +35,7 @@ abstract class AbstractStore
     }
 
     /**
-     * @param array<string, string> $filters
+     * @param array<string, string[]> $filters
      */
     public function setFilters(array $filters): self
     {
@@ -55,6 +55,14 @@ abstract class AbstractStore
         return $this;
     }
 
+    /**
+     * @return array<string, string>
+     */
+    protected function getOrderMapping(): array
+    {
+        return [];
+    }
+
     public function getAjaxResponse(): AjaxResponse
     {
         $data = $this->getList();
@@ -64,6 +72,7 @@ abstract class AbstractStore
             'data' => !is_array($data) ? iterator_to_array($data) : $data,
             'total' => $this->getCount(),
             'filters' => $this->getFilters(),
+            'possibleOrders' => array_keys($this->getOrderMapping()),
         ];
 
         return new AjaxResponse($return);

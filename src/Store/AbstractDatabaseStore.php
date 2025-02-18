@@ -35,7 +35,7 @@ abstract class AbstractDatabaseStore extends AbstractStore
     private array $orderBy = [];
 
     /**
-     * @var array<string, string>
+     * @var array<string, string[]>
      */
     private array $filters = [];
 
@@ -68,19 +68,23 @@ abstract class AbstractDatabaseStore extends AbstractStore
     }
 
     /**
-     * @param array<string, string> $filters
+     * @param array<string, string[]> $filters
      */
     public function setFilters(array $filters): self
     {
+        $this->filters = $filters;
+
         return $this;
     }
 
     /**
      * @throws ClientException
      * @throws ReflectionException
+     * @throws StoreException
      */
     protected function initQuery(): void
     {
+        $filters = $this->filters === [] ? [] : $this->getFilters();
         $this->setWheres();
         $this->selectQuery = (new SelectQuery($this->table, $this->getAlias()))
             ->setWheres($this->wheres)
@@ -89,7 +93,7 @@ abstract class AbstractDatabaseStore extends AbstractStore
         ;
 
         foreach ($this->filters as $field => $value) {
-            $filter = $this->getFilters()[$field] ?? null;
+            $filter = $filters[$field] ?? null;
 
             if ($filter === null) {
                 throw new StoreException(sprintf(
@@ -99,9 +103,24 @@ abstract class AbstractDatabaseStore extends AbstractStore
                 ));
             }
 
-            $this->selectQuery->addWhere(
-                new Where($filter->getWhere(), [$filter->getWhereParameterName() ?? $field => $value]),
-            );
+            if (count($value) === 0) {
+                continue;
+            }
+
+            $fieldName = $filter->getField();
+            $where = sprintf('%s=:%s', $fieldName, $field);
+            $parameters = [$field => reset($value)];
+
+            if ($filter->isMultiple()) {
+                $where = sprintf(
+                    '%s IN (%s)',
+                    $fieldName,
+                    $this->databaseStoreWrapper->getSelectService()->getParametersString($value),
+                );
+                $parameters = $value;
+            }
+
+            $this->selectQuery->addWhere(new Where($where, $parameters));
         }
 
         $this->selectQuery = $this->databaseStoreWrapper->getChildrenQuery()->extend(
@@ -112,11 +131,12 @@ abstract class AbstractDatabaseStore extends AbstractStore
     }
 
     /**
-     * @throws ClientException
      * @throws JsonException
      * @throws RecordException
      * @throws ReflectionException
      * @throws SelectError
+     * @throws StoreException
+     * @throws ClientException
      *
      * @return array|iterable<T>
      */
@@ -131,6 +151,7 @@ abstract class AbstractDatabaseStore extends AbstractStore
      * @throws SelectError
      * @throws ClientException
      * @throws ReflectionException
+     * @throws StoreException
      */
     public function getCount(): int
     {
@@ -157,9 +178,10 @@ abstract class AbstractDatabaseStore extends AbstractStore
     }
 
     /**
-     * @throws ReflectionException
      * @throws ClientException
      * @throws RecordException
+     * @throws StoreException
+     * @throws ReflectionException
      *
      * @return Option[]
      */
@@ -220,14 +242,6 @@ abstract class AbstractDatabaseStore extends AbstractStore
     protected function getAlias(): ?string
     {
         return null;
-    }
-
-    /**
-     * @return string[]
-     */
-    protected function getOrderMapping(): array
-    {
-        return [];
     }
 
     protected function addWhere(string $where, array $parameters = []): self
