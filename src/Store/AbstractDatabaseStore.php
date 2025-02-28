@@ -178,6 +178,8 @@ abstract class AbstractDatabaseStore extends AbstractStore
     }
 
     /**
+     * @param array<string, OrderDirection> $orders
+     *
      * @throws ClientException
      * @throws RecordException
      * @throws StoreException
@@ -185,7 +187,7 @@ abstract class AbstractDatabaseStore extends AbstractStore
      *
      * @return Option[]
      */
-    protected function getFilterOptions(string $nameSelect, string $valueSelect, bool $distinct): array
+    protected function getFilterOptions(string $nameSelect, string $valueSelect, bool $distinct, array $orders): array
     {
         $rows = $this->getRows();
         $from = $this->getFrom();
@@ -197,18 +199,14 @@ abstract class AbstractDatabaseStore extends AbstractStore
         ;
         $this->initQuery();
 
-        $selects = $this->selectQuery->getSelects();
         $this->selectQuery
             ->setSelects(['name' => $nameSelect, 'value' => $valueSelect])
             ->setDistinct($distinct)
+            ->setOrders($orders)
         ;
 
         $result = $this->getDatabaseStoreWrapper()->getClient()->execute($this->selectQuery);
 
-        $this->selectQuery
-            ->setSelects($selects)
-            ->setDistinct(false)
-        ;
         $this
             ->setFilters($filters)
             ->setLimit($rows, $from)
