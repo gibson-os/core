@@ -26,7 +26,7 @@ Ext.define('GibsonOS.module.core.component.grid.Panel', {
                 }
 
                 Ext.iterate(me.columns, (column) => {
-                    column.sortable = (jsonData.possibleOrders ?? []).indexOf(column.dataIndex) !== -1;
+                    column.sortable = (jsonData.possibleOrders ?? []).indexOf(column.getSortParam()) !== -1;
                 });
             });
         }
