@@ -11,7 +11,7 @@ class GetStore implements AttributeInterface
 {
     public function __construct(
         private readonly string $startParameter = 'start',
-        private readonly string $fromParameter = 'from',
+        private readonly string $limitParameter = 'limit',
         private readonly string $sortParameter = 'sort',
         private readonly string $filtersParameter = 'filters',
     ) {
@@ -27,9 +27,9 @@ class GetStore implements AttributeInterface
         return $this->startParameter;
     }
 
-    public function getFromParameter(): string
+    public function getLimitParameter(): string
     {
-        return $this->fromParameter;
+        return $this->limitParameter;
     }
 
     public function getSortParameter(): string

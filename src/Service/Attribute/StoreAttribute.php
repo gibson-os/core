@@ -75,11 +75,11 @@ class StoreAttribute implements AttributeServiceInterface, ParameterAttributeInt
         }
 
         try {
-            $from = (int) $this->requestService->getRequestValue($attribute->getFromParameter());
+            $limit = (int) $this->requestService->getRequestValue($attribute->getLimitParameter());
         } catch (RequestError) {
-            $from = 0;
+            $limit = 0;
         }
 
-        return $store->setLimit($start, $from);
+        return $store->setLimit($limit, $start);
     }
 }
