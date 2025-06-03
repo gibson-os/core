@@ -270,13 +270,19 @@ abstract class AbstractDatabaseStore extends AbstractStore
                 continue;
             }
 
-            if (!isset($mapping[$sortItem['property']])) {
+            $sortMappings = $mapping[$sortItem['property']] ?? null;
+
+            if ($sortMappings === null) {
                 continue;
             }
 
-            $orderBy[$mapping[$sortItem['property']]] = mb_strtolower($sortItem['direction'] ?? 'asc') === 'asc'
-                ? OrderDirection::ASC
-                : OrderDirection::DESC;
+            $sortMappings = is_array($sortMappings) ? $sortMappings : [$sortMappings];
+
+            foreach ($sortMappings as $sortMapping) {
+                $orderBy[$sortMapping] = mb_strtolower($sortItem['direction'] ?? 'asc') === 'asc'
+                    ? OrderDirection::ASC
+                    : OrderDirection::DESC;
+            }
         }
 
         $this->orderBy = $orderBy;

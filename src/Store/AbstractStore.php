@@ -56,7 +56,7 @@ abstract class AbstractStore
     }
 
     /**
-     * @return array<string, string>
+     * @return array<string, string|string[]>
      */
     protected function getOrderMapping(): array
     {
