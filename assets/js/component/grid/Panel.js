@@ -8,6 +8,7 @@ Ext.define('GibsonOS.module.core.component.grid.Panel', {
     enableKeyEvents: true,
     enableClickEvents: true,
     enableContextMenu: true,
+    filters: {},
     initComponent() {
         let me = this;
 
@@ -18,6 +19,7 @@ Ext.define('GibsonOS.module.core.component.grid.Panel', {
         }
 
         if (me.store !== undefined) {
+            me.store.getProxy().setExtraParam('filters', Ext.encode(me.filters));
             me.store.on('load', (store) => {
                 const jsonData = store.getProxy().getReader().jsonData;
 
@@ -38,7 +40,6 @@ Ext.define('GibsonOS.module.core.component.grid.Panel', {
     filterFunction(filters) {
         const me = this;
 
-        console.log(filters);
         me.store.getProxy().setExtraParam('filters', Ext.encode(filters));
         me.store.load();
     }
