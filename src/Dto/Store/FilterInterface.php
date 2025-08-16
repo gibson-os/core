@@ -8,5 +8,5 @@ use MDO\Dto\Query\Where;
 
 interface FilterInterface
 {
-    public function getWhere(string $field, array $value, DatabaseStoreWrapper $databaseStoreWrapper): Where;
+    public function getWhere(string $field, array $values, DatabaseStoreWrapper $databaseStoreWrapper): Where;
 }

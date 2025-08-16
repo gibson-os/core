@@ -53,19 +53,19 @@ class Filter implements FilterInterface, JsonSerializable
         ];
     }
 
-    public function getWhere(string $field, array $value, DatabaseStoreWrapper $databaseStoreWrapper): Where
+    public function getWhere(string $field, array $values, DatabaseStoreWrapper $databaseStoreWrapper): Where
     {
         $fieldName = $this->getField();
         $where = sprintf('%s=:%s', $fieldName, $field);
-        $parameters = [$field => reset($value)];
+        $parameters = [$field => reset($values)];
 
         if ($this->isMultiple()) {
             $where = sprintf(
                 '%s IN (%s)',
                 $fieldName,
-                $databaseStoreWrapper->getSelectService()->getParametersString($value),
+                $databaseStoreWrapper->getSelectService()->getParametersString($values),
             );
-            $parameters = $value;
+            $parameters = $values;
         }
 
         return new Where($where, $parameters);
