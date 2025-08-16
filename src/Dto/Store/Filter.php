@@ -4,9 +4,11 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Dto\Store;
 
 use GibsonOS\Core\Dto\Store\Filter\Option;
+use GibsonOS\Core\Wrapper\DatabaseStoreWrapper;
 use JsonSerializable;
+use MDO\Dto\Query\Where;
 
-class Filter implements JsonSerializable
+class Filter implements FilterInterface, JsonSerializable
 {
     /**
      * @param Option[] $options
@@ -49,5 +51,23 @@ class Filter implements JsonSerializable
             'options' => $this->getOptions(),
             'multiple' => $this->isMultiple(),
         ];
+    }
+
+    public function getWhere(string $field, array $value, DatabaseStoreWrapper $databaseStoreWrapper): Where
+    {
+        $fieldName = $this->getField();
+        $where = sprintf('%s=:%s', $fieldName, $field);
+        $parameters = [$field => reset($value)];
+
+        if ($this->isMultiple()) {
+            $where = sprintf(
+                '%s IN (%s)',
+                $fieldName,
+                $databaseStoreWrapper->getSelectService()->getParametersString($value),
+            );
+            $parameters = $value;
+        }
+
+        return new Where($where, $parameters);
     }
 }

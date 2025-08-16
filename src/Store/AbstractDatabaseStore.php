@@ -107,20 +107,7 @@ abstract class AbstractDatabaseStore extends AbstractStore
                 continue;
             }
 
-            $fieldName = $filter->getField();
-            $where = sprintf('%s=:%s', $fieldName, $field);
-            $parameters = [$field => reset($value)];
-
-            if ($filter->isMultiple()) {
-                $where = sprintf(
-                    '%s IN (%s)',
-                    $fieldName,
-                    $this->databaseStoreWrapper->getSelectService()->getParametersString($value),
-                );
-                $parameters = $value;
-            }
-
-            $this->selectQuery->addWhere(new Where($where, $parameters));
+            $this->selectQuery->addWhere($filter->getWhere($field, $value, $this->databaseStoreWrapper));
         }
 
         $this->selectQuery = $this->databaseStoreWrapper->getChildrenQuery()->extend(
