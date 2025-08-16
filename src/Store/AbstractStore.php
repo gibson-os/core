@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Store;
 
-use GibsonOS\Core\Dto\Store\Filter;
+use GibsonOS\Core\Dto\Store\FilterInterface;
 use GibsonOS\Core\Service\Response\AjaxResponse;
 
 abstract class AbstractStore
@@ -43,7 +43,7 @@ abstract class AbstractStore
     }
 
     /**
-     * @return array<string, Filter>
+     * @return array<string, FilterInterface>
      */
     protected function getFilters(): array
     {
