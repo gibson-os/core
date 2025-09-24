@@ -5,6 +5,7 @@ namespace GibsonOS\Core\Store;
 
 use GibsonOS\Core\Dto\Model\ChildrenMapping;
 use GibsonOS\Core\Dto\Store\Filter\Option;
+use GibsonOS\Core\Exception\FilterException;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Exception\StoreException;
 use GibsonOS\Core\Model\AbstractModel;
@@ -206,6 +207,26 @@ abstract class AbstractDatabaseStore extends AbstractStore
             ),
             iterator_to_array($result->iterateRecords()),
         );
+    }
+
+    /**
+     * @param class-string $enumClassName
+     *
+     * @throws FilterException
+     */
+    protected function getEnumFilterOptions(string $enumClassName): array
+    {
+        if (!enum_exists($enumClassName)) {
+            throw new FilterException(sprintf('Enum %s not found', $enumClassName));
+        }
+
+        $options = [];
+
+        foreach ($enumClassName::cases() as $value) {
+            $options[] = new Option($value->value, $value->name);
+        }
+
+        return $options;
     }
 
     /**
