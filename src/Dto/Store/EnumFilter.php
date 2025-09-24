@@ -23,7 +23,7 @@ class EnumFilter implements FilterInterface, JsonSerializable
         private readonly string $enumClassName,
     ) {
         if (!enum_exists($this->enumClassName)) {
-            throw new FilterException(sprintf('Enum %d not found', $this->enumClassName));
+            throw new FilterException(sprintf('Enum %s not found', $this->enumClassName));
         }
 
         foreach ($this->enumClassName::cases() as $value) {
