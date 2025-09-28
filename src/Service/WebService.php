@@ -71,12 +71,6 @@ class WebService
         curl_setopt($curl, CURLOPT_FILE, $responseHandle);
         curl_setopt($curl, CURLOPT_HEADER, true);
 
-        $body = $request->getBody();
-
-        if ($body instanceof Body) {
-            curl_setopt($curl, CURLOPT_POSTFIELDS, $body->getContent());
-        }
-
         $cookieFile = $this->setCookieFile($request, $curl);
 
         if (!curl_exec($curl)) {
