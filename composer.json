@@ -21,7 +21,8 @@
     "open-telemetry/exporter-otlp": "^1.2",
     "php-http/guzzle7-adapter": "^1.0",
     "ext-mysqli": "*",
-    "ext-exif": "*"
+    "ext-exif": "*",
+    "erusev/parsedown": "^1.7"
   },
   "require-dev": {
     "codeception/codeception": "^5.0",
