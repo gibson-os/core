@@ -13,10 +13,12 @@ Ext.define('GibsonOS.module.core.component.view.View', {
 
         me = GibsonOS.decorator.Drag.init(me);
         me = GibsonOS.decorator.Drop.init(me);
+        me = GibsonOS.decorator.AutoReload.init(me);
 
         me.callParent();
 
         GibsonOS.decorator.Drag.addListeners(me);
         GibsonOS.decorator.Drop.addListeners(me);
+        GibsonOS.decorator.AutoReload.addListeners(me);
     }
 });

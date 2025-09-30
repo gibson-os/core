@@ -81,6 +81,8 @@ class Column
         private ?string $type = null,
         private string $collate = 'utf8_general_ci',
         private string $charset = 'utf8',
+        //        private string $collate = 'utf8mb4_unicode_ci',
+        //        private string $charset = 'utf8mb4',
         private ?string $default = null,
         private ?int $length = null,
         private array $attributes = [],

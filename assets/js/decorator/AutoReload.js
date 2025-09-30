@@ -2,14 +2,18 @@ GibsonOS.define('GibsonOS.decorator.AutoReload', {
     init: (component) => {
         component = Ext.merge(component, Ext.merge({
             autoReload: false,
+            autoReloadDelay: 1000,
             activateAutoReload: function() {
                 if (typeof(component.getStore) === 'function') {
-                    component.getStore().autoReload = component.autoReload;
+                    component.getStore().gos = {
+                        autoReload: component.autoReload,
+                        autoReloadDelay: component.autoReloadDelay,
+                    };
                 }
             },
             deactivateAutoReload: function() {
                 if (typeof(component.getStore) === 'function') {
-                    component.getStore().autoReload = false;
+                    component.getStore().gos.autoReload = false;
                 }
             }
         }, component));
