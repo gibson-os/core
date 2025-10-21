@@ -24,9 +24,9 @@ GibsonOS.define('GibsonOS.decorator.AutoReload', {
         component.on('enable', component.activateAutoReload);
         component.on('show', component.activateAutoReload);
 
-        component.on('close', component.deactivateAutoReload);
+        component.on('beforeclose', component.deactivateAutoReload);
         component.on('hide', component.deactivateAutoReload);
-        component.on('destroy', component.deactivateAutoReload);
+        component.on('beforedestroy', component.deactivateAutoReload);
         component.on('disable', component.deactivateAutoReload);
     }
 });
