@@ -39,12 +39,12 @@ class Trigger extends AbstractModel implements JsonSerializable
     /**
      * Required for store.
      */
-    private string $classTitle;
+    private string $classTitle = '';
 
     /**
      * Required for store.
      */
-    private string $triggerTitle;
+    private string $triggerTitle = '';
 
     #[Column]
     private array $parameters = [];

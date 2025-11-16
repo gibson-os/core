@@ -13,10 +13,9 @@ use GibsonOS\Core\Enum\Permission;
 use GibsonOS\Core\Exception\DateTimeError;
 use GibsonOS\Core\Exception\EventException;
 use GibsonOS\Core\Exception\FactoryError;
-use GibsonOS\Core\Exception\GetError;
+use GibsonOS\Core\Exception\Lock\UnlockException;
 use GibsonOS\Core\Exception\Model\DeleteError;
 use GibsonOS\Core\Exception\Model\SaveError;
-use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Manager\ModelManager;
 use GibsonOS\Core\Model\Event;
 use GibsonOS\Core\Model\Event\Element;
@@ -47,15 +46,6 @@ class EventController extends AbstractController
         return $eventStore->getAjaxResponse();
     }
 
-    /**
-     * @throws ClientException
-     * @throws FactoryError
-     * @throws GetError
-     * @throws JsonException
-     * @throws RecordException
-     * @throws ReflectionException
-     * @throws SelectError
-     */
     #[CheckPermission([Permission::READ])]
     public function getElements(
         #[GetStore]
@@ -86,9 +76,6 @@ class EventController extends AbstractController
 
     /**
      * @param class-string $className
-     *
-     * @throws FactoryError
-     * @throws ReflectionException
      */
     #[CheckPermission([Permission::READ])]
     public function getMethods(
@@ -155,6 +142,8 @@ class EventController extends AbstractController
      * @throws JsonException
      * @throws ReflectionException
      * @throws SaveError
+     * @throws ClientException
+     * @throws RecordException
      */
     #[CheckPermission([Permission::WRITE])]
     public function postCopy(
@@ -218,11 +207,13 @@ class EventController extends AbstractController
 
     /**
      * @throws DateTimeError
+     * @throws EventException
      * @throws FactoryError
      * @throws JsonException
-     * @throws SaveError
-     * @throws EventException
+     * @throws RecordException
      * @throws ReflectionException
+     * @throws SaveError
+     * @throws UnlockException
      */
     #[CheckPermission([Permission::WRITE])]
     public function postRun(EventService $eventService, #[GetModel(['id' => 'eventId'])] Event $event): AjaxResponse
