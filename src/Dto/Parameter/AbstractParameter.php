@@ -79,7 +79,7 @@ abstract class AbstractParameter implements JsonSerializable
         return $this->value;
     }
 
-    public function setValue(array $value): self
+    public function setValue(mixed $value): self
     {
         $this->value = $value;
 
