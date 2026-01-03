@@ -15,6 +15,7 @@ use GibsonOS\Core\Model\Event\Element;
 use GibsonOS\Core\Repository\EventRepository;
 use GibsonOS\Core\Service\CommandService;
 use GibsonOS\Core\Service\DateTimeService;
+use GibsonOS\Core\Service\DirService;
 use GibsonOS\Core\Service\Event\ElementService;
 use GibsonOS\Core\Service\EventService;
 use GibsonOS\Core\Service\LockService;
@@ -38,6 +39,8 @@ class EventServiceTest extends Unit
 
     private LockService|ObjectProphecy $lockService;
 
+    private DirService|ObjectProphecy $dirService;
+
     private ServiceManager $serviceManager;
 
     protected function _before(): void
@@ -45,6 +48,16 @@ class EventServiceTest extends Unit
         $this->loadModelManager();
 
         $this->serviceManager = new ServiceManager();
+
+        $this->dirService = $this->prophesize(DirService::class);
+        $this->dirService->getRealPath(Argument::any())
+            ->willReturn('')
+        ;
+        $this->dirService->getFiles(Argument::any())
+            ->willReturn([])
+        ;
+        $this->serviceManager->setService(DirService::class, $this->dirService->reveal());
+
         $this->serviceManager->setInterface(LoggerInterface::class, LoggerService::class);
         $this->serviceManager->setService(Client::class, $this->client->reveal());
         $this->serviceManager->setService(ModelManager::class, $this->modelManager->reveal());
@@ -97,9 +110,7 @@ class EventServiceTest extends Unit
         $this->assertEquals(['Handtuch' => true], $globalParams);
     }
 
-    /**
-     * @dataProvider getTestData
-     */
+    #[DataProvider('getTestData')]
     public function testFireTimeControlled(Event $event, string $returnValue): void
     {
         $this->eventRepository->getTimeControlled(TestEvent::class, TestEvent::TRIGGER_MARVIN, Argument::any())

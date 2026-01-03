@@ -88,4 +88,15 @@ class DirService
 
         return $this->addEndSlash(implode($directorySeparator, $pathParts), $directorySeparator);
     }
+
+    public function getRealPath($path): string
+    {
+        $realpath = realpath($path);
+
+        if ($realpath === false) {
+            throw new GetError(sprintf('Pfad "%s" konnte nicht gefunden werden!', $path));
+        }
+
+        return $realpath;
+    }
 }

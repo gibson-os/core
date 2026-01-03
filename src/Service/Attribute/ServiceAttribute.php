@@ -39,7 +39,7 @@ class ServiceAttribute implements ParameterAttributeInterface, AttributeServiceI
             return [];
         }
 
-        $vendorPath = (realpath(
+        $vendorPath = $this->dirService->getRealPath(
             dirname(__FILE__) . DIRECTORY_SEPARATOR .
             '..' . DIRECTORY_SEPARATOR .
             '..' . DIRECTORY_SEPARATOR .
@@ -47,7 +47,7 @@ class ServiceAttribute implements ParameterAttributeInterface, AttributeServiceI
             '..' . DIRECTORY_SEPARATOR .
             '..' . DIRECTORY_SEPARATOR .
             'gibson-os',
-        ) ?: '') . DIRECTORY_SEPARATOR;
+        ) . DIRECTORY_SEPARATOR;
         $classes = [];
         $dirs = [];
         $modules = [];

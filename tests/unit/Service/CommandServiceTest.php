@@ -13,6 +13,7 @@ use GibsonOS\Core\Manager\ModelManager;
 use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Manager\ServiceManager;
 use GibsonOS\Core\Service\CommandService;
+use GibsonOS\Core\Service\DirService;
 use GibsonOS\Core\Service\LockService;
 use GibsonOS\Core\Service\LoggerService;
 use GibsonOS\Core\Service\OpenTelemetry\SpanService;
@@ -22,6 +23,8 @@ use GibsonOS\Core\Store\CommandStore;
 use GibsonOS\Mock\Service\TestCommand;
 use GibsonOS\Mock\Service\TestInvalidOptionCommand;
 use GibsonOS\Mock\Service\TestRequiresArgumentCommand;
+use PHPUnit\Framework\Attributes\DataProvider;
+use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Log\LoggerInterface;
@@ -41,6 +44,8 @@ class CommandServiceTest extends Unit
 
     private SpanService|ObjectProphecy $spanService;
 
+    private DirService|ObjectProphecy $dirService;
+
     private CommandService $commandService;
 
     protected function _before(): void
@@ -50,6 +55,7 @@ class CommandServiceTest extends Unit
         $this->lockService = $this->prophesize(LockService::class);
         $this->tracerService = $this->prophesize(TracerService::class);
         $this->spanService = $this->prophesize(SpanService::class);
+        $this->dirService = $this->prophesize(DirService::class);
         $serviceManager = new ServiceManager();
         $serviceManager->setInterface(LoggerInterface::class, LoggerService::class);
         $serviceManager->setService(ModelManager::class, $this->prophesize(ModelManager::class)->reveal());
@@ -62,6 +68,7 @@ class CommandServiceTest extends Unit
             $this->lockService->reveal(),
             $this->tracerService->reveal(),
             $this->spanService->reveal(),
+            $this->dirService->reveal(),
         );
     }
 
@@ -206,17 +213,22 @@ class CommandServiceTest extends Unit
 
     public function testExecuteAsync(): void
     {
-        $this->processService->executeAsync(\Prophecy\Argument::containingString('Test"  '))
+        $this->dirService->getRealPath(Argument::any())
+            ->shouldBeCalledTimes(3)
+            ->willReturn('')
+        ;
+
+        $this->processService->executeAsync(Argument::containingString('/bin/command \'Mock\Service\Test\'  '))
             ->shouldBeCalledOnce()
         ;
         $this->commandService->executeAsync(TestCommand::class);
 
-        $this->processService->executeAsync(\Prophecy\Argument::containingString('Test" "--ford=prefect" '))
+        $this->processService->executeAsync(Argument::containingString('/bin/command \'Mock\Service\Test\' \'--ford=prefect\' '))
             ->shouldBeCalledOnce()
         ;
         $this->commandService->executeAsync(TestCommand::class, ['ford' => 'prefect']);
 
-        $this->processService->executeAsync(\Prophecy\Argument::containingString('Test" "--arthur=dent" "-marvin"'))
+        $this->processService->executeAsync(Argument::containingString('/bin/command \'Mock\Service\Test\' \'--arthur=dent\' \'-marvin\''))
             ->shouldBeCalledOnce()
         ;
         $this->commandService->executeAsync(TestCommand::class, ['arthur' => 'dent'], ['marvin']);

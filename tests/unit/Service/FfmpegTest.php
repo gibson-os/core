@@ -199,7 +199,7 @@ class FfmpegTest extends Unit
             ->shouldNotBeCalled()
         ;
         $this->processService->execute(sprintf(
-            '%s -i %s -map v1 -c:v "codec" -sn %s > %s 2> %s',
+            '%s -i %s -map v1 -c:v \'codec\' -sn %s > %s 2> %s',
             $this->ffmpegPath,
             escapeshellarg($this->inputVideoFilename),
             escapeshellarg($this->outputVideoFilename),
@@ -228,7 +228,7 @@ class FfmpegTest extends Unit
             ->shouldNotBeCalled()
         ;
         $this->processService->execute(sprintf(
-            '%s -i %s -map a3 -c:a "codec" %s > %s 2> %s',
+            '%s -i %s -map a3 -c:a \'codec\' %s > %s 2> %s',
             $this->ffmpegPath,
             escapeshellarg($this->inputVideoFilename),
             escapeshellarg($this->outputVideoFilename),
@@ -266,7 +266,7 @@ class FfmpegTest extends Unit
             ->shouldNotBeCalled()
         ;
         $this->processService->execute(sprintf(
-            '%s -i %s -map v2 -c:v "codec" -vf subtitles=\'%s\':si=3 %s > %s 2> %s',
+            '%s -i %s -map v2 -c:v \'codec\' -vf subtitles=\'%s\':si=3 %s > %s 2> %s',
             $this->ffmpegPath,
             escapeshellarg($this->inputVideoFilename),
             $this->inputVideoFilename,
@@ -288,7 +288,7 @@ class FfmpegTest extends Unit
             ->shouldNotBeCalled()
         ;
         $this->processService->execute(sprintf(
-            '%s -i %s -arthur "dent" -mouse "answer" %s > %s 2> %s',
+            '%s -i %s -arthur \'dent\' -mouse \'answer\' %s > %s 2> %s',
             $this->ffmpegPath,
             escapeshellarg($this->inputVideoFilename),
             escapeshellarg($this->outputVideoFilename),
@@ -296,6 +296,7 @@ class FfmpegTest extends Unit
             escapeshellarg($this->logPath),
         ))
             ->shouldBeCalledOnce()
+            ->willReturn('')
         ;
 
         $this->ffmpeg->convert($media, $this->outputVideoFilename, null, null, [

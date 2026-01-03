@@ -18,13 +18,13 @@ class JavascriptService
         private readonly DirService $dirService,
         private readonly FileService $fileService,
     ) {
-        $this->vendorPath = (realpath(
+        $this->vendorPath = $this->dirService->getRealPath(
             dirname(__FILE__) . DIRECTORY_SEPARATOR .
             '..' . DIRECTORY_SEPARATOR .
             '..' . DIRECTORY_SEPARATOR .
             '..' . DIRECTORY_SEPARATOR .
             '..',
-        ) ?: '') . DIRECTORY_SEPARATOR;
+        ) . DIRECTORY_SEPARATOR;
     }
 
     /**

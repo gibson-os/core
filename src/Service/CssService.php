@@ -19,13 +19,13 @@ class CssService
         private readonly FileService $fileService,
         private readonly PermissionService $permissionService,
     ) {
-        $this->vendorPath = (realpath(
+        $this->vendorPath = $this->dirService->getRealPath(
             dirname(__FILE__) . DIRECTORY_SEPARATOR .
             '..' . DIRECTORY_SEPARATOR .
             '..' . DIRECTORY_SEPARATOR .
             '..' . DIRECTORY_SEPARATOR .
             '..',
-        ) ?: '') . DIRECTORY_SEPARATOR;
+        ) . DIRECTORY_SEPARATOR;
     }
 
     /**

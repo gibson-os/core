@@ -32,6 +32,7 @@ class CommandService
         private readonly LockService $lockService,
         private readonly TracerService $tracerService,
         private readonly SpanService $spanService,
+        private readonly DirService $dirService,
     ) {
     }
 
@@ -95,14 +96,14 @@ class CommandService
     public function executeAsync(string $commandClassname, array $arguments = [], array $options = []): void
     {
         $commandName = $this->getCommandName($commandClassname);
-        $commandPath = (realpath(
+        $commandPath = $this->dirService->getRealPath(
             dirname(__FILE__) .
                 DIRECTORY_SEPARATOR . '..' .
                 DIRECTORY_SEPARATOR . '..' .
                 DIRECTORY_SEPARATOR . '..' .
                 DIRECTORY_SEPARATOR . '..' .
                 DIRECTORY_SEPARATOR . '..',
-        ) ?: '') . DIRECTORY_SEPARATOR . 'bin' . DIRECTORY_SEPARATOR . 'command';
+        ) . DIRECTORY_SEPARATOR . 'bin' . DIRECTORY_SEPARATOR . 'command';
 
         $traceId = $this->spanService->getTraceId();
         $spanId = $this->spanService->getSpanId();

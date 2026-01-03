@@ -45,12 +45,12 @@ class ModuleService
         private readonly ModelWrapper $modelWrapper,
         ?string $modulesPath = null,
     ) {
-        $this->modulesPath = $modulesPath ?? (realpath(
+        $this->modulesPath = $modulesPath ?? $this->dirService->getRealPath(
             dirname(__FILE__) . DIRECTORY_SEPARATOR .
             '..' . DIRECTORY_SEPARATOR .
             '..' . DIRECTORY_SEPARATOR .
             '..' . DIRECTORY_SEPARATOR,
-        ) ?: '') . DIRECTORY_SEPARATOR;
+        ) . DIRECTORY_SEPARATOR;
     }
 
     /**

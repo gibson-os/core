@@ -3,6 +3,7 @@
   <component name="MessDetector">
     <phpmd_settings>
       <MessDetectorConfiguration tool_path="$PROJECT_DIR$/vendor/bin/phpmd" />
+      <phpmd_by_interpreter asDefaultInterpreter="true" interpreter_id="1c83db70-cf33-4e3a-b5d8-34a7626edc33" tool_path="/home/wolli/PhpstormProjects/gibsonOs/Core/vendor/bin/phpmd" timeout="30000" />
     </phpmd_settings>
   </component>
   <component name="MessDetectorOptionsConfiguration">
@@ -22,6 +23,7 @@
   <component name="PhpCodeSniffer">
     <phpcs_settings>
       <PhpCSConfiguration tool_path="$PROJECT_DIR$/../../Itronom/phpcs.xml" />
+      <phpcs_by_interpreter asDefaultInterpreter="true" interpreter_id="1c83db70-cf33-4e3a-b5d8-34a7626edc33" tool_path="/home/wolli/PhpstormProjects/Itronom/phpcs.xml" timeout="30000" />
     </phpcs_settings>
   </component>
   <component name="PhpIncludePathManager">
@@ -210,6 +212,7 @@
   <component name="PhpStan">
     <PhpStan_settings>
       <PhpStanConfiguration tool_path="$PROJECT_DIR$/vendor/bin/phpstan" />
+      <phpstan_by_interpreter asDefaultInterpreter="true" interpreter_id="1c83db70-cf33-4e3a-b5d8-34a7626edc33" tool_path="$PROJECT_DIR$/vendor/bin/phpstan" timeout="60000" />
     </PhpStan_settings>
   </component>
   <component name="PhpStanOptionsConfiguration">
@@ -223,6 +226,7 @@
   <component name="Psalm">
     <Psalm_settings>
       <PsalmConfiguration tool_path="$PROJECT_DIR$/vendor/bin/psalm" />
+      <psalm_fixer_by_interpreter asDefaultInterpreter="true" interpreter_id="1c83db70-cf33-4e3a-b5d8-34a7626edc33" tool_path="$PROJECT_DIR$/vendor/bin/psalm" timeout="60000" />
     </Psalm_settings>
   </component>
   <component name="PsalmOptionsConfiguration">
