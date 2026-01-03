@@ -61,14 +61,17 @@ class Body
      */
     public function setContent(string $content, int $length): Body
     {
-        $this->resource = fopen('php://memory', 'r+');
+        $resource = fopen('php://memory', 'r+')
+            ?: throw new WebException('Resource open error!')
+        ;
+        $this->resource = $resource;
         $this->length = $length;
 
-        if (fwrite($this->resource, $content, $length) === false) {
+        if (fwrite($resource, $content, $length) === false) {
             throw new WebException('Content write error!');
         }
 
-        rewind($this->resource);
+        rewind($resource);
 
         return $this;
     }

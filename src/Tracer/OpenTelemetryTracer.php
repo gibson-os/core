@@ -30,6 +30,7 @@ use OpenTelemetry\SDK\Trace\Sampler\ParentBased;
 use OpenTelemetry\SDK\Trace\SpanProcessor\BatchSpanProcessorBuilder;
 use OpenTelemetry\SDK\Trace\TracerProviderBuilder;
 use OpenTelemetry\SemConv\ResourceAttributes;
+use Override;
 use Throwable;
 
 class OpenTelemetryTracer extends AbstractTracer
@@ -114,11 +115,13 @@ class OpenTelemetryTracer extends AbstractTracer
         }
     }
 
+    #[Override]
     public function isLoaded(): bool
     {
         return $this->endpoint !== null && extension_loaded('opentelemetry');
     }
 
+    #[Override]
     public function setTransactionName(string $transactionName): OpenTelemetryTracer
     {
         if ($transactionName !== '') {
@@ -128,6 +131,7 @@ class OpenTelemetryTracer extends AbstractTracer
         return $this;
     }
 
+    #[Override]
     public function setCustomParameter(string $key, mixed $value, TracePrefix $prefix = TracePrefix::APP): OpenTelemetryTracer
     {
         if ($key !== '') {
@@ -137,6 +141,7 @@ class OpenTelemetryTracer extends AbstractTracer
         return $this;
     }
 
+    #[Override]
     public function startSpan(string $spanName, array $attributes = [], TracePrefix $prefix = TracePrefix::APP): OpenTelemetryTracer
     {
         if ($spanName === '') {
@@ -152,6 +157,7 @@ class OpenTelemetryTracer extends AbstractTracer
         return $this;
     }
 
+    #[Override]
     public function stopSpan(?Throwable $exception = null): AbstractTracer
     {
         $this->spanService->detachCurrentSpan($exception);
@@ -159,6 +165,7 @@ class OpenTelemetryTracer extends AbstractTracer
         return $this;
     }
 
+    #[Override]
     public function addEvent(string $eventName, array $attributes): self
     {
         $this->spanService->getCurrentSpan()?->addEvent($eventName, $attributes);

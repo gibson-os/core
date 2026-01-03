@@ -6,6 +6,7 @@ namespace GibsonOS\Core\AutoComplete;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\Action;
 use GibsonOS\Core\Repository\ActionRepository;
+use Override;
 
 class ActionAutoComplete implements AutoCompleteInterface
 {
@@ -18,6 +19,7 @@ class ActionAutoComplete implements AutoCompleteInterface
      *
      * @return Action[]
      */
+    #[Override]
     public function getByNamePart(string $namePart, array $parameters): array
     {
         return $this->actionRepository->findByName(
@@ -29,21 +31,25 @@ class ActionAutoComplete implements AutoCompleteInterface
     /**
      * @throws SelectError
      */
+    #[Override]
     public function getById(string $id, array $parameters): Action
     {
         return $this->actionRepository->getById((int) $id);
     }
 
+    #[Override]
     public function getModel(): string
     {
         return 'GibsonOS.module.core.module.model.Action';
     }
 
+    #[Override]
     public function getValueField(): string
     {
         return 'id';
     }
 
+    #[Override]
     public function getDisplayField(): string
     {
         return 'name';

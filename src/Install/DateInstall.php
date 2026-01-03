@@ -7,9 +7,11 @@ use Generator;
 use GibsonOS\Core\Dto\Install\Configuration;
 use GibsonOS\Core\Service\InstallService;
 use GibsonOS\Core\Service\PriorityInterface;
+use Override;
 
 class DateInstall extends AbstractInstall implements PriorityInterface, SingleInstallInterface
 {
+    #[Override]
     public function install(string $module): Generator
     {
         yield $timezoneInput = $this->getEnvInput('TIMEZONE', 'What is the timezone?');
@@ -23,11 +25,13 @@ class DateInstall extends AbstractInstall implements PriorityInterface, SingleIn
         ;
     }
 
+    #[Override]
     public function getPart(): string
     {
         return InstallService::PART_CONFIG;
     }
 
+    #[Override]
     public function getPriority(): int
     {
         return 800;

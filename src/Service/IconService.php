@@ -49,19 +49,20 @@ class IconService
 
         try {
             $this->modelManager->save($icon);
+            $id = $icon->getId() ?? 0;
             $this->fileService->copy(
                 $imageFilename,
-                $this->iconPath . DIRECTORY_SEPARATOR . 'icon' . $icon->getId() . '.' . $icon->getOriginalType(),
+                $this->iconPath . DIRECTORY_SEPARATOR . 'icon' . $id . '.' . $icon->getOriginalType(),
             );
 
             if ($iconFilename !== null && $iconFilename !== '') {
                 $this->fileService->copy(
                     $iconFilename,
-                    $this->iconPath . DIRECTORY_SEPARATOR . 'icon' . $icon->getId() . '.ico',
+                    $this->iconPath . DIRECTORY_SEPARATOR . 'icon' . $id . '.ico',
                 );
             }
 
-            $this->tagRepository->deleteByIconId($icon->getId() ?? 0);
+            $this->tagRepository->deleteByIconId($id);
 
             foreach ($tags as $tag) {
                 $this->modelManager->save(
@@ -89,10 +90,17 @@ class IconService
     public function delete(Icon $icon): void
     {
         $this->modelManager->delete($icon);
-        $this->fileService->delete($this->iconPath . DIRECTORY_SEPARATOR . 'icon' . $icon->getId() . '.' . $icon->getOriginalType());
+        $id = $icon->getId() ?? 0;
+        $this->fileService->delete($this->iconPath . DIRECTORY_SEPARATOR . 'icon' . $id . '.' . $icon->getOriginalType());
+        $iconFilename = sprintf(
+            '%s%sicon%s.ico',
+            $this->iconPath,
+            DIRECTORY_SEPARATOR,
+            $id,
+        );
 
-        if ($this->fileService->exists($this->iconPath . DIRECTORY_SEPARATOR . 'icon' . $icon->getId() . '.ico')) {
-            $this->fileService->delete($this->iconPath . DIRECTORY_SEPARATOR . 'icon' . $icon->getId() . '.ico');
+        if ($this->fileService->exists($iconFilename)) {
+            $this->fileService->delete($iconFilename);
         }
     }
 }

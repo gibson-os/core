@@ -8,9 +8,11 @@ use GibsonOS\Core\Exception\ResponseError;
 use GibsonOS\Core\Service\Response\AjaxResponse;
 use GibsonOS\Core\Service\Response\ExceptionResponse;
 use GibsonOS\Core\Service\Response\ResponseInterface;
+use Override;
 
 class AlwaysAjaxResponseService extends AbstractActionAttributeService
 {
+    #[Override]
     public function postExecute(AttributeInterface $attribute, ResponseInterface $response): void
     {
         if (

@@ -7,6 +7,7 @@ use GibsonOS\Core\Attribute\GetTableName;
 use GibsonOS\Core\Model\Icon;
 use GibsonOS\Core\Wrapper\DatabaseStoreWrapper;
 use MDO\Dto\Query\Join;
+use Override;
 
 /**
  * @extends AbstractDatabaseStore<Icon>
@@ -26,16 +27,19 @@ class IconStore extends AbstractDatabaseStore
         parent::__construct($databaseStoreWrapper);
     }
 
+    #[Override]
     protected function getModelClassName(): string
     {
         return Icon::class;
     }
 
+    #[Override]
     protected function getAlias(): ?string
     {
         return 'i';
     }
 
+    #[Override]
     protected function initQuery(): void
     {
         parent::initQuery();
@@ -47,6 +51,7 @@ class IconStore extends AbstractDatabaseStore
         $this->selectQuery->addJoin(new Join($this->getTable($this->iconTagTableName), 'it', '`it`.`icon_id`=`i`.`id`'));
     }
 
+    #[Override]
     protected function setWheres(): void
     {
         if ($this->tags === []) {

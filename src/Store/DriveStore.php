@@ -11,6 +11,7 @@ use MDO\Dto\Query\Join;
 use MDO\Enum\OrderDirection;
 use MDO\Exception\ClientException;
 use MDO\Exception\RecordException;
+use Override;
 
 /**
  * @extends AbstractDatabaseStore<Drive>
@@ -37,16 +38,19 @@ class DriveStore extends AbstractDatabaseStore
         parent::__construct($databaseStoreWrapper);
     }
 
+    #[Override]
     protected function getModelClassName(): string
     {
         return Drive::class;
     }
 
+    #[Override]
     protected function getAlias(): ?string
     {
         return 'd';
     }
 
+    #[Override]
     protected function initQuery(): void
     {
         parent::initQuery();
@@ -57,11 +61,13 @@ class DriveStore extends AbstractDatabaseStore
         ;
     }
 
+    #[Override]
     protected function getDefaultOrder(): array
     {
         return ['`ds`.`added`' => OrderDirection::ASC];
     }
 
+    #[Override]
     protected function setWheres(): void
     {
         $this->addWhere('`dsa`.`attribute_id`)=?', [$this->attributeId]);
@@ -134,6 +140,7 @@ class DriveStore extends AbstractDatabaseStore
      *
      * @return array
      */
+    #[Override]
     public function getList(): iterable
     {
         $this->selectQuery->setSelects([

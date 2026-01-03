@@ -17,6 +17,7 @@ use GibsonOS\Core\Repository\WeatherRepository;
 use GibsonOS\Core\Service\DateTimeService;
 use GibsonOS\Core\Service\WeatherService;
 use JsonException;
+use Override;
 use Psr\Log\LoggerInterface;
 use ReflectionException;
 
@@ -45,6 +46,7 @@ class WeatherCommand extends AbstractCommand
      * @throws WeatherError
      * @throws ReflectionException
      */
+    #[Override]
     protected function run(): int
     {
         foreach ($this->locationRepository->getToUpdate() as $location) {

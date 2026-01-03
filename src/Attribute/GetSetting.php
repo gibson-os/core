@@ -5,6 +5,7 @@ namespace GibsonOS\Core\Attribute;
 
 use Attribute;
 use GibsonOS\Core\Service\Attribute\SettingAttribute;
+use Override;
 
 #[Attribute(Attribute::TARGET_PARAMETER | Attribute::TARGET_PROPERTY)]
 class GetSetting implements AttributeInterface
@@ -15,6 +16,7 @@ class GetSetting implements AttributeInterface
     ) {
     }
 
+    #[Override]
     public function getAttributeServiceName(): string
     {
         return SettingAttribute::class;

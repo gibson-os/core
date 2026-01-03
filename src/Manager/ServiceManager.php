@@ -182,7 +182,11 @@ class ServiceManager
             fclose($handle);
 
             /** @var class-string $className */
-            $className = $hits[2] . '\\' . str_replace('.php', '', array_pop($pathParts));
+            $className = $hits[2] . '\\' . str_replace(
+                '.php',
+                '',
+                array_pop($pathParts) ?? throw new FactoryError('File name not found!'),
+            );
 
             return $className;
         }

@@ -8,8 +8,10 @@ use GibsonOS\Core\Dto\Ffmpeg\Stream\Subtitle;
 use GibsonOS\Core\Dto\Ffmpeg\Stream\Video;
 use GibsonOS\Core\Exception\Ffmpeg\NoAudioError;
 use GibsonOS\Core\Exception\Ffmpeg\NoSubtitleError;
+use GibsonOS\Core\Exception\Ffmpeg\NoVideoError;
 use InvalidArgumentException;
 use JsonSerializable;
+use Override;
 
 class Media implements JsonSerializable
 {
@@ -187,23 +189,31 @@ class Media implements JsonSerializable
      */
     public function getSelectedAudioStream(): Audio
     {
-        if (!isset($this->audioStreams[$this->selectedAudioStreamId])) {
+        $selectedAudioStreamId = $this->selectedAudioStreamId
+            ?? throw new NoAudioError('Kein Audio Stream selektiert!')
+        ;
+
+        if (!isset($this->audioStreams[$selectedAudioStreamId])) {
             throw new NoAudioError('Selektierter Audio Stream existiert nicht!');
         }
 
-        return $this->audioStreams[$this->selectedAudioStreamId];
+        return $this->audioStreams[$selectedAudioStreamId];
     }
 
     /**
-     * @throws NoAudioError
+     * @throws NoVideoError
      */
     public function getSelectedVideoStream(): Video
     {
-        if (!isset($this->videoStreams[$this->selectedVideoStreamId])) {
-            throw new NoAudioError('Selektierter Video Stream existiert nicht!');
+        $selectedVideoStreamId = $this->selectedAudioStreamId
+            ?? throw new NoVideoError('Kein Video Stream selektiert!')
+        ;
+
+        if (!isset($this->videoStreams[$selectedVideoStreamId])) {
+            throw new NoVideoError('Selektierter Video Stream existiert nicht!');
         }
 
-        return $this->videoStreams[$this->selectedVideoStreamId];
+        return $this->videoStreams[$selectedVideoStreamId];
     }
 
     /**
@@ -211,11 +221,15 @@ class Media implements JsonSerializable
      */
     public function getSelectedSubtitleStream(): Subtitle
     {
-        if (!isset($this->subtitleStreams[$this->selectedSubtitleStreamId])) {
+        $selectedSubtitleStreamId = $this->selectedSubtitleStreamId
+            ?? throw new NoSubtitleError('Kein Untertitel Stream selektiert!')
+        ;
+
+        if (!isset($this->subtitleStreams[$selectedSubtitleStreamId])) {
             throw new NoSubtitleError('Selektierter Untertitel Stream existiert nicht!');
         }
 
-        return $this->subtitleStreams[$this->selectedSubtitleStreamId];
+        return $this->subtitleStreams[$selectedSubtitleStreamId];
     }
 
     public function hasAudio(): bool
@@ -266,6 +280,7 @@ class Media implements JsonSerializable
         return $this;
     }
 
+    #[Override]
     public function jsonSerialize(): array
     {
         return [

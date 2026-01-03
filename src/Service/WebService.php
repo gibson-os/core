@@ -68,6 +68,11 @@ class WebService
         $curl = $this->initRequest($request, $method);
 
         $responseHandle = fopen('php://memory', 'r+');
+
+        if ($responseHandle === false) {
+            throw new WebException('Cannot open memory stream!');
+        }
+
         curl_setopt($curl, CURLOPT_FILE, $responseHandle);
         curl_setopt($curl, CURLOPT_HEADER, true);
 
@@ -110,6 +115,11 @@ class WebService
 
         $this->logger->debug('Call ' . ($method?->value ?? '') . ' ' . $url . '::' . $port);
         $curl = curl_init($url);
+
+        if ($curl === false) {
+            throw new WebException('curl not initialized!');
+        }
+
         curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $method?->value);
 
         $headers = $request->getHeaders();
@@ -175,7 +185,8 @@ class WebService
         $headerSize = curl_getinfo($curl, CURLINFO_HEADER_SIZE);
         curl_close($curl);
         rewind($responseHandle);
-        $length = fstat($responseHandle)['size'] - $headerSize;
+        $fstat = fstat($responseHandle) ?: [];
+        $length = ($fstat['size'] ?? 0) - $headerSize;
 
         if ($length <= 0 && $request->getMethod() !== HttpMethod::HEAD) {
             throw new WebException('No response length! Length: ' . $length);
@@ -186,7 +197,7 @@ class WebService
         return new Response(
             $request,
             $httpCode,
-            $this->getHeaders(fread($responseHandle, $headerSize)),
+            $this->getHeaders(fread($responseHandle, $headerSize) ?: ''),
             (new Body())->setResource($responseHandle, $length),
             $cookieFile,
         );

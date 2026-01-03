@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Dto\Parameter;
 
 use GibsonOS\Core\AutoComplete\AutoCompleteInterface;
+use Override;
 use stdClass;
 
 class AutoCompleteParameter extends AbstractParameter
@@ -27,7 +28,7 @@ class AutoCompleteParameter extends AbstractParameter
         return $this;
     }
 
-    public function setParameter(string $key, $value): AutoCompleteParameter
+    public function setParameter(string $key, bool $value): AutoCompleteParameter
     {
         $this->parameters[$key] = $value;
 
@@ -39,6 +40,7 @@ class AutoCompleteParameter extends AbstractParameter
         return $this->parameters;
     }
 
+    #[Override]
     protected function getTypeConfig(): array
     {
         return [
@@ -50,6 +52,7 @@ class AutoCompleteParameter extends AbstractParameter
         ];
     }
 
+    #[Override]
     public function getAllowedOperators(): array
     {
         return [

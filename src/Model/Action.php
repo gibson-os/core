@@ -9,6 +9,7 @@ use GibsonOS\Core\Attribute\Install\Database\Key;
 use GibsonOS\Core\Attribute\Install\Database\Table;
 use GibsonOS\Core\Enum\HttpMethod;
 use JsonSerializable;
+use Override;
 
 /**
  * @method Module getModule()
@@ -101,6 +102,7 @@ class Action extends AbstractModel implements JsonSerializable, AutoCompleteMode
         return $this;
     }
 
+    #[Override]
     public function jsonSerialize(): array
     {
         return [
@@ -112,6 +114,7 @@ class Action extends AbstractModel implements JsonSerializable, AutoCompleteMode
         ];
     }
 
+    #[Override]
     public function getAutoCompleteId(): int
     {
         return $this->getId() ?? 0;

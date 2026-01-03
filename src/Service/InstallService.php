@@ -54,7 +54,7 @@ class InstallService
     {
         $modules = $this->getModules();
         $moduleNames = array_map(
-            static fn (string $module): string => preg_replace('/.*\/(.*)/', '$1', $module),
+            static fn (string $module): ?string => preg_replace('/.*\/(.*)/', '$1', $module),
             $modules,
         );
         $parts = self::PARTS;
@@ -121,20 +121,20 @@ class InstallService
         }
 
         if ($configuration !== []) {
-            $envFilename = realpath(
+            $envFilename = (realpath(
                 dirname(__FILE__) . DIRECTORY_SEPARATOR .
                     '..' . DIRECTORY_SEPARATOR .
                     '..' . DIRECTORY_SEPARATOR .
                     '..' . DIRECTORY_SEPARATOR .
                     '..' . DIRECTORY_SEPARATOR .
                     '..' . DIRECTORY_SEPARATOR,
-            ) . DIRECTORY_SEPARATOR . '.env';
+            ) ?: '') . DIRECTORY_SEPARATOR . '.env';
 
             if (!$this->fileService->isWritable($envFilename, true)) {
                 throw new InstallException(sprintf('Env file "%s" is not writable!', $envFilename));
             }
 
-            $envFile = file_exists($envFilename) ? file_get_contents($envFilename) : '';
+            $envFile = file_exists($envFilename) ? (file_get_contents($envFilename) ?: '') : '';
             $oldEnvEntries = [];
 
             foreach (explode(PHP_EOL, $envFile) as $envEntry) {
@@ -166,12 +166,12 @@ class InstallService
      */
     private function getModules(): array
     {
-        $vendorPath = realpath(
+        $vendorPath = (realpath(
             dirname(__FILE__) . DIRECTORY_SEPARATOR .
             '..' . DIRECTORY_SEPARATOR .
             '..' . DIRECTORY_SEPARATOR .
             '..' . DIRECTORY_SEPARATOR,
-        ) . DIRECTORY_SEPARATOR;
+        ) ?: '') . DIRECTORY_SEPARATOR;
         $modules = [];
 
         foreach ($this->dirService->getFiles($vendorPath) as $dir) {

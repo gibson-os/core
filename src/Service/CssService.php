@@ -19,13 +19,13 @@ class CssService
         private readonly FileService $fileService,
         private readonly PermissionService $permissionService,
     ) {
-        $this->vendorPath = realpath(
+        $this->vendorPath = (realpath(
             dirname(__FILE__) . DIRECTORY_SEPARATOR .
             '..' . DIRECTORY_SEPARATOR .
             '..' . DIRECTORY_SEPARATOR .
             '..' . DIRECTORY_SEPARATOR .
             '..',
-        ) . DIRECTORY_SEPARATOR;
+        ) ?: '') . DIRECTORY_SEPARATOR;
     }
 
     /**
@@ -83,7 +83,13 @@ class CssService
 
         foreach ($this->dirService->getFiles($dir) as $path) {
             if ($this->fileService->getFileEnding($path) === 'css') {
-                $files[$path] = new Css($path, file_get_contents($path));
+                $content = file_get_contents($path);
+
+                if ($content === false) {
+                    throw new GetError('Could not read file ' . $path);
+                }
+
+                $files[$path] = new Css($path, $content);
             } elseif (is_dir($path)) {
                 $files = array_merge($files, $this->getFiles($path));
             }
@@ -92,7 +98,7 @@ class CssService
         return $files;
     }
 
-    private function transformModuleName(string $moduleName): string
+    private function transformModuleName(string $moduleName): ?string
     {
         return preg_replace_callback(
             '/([a-z])([A-Z])/',

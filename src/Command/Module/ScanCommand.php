@@ -7,6 +7,7 @@ use GibsonOS\Core\Command\AbstractCommand;
 use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\Model\SaveError;
 use GibsonOS\Core\Service\ModuleService;
+use Override;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -23,6 +24,7 @@ class ScanCommand extends AbstractCommand
      * @throws GetError
      * @throws SaveError
      */
+    #[Override]
     protected function run(): int
     {
         $this->moduleService->scan();

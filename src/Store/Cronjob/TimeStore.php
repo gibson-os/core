@@ -7,6 +7,7 @@ use GibsonOS\Core\Model\Cronjob;
 use GibsonOS\Core\Model\Cronjob\Time;
 use GibsonOS\Core\Store\AbstractDatabaseStore;
 use MDO\Dto\Record;
+use Override;
 
 /**
  * @extends AbstractDatabaseStore<Time>
@@ -25,11 +26,13 @@ class TimeStore extends AbstractDatabaseStore
 
     private ?Cronjob $cronjob = null;
 
+    #[Override]
     protected function getModelClassName(): string
     {
         return Time::class;
     }
 
+    #[Override]
     protected function setWheres(): void
     {
         if ($this->cronjob instanceof Cronjob) {
@@ -37,6 +40,7 @@ class TimeStore extends AbstractDatabaseStore
         }
     }
 
+    #[Override]
     public function getList(): array
     {
         $this->initQuery();

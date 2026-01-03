@@ -84,7 +84,7 @@ class MediaService
                 $media->selectVideoStream($streamIds[0]);
             }
 
-            $media->setFrames((int) ceil($media->getDuration() * $media->getSelectedVideoStream()->getFps()));
+            $media->setFrames((int) ceil($media->getDuration() * (float) $media->getSelectedVideoStream()->getFps()));
         }
 
         if (
@@ -138,9 +138,11 @@ class MediaService
     public function getImageBySecond(MediaDto $media, int $second, ?int $frame = null): Image
     {
         if ($second > $media->getDuration()) {
-            throw new OutOfRangeException(
-                'Sekunde ' . $second . ' ist größer als ' . $media->getDuration() . '!',
-            );
+            throw new OutOfRangeException(sprintf(
+                'Sekunde %s ist größer als %s!',
+                $second,
+                $media->getDuration(),
+            ));
         }
 
         return $this->getImageByFrame($media, ($second * $media->getSelectedVideoStream()->getFps()) + $frame);
@@ -260,11 +262,10 @@ class MediaService
         $propertiesString = (string) preg_replace('/(\([^\(].),(.+?\))/', '$1{%%KOMMA%%}$2', $propertiesString);
         $properties = explode(',', $propertiesString);
         $properties[count($properties) - 1] = preg_replace('/\(.*?$/', '', $properties[count($properties) - 1]);
+        $properties = array_filter($properties);
 
         return array_map(
-            function (string $str) {
-                return str_replace('{%%KOMMA%%}', ',', $str);
-            },
+            fn (string $str): string => str_replace('{%%KOMMA%%}', ',', $str),
             $properties,
         );
     }

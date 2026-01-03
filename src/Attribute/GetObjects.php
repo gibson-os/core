@@ -5,6 +5,7 @@ namespace GibsonOS\Core\Attribute;
 
 use Attribute;
 use GibsonOS\Core\Service\Attribute\ObjectsMapperAttribute;
+use Override;
 
 #[Attribute(Attribute::TARGET_PARAMETER)]
 class GetObjects implements AttributeInterface
@@ -25,6 +26,7 @@ class GetObjects implements AttributeInterface
         return $this->className;
     }
 
+    #[Override]
     public function getAttributeServiceName(): string
     {
         return ObjectsMapperAttribute::class;

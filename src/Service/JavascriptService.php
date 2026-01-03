@@ -18,13 +18,13 @@ class JavascriptService
         private readonly DirService $dirService,
         private readonly FileService $fileService,
     ) {
-        $this->vendorPath = realpath(
+        $this->vendorPath = (realpath(
             dirname(__FILE__) . DIRECTORY_SEPARATOR .
             '..' . DIRECTORY_SEPARATOR .
             '..' . DIRECTORY_SEPARATOR .
             '..' . DIRECTORY_SEPARATOR .
             '..',
-        ) . DIRECTORY_SEPARATOR;
+        ) ?: '') . DIRECTORY_SEPARATOR;
     }
 
     /**
@@ -37,12 +37,15 @@ class JavascriptService
         $oldData = '';
 
         foreach ($this->permissionViewRepository->getTaskList($userId, $module) as $task) {
-            $dir =
-                'js' . DIRECTORY_SEPARATOR .
-                'module' . DIRECTORY_SEPARATOR .
-                $task->get('module')->getValue() . DIRECTORY_SEPARATOR .
-                $task->get('task')->getValue() . DIRECTORY_SEPARATOR
-            ;
+            $dir = sprintf(
+                'js%smodule%s%s%s%s%s',
+                DIRECTORY_SEPARATOR,
+                DIRECTORY_SEPARATOR,
+                $task->get('module')->getValue() ?? '',
+                DIRECTORY_SEPARATOR,
+                $task->get('task')->getValue() ?? '',
+                DIRECTORY_SEPARATOR,
+            );
             /** @var Javascript[] $files */
             $files = array_merge($files, $this->getFiles($dir));
 
@@ -81,12 +84,15 @@ class JavascriptService
                 continue;
             }
 
-            $dir =
-                'js' . DIRECTORY_SEPARATOR .
-                'module' . DIRECTORY_SEPARATOR .
-                $permission->get('module')->getValue() . DIRECTORY_SEPARATOR .
-                $permission->get('task')->getValue() . DIRECTORY_SEPARATOR
-            ;
+            $dir = sprintf(
+                'js%smodule%s%s%s%s%s',
+                DIRECTORY_SEPARATOR,
+                DIRECTORY_SEPARATOR,
+                $permission->get('module')->getValue() ?? '',
+                DIRECTORY_SEPARATOR,
+                $permission->get('task')->getValue() ?? '',
+                DIRECTORY_SEPARATOR,
+            );
             /** @var Javascript[] $files */
             $files = array_merge($files, $this->getFiles($dir));
 
@@ -122,6 +128,11 @@ class JavascriptService
         foreach ($this->dirService->getFiles($dir) as $path) {
             if ($this->fileService->getFileEnding($path) === 'js') {
                 $content = file_get_contents($path);
+
+                if ($content === false) {
+                    throw new GetError('Could not read file ' . $path);
+                }
+
                 $classname = $this->getClassname($path);
 
                 $files[$classname] = (new Javascript($path, $classname, $content))
@@ -201,7 +212,7 @@ class JavascriptService
 
         $javascript->setLoaded(true);
 
-        return $content . $javascript . PHP_EOL;
+        return $content . $javascript->__toString() . PHP_EOL;
     }
 
     /**
@@ -215,7 +226,13 @@ class JavascriptService
 
         if (file_exists($filename)) {
             $return .= "\n/* " . $filename . " */\n";
-            $return .= file_get_contents($filename);
+            $content = file_get_contents($filename);
+
+            if ($content === false) {
+                throw new GetError('Could not read file ' . $filename);
+            }
+
+            $return .= $content;
         }
 
         return $return;
@@ -246,7 +263,7 @@ class JavascriptService
         );
     }
 
-    private function transformModuleName(string $moduleName): string
+    private function transformModuleName(string $moduleName): ?string
     {
         return preg_replace_callback(
             '/([a-z])([A-Z])/',

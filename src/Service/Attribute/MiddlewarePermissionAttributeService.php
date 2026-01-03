@@ -12,6 +12,7 @@ use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Exception\RequestError;
 use GibsonOS\Core\Model\Setting;
 use GibsonOS\Core\Service\RequestService;
+use Override;
 
 class MiddlewarePermissionAttributeService extends AbstractActionAttributeService
 {
@@ -28,6 +29,7 @@ class MiddlewarePermissionAttributeService extends AbstractActionAttributeServic
      * @throws LoginRequired
      * @throws SelectError
      */
+    #[Override]
     public function preExecute(AttributeInterface $attribute, array $parameters, array $reflectionParameters): array
     {
         if (!$attribute instanceof CheckMiddlewarePermission) {
@@ -51,6 +53,7 @@ class MiddlewarePermissionAttributeService extends AbstractActionAttributeServic
         return $parameters;
     }
 
+    #[Override]
     public function usedParameters(AttributeInterface $attribute): array
     {
         if (!$attribute instanceof CheckMiddlewarePermission) {

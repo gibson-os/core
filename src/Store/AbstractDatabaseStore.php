@@ -19,6 +19,7 @@ use MDO\Enum\OrderDirection;
 use MDO\Exception\ClientException;
 use MDO\Exception\RecordException;
 use MDO\Query\SelectQuery;
+use Override;
 use ReflectionException;
 
 /**
@@ -61,6 +62,7 @@ abstract class AbstractDatabaseStore extends AbstractStore
         $this->table = $this->databaseStoreWrapper->getTableManager()->getTable($this->tableName);
     }
 
+    #[Override]
     public function setLimit(int $rows, int $from): self
     {
         parent::setLimit($rows, $from);
@@ -71,6 +73,7 @@ abstract class AbstractDatabaseStore extends AbstractStore
     /**
      * @param array<string, string[]> $filters
      */
+    #[Override]
     public function setFilters(array $filters): self
     {
         $this->filters = $filters;
@@ -128,6 +131,7 @@ abstract class AbstractDatabaseStore extends AbstractStore
      *
      * @return array|iterable<T>
      */
+    #[Override]
     public function getList(): iterable
     {
         $this->initQuery();
@@ -141,6 +145,7 @@ abstract class AbstractDatabaseStore extends AbstractStore
      * @throws ReflectionException
      * @throws StoreException
      */
+    #[Override]
     public function getCount(): int
     {
         $rows = $this->getRows();
@@ -157,7 +162,7 @@ abstract class AbstractDatabaseStore extends AbstractStore
         $this->selectQuery->setSelects($selects);
         $this->setLimit($rows, $from);
 
-        return (int) ($result->iterateRecords()->current()->get('count')->getValue() ?? 0);
+        return (int) ($result->iterateRecords()->current()?->get('count')->getValue() ?? 0);
     }
 
     protected function getCountField(): string
@@ -261,6 +266,7 @@ abstract class AbstractDatabaseStore extends AbstractStore
     {
     }
 
+    #[Override]
     public function setSortByExt(array $sort): self
     {
         $mapping = $this->getOrderMapping();

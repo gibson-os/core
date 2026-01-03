@@ -7,9 +7,11 @@ use Generator;
 use GibsonOS\Core\Dto\Install\Configuration;
 use GibsonOS\Core\Service\InstallService;
 use GibsonOS\Core\Service\PriorityInterface;
+use Override;
 
 class OpenweathermapInstall extends AbstractInstall implements PriorityInterface
 {
+    #[Override]
     public function install(string $module): Generator
     {
         yield $apiKeyInput = $this->getEnvInput('OPENWEATHERMAP_API_KEY', 'What is the openweathermap API key?');
@@ -21,16 +23,19 @@ class OpenweathermapInstall extends AbstractInstall implements PriorityInterface
         ;
     }
 
+    #[Override]
     public function getPart(): string
     {
         return InstallService::PART_CONFIG;
     }
 
+    #[Override]
     public function getModule(): ?string
     {
         return 'core';
     }
 
+    #[Override]
     public function getPriority(): int
     {
         return 800;

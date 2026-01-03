@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Dto\Parameter;
 
+use Override;
+
 class FloatParameter extends AbstractParameter
 {
     private ?int $min = null;
@@ -31,6 +33,7 @@ class FloatParameter extends AbstractParameter
         return $this;
     }
 
+    #[Override]
     protected function getTypeConfig(): array
     {
         return [
@@ -40,6 +43,7 @@ class FloatParameter extends AbstractParameter
         ];
     }
 
+    #[Override]
     public function getAllowedOperators(): array
     {
         return [

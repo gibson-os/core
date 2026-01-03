@@ -11,6 +11,7 @@ use GibsonOS\Core\Install\AbstractInstall;
 use GibsonOS\Core\Service\InstallService;
 use GibsonOS\Core\Service\PriorityInterface;
 use JsonException;
+use Override;
 use ReflectionException;
 
 class AppData extends AbstractInstall implements PriorityInterface
@@ -21,6 +22,7 @@ class AppData extends AbstractInstall implements PriorityInterface
      * @throws JsonException
      * @throws ReflectionException
      */
+    #[Override]
     public function install(string $module): Generator
     {
         $this->addApp('Laufwerke', 'core', 'drive', 'index', 'icon_harddrive');
@@ -28,16 +30,19 @@ class AppData extends AbstractInstall implements PriorityInterface
         yield new Success('Core apps installed!');
     }
 
+    #[Override]
     public function getPart(): string
     {
         return InstallService::PART_DATA;
     }
 
+    #[Override]
     public function getModule(): ?string
     {
         return 'core';
     }
 
+    #[Override]
     public function getPriority(): int
     {
         return 0;

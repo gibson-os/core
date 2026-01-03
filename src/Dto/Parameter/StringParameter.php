@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Dto\Parameter;
 
+use Override;
+
 class StringParameter extends AbstractParameter
 {
     public const INPUT_TYPE_TEXT = 'text';
@@ -20,11 +22,13 @@ class StringParameter extends AbstractParameter
         parent::__construct($title, 'gosCoreComponentFormFieldTextField');
     }
 
+    #[Override]
     protected function getTypeConfig(): array
     {
         return ['inputType' => $this->inputType];
     }
 
+    #[Override]
     public function getAllowedOperators(): array
     {
         return [

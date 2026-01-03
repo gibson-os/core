@@ -6,6 +6,7 @@ namespace GibsonOS\Core\Attribute\Validation;
 use Attribute;
 use DateTimeInterface;
 use GibsonOS\Core\Validator\GreaterValidator;
+use Override;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class Greater extends AbstractValidation
@@ -14,11 +15,13 @@ class Greater extends AbstractValidation
     {
     }
 
+    #[Override]
     public function getAttributeServiceName(): string
     {
         return GreaterValidator::class;
     }
 
+    #[Override]
     public function getMessage(mixed $value): string
     {
         $greaterThan = $this->getGreaterThan();

@@ -9,6 +9,7 @@ use GibsonOS\Core\Attribute\Install\Database\Table;
 use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Model\User;
 use JsonSerializable;
+use Override;
 
 /**
  * @method User getUser()
@@ -155,6 +156,7 @@ class Item extends AbstractModel implements JsonSerializable
         return $this;
     }
 
+    #[Override]
     public function jsonSerialize(): array
     {
         $parameters = $this->getParameters();

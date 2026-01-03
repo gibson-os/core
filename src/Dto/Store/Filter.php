@@ -7,6 +7,7 @@ use GibsonOS\Core\Dto\Store\Filter\Option;
 use GibsonOS\Core\Wrapper\DatabaseStoreWrapper;
 use JsonSerializable;
 use MDO\Dto\Query\Where;
+use Override;
 
 class Filter implements FilterInterface, JsonSerializable
 {
@@ -44,6 +45,7 @@ class Filter implements FilterInterface, JsonSerializable
         return $this->field;
     }
 
+    #[Override]
     public function jsonSerialize(): array
     {
         return [
@@ -53,6 +55,7 @@ class Filter implements FilterInterface, JsonSerializable
         ];
     }
 
+    #[Override]
     public function getWhere(string $field, array $values, DatabaseStoreWrapper $databaseStoreWrapper): Where
     {
         $fieldName = $this->getField();

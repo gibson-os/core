@@ -16,6 +16,7 @@ use GibsonOS\Core\Wrapper\DatabaseStoreWrapper;
 use MDO\Dto\Value;
 use MDO\Exception\ClientException;
 use MDO\Query\SelectQuery;
+use Override;
 
 class PermissionStore extends AbstractStore
 {
@@ -40,6 +41,7 @@ class PermissionStore extends AbstractStore
     ) {
     }
 
+    #[Override]
     public function getCount(): int
     {
         $selectQuery = (new SelectQuery($this->databaseStoreWrapper->getTableManager()->getTable($this->userTableName)))
@@ -48,9 +50,10 @@ class PermissionStore extends AbstractStore
 
         $result = $this->databaseStoreWrapper->getClient()->execute($selectQuery);
 
-        return (int) ($result->iterateRecords()->current()->get('count')->getValue() ?? 0);
+        return (int) ($result->iterateRecords()->current()?->get('count')->getValue() ?? 0);
     }
 
+    #[Override]
     public function getList(): Generator
     {
         $selects = [

@@ -21,6 +21,7 @@ use MDO\Exception\ClientException;
 use MDO\Exception\RecordException;
 use MDO\Manager\TableManager;
 use MDO\Query\SelectQuery;
+use Override;
 use ReflectionException;
 use ReflectionParameter;
 
@@ -46,6 +47,7 @@ class ModelFetcherAttribute implements AttributeServiceInterface, ParameterAttri
      * @throws ClientException
      * @throws RecordException
      */
+    #[Override]
     public function replace(
         AttributeInterface $attribute,
         array $parameters,

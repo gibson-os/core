@@ -12,6 +12,7 @@ use GibsonOS\Core\Attribute\Install\Database\Table;
 use GibsonOS\Core\Model\User\Device;
 use GibsonOS\Core\Wrapper\ModelWrapper;
 use JsonSerializable;
+use Override;
 
 /**
  * @method Device[] getDevices()
@@ -141,6 +142,7 @@ class User extends AbstractModel implements JsonSerializable, AutoCompleteModelI
         return $this;
     }
 
+    #[Override]
     public function jsonSerialize(): array
     {
         return [
@@ -154,6 +156,7 @@ class User extends AbstractModel implements JsonSerializable, AutoCompleteModelI
         ];
     }
 
+    #[Override]
     public function getAutoCompleteId(): int
     {
         return $this->getId() ?? 0;

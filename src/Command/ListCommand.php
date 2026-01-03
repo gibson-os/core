@@ -7,6 +7,7 @@ use GibsonOS\Core\Attribute\Install\Cronjob;
 use GibsonOS\Core\Dto\Command;
 use GibsonOS\Core\Service\Command\TableService;
 use GibsonOS\Core\Store\CommandStore;
+use Override;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -22,6 +23,7 @@ class ListCommand extends AbstractCommand
         parent::__construct($logger);
     }
 
+    #[Override]
     protected function run(): int
     {
         echo PHP_EOL . $this->tableService->getTable(

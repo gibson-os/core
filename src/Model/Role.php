@@ -10,6 +10,7 @@ use GibsonOS\Core\Attribute\Install\Database\Table;
 use GibsonOS\Core\Model\Role\Permission;
 use GibsonOS\Core\Model\Role\User as RoleUser;
 use JsonSerializable;
+use Override;
 
 /**
  * @method Permission[] getPermissions()
@@ -65,6 +66,7 @@ class Role extends AbstractModel implements JsonSerializable
         return $this;
     }
 
+    #[Override]
     public function jsonSerialize(): array
     {
         return [

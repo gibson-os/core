@@ -17,6 +17,7 @@ use GibsonOS\Core\Service\InstallService;
 use GibsonOS\Core\Service\PriorityInterface;
 use MDO\Client;
 use MDO\Exception\ClientException;
+use Override;
 use ReflectionException;
 
 class ViewInstall extends AbstractInstall implements PriorityInterface
@@ -35,6 +36,7 @@ class ViewInstall extends AbstractInstall implements PriorityInterface
      * @throws ReflectionException
      * @throws InstallException
      */
+    #[Override]
     public function install(string $module): Generator
     {
         $path = $this->dirService->addEndSlash($module) . 'src' . DIRECTORY_SEPARATOR . 'Model';
@@ -82,11 +84,13 @@ class ViewInstall extends AbstractInstall implements PriorityInterface
         }
     }
 
+    #[Override]
     public function getPart(): string
     {
         return InstallService::PART_DATABASE;
     }
 
+    #[Override]
     public function getPriority(): int
     {
         return 697;

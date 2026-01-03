@@ -14,6 +14,7 @@ use GibsonOS\Core\Wrapper\DatabaseStoreWrapper;
 use JsonException;
 use MDO\Exception\ClientException;
 use MDO\Exception\RecordException;
+use Override;
 use ReflectionException;
 
 /**
@@ -31,16 +32,19 @@ class TriggerStore extends AbstractDatabaseStore
         parent::__construct($databaseStoreWrapper);
     }
 
+    #[Override]
     protected function getModelClassName(): string
     {
         return Trigger::class;
     }
 
+    #[Override]
     protected function setWheres(): void
     {
         $this->addWhere('`event_id`=?', [$this->event->getId() ?? 0]);
     }
 
+    #[Override]
     protected function initQuery(): void
     {
         parent::initQuery();
@@ -57,6 +61,7 @@ class TriggerStore extends AbstractDatabaseStore
      * @throws ClientException
      * @throws RecordException
      */
+    #[Override]
     public function getList(): iterable
     {
         $models = [];

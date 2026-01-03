@@ -9,6 +9,7 @@ use GibsonOS\Core\Command\CommandInterface;
 use GibsonOS\Core\Dto\Command;
 use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Service\CommandService;
+use Override;
 use ReflectionAttribute;
 use ReflectionException;
 use Traversable;
@@ -31,6 +32,7 @@ class CommandStore extends AbstractStore
      *
      * @return Traversable<Command>
      */
+    #[Override]
     public function getList(): Traversable
     {
         foreach ($this->classStrings as $classString) {
@@ -66,6 +68,7 @@ class CommandStore extends AbstractStore
         }
     }
 
+    #[Override]
     public function getCount(): int
     {
         return count($this->classStrings);

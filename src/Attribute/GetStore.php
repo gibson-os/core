@@ -5,6 +5,7 @@ namespace GibsonOS\Core\Attribute;
 
 use Attribute;
 use GibsonOS\Core\Service\Attribute\StoreAttribute;
+use Override;
 
 #[Attribute(Attribute::TARGET_PARAMETER)]
 class GetStore implements AttributeInterface
@@ -17,6 +18,7 @@ class GetStore implements AttributeInterface
     ) {
     }
 
+    #[Override]
     public function getAttributeServiceName(): string
     {
         return StoreAttribute::class;

@@ -6,6 +6,7 @@ namespace GibsonOS\Core\OpenTelemetry\Instrumentation;
 use GibsonOS\Core\Service\ControllerService;
 use GibsonOS\Core\Service\OpenTelemetry\InstrumentationService;
 use OpenTelemetry\API\Instrumentation\CachedInstrumentation;
+use Override;
 
 class ControllerInstrumentation implements InstrumentationInterface
 {
@@ -13,6 +14,7 @@ class ControllerInstrumentation implements InstrumentationInterface
     {
     }
 
+    #[Override]
     public function __invoke(): void
     {
         $instrumentation = new CachedInstrumentation('mysqli');

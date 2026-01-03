@@ -11,6 +11,7 @@ use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Manager\ServiceManager;
 use GibsonOS\Core\Utility\JsonUtility;
 use JsonException;
+use Override;
 use ReflectionException;
 use ReflectionParameter;
 use ReflectionProperty;
@@ -36,6 +37,7 @@ class ObjectMapper implements ObjectMapperInterface
      *
      * @return T
      */
+    #[Override]
     public function mapToObject(string $className, array $properties): object
     {
         $reflectionClass = $this->reflectionManager->getReflectionClass($className);

@@ -10,6 +10,7 @@ use GibsonOS\Core\Attribute\Install\Database\Key;
 use GibsonOS\Core\Attribute\Install\Database\Table;
 use GibsonOS\Core\Wrapper\ModelWrapper;
 use JsonSerializable;
+use Override;
 
 #[Table('system_drive')]
 class Drive extends AbstractModel implements JsonSerializable
@@ -341,6 +342,7 @@ class Drive extends AbstractModel implements JsonSerializable
         return $this;
     }
 
+    #[Override]
     public function jsonSerialize(): array
     {
         return [

@@ -10,6 +10,7 @@ use GibsonOS\Core\Attribute\Install\Database\Table;
 use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Model\Icon;
 use JsonSerializable;
+use Override;
 
 /**
  * @method Icon getIcon()
@@ -52,6 +53,7 @@ class Tag extends AbstractModel implements JsonSerializable
         return $this;
     }
 
+    #[Override]
     public function jsonSerialize(): array
     {
         return [

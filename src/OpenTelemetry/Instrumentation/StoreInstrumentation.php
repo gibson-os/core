@@ -6,6 +6,7 @@ namespace GibsonOS\Core\OpenTelemetry\Instrumentation;
 use GibsonOS\Core\Service\OpenTelemetry\InstrumentationService;
 use GibsonOS\Core\Store\AbstractStore;
 use OpenTelemetry\API\Instrumentation\CachedInstrumentation;
+use Override;
 
 class StoreInstrumentation implements InstrumentationInterface
 {
@@ -13,6 +14,7 @@ class StoreInstrumentation implements InstrumentationInterface
     {
     }
 
+    #[Override]
     public function __invoke(): void
     {
         $instrumentation = new CachedInstrumentation('gibsonOS.store');

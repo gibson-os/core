@@ -95,14 +95,14 @@ class CommandService
     public function executeAsync(string $commandClassname, array $arguments = [], array $options = []): void
     {
         $commandName = $this->getCommandName($commandClassname);
-        $commandPath = realpath(
+        $commandPath = (realpath(
             dirname(__FILE__) .
                 DIRECTORY_SEPARATOR . '..' .
                 DIRECTORY_SEPARATOR . '..' .
                 DIRECTORY_SEPARATOR . '..' .
                 DIRECTORY_SEPARATOR . '..' .
                 DIRECTORY_SEPARATOR . '..',
-        ) . DIRECTORY_SEPARATOR . 'bin' . DIRECTORY_SEPARATOR . 'command';
+        ) ?: '') . DIRECTORY_SEPARATOR . 'bin' . DIRECTORY_SEPARATOR . 'command';
 
         $traceId = $this->spanService->getTraceId();
         $spanId = $this->spanService->getSpanId();
@@ -125,12 +125,16 @@ class CommandService
 
     /**
      * @param class-string $className
+     *
+     * @throws CommandError
      */
     public function getCommandName(string $className): string
     {
         $commandName = mb_substr(str_replace('Command\\', '', $className), 0, -7);
 
-        return preg_replace('/^GibsonOS\\\\(Module\\\\)?/', '', $commandName);
+        return preg_replace('/^GibsonOS\\\\(Module\\\\)?/', '', $commandName)
+            ?? throw new CommandError('Command name is not found!')
+        ;
     }
 
     /**
@@ -180,8 +184,12 @@ class CommandService
         $possibleCommands = reset($possibleCommands) ?: [];
 
         foreach ($commandNameParts ?? [] as $commandNamePart) {
+            if (!is_array($possibleCommands)) {
+                $possibleCommands = [];
+            }
+
             $possibleCommands = $this->getPossibleCommandsPart($possibleCommands, $commandNamePart);
-            $possibleCommands = reset($possibleCommands);
+            $possibleCommands = reset($possibleCommands) ?: [];
         }
 
         if (is_string($possibleCommands)) {

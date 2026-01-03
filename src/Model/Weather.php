@@ -12,6 +12,7 @@ use GibsonOS\Core\Attribute\Install\Database\Table;
 use GibsonOS\Core\Model\Weather\Location;
 use GibsonOS\Core\Wrapper\ModelWrapper;
 use JsonSerializable;
+use Override;
 
 /**
  * @method Location getLocation()
@@ -346,6 +347,7 @@ class Weather extends AbstractModel implements JsonSerializable
         return $this;
     }
 
+    #[Override]
     public function jsonSerialize(): array
     {
         return [

@@ -19,6 +19,7 @@ use GibsonOS\Core\Wrapper\ModelWrapper;
 use JsonException;
 use MDO\Exception\ClientException;
 use MDO\Exception\RecordException;
+use Override;
 use ReflectionAttribute;
 use ReflectionException;
 use ReflectionParameter;
@@ -45,6 +46,7 @@ class ModelsMapperAttribute implements AttributeServiceInterface, ParameterAttri
      *
      * @return AbstractModel[]|null
      */
+    #[Override]
     public function replace(AttributeInterface $attribute, array $parameters, ReflectionParameter $reflectionParameter): ?array
     {
         if (!$attribute instanceof GetMappedModels) {

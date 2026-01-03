@@ -26,7 +26,7 @@ abstract class AbstractController
         ;
     }
 
-    protected function returnSuccess($data = null, ?int $total = null): AjaxResponse
+    protected function returnSuccess(mixed $data = null, ?int $total = null): AjaxResponse
     {
         $return = [
             'success' => true,
@@ -41,7 +41,7 @@ abstract class AbstractController
         return new AjaxResponse($return);
     }
 
-    protected function returnFailure($message, HttpStatusCode $code = HttpStatusCode::BAD_REQUEST): AjaxResponse
+    protected function returnFailure(string $message, HttpStatusCode $code = HttpStatusCode::BAD_REQUEST): AjaxResponse
     {
         return new AjaxResponse([
             'success' => false,

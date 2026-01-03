@@ -10,6 +10,7 @@ use GibsonOS\Core\Exception\FileNotFound;
 use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\Image\CreateError;
 use GibsonOS\Core\Exception\Image\LoadError;
+use GibsonOS\Core\Exception\ImageException;
 use Throwable;
 
 class ImageService
@@ -114,9 +115,16 @@ class ImageService
         return $Image;
     }
 
+    /**
+     * @throws ImageException
+     */
     public static function getImageTypeByFilename(string $filename): string
     {
-        return preg_replace('/.*\//', '', mime_content_type($filename));
+        return preg_replace(
+            '/.*\//',
+            '',
+            mime_content_type($filename) ?: throw new ImageException(sprintf('Could not get image type by filename %s!', $filename)),
+        ) ?? throw new ImageException(sprintf('Could not get image type by filename %s!', $filename));
     }
 
     public static function getImageTypeByMimeType(string $mimeType): string

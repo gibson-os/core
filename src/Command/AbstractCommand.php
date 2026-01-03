@@ -6,6 +6,7 @@ namespace GibsonOS\Core\Command;
 use GibsonOS\Core\Attribute\Command\Argument;
 use GibsonOS\Core\Attribute\Command\Option;
 use GibsonOS\Core\Service\LoggerService;
+use Override;
 use Psr\Log\LoggerInterface;
 
 abstract class AbstractCommand implements CommandInterface
@@ -38,6 +39,7 @@ abstract class AbstractCommand implements CommandInterface
 
     abstract protected function run(): int;
 
+    #[Override]
     public function execute(): int
     {
         if ($this->logger instanceof LoggerService) {

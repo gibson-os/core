@@ -12,6 +12,7 @@ use GibsonOS\Core\Exception\FactoryError;
 use GibsonOS\Core\Exception\Model\SaveError;
 use GibsonOS\Core\Service\EventService;
 use JsonException;
+use Override;
 use Psr\Log\LoggerInterface;
 use ReflectionException;
 
@@ -34,6 +35,7 @@ class CronjobCommand extends AbstractCommand
      * @throws JsonException
      * @throws ReflectionException
      */
+    #[Override]
     protected function run(): int
     {
         $this->eventService->fireInCommand(TimeEvent::class, TimeEvent::TRIGGER_CRONJOB);

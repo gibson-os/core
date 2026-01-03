@@ -7,6 +7,7 @@ use GibsonOS\Core\AutoComplete\AutoCompleteInterface;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\Weather\Location;
 use GibsonOS\Core\Repository\Weather\LocationRepository;
+use Override;
 
 class LocationAutoComplete implements AutoCompleteInterface
 {
@@ -14,6 +15,7 @@ class LocationAutoComplete implements AutoCompleteInterface
     {
     }
 
+    #[Override]
     public function getByNamePart(string $namePart, array $parameters): array
     {
         return $this->locationRepository->findByName($namePart, (bool) ($parameters['onlyActive'] ?? false));
@@ -22,21 +24,25 @@ class LocationAutoComplete implements AutoCompleteInterface
     /**
      * @throws SelectError
      */
+    #[Override]
     public function getById(string $id, array $parameters): Location
     {
         return $this->locationRepository->getById((int) $id);
     }
 
+    #[Override]
     public function getModel(): string
     {
         return 'GibsonOS.module.core.weather.model.Location';
     }
 
+    #[Override]
     public function getValueField(): string
     {
         return 'id';
     }
 
+    #[Override]
     public function getDisplayField(): string
     {
         return 'name';

@@ -21,6 +21,7 @@ use MDO\Client;
 use MDO\Dto\Record;
 use MDO\Exception\ClientException;
 use MDO\Exception\RecordException;
+use Override;
 use ReflectionAttribute;
 use ReflectionException;
 
@@ -42,6 +43,7 @@ class ConstraintInstall extends AbstractInstall implements PriorityInterface
      * @throws ReflectionException
      * @throws RecordException
      */
+    #[Override]
     public function install(string $module): Generator
     {
         $path = $this->dirService->addEndSlash($module) . 'src' . DIRECTORY_SEPARATOR . 'Model';
@@ -150,11 +152,13 @@ class ConstraintInstall extends AbstractInstall implements PriorityInterface
         }
     }
 
+    #[Override]
     public function getPart(): string
     {
         return InstallService::PART_DATABASE;
     }
 
+    #[Override]
     public function getPriority(): int
     {
         return 698;

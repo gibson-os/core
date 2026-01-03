@@ -11,6 +11,7 @@ use GibsonOS\Core\Model\SmartAttribute;
 use GibsonOS\Core\Service\InstallService;
 use GibsonOS\Core\Service\PriorityInterface;
 use JsonException;
+use Override;
 use ReflectionException;
 
 class SmartAttributeData extends AbstractInstall implements PriorityInterface
@@ -20,6 +21,7 @@ class SmartAttributeData extends AbstractInstall implements PriorityInterface
      * @throws ReflectionException
      * @throws SaveError
      */
+    #[Override]
     public function install(string $module): Generator
     {
         $this
@@ -106,16 +108,19 @@ class SmartAttributeData extends AbstractInstall implements PriorityInterface
         return $this;
     }
 
+    #[Override]
     public function getPart(): string
     {
         return InstallService::PART_DATA;
     }
 
+    #[Override]
     public function getModule(): ?string
     {
         return 'core';
     }
 
+    #[Override]
     public function getPriority(): int
     {
         return 0;

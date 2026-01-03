@@ -11,6 +11,7 @@ use GibsonOS\Core\Exception\FileNotFound;
 use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Service\DirService;
 use GibsonOS\Core\Service\FileService;
+use Override;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -33,6 +34,7 @@ class CookieRemoveCommand extends AbstractCommand
      * @throws FileNotFound
      * @throws GetError
      */
+    #[Override]
     protected function run(): int
     {
         foreach ($this->dirService->getFiles(sys_get_temp_dir(), 'cookies*') as $file) {

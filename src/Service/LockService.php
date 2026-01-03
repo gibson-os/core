@@ -43,7 +43,7 @@ class LockService
             $this->modelManager->save(
                 (new Lock($this->modelWrapper))
                     ->setName($name)
-                    ->setPid(getmypid()),
+                    ->setPid(getmypid() ?: throw new LockException('Cannot get PID')),
             );
         } catch (SaveError|Exception) {
             throw new LockException('Can not save lock!');
@@ -74,7 +74,7 @@ class LockService
         }
 
         try {
-            $this->modelManager->save($lock->setPid(getmypid()));
+            $this->modelManager->save($lock->setPid(getmypid() ?: throw new LockException('Cannot get PID')));
         } catch (SaveError) {
             throw new LockException('Can not save lock!');
         }

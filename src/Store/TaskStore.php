@@ -7,6 +7,7 @@ use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Model\Task;
 use JsonException;
 use MDO\Enum\OrderDirection;
+use Override;
 use ReflectionException;
 
 /**
@@ -16,11 +17,13 @@ class TaskStore extends AbstractDatabaseStore
 {
     private ?int $moduleId = null;
 
+    #[Override]
     protected function getModelClassName(): string
     {
         return Task::class;
     }
 
+    #[Override]
     protected function setWheres(): void
     {
         if ($this->moduleId !== null) {
@@ -28,6 +31,7 @@ class TaskStore extends AbstractDatabaseStore
         }
     }
 
+    #[Override]
     protected function getDefaultOrder(): array
     {
         return ['`name`' => OrderDirection::ASC];
@@ -40,6 +44,7 @@ class TaskStore extends AbstractDatabaseStore
      *
      * @return iterable<array>
      */
+    #[Override]
     public function getList(): iterable
     {
         /** @var Task $task */

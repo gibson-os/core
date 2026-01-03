@@ -10,6 +10,7 @@ use GibsonOS\Core\Attribute\Install\Database\Table;
 use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Model\AutoCompleteModelInterface;
 use JsonSerializable;
+use Override;
 
 #[Table]
 #[Key(unique: true, columns: ['latitude', 'longitude'])]
@@ -161,6 +162,7 @@ class Location extends AbstractModel implements JsonSerializable, AutoCompleteMo
         return $this;
     }
 
+    #[Override]
     public function jsonSerialize(): array
     {
         $lastRun = $this->getLastRun();
@@ -177,6 +179,7 @@ class Location extends AbstractModel implements JsonSerializable, AutoCompleteMo
         ];
     }
 
+    #[Override]
     public function getAutoCompleteId(): int
     {
         return $this->getId() ?? 0;

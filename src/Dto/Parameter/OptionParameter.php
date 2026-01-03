@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Dto\Parameter;
 
+use Override;
+
 class OptionParameter extends AbstractParameter
 {
     public function __construct(string $title, private array $options)
@@ -10,6 +12,7 @@ class OptionParameter extends AbstractParameter
         parent::__construct($title, 'gosCoreComponentFormFieldComboBox');
     }
 
+    #[Override]
     protected function getTypeConfig(): array
     {
         return [
@@ -17,6 +20,7 @@ class OptionParameter extends AbstractParameter
         ];
     }
 
+    #[Override]
     public function getAllowedOperators(): array
     {
         return [

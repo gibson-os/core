@@ -7,9 +7,11 @@ use Generator;
 use GibsonOS\Core\Dto\Install\Configuration;
 use GibsonOS\Core\Service\InstallService;
 use GibsonOS\Core\Service\PriorityInterface;
+use Override;
 
 class FfmpegInstall extends AbstractInstall implements PriorityInterface, SingleInstallInterface
 {
+    #[Override]
     public function install(string $module): Generator
     {
         yield $ffmpegPathInput = $this->getEnvInput('FFMPEG_PATH', 'What is the ffmpeg path?');
@@ -21,11 +23,13 @@ class FfmpegInstall extends AbstractInstall implements PriorityInterface, Single
         ;
     }
 
+    #[Override]
     public function getPart(): string
     {
         return InstallService::PART_CONFIG;
     }
 
+    #[Override]
     public function getPriority(): int
     {
         return 800;

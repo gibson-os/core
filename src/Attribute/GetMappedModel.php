@@ -5,6 +5,7 @@ namespace GibsonOS\Core\Attribute;
 
 use Attribute;
 use GibsonOS\Core\Service\Attribute\ModelMapperAttribute;
+use Override;
 
 #[Attribute(Attribute::TARGET_PARAMETER)]
 class GetMappedModel extends GetObject
@@ -18,6 +19,7 @@ class GetMappedModel extends GetObject
         parent::__construct($mapping);
     }
 
+    #[Override]
     public function getAttributeServiceName(): string
     {
         return ModelMapperAttribute::class;

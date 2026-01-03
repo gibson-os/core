@@ -6,6 +6,7 @@ namespace GibsonOS\Core\Dto;
 use GibsonOS\Core\Dto\Form\Button;
 use GibsonOS\Core\Dto\Parameter\AbstractParameter;
 use JsonSerializable;
+use Override;
 
 class Form implements JsonSerializable
 {
@@ -55,6 +56,7 @@ class Form implements JsonSerializable
         return $this;
     }
 
+    #[Override]
     public function jsonSerialize(): array
     {
         return [

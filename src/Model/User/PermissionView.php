@@ -8,6 +8,7 @@ use GibsonOS\Core\Enum\HttpMethod;
 use GibsonOS\Core\Enum\Permission as PermissionEnum;
 use GibsonOS\Core\Model\AbstractModel;
 use JsonSerializable;
+use Override;
 
 #[View(self::QUERY, 'view_user_permission')]
 class PermissionView extends AbstractModel implements JsonSerializable
@@ -414,6 +415,7 @@ class PermissionView extends AbstractModel implements JsonSerializable
         return $this;
     }
 
+    #[Override]
     public function jsonSerialize(): array
     {
         return [
@@ -422,9 +424,6 @@ class PermissionView extends AbstractModel implements JsonSerializable
             'userHost' => $this->getUserHost(),
             'userIp' => $this->getUserIp(),
             'permission' => $this->getPermission(),
-            'module' => $this->getModule(),
-            'task' => $this->getTask(),
-            'action' => $this->getAction(),
             'moduleId' => $this->getModuleId(),
             'moduleName' => $this->getModuleName(),
             'taskId' => $this->getTaskId(),

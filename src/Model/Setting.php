@@ -8,6 +8,7 @@ use GibsonOS\Core\Attribute\Install\Database\Constraint;
 use GibsonOS\Core\Attribute\Install\Database\Key;
 use GibsonOS\Core\Attribute\Install\Database\Table;
 use JsonSerializable;
+use Override;
 
 /**
  * @method User|null getUser()
@@ -100,6 +101,7 @@ class Setting extends AbstractModel implements JsonSerializable
         return $this;
     }
 
+    #[Override]
     public function jsonSerialize(): array
     {
         return [

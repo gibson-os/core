@@ -5,6 +5,7 @@ namespace GibsonOS\Core\Store;
 
 use GibsonOS\Core\Model\Setting;
 use MDO\Enum\OrderDirection;
+use Override;
 
 /**
  * @extends AbstractDatabaseStore<Setting>
@@ -15,21 +16,25 @@ class SettingStore extends AbstractDatabaseStore
 
     private ?int $moduleId = null;
 
+    #[Override]
     protected function getModelClassName(): string
     {
         return Setting::class;
     }
 
+    #[Override]
     protected function getCountField(): string
     {
         return '*';
     }
 
+    #[Override]
     protected function getDefaultOrder(): array
     {
         return ['`key`' => OrderDirection::ASC];
     }
 
+    #[Override]
     protected function setWheres(): void
     {
         if ($this->userId !== null) {

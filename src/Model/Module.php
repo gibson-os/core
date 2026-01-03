@@ -7,6 +7,7 @@ use GibsonOS\Core\Attribute\Install\Database\Column;
 use GibsonOS\Core\Attribute\Install\Database\Key;
 use GibsonOS\Core\Attribute\Install\Database\Table;
 use JsonSerializable;
+use Override;
 
 #[Table]
 class Module extends AbstractModel implements JsonSerializable, AutoCompleteModelInterface
@@ -42,6 +43,7 @@ class Module extends AbstractModel implements JsonSerializable, AutoCompleteMode
         return $this;
     }
 
+    #[Override]
     public function jsonSerialize(): array
     {
         return [
@@ -50,6 +52,7 @@ class Module extends AbstractModel implements JsonSerializable, AutoCompleteMode
         ];
     }
 
+    #[Override]
     public function getAutoCompleteId(): int
     {
         return $this->getId() ?? 0;

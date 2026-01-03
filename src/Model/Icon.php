@@ -9,6 +9,7 @@ use GibsonOS\Core\Attribute\Install\Database\Column;
 use GibsonOS\Core\Attribute\Install\Database\Table;
 use GibsonOS\Core\Wrapper\ModelWrapper;
 use JsonSerializable;
+use Override;
 
 #[Table]
 class Icon extends AbstractModel implements JsonSerializable
@@ -80,6 +81,7 @@ class Icon extends AbstractModel implements JsonSerializable
         return $this;
     }
 
+    #[Override]
     public function jsonSerialize(): array
     {
         return [

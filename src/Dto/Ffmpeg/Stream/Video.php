@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Dto\Ffmpeg\Stream;
 
 use JsonSerializable;
+use Override;
 
 class Video implements JsonSerializable
 {
@@ -105,6 +106,7 @@ class Video implements JsonSerializable
         return $this;
     }
 
+    #[Override]
     public function jsonSerialize(): array
     {
         return [

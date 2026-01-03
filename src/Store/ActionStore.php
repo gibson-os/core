@@ -5,6 +5,7 @@ namespace GibsonOS\Core\Store;
 
 use GibsonOS\Core\Model\Action;
 use MDO\Enum\OrderDirection;
+use Override;
 
 /**
  * @extends AbstractDatabaseStore<Action>
@@ -13,16 +14,19 @@ class ActionStore extends AbstractDatabaseStore
 {
     private ?int $taskId = null;
 
+    #[Override]
     protected function getModelClassName(): string
     {
         return Action::class;
     }
 
+    #[Override]
     protected function getDefaultOrder(): array
     {
         return ['`name`' => OrderDirection::ASC];
     }
 
+    #[Override]
     protected function setWheres(): void
     {
         if ($this->taskId !== null) {
@@ -30,6 +34,7 @@ class ActionStore extends AbstractDatabaseStore
         }
     }
 
+    #[Override]
     public function getList(): iterable
     {
         /** @var Action $action */

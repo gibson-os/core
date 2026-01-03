@@ -9,6 +9,7 @@ use GibsonOS\Core\Event\TimeEvent;
 use GibsonOS\Core\Exception\DateTimeError;
 use GibsonOS\Core\Service\DateTimeService;
 use GibsonOS\Core\Service\EventService;
+use Override;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -28,6 +29,7 @@ class SunChangeCommand extends AbstractCommand
     /**
      * @throws DateTimeError
      */
+    #[Override]
     protected function run(): int
     {
         $dateTimeNow = $this->dateTimeService->get();

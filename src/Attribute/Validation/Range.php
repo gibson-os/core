@@ -6,6 +6,7 @@ namespace GibsonOS\Core\Attribute\Validation;
 use Attribute;
 use DateTimeInterface;
 use GibsonOS\Core\Validator\RangeValidator;
+use Override;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class Range extends AbstractValidation
@@ -16,11 +17,13 @@ class Range extends AbstractValidation
     ) {
     }
 
+    #[Override]
     public function getAttributeServiceName(): string
     {
         return RangeValidator::class;
     }
 
+    #[Override]
     public function getMessage(mixed $value): string
     {
         $min = $this->getMin();

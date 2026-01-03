@@ -8,6 +8,7 @@ use GibsonOS\Core\Enum\HttpMethod;
 use GibsonOS\Core\Enum\Permission;
 use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\Model\SaveError;
+use GibsonOS\Core\Exception\ModuleNotFound;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Manager\ModelManager;
 use GibsonOS\Core\Manager\ReflectionManager;
@@ -44,12 +45,12 @@ class ModuleService
         private readonly ModelWrapper $modelWrapper,
         ?string $modulesPath = null,
     ) {
-        $this->modulesPath = $modulesPath ?? realpath(
+        $this->modulesPath = $modulesPath ?? (realpath(
             dirname(__FILE__) . DIRECTORY_SEPARATOR .
             '..' . DIRECTORY_SEPARATOR .
             '..' . DIRECTORY_SEPARATOR .
             '..' . DIRECTORY_SEPARATOR,
-        ) . DIRECTORY_SEPARATOR;
+        ) ?: '') . DIRECTORY_SEPARATOR;
     }
 
     /**
@@ -101,7 +102,7 @@ class ModuleService
             try {
                 $module = $this->moduleRepository->getByName($moduleName);
             } catch (SelectError) {
-                $module = (new Module($this->modelWrapper))->setName($moduleName);
+                $module = new Module($this->modelWrapper)->setName($moduleName);
                 $this->modelManager->saveWithoutChildren($module);
             }
 
@@ -265,12 +266,15 @@ class ModuleService
         ));
     }
 
+    /**
+     * @throws ModuleNotFound
+     */
     private function transformModuleName(string $moduleName): string
     {
         return preg_replace_callback(
             '/-(\w)/',
             static fn ($matches) => mb_strtoupper($matches[1]),
             $moduleName,
-        );
+        ) ?? throw new ModuleNotFound('Modulename not found.');
     }
 }

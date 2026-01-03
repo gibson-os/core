@@ -5,6 +5,7 @@ namespace GibsonOS\Core\Service\Response;
 
 use GibsonOS\Core\Enum\HttpStatusCode;
 use GibsonOS\Core\Service\TwigService;
+use Override;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
@@ -21,6 +22,7 @@ class TwigResponse implements ResponseInterface
     ) {
     }
 
+    #[Override]
     public function getHeaders(): array
     {
         return $this->headers;
@@ -31,22 +33,25 @@ class TwigResponse implements ResponseInterface
      * @throws RuntimeError
      * @throws SyntaxError
      */
+    #[Override]
     public function getBody(): string
     {
         return $this->twigService->getTwig()->render($this->template, $this->variables);
     }
 
+    #[Override]
     public function getRequiredHeaders(): array
     {
         return [];
     }
 
+    #[Override]
     public function getCode(): HttpStatusCode
     {
         return $this->code;
     }
 
-    public function setVariable(string $name, $value): TwigResponse
+    public function setVariable(string $name, array $value): TwigResponse
     {
         $this->variables[$name] = $value;
 

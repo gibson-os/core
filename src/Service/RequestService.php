@@ -39,7 +39,7 @@ class RequestService
         $params = [];
 
         while (count($queryParams) > 1) {
-            $params[array_shift($queryParams)] = array_shift($queryParams);
+            $params[array_shift($queryParams) ?: ''] = array_shift($queryParams);
         }
 
         $files = [];
@@ -88,10 +88,14 @@ class RequestService
         return $this->actionName;
     }
 
-    /** @SuppressWarnings(PHPMD.Superglobals) */
+    /**
+     * @SuppressWarnings(PHPMD.Superglobals)
+     */
     public function getBaseDir(): string
     {
-        return preg_replace('|^(.*/).+?$|', '$1', $_SERVER['SCRIPT_NAME'] ?? '');
+        return preg_replace('|^(.*/).+?$|', '$1', $_SERVER['SCRIPT_NAME'] ?? '')
+            ?? throw new RequestError('Base dir not set!')
+        ;
     }
 
     /**

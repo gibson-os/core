@@ -4,9 +4,11 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Model;
 
 use GibsonOS\Core\Attribute\Install\Database\Table;
+use GibsonOS\Core\Exception\QueryException;
 use GibsonOS\Core\Factory\DateTimeFactory;
 use GibsonOS\Core\Service\DateTimeService;
 use GibsonOS\Core\Wrapper\ModelWrapper;
+use Override;
 use ReflectionAttribute;
 use ReflectionClass;
 use ReflectionException;
@@ -29,6 +31,7 @@ abstract class AbstractModel implements ModelInterface
         return $this->modelWrapper;
     }
 
+    #[Override]
     public function getTableName(): string
     {
         if ($this->tableName !== null) {
@@ -46,7 +49,8 @@ abstract class AbstractModel implements ModelInterface
                 str_replace(
                     'Core\\',
                     '',
-                    preg_replace('/.*\\\\(.+?)\\\\.*Model\\\\/', '$1\\', $this::class),
+                    preg_replace('/.*\\\\(.+?)\\\\.*Model\\\\/', '$1\\', $this::class)
+                        ?? throw new QueryException('No model class name found'),
                 ),
             ));
         } catch (ReflectionException) {
@@ -60,7 +64,7 @@ abstract class AbstractModel implements ModelInterface
         $nameParts = explode('\\', $name);
         $name = lcfirst(end($nameParts));
 
-        return mb_strtolower(preg_replace('/([A-Z])/', '_$1', $name));
+        return mb_strtolower(preg_replace('/([A-Z])/', '_$1', $name) ?: throw new QueryException('Empty name'));
     }
 
     private function transformFieldName(string $fieldName): string

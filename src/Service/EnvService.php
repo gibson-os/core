@@ -86,7 +86,14 @@ class EnvService
     public function loadFile(string $filename): EnvService
     {
         $file = file_get_contents($filename);
-        $rows = preg_split('/\r\n|\r|\n/', $file);
+
+        if ($file === false) {
+            throw new SetError(sprintf('Could not read file "%s"!', $filename));
+        }
+
+        $rows = preg_split('/\r\n|\r|\n/', $file)
+            ?: throw new SetError(sprintf('Could not read file "%s"!', $filename))
+        ;
 
         foreach ($rows as $row) {
             if (mb_strpos($row, '#') === 0 || $row === '' || $row === '0') {

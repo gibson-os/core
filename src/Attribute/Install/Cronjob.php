@@ -6,6 +6,7 @@ namespace GibsonOS\Core\Attribute\Install;
 use Attribute;
 use GibsonOS\Core\Attribute\AttributeInterface;
 use GibsonOS\Core\Service\Attribute\Install\CronjobInstallAttribute;
+use Override;
 
 #[Attribute(Attribute::TARGET_CLASS | Attribute::IS_REPEATABLE)]
 class Cronjob implements AttributeInterface
@@ -24,6 +25,7 @@ class Cronjob implements AttributeInterface
     ) {
     }
 
+    #[Override]
     public function getAttributeServiceName(): string
     {
         return CronjobInstallAttribute::class;

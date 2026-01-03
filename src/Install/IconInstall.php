@@ -10,6 +10,7 @@ use GibsonOS\Core\Exception\Model\SaveError;
 use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Service\InstallService;
 use GibsonOS\Core\Service\PriorityInterface;
+use Override;
 
 class IconInstall extends AbstractInstall implements PriorityInterface
 {
@@ -18,9 +19,10 @@ class IconInstall extends AbstractInstall implements PriorityInterface
      * @throws SaveError
      * @throws SelectError
      */
+    #[Override]
     public function install(string $module): Generator
     {
-        $customIconPath = realpath(
+        $customIconPath = (realpath(
             dirname(__FILE__) . DIRECTORY_SEPARATOR .
             '..' . DIRECTORY_SEPARATOR .
             '..' . DIRECTORY_SEPARATOR .
@@ -31,7 +33,7 @@ class IconInstall extends AbstractInstall implements PriorityInterface
             'img' . DIRECTORY_SEPARATOR .
             'icons' . DIRECTORY_SEPARATOR .
             'custom' . DIRECTORY_SEPARATOR,
-        ) . DIRECTORY_SEPARATOR;
+        ) ?: '') . DIRECTORY_SEPARATOR;
 
         if (!file_exists($customIconPath)) {
             $this->dirService->create($customIconPath);
@@ -42,16 +44,19 @@ class IconInstall extends AbstractInstall implements PriorityInterface
         yield new Success(sprintf('Custom icon path set to "%s"!', $customIconPath));
     }
 
+    #[Override]
     public function getPart(): string
     {
         return InstallService::PART_CONFIG;
     }
 
+    #[Override]
     public function getModule(): ?string
     {
         return 'core';
     }
 
+    #[Override]
     public function getPriority(): int
     {
         return 500;

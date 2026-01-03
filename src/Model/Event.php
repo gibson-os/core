@@ -14,6 +14,7 @@ use GibsonOS\Core\Model\Event\Event\Tag;
 use GibsonOS\Core\Model\Event\Trigger;
 use GibsonOS\Core\Wrapper\ModelWrapper;
 use JsonSerializable;
+use Override;
 
 /**
  * @method Element[] getElements()
@@ -205,6 +206,7 @@ class Event extends AbstractModel implements JsonSerializable, AutoCompleteModel
         return $this;
     }
 
+    #[Override]
     public function jsonSerialize(): array
     {
         return [
@@ -220,6 +222,7 @@ class Event extends AbstractModel implements JsonSerializable, AutoCompleteModel
         ];
     }
 
+    #[Override]
     public function getAutoCompleteId(): int
     {
         return $this->getId() ?? 0;

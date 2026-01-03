@@ -15,6 +15,7 @@ use JsonException;
 use MDO\Enum\OrderDirection;
 use MDO\Exception\ClientException;
 use MDO\Exception\RecordException;
+use Override;
 use ReflectionException;
 
 /**
@@ -37,16 +38,19 @@ class ElementStore extends AbstractDatabaseStore
         $this->event = $event;
     }
 
+    #[Override]
     protected function getModelClassName(): string
     {
         return Element::class;
     }
 
+    #[Override]
     protected function setWheres(): void
     {
         $this->addWhere('`event_id`=?', [$this->event->getId() ?? 0]);
     }
 
+    #[Override]
     protected function initQuery(): void
     {
         parent::initQuery();
@@ -68,6 +72,7 @@ class ElementStore extends AbstractDatabaseStore
      *
      * @return Element[]
      */
+    #[Override]
     public function getList(): array
     {
         $this->initQuery();

@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Dto\Parameter;
 
 use JsonSerializable;
+use Override;
 
 abstract class AbstractParameter implements JsonSerializable
 {
@@ -78,7 +79,7 @@ abstract class AbstractParameter implements JsonSerializable
         return $this->value;
     }
 
-    public function setValue(mixed $value): self
+    public function setValue(array $value): self
     {
         $this->value = $value;
 
@@ -109,6 +110,7 @@ abstract class AbstractParameter implements JsonSerializable
         return $this;
     }
 
+    #[Override]
     public function jsonSerialize(): array
     {
         return [

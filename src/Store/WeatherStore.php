@@ -5,6 +5,7 @@ namespace GibsonOS\Core\Store;
 
 use DateTimeInterface;
 use GibsonOS\Core\Model\Weather;
+use Override;
 
 /**
  * @extends AbstractDatabaseStore<Weather>
@@ -15,11 +16,13 @@ class WeatherStore extends AbstractDatabaseStore
 
     private ?DateTimeInterface $date = null;
 
+    #[Override]
     protected function getModelClassName(): string
     {
         return Weather::class;
     }
 
+    #[Override]
     protected function setWheres(): void
     {
         $this->addWhere('`location_id`=?', [$this->locationId]);

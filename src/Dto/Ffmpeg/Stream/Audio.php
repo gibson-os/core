@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Dto\Ffmpeg\Stream;
 
 use JsonSerializable;
+use Override;
 
 class Audio implements JsonSerializable
 {
@@ -91,6 +92,7 @@ class Audio implements JsonSerializable
         return $this;
     }
 
+    #[Override]
     public function jsonSerialize(): array
     {
         return [

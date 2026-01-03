@@ -22,6 +22,7 @@ use MDO\Extractor\PrimaryKeyExtractor;
 use MDO\Manager\TableManager;
 use MDO\Query\SelectQuery;
 use MDO\Service\SelectService;
+use Override;
 use ReflectionException;
 use ReflectionParameter;
 
@@ -50,6 +51,7 @@ class ModelsFetcherAttribute implements AttributeServiceInterface, ParameterAttr
      *
      * @return AbstractModel[]|null
      */
+    #[Override]
     public function replace(
         AttributeInterface $attribute,
         array $parameters,

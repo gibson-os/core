@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Dto\Store\Filter;
 
 use JsonSerializable;
+use Override;
 
 class Option implements JsonSerializable
 {
@@ -23,6 +24,7 @@ class Option implements JsonSerializable
         return $this->value;
     }
 
+    #[Override]
     public function jsonSerialize(): array
     {
         return [

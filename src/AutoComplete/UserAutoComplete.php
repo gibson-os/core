@@ -9,6 +9,7 @@ use GibsonOS\Core\Repository\UserRepository;
 use JsonException;
 use MDO\Exception\ClientException;
 use MDO\Exception\RecordException;
+use Override;
 use ReflectionException;
 
 class UserAutoComplete implements AutoCompleteInterface
@@ -25,6 +26,7 @@ class UserAutoComplete implements AutoCompleteInterface
      *
      * @return User[]
      */
+    #[Override]
     public function getByNamePart(string $namePart, array $parameters): array
     {
         return $this->userRepository->findByName($namePart);
@@ -37,21 +39,25 @@ class UserAutoComplete implements AutoCompleteInterface
      * @throws RecordException
      * @throws ReflectionException
      */
+    #[Override]
     public function getById(string $id, array $parameters): User
     {
         return $this->userRepository->getById((int) $id);
     }
 
+    #[Override]
     public function getModel(): string
     {
         return 'GibsonOS.module.core.user.model.User';
     }
 
+    #[Override]
     public function getValueField(): string
     {
         return 'id';
     }
 
+    #[Override]
     public function getDisplayField(): string
     {
         return 'user';

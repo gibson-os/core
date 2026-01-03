@@ -8,27 +8,32 @@ use GibsonOS\Core\Store\AbstractDatabaseStore;
 use MDO\Dto\Record;
 use MDO\Dto\Value;
 use MDO\Enum\OrderDirection;
+use Override;
 
 /**
  * @extends AbstractDatabaseStore<Tag>
  */
 class TagStore extends AbstractDatabaseStore
 {
+    #[Override]
     protected function getModelClassName(): string
     {
         return Tag::class;
     }
 
+    #[Override]
     protected function getCountField(): string
     {
         return '*';
     }
 
+    #[Override]
     protected function getDefaultOrder(): array
     {
         return ['`tag`' => OrderDirection::ASC];
     }
 
+    #[Override]
     protected function initQuery(): void
     {
         parent::initQuery();
@@ -39,6 +44,7 @@ class TagStore extends AbstractDatabaseStore
         ;
     }
 
+    #[Override]
     public function getList(): array
     {
         $result = $this->getDatabaseStoreWrapper()->getClient()->execute($this->selectQuery);

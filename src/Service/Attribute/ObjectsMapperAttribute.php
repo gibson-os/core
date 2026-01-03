@@ -9,6 +9,7 @@ use GibsonOS\Core\Exception\FactoryError;
 use GibsonOS\Core\Exception\MapperException;
 use GibsonOS\Core\Mapper\ObjectMapper;
 use JsonException;
+use Override;
 use ReflectionException;
 use ReflectionParameter;
 
@@ -26,6 +27,7 @@ class ObjectsMapperAttribute implements AttributeServiceInterface, ParameterAttr
      * @throws JsonException
      * @throws FactoryError
      */
+    #[Override]
     public function replace(AttributeInterface $attribute, array $parameters, ReflectionParameter $reflectionParameter): array
     {
         if (!$attribute instanceof GetObjects) {

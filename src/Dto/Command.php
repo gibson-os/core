@@ -5,6 +5,7 @@ namespace GibsonOS\Core\Dto;
 
 use GibsonOS\Core\Attribute\Install\Cronjob;
 use JsonSerializable;
+use Override;
 
 class Command implements JsonSerializable
 {
@@ -58,6 +59,7 @@ class Command implements JsonSerializable
         return $this->cronjobs;
     }
 
+    #[Override]
     public function jsonSerialize(): array
     {
         return [

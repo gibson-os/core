@@ -16,6 +16,7 @@ use GibsonOS\Core\Service\RequestService;
 use GibsonOS\Core\Service\SessionService;
 use JsonException;
 use MDO\Exception\RecordException;
+use Override;
 use ReflectionException;
 
 class PermissionAttribute extends AbstractActionAttributeService
@@ -35,6 +36,7 @@ class PermissionAttribute extends AbstractActionAttributeService
      * @throws RecordException
      * @throws ReflectionException
      */
+    #[Override]
     public function preExecute(AttributeInterface $attribute, array $parameters, array $reflectionParameters): array
     {
         if (!$attribute instanceof CheckPermission) {
@@ -74,6 +76,7 @@ class PermissionAttribute extends AbstractActionAttributeService
         throw new LoginRequired();
     }
 
+    #[Override]
     public function usedParameters(AttributeInterface $attribute): array
     {
         if (!$attribute instanceof CheckPermission) {

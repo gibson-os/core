@@ -11,6 +11,7 @@ use GibsonOS\Core\Manager\ServiceManager;
 use GibsonOS\Core\Utility\JsonUtility;
 use GibsonOS\Core\Wrapper\ModelWrapper;
 use JsonException;
+use Override;
 use ReflectionAttribute;
 use ReflectionException;
 
@@ -24,6 +25,7 @@ class ModelMapper extends ObjectMapper
         parent::__construct($this->serviceManagerService, $this->reflectionManager);
     }
 
+    #[Override]
     public function mapToObject(string $className, array $properties): object
     {
         $properties['modelWrapper'] = $this->modelWrapper;
@@ -37,6 +39,7 @@ class ModelMapper extends ObjectMapper
      * @throws MapperException
      * @throws ReflectionException
      */
+    #[Override]
     public function setObjectValues(object $object, array $properties): object
     {
         $reflectionClass = $this->reflectionManager->getReflectionClass($object);

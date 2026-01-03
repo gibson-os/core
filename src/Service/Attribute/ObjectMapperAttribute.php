@@ -13,6 +13,7 @@ use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Mapper\ObjectMapper;
 use GibsonOS\Core\Service\RequestService;
 use JsonException;
+use Override;
 use ReflectionException;
 use ReflectionMethod;
 use ReflectionParameter;
@@ -33,6 +34,7 @@ class ObjectMapperAttribute implements AttributeServiceInterface, ParameterAttri
      * @throws JsonException
      * @throws FactoryError
      */
+    #[Override]
     public function replace(AttributeInterface $attribute, array $parameters, ReflectionParameter $reflectionParameter): ?object
     {
         if (!$attribute instanceof GetObject) {

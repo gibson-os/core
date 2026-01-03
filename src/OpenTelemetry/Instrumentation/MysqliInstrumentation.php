@@ -9,6 +9,7 @@ use mysqli;
 use mysqli_stmt;
 use OpenTelemetry\API\Instrumentation\CachedInstrumentation;
 use OpenTelemetry\API\Trace\SpanKind;
+use Override;
 
 class MysqliInstrumentation implements InstrumentationInterface
 {
@@ -18,6 +19,7 @@ class MysqliInstrumentation implements InstrumentationInterface
     ) {
     }
 
+    #[Override]
     public function __invoke(): void
     {
         $instrumentation = new CachedInstrumentation('mysqli');

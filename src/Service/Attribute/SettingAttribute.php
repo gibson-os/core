@@ -10,6 +10,7 @@ use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Repository\SettingRepository;
 use GibsonOS\Core\Service\RequestService;
 use GibsonOS\Core\Service\SessionService;
+use Override;
 use ReflectionException;
 use ReflectionParameter;
 
@@ -26,6 +27,7 @@ class SettingAttribute implements ParameterAttributeInterface, AttributeServiceI
     /**
      * @throws ReflectionException
      */
+    #[Override]
     public function replace(
         AttributeInterface $attribute,
         array $parameters,

@@ -7,6 +7,7 @@ namespace GibsonOS\Core\Tracer;
 use GibsonOS\Core\Attribute\GetEnv;
 use GibsonOS\Core\Enum\TracePrefix;
 use GibsonOS\Core\Utility\JsonUtility;
+use Override;
 
 class NewRelicTracer extends AbstractTracer
 {
@@ -21,11 +22,13 @@ class NewRelicTracer extends AbstractTracer
         }
     }
 
+    #[Override]
     public function isLoaded(): bool
     {
         return extension_loaded('newrelic');
     }
 
+    #[Override]
     public function setTransactionName(string $transactionName): NewRelicTracer
     {
         newrelic_name_transaction($transactionName);
@@ -33,6 +36,7 @@ class NewRelicTracer extends AbstractTracer
         return $this;
     }
 
+    #[Override]
     public function setCustomParameter(string $key, mixed $value, TracePrefix $prefix = TracePrefix::APP): NewRelicTracer
     {
         if (!is_bool($value) && !is_float($value) && !is_int($value) && !is_string($value)) {

@@ -16,6 +16,7 @@ use GibsonOS\Core\Service\AttributeService;
 use GibsonOS\Core\Service\InstallService;
 use GibsonOS\Core\Service\PriorityInterface;
 use JsonException;
+use Override;
 use ReflectionException;
 
 class CronjobInstall extends AbstractInstall implements PriorityInterface
@@ -35,6 +36,7 @@ class CronjobInstall extends AbstractInstall implements PriorityInterface
      * @throws SaveError
      * @throws JsonException
      */
+    #[Override]
     public function install(string $module): Generator
     {
         foreach ($this->getFiles($this->dirService->addEndSlash($module) . 'src' . DIRECTORY_SEPARATOR . 'Command') as $file) {
@@ -54,11 +56,13 @@ class CronjobInstall extends AbstractInstall implements PriorityInterface
         yield new Success(sprintf('Cronjobs installed for module "%s"!', $module));
     }
 
+    #[Override]
     public function getPart(): string
     {
         return InstallService::PART_CRONJOB;
     }
 
+    #[Override]
     public function getPriority(): int
     {
         return -100;

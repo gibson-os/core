@@ -5,6 +5,7 @@ namespace GibsonOS\Core\Command;
 
 use GibsonOS\Core\Attribute\Install\Cronjob;
 use GibsonOS\Core\Service\ProcessService;
+use Override;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -18,6 +19,7 @@ class DriveStatCommand extends AbstractCommand
         parent::__construct($logger);
     }
 
+    #[Override]
     protected function run(): int
     {
         foreach (glob('/dev/sd?') ?: [] as $disk) {

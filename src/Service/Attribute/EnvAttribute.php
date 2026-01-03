@@ -7,6 +7,7 @@ use GibsonOS\Core\Attribute\AttributeInterface;
 use GibsonOS\Core\Attribute\GetEnv;
 use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Service\EnvService;
+use Override;
 use ReflectionNamedType;
 use ReflectionParameter;
 
@@ -19,6 +20,7 @@ class EnvAttribute implements ParameterAttributeInterface, AttributeServiceInter
     /**
      * @throws GetError
      */
+    #[Override]
     public function replace(AttributeInterface $attribute, array $parameters, ReflectionParameter $reflectionParameter): mixed
     {
         if (!$attribute instanceof GetEnv) {

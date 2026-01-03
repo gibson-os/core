@@ -18,12 +18,12 @@ class TwigService
      */
     public function __construct(DirService $dirService)
     {
-        $vendorPath = realpath(
+        $vendorPath = (realpath(
             dirname(__FILE__) . DIRECTORY_SEPARATOR .
             '..' . DIRECTORY_SEPARATOR .
             '..' . DIRECTORY_SEPARATOR .
             '..' . DIRECTORY_SEPARATOR,
-        ) . DIRECTORY_SEPARATOR;
+        ) ?: '') . DIRECTORY_SEPARATOR;
         $loader = new FilesystemLoader();
 
         foreach ($dirService->getFiles($vendorPath) as $path) {

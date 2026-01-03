@@ -10,6 +10,7 @@ use GibsonOS\Core\Exception\Model\SaveError;
 use GibsonOS\Core\Service\Attribute\AttributeServiceInterface;
 use GibsonOS\Core\Service\CronjobService;
 use JsonException;
+use Override;
 use ReflectionException;
 
 class CronjobInstallAttribute implements InstallAttributeInterface, AttributeServiceInterface
@@ -26,6 +27,7 @@ class CronjobInstallAttribute implements InstallAttributeInterface, AttributeSer
      * @throws JsonException
      * @throws ReflectionException
      */
+    #[Override]
     public function execute(AttributeInterface $attribute, string $className): void
     {
         if (!$attribute instanceof CronjobAttribute) {

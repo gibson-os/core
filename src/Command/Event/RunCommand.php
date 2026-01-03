@@ -13,6 +13,7 @@ use GibsonOS\Core\Exception\Repository\SelectError;
 use GibsonOS\Core\Repository\EventRepository;
 use GibsonOS\Core\Service\EventService;
 use JsonException;
+use Override;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -39,6 +40,7 @@ class RunCommand extends AbstractCommand
      * @throws EventException
      * @throws FactoryError
      */
+    #[Override]
     protected function run(): int
     {
         $this->eventService->runEvent(

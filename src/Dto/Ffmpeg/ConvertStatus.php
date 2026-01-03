@@ -9,6 +9,7 @@ use Exception;
 use GibsonOS\Core\Enum\Ffmpeg\ConvertStatus as ConvertStatusEnum;
 use GibsonOS\Core\Exception\SetError;
 use JsonSerializable;
+use Override;
 
 class ConvertStatus implements JsonSerializable
 {
@@ -128,7 +129,7 @@ class ConvertStatus implements JsonSerializable
             return 0;
         }
 
-        $percent = intval((100 / $this->getFrames()) * $this->getFrame());
+        $percent = (int) (100 / $this->getFrames()) * $this->getFrame();
 
         return $percent > 100 ? 100 : $percent;
     }
@@ -142,7 +143,7 @@ class ConvertStatus implements JsonSerializable
             return null;
         }
 
-        return new DateTime('@' . round(($this->getFrames() - $this->getFrame()) / $this->getFps()));
+        return new DateTime(sprintf('@%s', round(($this->getFrames() - $this->getFrame()) / $this->getFps())));
     }
 
     public function getStatus(): ConvertStatusEnum
@@ -163,6 +164,7 @@ class ConvertStatus implements JsonSerializable
     /**
      * @throws Exception
      */
+    #[Override]
     public function jsonSerialize(): array
     {
         if ($this->status === ConvertStatusEnum::GENERATE) {

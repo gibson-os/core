@@ -6,6 +6,7 @@ namespace GibsonOS\Core\Attribute;
 use Attribute;
 use GibsonOS\Core\Enum\Permission;
 use GibsonOS\Core\Service\Attribute\PermissionAttribute;
+use Override;
 
 #[Attribute(Attribute::TARGET_METHOD)]
 class CheckPermission implements AttributeInterface
@@ -38,6 +39,7 @@ class CheckPermission implements AttributeInterface
         return $this->permissionsByRequestValues;
     }
 
+    #[Override]
     public function getAttributeServiceName(): string
     {
         return PermissionAttribute::class;

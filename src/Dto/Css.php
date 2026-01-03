@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Dto;
 
+use Override;
 use Stringable;
 
 class Css implements Stringable
@@ -35,6 +36,7 @@ class Css implements Stringable
         return $this;
     }
 
+    #[Override]
     public function __toString(): string
     {
         return

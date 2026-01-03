@@ -11,6 +11,7 @@ use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Model\Role;
 use GibsonOS\Core\Model\User as BaseUser;
 use JsonSerializable;
+use Override;
 
 /**
  * @method User     setRole(Role $role)
@@ -73,6 +74,7 @@ class User extends AbstractModel implements JsonSerializable
         return $this;
     }
 
+    #[Override]
     public function jsonSerialize(): array
     {
         return [

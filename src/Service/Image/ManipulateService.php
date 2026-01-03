@@ -8,6 +8,7 @@ use GibsonOS\Core\Enum\Image\Axis;
 use GibsonOS\Core\Exception\FileNotFound;
 use GibsonOS\Core\Exception\Image\CreateError;
 use GibsonOS\Core\Exception\Image\LoadError;
+use Override;
 
 class ManipulateService extends DrawService
 {
@@ -15,7 +16,7 @@ class ManipulateService extends DrawService
     {
         // Wenn das bild breiter als hoch ist
         if ($this->getWidth($image) > $this->getHeight($image)) {
-            $newHeight = ($this->getHeight($image) / $this->getWidth($image)) * $width;
+            $newHeight = (int) ($this->getHeight($image) / $this->getWidth($image)) * $width;
             $newWidth = $width;
 
             /* Höhe passt nicht in die übergebenen maße
@@ -26,16 +27,16 @@ class ManipulateService extends DrawService
                          deswegen: new w=100; new h=50
             */
             if ($newHeight > $height) {
-                $newWidth = ($width / $newHeight) * $height;
+                $newWidth = (int) ($width / $newHeight) * $height;
                 $newHeight = $height;
             }
         } else {
             // Wenn das Bild höher als breit ist
-            $newWidth = ($this->getWidth($image) / $this->getHeight($image)) * $height;
+            $newWidth = (int) ($this->getWidth($image) / $this->getHeight($image)) * $height;
             $newHeight = $height;
 
             if ($newWidth > $width) {
-                $newHeight = ($height / $newWidth) * $width;
+                $newHeight = (int) ($height / $newWidth) * $width;
                 $newWidth = $width;
             }
         }
@@ -140,24 +141,24 @@ class ManipulateService extends DrawService
     public function cropResized(Image $image, int $width, int $height, ?int $startX = null, ?int $startY = null): bool
     {
         if ($this->getWidth($image) > $this->getHeight($image)) {
-            $newWidth = ($this->getWidth($image) / $this->getHeight($image)) * $height;
+            $newWidth = (int) ($this->getWidth($image) / $this->getHeight($image)) * $height;
             $newHeight = $height;
 
             if ($newWidth < $width) {
-                $newHeight = ($height / $newWidth) * $width;
+                $newHeight = (int) ($height / $newWidth) * $width;
                 $newWidth = $width;
             }
         } else {
-            $newHeight = ($this->getHeight($image) / $this->getWidth($image)) * $width;
+            $newHeight = (int) ($this->getHeight($image) / $this->getWidth($image)) * $width;
             $newWidth = $width;
 
             if ($newHeight < $height) {
-                $newWidth = ($width / $newHeight) * $height;
+                $newWidth = (int) ($width / $newHeight) * $height;
                 $newHeight = $height;
             }
         }
 
-        return $this->resize($image, (int) $newWidth, (int) $newHeight) && $this->crop($image, $width, $height, $startX, $startY);
+        return $this->resize($image, $newWidth, $newHeight) && $this->crop($image, $width, $height, $startX, $startY);
     }
 
     public function copy(Image $sourceImage, Image $destinationImage, int $destX = 0, int $destY = 0, int $srcX = 0, int $srcY = 0, int $srcWidth = -1, int $srcHeight = -1, int $dstWidth = -1, int $dstHeight = -1): bool
@@ -198,9 +199,14 @@ class ManipulateService extends DrawService
         return $newImage;
     }
 
+    /**
+     * @throws CreateError
+     */
     public function rotate(Image $image, float $angle, int $backgroundColor = 0): Image
     {
-        return new Image(imagerotate($image->getImage(), $angle, $backgroundColor));
+        return new Image(
+            imagerotate($image->getImage(), $angle, $backgroundColor) ?: throw new CreateError('Cannot rotate image'),
+        );
     }
 
     /**
@@ -225,6 +231,7 @@ class ManipulateService extends DrawService
      * @throws FileNotFound
      * @throws LoadError
      */
+    #[Override]
     public function load(string $filename, ?string $type = null): Image
     {
         return $this->setOrientationByExif(parent::load($filename, $type));

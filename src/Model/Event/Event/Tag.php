@@ -12,6 +12,7 @@ use GibsonOS\Core\Model\Event;
 use GibsonOS\Core\Model\Event\Element;
 use GibsonOS\Core\Model\Event\Tag as EventTag;
 use JsonSerializable;
+use Override;
 
 /**
  * @method Tag      setEvent(Element $element)
@@ -74,6 +75,7 @@ class Tag extends AbstractModel implements JsonSerializable
         return $this;
     }
 
+    #[Override]
     public function jsonSerialize(): array
     {
         return [

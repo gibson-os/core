@@ -22,6 +22,7 @@ use GibsonOS\Core\Wrapper\ModelWrapper;
 use JsonException;
 use MDO\Exception\ClientException;
 use MDO\Exception\RecordException;
+use Override;
 use Psr\Log\LoggerInterface;
 use ReflectionException;
 
@@ -205,6 +206,7 @@ abstract class AbstractInstall implements InstallInterface
         return $this;
     }
 
+    #[Override]
     public function getModule(): ?string
     {
         return null;

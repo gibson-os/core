@@ -10,6 +10,7 @@ use GibsonOS\Core\Enum\HttpMethod;
 use GibsonOS\Core\Enum\HttpStatusCode;
 use GibsonOS\Core\Exception\WebException;
 use GibsonOS\Core\Service\WebService;
+use Override;
 
 class WebResponse implements ResponseInterface
 {
@@ -23,6 +24,7 @@ class WebResponse implements ResponseInterface
     ) {
     }
 
+    #[Override]
     public function getCode(): HttpStatusCode
     {
         if ($this->statusCode instanceof HttpStatusCode) {
@@ -34,6 +36,7 @@ class WebResponse implements ResponseInterface
         return $this->statusCode;
     }
 
+    #[Override]
     public function getHeaders(): array
     {
         if ($this->headers !== null) {
@@ -48,6 +51,7 @@ class WebResponse implements ResponseInterface
     /**
      * @throws WebException
      */
+    #[Override]
     public function getBody(): string
     {
         $this->webService->requestWithOutput($this->request);
@@ -55,6 +59,7 @@ class WebResponse implements ResponseInterface
         return '';
     }
 
+    #[Override]
     public function getRequiredHeaders(): array
     {
         return [];

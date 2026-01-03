@@ -11,6 +11,7 @@ use GibsonOS\Core\Manager\ServiceManager;
 use GibsonOS\Core\Service\InstallService;
 use GibsonOS\Core\Service\ModuleService;
 use GibsonOS\Core\Service\PriorityInterface;
+use Override;
 
 class ModuleInstall extends AbstractInstall implements PriorityInterface, SingleInstallInterface
 {
@@ -25,6 +26,7 @@ class ModuleInstall extends AbstractInstall implements PriorityInterface, Single
      * @throws GetError
      * @throws SaveError
      */
+    #[Override]
     public function install(string $module): Generator
     {
         $this->moduleService->scan();
@@ -32,11 +34,13 @@ class ModuleInstall extends AbstractInstall implements PriorityInterface, Single
         yield new Success('Modules scanned!');
     }
 
+    #[Override]
     public function getPart(): string
     {
         return InstallService::PART_CONFIG;
     }
 
+    #[Override]
     public function getPriority(): int
     {
         return 600;

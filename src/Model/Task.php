@@ -8,6 +8,7 @@ use GibsonOS\Core\Attribute\Install\Database\Constraint;
 use GibsonOS\Core\Attribute\Install\Database\Key;
 use GibsonOS\Core\Attribute\Install\Database\Table;
 use JsonSerializable;
+use Override;
 
 /**
  * @method Module getModule()
@@ -65,6 +66,7 @@ class Task extends AbstractModel implements JsonSerializable, AutoCompleteModelI
         return $this;
     }
 
+    #[Override]
     public function jsonSerialize(): array
     {
         return [
@@ -74,6 +76,7 @@ class Task extends AbstractModel implements JsonSerializable, AutoCompleteModelI
         ];
     }
 
+    #[Override]
     public function getAutoCompleteId(): int
     {
         return $this->getId() ?? 0;

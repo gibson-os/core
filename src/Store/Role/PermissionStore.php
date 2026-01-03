@@ -18,6 +18,7 @@ use MDO\Dto\Value;
 use MDO\Enum\JoinType;
 use MDO\Enum\OrderDirection;
 use MDO\Exception\ClientException;
+use Override;
 
 /**
  * @extends AbstractDatabaseStore<Role>
@@ -44,21 +45,25 @@ class PermissionStore extends AbstractDatabaseStore
         parent::__construct($databaseStoreWrapper);
     }
 
+    #[Override]
     protected function getModelClassName(): string
     {
         return Role::class;
     }
 
+    #[Override]
     protected function getAlias(): ?string
     {
         return 'r';
     }
 
+    #[Override]
     protected function getDefaultOrder(): array
     {
         return ['`r`.`name`' => OrderDirection::ASC];
     }
 
+    #[Override]
     protected function initQuery(): void
     {
         parent::initQuery();
@@ -211,6 +216,7 @@ class PermissionStore extends AbstractDatabaseStore
      *
      * @return iterable<array>
      */
+    #[Override]
     protected function getModels(): iterable
     {
         $result = $this->getDatabaseStoreWrapper()->getClient()->execute($this->selectQuery);

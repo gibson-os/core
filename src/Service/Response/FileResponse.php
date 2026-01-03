@@ -7,6 +7,7 @@ use GibsonOS\Core\Enum\HttpStatusCode;
 use GibsonOS\Core\Exception\RequestError;
 use GibsonOS\Core\Exception\ResponseError;
 use GibsonOS\Core\Service\RequestService;
+use Override;
 
 class FileResponse implements ResponseInterface
 {
@@ -54,11 +55,13 @@ class FileResponse implements ResponseInterface
         }
     }
 
+    #[Override]
     public function getCode(): HttpStatusCode
     {
         return $this->code;
     }
 
+    #[Override]
     public function getHeaders(): array
     {
         $headers = [
@@ -90,6 +93,7 @@ class FileResponse implements ResponseInterface
     /**
      * @throws ResponseError
      */
+    #[Override]
     public function getBody(): string
     {
         ini_set('max_execution_time', '0');
@@ -119,6 +123,7 @@ class FileResponse implements ResponseInterface
         return '';
     }
 
+    #[Override]
     public function getRequiredHeaders(): array
     {
         return [];

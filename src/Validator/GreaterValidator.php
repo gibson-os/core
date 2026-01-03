@@ -8,12 +8,14 @@ use GibsonOS\Core\Attribute\Validation\AbstractValidation;
 use GibsonOS\Core\Attribute\Validation\Greater;
 use GibsonOS\Core\Attribute\Validation\GreaterEqual;
 use GibsonOS\Core\Exception\ValidationException;
+use Override;
 
 class GreaterValidator extends AbstractValidator
 {
     /**
      * @throws ValidationException
      */
+    #[Override]
     public function isValid(AbstractValidation $validation, mixed $value): bool
     {
         if (!$validation instanceof Greater && !$validation instanceof GreaterEqual) {

@@ -23,7 +23,9 @@ class ReaderService
      */
     public function getContent(string $filename): string
     {
-        $mimeType = mime_content_type($filename);
+        $mimeType = mime_content_type($filename)
+            ?: throw new ReaderException(sprintf('Mime type for file "%s" could not be detected!', $filename))
+        ;
 
         foreach ($this->readers as $reader) {
             if (!in_array($mimeType, $reader->supportedMimeTypes())) {

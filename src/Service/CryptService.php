@@ -18,7 +18,7 @@ class CryptService
     ) {
     }
 
-    public function encrypt(string $data): string
+    public function encrypt(string $data): string|false
     {
         $initializationVector = substr(
             $this->cryptInitializationVector,
@@ -61,7 +61,7 @@ class CryptService
         fclose($outputFile);
     }
 
-    public function decrypt(string $data): string
+    public function decrypt(string $data): string|false
     {
         $initializationVector = substr(
             $this->cryptInitializationVector,

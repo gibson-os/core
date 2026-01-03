@@ -59,11 +59,14 @@ class WeatherService
             abs($location->getLatitude() - $data['lat']) >= .0001
             || abs($location->getLongitude() - $data['lon']) >= .0001
         ) {
-            throw new WeatherError(
-                'Coordinates from location ' . $location->getName() .
-                ' (lat: ' . $location->getLatitude() . ', lon: ' . $location->getLongitude() . ') not equal with response' .
-                ' (lat: ' . $data['lat'] . ', lon: ' . $data['lon'] . ')',
-            );
+            throw new WeatherError(sprintf(
+                'Coordinates from location %s (lat: %s, lon: %s) not equal with response (lat: %s, lon: %s)',
+                $location->getName(),
+                $location->getLatitude(),
+                $location->getLongitude(),
+                $data['lat'],
+                $data['lon'],
+            ));
         }
 
         if ($data['timezone'] !== $location->getTimezone()) {
@@ -109,12 +112,13 @@ class WeatherService
     private function getByCoordinates(float $latitude, float $longitude): Response
     {
         return $this->webService->get(
-            new Request(
-                'https://' . $this->envService->getString('OPENWEATHERMAP_URL') .
-                'onecall?lat=' . $latitude . '&lon=' . $longitude .
-                '&appid=' . $this->envService->getString('OPENWEATHERMAP_API_KEY') .
-                '&units=metric&lang=de&exclude=minutely,daily',
-            ),
+            new Request(sprintf(
+                'https://%sonecall?lat=%s&lon=%s&appid=%s&units=metric&lang=de&exclude=minutely,daily',
+                $this->envService->getString('OPENWEATHERMAP_URL'),
+                $latitude,
+                $longitude,
+                $this->envService->getString('OPENWEATHERMAP_API_KEY'),
+            )),
         );
     }
 }

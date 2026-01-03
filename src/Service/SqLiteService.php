@@ -78,6 +78,8 @@ class SqLiteService
 
     /**
      * @throws ExecuteError
+     *
+     * @return array|scalar|null
      */
     public function querySingle(string $query)
     {

@@ -5,6 +5,7 @@ namespace GibsonOS\Core\Query;
 
 use GibsonOS\Core\Attribute\Install\Database\Constraint;
 use GibsonOS\Core\Dto\Model\ChildrenMapping;
+use GibsonOS\Core\Exception\QueryException;
 use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Wrapper\ModelWrapper;
@@ -249,7 +250,13 @@ class ChildrenQuery
         }
 
         return $constraintAttribute->getOwnColumn()
-            ?? (mb_strtolower(preg_replace('/([A-Z])/', '_$1', $reflectionProperty->getName())) . '_id')
+            ?? (mb_strtolower(
+                preg_replace(
+                    '/([A-Z])/',
+                    '_$1',
+                    $reflectionProperty->getName(),
+                ) ?: throw new QueryException('Property name is not set!'),
+            ) . '_id')
         ;
     }
 
@@ -276,7 +283,13 @@ class ChildrenQuery
         Constraint $constraintAttribute,
     ): string {
         $typeName = $this->reflectionManager->getTypeName($reflectionProperty);
-        $parentColumn = mb_strtolower(preg_replace('/([A-Z])/', '_$1', $constraintAttribute->getParentColumn()));
+        $parentColumn = mb_strtolower(
+            preg_replace(
+                '/([A-Z])/',
+                '_$1',
+                $constraintAttribute->getParentColumn(),
+            ) ?? throw new QueryException('Parent column is not set!'),
+        );
 
         if ($typeName === 'array') {
             return $parentColumn . '_id';

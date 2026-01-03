@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Archive;
 
 use GibsonOS\Core\Exception\ArchiveException;
+use Override;
 use ZipArchive as StandardZipArchive;
 
 class ZipArchive implements ArchiveInterface
@@ -17,6 +18,7 @@ class ZipArchive implements ArchiveInterface
      *
      * @throws ArchiveException
      */
+    #[Override]
     public function packFiles(string $filename, array $files): void
     {
         if ($this->zipArchive->open($filename, StandardZipArchive::CREATE) !== true) {
@@ -34,6 +36,10 @@ class ZipArchive implements ArchiveInterface
         }
     }
 
+    #[Override]
+    /**
+     * @return void
+     */
     public function unpack(string $filename)
     {
         // TODO: Implement unpack() method.

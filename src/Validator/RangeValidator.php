@@ -7,12 +7,14 @@ use DateTimeInterface;
 use GibsonOS\Core\Attribute\Validation\AbstractValidation;
 use GibsonOS\Core\Attribute\Validation\Range;
 use GibsonOS\Core\Exception\ValidationException;
+use Override;
 
 class RangeValidator extends AbstractValidator
 {
     /**
      * @throws ValidationException
      */
+    #[Override]
     public function isValid(AbstractValidation $validation, mixed $value): bool
     {
         if (!$validation instanceof Range) {

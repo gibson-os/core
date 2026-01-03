@@ -9,6 +9,7 @@ use GibsonOS\Core\Service\RequestService;
 use GibsonOS\Core\Service\TwigService;
 use GibsonOS\Core\Utility\JsonUtility;
 use JsonException;
+use Override;
 use Throwable;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
@@ -24,6 +25,7 @@ readonly class ExceptionResponse implements ResponseInterface
     ) {
     }
 
+    #[Override]
     public function getCode(): HttpStatusCode
     {
         try {
@@ -33,6 +35,7 @@ readonly class ExceptionResponse implements ResponseInterface
         }
     }
 
+    #[Override]
     public function getHeaders(): array
     {
         $headers = [];
@@ -50,6 +53,7 @@ readonly class ExceptionResponse implements ResponseInterface
      * @throws SyntaxError
      * @throws JsonException
      */
+    #[Override]
     public function getBody(): string
     {
 
@@ -81,14 +85,14 @@ readonly class ExceptionResponse implements ResponseInterface
                     'success' => false,
                     'failure' => true,
                     'data' => $data,
-                ]);
+                ]) ?: '';
             }
 
             return JsonUtility::encode([
                 'success' => false,
                 'failure' => true,
                 'exception' => $exception,
-            ]);
+            ]) ?: '';
         }
 
         $response = new TwigResponse($this->twigService, '@core/exception.html.twig');
@@ -97,6 +101,7 @@ readonly class ExceptionResponse implements ResponseInterface
         return $response->getBody();
     }
 
+    #[Override]
     public function getRequiredHeaders(): array
     {
         return [];

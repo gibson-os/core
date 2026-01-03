@@ -9,6 +9,7 @@ use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\InstallException;
 use GibsonOS\Core\Exception\SetError;
 use GibsonOS\Core\Service\InstallService;
+use Override;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -32,6 +33,7 @@ class InstallCommand extends AbstractCommand
      * @throws InstallException
      * @throws SetError
      */
+    #[Override]
     protected function run(): int
     {
         foreach ($this->installService->install($this->module, $this->part) as $installDto) {

@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Service\Response;
 
 use GibsonOS\Core\Enum\HttpStatusCode;
+use Override;
 
 class Response implements ResponseInterface
 {
@@ -14,21 +15,25 @@ class Response implements ResponseInterface
         $this->headers = $headers;
     }
 
+    #[Override]
     public function getHeaders(): array
     {
         return $this->headers;
     }
 
+    #[Override]
     public function getBody(): string
     {
         return $this->body;
     }
 
+    #[Override]
     public function getRequiredHeaders(): array
     {
         return [];
     }
 
+    #[Override]
     public function getCode(): HttpStatusCode
     {
         return $this->code;

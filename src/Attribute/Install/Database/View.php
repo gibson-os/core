@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Attribute\Install\Database;
 
 use Attribute;
+use Override;
 
 #[Attribute(Attribute::TARGET_CLASS)]
 class View extends Table
@@ -18,6 +19,7 @@ class View extends Table
         return $this->query;
     }
 
+    #[Override]
     public function getName(): ?string
     {
         return $this->name;

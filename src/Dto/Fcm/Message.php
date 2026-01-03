@@ -7,6 +7,7 @@ use GibsonOS\Core\Enum\Middleware\Message\Priority;
 use GibsonOS\Core\Enum\Middleware\Message\Type;
 use GibsonOS\Core\Enum\Middleware\Message\Vibrate;
 use JsonSerializable;
+use Override;
 
 class Message implements JsonSerializable
 {
@@ -25,6 +26,7 @@ class Message implements JsonSerializable
     ) {
     }
 
+    #[Override]
     public function jsonSerialize(): array
     {
         return [

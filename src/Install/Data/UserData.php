@@ -18,6 +18,7 @@ use GibsonOS\Core\Service\InstallService;
 use GibsonOS\Core\Service\PriorityInterface;
 use GibsonOS\Core\Service\UserService;
 use JsonException;
+use Override;
 use ReflectionException;
 
 class UserData extends AbstractInstall implements PriorityInterface, SingleInstallInterface
@@ -37,6 +38,7 @@ class UserData extends AbstractInstall implements PriorityInterface, SingleInsta
      * @throws JsonException
      * @throws ReflectionException
      */
+    #[Override]
     public function install(string $module): Generator
     {
         if ($this->userRepository->getCount() !== 0) {
@@ -64,11 +66,13 @@ class UserData extends AbstractInstall implements PriorityInterface, SingleInsta
         }
     }
 
+    #[Override]
     public function getPart(): string
     {
         return InstallService::PART_DATA;
     }
 
+    #[Override]
     public function getPriority(): int
     {
         return 0;

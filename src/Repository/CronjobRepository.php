@@ -94,7 +94,7 @@ class CronjobRepository extends AbstractRepository
         return $this->getModels($selectQuery, Cronjob::class);
     }
 
-    private function getTimePart(string $field, $parameterName): string
+    private function getTimePart(string $field, string $parameterName): string
     {
         return sprintf(
             'IF(' .

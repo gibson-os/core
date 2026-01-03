@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Dto\Parameter;
 
 use DateTimeInterface;
+use Override;
 
 class TimeParameter extends AbstractParameter
 {
@@ -33,6 +34,7 @@ class TimeParameter extends AbstractParameter
         return $this;
     }
 
+    #[Override]
     protected function getTypeConfig(): array
     {
         return [
@@ -42,6 +44,7 @@ class TimeParameter extends AbstractParameter
         ];
     }
 
+    #[Override]
     public function getAllowedOperators(): array
     {
         return [

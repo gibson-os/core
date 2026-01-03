@@ -8,12 +8,14 @@ use GibsonOS\Core\Attribute\Validation\AbstractValidation;
 use GibsonOS\Core\Attribute\Validation\Lower;
 use GibsonOS\Core\Attribute\Validation\LowerEqual;
 use GibsonOS\Core\Exception\ValidationException;
+use Override;
 
 class LowerValidator extends AbstractValidator
 {
     /**
      * @throws ValidationException
      */
+    #[Override]
     public function isValid(AbstractValidation $validation, mixed $value): bool
     {
         if (!$validation instanceof Lower && !$validation instanceof LowerEqual) {

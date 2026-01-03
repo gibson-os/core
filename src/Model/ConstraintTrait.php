@@ -32,8 +32,13 @@ trait ConstraintTrait
      */
     public function __call(string $name, array $arguments)
     {
-        $methodType = preg_replace('/^(get|set|add|unload).*/', '$1', $name, 1);
-        $propertyName = lcfirst(preg_replace('/^(get|set|add|unload)/', '', $name, 1));
+        $methodType = preg_replace('/^(get|set|add|unload).*/', '$1', $name, 1)
+            ?: throw new InvalidArgumentException('No method type defined in call name')
+        ;
+        $propertyName = lcfirst(
+            preg_replace('/^(get|set|add|unload)/', '', $name, 1)
+                ?: throw new InvalidArgumentException('No method name defined in call name'),
+        );
         $reflectionClass = new ReflectionClass($this::class);
         $reflectionProperty = $reflectionClass->getProperty($propertyName);
         /** @psalm-suppress UndefinedMethod */

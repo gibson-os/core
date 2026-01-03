@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Dto;
 
+use Override;
 use Stringable;
 
 class Javascript implements Stringable
@@ -84,6 +85,7 @@ class Javascript implements Stringable
         return $this;
     }
 
+    #[Override]
     public function __toString(): string
     {
         return

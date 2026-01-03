@@ -6,6 +6,7 @@ namespace GibsonOS\Core\Attribute;
 use Attribute;
 use GibsonOS\Core\Enum\Permission;
 use GibsonOS\Core\Service\Attribute\MiddlewarePermissionAttributeService;
+use Override;
 
 #[Attribute(Attribute::TARGET_METHOD)]
 class CheckMiddlewarePermission extends CheckPermission
@@ -23,6 +24,7 @@ class CheckMiddlewarePermission extends CheckPermission
         parent::__construct($permissions, $permissionsByRequestValues, $permissionParameter);
     }
 
+    #[Override]
     public function getAttributeServiceName(): string
     {
         return MiddlewarePermissionAttributeService::class;

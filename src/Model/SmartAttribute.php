@@ -6,6 +6,7 @@ namespace GibsonOS\Core\Model;
 use GibsonOS\Core\Attribute\Install\Database\Column;
 use GibsonOS\Core\Attribute\Install\Database\Table;
 use JsonSerializable;
+use Override;
 
 #[Table('system_smart_attribute')]
 class SmartAttribute extends AbstractModel implements JsonSerializable
@@ -55,6 +56,7 @@ class SmartAttribute extends AbstractModel implements JsonSerializable
         return $this;
     }
 
+    #[Override]
     public function jsonSerialize(): array
     {
         return [

@@ -6,6 +6,7 @@ namespace GibsonOS\Core\Attribute\Validation;
 use Attribute;
 use DateTimeInterface;
 use GibsonOS\Core\Validator\LowerValidator;
+use Override;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class Lower extends AbstractValidation
@@ -14,11 +15,13 @@ class Lower extends AbstractValidation
     {
     }
 
+    #[Override]
     public function getAttributeServiceName(): string
     {
         return LowerValidator::class;
     }
 
+    #[Override]
     public function getMessage(mixed $value): string
     {
         $lowerThan = $this->getLowerThan();

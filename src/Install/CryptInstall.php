@@ -10,9 +10,11 @@ use GibsonOS\Core\Exception\GetError;
 use GibsonOS\Core\Exception\InstallException;
 use GibsonOS\Core\Service\InstallService;
 use GibsonOS\Core\Service\PriorityInterface;
+use Override;
 
 class CryptInstall extends AbstractInstall implements PriorityInterface, SingleInstallInterface
 {
+    #[Override]
     public function install(string $module): Generator
     {
         try {
@@ -92,11 +94,13 @@ class CryptInstall extends AbstractInstall implements PriorityInterface, SingleI
         ;
     }
 
+    #[Override]
     public function getPart(): string
     {
         return InstallService::PART_CONFIG;
     }
 
+    #[Override]
     public function getPriority(): int
     {
         return 800;

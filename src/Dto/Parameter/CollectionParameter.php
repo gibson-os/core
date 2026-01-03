@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Dto\Parameter;
 
+use Override;
+
 class CollectionParameter extends AbstractParameter
 {
     /**
@@ -15,11 +17,13 @@ class CollectionParameter extends AbstractParameter
         parent::__construct('', 'gosCoreComponentPanel');
     }
 
+    #[Override]
     protected function getTypeConfig(): array
     {
         return [];
     }
 
+    #[Override]
     public function getAllowedOperators(): array
     {
         return array_intersect(...array_map(

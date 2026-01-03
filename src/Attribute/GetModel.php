@@ -6,6 +6,7 @@ namespace GibsonOS\Core\Attribute;
 use Attribute;
 use GibsonOS\Core\Dto\Model\ChildrenMapping;
 use GibsonOS\Core\Service\Attribute\ModelFetcherAttribute;
+use Override;
 
 #[Attribute(Attribute::TARGET_PARAMETER)]
 class GetModel implements AttributeInterface
@@ -21,6 +22,7 @@ class GetModel implements AttributeInterface
     ) {
     }
 
+    #[Override]
     public function getAttributeServiceName(): string
     {
         return ModelFetcherAttribute::class;

@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Service;
 
+use Override;
 use Parsedown;
 
 class ParsedownService extends Parsedown
@@ -14,6 +15,7 @@ class ParsedownService extends Parsedown
         $this->setSafeMode(true);
     }
 
+    #[Override]
     protected function inlineLink($Excerpt): ?array
     {
         $link = parent::inlineLink($Excerpt);

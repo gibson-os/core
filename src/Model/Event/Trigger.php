@@ -11,6 +11,7 @@ use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Model\Event;
 use JsonException;
 use JsonSerializable;
+use Override;
 
 /**
  * @method Event   getEvent()
@@ -266,6 +267,7 @@ class Trigger extends AbstractModel implements JsonSerializable
     /**
      * @throws JsonException
      */
+    #[Override]
     public function jsonSerialize(): array
     {
         return [

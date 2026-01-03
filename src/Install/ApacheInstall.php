@@ -7,9 +7,11 @@ use Generator;
 use GibsonOS\Core\Dto\Install\Configuration;
 use GibsonOS\Core\Service\InstallService;
 use GibsonOS\Core\Service\PriorityInterface;
+use Override;
 
 class ApacheInstall extends AbstractInstall implements PriorityInterface, SingleInstallInterface
 {
+    #[Override]
     public function install(string $module): Generator
     {
         yield $apacheUserInput = $this->getEnvInput('APACHE_USER', 'What is the apache username?');
@@ -22,11 +24,13 @@ class ApacheInstall extends AbstractInstall implements PriorityInterface, Single
         ;
     }
 
+    #[Override]
     public function getPart(): string
     {
         return InstallService::PART_CONFIG;
     }
 
+    #[Override]
     public function getPriority(): int
     {
         return 800;

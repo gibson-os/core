@@ -9,6 +9,7 @@ use GibsonOS\Core\Model\Role\User;
 use GibsonOS\Core\Store\AbstractDatabaseStore;
 use GibsonOS\Core\Wrapper\DatabaseStoreWrapper;
 use MDO\Enum\OrderDirection;
+use Override;
 
 /**
  * @extends AbstractDatabaseStore<User>
@@ -22,6 +23,7 @@ class UserStore extends AbstractDatabaseStore
         parent::__construct($databaseStoreWrapper);
     }
 
+    #[Override]
     protected function getModelClassName(): string
     {
         return User::class;
@@ -34,21 +36,25 @@ class UserStore extends AbstractDatabaseStore
         return $this;
     }
 
+    #[Override]
     protected function getAlias(): string
     {
         return 'ru';
     }
 
+    #[Override]
     protected function getDefaultOrder(): array
     {
         return ['`u`.`user`' => OrderDirection::ASC];
     }
 
+    #[Override]
     protected function setWheres(): void
     {
         $this->addWhere('`ru`.`role_id`=?', [$this->role->getId() ?? 0]);
     }
 
+    #[Override]
     protected function getExtends(): array
     {
         return [new ChildrenMapping('user', 'user', 'u')];

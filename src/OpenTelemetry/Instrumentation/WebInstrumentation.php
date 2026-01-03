@@ -9,6 +9,7 @@ use GibsonOS\Core\Service\OpenTelemetry\SpanService;
 use GibsonOS\Core\Service\WebService;
 use OpenTelemetry\API\Instrumentation\CachedInstrumentation;
 use OpenTelemetry\API\Trace\SpanKind;
+use Override;
 
 class WebInstrumentation implements InstrumentationInterface
 {
@@ -18,6 +19,7 @@ class WebInstrumentation implements InstrumentationInterface
     ) {
     }
 
+    #[Override]
     public function __invoke(): void
     {
         $instrumentation = new CachedInstrumentation('gibsonOS.web');

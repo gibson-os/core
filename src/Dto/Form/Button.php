@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Dto\Form;
 
 use JsonSerializable;
+use Override;
 use stdClass;
 
 class Button implements JsonSerializable
@@ -42,6 +43,7 @@ class Button implements JsonSerializable
         return $this->parameters;
     }
 
+    #[Override]
     public function jsonSerialize(): array
     {
         return [

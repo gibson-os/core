@@ -173,16 +173,23 @@ class CronjobService
         array $years,
     ): array {
         $combinedTimes = [];
+        $firstHour = reset($hours) ?: new TimePart(0, 23);
+        $firstMinute = reset($minutes) ?: new TimePart(0, 59);
+        $firstSecond = reset($seconds) ?: new TimePart(0, 59);
+        $firstDayOfMonth = reset($daysOfMonth) ?: new TimePart(1, 31);
+        $firstDayOfWeek = reset($daysOfWeek) ?: new TimePart(0, 6);
+        $firstMonth = reset($months) ?: new TimePart(1, 12);
+        $firstYear = reset($years) ?: new TimePart(1970, 9999);
 
         foreach ($hours as $hour) {
             $combinedTimes[] = new Time(
                 $hour,
-                reset($minutes),
-                reset($seconds),
-                reset($daysOfMonth),
-                reset($daysOfWeek),
-                reset($months),
-                reset($years),
+                $firstMinute,
+                $firstSecond,
+                $firstDayOfMonth,
+                $firstDayOfWeek,
+                $firstMonth,
+                $firstYear,
             );
         }
 
@@ -190,13 +197,13 @@ class CronjobService
 
         for ($i = 1; $i < $counter; ++$i) {
             $combinedTimes[] = new Time(
-                reset($hours),
+                $firstHour,
                 $minutes[$i],
-                reset($seconds),
-                reset($daysOfMonth),
-                reset($daysOfWeek),
-                reset($months),
-                reset($years),
+                $firstSecond,
+                $firstDayOfMonth,
+                $firstDayOfWeek,
+                $firstMonth,
+                $firstYear,
             );
         }
 
@@ -204,13 +211,13 @@ class CronjobService
 
         for ($i = 1; $i < $counter; ++$i) {
             $combinedTimes[] = new Time(
-                reset($hours),
-                reset($minutes),
+                $firstHour,
+                $firstMinute,
                 $seconds[$i],
-                reset($daysOfMonth),
-                reset($daysOfWeek),
-                reset($months),
-                reset($years),
+                $firstDayOfMonth,
+                $firstDayOfWeek,
+                $firstMonth,
+                $firstYear,
             );
         }
 
@@ -218,13 +225,13 @@ class CronjobService
 
         for ($i = 1; $i < $counter; ++$i) {
             $combinedTimes[] = new Time(
-                reset($hours),
-                reset($minutes),
-                reset($seconds),
+                $firstHour,
+                $firstMinute,
+                $firstSecond,
                 $daysOfMonth[$i],
-                reset($daysOfWeek),
-                reset($months),
-                reset($years),
+                $firstDayOfWeek,
+                $firstMonth,
+                $firstYear,
             );
         }
 
@@ -232,13 +239,13 @@ class CronjobService
 
         for ($i = 1; $i < $counter; ++$i) {
             $combinedTimes[] = new Time(
-                reset($hours),
-                reset($minutes),
-                reset($seconds),
-                reset($daysOfMonth),
+                $firstHour,
+                $firstMinute,
+                $firstSecond,
+                $firstDayOfMonth,
                 $daysOfWeek[$i],
-                reset($months),
-                reset($years),
+                $firstMonth,
+                $firstYear,
             );
         }
 
@@ -246,13 +253,13 @@ class CronjobService
 
         for ($i = 1; $i < $counter; ++$i) {
             $combinedTimes[] = new Time(
-                reset($hours),
-                reset($minutes),
-                reset($seconds),
-                reset($daysOfMonth),
-                reset($daysOfWeek),
+                $firstHour,
+                $firstMinute,
+                $firstSecond,
+                $firstDayOfMonth,
+                $firstDayOfWeek,
                 $months[$i],
-                reset($years),
+                $firstYear,
             );
         }
 
@@ -260,12 +267,12 @@ class CronjobService
 
         for ($i = 1; $i < $counter; ++$i) {
             $combinedTimes[] = new Time(
-                reset($hours),
-                reset($minutes),
-                reset($seconds),
-                reset($daysOfMonth),
-                reset($daysOfWeek),
-                reset($months),
+                $firstHour,
+                $firstMinute,
+                $firstSecond,
+                $firstDayOfMonth,
+                $firstDayOfWeek,
+                $firstMonth,
                 $years[$i],
             );
         }

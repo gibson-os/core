@@ -15,6 +15,7 @@ use GibsonOS\Core\Repository\LockRepository;
 use GibsonOS\Core\Service\CronjobService;
 use GibsonOS\Core\Service\LockService;
 use JsonException;
+use Override;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -46,6 +47,7 @@ class RunCommand extends AbstractCommand
      * @throws SaveError
      * @throws JsonException
      */
+    #[Override]
     protected function run(): int
     {
         try {

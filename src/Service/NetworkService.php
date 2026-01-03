@@ -4,6 +4,8 @@ declare(strict_types=1);
 namespace GibsonOS\Core\Service;
 
 use GibsonOS\Core\Event\NetworkEvent;
+use GibsonOS\Core\Exception\NetworkException;
+use Socket;
 
 class NetworkService
 {
@@ -24,6 +26,11 @@ class NetworkService
 
         $package = "\x08\x00\x7d\x4b\x00\x00\x00\x00PingHost";
         $socket = socket_create(AF_INET, SOCK_RAW, 1);
+
+        if (!$socket instanceof Socket) {
+            throw new NetworkException('Socket konnte nicht erstellt werden!');
+        }
+
         socket_set_option($socket, SOL_SOCKET, SO_RCVTIMEO, ['sec' => $timeout, 'usec' => 0]);
         socket_connect($socket, $host, 0);
         socket_send($socket, $package, strlen($package), 0);

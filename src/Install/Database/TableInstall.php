@@ -26,6 +26,7 @@ use MDO\Client;
 use MDO\Dto\Record;
 use MDO\Exception\ClientException;
 use MDO\Exception\RecordException;
+use Override;
 use ReflectionAttribute;
 use ReflectionException;
 use UnitEnum;
@@ -75,6 +76,7 @@ class TableInstall extends AbstractInstall implements PriorityInterface
      * @throws JsonException
      * @throws RecordException
      */
+    #[Override]
     public function install(string $module): Generator
     {
         $path = $this->dirService->addEndSlash($module) . 'src' . DIRECTORY_SEPARATOR . 'Model';
@@ -245,11 +247,13 @@ class TableInstall extends AbstractInstall implements PriorityInterface
         }
     }
 
+    #[Override]
     public function getPart(): string
     {
         return InstallService::PART_DATABASE;
     }
 
+    #[Override]
     public function getPriority(): int
     {
         return 700;
@@ -314,13 +318,14 @@ class TableInstall extends AbstractInstall implements PriorityInterface
     private function getColumnType(Column $column): string
     {
         $type = $column->getType();
+        $length = $column->getLength();
 
         return trim(
             $type .
             (
                 $type === Column::TYPE_ENUM
                     ? "('" . implode("','", $column->getValues()) . "')"
-                    : ($column->getLength() === null ? ' ' : '(' . $column->getLength() . ')')
+                    : ($length === null ? ' ' : '(' . $length . ')')
             ),
         );
     }

@@ -6,9 +6,11 @@ namespace GibsonOS\Core\Service\Attribute;
 use GibsonOS\Core\Attribute\AttributeInterface;
 use GibsonOS\Core\Attribute\GetTableName;
 use GibsonOS\Core\Attribute\Install\Database\Table;
+use GibsonOS\Core\Exception\QueryException;
 use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Wrapper\ModelWrapper;
+use Override;
 use ReflectionAttribute;
 use ReflectionException;
 use ReflectionParameter;
@@ -26,6 +28,7 @@ class TableNameAttribute implements ParameterAttributeInterface, AttributeServic
     /**
      * @throws ReflectionException
      */
+    #[Override]
     public function replace(AttributeInterface $attribute, array $parameters, ReflectionParameter $reflectionParameter): mixed
     {
         if (!$attribute instanceof GetTableName) {
@@ -56,6 +59,6 @@ class TableNameAttribute implements ParameterAttributeInterface, AttributeServic
         $nameParts = explode('\\', $name);
         $name = lcfirst(end($nameParts));
 
-        return mb_strtolower(preg_replace('/([A-Z])/', '_$1', $name));
+        return mb_strtolower(preg_replace('/([A-Z])/', '_$1', $name) ?: throw new QueryException('Empty table name'));
     }
 }

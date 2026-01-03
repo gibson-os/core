@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Dto\Parameter;
 
+use Override;
+
 class BoolParameter extends AbstractParameter
 {
     public function __construct(string $title)
@@ -10,11 +12,13 @@ class BoolParameter extends AbstractParameter
         parent::__construct($title, 'gosCoreComponentFormFieldCheckbox');
     }
 
+    #[Override]
     protected function getTypeConfig(): array
     {
         return [];
     }
 
+    #[Override]
     public function getAllowedOperators(): array
     {
         return [

@@ -21,7 +21,7 @@ class DrawService extends ImageService
         return imagefilledrectangle($image->getImage(), $startX, $startY, $stopX, $stopY, $color);
     }
 
-    public function setTtfText(ImageDto $image, string $text, int $color, string $fontFile, int $size, int $startX = 0, int $startY = 0, int $angle = 0): array
+    public function setTtfText(ImageDto $image, string $text, int $color, string $fontFile, int $size, int $startX = 0, int $startY = 0, int $angle = 0): array|false
     {
         if ($startY == 0) {
             $startY = $size;
@@ -33,7 +33,7 @@ class DrawService extends ImageService
     /**
      * Schreibt einen Text in das Bild.
      */
-    public function setTfbBox(string $text, string $fontFile, int $size, int $angle = 0): array
+    public function setTfbBox(string $text, string $fontFile, int $size, int $angle = 0): array|false
     {
         return imagettfbbox($size, $angle, $fontFile, $text);
     }

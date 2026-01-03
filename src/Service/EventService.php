@@ -59,10 +59,6 @@ class EventService
         $triggerName = $className . '::' . $trigger;
         $this->logger->info('Add event for trigger ' . $className . '::' . $trigger);
 
-        if (!isset($this->events[$trigger])) {
-            $this->events[$triggerName] = [];
-        }
-
         $this->events[$triggerName][] = $function;
     }
 
@@ -125,38 +121,39 @@ class EventService
      */
     public function runEvent(Event $event, bool $async): void
     {
+        $id = $event->getId() ?? 0;
         if ($async) {
-            $this->logger->info('Run async event ' . $event->getId());
-            $this->commandService->executeAsync(RunCommand::class, ['eventId' => $event->getId()], []);
+            $this->logger->info('Run async event ' . $id);
+            $this->commandService->executeAsync(RunCommand::class, ['eventId' => $id], []);
 
             return;
         }
 
-        $lockName = sprintf('event%d', $event->getId() ?? 0);
+        $lockName = sprintf('event%d', $id);
 
         if ($event->isLockCommand()) {
             try {
                 $this->lockService->lock($lockName);
             } catch (LockException) {
-                $this->logger->warning(sprintf('Event %s already runs', $event->getId() ?? 0));
+                $this->logger->warning(sprintf('Event %s already runs', $id));
 
                 return;
             }
         }
 
-        $this->logger->info('Run event ' . $event->getId());
+        $this->logger->info('Run event ' . $id);
         $this->modelManager->saveWithoutChildren(
             $event
-                ->setPid(getmypid())
+                ->setPid(getmypid() ?: throw new EventException('Cannot get PID'))
                 ->setLastRun($this->dateTimeService->get()),
         );
-        $startTime = (int) (microtime(true) * 1000000);
+        $startTime = (int) (microtime(true) * 1000000.0);
         $this->elementService->runElements($event->getElements(), $event);
         $this->modelManager->saveWithoutChildren(
             $event
                 ->setPid(null)
                 ->setLastRun($this->dateTimeService->get())
-                ->setRuntime(((int) (microtime(true) * 1000000)) - $startTime),
+                ->setRuntime(((int) (microtime(true) * 1000000.0)) - $startTime),
         );
 
         if ($event->isLockCommand()) {
@@ -293,6 +290,7 @@ class EventService
     private function checkTriggerParameters(Event $event, string $className, string $trigger, array $parameters): bool
     {
         $triggerName = $this->getTriggerName($className, $trigger);
+        $id = $event->getId() ?? 0;
 
         foreach ($event->getTriggers() as $eventTrigger) {
             if (
@@ -359,7 +357,7 @@ class EventService
 
                 if (!$this->elementService->getConditionResult($parameters[$parameterName], $eventParameter['operator'], $eventParameter['value'])) {
                     $this->logger->debug(
-                        'Trigger parameter for event ' . $event->getId() . ' not true' .
+                        'Trigger parameter for event ' . $id . ' not true' .
                         '(' . $parameters[$parameterName] . ' ' . $eventParameter['operator'] . ' ' . $eventParameter['value'] . ')',
                     );
 
@@ -372,7 +370,7 @@ class EventService
             return true;
         }
 
-        $this->logger->info('Trigger ' . $triggerName . ' not passed for event ' . $event->getId());
+        $this->logger->info('Trigger ' . $triggerName . ' not passed for event ' . $id);
 
         return false;
     }

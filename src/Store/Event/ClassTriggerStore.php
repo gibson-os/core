@@ -9,6 +9,7 @@ use GibsonOS\Core\Exception\FactoryError;
 use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Service\EventService;
 use GibsonOS\Core\Store\AbstractStore;
+use Override;
 use ReflectionAttribute;
 use ReflectionClass;
 use ReflectionClassConstant;
@@ -46,6 +47,7 @@ class ClassTriggerStore extends AbstractStore
      *
      * @return array[]
      */
+    #[Override]
     public function getList(): array
     {
         $this->generateList();
@@ -56,6 +58,7 @@ class ClassTriggerStore extends AbstractStore
     /**
      * @throws FactoryError
      */
+    #[Override]
     public function getCount(): int
     {
         return count($this->getList());

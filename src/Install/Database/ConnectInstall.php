@@ -13,12 +13,14 @@ use GibsonOS\Core\Service\InstallService;
 use GibsonOS\Core\Service\PriorityInterface;
 use MDO\Client;
 use MDO\Exception\ClientException;
+use Override;
 
 class ConnectInstall extends AbstractInstall implements PriorityInterface, SingleInstallInterface
 {
     /**
      * @throws InstallException
      */
+    #[Override]
     public function install(string $module): Generator
     {
         yield $hostInput = $this->getEnvInput('MYSQL_HOST', 'What is the MySQL hostname?');
@@ -105,11 +107,13 @@ class ConnectInstall extends AbstractInstall implements PriorityInterface, Singl
         ;
     }
 
+    #[Override]
     public function getPart(): string
     {
         return InstallService::PART_DATABASE;
     }
 
+    #[Override]
     public function getPriority(): int
     {
         return 900;

@@ -7,6 +7,7 @@ use GibsonOS\Core\Attribute\Event;
 use GibsonOS\Core\Attribute\GetClassNames;
 use GibsonOS\Core\Manager\ReflectionManager;
 use GibsonOS\Core\Store\AbstractStore;
+use Override;
 use ReflectionAttribute;
 use ReflectionException;
 
@@ -29,6 +30,7 @@ class ClassNameStore extends AbstractStore
      *
      * @return array[]
      */
+    #[Override]
     public function getList(): array
     {
         $this->generateList();
@@ -39,6 +41,7 @@ class ClassNameStore extends AbstractStore
     /**
      * @throws ReflectionException
      */
+    #[Override]
     public function getCount(): int
     {
         return count($this->getList());

@@ -13,6 +13,7 @@ use GibsonOS\Core\Model\AbstractModel;
 use GibsonOS\Core\Model\Event;
 use JsonException;
 use JsonSerializable;
+use Override;
 use ReflectionException;
 use Serializable;
 
@@ -240,6 +241,9 @@ class Element extends AbstractModel implements Serializable, JsonSerializable
             $element->setOrder($order++);
         }
 
+        /**
+         * @psalm-suppress UndefinedMagicMethod
+         */
         parent::addChildren($elements);
 
         return $this;
@@ -256,16 +260,21 @@ class Element extends AbstractModel implements Serializable, JsonSerializable
             $element->setOrder($order++);
         }
 
+        /**
+         * @psalm-suppress UndefinedMagicMethod
+         */
         parent::setChildren($elements);
 
         return $this;
     }
 
+    #[Override]
     public function serialize(): string
     {
         return serialize($this->__serialize());
     }
 
+    #[Override]
     public function unserialize(string $data): void
     {
         $this->__unserialize(unserialize($data));
@@ -274,6 +283,7 @@ class Element extends AbstractModel implements Serializable, JsonSerializable
     /**
      * @throws JsonException
      */
+    #[Override]
     public function jsonSerialize(): array
     {
         $data = [
