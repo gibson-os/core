@@ -5,5 +5,8 @@ namespace GibsonOS\Core\EventSubscriber;
 
 interface SubscriberInterface
 {
-    public function event(array $parameters): void;
+    /**
+     * @param class-string $className
+     */
+    public function event(string $className, string $trigger, array $parameters): void;
 }

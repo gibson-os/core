@@ -28,10 +28,12 @@ class SubscriberService
             $subscriberReflection = $this->reflectionManager->getReflectionClass($subscriber);
 
             foreach ($this->reflectionManager->getAttributes($subscriberReflection, Subscriber::class) as $eventSubscriberAttribute) {
+                $className = $eventSubscriberAttribute->getClassName();
+                $trigger = $eventSubscriberAttribute->getTrigger();
                 $this->eventService->add(
-                    $eventSubscriberAttribute->getClassName(),
-                    $eventSubscriberAttribute->getTrigger(),
-                    fn (array $parameters) => $subscriber->event($parameters),
+                    $className,
+                    $trigger,
+                    fn (array $parameters) => $subscriber->event($className, $trigger, $parameters),
                 );
             }
         }
