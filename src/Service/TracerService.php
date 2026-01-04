@@ -30,10 +30,7 @@ class TracerService
         return $this;
     }
 
-    /**
-     * @param int|string|true $value
-     */
-    public function setCustomParameter(string $key, bool|int|string $value, TracePrefix $prefix = TracePrefix::APP): TracerService
+    public function setCustomParameter(string $key, mixed $value, TracePrefix $prefix = TracePrefix::APP): TracerService
     {
         foreach ($this->tracers as $tracer) {
             if ($tracer->isLoaded()) {

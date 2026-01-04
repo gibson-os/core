@@ -44,9 +44,6 @@ class ValidatorService
         return $violations;
     }
 
-    /**
-     * @param array|object|scalar|null $value
-     */
     private function getViolations(
         ReflectionClass|ReflectionProperty $reflectionObject,
         mixed $value,
