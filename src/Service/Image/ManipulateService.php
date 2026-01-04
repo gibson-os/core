@@ -16,7 +16,7 @@ class ManipulateService extends DrawService
     {
         // Wenn das bild breiter als hoch ist
         if ($this->getWidth($image) > $this->getHeight($image)) {
-            $newHeight = (int) ($this->getHeight($image) / $this->getWidth($image)) * $width;
+            $newHeight = (int) (((float) $this->getHeight($image) / (float) $this->getWidth($image)) * (float) $width);
             $newWidth = $width;
 
             /* Höhe passt nicht in die übergebenen maße
@@ -27,22 +27,22 @@ class ManipulateService extends DrawService
                          deswegen: new w=100; new h=50
             */
             if ($newHeight > $height) {
-                $newWidth = (int) ($width / $newHeight) * $height;
+                $newWidth = (int) (((float) $width / (float) $newHeight) * (float) $height);
                 $newHeight = $height;
             }
         } else {
             // Wenn das Bild höher als breit ist
-            $newWidth = (int) ($this->getWidth($image) / $this->getHeight($image)) * $height;
+            $newWidth = (int) (((float) $this->getWidth($image) / (float) $this->getHeight($image)) * (float) $height);
             $newHeight = $height;
 
             if ($newWidth > $width) {
-                $newHeight = (int) ($height / $newWidth) * $width;
+                $newHeight = (int) (((float) $height / (float) $newWidth) * (float) $width);
                 $newWidth = $width;
             }
         }
 
-        $width = (int) $newWidth;
-        $height = (int) $newHeight;
+        $width = $newWidth;
+        $height = $newHeight;
 
         $newImage = imagescale($image->getImage(), $width, $height);
 

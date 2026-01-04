@@ -28,7 +28,7 @@ class AutoCompleteParameter extends AbstractParameter
         return $this;
     }
 
-    public function setParameter(string $key, bool $value): AutoCompleteParameter
+    public function setParameter(string $key, mixed $value): AutoCompleteParameter
     {
         $this->parameters[$key] = $value;
 

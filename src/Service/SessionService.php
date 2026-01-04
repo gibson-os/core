@@ -41,10 +41,8 @@ class SessionService
 
     /**
      * @SuppressWarnings (PHPMD.Superglobals)
-     *
-     * @param int|true|null $value
      */
-    public function set(string $key, bool|int|null $value): SessionService
+    public function set(string $key, mixed $value): SessionService
     {
         $this->data[$key] = $value;
         session_start();
@@ -78,10 +76,7 @@ class SessionService
         return $this;
     }
 
-    /**
-     * @psalm-param 0|false|null $default
-     */
-    public function getWithDefault(string $key, int|false|null $default = null)
+    public function getWithDefault(string $key, mixed $default = null)
     {
         try {
             return $this->get($key);

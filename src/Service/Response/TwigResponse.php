@@ -51,7 +51,7 @@ class TwigResponse implements ResponseInterface
         return $this->code;
     }
 
-    public function setVariable(string $name, array $value): TwigResponse
+    public function setVariable(string $name, mixed $value): TwigResponse
     {
         $this->variables[$name] = $value;
 
