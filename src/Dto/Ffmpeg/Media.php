@@ -205,7 +205,7 @@ class Media implements JsonSerializable
      */
     public function getSelectedVideoStream(): Video
     {
-        $selectedVideoStreamId = $this->selectedAudioStreamId
+        $selectedVideoStreamId = $this->selectedVideoStreamId
             ?? throw new NoVideoError('Kein Video Stream selektiert!')
         ;
 
