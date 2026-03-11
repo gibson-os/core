@@ -7,7 +7,7 @@ class GraphQlQueryMapper
 {
     public function mapToString(array $query): string
     {
-        $queryString = '{' . PHP_EOL . "\t";
+        $queryString = '{' . PHP_EOL;
 
         foreach ($query as $key => $value) {
             $queryString .= is_string($key) ? $key : $value;

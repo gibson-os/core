@@ -6,6 +6,7 @@ namespace GibsonOS\Core\Dto\Fcm;
 use GibsonOS\Core\Enum\Middleware\Message\Priority;
 use GibsonOS\Core\Enum\Middleware\Message\Type;
 use GibsonOS\Core\Enum\Middleware\Message\Vibrate;
+use GibsonOS\Core\Utility\JsonUtility;
 use JsonSerializable;
 use Override;
 
@@ -23,6 +24,7 @@ class Message implements JsonSerializable
         private readonly array $data = [],
         private readonly Priority $priority = Priority::NORMAL,
         private readonly ?Vibrate $vibrate = null,
+        private readonly ?string $foreignId = null,
     ) {
     }
 
@@ -30,6 +32,7 @@ class Message implements JsonSerializable
     public function jsonSerialize(): array
     {
         return [
+            'foreignId' => $this->foreignId,
             'action' => $this->action,
             'task' => $this->task,
             'module' => $this->module,
@@ -38,7 +41,7 @@ class Message implements JsonSerializable
             'type' => $this->type->value,
             'title' => $this->title,
             'body' => $this->body,
-            'data' => $this->data,
+            'data' => JsonUtility::encode($this->data),
             'priority' => $this->priority->value,
             'vibrate' => $this->vibrate?->value ?? null,
         ];

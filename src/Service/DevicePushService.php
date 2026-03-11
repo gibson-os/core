@@ -35,6 +35,7 @@ class DevicePushService
                 action: $action,
                 data: $payload,
                 priority: Priority::HIGH,
+                foreignId: $foreignId,
             ));
         }
     }
