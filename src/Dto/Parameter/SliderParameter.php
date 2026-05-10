@@ -7,14 +7,12 @@ use Override;
 
 class SliderParameter extends AbstractParameter
 {
-    private int $minValue = 0;
-
-    private int $maxValue = 100;
-
-    private int $increment = 1;
-
-    public function __construct(string $title)
-    {
+    public function __construct(
+        string $title,
+        private readonly int $minValue,
+        private readonly int $maxValue,
+        private readonly int $increment,
+    ) {
         parent::__construct($title, 'gosCoreComponentFormFieldSliderField');
     }
 
@@ -35,26 +33,5 @@ class SliderParameter extends AbstractParameter
             self::OPERATOR_EQUAL,
             self::OPERATOR_NOT_EQUAL,
         ];
-    }
-
-    public function setMinValue(int $minValue): SliderParameter
-    {
-        $this->minValue = $minValue;
-
-        return $this;
-    }
-
-    public function setMaxValue(int $maxValue): SliderParameter
-    {
-        $this->maxValue = $maxValue;
-
-        return $this;
-    }
-
-    public function setIncrement(int $increment): SliderParameter
-    {
-        $this->increment = $increment;
-
-        return $this;
     }
 }
