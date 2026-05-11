@@ -165,6 +165,10 @@ Ext.define('GibsonOS.module.core.component.form.Panel', {
             item.inputType = parameter.config.inputType;
         }
 
+        if (parameter.config.multiple) {
+            item.multiSelect = parameter.config.multiple;
+        }
+
         if (parameter.config.options) {
             item.store = {
                 fields: ['id', 'name'],
