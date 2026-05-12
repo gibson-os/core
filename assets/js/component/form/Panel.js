@@ -169,6 +169,18 @@ Ext.define('GibsonOS.module.core.component.form.Panel', {
             item.multiSelect = parameter.config.multiple;
         }
 
+        if (parameter.config.minValue) {
+            item.minValue = parameter.config.minValue;
+        }
+
+        if (parameter.config.maxValue) {
+            item.maxValue = parameter.config.maxValue;
+        }
+
+        if (parameter.config.increment) {
+            item.increment = parameter.config.increment;
+        }
+
         if (parameter.config.options) {
             item.store = {
                 fields: ['id', 'name'],
