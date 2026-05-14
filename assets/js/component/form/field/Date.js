@@ -3,5 +3,12 @@ Ext.define('GibsonOS.module.core.component.form.field.Date', {
     alias: ['widget.gosCoreComponentFormFieldDate'],
     anchor: '100%',
     format: 'Y-m-d',
-    fieldLabel: 'Datum'
+    fieldLabel: 'Datum',
+    initComponent() {
+        const me = this;
+
+        me.callParent();
+
+        GibsonOS.decorator.FormField.addListeners(me);
+    }
 });

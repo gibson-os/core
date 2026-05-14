@@ -4,4 +4,11 @@ Ext.define('GibsonOS.module.core.component.form.field.TextArea', {
     fieldLabel: 'Text Area',
     anchor: '100%',
     border: false,
+    initComponent() {
+        const me = this;
+
+        me.callParent();
+
+        GibsonOS.decorator.FormField.addListeners(me);
+    }
 });

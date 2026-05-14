@@ -3,22 +3,23 @@ declare(strict_types=1);
 
 namespace GibsonOS\Core\Dto\Parameter;
 
+use GibsonOS\Core\Dto\Form\SubmitOnChange;
 use JsonSerializable;
 use Override;
 
 abstract class AbstractParameter implements JsonSerializable
 {
-    protected const OPERATOR_EQUAL = '===';
+    protected const string OPERATOR_EQUAL = '===';
 
-    protected const OPERATOR_NOT_EQUAL = '!==';
+    protected const string OPERATOR_NOT_EQUAL = '!==';
 
-    protected const OPERATOR_BIGGER = '>';
+    protected const string OPERATOR_BIGGER = '>';
 
-    protected const OPERATOR_BIGGER_EQUAL = '>=';
+    protected const string OPERATOR_BIGGER_EQUAL = '>=';
 
-    protected const OPERATOR_SMALLER = '<';
+    protected const string OPERATOR_SMALLER = '<';
 
-    protected const OPERATOR_SMALLER_EQUAL = '<=';
+    protected const string OPERATOR_SMALLER_EQUAL = '<=';
 
     private ?string $image = null;
 
@@ -29,6 +30,8 @@ abstract class AbstractParameter implements JsonSerializable
     private ?string $operator = null;
 
     private mixed $value = null;
+
+    private ?SubmitOnChange $submitOnChange = null;
 
     abstract protected function getTypeConfig(): array;
 
@@ -110,6 +113,18 @@ abstract class AbstractParameter implements JsonSerializable
         return $this;
     }
 
+    public function getSubmitOnChange(): ?SubmitOnChange
+    {
+        return $this->submitOnChange;
+    }
+
+    public function setSubmitOnChange(?SubmitOnChange $submitOnChange): AbstractParameter
+    {
+        $this->submitOnChange = $submitOnChange;
+
+        return $this;
+    }
+
     #[Override]
     public function jsonSerialize(): array
     {
@@ -122,6 +137,7 @@ abstract class AbstractParameter implements JsonSerializable
             'value' => $this->getValue(),
             'subText' => $this->getSubText(),
             'image' => $this->getImage(),
+            'submitOnChange' => $this->getSubmitOnChange(),
         ];
     }
 }

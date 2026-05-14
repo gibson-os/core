@@ -11,6 +11,8 @@ Ext.define('GibsonOS.module.core.component.form.field.NumberField', {
 
         me.callParent();
 
+        GibsonOS.decorator.FormField.addListeners(me);
+
         me.on('afterrender', () => {
             if (!config.listeners) {
                 return;

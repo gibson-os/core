@@ -4,4 +4,11 @@ Ext.define('GibsonOS.module.core.component.form.field.FileField', {
     fieldLabel: 'File Field',
     anchor: '100%',
     border: false,
+    initComponent() {
+        const me = this;
+
+        me.callParent();
+
+        GibsonOS.decorator.FormField.addListeners(me);
+    }
 });

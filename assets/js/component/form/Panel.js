@@ -121,7 +121,6 @@ Ext.define('GibsonOS.module.core.component.form.Panel', {
 
                 form.submit({
                     xtype: 'gosFormActionAction',
-                    itemId: name,
                     requiredPermission: {
                         module: renderedButton.module,
                         task: renderedButton.task,
@@ -158,7 +157,8 @@ Ext.define('GibsonOS.module.core.component.form.Panel', {
             value: parameter.value ?? null,
             checked: parameter.value === true,
             parameterObject: parameter,
-            fieldLabel: parameter.title
+            fieldLabel: parameter.title,
+            submitOnChange: parameter.submitOnChange ?? null,
         };
 
         if (parameter.config.inputType) {

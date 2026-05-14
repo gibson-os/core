@@ -4,5 +4,12 @@ Ext.define('GibsonOS.module.core.component.form.field.Time', {
     anchor: '100%',
     fieldLabel: 'Zeit',
     format: 'H:i:s',
-    increment: 15
+    increment: 15,
+    initComponent() {
+        const me = this;
+
+        me.callParent();
+
+        GibsonOS.decorator.FormField.addListeners(me);
+    }
 });

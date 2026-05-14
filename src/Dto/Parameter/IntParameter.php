@@ -28,8 +28,8 @@ class IntParameter extends AbstractParameter
     protected function getTypeConfig(): array
     {
         return [
-            'min' => $this->min,
-            'max' => $this->max,
+            'minValue' => $this->min,
+            'maxValue' => $this->max,
         ];
     }
 
