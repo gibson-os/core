@@ -7,15 +7,36 @@ use Override;
 
 class BoolParameter extends AbstractParameter
 {
+    private string $inputValue = 'true';
+
+    private string $uncheckedValue = 'false';
+
     public function __construct(string $title)
     {
         parent::__construct($title, 'gosCoreComponentFormFieldCheckbox');
     }
 
+    public function setInputValue(string $inputValue): BoolParameter
+    {
+        $this->inputValue = $inputValue;
+
+        return $this;
+    }
+
+    public function setUncheckedValue(string $uncheckedValue): BoolParameter
+    {
+        $this->uncheckedValue = $uncheckedValue;
+
+        return $this;
+    }
+
     #[Override]
     protected function getTypeConfig(): array
     {
-        return [];
+        return [
+            'inputValue' => $this->inputValue,
+            'uncheckedValue' => $this->uncheckedValue,
+        ];
     }
 
     #[Override]

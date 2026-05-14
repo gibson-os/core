@@ -158,28 +158,16 @@ Ext.define('GibsonOS.module.core.component.form.Panel', {
             checked: parameter.value === true,
             parameterObject: parameter,
             fieldLabel: parameter.title,
-            submitOnChange: parameter.submitOnChange ?? null,
+            submitOnChange: parameter.submitOnChange ?? undefined,
         };
 
-        if (parameter.config.inputType) {
-            item.inputType = parameter.config.inputType;
-        }
+        Ext.iterate(parameter.config, (key, value) => {
+            if (key === 'options') {
+                return true;
+            }
 
-        if (parameter.config.multiple) {
-            item.multiSelect = parameter.config.multiple;
-        }
-
-        if (parameter.config.minValue) {
-            item.minValue = parameter.config.minValue;
-        }
-
-        if (parameter.config.maxValue) {
-            item.maxValue = parameter.config.maxValue;
-        }
-
-        if (parameter.config.increment) {
-            item.increment = parameter.config.increment;
-        }
+            item[key] = value;
+        })
 
         if (parameter.config.options) {
             item.store = {
