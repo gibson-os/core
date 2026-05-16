@@ -7,6 +7,8 @@ use Override;
 
 class SliderParameter extends AbstractParameter
 {
+    private bool $controlByVolumeControl = false;
+
     public function __construct(
         string $title,
         private readonly int $minValue,
@@ -23,6 +25,7 @@ class SliderParameter extends AbstractParameter
             'minValue' => $this->minValue,
             'maxValue' => $this->maxValue,
             'increment' => $this->increment,
+            'controlByVolumeControl' => $this->controlByVolumeControl,
         ];
     }
 
@@ -33,5 +36,12 @@ class SliderParameter extends AbstractParameter
             self::OPERATOR_EQUAL,
             self::OPERATOR_NOT_EQUAL,
         ];
+    }
+
+    public function setControlByVolumeControl(bool $controlByVolumeControl): SliderParameter
+    {
+        $this->controlByVolumeControl = $controlByVolumeControl;
+
+        return $this;
     }
 }
