@@ -184,12 +184,27 @@ Ext.define('GibsonOS.module.core.component.form.Panel', {
         }
 
         if (parameter.image) {
-            me.add({
+            const imageView = me.add({
                 xtype: 'gosCoreComponentFormFieldDisplay',
                 value: '<img src="' + parameter.image + '" alt="image" />',
                 fieldLabel: '&nbsp;',
                 labelSeparator: ''
             });
+
+            const img = imageView?.getEl()?.down('img');
+
+            if (!img) {
+                return;
+            }
+
+            if (img.dom.complete) {
+                me.updateLayout();
+                return;
+            }
+
+            img.on('load', () => me.updateLayout(), null, { single: true });
+            img.on('error', () => me.updateLayout(), null, { single: true });
+
         }
 
         if (me.withOperator) {
